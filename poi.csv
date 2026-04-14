@@ -1,0 +1,819 @@
+,HOTEL_NAME,CITY,HOTEL_LAT,HOTEL_LON,RAYON_KM,OSM_TYPE,OSM_ID,NAME,SHOP_TYPE,BRAND,ADDRESS_STREET,ADDRESS_POSTCODE,ADDRESS_CITY,LAT,LON
+0,Ibis budget Nice,Nice,43.6675713,7.2143076,1,node,1014323371,Carrefour City,convenience,Carrefour City,,,,43.6699649,7.2211484
+1,Ibis budget Nice,Nice,43.6675713,7.2143076,1,node,9327299365,Sanifix,supermarket,,Rue Auguste Pégurier,06200,Nice,43.6723197,7.2215342
+2,Ibis budget Nice,Nice,43.6675713,7.2143076,1,node,12171865908,Arenas,tobacco,,,,,43.6677216,7.2136619
+3,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,25213936,Dyneff,convenience,Dyneff,Boulevard Léon Morane,06200,,43.6636803,7.2016044
+4,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,303595830,Intermarché,supermarket,Intermarché,Boulevard René Cassin,,,43.675186,7.2269224
+5,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,1014323371,Carrefour City,convenience,Carrefour City,,,,43.6699649,7.2211484
+6,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,1445374662,Carrefour City,convenience,Carrefour City,,,,43.6872516,7.2372598
+7,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,1633608918,Relais Sainte-Marguerite,convenience,Total Access,Boulevard du Mercantour,,Nice,43.6875595,7.1973665
+8,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,2120553623,Épicerie Napoléon III,convenience,,Boulevard Napoléon III,,Nice,43.6811443,7.2213816
+9,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,2128870332,Le Chantilly,tobacco,,Avenue Sainte-Marguerite,,Nice,43.6780949,7.2193698
+10,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,2138749499,Carrefour Market,supermarket,Carrefour Market,,,,43.6785983,7.2288429
+11,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,2169041274,Total Grand Soleil,convenience,Total,Boulevard Napoléon III,,Nice,43.6859466,7.2260196
+12,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,2249047650,Tabac Californie,tobacco,,Avenue de la Californie,,Nice,43.681098,7.2312091
+13,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,2249047979,Spar,convenience,Spar,,,,43.6813802,7.2308993
+14,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,2281078573,Libre Service des 3 Vallées,convenience,,Chemin de la Madonette de Terron,,,43.6899813,7.2270866
+15,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,2290772713,Vival,convenience,,,,,43.6860186,7.2358013
+16,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,2455200422,Carrefour City,convenience,Carrefour City,Boulevard Napoléon III,,Nice,43.6863153,7.2257586
+17,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,5325463321,Epicerie Proxi Caucade Sainte-Marguerite,convenience,,Avenue Sainte-Marguerite,06200,Nice,43.6787075,7.2104756
+18,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,5612149321,Proxi,convenience,Proxi,Corniche Fleurie,06200,Nice,43.6816469,7.2155109
+19,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,6750694749,Carrefour Contact,supermarket,Carrefour Contact,Avenue Jean Aicard,06700,Saint-Laurent-du-Var,43.6830244,7.1875052
+20,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,7009163736,Monoprix,supermarket,Monoprix,Avenue Eugène Donadeï,06700,Saint-Laurent-du-Var,43.658729,7.198064
+21,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,8561274466,Le Casino de l'Empereur,supermarket,,,,,43.666511,7.187032
+22,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,9236758012,Tlp,tobacco,,Avenue de Fabron,,Nice,43.6908961,7.2136073
+23,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,9236758014,Vival,convenience,Vival,Avenue de Fabron,,Nice,43.6908229,7.21348
+24,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,9327299365,Sanifix,supermarket,,Rue Auguste Pégurier,06200,Nice,43.6723197,7.2215342
+25,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,9346449361,First Robinetterie Saint Laurent du Var,supermarket,,Allée des Imprimeurs,06700,Saint-Laurent-du-Var,43.6836972,7.1865217
+26,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,10091983349,Casino Shop,convenience,Casino Shop,Avenue Simone Veil,,,43.6830284,7.2034344
+27,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,10599913492,Carrefour Market,supermarket,Carrefour Market,Avenue Martin Luther King,,Nice,43.6751115,7.2066517
+28,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,10740470757,Épicerie Jeannette,convenience,,Avenue de la Méditerranée,,,43.6766959,7.203687
+29,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,11766013019,JB Tabacco,tobacco,,Place des Amaryllis,,,43.6751974,7.2051567
+30,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,12171865908,Arenas,tobacco,,,,,43.6677216,7.2136619
+31,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,12441372558,,tobacco,,Avenue Eugène Donadeï,06700,Saint-Laurent-du-Var,43.6594053,7.1971699
+32,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,13618505392,Bonjour,convenience,Bonjour,,,,43.6731149,7.2258578
+33,Ibis budget Nice,Nice,43.6675713,7.2143076,3,node,13703291531,Relay,convenience,,,,,43.6589441,7.2057411
+34,Ibis budget Nice,Nice,43.6675713,7.2143076,3,way,63432232,Intermarché,supermarket,Intermarché,,,,43.6677929,7.1932951
+35,Ibis budget Nice,Nice,43.6675713,7.2143076,3,way,63434492,Intermarché Super,supermarket,Intermarché,Boulevard Marcel Pagnol,,,43.6673109,7.1839644
+36,Ibis budget Nice,Nice,43.6675713,7.2143076,3,way,63437454,U Express,convenience,U Express,,,,43.6737905,7.1895228
+37,Ibis budget Nice,Nice,43.6675713,7.2143076,3,way,139112453,Vival Abbaye Roseland,convenience,Vival,Boulevard Napoléon III,06200,Nice,43.6888275,7.2301825
+38,Ibis budget Nice,Nice,43.6675713,7.2143076,3,way,140242318,Atipic' Marché,convenience,,Avenue de Fabron,,Nice,43.689398,7.219559
+39,Ibis budget Nice,Nice,43.6675713,7.2143076,3,way,143789625,Lidl,supermarket,Lidl,Route de Grenoble,,Nice,43.6787795,7.2018385
+0,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,309974648,Le Diplomate,tobacco,,,,,48.88924,2.3259864
+1,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,463700064,Franprix,convenience,Franprix,Rue des Dames,75017,Paris,48.8834355,2.3203247
+2,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,463703260,Franprix,convenience,Franprix,,,,48.8862362,2.3189274
+3,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,463705952,Carrefour Express,convenience,Carrefour Express,,,,48.8850436,2.3209236
+4,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,596076650,G20,supermarket,G20,,,,48.8893922,2.3195945
+5,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,597271657,Super U,supermarket,Super U,,,,48.8893257,2.3220647
+6,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,599796542,Carrefour Market,convenience,Carrefour Market,,,,48.8940635,2.3281241
+7,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,599956161,monop',supermarket,monop',,,,48.8935528,2.3274406
+8,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,629775176,Gastronomie Russe,convenience,,Boulevard des Batignolles,75008,Paris,48.8814741,2.3185412
+9,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,672842501,Mini Market,convenience,,,75009,Paris,48.8793624,2.3337517
+10,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,672973035,Franprix,convenience,Franprix,Rue Jean-Baptiste Pigalle,75009,Paris,48.8782,2.33235
+11,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,1251069184,Carrefour Market,convenience,Carrefour Market,,,,48.8818286,2.3399461
+12,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,1272037735,Votre Marché,convenience,Votre Marché,,,,48.8829113,2.3174747
+13,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,1457027508,Monoprix,supermarket,Monoprix,,,,48.8933957,2.3335323
+14,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,1789405050,Bio C' Bon,supermarket,Bio C' Bon,Place Pigalle,75009,Paris,48.8817666,2.3371231
+15,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,1789405057,Monop',convenience,Monop',,,,48.882085,2.337801
+16,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,1821668283,Jardin de Trinité,convenience,,,,,48.8770108,2.3324014
+17,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,1823551389,Carrefour Express,convenience,Carrefour Express,,,,48.8818811,2.3280757
+18,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,1877456892,Monoprix,supermarket,Monoprix,,,,48.8868122,2.3256852
+19,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,1877539384,Monoprix,supermarket,Monoprix,Rue Pierre Fontaine,75009,Paris,48.883444,2.3329119
+20,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,1877597664,Auchan Supermarché,supermarket,Auchan Supermarché,,75008,,48.8830525,2.326204
+21,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,1877600066,Supérette du Sacré-Cœur,convenience,,,,,48.885169,2.3306135
+22,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,1886394598,Franprix,convenience,Franprix,Rue la Condamine,75017,Paris,48.8872701,2.3233457
+23,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,1896104345,U Express,convenience,U Express,,,,48.8939964,2.332368
+24,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,1896120018,Monoprix,supermarket,Monoprix,Rue Ordener,75018,Paris,48.8938623,2.3337104
+25,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,1896130094,Franprix,convenience,Franprix,,,,48.8906695,2.3342086
+26,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,1896328979,Rapid Market,convenience,,,,,48.888102,2.3326713
+27,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,2295207233,Carrefour Market,convenience,Carrefour Market,,,,48.890028,2.3261873
+28,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,2310938053,AA. Brothers Bazar,convenience,,Rue Championnet,75018,Paris,48.8930738,2.3282096
+29,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,2347121437,G20,supermarket,G20,,,,48.8892317,2.335693
+30,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,2582123805,Carrefour City,convenience,Carrefour City,,75017,,48.8853514,2.3263695
+31,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,2586350424,Carrefour Market,convenience,Carrefour Market,,,,48.8913458,2.3370148
+32,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,2973034756,Causses,supermarket,,Rue Notre-Dame-de-Lorette,75009,,48.8801006,2.3353373
+33,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,3325311496,Carrefour,convenience,Carrefour,,,,48.8816314,2.3315269
+34,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,3345653495,Naturalia,supermarket,Naturalia,,,,48.8827834,2.3249905
+35,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,3345653894,Franprix,convenience,Franprix,,,,48.8827502,2.3247491
+36,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,3409087761,Comme en Pologne,convenience,,Rue Hégésippe Moreau,75018,Paris,48.8870919,2.3271449
+37,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,3414484826,Casino Shop,convenience,Casino Shop,,,,48.8850241,2.3269069
+38,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,3414484827,Mini super market,convenience,,,,,48.8848081,2.3270062
+39,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,3423613345,Thillai ans Co 20,convenience,,,,,48.8860674,2.3242478
+40,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,3438437291,Superette des Dames,convenience,,,,,48.8841777,2.3234679
+41,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,3545028502,G20,supermarket,G20,,,,48.8801144,2.3196281
+42,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,3561670093,CocciMarket,convenience,CocciMarket,,,,48.8851313,2.3342181
+43,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,3623709097,Super Market de la Place,convenience,,,,,48.8832447,2.3416521
+44,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,3708580901,Carrefour Express,convenience,Carrefour Express,,,,48.8835784,2.3421109
+45,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,3711733945,Diagonal,supermarket,Diagonal,,,,48.8808015,2.3285905
+46,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,3783140525,Franprix,convenience,Franprix,,,,48.8922996,2.3225275
+47,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,3812680959,Alimentation Générale,convenience,,,,,48.8880548,2.3213188
+48,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,3823126473,VSS mini market,supermarket,,,,,48.8934887,2.3249163
+49,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,3835958366,Franprix,convenience,Franprix,,,,48.8886897,2.3193886
+50,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,3873384059,Carrefour City,convenience,Carrefour City,,,,48.8909447,2.3319976
+51,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,4069497510,Alimentation Génerale,supermarket,,Rue Gabrielle,75018,Paris,48.8859862,2.3396945
+52,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,4078042211,Civette des Arts,tobacco,,,,,48.890709,2.3345392
+53,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,4078168502,PrimaPrix,convenience,,,,,48.8928275,2.3260791
+54,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,4086332326,Carrefour City,convenience,Carrefour City,Boulevard des Batignolles,75008,,48.8821257,2.3216107
+55,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,4196650490,Monoprix,supermarket,Monoprix,,,,48.8806221,2.324452
+56,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,4220112404,La Havane,tobacco,,,,,48.8833997,2.3279488
+57,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,4318350791,Proxi,convenience,Proxi,,,,48.8909334,2.3252476
+58,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,4444437998,Au Marché de la Butte,convenience,,,,,48.8856465,2.3384154
+59,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,4627795494,E.Leclerc Relais,convenience,E.Leclerc Relais,Avenue de Clichy,75018,Paris,48.8867986,2.326089
+60,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,4886248007,Franprix,convenience,Franprix,,,,48.8898436,2.3413051
+61,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,4905282561,Casino Shop,convenience,Casino Shop,,,,48.8880307,2.3259665
+62,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,4952212921,La divette de montmartre,tobacco,,,,,48.8915362,2.3370943
+63,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,5051303755,day by day,convenience,day by day,,,,48.8895694,2.3202326
+64,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,5066091623,Supérette des 3 Frères,convenience,,,,,48.8849555,2.3407646
+65,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,5118262625,Carrefour City,convenience,Carrefour City,,,,48.8886456,2.3238562
+66,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,5155866369,NOUS anti-gaspi,convenience,NOUS anti-gaspi,,,,48.888845,2.3228328
+67,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,5155886608,Épicerie Legendre,convenience,,,,,48.8853946,2.3165044
+68,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,5218708414,Naturalia,supermarket,Naturalia,,,,48.8864989,2.3336862
+69,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,5407961264,Carrefour Market,convenience,Carrefour Market,,,,48.8923833,2.3239407
+70,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,5628135545,Groupe MarianoV,convenience,,,,,48.8891905,2.3198517
+71,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,5774833349,Monop',convenience,Monop',,,,48.8793876,2.3214277
+72,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,5879449514,L'Atelier Germé,convenience,,,,,48.8910742,2.3396946
+73,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,5879450175,G20,supermarket,G20,Rue Francœur,75018,Paris,48.8904017,2.3410749
+74,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,5929832607,Super Market,convenience,,Boulevard de Clichy,75009,Paris,48.8826622,2.3356254
+75,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,5932468219,Apou Market,convenience,,Boulevard de Clichy,75018,Paris,48.8837236,2.3336357
+76,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,5941386170,Superette Fraîcheur,convenience,,Boulevard de Clichy,75018,Paris,48.8841098,2.3303939
+77,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,5941386173,CocciMarket,convenience,CocciMarket,,,,48.8823796,2.3365628
+78,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,5941386179,Super Market,convenience,,Boulevard de Clichy,75018,Paris,48.8831509,2.3355298
+79,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,5941386586,Couche Tard Market,convenience,,Boulevard de Clichy,75018,Paris,48.8833775,2.33479
+80,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,5941386587,Tabac Totem,tobacco,,Boulevard de Clichy,75018,Paris,48.8833954,2.3347297
+81,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,6070722881,Biocoop,supermarket,Biocoop,Rue Caulaincourt,75018,,48.8869738,2.3326649
+82,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,6744519465,G20,supermarket,G20,Rue Blanche,,,48.8775076,2.3321959
+83,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,6973095946,Panier Sympa,supermarket,,,,,48.8820299,2.3383431
+84,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,7051944539,Carrefour City,convenience,Carrefour City,,,,48.8813741,2.3365005
+85,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,7116649850,La Vendimia d'Espagne,convenience,,Rue Hégésippe Moreau,75018,Paris,48.886908,2.3276738
+86,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,7434200731,Franprix,convenience,Franprix,,,,48.882442,2.3293799
+87,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,7442041858,Franprix,convenience,Franprix,,,,48.8795305,2.3291552
+88,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,7656096460,G20,supermarket,G20,Rue Lepic,,,48.8850068,2.3337579
+89,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,7778255920,AB BIO,supermarket,,,,,48.8898617,2.3205079
+90,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,7959241186,Mini Market,convenience,,,,,48.8774348,2.326789
+91,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,7995899089,Paulin,convenience,,,,,48.8860642,2.3192144
+92,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,7995899103,Delipop,convenience,,,,,48.8863062,2.3206211
+93,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,8334294522,Legendre 107,convenience,,,,,48.8887949,2.3220147
+94,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,8440760024,G20,supermarket,G20,,,,48.8836874,2.3288537
+95,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,8493896719,Mini Supermarket,convenience,,,,,48.8821685,2.3415794
+96,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,8494638117,VT One,convenience,,,,,48.8879217,2.3243601
+97,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,8494638136,P.B General Shop,convenience,,,,,48.8846874,2.3198645
+98,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,8494638137,Molly's,convenience,,,,,48.887872,2.3242838
+99,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,8817178080,Charlie's Market,convenience,,Avenue de Saint-Ouen,75018,Paris,48.8887136,2.3261836
+100,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,8817369882,Biocoop,supermarket,Biocoop,,,,48.8873595,2.3254599
+101,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,8961420270,Happy Market (Chez Milk),convenience,,,,,48.8843014,2.3413733
+102,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,8961420292,Super Market,convenience,,Rue Yvonne Le Tac,75018,Paris,48.8841524,2.3405695
+103,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,8961420299,Paris Porto,convenience,,Rue des Martyrs,75018,Paris,48.8845661,2.3398475
+104,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,9004600380,Le Terminus,tobacco,,Place Jacques Froment,75018,Paris,48.8908485,2.3314082
+105,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,9295462705,Mini store,convenience,,,,,48.8906386,2.3198328
+106,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,9327834988,La Pomme d'Argent,convenience,,,,,48.894027,2.3275694
+107,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,9421111293,Aksha,convenience,,,,,48.8916439,2.3205301
+108,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,9481321107,Métro Délices,convenience,,,,,48.8848292,2.3255557
+109,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,9481401436,Ça me dit,convenience,,,,,48.8887124,2.3237388
+110,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,9481401441,Maya,convenience,,,,,48.8890198,2.3231946
+111,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,9481401486,La Ville aux Champs,convenience,,,,,48.887784,2.3247887
+112,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,9558471517,Sidi Brahim Alimentation,convenience,,,,,48.8837664,2.3388606
+113,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,9558740917,Franprix,convenience,Franprix,Rue Condorcet,75009,Paris,48.8804379,2.3408823
+114,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,9828292233,NOUS anti-gaspi,convenience,NOUS anti-gaspi,Rue d'Amsterdam,75009,Paris,48.8818439,2.3272269
+115,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,9864287769,Alimentation Générale,convenience,,,,,48.8792223,2.3370568
+116,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,10120462633,Auchan Click&Collect,convenience,,,,,48.8788399,2.3297971
+117,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,10160780215,Lemon Story,convenience,,Rue Garreau,75018,Paris,48.8857158,2.3376756
+118,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,10677710887,,tobacco,,,,,48.8828971,2.3329953
+119,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,10677717229,G20,supermarket,G20,,,,48.8814497,2.3344461
+120,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,10940347384,Mini Market,convenience,,,,,48.8828333,2.3333108
+121,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,11144335248,,convenience,,,,,48.8812539,2.3269863
+122,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,11144335251,Carrefour Express,convenience,Carrefour Express,,,,48.8799375,2.3271359
+123,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,11159231607,,convenience,,,,,48.8832287,2.3323616
+124,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,11314909588,Gram Bangla,convenience,,,,,48.8916155,2.3256879
+125,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,11369357430,Naturalia,supermarket,Naturalia,Boulevard de Clichy,75009,Paris,48.8830115,2.3344003
+126,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,11370120138,Tabac Lepic,tobacco,,Rue Lepic,75018,Paris,48.8844788,2.3335426
+127,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,11370120155,ExpresShop,convenience,,Avenue Rachel,75018,Paris,48.8848397,2.3305724
+128,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,11535139659,New Exotic City,convenience,,,,,48.8938545,2.3306836
+129,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,11557085547,Pti Bazar,convenience,,,,,48.8912618,2.3253478
+130,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,11579674055,,tobacco,,,,,48.8807138,2.3347526
+131,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,11579716102,Paris BD Blanche,convenience,,,,,48.8824815,2.3333381
+132,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,11755103850,,convenience,,,,,48.8908125,2.3203724
+133,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,12022914042,Anna Exotique,convenience,,,,,48.8925928,2.3292554
+134,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,12071628468,CocciMarket,convenience,CocciMarket,,,,48.8794779,2.3265629
+135,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,12118978993,Sana supermarket,convenience,,,,,48.8933712,2.326232
+136,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,12293854402,Proxi,convenience,Proxi,,,,48.8899219,2.3337831
+137,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,12294041723,Exo haran - alimentation générale exotique,convenience,,,,,48.8911736,2.3298276
+138,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,12294088127,Épicerie montmartre,convenience,,,,,48.8909927,2.3392543
+139,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,12294101058,Alimentation générale epi 18,convenience,,,,,48.8909548,2.3396019
+140,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,12312219177,Supermarckette,convenience,,,,,48.8901118,2.3380425
+141,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,12318859572,Franprix,convenience,Franprix,,,,48.8925972,2.330199
+142,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,12318863613,Rapid Market,convenience,,,,,48.8925328,2.3306191
+143,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,12366257860,,convenience,,,,,48.8871399,2.3327062
+144,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,12465444142,MT Brothers,convenience,,,,,48.8809704,2.3348083
+145,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,12521089621,Bio C' Bon,supermarket,Bio C' Bon,,,,48.8930832,2.3333633
+146,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,12641078884,Rapid'Market,convenience,,,,,48.8802682,2.3354353
+147,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,12802150763,,tobacco,,,,,48.8840617,2.3385564
+148,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,13197785640,SKVP superette,convenience,,,,,48.8920327,2.3221238
+149,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,node,13689127159,alimentation générale,convenience,,,,,48.8932078,2.3359335
+150,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,way,75750832,Carrefour City,convenience,Carrefour City,Avenue de Saint-Ouen,75017,Paris,48.8918336,2.3267425
+151,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,way,77780438,Franprix,convenience,Franprix,,,,48.8886356,2.3346957
+152,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,way,407708323,Monop',convenience,Monop',,,,48.8769777,2.3264755
+153,Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,1,way,929780121,Intermarché Express,convenience,Intermarché Express,Rue Lepic,75018,Paris,48.8861694,2.3344828
+0,Novotel Megève Mont-Blanc,Megève,45.8598495,6.6194782,2,node,2825025160,Le Petit Casino,convenience,Le Petit Casino,Rue de la Poste,74120,Megève,45.8557236,6.6159983
+1,Novotel Megève Mont-Blanc,Megève,45.8598495,6.6194782,2,node,7663476067,Carrefour Montagne,convenience,Carrefour Montagne,Rue Ambroise Martin,74120,Megève,45.856945,6.6158194
+2,Novotel Megève Mont-Blanc,Megève,45.8598495,6.6194782,2,node,13042855812,Franprix,convenience,Franprix,,,,45.8594776,6.6189143
+3,Novotel Megève Mont-Blanc,Megève,45.8598495,6.6194782,2,node,13069527149,Proxi,convenience,Proxi,,,,45.8533347,6.631535
+4,Novotel Megève Mont-Blanc,Megève,45.8598495,6.6194782,2,way,68158460,Carrefour,convenience,Carrefour,Route Nationale,74120,Megève,45.8633659,6.6255458
+5,Novotel Megève Mont-Blanc,Megève,45.8598495,6.6194782,2,way,157666398,Auchan Supermarché,supermarket,Auchan Supermarché,Route de Sallanches,74120,Megève,45.8708909,6.6309129
+6,Novotel Megève Mont-Blanc,Megève,45.8598495,6.6194782,3,node,2825025160,Le Petit Casino,convenience,Le Petit Casino,Rue de la Poste,74120,Megève,45.8557236,6.6159983
+7,Novotel Megève Mont-Blanc,Megève,45.8598495,6.6194782,3,node,7663476067,Carrefour Montagne,convenience,Carrefour Montagne,Rue Ambroise Martin,74120,Megève,45.856945,6.6158194
+8,Novotel Megève Mont-Blanc,Megève,45.8598495,6.6194782,3,node,13042855812,Franprix,convenience,Franprix,,,,45.8594776,6.6189143
+9,Novotel Megève Mont-Blanc,Megève,45.8598495,6.6194782,3,node,13069527149,Proxi,convenience,Proxi,,,,45.8533347,6.631535
+10,Novotel Megève Mont-Blanc,Megève,45.8598495,6.6194782,3,way,68158460,Carrefour,convenience,Carrefour,Route Nationale,74120,Megève,45.8633659,6.6255458
+11,Novotel Megève Mont-Blanc,Megève,45.8598495,6.6194782,3,way,157666398,Auchan Supermarché,supermarket,Auchan Supermarché,Route de Sallanches,74120,Megève,45.8708909,6.6309129
+0,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,259284911,Esso,convenience,Esso,,,,48.8391995,2.2925362
+1,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,260016094,Monoprix,supermarket,Monoprix,Rue Lecourbe,75015,Paris,48.8435771,2.3052604
+2,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,262861803,G20,supermarket,G20,,,,48.8359056,2.2906833
+3,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,283225860,G20,supermarket,G20,,,,48.8579464,2.3012012
+4,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,306912775,Carrefour City,convenience,Carrefour City,,,,48.83919,2.3005803
+5,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,310054121,Monoprix,supermarket,Monoprix,,,,48.8366804,2.2948576
+6,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,310054182,Carrefour City,convenience,Carrefour City,,,,48.836409,2.2951587
+7,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,312765467,Carrefour City,convenience,Carrefour City,,,,48.8457327,2.28736
+8,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,450721863,Intermarché,supermarket,Intermarché,,75015,,48.8363475,2.2815351
+9,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,476311623,Carrefour City,convenience,Carrefour City,,,,48.8378906,2.2979809
+10,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,532261595,Chez Miha,convenience,,,,,48.84429,2.2852335
+11,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,582744705,Le Bosquet,tobacco,,,,,48.8556093,2.305315
+12,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,582750092,Carrefour City,convenience,Carrefour City,Avenue de la Motte-Picquet,75007,Paris,48.8548362,2.3059829
+13,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,629382803,Biocoop,supermarket,Biocoop,,,,48.8370128,2.2967236
+14,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,629866756,Prestige,convenience,,,,,48.8448296,2.3096526
+15,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,653880473,mon-marché.fr,supermarket,,,,,48.8447404,2.3092568
+16,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,681244410,Carrefour City,supermarket,Auchan,,,,48.8523709,2.2902718
+17,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,871800464,Franprix,convenience,Franprix,,,,48.8409085,2.2974226
+18,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,913260871,Carrefour City,convenience,Carrefour City,,,,48.8430474,2.3026837
+19,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,948387564,U Express,supermarket,U Express,,,Paris,48.8660666,2.2739354
+20,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,955211223,Shell,convenience,Shell,,,,48.8635857,2.2722338
+21,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,975207461,Proxi,convenience,Proxi,Rue des Vignes,75016,Paris,48.8570648,2.2733175
+22,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,979335566,Marché Franprix,supermarket,Franprix,Avenue Perrichont,,,48.8496801,2.2729587
+23,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,979335628,Franprix,convenience,Franprix,Rue Pierre Louys,75016,,48.850371,2.2760281
+24,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,993833817,Le Fruitier d'Auteuil,grocery,,Rue Bastien Lepage,75016,Paris,48.8484734,2.26594
+25,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1001216228,Franprix,convenience,Franprix,Boulevard Murat,75016,Paris,48.8454735,2.2578961
+26,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1001216251,Le Viaduc d'Auteuil,tobacco,,Rue Molitor,75016,Paris,48.8454462,2.2590551
+27,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1001524198,Le Verger d'Auteuil,grocery,,Rue Erlanger,75016,Paris,48.8478392,2.2622879
+28,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1009007686,Franprix,convenience,Franprix,Avenue Mozart,75016,Paris,48.8559991,2.270699
+29,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1041617655,,supermarket,,,,,48.8379482,2.2960836
+30,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1059726434,Naturalia,supermarket,Naturalia,,,,48.8363144,2.298982
+31,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1080956782,Biocoop,supermarket,Biocoop,,,,48.851599,2.2912004
+32,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1163571474,Monoprix,supermarket,Monoprix,,,,48.8489245,2.2975729
+33,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1166505087,Tabac d'Auteuil,tobacco,,Rue d'Auteuil,75016,Paris,48.8478515,2.2607497
+34,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1181634120,Franprix,convenience,Franprix,Avenue de la Bourdonnais,,,48.8551604,2.3042644
+35,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1184686009,La Vie Claire,supermarket,La Vie Claire,,,,48.8449526,2.2857911
+36,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1188949132,Monop’,supermarket,Monoprix,Rue de Boulainvilliers,,,48.851792,2.277352
+37,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1215364292,Naturalia,convenience,Naturalia,,,,48.8372209,2.2840449
+38,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1244411706,Franprix,convenience,Franprix,,,,48.8445942,2.3097624
+39,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1249809146,Au Jardin de Bellart,convenience,,,,,48.8471317,2.3082683
+40,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1251064487,Alimentation Générale,convenience,,,,,48.8477736,2.3079445
+41,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1293278646,Franprix,convenience,Franprix,,,,48.8386983,2.2904723
+42,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1307645902,Alimentation Générale,convenience,,,,,48.8475223,2.3102369
+43,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1307926873,Monoprix,supermarket,Monoprix,,,,48.848189,2.2839192
+44,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1347770060,Franprix,convenience,Franprix,,75015,,48.8404828,2.284259
+45,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1352878658,Carrefour City,convenience,Carrefour City,,,,48.8453338,2.2971759
+46,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1373609036,Franprix,convenience,Franprix,,,,48.8444974,2.2875895
+47,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1442297626,K-Market,convenience,K-Market,Rue de la Pompe,,,48.8603968,2.2751179
+48,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1446934502,Auchan Supermarché,supermarket,Auchan Supermarché,,,,48.8622321,2.2761349
+49,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1448783412,Tabac de la Mairie,tobacco,,,,,48.8630088,2.276527
+50,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1509815470,Monoprix,supermarket,Monoprix,,,,48.8414253,2.2875706
+51,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1670553045,Naturalia,supermarket,Naturalia,,,,48.8550011,2.3062259
+52,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1701111407,Franprix,convenience,Franprix,,,,48.8328763,2.289012
+53,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1756731305,Aldi,supermarket,Aldi,Rue de Vaugirard,,,48.8391782,2.2998895
+54,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1787626751,Carrefour City,convenience,Carrefour City,Avenue de Versailles,,,48.8418462,2.2668066
+55,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1798668598,Franprix,convenience,Franprix,Rue Dombasle,75015,Paris,48.8361192,2.2976662
+56,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1798835188,Carrefour Express,convenience,Carrefour Express,,,,48.839074,2.2926563
+57,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1827357922,Franprix,convenience,Franprix,Avenue de Versailles,75016,Paris,48.8479105,2.2739321
+58,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1827365953,Carrefour City,convenience,Carrefour City,Rue de Rémusat,75016,Paris,48.8479114,2.2725082
+59,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1900791147,APM Alimentation Générale,convenience,,,,,48.8345691,2.2884841
+60,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1915692171,Latino Shop,convenience,,,,,48.8348486,2.2888176
+61,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1937157672,Total,convenience,Total,,,,48.8519985,2.2908966
+62,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1938608271,Lidl,supermarket,Lidl,,,,48.8414107,2.280804
+63,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1986819816,Au Marché du Coin,convenience,,Rue de Boulainvilliers,75016,Paris,48.853843,2.2757155
+64,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1987166804,Franprix,convenience,Franprix,,,Paris,48.8611261,2.2842369
+65,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,1987166997,La Parisienne,convenience,,,,,48.8651841,2.2885128
+66,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2107054818,A la Providence,convenience,,,,,48.8450762,2.2637545
+67,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2107699914,Franprix,convenience,Franprix,,,,48.8403549,2.2638697
+68,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2126357921,Carrefour City,convenience,Carrefour City,,,,48.8489155,2.2943202
+69,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2239394095,Proxi,convenience,Proxi,,,,48.8359876,2.3011401
+70,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2255919365,Vival,convenience,Vival,,,,48.8423677,2.2773886
+71,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2256156637,Stella exotique,convenience,,,,,48.835715,2.2805511
+72,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2256156638,Exo Paris 15,convenience,,,,,48.8357596,2.2804036
+73,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2265947145,Le Jardin d'Exelmans,convenience,,,,,48.8423451,2.2622638
+74,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2265964337,Casino Shop,convenience,Casino Shop,,,Paris,48.8433892,2.2601664
+75,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2267594417,Mini Boutique,convenience,,,,,48.8460342,2.2777904
+76,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2267687601,Carrefour City,convenience,Carrefour City,,,,48.8431778,2.2776482
+77,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2275450617,Franprix,convenience,Franprix,,,,48.8396006,2.2614514
+78,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2288476208,Franprix,convenience,Franprix,,75015,,48.8445018,2.296991
+79,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2290944630,Franprix,convenience,Franprix,,,,48.8485986,2.2903852
+80,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2449418758,Auchan Drive,convenience,Auchan Drive,,,,48.8456389,2.2845372
+81,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2458164240,Carrefour City,convenience,Carrefour City,,,,48.8463401,2.2843476
+82,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2496744657,,convenience,,,,,48.8424794,2.2916643
+83,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2527776463,Carrefour City,convenience,Carrefour City,,,,48.8438185,2.307128
+84,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2528337528,G20,supermarket,G20,,,,48.8468492,2.3063014
+85,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2530845114,Le Marché Franprix,supermarket,Franprix,,,,48.8531403,2.2904622
+86,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2556489542,E. Leclerc Relais,supermarket,E. Leclerc Drive,,,,48.8504014,2.2929658
+87,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2745637275,Aldi,supermarket,Aldi,Rue Cler,,,48.856729,2.3065898
+88,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2799009879,Abbissha Supermarché,supermarket,,,,,48.8350958,2.2896974
+89,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2855750768,8 à Huit,convenience,8 à Huit,,,,48.8659023,2.2860993
+90,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2855846760,Beryte Épicerie Orientale,convenience,,,,,48.8654361,2.2845221
+91,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2871518863,Naturalia,supermarket,Naturalia,,,,48.8649421,2.2829335
+92,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2871530387,Au jardin des Sablons,convenience,,,,,48.8648689,2.2828651
+93,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2902918484,Le Petit Casino,convenience,Le Petit Casino,,,,48.8530021,2.2977049
+94,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2902918485,Auchan Supermarché,supermarket,Auchan Supermarché,Rue Dupleix,75015,Paris,48.8519468,2.2983523
+95,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2917352881,Franprix,convenience,Franprix,,,,48.840698,2.3055166
+96,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2935106305,Les Délices d'Orient,convenience,,,,,48.8485598,2.3012514
+97,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2935106311,Waseng,convenience,,Boulevard Garibaldi,75015,Paris,48.847098,2.3036131
+98,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2952979773,Chez Max,convenience,,,,,48.8603066,2.2847886
+99,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2954926655,Le Soleil de Franklin,convenience,,,,,48.8596478,2.2855716
+100,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,2954945095,Le Franklin,tobacco,,,,,48.8590284,2.2849882
+101,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,3102143288,Carrefour City,convenience,Carrefour City,,,,48.8476677,2.299215
+102,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,3103708605,Carrefour Express,convenience,Carrefour Express,,,,48.8477424,2.2866248
+103,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,3103708606,Carrefour City,convenience,Carrefour City,,,,48.8423788,2.2816153
+104,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,3103708607,Carrefour City,convenience,Carrefour City,Avenue Félix Faure,75015,,48.8377993,2.2807426
+105,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,3199938723,Miranda Service,convenience,,,,,48.8430917,2.306692
+106,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,3247052673,Franprix,convenience,Franprix,Rue Saint-Charles,75015,,48.8426924,2.282291
+107,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,3273432591,Ker Primeurs,convenience,,,,,48.8467811,2.2933829
+108,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,3282727004,La Vie Claire,supermarket,La Vie Claire,,,,48.8474634,2.2978722
+109,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,3363289394,Naturalia,supermarket,Naturalia,,,,48.8442596,2.2943345
+110,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,3385567398,Carrefour Express,convenience,Carrefour Express,Rue Michel-Ange,75016,Paris,48.8419008,2.2593513
+111,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,3394998133,monop',supermarket,monop',,,,48.8412759,2.2656972
+112,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,3482599199,Monop',supermarket,Monop',,,Paris,48.8443836,2.2914736
+113,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,3482693200,G20,supermarket,G20,,,,48.8452039,2.2841485
+114,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,3539029886,Franprix,convenience,Franprix,,,,48.8442923,2.294246
+115,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,3726441725,Grenelle Market,convenience,,,,,48.8502585,2.2949078
+116,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,3726441726,Carrefour City,convenience,Carrefour City,,,,48.8497965,2.2964269
+117,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,3761282025,,tobacco,,,,,48.8440057,2.3077853
+118,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,3761763094,monop',supermarket,monop',,,,48.848074,2.3053881
+119,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,3860181667,Le Kennedy,tobacco,,Avenue de Versailles,75016,Paris,48.8508095,2.2772227
+120,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,3897134372,Hana Food,convenience,,,,,48.8484176,2.2951739
+121,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,3905019668,My Auchan,convenience,My Auchan,,,,48.8465839,2.2806525
+122,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,3966675072,Euro Mart,convenience,,Avenue Émile Zola,75015,,48.8465602,2.2796537
+123,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,4068237790,Naturalia,supermarket,Naturalia,,,,48.8407797,2.3058162
+124,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,4132454591,Carrefour City,convenience,Carrefour City,,,,48.8404254,2.2890272
+125,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,4135037291,Franprix,convenience,Franprix,,,,48.8445486,2.2800452
+126,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,4197171725,G20,supermarket,G20,,,,48.8391786,2.2846364
+127,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,4245128171,Monop',convenience,Monop',Avenue Kléber,,,48.864075,2.2883521
+128,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,4284048139,Biocoop,supermarket,Biocoop,,,,48.841458,2.2847095
+129,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,4291763789,Franprix,convenience,Franprix,,,,48.8576532,2.3060535
+130,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,4424838991,Franprix,convenience,Franprix,,,,48.8493789,2.2986871
+131,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,4515397654,Franprix,supermarket,Diagonal,Rue Jean de La Fontaine,75016,Paris,48.8508514,2.2713812
+132,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,4535369091,Eskan - épicerie Iranienne,convenience,,,,,48.8452886,2.2887382
+133,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,4535378093,Le Village,tobacco,,,,,48.8449114,2.2896427
+134,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,4569195146,Carrefour City,convenience,Carrefour City,Villa Croix Nivert,75015,Paris,48.8456239,2.3009981
+135,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,4813723481,U Express,convenience,U Express,,,,48.8467606,2.2924962
+136,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,4848933202,Bio C' Bon,convenience,Bio C' Bon,,,,48.8594656,2.3058904
+137,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,4849823521,Franprix,convenience,Franprix,,,,48.8650914,2.2871713
+138,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,4908763554,LVRV marché,convenience,,,,,48.839818,2.3057568
+139,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,4964630747,Le Bonheur,convenience,,,,,48.8319189,2.2800868
+140,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5068089225,Franprix,supermarket,Franprix,,,,48.8600871,2.2810296
+141,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5171074422,Monoprix,supermarket,Monoprix,Rue de Passy,75016,,48.8582216,2.2821508
+142,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5180477153,Carrefour City,convenience,Carrefour City,Avenue Théophile Gautier,75016,Paris,48.8506927,2.2737805
+143,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5256711097,Franprix,convenience,Franprix,Rue Mademoiselle,75015,Paris,48.8436671,2.2944024
+144,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5338799952,,convenience,,,,,48.8416558,2.3080494
+145,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5338799953,Franmar,convenience,,,,,48.8414068,2.3073502
+146,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5389945892,La Civette Saint-Charles,tobacco,,,,,48.8421528,2.2812503
+147,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5422620900,L'Air dans les Vapes,tobacco,,,,,48.843242,2.3051802
+148,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5422621478,L'ariel,tobacco,,,,,48.8403506,2.2956782
+149,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5422621507,Carrefour Market,supermarket,Carrefour Market,,,,48.8380726,2.2883315
+150,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5424412827,Les Halles des Belles Feuilles,convenience,,,,,48.8673873,2.2816216
+151,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5430785259,Épicerie de la Tour,convenience,,,,,48.8542701,2.3069316
+152,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5465475337,Mini Market,convenience,,,,,48.8466108,2.2994592
+153,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5478947935,O'seyon,convenience,,Rue de l'Abbé Groult,,,48.8421057,2.2942586
+154,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5478948321,Superette Mademoiselle,convenience,,,,,48.8437012,2.2961574
+155,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5508093726,Au Petit Marché Mozart,convenience,,Avenue Mozart,75016,Paris,48.8532048,2.2687449
+156,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5615236401,Beau Drugstore,tobacco,,,,,48.8472019,2.2852063
+157,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5763228076,Monoprix,supermarket,Monoprix,Rue des Belles Feuilles,75016,Paris,48.8669064,2.282077
+158,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5841639092,Rapid'Market,convenience,,,,,48.8393697,2.2824663
+159,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5841660358,FR,convenience,,,,,48.8370937,2.2793363
+160,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5843769590,Franprix,convenience,Franprix,,,,48.8549338,2.2947627
+161,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5864170786,Franprix,convenience,Franprix,,,,48.8652762,2.2745684
+162,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5868083586,U Express,convenience,,,,,48.8662598,2.2738793
+163,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5876604058,,tobacco,,,,,48.8569024,2.30364
+164,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5913204000,Civette Bosquet,tobacco,,,,,48.8585299,2.3033591
+165,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5989201993,Franprix,convenience,Franprix,,,,48.8599088,2.2968889
+166,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,5997813488,Verger de Versailles,convenience,,,,,48.8410874,2.2653587
+167,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,6070722870,Bio C' Bon,supermarket,Bio C' Bon,,,,48.8589331,2.2762119
+168,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,6070833836,Bio C' Bon,supermarket,Bio C' Bon,,,,48.8665733,2.2854699
+169,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,6073031193,Philippines Mini-markt,convenience,,,,,48.8576592,2.276605
+170,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,6134912318,,convenience,,,,,48.8568397,2.2847267
+171,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,6224808086,Franprix,convenience,Franprix,Rue du Docteur Blanche,75016,Paris,48.854165,2.2653443
+172,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,6224822786,Tabac Jasmin,tobacco,,Rue du Docteur Blanche,75016,Paris,48.853935,2.2652655
+173,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,6224856685,Carrefour City,convenience,Carrefour City,Rue Raffet,75016,Paris,48.8519716,2.2643132
+174,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,6244055674,Carrefour Market,convenience,Carrefour Market,,,,48.8657981,2.2765581
+175,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,6246354034,G20,supermarket,G20,,,,48.8517199,2.2937587
+176,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,6274108086,Château Russe,convenience,,Avenue Mozart,75016,Paris,48.8519864,2.2677289
+177,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,6274137785,Monoprix,supermarket,Monoprix,Rue de la Source,75016,Paris,48.8509157,2.2675092
+178,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,6375908099,Carrefour Express,convenience,Carrefour Express,Rue de Boulainvilliers,75016,Paris,48.8532263,2.2758657
+179,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,6388875002,Biocoop,supermarket,Biocoop,Rue Mirabeau,75016,,48.846619,2.2706442
+180,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,6413865585,Supermarché de Vasco,convenience,,,,,48.835354,2.2852218
+181,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,6413880285,Planète Bio-Nat,convenience,,,,,48.8365823,2.2837865
+182,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,6448502650,Supérette Passy,convenience,,Rue Lekain,75016,Paris,48.8568021,2.2786345
+183,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,6448502652,Au Bon Prix,convenience,,,,,48.859283,2.2744781
+184,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,6511208243,Bio C' Bon,supermarket,Bio C' Bon,Rue Fondary,75015,Paris,48.848934,2.2912784
+185,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,6532203037,Lourmel Exotique,convenience,,,,,48.8494775,2.2911391
+186,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,6537190105,Sitis Market,supermarket,,,,,48.8503128,2.2888604
+187,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,6560254387,Franprix,convenience,Franprix,Rue du Ranelagh,75016,Paris,48.855154,2.2714739
+188,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,6801907686,Carrefour City,convenience,Carrefour City,,,,48.8662274,2.2886227
+189,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,6846309086,Intermarché Express,convenience,Intermarché Express,Rue Saint-Charles,75015,Paris,48.8472908,2.2863859
+190,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,6924530186,Carrefour City,convenience,Carrefour City,,,Paris,48.8430288,2.2949968
+191,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,6939307165,Civette Radio France,tobacco,,Rue Raynouard,75016,Paris,48.8530097,2.276136
+192,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,6957449485,Supérette de la Poste,convenience,,,,,48.852002,2.2918369
+193,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,7398764369,Monoprix,supermarket,Monoprix,Rue d'Auteuil,75016,Paris,48.847792,2.2646491
+194,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,7541196897,G20,supermarket,G20,Rue Duban,,,48.8574511,2.2777121
+195,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,7557205201,G20,supermarket,G20,Rue Saint-Didier,75016,Paris,48.866821,2.2848525
+196,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,7566060396,Hecosfair,convenience,,,,,48.8568305,2.2652113
+197,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,7704379032,Carrefour City,convenience,Carrefour City,,,,48.856936,2.2777953
+198,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,8088343519,Jackpot,convenience,,,,,48.834268,2.290506
+199,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,8088362917,Le Chamois,tobacco,,,,,48.8367426,2.2957143
+200,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,8312054919,Naturalia,supermarket,Naturalia,Rue Lecourbe,75015,Paris,48.8426012,2.3030456
+201,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,8806916725,Naturalia,supermarket,Naturalia,Rue Saint-Charles,75015,,48.84263,2.2818638
+202,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,8827457518,Les Volutes (Tabac Jeux Drugstore),convenience,,,,,48.8408992,2.2880566
+203,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,8957705477,CocciMarket,convenience,CocciMarket,Rue du Docteur Finlay,,,48.852254,2.2880963
+204,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,9040881069,L'Ariel,tobacco,,,,,48.8345202,2.2958269
+205,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,9040881096,Olivier market,convenience,,,,,48.8345801,2.2958808
+206,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,9040881099,Élan Nature,supermarket,,,,,48.8341809,2.2962531
+207,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,9394263320,Momo l'Épicier,convenience,,,,,48.8377441,2.2818312
+208,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,9426834321,La Parisienne,tobacco,,Avenue Mozart,75016,Paris,48.8546954,2.2695798
+209,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,9426890981,Carrefour City,convenience,Carrefour City,Rue Serge Prokofiev,75016,Paris,48.8546192,2.2688701
+210,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,9549540610,Bien épicerie bio,convenience,,Rue de la Pompe,,,48.8627773,2.2762084
+211,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,9670499369,Les Délices D’Orient,convenience,,,,,48.8462889,2.2832668
+212,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,9742512683,Monoprix,supermarket,Monoprix,,,,48.8568153,2.2795247
+213,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,9836658248,Intermarché Express,convenience,Intermarché Express,Rue Chardon-Lagache,75016,Paris,48.8426818,2.2644013
+214,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,9842504156,Tsieco,convenience,,,,,48.8349969,2.2829342
+215,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,9854378117,Monoprix,supermarket,Monoprix,Rue d'Auteuil,75016,Paris,48.8480172,2.2618572
+216,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,9872523634,Auchan Drive,supermarket,Auchan Drive,,,,48.8371638,2.2794601
+217,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,9941321974,Eline's Market,convenience,,,,,48.8360287,2.2973062
+218,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,9941321980,SND Mini Marché,convenience,,,,,48.8342925,2.295203
+219,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,9977259190,La Lune Orientale,convenience,,,,,48.8455028,2.2982659
+220,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,9977259196,L'Alliance,tobacco,,,,,48.8454389,2.2977794
+221,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,9981256715,Happy Mini Mart,convenience,,,,,48.8375354,2.2826219
+222,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,10019188364,La Vie Claire,supermarket,La Vie Claire,Rue Lecourbe,75015,Paris,48.8406881,2.2961151
+223,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,10024714917,Proxi,convenience,Proxi,,,,48.8456996,2.2986014
+224,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,10042691616,LJ Mini Market,convenience,,,,,48.8461436,2.3020324
+225,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,10120618608,Proxi,convenience,Proxi,,,,48.8612183,2.2794486
+226,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,10554497865,Monoprix,supermarket,Monoprix,,,,48.8552526,2.3065914
+227,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,10572285478,Pilipinas Store,convenience,,,,,48.8660644,2.2907926
+228,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,10576265226,G20,supermarket,G20,Rue d'Auteuil,75016,Paris,48.8477614,2.2604321
+229,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,10624130051,La petite épicerie,convenience,,,,,48.8620179,2.2822367
+230,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,10827395657,Rapid' Market,convenience,,,,,48.8483085,2.2996001
+231,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,10827395664,Gourmand,convenience,,,,,48.8476939,2.2970502
+232,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,10977136244,Casino Shop,convenience,Casino Shop,Rue Poussin,75016,Paris,48.8490027,2.2654016
+233,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,11197813835,Hi MART,convenience,,,,,48.8478623,2.2868392
+234,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,11328371157,KnK,convenience,,,,,48.8374161,2.2892674
+235,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,11555152763,Le panier d'à côté,convenience,,Rue de l'Abbé Groult,,,48.8408842,2.2954913
+236,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,11555185657,Tajrish,convenience,,Rue de l'Abbé Groult,,,48.8428763,2.2938188
+237,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,11574101785,Mini market,convenience,,Rue de Vaugirard,,,48.8405801,2.3044358
+238,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,11575018947,Votre Marché,convenience,Votre Marché,Rue des Favorites,,,48.8389199,2.3035262
+239,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,11632098750,Naturalia,supermarket,Naturalia,Rue de Passy,,,48.8578321,2.2790353
+240,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,11679129621,Naturalia,supermarket,Naturalia,Rue Dupleix,75015,Paris,48.8517474,2.2981612
+241,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,11684342545,Thiranu Express,convenience,,,,,48.8577991,2.2875228
+242,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,11711768810,Afrikaraïbes Shop,convenience,,,,,48.837679,2.2779076
+243,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,11773202796,monop',supermarket,,,,,48.8590756,2.3041134
+244,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,11836056630,Carrefour Express,convenience,Carrefour Express,,,,48.8418698,2.3028395
+245,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,11836056637,day by day,convenience,day by day,,,,48.84155,2.3029027
+246,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,11949822889,Franprix,convenience,Franprix,,,,48.8594763,2.2823265
+247,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,11980531163,Monop',convenience,Monop',,,,48.8506432,2.2955108
+248,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,11982406069,NOUS anti-gaspi,convenience,NOUS anti-gaspi,Rue de Vaugirard,75015,,48.8387804,2.2989968
+249,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,12055421669,La Civette de l'Alma,tobacco,,Avenue Rapp,75007,,48.8604624,2.3013261
+250,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,12066298439,Cocci market,convenience,,,,,48.862732,2.2741475
+251,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,12066317485,Franprix,convenience,,,,,48.864913,2.2783391
+252,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,12075299569,Tabac Loto,tobacco,,Avenue de la Motte-Picquet,75007,,48.8554231,2.3075805
+253,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,12106980501,Supérette de Grenelle,convenience,,,,,48.8501045,2.2938378
+254,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,12122406984,U Express,supermarket,U Express,,,,48.8535631,2.2946309
+255,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,12124095353,La petite épicerie - RRS,convenience,,,,,48.8371206,2.3027707
+256,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,12314286449,Totoyeyen,convenience,,,,,48.8668049,2.2858845
+257,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,12314297225,Tabac flor de Cuba,tobacco,,,,,48.8637085,2.2866884
+258,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,12320183565,Supérette de Versailles,convenience,,,,,48.8410065,2.2658853
+259,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,12565769003,K-Mart Beaugrenelle,grocery,,Rue Robert de Flers,75015,,48.850002,2.2848098
+260,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,12662174455,Night Shop,convenience,,,,,48.8426054,2.2689942
+261,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,12681666913,Tabac Lamartine,tobacco,,,,,48.8660412,2.2764453
+262,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,12714732701,Leader Cash,supermarket,,Rue d'Auteuil,75016,,48.8484016,2.2595482
+263,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,13181377660,Auchan Supermarché,supermarket,Auchan Supermarché,,,,48.8660835,2.2829124
+264,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,13195285073,Votre Marché,convenience,,,,,48.8469777,2.3056368
+265,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,13197507544,,tobacco,,,,,48.8476013,2.300931
+266,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,13241092243,Tabac Le Mirabeau,tobacco,,Rue Mirabeau,75016,Paris,48.8472864,2.272891
+267,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,13246475628,Abi Supermarché,convenience,,Rue de Boulainvilliers,75016,Paris,48.8558735,2.274835
+268,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,13246475632,Carrefour Express,convenience,Carrefour Express,Rue Singer,75016,Paris,48.8570356,2.2737702
+269,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,13248147898,Fais ton marché Auvergnat,convenience,,Avenue de Versailles,75016,Paris,48.850939,2.2774679
+270,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,13250019941,Alimentation Passy,convenience,,Rue du Ranelagh,75016,Paris,48.8563846,2.2666522
+271,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,node,13384296125,Franprix,convenience,Franprix,Rue Bois-le-Vent,,,48.8576903,2.2770067
+272,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,way,53379222,Franprix,convenience,Franprix,,,,48.8422118,2.2898626
+273,Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,2,way,760842097,Franprix,convenience,Franprix,,,,48.8630431,2.2758417
+0,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,240038999,Norma,supermarket,Norma,Rue Saint-Michel,67000,Strasbourg,48.5814116,7.7362298
+1,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,485869845,Le Finkwiller de Fred,tobacco,,,,,48.5789424,7.7429823
+2,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,501850512,Carrefour City,convenience,Carrefour City,Rue du Maire Kuss,67000,Strasbourg,48.5840464,7.7366778
+3,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,1099961945,Auchan Supermarché,supermarket,Auchan Supermarché,,,,48.5826394,7.7474355
+4,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,1179939500,Proxi super,supermarket,,,,,48.5861915,7.743376
+5,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,1210841502,Naturalia,supermarket,Naturalia,,,,48.590101,7.7472832
+6,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,1246670031,Tabac au Lion,tobacco,,,,,48.5768998,7.731868
+7,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,1249709915,Le Chat De l'Île,tobacco,,,,,48.583236,7.739639
+8,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,1249709926,Le Panier de la cigogne,tobacco,,,,,48.5836983,7.741495
+9,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,1250345385,U Express,convenience,U Express,Grand'Rue,67000,Strasbourg,48.5826589,7.7405225
+10,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,2308745157,Monoprix,supermarket,Monoprix,,,,48.5839662,7.7466382
+11,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,3190441253,La Maison Vitale,supermarket,,,,,48.5815042,7.7394244
+12,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,3292589733,Lacocina,convenience,,Grand'Rue,,,48.5826103,7.7389684
+13,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,3788168380,Monop',convenience,Monop',Rue du Faubourg de Pierre,67000,Strasbourg,48.5881756,7.7460441
+14,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,4431494273,Norma,supermarket,Norma,,,,48.5816992,7.7437207
+15,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,4431494275,Superette Mersel,supermarket,,,,,48.5819972,7.7425867
+16,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,4487706471,Alélor - La Boutique des Condiments Strasbourg,convenience,,Place Broglie,67000,Strasbourg,48.5851062,7.749785
+17,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,4614044845,La regence,tobacco,,,,,48.5826359,7.7432145
+18,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,4626055395,Épicerie Cinar,convenience,,Rue du Faubourg de Saverne,67000,Strasbourg,48.5846608,7.7405719
+19,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,4720331561,Paris Store Strasbourg,convenience,Paris Store,Rue du Faubourg de Saverne,67000,Strasbourg,48.5858058,7.7397176
+20,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,4753035339,Tabac presse,tobacco,,Rue Thomann,,,48.5849974,7.7459572
+21,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,4868560094,Naturalia,supermarket,Naturalia,Rue du Vieux Marché aux Grains,,,48.5824495,7.7469604
+22,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,4968835226,Tabac Presse du Faubourg de Pierre,tobacco,,,,,48.5872501,7.7465361
+23,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,4968835229,Ayesha,convenience,,,,,48.5873459,7.7461445
+24,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,5772458656,EPICERIE AKHTAMAR,convenience,,Boulevard de Lyon,67000,Strasbourg,48.5782973,7.7314251
+25,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,5780996082,Alimentation générale,convenience,,Rue d'Obernai,67000,Strasbourg,48.5781533,7.7333015
+26,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,6243995942,TAJ,convenience,,Quai Saint-Jean,67000,Strasbourg,48.5832454,7.7382968
+27,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,6785794179,Carrefour Express,convenience,Carrefour Express,,,,48.5894181,7.7410282
+28,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,7089160914,Carrefour City,convenience,Carrefour City,Rue du 22 Novembre,67000,Strasbourg,48.5828361,7.7434891
+29,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,7135781664,Tabac Homme de Fer,tobacco,,Rue du Noyer,67000,Strasbourg,48.5848929,7.7438162
+30,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,7214017512,Le Petit Casino,convenience,Le Petit Casino,Rue du Faubourg National,67000,Strasbourg,48.5822715,7.7364045
+31,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,7602263190,,supermarket,,,,,48.5822253,7.735989
+32,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,9031642721,Le Balto,tobacco,,,,,48.5818086,7.7433234
+33,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,10108264090,Supérette Unique,convenience,,Rue des Glacières,67000,Strasbourg,48.5771305,7.7421081
+34,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,10876481905,Coopalim,convenience,,Rue Kageneck,67000,Strasbourg,48.5841547,7.7384809
+35,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,11221838367,S'duwaklaedel,tobacco,,,,,48.5823587,7.7370619
+36,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,11221839481,A la Source,convenience,,Quai Saint-Jean,67000,Strasbourg,48.5829024,7.738157
+37,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,11736927561,Indian stores,convenience,,rue de la course,67000,Strasbourg,48.5831966,7.7374877
+38,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,11736982836,Raja cash & carry,convenience,,rue de la course,67000,Strasbourg,48.5833516,7.7379028
+39,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,11916012373,Épicerie Konate,convenience,,Rue du Faubourg de Saverne,67000,Strasbourg,48.5870996,7.7393312
+40,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,12147783370,Le comptoir de l'ilôt,convenience,,rue du Foubourg National,67000,Strasbourg,48.5823683,7.7344022
+41,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,12616183830,Monop',convenience,Monop',Place de la Gare,67000,Strasbourg,48.584996,7.7343431
+42,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,13019079204,Terres d'Alsace,convenience,,Place de la Gare,67000,Strasbourg,48.5851283,7.7347337
+43,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,13063592202,Aux 4 Saisons,convenience,,,,,48.5837879,7.7373344
+44,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,13264901054,Tabac Hippies,tobacco,Tabac Presse,,,,48.5804634,7.7472217
+45,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,node,13439893508,Boucherie Baymar,convenience,,Rue du Travail,67000,Strasbourg,48.589098,7.7424528
+46,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,way,1001406932,La tabatière des halles,tobacco,,,,,48.5868713,7.7410766
+47,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,1,way,1001406968,Auchan Supermarché,supermarket,Auchan Supermarché,,,,48.5871223,7.7402925
+48,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,240038999,Norma,supermarket,Norma,Rue Saint-Michel,67000,Strasbourg,48.5814116,7.7362298
+49,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,288170487,Auchan Supermarché,supermarket,Auchan Supermarché,,,,48.5758927,7.7568745
+50,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,485869845,Le Finkwiller de Fred,tobacco,,,,,48.5789424,7.7429823
+51,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,501850512,Carrefour City,convenience,Carrefour City,Rue du Maire Kuss,67000,Strasbourg,48.5840464,7.7366778
+52,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,583243358,BeeVrac,convenience,,Route de Mittelhausbergen,67200,Strasbourg,48.5927843,7.7236229
+53,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,617281411,EGE Market,convenience,,,,,48.5942664,7.719951
+54,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,617835524,Tabac du Centre,tobacco,,Rue du Sable,67200,Strasbourg,48.5943435,7.7194237
+55,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,621842922,ALDI,supermarket,Aldi,,,,48.5979716,7.7356622
+56,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,1099961945,Auchan Supermarché,supermarket,Auchan Supermarché,,,,48.5826394,7.7474355
+57,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,1179939500,Proxi super,supermarket,,,,,48.5861915,7.743376
+58,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,1210841502,Naturalia,supermarket,Naturalia,,,,48.590101,7.7472832
+59,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,1211016262,Marché Contades,convenience,,Rue Strauss-Durkheim,67000,Strasbourg,48.5903345,7.7546353
+60,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,1211016710,Carrefour City,convenience,Carrefour City,,,,48.5901859,7.7485826
+61,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,1224349404,Épicerie des Romains,convenience,,Route des Romains,67200,Strasbourg,48.5801408,7.7186114
+62,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,1246670031,Tabac au Lion,tobacco,,,,,48.5768998,7.731868
+63,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,1249709915,Le Chat De l'Île,tobacco,,,,,48.583236,7.739639
+64,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,1249709926,Le Panier de la cigogne,tobacco,,,,,48.5836983,7.741495
+65,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,1250345385,U Express,convenience,U Express,Grand'Rue,67000,Strasbourg,48.5826589,7.7405225
+66,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,1445515540,Alimentation Ediz,convenience,,Route des Romains,67200,Strasbourg,48.5788068,7.7116312
+67,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,1445515557,Lidl,supermarket,Lidl,Route des Romains,67200,Strasbourg,48.5798077,7.7146627
+68,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,1445515635,Tabac des Comtes,tobacco,,Route des Romains,67200,Strasbourg,48.5794409,7.71563
+69,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,1694445765,Tabac de la cité,tobacco,,,,,48.5787661,7.7594509
+70,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,1719651870,Au Bon Panier,convenience,,Route du Général de Gaulle,67300,Schiltigheim,48.6030054,7.7379614
+71,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,1970477061,U Express,convenience,U Express,,,,48.5788544,7.7510886
+72,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,2308745157,Monoprix,supermarket,Monoprix,,,,48.5839662,7.7466382
+73,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,3049597230,Carrefour City,convenience,Carrefour City,Avenue de la Marseillaise,67000,Strasbourg,48.5843937,7.7578392
+74,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,3065664579,Norma,supermarket,Norma,Rue des Frères,67000,Strasbourg,48.5830279,7.7533343
+75,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,3187170570,La Nouvelle Douane,supermarket,La Nouvelle Douane,,,,48.5796281,7.7503588
+76,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,3190441253,La Maison Vitale,supermarket,,,,,48.5815042,7.7394244
+77,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,3292589733,Lacocina,convenience,,Grand'Rue,,,48.5826103,7.7389684
+78,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,3788168380,Monop',convenience,Monop',Rue du Faubourg de Pierre,67000,Strasbourg,48.5881756,7.7460441
+79,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,3818925770,Carrefour City,convenience,Carrefour City,Rue de la Première Armée,67000,Strasbourg,48.5767646,7.7523857
+80,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,3818947529,Marché 2000,convenience,,,,,48.5778737,7.7504564
+81,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,4213131688,Épicerie Karatas,convenience,,Rue Schwendi,67000,Strasbourg,48.5908902,7.7519209
+82,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,4431494273,Norma,supermarket,Norma,,,,48.5816992,7.7437207
+83,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,4431494275,Superette Mersel,supermarket,,,,,48.5819972,7.7425867
+84,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,4487706471,Alélor - La Boutique des Condiments Strasbourg,convenience,,Place Broglie,67000,Strasbourg,48.5851062,7.749785
+85,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,4603865209,Epicerie de la Krutenau,convenience,,Rue de la Krutenau,67000,Strasbourg,48.5800128,7.7576425
+86,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,4614044845,La regence,tobacco,,,,,48.5826359,7.7432145
+87,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,4626055395,Épicerie Cinar,convenience,,Rue du Faubourg de Saverne,67000,Strasbourg,48.5846608,7.7405719
+88,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,4720331561,Paris Store Strasbourg,convenience,Paris Store,Rue du Faubourg de Saverne,67000,Strasbourg,48.5858058,7.7397176
+89,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,4753035339,Tabac presse,tobacco,,Rue Thomann,,,48.5849974,7.7459572
+90,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,4833415616,Mag presse,tobacco,,,,,48.5853882,7.7558161
+91,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,4868560094,Naturalia,supermarket,Naturalia,Rue du Vieux Marché aux Grains,,,48.5824495,7.7469604
+92,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,4968835226,Tabac Presse du Faubourg de Pierre,tobacco,,,,,48.5872501,7.7465361
+93,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,4968835229,Ayesha,convenience,,,,,48.5873459,7.7461445
+94,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,5337208582,Au parchemin,tobacco,,,,,48.5845526,7.7541137
+95,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,5337210150,Carrefour Express,convenience,Carrefour Express,Rue du Parchemin,67000,Strasbourg,48.5845648,7.7537848
+96,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,5573056155,Carrefour Express,convenience,Carrefour Express,Rue Ehrmann,67000,Strasbourg,48.5918362,7.7549301
+97,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,5772458656,EPICERIE AKHTAMAR,convenience,,Boulevard de Lyon,67000,Strasbourg,48.5782973,7.7314251
+98,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,5780996082,Alimentation générale,convenience,,Rue d'Obernai,67000,Strasbourg,48.5781533,7.7333015
+99,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,5782485269,Biocoop,supermarket,Biocoop,Rue de la Première Armée,67000,Strasbourg,48.5780418,7.7499757
+100,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,5834495257,Côté Nature,supermarket,Côté Nature,Place de l'Abattoir,,,48.5989786,7.7345418
+101,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,6178428150,Bon Marché Toros,supermarket,,,,,48.5760261,7.731839
+102,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,6178435931,Africain Exotique,convenience,,Boulevard de Lyon,67000,Strasbourg,48.5762781,7.7315959
+103,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,6243995942,TAJ,convenience,,Quai Saint-Jean,67000,Strasbourg,48.5832454,7.7382968
+104,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,6566132103,Tabac Pinès,tobacco,,Route d'Oberhausbergen,67200,Strasbourg,48.5925124,7.7172306
+105,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,6631711133,Naturalia,supermarket,Naturalia,,,,48.5788228,7.7519924
+106,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,6689549922,Arménie 2000,convenience,,Rue Jacques Peirotes,67000,Strasbourg,48.5763491,7.7547665
+107,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,6785794179,Carrefour Express,convenience,Carrefour Express,,,,48.5894181,7.7410282
+108,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,6804933554,U Express,supermarket,U Express,,,,48.5933436,7.7143536
+109,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,6806480395,Supermarché Inal,convenience,,Quai du Général Koenig,67000,Strasbourg,48.5754648,7.7569679
+110,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,7089160914,Carrefour City,convenience,Carrefour City,Rue du 22 Novembre,67000,Strasbourg,48.5828361,7.7434891
+111,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,7135781664,Tabac Homme de Fer,tobacco,,Rue du Noyer,67000,Strasbourg,48.5848929,7.7438162
+112,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,7214017512,Le Petit Casino,convenience,Le Petit Casino,Rue du Faubourg National,67000,Strasbourg,48.5822715,7.7364045
+113,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,7277030194,FB Espace Casher,supermarket,Espace Casher,Rue Sellenick,,Strasbourg,48.5907109,7.751775
+114,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,7602263190,,supermarket,,,,,48.5822253,7.735989
+115,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,7925084098,Tabac des Alpes,tobacco,,Rue du Mont-Blanc,,,48.5756364,7.7592958
+116,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,8189110041,Épicerie Ariana,convenience,,Route des Romains,67200,Strasbourg,48.5799996,7.7177316
+117,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,8384692951,Alimentation SARI,convenience,,,,,48.5794674,7.7564787
+118,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,8985886558,Alimentation Meherzad Snack,convenience,,Route de Mittelhausbergen,67200,Strasbourg,48.5938623,7.7203592
+119,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,9031642721,Le Balto,tobacco,,,,,48.5818086,7.7433234
+120,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,9534173569,Envie Végane,convenience,,,,,48.5808322,7.7570797
+121,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,9645732917,Signorini Tartufi,grocery,,,,,48.5785557,7.7521372
+122,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,9689705849,TAT Market,convenience,,Rue des Pinsons,67200,Strasbourg,48.5919746,7.7208816
+123,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,9791239383,Lidl,supermarket,Lidl,Allée Frédérique Kleinknecht,67300,Schiltigheim,48.5999619,7.7420154
+124,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,10108264090,Supérette Unique,convenience,,Rue des Glacières,67000,Strasbourg,48.5771305,7.7421081
+125,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,10223250509,Le Regal'night,convenience,,Route des Romains,67200,Strasbourg,48.5801349,7.7188111
+126,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,10223321068,Tabac des Romains,tobacco,,Route des Romains,67200,Strasbourg,48.5798806,7.718536
+127,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,10733160795,Tabacs,tobacco,,,,,48.5821934,7.7568988
+128,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,10876481905,Coopalim,convenience,,Rue Kageneck,67000,Strasbourg,48.5841547,7.7384809
+129,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,11221838367,S'duwaklaedel,tobacco,,,,,48.5823587,7.7370619
+130,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,11221839481,A la Source,convenience,,Quai Saint-Jean,67000,Strasbourg,48.5829024,7.738157
+131,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,11553362805,Carrefour City,convenience,Carrefour City,Route de Mittelhausbergen,67200,Strasbourg,48.5941911,7.7196871
+132,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,11610391465,Tabac Austerlitz,tobacco,,,,,48.5783284,7.7529372
+133,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,11736927561,Indian stores,convenience,,rue de la course,67000,Strasbourg,48.5831966,7.7374877
+134,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,11736982836,Raja cash & carry,convenience,,rue de la course,67000,Strasbourg,48.5833516,7.7379028
+135,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,11916012373,Épicerie Konate,convenience,,Rue du Faubourg de Saverne,67000,Strasbourg,48.5870996,7.7393312
+136,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,11919622992,Houdan.est Shop,convenience,,Rue de Molsheim,67000,Strasbourg,48.5760147,7.7313393
+137,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,12147783370,Le comptoir de l'ilôt,convenience,,rue du Foubourg National,67000,Strasbourg,48.5823683,7.7344022
+138,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,12147783371,Kooma,convenience,,,,,48.5810525,7.7580836
+139,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,12148831701,Tang Heng Long,grocery,,,,,48.5827513,7.7523699
+140,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,12373632383,Kara Market,convenience,,Route de Mittelhausbergen,67200,Strasbourg,48.5928699,7.7234017
+141,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,12581768120,Pondi Street,convenience,,Route d'Oberhausbergen,67200,Strasbourg,48.5924798,7.7174118
+142,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,12616183830,Monop',convenience,Monop',Place de la Gare,67000,Strasbourg,48.584996,7.7343431
+143,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,13019079204,Terres d'Alsace,convenience,,Place de la Gare,67000,Strasbourg,48.5851283,7.7347337
+144,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,13020415971,Le Comptoir du Cigare,tobacco,,,,,48.5801875,7.7501848
+145,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,13052073143,Multimarket,convenience,,,,,48.5775379,7.7525346
+146,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,13063592202,Aux 4 Saisons,convenience,,,,,48.5837879,7.7373344
+147,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,13241364768,Épicerie La Latina,grocery,,Rue Fritz Kiener,67000,Strasbourg,48.5833232,7.760912
+148,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,13264901054,Tabac Hippies,tobacco,Tabac Presse,,,,48.5804634,7.7472217
+149,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,13439893508,Boucherie Baymar,convenience,,Rue du Travail,67000,Strasbourg,48.589098,7.7424528
+150,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,node,13443670894,Mon Libanis,convenience,,Rue Munch,67000,Strasbourg,48.5818023,7.7570737
+151,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,way,42415311,Supermarché & Boucherie Halal Aksaray,supermarket,,Route des Romains,67200,Strasbourg,48.5801298,7.7206965
+152,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,way,617814942,Côté Nature,supermarket,Côté Nature,Place de l'Abattoir,67200,Strasbourg,48.5988243,7.7348621
+153,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,way,1001406932,La tabatière des halles,tobacco,,,,,48.5868713,7.7410766
+154,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,2,way,1001406968,Auchan Supermarché,supermarket,Auchan Supermarché,,,,48.5871223,7.7402925
+155,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,25210848,Relais Total De L'Aar,convenience,TotalEnergies,Avenue Pierre Mendès France,67300,Schiltigheim,48.6038843,7.7582739
+156,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,240038999,Norma,supermarket,Norma,Rue Saint-Michel,67000,Strasbourg,48.5814116,7.7362298
+157,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,263359331,Carrefour Express,convenience,Carrefour Express,Rue de Rathsamhausen,67100,Strasbourg,48.5694274,7.7627931
+158,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,263360854,Tabac de la Musau,tobacco,,,,,48.5692314,7.7627272
+159,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,288170487,Auchan Supermarché,supermarket,Auchan Supermarché,,,,48.5758927,7.7568745
+160,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,485869845,Le Finkwiller de Fred,tobacco,,,,,48.5789424,7.7429823
+161,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,501850512,Carrefour City,convenience,Carrefour City,Rue du Maire Kuss,67000,Strasbourg,48.5840464,7.7366778
+162,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,537969496,Market City,convenience,,,,,48.5713804,7.7124563
+163,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,538843845,Tabac du Coin,tobacco,,Rue de Barr,67300,Schiltigheim,48.6024714,7.7455925
+164,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,538843846,Carrefour City,convenience,Carrefour City,Route de Bischwiller,67300,Schiltigheim,48.6026473,7.7457358
+165,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,538992248,Épicerie Cicek,convenience,,Rue de la Mairie,67300,Schiltigheim,48.6042454,7.7475848
+166,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,583243358,BeeVrac,convenience,,Route de Mittelhausbergen,67200,Strasbourg,48.5927843,7.7236229
+167,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,583341804,Carrefour City,convenience,Carrefour City,Rue Lauth,67000,Strasbourg,48.5940162,7.7611663
+168,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,617281411,EGE Market,convenience,,,,,48.5942664,7.719951
+169,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,617835524,Tabac du Centre,tobacco,,Rue du Sable,67200,Strasbourg,48.5943435,7.7194237
+170,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,620845086,Asan Market,convenience,,Route de Mittelhausbergen,67200,Strasbourg,48.6012644,7.7105373
+171,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,621842922,ALDI,supermarket,Aldi,,,,48.5979716,7.7356622
+172,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,665418305,,tobacco,,,,,48.5867312,7.6962685
+173,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,686683470,Papà Ciccio,convenience,,Route du Général de Gaulle,67300,Schiltigheim,48.603088,7.7379118
+174,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,686683473,Le Journal,tobacco,,Route du Général de Gaulle,67300,Schiltigheim,48.6030634,7.7382438
+175,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,896353121,Tabac le Marigny,tobacco,,,,,48.5950267,7.7096025
+176,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,944541049,Épicerie Principale,convenience,,Rue Principale,67300,Schiltigheim,48.604464,7.7504939
+177,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,1099961945,Auchan Supermarché,supermarket,Auchan Supermarché,,,,48.5826394,7.7474355
+178,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,1179939500,Proxi super,supermarket,,,,,48.5861915,7.743376
+179,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,1198890418,Carrefour City,convenience,Carrefour City,Place de l'Esplanade,67000,Strasbourg,48.5769828,7.768209
+180,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,1210841502,Naturalia,supermarket,Naturalia,,,,48.590101,7.7472832
+181,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,1211016262,Marché Contades,convenience,,Rue Strauss-Durkheim,67000,Strasbourg,48.5903345,7.7546353
+182,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,1211016710,Carrefour City,convenience,Carrefour City,,,,48.5901859,7.7485826
+183,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,1224349404,Épicerie des Romains,convenience,,Route des Romains,67200,Strasbourg,48.5801408,7.7186114
+184,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,1230002124,Relais E.Leclerc Esplanade,supermarket,,,,,48.5774435,7.7682696
+185,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,1246670031,Tabac au Lion,tobacco,,,,,48.5768998,7.731868
+186,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,1249709915,Le Chat De l'Île,tobacco,,,,,48.583236,7.739639
+187,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,1249709926,Le Panier de la cigogne,tobacco,,,,,48.5836983,7.741495
+188,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,1250345385,U Express,convenience,U Express,Grand'Rue,67000,Strasbourg,48.5826589,7.7405225
+189,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,1354006063,H. B. D,convenience,,Route du Polygone,67100,Strasbourg,48.569222,7.7570548
+190,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,1394498861,Carrefour City,convenience,Carrefour City,Place du Schluthfeld,67100,Strasbourg,48.5687257,7.7526549
+191,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,1445515540,Alimentation Ediz,convenience,,Route des Romains,67200,Strasbourg,48.5788068,7.7116312
+192,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,1445515557,Lidl,supermarket,Lidl,Route des Romains,67200,Strasbourg,48.5798077,7.7146627
+193,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,1445515635,Tabac des Comtes,tobacco,,Route des Romains,67200,Strasbourg,48.5794409,7.71563
+194,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,1639772966,Carrefour City,convenience,Carrefour City,Route du Polygone,67100,Strasbourg,48.5649136,7.7603061
+195,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,1694445765,Tabac de la cité,tobacco,,,,,48.5787661,7.7594509
+196,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,1719651870,Au Bon Panier,convenience,,Route du Général de Gaulle,67300,Schiltigheim,48.6030054,7.7379614
+197,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,1970477061,U Express,convenience,U Express,,,,48.5788544,7.7510886
+198,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,2217040257,Carrefour City,convenience,Carrefour City,Rue Geiler,67000,Strasbourg,48.5865207,7.7685546
+199,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,2308745157,Monoprix,supermarket,Monoprix,,,,48.5839662,7.7466382
+200,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,2676667575,Auchan Supermarché,supermarket,Auchan Supermarché,,,,48.5839219,7.774409
+201,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,2854450935,Delices d'Alsace - Bakou,convenience,,Rue de Verdun,67000,Strasbourg,48.5857366,7.7709496
+202,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,3049231883,Naturalia,supermarket,Naturalia,,,,48.5825218,7.7661253
+203,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,3049597230,Carrefour City,convenience,Carrefour City,Avenue de la Marseillaise,67000,Strasbourg,48.5843937,7.7578392
+204,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,3065664579,Norma,supermarket,Norma,Rue des Frères,67000,Strasbourg,48.5830279,7.7533343
+205,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,3187170570,La Nouvelle Douane,supermarket,La Nouvelle Douane,,,,48.5796281,7.7503588
+206,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,3190441253,La Maison Vitale,supermarket,,,,,48.5815042,7.7394244
+207,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,3292589733,Lacocina,convenience,,Grand'Rue,,,48.5826103,7.7389684
+208,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,3788168380,Monop',convenience,Monop',Rue du Faubourg de Pierre,67000,Strasbourg,48.5881756,7.7460441
+209,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,3818925770,Carrefour City,convenience,Carrefour City,Rue de la Première Armée,67000,Strasbourg,48.5767646,7.7523857
+210,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,3818947529,Marché 2000,convenience,,,,,48.5778737,7.7504564
+211,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,4072197932,,tobacco,,,,,48.606702,7.7497272
+212,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,4080325261,Sefa,convenience,,Rue de la Glacière,67300,Schiltigheim,48.6056581,7.7553689
+213,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,4081086812,Meff Market,supermarket,,,,,48.6090488,7.750492
+214,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,4213131688,Épicerie Karatas,convenience,,Rue Schwendi,67000,Strasbourg,48.5908902,7.7519209
+215,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,4431494273,Norma,supermarket,Norma,,,,48.5816992,7.7437207
+216,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,4431494275,Superette Mersel,supermarket,,,,,48.5819972,7.7425867
+217,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,4478843458,Chez Henri,convenience,,Avenue de la Forêt Noire,67000,Strasbourg,48.5810222,7.7765494
+218,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,4487706471,Alélor - La Boutique des Condiments Strasbourg,convenience,,Place Broglie,67000,Strasbourg,48.5851062,7.749785
+219,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,4600677788,,tobacco,,,,,48.5778043,7.770465
+220,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,4600677790,Beyrouth Market,convenience,,Rue de Leicester,67000,Strasbourg,48.5776624,7.7712129
+221,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,4603865209,Epicerie de la Krutenau,convenience,,Rue de la Krutenau,67000,Strasbourg,48.5800128,7.7576425
+222,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,4614044845,La regence,tobacco,,,,,48.5826359,7.7432145
+223,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,4620360223,day by day Strasbourg,convenience,,Route du Polygone,67100,Strasbourg,48.5651195,7.7596635
+224,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,4626055395,Épicerie Cinar,convenience,,Rue du Faubourg de Saverne,67000,Strasbourg,48.5846608,7.7405719
+225,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,4720331561,Paris Store Strasbourg,convenience,Paris Store,Rue du Faubourg de Saverne,67000,Strasbourg,48.5858058,7.7397176
+226,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,4753035339,Tabac presse,tobacco,,Rue Thomann,,,48.5849974,7.7459572
+227,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,4833415616,Mag presse,tobacco,,,,,48.5853882,7.7558161
+228,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,4868560094,Naturalia,supermarket,Naturalia,Rue du Vieux Marché aux Grains,,,48.5824495,7.7469604
+229,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,4968835226,Tabac Presse du Faubourg de Pierre,tobacco,,,,,48.5872501,7.7465361
+230,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,4968835229,Ayesha,convenience,,,,,48.5873459,7.7461445
+231,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,5075908008,Epicerie du Coin,convenience,,Rue de Lauterbourg,67300,Schiltigheim,48.6091136,7.7445665
+232,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,5253944233,Épicerie Mila,convenience,,Rue Saint-Aloïse,67100,Strasbourg,48.5654479,7.7634117
+233,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,5337208582,Au parchemin,tobacco,,,,,48.5845526,7.7541137
+234,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,5337210150,Carrefour Express,convenience,Carrefour Express,Rue du Parchemin,67000,Strasbourg,48.5845648,7.7537848
+235,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,5438540512,Epicerie des Quinze,convenience,,Rue de Bruges,67000,Strasbourg,48.5849901,7.7766385
+236,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,5573056155,Carrefour Express,convenience,Carrefour Express,Rue Ehrmann,67000,Strasbourg,48.5918362,7.7549301
+237,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,5745975190,,tobacco,,,,,48.5893727,7.767164
+238,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,5772458656,EPICERIE AKHTAMAR,convenience,,Boulevard de Lyon,67000,Strasbourg,48.5782973,7.7314251
+239,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,5780996082,Alimentation générale,convenience,,Rue d'Obernai,67000,Strasbourg,48.5781533,7.7333015
+240,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,5782485269,Biocoop,supermarket,Biocoop,Rue de la Première Armée,67000,Strasbourg,48.5780418,7.7499757
+241,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,5834495257,Côté Nature,supermarket,Côté Nature,Place de l'Abattoir,,,48.5989786,7.7345418
+242,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,6178428150,Bon Marché Toros,supermarket,,,,,48.5760261,7.731839
+243,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,6178435931,Africain Exotique,convenience,,Boulevard de Lyon,67000,Strasbourg,48.5762781,7.7315959
+244,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,6243995942,TAJ,convenience,,Quai Saint-Jean,67000,Strasbourg,48.5832454,7.7382968
+245,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,6280449996,FB Espace Casher,convenience,,Avenue de la Forêt Noire,67000,Strasbourg,48.5859279,7.763792
+246,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,6566132103,Tabac Pinès,tobacco,,Route d'Oberhausbergen,67200,Strasbourg,48.5925124,7.7172306
+247,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,6631711133,Naturalia,supermarket,Naturalia,,,,48.5788228,7.7519924
+248,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,6689549922,Arménie 2000,convenience,,Rue Jacques Peirotes,67000,Strasbourg,48.5763491,7.7547665
+249,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,6720618949,Epicerie de L'Etoile,convenience,,Rue de la Thumenau,67100,Strasbourg,48.571398,7.7553723
+250,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,6785794179,Carrefour Express,convenience,Carrefour Express,,,,48.5894181,7.7410282
+251,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,6804933554,U Express,supermarket,U Express,,,,48.5933436,7.7143536
+252,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,6806480395,Supermarché Inal,convenience,,Quai du Général Koenig,67000,Strasbourg,48.5754648,7.7569679
+253,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,6855756214,Cebalim,supermarket,,,,,48.5666702,7.7257391
+254,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,6867665338,Carrefour Express,convenience,Carrefour Express,,,,48.5810038,7.7689046
+255,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,6908329710,L'Express,tobacco,,,,,48.60505,7.7585951
+256,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,7089160914,Carrefour City,convenience,Carrefour City,Rue du 22 Novembre,67000,Strasbourg,48.5828361,7.7434891
+257,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,7135781664,Tabac Homme de Fer,tobacco,,Rue du Noyer,67000,Strasbourg,48.5848929,7.7438162
+258,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,7214017512,Le Petit Casino,convenience,Le Petit Casino,Rue du Faubourg National,67000,Strasbourg,48.5822715,7.7364045
+259,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,7277030194,FB Espace Casher,supermarket,Espace Casher,Rue Sellenick,,Strasbourg,48.5907109,7.751775
+260,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,7553176816,乐选食铺 Le choix store,convenience,,Rue de Londres,67000,Strasbourg,48.5777091,7.7706767
+261,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,7602263190,,supermarket,,,,,48.5822253,7.735989
+262,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,7891113462,Esplanade Market,convenience,,Rue de Boston,67000,Strasbourg,48.5771692,7.7705626
+263,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,7908461724,Biocoop,supermarket,Biocoop,,,,48.5675964,7.7576751
+264,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,7925084098,Tabac des Alpes,tobacco,,Rue du Mont-Blanc,,,48.5756364,7.7592958
+265,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,8189110041,Épicerie Ariana,convenience,,Route des Romains,67200,Strasbourg,48.5799996,7.7177316
+266,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,8384692951,Alimentation SARI,convenience,,,,,48.5794674,7.7564787
+267,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,8675241104,Carrefour City,convenience,Carrefour City,Allée des Açores,67000,Strasbourg,48.5988878,7.7636595
+268,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,8985886558,Alimentation Meherzad Snack,convenience,,Route de Mittelhausbergen,67200,Strasbourg,48.5938623,7.7203592
+269,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,9031642721,Le Balto,tobacco,,,,,48.5818086,7.7433234
+270,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,9534173569,Envie Végane,convenience,,,,,48.5808322,7.7570797
+271,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,9644341623,Friendly,convenience,,Route d'Oberhausbergen,67200,Strasbourg,48.5946228,7.7106959
+272,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,9645732917,Signorini Tartufi,grocery,,,,,48.5785557,7.7521372
+273,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,9689705849,TAT Market,convenience,,Rue des Pinsons,67200,Strasbourg,48.5919746,7.7208816
+274,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,9791239383,Lidl,supermarket,Lidl,Allée Frédérique Kleinknecht,67300,Schiltigheim,48.5999619,7.7420154
+275,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,10080418411,Le Bio Chez Soi,convenience,,Rue du Birkenfels,67100,Strasbourg,48.5667481,7.7599213
+276,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,10108264090,Supérette Unique,convenience,,Rue des Glacières,67000,Strasbourg,48.5771305,7.7421081
+277,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,10173705556,Pro Via Market,convenience,,Rue de Hochfelden,67200,Strasbourg,48.6022235,7.7231104
+278,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,10223250509,Le Regal'night,convenience,,Route des Romains,67200,Strasbourg,48.5801349,7.7188111
+279,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,10223321068,Tabac des Romains,tobacco,,Route des Romains,67200,Strasbourg,48.5798806,7.718536
+280,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,10296813417,Epicerie Athena,convenience,,Avenue Racine,67200,Strasbourg,48.5912136,7.7105018
+281,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,10733160795,Tabacs,tobacco,,,,,48.5821934,7.7568988
+282,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,10857860449,Tabac de la Poste,tobacco,,Route du Polygone,67100,,48.5670086,7.7584174
+283,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,10876481905,Coopalim,convenience,,Rue Kageneck,67000,Strasbourg,48.5841547,7.7384809
+284,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,10949371355,Auchan Supermarché,supermarket,Auchan Supermarché,Allée Robert Théophile Debus,67300,Schiltigheim,48.6094582,7.7498109
+285,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,11061350750,Tabac César,tobacco,,Route des Romains,67200,Strasbourg,48.578077,7.7041464
+286,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,11221838367,S'duwaklaedel,tobacco,,,,,48.5823587,7.7370619
+287,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,11221839481,A la Source,convenience,,Quai Saint-Jean,67000,Strasbourg,48.5829024,7.738157
+288,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,11298359669,Carrefour City,convenience,Carrefour City,Rue Edmond Michelet,67100,Strasbourg,48.5732773,7.7669936
+289,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,11553362805,Carrefour City,convenience,Carrefour City,Route de Mittelhausbergen,67200,Strasbourg,48.5941911,7.7196871
+290,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,11610391465,Tabac Austerlitz,tobacco,,,,,48.5783284,7.7529372
+291,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,11730649717,Balkanfood,convenience,,,,,48.5682965,7.7576047
+292,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,11736927561,Indian stores,convenience,,rue de la course,67000,Strasbourg,48.5831966,7.7374877
+293,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,11736982836,Raja cash & carry,convenience,,rue de la course,67000,Strasbourg,48.5833516,7.7379028
+294,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,11861680071,Monoprix,supermarket,Monoprix,,,,48.5678805,7.7579013
+295,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,11891256370,Le Lombardie,tobacco,,Route de l'Hôpital,67100,,48.5679406,7.7515073
+296,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,11916012373,Épicerie Konate,convenience,,Rue du Faubourg de Saverne,67000,Strasbourg,48.5870996,7.7393312
+297,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,11919622992,Houdan.est Shop,convenience,,Rue de Molsheim,67000,Strasbourg,48.5760147,7.7313393
+298,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,12147783370,Le comptoir de l'ilôt,convenience,,rue du Foubourg National,67000,Strasbourg,48.5823683,7.7344022
+299,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,12147783371,Kooma,convenience,,,,,48.5810525,7.7580836
+300,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,12148831701,Tang Heng Long,grocery,,,,,48.5827513,7.7523699
+301,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,12373632383,Kara Market,convenience,,Route de Mittelhausbergen,67200,Strasbourg,48.5928699,7.7234017
+302,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,12444244501,Supermarché de l'Elsau,supermarket,,,,,48.5671698,7.7261475
+303,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,12450910759,Tabac Campione,tobacco,,Route du Polygone,67100,Strasbourg,48.5700173,7.7567574
+304,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,12450910760,Épicerie du Polygone Herman,convenience,,Route du Polygone,67100,Strasbourg,48.5701463,7.7567098
+305,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,12581768120,Pondi Street,convenience,,Route d'Oberhausbergen,67200,Strasbourg,48.5924798,7.7174118
+306,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,12616183830,Monop',convenience,Monop',Place de la Gare,67000,Strasbourg,48.584996,7.7343431
+307,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,13019077112,Super Asie Tien Hung,convenience,,Rue Charles Péguy,67000,Strasbourg,48.5875558,7.7007039
+308,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,13019079204,Terres d'Alsace,convenience,,Place de la Gare,67000,Strasbourg,48.5851283,7.7347337
+309,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,13020415971,Le Comptoir du Cigare,tobacco,,,,,48.5801875,7.7501848
+310,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,13052073143,Multimarket,convenience,,,,,48.5775379,7.7525346
+311,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,13063592202,Aux 4 Saisons,convenience,,,,,48.5837879,7.7373344
+312,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,13121309196,Caravane,convenience,,,,,48.5718356,7.7130591
+313,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,13241364768,Épicerie La Latina,grocery,,Rue Fritz Kiener,67000,Strasbourg,48.5833232,7.760912
+314,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,13264901054,Tabac Hippies,tobacco,Tabac Presse,,,,48.5804634,7.7472217
+315,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,13296420754,Super MM,convenience,,,,,48.6058596,7.7590946
+316,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,13314107251,PCMAC,supermarket,,Route des romains,67200,Strasbourg,48.5775689,7.7062311
+317,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,13439893508,Boucherie Baymar,convenience,,Rue du Travail,67000,Strasbourg,48.589098,7.7424528
+318,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,node,13443670894,Mon Libanis,convenience,,Rue Munch,67000,Strasbourg,48.5818023,7.7570737
+319,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,way,40609827,Auchan Supermarché,supermarket,Auchan Supermarché,,,,48.5983591,7.7094898
+320,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,way,41892969,Super MM,supermarket,,Route du Général de Gaulle,67300,Schiltigheim,48.6076044,7.7348587
+321,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,way,41959963,Pro-Inter Hautepierre,supermarket,Pro-inter,,,,48.5890669,7.6978933
+322,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,way,42072876,Centre Commercial E.Leclerc,supermarket,Centre Commercial E.Leclerc,Route du Général de Gaulle,67300,Schiltigheim,48.610331,7.7354836
+323,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,way,42072885,Norma,supermarket,Norma,Rue d'Erstein,67300,Schiltigheim,48.610748,7.7385881
+324,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,way,42401089,Auchan Supermarché,supermarket,Auchan Supermarché,Route des Romains,67200,Strasbourg,48.577281,7.7061222
+325,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,way,42415311,Supermarché & Boucherie Halal Aksaray,supermarket,,Route des Romains,67200,Strasbourg,48.5801298,7.7206965
+326,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,way,43791844,Monoprix,supermarket,Monoprix,,,,48.5680368,7.7581719
+327,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,way,175016334,Auchan Drive,supermarket,Auchan Drive,,,,48.5908991,7.6980073
+328,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,way,374859952,ALDI,supermarket,ALDI,,,,48.5923231,7.6976629
+329,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,way,465524077,Auchan Supermarché,supermarket,Auchan Supermarché,Rue de Leicester,,,48.5781039,7.7714359
+330,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,way,517021603,Pro Inter,supermarket,,,,,48.6101032,7.7383596
+331,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,way,539424000,Grand Frais,supermarket,Grand Frais,,,,48.5868104,7.7031596
+332,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,way,617814942,Côté Nature,supermarket,Côté Nature,Place de l'Abattoir,67200,Strasbourg,48.5988243,7.7348621
+333,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,way,1001406932,La tabatière des halles,tobacco,,,,,48.5868713,7.7410766
+334,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,way,1001406968,Auchan Supermarché,supermarket,Auchan Supermarché,,,,48.5871223,7.7402925
+335,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,way,1011275302,Asia Market,convenience,,,,,48.6038031,7.7082311
+336,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,way,1012884314,E.Leclerc,supermarket,E.Leclerc,,,,48.5733951,7.7603463
+337,Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,3,way,1024490137,,tobacco,,,,,48.6099991,7.7355688
