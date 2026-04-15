@@ -1,0 +1,13 @@
+{
+  "hotel_name": "Novotel Megève Mont-Blanc",
+  "failed_stage": null,
+  "last_error": null,
+  "retry_after": null,
+  "done": {
+    "location": true,
+    "hotel_df": false,
+    "poi_df": false,
+    "hotels_df": false
+  },
+  "updated_at": "2026-04-15T23:19:51.934638"
+}

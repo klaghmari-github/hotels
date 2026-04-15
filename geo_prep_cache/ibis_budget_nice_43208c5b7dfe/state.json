@@ -1,0 +1,13 @@
+{
+  "hotel_name": "Ibis budget Nice",
+  "failed_stage": null,
+  "last_error": null,
+  "retry_after": null,
+  "done": {
+    "location": true,
+    "hotel_df": false,
+    "poi_df": true,
+    "hotels_df": false
+  },
+  "updated_at": "2026-04-15T23:19:19.549088"
+}
