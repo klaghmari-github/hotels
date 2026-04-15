@@ -1,5 +1,5 @@
 {
-  "hotel_name": "Mercure Paris Montmartre Sacré-Cœur",
+  "hotel_name": "Ibis budget Strasbourg Centre République",
   "failed_stage": null,
   "last_error": null,
   "retry_after": null,
@@ -9,5 +9,5 @@
     "poi_df": true,
     "hotels_df": true
   },
-  "updated_at": "2026-04-15T23:27:49.087137"
+  "updated_at": "2026-04-15T23:27:49.142494"
 }
