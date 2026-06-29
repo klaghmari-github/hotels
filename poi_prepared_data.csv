@@ -1,0 +1,7 @@
+HOTEL_NAME,HOTEL_CITY,HOTEL_LAT,HOTEL_LON,fb_0_1km,fb_0_2km,fb_0_3km,fb_0_4km,fb_0_5km,not_fb_0_1km,not_fb_0_2km,not_fb_0_3km,not_fb_0_4km,not_fb_0_5km
+Ibis budget Nice,Nice,43.6675713,7.2143076,0,0,0,3,3,3,3,6,6,6
+Ibis budget Strasbourg Centre République,Strasbourg,48.5850581,7.7365913,0,30,60,102,120,0,3,3,24,36
+Mercure Paris Montmartre Sacré-Cœur,Paris,48.8852398,2.3300554,6,12,57,123,195,3,3,27,45,54
+Novotel Megève Mont-Blanc,Megève,45.8598495,6.6194782,3,3,6,6,15,0,0,3,3,3
+Novotel Paris Tour Eiffel,Paris,48.8496595,2.2837039,3,6,9,36,69,0,9,12,15,18
+Novotel Porte d’Italie,Paris,48.819054,2.3594056,9,18,21,42,75,3,3,3,6,9
