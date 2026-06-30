@@ -324,3 +324,63 @@ console.log("Business logic integrated: funnel, reallocate, P&L, recommendations
 // Quick helper if user wants to trigger full sim from console
 window.runBusiness = runFullBusinessSim;
 
+
+async function enrichHotel() {
+  const name = document.getElementById('hotel_name').value || 'Ibis budget Nice';
+  const city = document.getElementById('city').value || 'Nice';
+  const status = document.getElementById('enrich_status');
+  status.innerText = 'Enrichissement...';
+  try {
+    const res = await fetch('/api/enrich', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({hotel_name: name, city: city})
+    });
+    const d = await res.json();
+    window.enrichedFeatures = d.enriched_features || {};
+    status.innerText = 'POI + Météo auto calculés !';
+    console.log('Enriched:', window.enrichedFeatures);
+  } catch(e) {
+    status.innerText = 'Enrichissement simulé.';
+    window.enrichedFeatures = {};
+  }
+}
+
+function normalizeMix() {
+  const fb = parseFloat(document.getElementById('mix_fb').value) || 40;
+  const non = document.getElementById('mix_nonfb');
+  if (non) non.value = (100 - fb);
+  alert('Ajustez les sous % manuellement.');
+}
+
+async function predictWithForcedMix() {
+  const params = collectRodInputs();
+  const desired = {
+    'ALCOOL': (parseFloat(document.getElementById('p_alcool').value) || 10) / 100,
+    'FOOD_SALEE': (parseFloat(document.getElementById('p_food').value) || 35) / 100,
+    'FOOD_SUCREE': (parseFloat(document.getElementById('p_sucre').value) || 30) / 100,
+    'SANS_ALCOOL': (parseFloat(document.getElementById('p_sans').value) || 25) / 100
+  };
+  const payload = Object.assign({}, params, {desired_mix: desired, overrides: params.overrides || {}});
+  const res = await fetch('/api/business_simulate', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+  const data = await res.json();
+  const t = data.adjusted_profile ? Object.values(data.adjusted_profile).reduce((a,b)=>a+b,0) : (data.base_profile ? data.base_profile.total_ca : 0);
+  document.getElementById('kpi_ca').innerText = Math.round(t).toLocaleString('fr-FR');
+  alert('Avec votre mix forcé : ' + Math.round(t) + ' € de CA annuel');
+  window.lastPrediction = data;
+}
+
+async function proposeBestMix() {
+  const params = collectRodInputs();
+  const payload = Object.assign({}, params, {desired_mix: {}});
+  const res = await fetch('/api/business_simulate', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+  const data = await res.json();
+  const t = data.base_profile ? data.base_profile.total_ca : 0;
+  document.getElementById('kpi_ca').innerText = Math.round(t).toLocaleString('fr-FR');
+  if (data.recommendations && data.recommendations.length) {
+    const b = data.recommendations[0];
+    alert('Meilleur proposé : ' + b.concept + ' m_lin=' + b.m_lin + ' → Marge ' + b.margin + '€');
+  }
+  window.lastPrediction = data;
+}
+

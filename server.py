@@ -28,6 +28,13 @@ except Exception as e:
     HAS_BIZ = False
     print("[server] business_logic not available:", e)
 
+try:
+    from enrich_hotel import geocode_hotel, fetch_poi, fetch_weather, compute_poi_features, aggregate_weather
+    HAS_ENRICH = True
+except Exception as e:
+    HAS_ENRICH = False
+    print("[server] enrich_hotel not fully available, will use mock:", e)
+
 app = Flask(__name__, static_folder="web", static_url_path="/static")
 
 # ---------------- Load artifacts ----------------
@@ -216,6 +223,39 @@ def api_predict():
         result["funnel"] = funnel
 
     return jsonify(result)
+
+
+@app.route("/api/enrich", methods=["POST"])
+def api_enrich():
+    """Auto compute POI + Meteo from hotel name/city. Director does NOT enter these."""
+    data = request.get_json(force=True)
+    hotel_name = data.get("hotel_name", "")
+    city = data.get("city", "")
+
+    if not HAS_ENRICH or not hotel_name:
+        # Mock for demo: return plausible values for a city center
+        mock = {
+            "fb_0_1km": 15, "fb_0_2km": 45, "fb_0_3km": 80, "fb_0_4km": 120, "fb_0_5km": 180,
+            "not_fb_0_1km": 8, "not_fb_0_2km": 25, "not_fb_0_3km": 50, "not_fb_0_4km": 70, "not_fb_0_5km": 95,
+            "m01_dwpt_mean": 4.5, "m01_prcp_mean": 0.08  # simplified weather
+        }
+        return jsonify({"enriched_features": mock, "note": "Mock (no real enrich)"})
+
+    try:
+        geo = geocode_hotel(hotel_name, city)
+        if not geo:
+            return jsonify({"error": "Could not geocode"}), 400
+
+        poi = fetch_poi(geo["lat"], geo["lon"])
+        poi_feats = compute_poi_features(poi)
+
+        weather = fetch_weather(geo["lat"], geo["lon"])
+        weather_feats = aggregate_weather(weather)
+
+        features = {**poi_feats, **weather_feats}
+        return jsonify({"enriched_features": features, "geo": geo})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/api/simulate", methods=["POST"])
 def api_simulate():

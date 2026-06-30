@@ -21,6 +21,24 @@
       </div>
     </div>
 
+    <!-- Hotel Identification + Auto Enrich (POI + Meteo - NOT entered by director) -->
+    <div class="mb-6 bg-zinc-900 border border-zinc-700 rounded-2xl p-6">
+      <h2 class="font-semibold mb-2">Identification de l'hôtel</h2>
+      <p class="text-xs text-zinc-500 mb-3">Données POI et Météo calculées automatiquement dès l'identification de l'hôtel (pas à saisir manuellement).</p>
+      <div class="flex gap-3 items-end">
+        <div class="flex-1">
+          <label class="text-xs">Nom de l'hôtel</label>
+          <input id="hotel_name" value="Ibis budget Nice" class="w-full bg-zinc-950 border border-zinc-600 rounded px-3 py-2 text-sm">
+        </div>
+        <div class="flex-1">
+          <label class="text-xs">Ville</label>
+          <input id="city" value="Nice" class="w-full bg-zinc-950 border border-zinc-600 rounded px-3 py-2 text-sm">
+        </div>
+        <button onclick="enrichHotel()" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-xl text-sm">Enrichir automatiquement (POI + Météo)</button>
+      </div>
+      <div id="enrich_status" class="text-xs mt-2 text-emerald-400"></div>
+    </div>
+
     <!-- Tabs for ROD Simulator Screens -->
     <div class="mb-4">
       <div class="flex border-b border-zinc-700" id="tab-buttons">
@@ -175,7 +193,28 @@
     </div>
 
     <!-- Results -->
-    <div class="mt-8" id="results" style="display:none;">
+            <!-- Director Mix % -->
+        <div class="mb-4 border border-amber-700 rounded-xl p-4 bg-zinc-950">
+          <h3 class="font-semibold mb-2 text-amber-400">Choix du mix par le directeur (en %)</h3>
+          <p class="text-xs text-zinc-500 mb-2">Saisissez vos % F&amp;B et sous-catégories. Le modèle prédit le CA et le gain.</p>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div><label>% F&amp;B</label><input id="mix_fb" type="number" value="40" class="w-full bg-zinc-900 border px-1 py-0.5"></div>
+            <div><label>% Non F&amp;B</label><input id="mix_nonfb" type="number" value="60" class="w-full bg-zinc-900 border px-1 py-0.5"></div>
+          </div>
+          <div class="mt-1 grid grid-cols-4 gap-1 text-xs">
+            <input id="p_alcool" value="10" placeholder="ALCOOL %">
+            <input id="p_food" value="35" placeholder="FOOD_SALEE %">
+            <input id="p_sucre" value="30" placeholder="FOOD_SUCREE %">
+            <input id="p_sans" value="25" placeholder="SANS %">
+          </div>
+          <div class="mt-2 flex gap-2">
+            <button onclick="normalizeMix()" class="text-xs px-2 py-1 bg-zinc-700 rounded">Normaliser 100%</button>
+            <button onclick="predictWithForcedMix()" class="flex-1 bg-amber-600 text-xs py-1 rounded">Mon mix forcé → CA &amp; gain</button>
+            <button onclick="proposeBestMix()" class="flex-1 bg-emerald-600 text-xs py-1 rounded">Meilleur (ML)</button>
+          </div>
+        </div>
+
+<div class="mt-8" id="results" style="display:none;">
       <h3 class="font-semibold mb-3">Résultats — Prédiction des Variables Cibles</h3>
       
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
