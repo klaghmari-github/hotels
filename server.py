@@ -391,7 +391,7 @@ def api_reallocate():
     total_ca = data.get("total_ca", sum(base_by_gamme.values()))
 
     if HAS_BIZ:
-        new_by_gamme = biz.reallocate_mix(base_by_gamme, desired, total_ca)
+        new_by_gamme = biz.predict_coherent_with_mix(base_by_gamme, desired, total_ca)
     else:
         new_by_gamme = reallocate_mix(base_by_gamme, desired)  # fallback
 
@@ -403,15 +403,23 @@ def api_reallocate():
 
 @app.route("/api/business_simulate", methods=["POST"])
 def api_business_simulate():
-    """Full interesting business flow: predict profile -> reallocate mix if needed -> P&L + recommendation."""
+    """Full métier flow (as per user spec):
+    - POI/Meteo auto via enrich (not entered)
+    - Director saisie: ROD hotel info + desired mix in %
+    - ML gives natural profile
+    - Volume from ROD (funnel)
+    - If desired_mix provided: reallocate using model's natural attractiveness (coherent %)
+    - Return natural vs forced + gain + P&L + best proposal
+    """
     data = request.get_json(force=True)
 
     nb = int(data.get("nb_ch", 180))
     m_lin = float(data.get("m_lin", 5.0))
     concept = data.get("concept", "SIMPLY")
-    desired_mix = data.get("desired_mix", {})
+    desired_mix = data.get("desired_mix", {}) or {}
+    to = float(data.get("to", 0.78))
 
-    # 1. Predict base profile from current inputs
+    # 1. Base prediction from features (enriched + ROD saisies)
     loc = data.get("location", "centre_ville_dense")
     overrides = data.get("overrides", {})
     overrides[NB_CH_COL] = nb
@@ -420,27 +428,40 @@ def api_business_simulate():
     pred = MODEL.predict(scaled)[0]
     base = aggregate_prediction(pred)
 
-    # 2. Reallocate if desired_mix
-    if desired_mix and HAS_BIZ:
-        new_gamme = biz.reallocate_mix(base["by_gamme"], desired_mix, base["total_ca"])
-        adjusted_profile = new_gamme
-    else:
-        adjusted_profile = base["by_gamme"]
+    natural_total = base["total_ca"]
+    natural_profile = base["by_gamme"]
 
-    # 3. P&L
-    if HAS_BIZ:
-        pnl = biz.simulate_pnl(nb, m_lin, concept, adjusted_profile)
-        recommendations = biz.recommend_best(nb, adjusted_profile)
+    # 2. Volume (what director controls indirectly via TO, nb_ch etc.)
+    volume_buyers = biz.compute_volume_from_rod(nb, to) if HAS_BIZ else natural_total / 30.0
+
+    # 3. Forced or natural
+    if desired_mix and HAS_BIZ:
+        adjusted = biz.predict_coherent_with_mix(natural_profile, desired_mix, natural_total)
+        adj_total = sum(adjusted.values())
+        gain = adj_total - natural_total
     else:
-        pnl = {"revenue": base["total_ca"] * (m_lin / 5), "costs": m_lin * 2000, "margin": 0, "margin_pct": 0}
-        recommendations = []
+        adjusted = natural_profile
+        adj_total = natural_total
+        gain = 0
+
+    # 4. Business numbers
+    if HAS_BIZ:
+        pnl = biz.simulate_pnl(nb, m_lin, concept, adjusted)
+        recos = biz.recommend_best(nb, natural_profile)
+    else:
+        pnl = {"revenue": adj_total * (m_lin/5.0), "costs": m_lin*1800, "margin": 0, "margin_pct": 0}
+        recos = []
 
     return jsonify({
-        "base_profile": base,
-        "adjusted_profile": adjusted_profile,
+        "natural_total": round(natural_total, 0),
+        "natural_profile": natural_profile,
+        "adjusted_total": round(adj_total, 0),
+        "adjusted_profile": adjusted,
+        "gain": round(gain, 0),
         "pnl": pnl,
-        "recommendations": recommendations[:3],
-        "funnel": biz.compute_funnel(nb, 0.78) if HAS_BIZ else {}
+        "recommendations": recos[:3],
+        "volume_buyers_mois": round(volume_buyers, 1),
+        "note": "POI/Meteo auto. Mix % from director. Coherent reallocation using ML shape."
     })
 
 

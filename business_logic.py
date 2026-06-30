@@ -121,3 +121,57 @@ def recommend_best(nb_ch: int, base_profile: Dict[str, float], m_lin_range=(3,10
     # Sort by margin
     results.sort(key=lambda x: x["margin"], reverse=True)
     return results[:3]  # top 3
+
+def compute_volume_from_rod(nb_ch: int, to: float = 0.78, guests_per_ch: float = 1.7, 
+                            buyer_conversion: float = 0.35) -> float:
+    """Compute expected monthly buyers (volume) from ROD params."""
+    ch_occ = nb_ch * to
+    cl_heb_jour = ch_occ * guests_per_ch
+    cl_heb_mois = cl_heb_jour * 30.5
+    buyers_mois = cl_heb_mois * buyer_conversion
+    return round(buyers_mois, 1)
+
+def predict_coherent_with_mix(base_by_gamme: Dict[str, float], desired_mix: Dict[str, float], 
+                              base_total: float, volume_buyers: float = None) -> Dict[str, float]:
+    """
+    Core métier logic:
+    - base_by_gamme: from ML prediction (natural profile)
+    - desired_mix: user's choice in % (e.g. {'ALCOOL': 0.0, 'FOOD_SALEE': 0.4, ...} or partial)
+    - Reallocate the profile to respect desired % while preserving relative attractiveness from ML.
+    - Scale to desired volume if provided.
+    Returns new_by_gamme with coherent totals.
+    """
+    if not base_by_gamme or sum(base_by_gamme.values()) == 0:
+        return base_by_gamme
+
+    # Normalize desired to sum to 1.0 (user can set some, others redistribute)
+    explicit = {g: max(0.0, float(v)) for g, v in desired_mix.items() if g in base_by_gamme}
+    forced_sum = sum(explicit.values())
+    if forced_sum > 1.0:
+        explicit = {g: v / forced_sum for g, v in explicit.items()}
+        forced_sum = 1.0
+
+    remaining = [g for g in base_by_gamme if g not in explicit]
+    free_share = max(0.0, 1.0 - forced_sum)
+
+    # Original weights of remaining (from ML base = attractiveness)
+    orig_rem_sum = sum(base_by_gamme.get(g, 0) for g in remaining)
+    if orig_rem_sum <= 0:
+        orig_rem_sum = 1.0
+
+    new_profile = {}
+    for g in explicit:
+        new_profile[g] = explicit[g] * base_total
+
+    for g in remaining:
+        weight = base_by_gamme.get(g, 0) / orig_rem_sum
+        new_profile[g] = weight * free_share * base_total
+
+    # If volume_buyers given, we could further scale, but here we keep the base_total as anchor
+    # (volume is used to set expectations, but ML gives the CA level)
+    new_total = sum(new_profile.values())
+    if new_total > 0:
+        scale = base_total / new_total
+        new_profile = {g: round(v * scale, 2) for g, v in new_profile.items()}
+
+    return new_profile
