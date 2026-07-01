@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "description": "Registre canonique — toute jointure inter-sources passe par hotel_id",
+  "hotels": [
+    {
+      "hotel_id": "ibis-budget-nice",
+      "brand": "IBIS BUDGET",
+      "city": "Nice",
+      "name_display": "Ibis budget Nice Californie",
+      "name_ventes": "Ibis budget Nice",
+      "name_rod": "Nice Californie",
+      "aliases": ["Ibis Budget Nice", "IBIS BUDGET Nice"],
+      "has_sales": true,
+      "has_rod": true,
+      "nb_chambres": 129
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "brand": "IBIS BUDGET",
+      "city": "Strasbourg",
+      "name_display": "Ibis budget Strasbourg Centre République",
+      "name_ventes": "Ibis budget Strasbourg Centre République",
+      "name_rod": "Strasbourg République",
+      "aliases": ["Ibis Budget Strasbourg", "Ibis budget Strasbourg"],
+      "has_sales": true,
+      "has_rod": true,
+      "nb_chambres": 97
+    },
+    {
+      "hotel_id": "ibis-styles-roissy-cdg",
+      "brand": "IBIS STYLES",
+      "city": "Roissy",
+      "name_display": "Ibis Styles Roissy CDG",
+      "name_ventes": null,
+      "name_rod": "Roissy CDG",
+      "aliases": [],
+      "has_sales": false,
+      "has_rod": true,
+      "nb_chambres": 309
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "brand": "NOVOTEL",
+      "city": "Megève",
+      "name_display": "Novotel Megève Mont-Blanc",
+      "name_ventes": "Novotel Megève Mont-Blanc",
+      "name_rod": "Megève Mont Blanc",
+      "aliases": ["Novotel Megeve Mont-Blanc"],
+      "has_sales": true,
+      "has_rod": true,
+      "nb_chambres": 572
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "brand": "NOVOTEL",
+      "city": "Paris",
+      "name_display": "Novotel Paris Centre Tour Eiffel",
+      "name_ventes": "Novotel Paris Tour Eiffel",
+      "name_rod": "Paris Centre Tour Eiffel",
+      "aliases": ["Novotel Paris Tour Eiffel"],
+      "has_sales": true,
+      "has_rod": true,
+      "nb_chambres": 764
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "brand": "MERCURE",
+      "city": "Paris",
+      "name_display": "Mercure Paris Montmartre Sacré-Cœur",
+      "name_ventes": "Mercure Paris Montmartre Sacré-Cœur",
+      "name_rod": "Montmartre Sacré-Cœur",
+      "aliases": ["Mercure Montmartre Sacre Coeur"],
+      "has_sales": true,
+      "has_rod": true,
+      "nb_chambres": 305
+    },
+    {
+      "hotel_id": "mercure-boulogne",
+      "brand": "MERCURE",
+      "city": "Boulogne-Billancourt",
+      "name_display": "Mercure Paris Boulogne",
+      "name_ventes": null,
+      "name_rod": "Paris Boulogne",
+      "aliases": [],
+      "has_sales": false,
+      "has_rod": true,
+      "nb_chambres": 191
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "brand": "NOVOTEL",
+      "city": "Paris",
+      "name_display": "Novotel Porte d'Italie",
+      "name_ventes": "Novotel Porte d'Italie",
+      "name_rod": null,
+      "aliases": ["Novotel Porte d Italie"],
+      "has_sales": true,
+      "has_rod": false,
+      "nb_chambres": null
+    }
+  ]
+}

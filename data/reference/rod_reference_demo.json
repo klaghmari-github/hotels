@@ -1,0 +1,42 @@
+{
+  "_warning": "Références DEMO — remplacer par valeurs extraites Excel via scripts/extract_excel_rules.py",
+  "concepts": {
+    "SIMPLY": {
+      "base_monthly_ca": 0,
+      "base_monthly_sales": 0,
+      "pivot_m_lin": 6,
+      "pivot_clients_mois": 0,
+      "cost_per_m": 0,
+      "fixed_capex": 0,
+      "opex_monthly": 0,
+      "amort_months": 84
+    },
+    "LIBERTY": {
+      "base_monthly_ca": 0,
+      "base_monthly_sales": 0,
+      "pivot_m_lin": 8,
+      "pivot_clients_mois": 0,
+      "cost_per_m": 0,
+      "fixed_capex": 0,
+      "opex_monthly": 0,
+      "amort_months": 84
+    },
+    "CONNECTED": {
+      "base_monthly_ca": 0,
+      "base_monthly_sales": 0,
+      "pivot_m_lin": 7,
+      "pivot_clients_mois": 0,
+      "cost_per_m": 0,
+      "fixed_capex": 0,
+      "opex_monthly": 0,
+      "amort_months": 84
+    }
+  },
+  "seasonality": {
+    "monthly": {
+      "m01": 1.0, "m02": 1.0, "m03": 1.0, "m04": 1.0,
+      "m05": 1.0, "m06": 1.0, "m07": 1.0, "m08": 1.0,
+      "m09": 1.0, "m10": 1.0, "m11": 1.0, "m12": 1.0
+    }
+  }
+}

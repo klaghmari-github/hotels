@@ -1,0 +1,1 @@
+"""Couche domaine — modèles, règles métier, services et repositories."""
