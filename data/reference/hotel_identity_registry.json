@@ -1,6 +1,5 @@
 {
   "version": 1,
-  "description": "Registre canonique — toute jointure inter-sources passe par hotel_id",
   "hotels": [
     {
       "hotel_id": "ibis-budget-nice",
@@ -9,7 +8,17 @@
       "name_display": "Ibis budget Nice Californie",
       "name_ventes": "Ibis budget Nice",
       "name_rod": "Nice Californie",
-      "aliases": ["Ibis Budget Nice", "IBIS BUDGET Nice"],
+      "aliases": [
+        "Ibis Budget Nice",
+        "IBIS BUDGET Nice"
+      ],
+      "lat_canonical": 43.71,
+      "lon_canonical": 7.26,
+      "geo_source": "nominatim",
+      "lat_rod": null,
+      "lon_rod": null,
+      "lat_nominatim": 43.6675713,
+      "lon_nominatim": 7.2143076,
       "has_sales": true,
       "has_rod": true,
       "nb_chambres": 129
@@ -21,7 +30,17 @@
       "name_display": "Ibis budget Strasbourg Centre République",
       "name_ventes": "Ibis budget Strasbourg Centre République",
       "name_rod": "Strasbourg République",
-      "aliases": ["Ibis Budget Strasbourg", "Ibis budget Strasbourg"],
+      "aliases": [
+        "Ibis Budget Strasbourg",
+        "Ibis budget Strasbourg"
+      ],
+      "lat_canonical": null,
+      "lon_canonical": null,
+      "geo_source": null,
+      "lat_rod": null,
+      "lon_rod": null,
+      "lat_nominatim": null,
+      "lon_nominatim": null,
       "has_sales": true,
       "has_rod": true,
       "nb_chambres": 97
@@ -34,6 +53,13 @@
       "name_ventes": null,
       "name_rod": "Roissy CDG",
       "aliases": [],
+      "lat_canonical": null,
+      "lon_canonical": null,
+      "geo_source": null,
+      "lat_rod": null,
+      "lon_rod": null,
+      "lat_nominatim": null,
+      "lon_nominatim": null,
       "has_sales": false,
       "has_rod": true,
       "nb_chambres": 309
@@ -45,7 +71,16 @@
       "name_display": "Novotel Megève Mont-Blanc",
       "name_ventes": "Novotel Megève Mont-Blanc",
       "name_rod": "Megève Mont Blanc",
-      "aliases": ["Novotel Megeve Mont-Blanc"],
+      "aliases": [
+        "Novotel Megeve Mont-Blanc"
+      ],
+      "lat_canonical": null,
+      "lon_canonical": null,
+      "geo_source": null,
+      "lat_rod": null,
+      "lon_rod": null,
+      "lat_nominatim": null,
+      "lon_nominatim": null,
       "has_sales": true,
       "has_rod": true,
       "nb_chambres": 572
@@ -57,7 +92,16 @@
       "name_display": "Novotel Paris Centre Tour Eiffel",
       "name_ventes": "Novotel Paris Tour Eiffel",
       "name_rod": "Paris Centre Tour Eiffel",
-      "aliases": ["Novotel Paris Tour Eiffel"],
+      "aliases": [
+        "Novotel Paris Tour Eiffel"
+      ],
+      "lat_canonical": 48.85,
+      "lon_canonical": 2.35,
+      "geo_source": "nominatim",
+      "lat_rod": null,
+      "lon_rod": null,
+      "lat_nominatim": 48.85,
+      "lon_nominatim": 2.35,
       "has_sales": true,
       "has_rod": true,
       "nb_chambres": 764
@@ -69,7 +113,16 @@
       "name_display": "Mercure Paris Montmartre Sacré-Cœur",
       "name_ventes": "Mercure Paris Montmartre Sacré-Cœur",
       "name_rod": "Montmartre Sacré-Cœur",
-      "aliases": ["Mercure Montmartre Sacre Coeur"],
+      "aliases": [
+        "Mercure Montmartre Sacre Coeur"
+      ],
+      "lat_canonical": null,
+      "lon_canonical": null,
+      "geo_source": null,
+      "lat_rod": null,
+      "lon_rod": null,
+      "lat_nominatim": null,
+      "lon_nominatim": null,
       "has_sales": true,
       "has_rod": true,
       "nb_chambres": 305
@@ -82,6 +135,13 @@
       "name_ventes": null,
       "name_rod": "Paris Boulogne",
       "aliases": [],
+      "lat_canonical": null,
+      "lon_canonical": null,
+      "geo_source": null,
+      "lat_rod": null,
+      "lon_rod": null,
+      "lat_nominatim": null,
+      "lon_nominatim": null,
       "has_sales": false,
       "has_rod": true,
       "nb_chambres": 191
@@ -93,7 +153,16 @@
       "name_display": "Novotel Porte d'Italie",
       "name_ventes": "Novotel Porte d'Italie",
       "name_rod": null,
-      "aliases": ["Novotel Porte d Italie"],
+      "aliases": [
+        "Novotel Porte d Italie"
+      ],
+      "lat_canonical": null,
+      "lon_canonical": null,
+      "geo_source": null,
+      "lat_rod": null,
+      "lon_rod": null,
+      "lat_nominatim": null,
+      "lon_nominatim": null,
       "has_sales": true,
       "has_rod": false,
       "nb_chambres": null

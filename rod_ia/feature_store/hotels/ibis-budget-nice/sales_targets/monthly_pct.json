@@ -1,0 +1,1066 @@
+{
+  "rows": [
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 1,
+      "month": 1,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m01",
+      "pct": 0.031674698887200134
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 1,
+      "month": 2,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m02",
+      "pct": 0.024590051248367464
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 1,
+      "month": 3,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m03",
+      "pct": 0.056924639695717594
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 1,
+      "month": 4,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m04",
+      "pct": 0.0738022317098319
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 1,
+      "month": 5,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m05",
+      "pct": 0.08645011494604028
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 1,
+      "month": 6,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m06",
+      "pct": 0.12740451077284984
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 1,
+      "month": 7,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m07",
+      "pct": 0.14644507412301136
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 1,
+      "month": 8,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m08",
+      "pct": 0.15818102664762357
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 1,
+      "month": 9,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m09",
+      "pct": 0.12951707387860784
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 1,
+      "month": 10,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m10",
+      "pct": 0.08411911617569559
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 1,
+      "month": 11,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m11",
+      "pct": 0.04178384034338698
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 1,
+      "month": 12,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m12",
+      "pct": 0.03910762157166753
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 2,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m01_type_fandb",
+      "pct": 0.9016203703703703
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m01_type_fandb_gamme_food_salee",
+      "pct": 0.09146341463414634
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m01_type_fandb_gamme_food_sucree",
+      "pct": 0.08023106546854941
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m01_type_fandb_gamme_sans_alcool",
+      "pct": 0.8283055198973043
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 2,
+      "month": 1,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m01_type_non_fandb",
+      "pct": 0.09837962962962962
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 1,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "column": "d_pct_mois_m01_type_non_fandb_gamme_accessoires",
+      "pct": 0.5882352941176471
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 1,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m01_type_non_fandb_gamme_sos",
+      "pct": 0.4117647058823529
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 2,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m02_type_fandb",
+      "pct": 0.940365262765561
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m02_type_fandb_gamme_food_salee",
+      "pct": 0.07927070947284978
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m02_type_fandb_gamme_food_sucree",
+      "pct": 0.06936187078874356
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m02_type_fandb_gamme_sans_alcool",
+      "pct": 0.8513674197384067
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 2,
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m02_type_non_fandb",
+      "pct": 0.05963473723443906
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "column": "d_pct_mois_m02_type_non_fandb_gamme_accessoires",
+      "pct": 0.625
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "column": "d_pct_mois_m02_type_non_fandb_gamme_pap",
+      "pct": 0.375
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 2,
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m03_type_fandb",
+      "pct": 0.9315730156174529
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m03_type_fandb_gamme_food_salee",
+      "pct": 0.03370203940546146
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m03_type_fandb_gamme_food_sucree",
+      "pct": 0.07086069823712408
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m03_type_fandb_gamme_sans_alcool",
+      "pct": 0.8954372623574145
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 2,
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m03_type_non_fandb",
+      "pct": 0.06842698438254709
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "column": "d_pct_mois_m03_type_non_fandb_gamme_ref",
+      "pct": 0.5176470588235295
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "column": "d_pct_mois_m03_type_non_fandb_gamme_accessoires",
+      "pct": 0.4823529411764706
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 2,
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m04_type_fandb",
+      "pct": 0.7366656317913692
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m04_type_fandb_gamme_food_salee",
+      "pct": 0.09356035064059338
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m04_type_fandb_gamme_food_sucree",
+      "pct": 0.0667565745111261
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m04_type_fandb_gamme_sans_alcool",
+      "pct": 0.8396830748482805
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 2,
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m04_type_non_fandb",
+      "pct": 0.2633343682086309
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "column": "d_pct_mois_m04_type_non_fandb_gamme_ref",
+      "pct": 0.056590426786135344
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "column": "d_pct_mois_m04_type_non_fandb_gamme_accessoires",
+      "pct": 0.6156566847441641
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m04_type_non_fandb_gamme_cosmetique",
+      "pct": 0.06838009903324688
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "column": "d_pct_mois_m04_type_non_fandb_gamme_pap",
+      "pct": 0.20749823154916291
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m04_type_non_fandb_gamme_sos",
+      "pct": 0.05187455788729073
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 2,
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m05_type_fandb",
+      "pct": 0.5557911476278823
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m05_type_fandb_gamme_food_salee",
+      "pct": 0.13447782546494993
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m05_type_fandb_gamme_sans_alcool",
+      "pct": 0.8655221745350501
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 2,
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m05_type_non_fandb",
+      "pct": 0.44420885237211766
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "column": "d_pct_mois_m05_type_non_fandb_gamme_ref",
+      "pct": 0.39856801909307876
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "column": "d_pct_mois_m05_type_non_fandb_gamme_accessoires",
+      "pct": 0.3627684964200477
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "column": "d_pct_mois_m05_type_non_fandb_gamme_jeux_enfants",
+      "pct": 0.04295942720763723
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "column": "d_pct_mois_m05_type_non_fandb_gamme_pap",
+      "pct": 0.162291169451074
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m05_type_non_fandb_gamme_sos",
+      "pct": 0.03341288782816229
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 2,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m06_type_fandb",
+      "pct": 0.5258974174519818
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m06_type_fandb_gamme_food_salee",
+      "pct": 0.07762806921551192
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m06_type_fandb_gamme_sans_alcool",
+      "pct": 0.9223719307844881
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 2,
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m06_type_non_fandb",
+      "pct": 0.47410258254801807
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "column": "d_pct_mois_m06_type_non_fandb_gamme_ref",
+      "pct": 0.4476139898338518
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "column": "d_pct_mois_m06_type_non_fandb_gamme_accessoires",
+      "pct": 0.32478567635232536
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m06_type_non_fandb_gamme_cosmetique",
+      "pct": 0.015173355587588196
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "column": "d_pct_mois_m06_type_non_fandb_gamme_jeux_enfants",
+      "pct": 0.04096806008648813
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "column": "d_pct_mois_m06_type_non_fandb_gamme_pap",
+      "pct": 0.15325089143464077
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m06_type_non_fandb_gamme_sos",
+      "pct": 0.018208026705105837
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 2,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m07_type_fandb",
+      "pct": 0.5198235128453861
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m07_type_fandb_gamme_food_salee",
+      "pct": 0.10835540573079701
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m07_type_fandb_gamme_sans_alcool",
+      "pct": 0.891644594269203
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 2,
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m07_type_non_fandb",
+      "pct": 0.48017648715461403
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "column": "d_pct_mois_m07_type_non_fandb_gamme_ref",
+      "pct": 0.5539263603779733
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "column": "d_pct_mois_m07_type_non_fandb_gamme_accessoires",
+      "pct": 0.25448028673835127
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m07_type_non_fandb_gamme_cosmetique",
+      "pct": 0.02606712284131639
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "column": "d_pct_mois_m07_type_non_fandb_gamme_jeux_enfants",
+      "pct": 0.05865102639296188
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "column": "d_pct_mois_m07_type_non_fandb_gamme_pap",
+      "pct": 0.09644835451287065
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m07_type_non_fandb_gamme_sos",
+      "pct": 0.010426849136526556
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 2,
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m08_type_fandb",
+      "pct": 0.510690074743612
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m08_type_fandb_gamme_food_salee",
+      "pct": 0.07374631268436578
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m08_type_fandb_gamme_sans_alcool",
+      "pct": 0.9262536873156342
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 2,
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m08_type_non_fandb",
+      "pct": 0.48930992525638795
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "column": "d_pct_mois_m08_type_non_fandb_gamme_ref",
+      "pct": 0.42628774422735344
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "column": "d_pct_mois_m08_type_non_fandb_gamme_accessoires",
+      "pct": 0.43220840734162225
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m08_type_non_fandb_gamme_cosmetique",
+      "pct": 0.023090586145648313
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "column": "d_pct_mois_m08_type_non_fandb_gamme_jeux_enfants",
+      "pct": 0.05328596802841918
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "column": "d_pct_mois_m08_type_non_fandb_gamme_pap",
+      "pct": 0.055654233274126705
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m08_type_non_fandb_gamme_sos",
+      "pct": 0.009473060982830076
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 2,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m09_type_fandb",
+      "pct": 0.5011145313660971
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m09_type_fandb_gamme_food_salee",
+      "pct": 0.09249452799548118
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m09_type_fandb_gamme_food_sucree",
+      "pct": 0.0670761844242039
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m09_type_fandb_gamme_sans_alcool",
+      "pct": 0.8404292875803149
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 2,
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m09_type_non_fandb",
+      "pct": 0.49888546863390293
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "column": "d_pct_mois_m09_type_non_fandb_gamme_ref",
+      "pct": 0.601418439716312
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "column": "d_pct_mois_m09_type_non_fandb_gamme_accessoires",
+      "pct": 0.2690307328605201
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m09_type_non_fandb_gamme_cosmetique",
+      "pct": 0.028368794326241134
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "column": "d_pct_mois_m09_type_non_fandb_gamme_pap",
+      "pct": 0.08983451536643026
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m09_type_non_fandb_gamme_sos",
+      "pct": 0.011347517730496455
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 2,
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m10_type_fandb",
+      "pct": 0.6222920336305362
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m10_type_fandb_gamme_food_salee",
+      "pct": 0.10680206600717851
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m10_type_fandb_gamme_food_sucree",
+      "pct": 0.07003414164405147
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m10_type_fandb_gamme_sans_alcool",
+      "pct": 0.82316379234877
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 2,
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m10_type_non_fandb",
+      "pct": 0.3777079663694638
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "column": "d_pct_mois_m10_type_non_fandb_gamme_ref",
+      "pct": 0.3346153846153846
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "column": "d_pct_mois_m10_type_non_fandb_gamme_accessoires",
+      "pct": 0.39807692307692305
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "column": "d_pct_mois_m10_type_non_fandb_gamme_pap",
+      "pct": 0.10576923076923075
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m10_type_non_fandb_gamme_sos",
+      "pct": 0.16153846153846152
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 2,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m11_type_fandb",
+      "pct": 0.759815749067778
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m11_type_fandb_gamme_food_salee",
+      "pct": 0.08516166281755196
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m11_type_fandb_gamme_food_sucree",
+      "pct": 0.05918013856812932
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m11_type_fandb_gamme_sans_alcool",
+      "pct": 0.8556581986143187
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 2,
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m11_type_non_fandb",
+      "pct": 0.2270234700592235
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "column": "d_pct_mois_m11_type_non_fandb_gamme_ref",
+      "pct": 0.8115942028985508
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "column": "d_pct_mois_m11_type_non_fandb_gamme_accessoires",
+      "pct": 0.11594202898550725
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "column": "d_pct_mois_m11_type_non_fandb_gamme_pap",
+      "pct": 0.07246376811594203
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 2,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m12_type_fandb",
+      "pct": 0.6988516522146707
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m12_type_fandb_gamme_food_salee",
+      "pct": 0.062038900067069074
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m12_type_fandb_gamme_food_sucree",
+      "pct": 0.08886653252850435
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m12_type_fandb_gamme_sans_alcool",
+      "pct": 0.8490945674044265
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 2,
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m12_type_non_fandb",
+      "pct": 0.1652214670728849
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "column": "d_pct_mois_m12_type_non_fandb_gamme_ref",
+      "pct": 0.45390070921985815
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "column": "d_pct_mois_m12_type_non_fandb_gamme_accessoires",
+      "pct": 0.2624113475177305
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "column": "d_pct_mois_m12_type_non_fandb_gamme_pap",
+      "pct": 0.22695035460992907
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "level": 3,
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m12_type_non_fandb_gamme_sos",
+      "pct": 0.05673758865248227
+    }
+  ]
+}

@@ -36,11 +36,36 @@ class Settings:
 
     @property
     def rod_reference_path(self) -> Path:
+        extracted = self.data_reference_dir / "rod_reference.json"
+        if extracted.exists():
+            return extracted
         return self.data_reference_dir / "rod_reference_demo.json"
+
+    @property
+    def brand_projections_path(self) -> Path:
+        return self.data_reference_dir / "brand_projections.json"
+
+    @property
+    def performance_report_path(self) -> Path:
+        return self.data_processed_dir / "performance_report.json"
 
     @property
     def column_manifest_path(self) -> Path:
         return self.data_processed_dir / "column_manifest.json"
+
+    @property
+    def rod_recap_path(self) -> Path | None:
+        """Fichier « Récapitulatif … ROD » dans ``sources/raw`` (si présent)."""
+        for path in self.sources_raw_dir.iterdir():
+            name = path.name.lower()
+            if "capitulatif" in name or "recap" in name:
+                if path.suffix.lower() in {".xlsx", ".xlsm"}:
+                    return path
+        return None
+
+    @property
+    def rod_recap_reference_dir(self) -> Path:
+        return self.data_reference_dir / "rod_recap"
 
 
 @lru_cache(maxsize=1)

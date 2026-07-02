@@ -1,0 +1,464 @@
+{
+  "rows": [
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 23.9,
+      "avg_nbr_ventes": 7.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 35.7,
+      "avg_nbr_ventes": 11.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 26.0,
+      "avg_nbr_ventes": 4.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 1,
+      "TYPE": NaN,
+      "GAMME": NaN,
+      "avg_montant": 66.0,
+      "avg_nbr_ventes": 4.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 78.3,
+      "avg_nbr_ventes": 17.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 41.7,
+      "avg_nbr_ventes": 12.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 65.0,
+      "avg_nbr_ventes": 11.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 2,
+      "TYPE": NaN,
+      "GAMME": NaN,
+      "avg_montant": 66.0,
+      "avg_nbr_ventes": 4.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 130.0,
+      "avg_nbr_ventes": 25.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 191.6,
+      "avg_nbr_ventes": 44.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 165.5,
+      "avg_nbr_ventes": 32.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 3,
+      "TYPE": NaN,
+      "GAMME": NaN,
+      "avg_montant": 7.5,
+      "avg_nbr_ventes": 1.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 80.6,
+      "avg_nbr_ventes": 19.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 78.7,
+      "avg_nbr_ventes": 15.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 132.5,
+      "avg_nbr_ventes": 25.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 73.0,
+      "avg_nbr_ventes": 16.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 290.6,
+      "avg_nbr_ventes": 67.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 456.0,
+      "avg_nbr_ventes": 77.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 5,
+      "TYPE": NaN,
+      "GAMME": NaN,
+      "avg_montant": 64.5,
+      "avg_nbr_ventes": 5.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 114.2,
+      "avg_nbr_ventes": 13.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 132.5,
+      "avg_nbr_ventes": 27.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 300.5,
+      "avg_nbr_ventes": 60.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 6,
+      "TYPE": NaN,
+      "GAMME": NaN,
+      "avg_montant": 12.0,
+      "avg_nbr_ventes": 1.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 146.1,
+      "avg_nbr_ventes": 23.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 182.4,
+      "avg_nbr_ventes": 46.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 431.5,
+      "avg_nbr_ventes": 70.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 103.6,
+      "avg_nbr_ventes": 18.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 93.1,
+      "avg_nbr_ventes": 24.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 312.0,
+      "avg_nbr_ventes": 49.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 35.8,
+      "avg_nbr_ventes": 11.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 82.6,
+      "avg_nbr_ventes": 19.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 98.75,
+      "avg_nbr_ventes": 16.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 96.7,
+      "avg_nbr_ventes": 26.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 174.95000000000002,
+      "avg_nbr_ventes": 46.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 299.5,
+      "avg_nbr_ventes": 43.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 10,
+      "TYPE": NaN,
+      "GAMME": NaN,
+      "avg_montant": 83.4,
+      "avg_nbr_ventes": 10.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 93.375,
+      "avg_nbr_ventes": 27.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 158.93,
+      "avg_nbr_ventes": 44.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 221.75,
+      "avg_nbr_ventes": 37.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 0.7,
+      "avg_nbr_ventes": 1.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 11,
+      "TYPE": NaN,
+      "GAMME": NaN,
+      "avg_montant": 43.0,
+      "avg_nbr_ventes": 5.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 132.2,
+      "avg_nbr_ventes": 33.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 171.15,
+      "avg_nbr_ventes": 47.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 230.0,
+      "avg_nbr_ventes": 35.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 0.7,
+      "avg_nbr_ventes": 1.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "month": 12,
+      "TYPE": NaN,
+      "GAMME": NaN,
+      "avg_montant": 32.5,
+      "avg_nbr_ventes": 4.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    }
+  ]
+}

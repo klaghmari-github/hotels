@@ -1,0 +1,9 @@
+{
+  "hotel_id": "mercure-montmartre",
+  "updated_at": "2026-07-02T01:09:42.324373+00:00",
+  "is_pivot": true,
+  "brand": "MERCURE",
+  "nb_chambres": 305,
+  "has_sales": true,
+  "has_rod": true
+}

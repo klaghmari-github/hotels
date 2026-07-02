@@ -2,16 +2,17 @@
 
 from __future__ import annotations
 
+import hashlib
 import math
 import unicodedata
 from datetime import datetime, timedelta
-from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 import requests
 
 from rod_ia.config.settings import Settings, get_settings
+from rod_ia.domain.models.enrichment import EnrichResult
 from rod_ia.domain.models.simulation import EnrichedHotelFeatures
 from rod_ia.domain.repositories.feature_store_repository import FeatureStoreRepository
 from rod_ia.domain.repositories.identity_registry import HotelIdentityRegistry
@@ -30,9 +31,23 @@ FB_TYPES = [
 ]
 NOT_FB_TYPES = ["cosmetics", "gift", "tobacco", "kiosk", "pharmacy", "chemist"]
 
+BEACH_TAGS = (
+    ('natural', 'beach'),
+    ('leisure', 'beach_resort'),
+    ('leisure', 'swimming_area'),
+)
+BEACH_SEARCH_RADIUS_KM = 5.0
+BEACH_MISSING_SENTINEL_M = 99_999.0
+
 
 class EnrichHotelService:
-    """Géocode, enrichit et persiste les features dans le feature store."""
+    """Orchestre enrichissement POI/météo avec lecture cache ou calcul frais.
+
+    Flux :
+      1. Résoudre ``hotel_id`` via le registre d'identité
+      2. Si cache valide dans le feature store → retour immédiat (``source=cache``)
+      3. Sinon → géocode + météo + POI → persistance (``source=computed``)
+    """
 
     def __init__(
         self,
@@ -59,32 +74,84 @@ class EnrichHotelService:
         city: str = "",
         force_refresh: bool = False,
         hotel_id: str | None = None,
-    ) -> Tuple[str, EnrichedHotelFeatures, list[str]]:
+    ) -> EnrichResult:
         warnings: list[str] = []
+        resolved_id, warnings = self._resolve_hotel_id(hotel_name, city, hotel_id, warnings)
+        fingerprint = self._enrichment_fingerprint(hotel_name, address, city)
+
+        if not force_refresh:
+            cached = self._load_from_cache(resolved_id, fingerprint)
+            if cached is not None:
+                return cached
+
+        return self._compute_and_persist(
+            resolved_id, hotel_name, address, city, fingerprint, warnings
+        )
+
+    def _resolve_hotel_id(
+        self,
+        hotel_name: str,
+        city: str,
+        hotel_id: str | None,
+        warnings: list[str],
+    ) -> Tuple[str, list[str]]:
         resolved_id = hotel_id or self.resolve_hotel_id(hotel_name, city)
         if not resolved_id:
             warnings.append(
                 f"Hôtel non trouvé dans le registre: '{hotel_name}'. "
-                "Enrichissement sans hotel_id canonique."
+                "Enrichissement avec identifiant provisoire."
             )
             resolved_id = self._fallback_slug(hotel_name, city)
+        return resolved_id, warnings
 
-        if not force_refresh:
-            cached = self.feature_store.load_enriched(resolved_id)
-            if cached and cached.lat is not None:
-                return resolved_id, cached, warnings
+    def _load_from_cache(self, hotel_id: str, fingerprint: str) -> EnrichResult | None:
+        """Cas 1 : données déjà dans le feature store."""
+        if not self.feature_store.has_valid_enrichment(hotel_id):
+            return None
+        if not self.feature_store.enrichment_fingerprint_matches(hotel_id, fingerprint):
+            return None
 
+        features = self.feature_store.load_enriched(hotel_id)
+        if features is None or features.lat is None:
+            return None
+
+        meta = self.feature_store.load_meta(hotel_id) or {}
+        return EnrichResult(
+            hotel_id=hotel_id,
+            features=features,
+            source="cache",
+            warnings=[],
+            cached_at=meta.get("updated_at"),
+        )
+
+    def _compute_and_persist(
+        self,
+        hotel_id: str,
+        hotel_name: str,
+        address: str,
+        city: str,
+        fingerprint: str,
+        warnings: list[str],
+    ) -> EnrichResult:
+        """Cas 2 : calcul frais puis persistance feature store."""
         geo = self._geocode_hotel(hotel_name, address, city)
         if not geo:
             empty = EnrichedHotelFeatures()
-            self.feature_store.save_enriched(resolved_id, empty)
+            self.feature_store.save_enriched(hotel_id, empty, fingerprint=fingerprint)
             warnings.append("Géocodage échoué.")
-            return resolved_id, empty, warnings
+            return EnrichResult(
+                hotel_id=hotel_id,
+                features=empty,
+                source="failed",
+                warnings=warnings,
+            )
 
         lat, lon = geo["lat"], geo["lon"]
-        warnings.extend(
-            self.identity_registry.update_nominatim_coords(resolved_id, lat, lon)
-        )
+        if self.identity_registry.get(hotel_id):
+            warnings.extend(
+                self.identity_registry.update_nominatim_coords(hotel_id, lat, lon)
+            )
+            self.identity_registry.save()
 
         weather = self._fetch_weather_12_months(lat, lon)
         try:
@@ -94,6 +161,15 @@ class EnrichHotelService:
             poi_features, nearest = {}, {}
             warnings.append(f"POI indisponibles: {exc}")
 
+        try:
+            beach_m = self._fetch_nearest_beach_m(lat, lon)
+            nearest["nearest_beach_m"] = beach_m
+            nearest["nearest_beach_km"] = beach_m / 1000.0
+        except Exception as exc:
+            nearest["nearest_beach_m"] = BEACH_MISSING_SENTINEL_M
+            nearest["nearest_beach_km"] = BEACH_MISSING_SENTINEL_M / 1000.0
+            warnings.append(f"Plages indisponibles: {exc}")
+
         features = EnrichedHotelFeatures(
             lat=lat,
             lon=lon,
@@ -102,8 +178,21 @@ class EnrichHotelService:
             weather_monthly=self._prefix_descriptive(weather),
             nearest=self._prefix_descriptive(nearest),
         )
-        self.feature_store.save_enriched(resolved_id, features)
-        return resolved_id, features, warnings
+        self.feature_store.save_enriched(hotel_id, features, fingerprint=fingerprint)
+        meta = self.feature_store.load_meta(hotel_id) or {}
+
+        return EnrichResult(
+            hotel_id=hotel_id,
+            features=features,
+            source="computed",
+            warnings=warnings,
+            cached_at=meta.get("updated_at"),
+        )
+
+    @staticmethod
+    def _enrichment_fingerprint(hotel_name: str, address: str, city: str) -> str:
+        raw = f"{hotel_name.strip().lower()}|{address.strip().lower()}|{city.strip().lower()}"
+        return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
 
     @staticmethod
     def _prefix_descriptive(features: Dict[str, float]) -> Dict[str, float]:
@@ -200,6 +289,42 @@ out center tags;
             )
         return pois
 
+    def _fetch_nearest_beach_m(self, lat: float, lon: float) -> float:
+        """Distance minimale à une plage (Overpass) — utile mix SOS / textile plage."""
+        radius_m = int(BEACH_SEARCH_RADIUS_KM * 1000)
+        tag_filters = "\n".join(
+            f'  node["{key}"="{value}"](around:{radius_m},{lat},{lon});\n'
+            f'  way["{key}"="{value}"](around:{radius_m},{lat},{lon});\n'
+            f'  relation["{key}"="{value}"](around:{radius_m},{lat},{lon});'
+            for key, value in BEACH_TAGS
+        )
+        query = f"""
+[out:json][timeout:25];
+(
+{tag_filters}
+);
+out center tags;
+"""
+        response = requests.post(
+            self.settings.overpass_url,
+            data={"data": query},
+            headers={"User-Agent": self.settings.user_agent},
+            timeout=40,
+        )
+        response.raise_for_status()
+        distances: list[float] = []
+        for element in response.json().get("elements", []):
+            p_lat = element.get("lat") or element.get("center", {}).get("lat")
+            p_lon = element.get("lon") or element.get("center", {}).get("lon")
+            if p_lat is None or p_lon is None:
+                continue
+            distances.append(
+                self._haversine_m(lat, lon, float(p_lat), float(p_lon))
+            )
+        if not distances:
+            return BEACH_MISSING_SENTINEL_M
+        return float(min(distances))
+
     def _compute_poi_features(
         self, pois: List[Dict]
     ) -> Tuple[Dict[str, float], Dict[str, float]]:
@@ -210,11 +335,7 @@ out center tags;
             key = str(radius).replace(".", "_")
             max_m = radius * 1000
             fb_count = len(
-                [
-                    p
-                    for p in pois
-                    if p["distance_m"] <= max_m and p.get("shop") in FB_TYPES
-                ]
+                [p for p in pois if p["distance_m"] <= max_m and p.get("shop") in FB_TYPES]
             )
             nf_count = len(
                 [

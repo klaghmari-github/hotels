@@ -1,0 +1,1384 @@
+{
+  "rows": [
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "avg_montant": 16.0,
+      "avg_nbr_ventes": 1.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 78.0,
+      "avg_nbr_ventes": 6.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 544.9,
+      "avg_nbr_ventes": 41.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 108.0,
+      "avg_nbr_ventes": 27.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 16.5,
+      "avg_nbr_ventes": 1.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 1,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "avg_montant": 120.0,
+      "avg_nbr_ventes": 6.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 1,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "avg_montant": 183.0,
+      "avg_nbr_ventes": 8.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 1,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "avg_montant": 248.05,
+      "avg_nbr_ventes": 12.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 1,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "avg_montant": 591.0,
+      "avg_nbr_ventes": 22.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 1,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 112.0,
+      "avg_nbr_ventes": 6.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 1,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 1.5,
+      "avg_nbr_ventes": 2.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "avg_montant": 40.0,
+      "avg_nbr_ventes": 2.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 79.7,
+      "avg_nbr_ventes": 10.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 385.8,
+      "avg_nbr_ventes": 65.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 204.0,
+      "avg_nbr_ventes": 45.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "avg_montant": 33.0,
+      "avg_nbr_ventes": 3.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "avg_montant": 372.0,
+      "avg_nbr_ventes": 16.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 51.9,
+      "avg_nbr_ventes": 6.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "avg_montant": 349.25,
+      "avg_nbr_ventes": 25.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "avg_montant": 340.0,
+      "avg_nbr_ventes": 11.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 545.5,
+      "avg_nbr_ventes": 27.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 7.5,
+      "avg_nbr_ventes": 6.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 76.0,
+      "avg_nbr_ventes": 7.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 144.75,
+      "avg_nbr_ventes": 25.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 94.5,
+      "avg_nbr_ventes": 22.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "avg_montant": 60.0,
+      "avg_nbr_ventes": 5.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "avg_montant": 106.5,
+      "avg_nbr_ventes": 4.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 68.5,
+      "avg_nbr_ventes": 4.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "avg_montant": 259.875,
+      "avg_nbr_ventes": 18.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "avg_montant": 240.0,
+      "avg_nbr_ventes": 6.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 89.0,
+      "avg_nbr_ventes": 10.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 11.5,
+      "avg_nbr_ventes": 3.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 31.5,
+      "avg_nbr_ventes": 5.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 145.0,
+      "avg_nbr_ventes": 15.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 31.0,
+      "avg_nbr_ventes": 9.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "avg_montant": 33.0,
+      "avg_nbr_ventes": 3.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "avg_montant": 151.0,
+      "avg_nbr_ventes": 6.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 139.75,
+      "avg_nbr_ventes": 6.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "avg_montant": 125.075,
+      "avg_nbr_ventes": 9.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "avg_montant": 105.0,
+      "avg_nbr_ventes": 3.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 61.5,
+      "avg_nbr_ventes": 3.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 130.0,
+      "avg_nbr_ventes": 4.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "avg_montant": 60.0,
+      "avg_nbr_ventes": 4.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 37.5,
+      "avg_nbr_ventes": 5.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 105.2,
+      "avg_nbr_ventes": 12.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 57.0,
+      "avg_nbr_ventes": 16.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 14.0,
+      "avg_nbr_ventes": 1.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "avg_montant": 60.0,
+      "avg_nbr_ventes": 4.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "avg_montant": 207.5,
+      "avg_nbr_ventes": 5.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 238.39999999999998,
+      "avg_nbr_ventes": 8.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "avg_montant": 99.2,
+      "avg_nbr_ventes": 6.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "avg_montant": 102.5,
+      "avg_nbr_ventes": 2.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 58.0,
+      "avg_nbr_ventes": 2.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 32.0,
+      "avg_nbr_ventes": 1.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "avg_montant": 112.0,
+      "avg_nbr_ventes": 7.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 57.0,
+      "avg_nbr_ventes": 8.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 156.25,
+      "avg_nbr_ventes": 16.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 60.0,
+      "avg_nbr_ventes": 16.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 7.0,
+      "avg_nbr_ventes": 1.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "avg_montant": 196.5,
+      "avg_nbr_ventes": 13.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "avg_montant": 210.5,
+      "avg_nbr_ventes": 7.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 134.9,
+      "avg_nbr_ventes": 6.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "avg_montant": 159.025,
+      "avg_nbr_ventes": 10.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "avg_montant": 50.0,
+      "avg_nbr_ventes": 1.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 90.0,
+      "avg_nbr_ventes": 6.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 6.5,
+      "avg_nbr_ventes": 3.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "avg_montant": 26.0,
+      "avg_nbr_ventes": 2.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 96.25,
+      "avg_nbr_ventes": 18.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 256.5,
+      "avg_nbr_ventes": 38.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 125.0,
+      "avg_nbr_ventes": 32.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 6.0,
+      "avg_nbr_ventes": 1.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "avg_montant": 354.5,
+      "avg_nbr_ventes": 22.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "avg_montant": 193.5,
+      "avg_nbr_ventes": 6.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 131.95,
+      "avg_nbr_ventes": 8.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "avg_montant": 160.35,
+      "avg_nbr_ventes": 10.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "avg_montant": 154.5,
+      "avg_nbr_ventes": 4.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 188.0,
+      "avg_nbr_ventes": 12.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 112.0,
+      "avg_nbr_ventes": 3.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "avg_montant": 32.0,
+      "avg_nbr_ventes": 3.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 114.85,
+      "avg_nbr_ventes": 19.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 297.8,
+      "avg_nbr_ventes": 40.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 169.25,
+      "avg_nbr_ventes": 42.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 36.7,
+      "avg_nbr_ventes": 3.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "avg_montant": 917.95,
+      "avg_nbr_ventes": 50.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "avg_montant": 257.0,
+      "avg_nbr_ventes": 8.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 61.2,
+      "avg_nbr_ventes": 5.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "avg_montant": 307.55,
+      "avg_nbr_ventes": 21.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "avg_montant": 318.5,
+      "avg_nbr_ventes": 10.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 267.5,
+      "avg_nbr_ventes": 19.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 35.0,
+      "avg_nbr_ventes": 2.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "avg_montant": 52.0,
+      "avg_nbr_ventes": 4.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 30.5,
+      "avg_nbr_ventes": 6.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 106.65,
+      "avg_nbr_ventes": 16.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 81.5,
+      "avg_nbr_ventes": 20.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 33.0,
+      "avg_nbr_ventes": 2.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "avg_montant": 389.5,
+      "avg_nbr_ventes": 25.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "avg_montant": 394.0,
+      "avg_nbr_ventes": 8.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 110.8,
+      "avg_nbr_ventes": 7.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "avg_montant": 115.4,
+      "avg_nbr_ventes": 9.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "avg_montant": 151.0,
+      "avg_nbr_ventes": 4.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 118.0,
+      "avg_nbr_ventes": 9.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 43.0,
+      "avg_nbr_ventes": 3.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "avg_montant": 140.0,
+      "avg_nbr_ventes": 11.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 39.0,
+      "avg_nbr_ventes": 4.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 74.4,
+      "avg_nbr_ventes": 8.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 37.5,
+      "avg_nbr_ventes": 10.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "avg_montant": 71.95,
+      "avg_nbr_ventes": 5.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "avg_montant": 240.0,
+      "avg_nbr_ventes": 5.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 81.7,
+      "avg_nbr_ventes": 4.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "avg_montant": 55.1,
+      "avg_nbr_ventes": 4.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "avg_montant": 35.0,
+      "avg_nbr_ventes": 1.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 27.5,
+      "avg_nbr_ventes": 2.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 48.0,
+      "avg_nbr_ventes": 3.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "avg_montant": 16.0,
+      "avg_nbr_ventes": 2.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 58.65,
+      "avg_nbr_ventes": 11.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 102.8,
+      "avg_nbr_ventes": 9.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 49.5,
+      "avg_nbr_ventes": 12.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "avg_montant": 139.0,
+      "avg_nbr_ventes": 13.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "avg_montant": 398.5,
+      "avg_nbr_ventes": 8.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 138.45,
+      "avg_nbr_ventes": 5.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "avg_montant": 59.925,
+      "avg_nbr_ventes": 4.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "avg_montant": 112.5,
+      "avg_nbr_ventes": 3.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 167.5,
+      "avg_nbr_ventes": 14.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 10.5,
+      "avg_nbr_ventes": 2.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 11,
+      "TYPE": NaN,
+      "GAMME": NaN,
+      "avg_montant": 152.0,
+      "avg_nbr_ventes": 8.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "avg_montant": 8.0,
+      "avg_nbr_ventes": 1.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 81.0,
+      "avg_nbr_ventes": 16.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 396.15,
+      "avg_nbr_ventes": 63.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 156.25,
+      "avg_nbr_ventes": 44.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 66.5,
+      "avg_nbr_ventes": 3.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "avg_montant": 97.5,
+      "avg_nbr_ventes": 9.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "avg_montant": 267.5,
+      "avg_nbr_ventes": 8.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 64.7,
+      "avg_nbr_ventes": 6.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "avg_montant": 201.95,
+      "avg_nbr_ventes": 14.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "avg_montant": 330.0,
+      "avg_nbr_ventes": 10.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 228.0,
+      "avg_nbr_ventes": 15.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 50.5,
+      "avg_nbr_ventes": 3.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "month": 12,
+      "TYPE": NaN,
+      "GAMME": NaN,
+      "avg_montant": 1270.4,
+      "avg_nbr_ventes": 80.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    }
+  ]
+}

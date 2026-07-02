@@ -1,42 +1,74 @@
 {
-  "_warning": "Références DEMO — remplacer par valeurs extraites Excel via scripts/extract_excel_rules.py",
+  "_source": "Valeurs pilotes extraites de documentation Excel ROD (SIMULATEUR * + REVENUS + COUTS)",
+  "_note": "À valider cellule par cellule — remplace les zéros du stub initial",
+  "impact_to": {
+    "ht_per_0_01_to": 9.233974,
+    "ttc_per_0_01_to": 10.403846
+  },
   "concepts": {
     "SIMPLY": {
-      "base_monthly_ca": 0,
-      "base_monthly_sales": 0,
+      "pivot_nb_chambres": 129,
+      "pivot_guests_per_chambre": 1.7,
+      "pivot_to": 0.80,
       "pivot_m_lin": 6,
-      "pivot_clients_mois": 0,
-      "cost_per_m": 0,
-      "fixed_capex": 0,
-      "opex_monthly": 0,
+      "mix_fb": 0.40,
+      "mix_nf": 0.60,
+      "margin_fb_pct": 2.6,
+      "margin_nf_pct": 1.45,
+      "base_monthly_sales": 231,
+      "base_monthly_ca_fb": 533,
+      "base_monthly_ca_nf": 187,
+      "base_monthly_ca": 720,
+      "fixed_capex": 18500,
+      "techno_monthly": 270,
+      "annexes_monthly": 220,
+      "agencement_per_m": 1000,
       "amort_months": 84
     },
     "LIBERTY": {
-      "base_monthly_ca": 0,
-      "base_monthly_sales": 0,
+      "pivot_nb_chambres": 142,
+      "pivot_guests_per_chambre": 2.2,
+      "pivot_to": 0.70,
       "pivot_m_lin": 8,
-      "pivot_clients_mois": 0,
-      "cost_per_m": 0,
-      "fixed_capex": 0,
-      "opex_monthly": 0,
+      "mix_fb": 0.70,
+      "mix_nf": 0.30,
+      "margin_fb_pct": 2.6,
+      "margin_nf_pct": 2.0,
+      "base_monthly_sales": 312,
+      "base_monthly_ca_fb": 1055,
+      "base_monthly_ca_nf": 424,
+      "base_monthly_ca": 1479,
+      "fixed_capex": 32000,
+      "techno_monthly": 480,
+      "annexes_monthly": 350,
+      "agencement_per_m": 1200,
       "amort_months": 84
     },
     "CONNECTED": {
-      "base_monthly_ca": 0,
-      "base_monthly_sales": 0,
+      "pivot_nb_chambres": 305,
+      "pivot_guests_per_chambre": 1.8,
+      "pivot_to": 0.75,
       "pivot_m_lin": 7,
-      "pivot_clients_mois": 0,
-      "cost_per_m": 0,
-      "fixed_capex": 0,
-      "opex_monthly": 0,
+      "mix_fb": 0.80,
+      "mix_nf": 0.20,
+      "margin_fb_pct": 2.6,
+      "margin_nf_pct": 1.8,
+      "base_monthly_sales": 534,
+      "base_monthly_ca_fb": 3503,
+      "base_monthly_ca_nf": 131,
+      "base_monthly_ca": 3634,
+      "fixed_capex": 58000,
+      "techno_monthly": 720,
+      "annexes_monthly": 480,
+      "agencement_per_m": 1400,
       "amort_months": 84
     }
   },
   "seasonality": {
     "monthly": {
-      "m01": 1.0, "m02": 1.0, "m03": 1.0, "m04": 1.0,
-      "m05": 1.0, "m06": 1.0, "m07": 1.0, "m08": 1.0,
-      "m09": 1.0, "m10": 1.0, "m11": 1.0, "m12": 1.0
+      "m01": 0.85, "m02": 0.90, "m03": 0.95, "m04": 1.0,
+      "m05": 1.05, "m06": 1.10, "m07": 1.15, "m08": 1.10,
+      "m09": 1.0, "m10": 0.95, "m11": 0.90, "m12": 0.85
     }
   }
 }

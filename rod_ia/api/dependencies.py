@@ -11,10 +11,13 @@ from rod_ia.domain.repositories.reference_repository import ReferenceRepository
 from rod_ia.domain.rules.cost_rules import RodCostRules
 from rod_ia.domain.rules.recommendation_rules import RodRecommendationRules
 from rod_ia.domain.rules.revenue_rules import RodRevenueRules
+from rod_ia.domain.services.ai_pnl_service import AIPnlService
 from rod_ia.domain.services.ai_predictor import AIRodRevenuePredictor
+from rod_ia.domain.services.hotel_feature_loader import HotelFeatureLoader
 from rod_ia.domain.services.enrich_hotel import EnrichHotelService
 from rod_ia.domain.services.optimizer import RodOptimizer
 from rod_ia.domain.services.rod_simulator import RodSimulator
+from rod_ia.domain.services.simulation_orchestrator import SimulationOrchestrator
 
 
 @dataclass
@@ -28,6 +31,8 @@ class AppContainer:
     enrich_service: EnrichHotelService
     rod_simulator: RodSimulator
     ai_predictor: AIRodRevenuePredictor
+    ai_pnl: AIPnlService
+    simulation_orchestrator: SimulationOrchestrator
     optimizer: RodOptimizer
 
 
@@ -41,6 +46,15 @@ def build_container(settings: Settings | None = None) -> AppContainer:
     cost_rules = RodCostRules(reference_repository)
     recommendation_rules = RodRecommendationRules()
     rod_simulator = RodSimulator(revenue_rules, cost_rules, recommendation_rules)
+    hotel_features = HotelFeatureLoader(settings.data_processed_dir)
+    ai_predictor = AIRodRevenuePredictor(settings.artifacts_dir, hotel_features)
+    ai_pnl = AIPnlService(ai_predictor, revenue_rules, cost_rules)
+    simulation_orchestrator = SimulationOrchestrator(
+        reference_repository,
+        rod_simulator,
+        ai_pnl,
+        recommendation_rules,
+    )
 
     return AppContainer(
         settings=settings,
@@ -49,6 +63,8 @@ def build_container(settings: Settings | None = None) -> AppContainer:
         reference_repository=reference_repository,
         enrich_service=EnrichHotelService(feature_store, identity_registry, settings),
         rod_simulator=rod_simulator,
-        ai_predictor=AIRodRevenuePredictor(settings.artifacts_dir),
-        optimizer=RodOptimizer(rod_simulator),
+        ai_predictor=ai_predictor,
+        ai_pnl=ai_pnl,
+        simulation_orchestrator=simulation_orchestrator,
+        optimizer=RodOptimizer(simulation_orchestrator),
     )

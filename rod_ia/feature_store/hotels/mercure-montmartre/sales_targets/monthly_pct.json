@@ -1,0 +1,1129 @@
+{
+  "rows": [
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 1,
+      "month": 1,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m01",
+      "pct": 0.08802681287305482
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 1,
+      "month": 2,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m02",
+      "pct": 0.06950138395096175
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 1,
+      "month": 3,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m03",
+      "pct": 0.07945949739557033
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 1,
+      "month": 4,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m04",
+      "pct": 0.09199807599148918
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 1,
+      "month": 5,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m05",
+      "pct": 0.06924890062769923
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 1,
+      "month": 6,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m06",
+      "pct": 0.08104286738891162
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 1,
+      "month": 7,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m07",
+      "pct": 0.07696889918982809
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 1,
+      "month": 8,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m08",
+      "pct": 0.06064735012333169
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 1,
+      "month": 9,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m09",
+      "pct": 0.10309878345831971
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 1,
+      "month": 10,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m10",
+      "pct": 0.12337618988115312
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 1,
+      "month": 11,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m11",
+      "pct": 0.0773925576475059
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 1,
+      "month": 12,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m12",
+      "pct": 0.07923868147217464
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 2,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m01_type_fandb",
+      "pct": 0.985512882839086
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "column": "d_pct_mois_m01_type_fandb_gamme_alcool",
+      "pct": 0.29873717442778214
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m01_type_fandb_gamme_food_salee",
+      "pct": 0.054064719810576166
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m01_type_fandb_gamme_food_sucree",
+      "pct": 0.12253354380426204
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m01_type_fandb_gamme_sans_alcool",
+      "pct": 0.5189423835832676
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m01_type_fandb_gamme_souvenirs",
+      "pct": 0.005722178374112076
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 2,
+      "month": 1,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m01_type_non_fandb",
+      "pct": 0.014487117160913953
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 1,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m01_type_non_fandb_gamme_cosmetique",
+      "pct": 0.4899328859060403
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 1,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m01_type_non_fandb_gamme_sos",
+      "pct": 0.5100671140939598
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 2,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m02_type_fandb",
+      "pct": 0.846438027215073
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "column": "d_pct_mois_m02_type_fandb_gamme_alcool",
+      "pct": 0.32559831235906017
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m02_type_fandb_gamme_food_salee",
+      "pct": 0.08074488979413691
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m02_type_fandb_gamme_food_sucree",
+      "pct": 0.06415945297155744
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m02_type_fandb_gamme_sans_alcool",
+      "pct": 0.5210591401760384
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m02_type_fandb_gamme_souvenirs",
+      "pct": 0.0084382046992071
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 2,
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m02_type_non_fandb",
+      "pct": 0.15356197278492703
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m02_type_non_fandb_gamme_cosmetique",
+      "pct": 0.2806736166800321
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m02_type_non_fandb_gamme_sos",
+      "pct": 0.11307137129109864
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m02_type_non_fandb_gamme_souvenirs",
+      "pct": 0.6062550120288693
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 2,
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m03_type_fandb",
+      "pct": 0.91813873330461
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "column": "d_pct_mois_m03_type_fandb_gamme_alcool",
+      "pct": 0.2563350539652745
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m03_type_fandb_gamme_food_salee",
+      "pct": 0.06182543406851244
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m03_type_fandb_gamme_food_sucree",
+      "pct": 0.08962928202721727
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m03_type_fandb_gamme_sans_alcool",
+      "pct": 0.5889253871421868
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m03_type_fandb_gamme_souvenirs",
+      "pct": 0.00328484279680901
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 2,
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m03_type_non_fandb",
+      "pct": 0.08186126669538991
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m03_type_non_fandb_gamme_cosmetique",
+      "pct": 0.3131578947368421
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m03_type_non_fandb_gamme_sos",
+      "pct": 0.5710526315789474
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m03_type_non_fandb_gamme_souvenirs",
+      "pct": 0.11578947368421053
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 2,
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m04_type_fandb",
+      "pct": 0.8768257512326728
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "column": "d_pct_mois_m04_type_fandb_gamme_alcool",
+      "pct": 0.30716180371352786
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m04_type_fandb_gamme_food_salee",
+      "pct": 0.04753315649867374
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m04_type_fandb_gamme_food_sucree",
+      "pct": 0.08095490716180372
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m04_type_fandb_gamme_sans_alcool",
+      "pct": 0.5287002652519894
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m04_type_fandb_gamme_souvenirs",
+      "pct": 0.03564986737400531
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 2,
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m04_type_non_fandb",
+      "pct": 0.12317424876732719
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m04_type_non_fandb_gamme_cosmetique",
+      "pct": 0.30513595166163143
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m04_type_non_fandb_gamme_sos",
+      "pct": 0.3564954682779456
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m04_type_non_fandb_gamme_souvenirs",
+      "pct": 0.338368580060423
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 2,
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m05_type_fandb",
+      "pct": 0.9368434062538623
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "column": "d_pct_mois_m05_type_fandb_gamme_alcool",
+      "pct": 0.2711081794195251
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m05_type_fandb_gamme_food_salee",
+      "pct": 0.07229551451187335
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m05_type_fandb_gamme_food_sucree",
+      "pct": 0.070844327176781
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m05_type_fandb_gamme_sans_alcool",
+      "pct": 0.5857519788918206
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 2,
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m05_type_non_fandb",
+      "pct": 0.06315659374613769
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m05_type_non_fandb_gamme_cosmetique",
+      "pct": 0.38943248532289626
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m05_type_non_fandb_gamme_sos",
+      "pct": 0.48532289628180036
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m05_type_non_fandb_gamme_souvenirs",
+      "pct": 0.12524461839530332
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 2,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m06_type_fandb",
+      "pct": 0.9526877178160312
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "column": "d_pct_mois_m06_type_fandb_gamme_alcool",
+      "pct": 0.1568562243653697
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m06_type_fandb_gamme_food_salee",
+      "pct": 0.05387429331559694
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m06_type_fandb_gamme_food_sucree",
+      "pct": 0.08713002993016296
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m06_type_fandb_gamme_sans_alcool",
+      "pct": 0.6921627314045006
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m06_type_fandb_gamme_souvenirs",
+      "pct": 0.009976720984369804
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 2,
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m06_type_non_fandb",
+      "pct": 0.04731228218396874
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m06_type_non_fandb_gamme_cosmetique",
+      "pct": 0.59375
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m06_type_non_fandb_gamme_sos",
+      "pct": 0.21875
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m06_type_non_fandb_gamme_souvenirs",
+      "pct": 0.1875
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 2,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m07_type_fandb",
+      "pct": 0.9705326364950517
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "column": "d_pct_mois_m07_type_fandb_gamme_alcool",
+      "pct": 0.19867094408799266
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m07_type_fandb_gamme_food_salee",
+      "pct": 0.07023373052245646
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m07_type_fandb_gamme_food_sucree",
+      "pct": 0.0826076993583868
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m07_type_fandb_gamme_sans_alcool",
+      "pct": 0.6450504124656279
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m07_type_fandb_gamme_souvenirs",
+      "pct": 0.0034372135655362053
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 2,
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m07_type_non_fandb",
+      "pct": 0.02946736350494829
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m07_type_non_fandb_gamme_cosmetique",
+      "pct": 0.5660377358490566
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m07_type_non_fandb_gamme_sos",
+      "pct": 0.18490566037735848
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m07_type_non_fandb_gamme_souvenirs",
+      "pct": 0.2490566037735849
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 2,
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m08_type_fandb",
+      "pct": 0.9740333051086649
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "column": "d_pct_mois_m08_type_fandb_gamme_alcool",
+      "pct": 0.26992176180817157
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m08_type_fandb_gamme_food_salee",
+      "pct": 0.06201101130107215
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m08_type_fandb_gamme_food_sucree",
+      "pct": 0.10909881193856853
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m08_type_fandb_gamme_sans_alcool",
+      "pct": 0.5589684149521877
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 2,
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m08_type_non_fandb",
+      "pct": 0.025966694891335025
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m08_type_non_fandb_gamme_cosmetique",
+      "pct": 0.13043478260869565
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m08_type_non_fandb_gamme_sos",
+      "pct": 0.41304347826086957
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m08_type_non_fandb_gamme_souvenirs",
+      "pct": 0.45652173913043476
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 2,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m09_type_fandb",
+      "pct": 0.9845591897725386
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "column": "d_pct_mois_m09_type_fandb_gamme_alcool",
+      "pct": 0.35084317032040474
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m09_type_fandb_gamme_food_salee",
+      "pct": 0.0672849915682968
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m09_type_fandb_gamme_food_sucree",
+      "pct": 0.08347386172006746
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m09_type_fandb_gamme_sans_alcool",
+      "pct": 0.498397976391231
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 2,
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m09_type_non_fandb",
+      "pct": 0.015440810227461398
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m09_type_non_fandb_gamme_cosmetique",
+      "pct": 0.3225806451612903
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m09_type_non_fandb_gamme_sos",
+      "pct": 0.22580645161290322
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m09_type_non_fandb_gamme_souvenirs",
+      "pct": 0.45161290322580644
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 2,
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m10_type_fandb",
+      "pct": 0.9515650147066984
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "column": "d_pct_mois_m10_type_fandb_gamme_alcool",
+      "pct": 0.31355252606255013
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m10_type_fandb_gamme_food_salee",
+      "pct": 0.06969453962236641
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m10_type_fandb_gamme_food_sucree",
+      "pct": 0.060508857621928994
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m10_type_fandb_gamme_sans_alcool",
+      "pct": 0.5562440766931545
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 2,
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m10_type_non_fandb",
+      "pct": 0.048434985293301515
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m10_type_non_fandb_gamme_cosmetique",
+      "pct": 0.20252076768834146
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m10_type_non_fandb_gamme_sos",
+      "pct": 0.17015181896304782
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m10_type_non_fandb_gamme_souvenirs",
+      "pct": 0.6273274133486106
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 2,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m11_type_fandb",
+      "pct": 0.9837987282278131
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "column": "d_pct_mois_m11_type_fandb_gamme_alcool",
+      "pct": 0.297886690647482
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m11_type_fandb_gamme_food_salee",
+      "pct": 0.08329586330935251
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m11_type_fandb_gamme_food_sucree",
+      "pct": 0.08655575539568346
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m11_type_fandb_gamme_sans_alcool",
+      "pct": 0.5288893884892086
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m11_type_fandb_gamme_souvenirs",
+      "pct": 0.003372302158273381
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 2,
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m11_type_non_fandb",
+      "pct": 0.016201271772186894
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m11_type_non_fandb_gamme_cosmetique",
+      "pct": 0.5508532423208191
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m11_type_non_fandb_gamme_sos",
+      "pct": 0.4491467576791809
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 2,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m12_type_fandb",
+      "pct": 0.9569894795964657
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "column": "d_pct_mois_m12_type_fandb_gamme_alcool",
+      "pct": 0.3511286681715576
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m12_type_fandb_gamme_food_salee",
+      "pct": 0.06941309255079006
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m12_type_fandb_gamme_food_sucree",
+      "pct": 0.09130925507900677
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m12_type_fandb_gamme_sans_alcool",
+      "pct": 0.4881489841986456
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 2,
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m12_type_non_fandb",
+      "pct": 0.04301052040353416
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m12_type_non_fandb_gamme_cosmetique",
+      "pct": 0.5735811150175791
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m12_type_non_fandb_gamme_sos",
+      "pct": 0.3159216474133601
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "level": 3,
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m12_type_non_fandb_gamme_souvenirs",
+      "pct": 0.11049723756906078
+    }
+  ]
+}

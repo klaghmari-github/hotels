@@ -11,11 +11,15 @@ def create_simulate_blueprint(container: AppContainer) -> Blueprint:
     def simulate():
         payload = request.get_json(force=True) or {}
         request_model = RodSimulationRequest.from_dict(payload)
-        rod_result = container.rod_simulator.simulate(request_model)
-        ai_result = container.ai_predictor.predict(request_model)
+        full = container.simulation_orchestrator.simulate_all(request_model)
         if request_model.identity.hotel_id:
-            container.feature_store.append_simulation(request_model.identity.hotel_id, rod_result)
-        return jsonify({"rod": rod_result.to_dict(), "ai": ai_result.to_dict()})
+            reco = full.recommended_concept
+            if reco in full.rod_by_concept:
+                container.feature_store.append_simulation(
+                    request_model.identity.hotel_id,
+                    full.rod_by_concept[reco],
+                )
+        return jsonify(full.to_dict())
 
     @blueprint.post("/api/optimize")
     def optimize():

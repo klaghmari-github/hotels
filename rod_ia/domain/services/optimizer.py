@@ -6,41 +6,47 @@ from copy import deepcopy
 from itertools import product
 
 from rod_ia.domain.models.simulation import RodSimulationRequest
+from rod_ia.domain.services.simulation_orchestrator import SimulationOrchestrator
 
 
 class RodOptimizer:
     """Recherche la meilleure configuration en respectant ``locked_fields``."""
 
-    def __init__(self, simulator) -> None:
-        self.simulator = simulator
+    def __init__(self, orchestrator: SimulationOrchestrator) -> None:
+        self._orchestrator = orchestrator
 
     def optimize(
         self,
         request: RodSimulationRequest,
         concepts: tuple[str, ...] = ("SIMPLY", "LIBERTY", "CONNECTED"),
-        m_lins: tuple[float, ...] = (1, 2, 3, 4, 5, 6, 7, 8),
-        fb_shares: tuple[float, ...] = (0.5, 0.6, 0.7, 0.8, 0.9),
+        m_lins: tuple[float, ...] = (2, 4, 6, 8, 10),
+        fb_shares: tuple[float, ...] = (0.4, 0.5, 0.6, 0.7, 0.8),
     ) -> dict:
-        locked = set(request.store.locked_fields)
+        base = deepcopy(request)
+        locked = set()
+        if base.store:
+            locked = set(base.store.locked_fields)
+        locked.update(base.constraints.get("locked_fields") or [])
+
         best_result = None
         best_request = None
 
         for concept, m_lin, fb_share in product(concepts, m_lins, fb_shares):
-            candidate = deepcopy(request)
-            if "concept" not in locked:
-                candidate.store.concept = concept
-            if "m_lin" not in locked:
-                candidate.store.m_lin = float(m_lin)
-            if "fb_share" not in locked:
-                candidate.store.mix.fb_share = float(fb_share)
-                candidate.store.mix.non_fb_share = float(1.0 - fb_share)
+            if "concept" in locked and base.store and base.store.concept != concept:
+                continue
 
-            result = self.simulator.simulate(candidate)
+            req, result = self._orchestrator.simulate_concept(
+                base,
+                concept,
+                m_lin=None if "m_lin" in locked else float(m_lin),
+                fb_share=None if "fb_share" in locked else float(fb_share),
+            )
             if best_result is None or result.marge_annuelle > best_result.marge_annuelle:
                 best_result = result
-                best_request = candidate
+                best_request = req
 
         return {
-            "request": best_request.store.to_dict() if best_request else None,
+            "request": best_request.store.to_dict() if best_request and best_request.store else None,
             "result": best_result.to_dict() if best_result else None,
+            "recommended_concept": best_result.concept if best_result else None,
         }

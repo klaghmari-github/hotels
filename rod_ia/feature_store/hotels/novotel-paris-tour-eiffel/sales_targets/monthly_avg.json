@@ -1,0 +1,634 @@
+{
+  "rows": [
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 2842.6,
+      "avg_nbr_ventes": 313.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 1763.5,
+      "avg_nbr_ventes": 290.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 3864.5,
+      "avg_nbr_ventes": 608.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 1,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 2419.0,
+      "avg_nbr_ventes": 238.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 2892.1,
+      "avg_nbr_ventes": 310.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 1853.2,
+      "avg_nbr_ventes": 299.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 4201.3,
+      "avg_nbr_ventes": 649.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 24.0,
+      "avg_nbr_ventes": 3.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 3432.0,
+      "avg_nbr_ventes": 351.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 3653.0,
+      "avg_nbr_ventes": 345.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 2109.2,
+      "avg_nbr_ventes": 343.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 4495.8,
+      "avg_nbr_ventes": 748.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 48.0,
+      "avg_nbr_ventes": 5.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 3112.0,
+      "avg_nbr_ventes": 346.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 4827.4,
+      "avg_nbr_ventes": 459.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 2330.3,
+      "avg_nbr_ventes": 373.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 5331.3,
+      "avg_nbr_ventes": 918.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 16.0,
+      "avg_nbr_ventes": 2.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 2322.0,
+      "avg_nbr_ventes": 256.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 4,
+      "TYPE": NaN,
+      "GAMME": NaN,
+      "avg_montant": 28.0,
+      "avg_nbr_ventes": 5.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 4658.0,
+      "avg_nbr_ventes": 487.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 2031.7,
+      "avg_nbr_ventes": 359.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 5897.5,
+      "avg_nbr_ventes": 972.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 48.0,
+      "avg_nbr_ventes": 6.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 1324.0,
+      "avg_nbr_ventes": 140.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 2517.9,
+      "avg_nbr_ventes": 281.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 1212.4499999999998,
+      "avg_nbr_ventes": 192.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 4787.35,
+      "avg_nbr_ventes": 598.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 24.0,
+      "avg_nbr_ventes": 3.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 1991.0,
+      "avg_nbr_ventes": 178.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 3397.85,
+      "avg_nbr_ventes": 330.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 1604.1499999999999,
+      "avg_nbr_ventes": 233.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 6003.085,
+      "avg_nbr_ventes": 722.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 48.0,
+      "avg_nbr_ventes": 6.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 2067.5,
+      "avg_nbr_ventes": 176.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 18.5,
+      "avg_nbr_ventes": 1.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 4641.7,
+      "avg_nbr_ventes": 487.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 2191.4,
+      "avg_nbr_ventes": 331.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 7381.8,
+      "avg_nbr_ventes": 1077.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 56.0,
+      "avg_nbr_ventes": 7.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 3583.0,
+      "avg_nbr_ventes": 335.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 1874.25,
+      "avg_nbr_ventes": 221.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 933.05,
+      "avg_nbr_ventes": 158.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 3056.5,
+      "avg_nbr_ventes": 498.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 20.0,
+      "avg_nbr_ventes": 2.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 1900.5,
+      "avg_nbr_ventes": 185.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 3039.95,
+      "avg_nbr_ventes": 368.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 1993.85,
+      "avg_nbr_ventes": 345.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 5264.95,
+      "avg_nbr_ventes": 823.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 40.0,
+      "avg_nbr_ventes": 4.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 3562.0,
+      "avg_nbr_ventes": 348.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 2895.25,
+      "avg_nbr_ventes": 341.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 1597.8,
+      "avg_nbr_ventes": 278.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 4279.3,
+      "avg_nbr_ventes": 698.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 16.0,
+      "avg_nbr_ventes": 1.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 3134.0,
+      "avg_nbr_ventes": 320.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 11,
+      "TYPE": NaN,
+      "GAMME": NaN,
+      "avg_montant": 16.0,
+      "avg_nbr_ventes": 2.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 3702.15,
+      "avg_nbr_ventes": 370.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 2094.8,
+      "avg_nbr_ventes": 349.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 5533.45,
+      "avg_nbr_ventes": 878.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 60.0,
+      "avg_nbr_ventes": 6.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 2835.0,
+      "avg_nbr_ventes": 297.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "month": 12,
+      "TYPE": NaN,
+      "GAMME": NaN,
+      "avg_montant": 96.0,
+      "avg_nbr_ventes": 11.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    }
+  ]
+}

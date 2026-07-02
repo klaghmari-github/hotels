@@ -1,0 +1,36 @@
+{
+  "types": [
+    "F&B",
+    "NON-F&B"
+  ],
+  "by_type": {
+    "F&B": [
+      "ALCOOL",
+      "FOOD SALEE",
+      "FOOD SUCREE",
+      "SANS ALCOOL",
+      "SOUVENIRS"
+    ],
+    "NON-F&B": [
+      "ACCESSOIRES",
+      "COSMETIQUE",
+      "JEUX / ENFANTS",
+      "PAP",
+      "SOS",
+      "SOUVENIRS"
+    ]
+  },
+  "gammes": [
+    "ACCESSOIRES",
+    "ALCOOL",
+    "COSMETIQUE",
+    "FOOD SALEE",
+    "FOOD SUCREE",
+    "JEUX / ENFANTS",
+    "PAP",
+    "SANS ALCOOL",
+    "SOS",
+    "SOUVENIRS"
+  ],
+  "source": "/media/laghmari/ssd-data/dev/hotels/sources/raw/001.queryVentes.csv"
+}

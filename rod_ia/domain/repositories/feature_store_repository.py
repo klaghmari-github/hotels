@@ -46,13 +46,36 @@ class FeatureStoreRepository:
         }
         self._write_json(hotel_id, "meta.json", meta)
 
+    def load_meta(self, hotel_id: str) -> Optional[dict]:
+        return self._read_json(hotel_id, "meta.json")
+
+    def has_valid_enrichment(self, hotel_id: str) -> bool:
+        """True si POI/météo déjà calculés et persistés pour cet hôtel."""
+        enriched = self.load_enriched(hotel_id)
+        return enriched is not None and enriched.lat is not None
+
     def load_enriched(self, hotel_id: str) -> Optional[EnrichedHotelFeatures]:
         data = self._read_json(hotel_id, "geo/enriched.json")
         return EnrichedHotelFeatures.from_dict(data) if data else None
 
-    def save_enriched(self, hotel_id: str, features: EnrichedHotelFeatures) -> None:
+    def save_enriched(
+        self,
+        hotel_id: str,
+        features: EnrichedHotelFeatures,
+        fingerprint: str | None = None,
+    ) -> None:
         self._write_json(hotel_id, "geo/enriched.json", features.to_dict())
-        self.save_meta(hotel_id, {"enriched": True})
+        extra: dict[str, Any] = {"enriched": features.lat is not None}
+        if fingerprint:
+            extra["enrichment_fingerprint"] = fingerprint
+        self.save_meta(hotel_id, extra)
+
+    def enrichment_fingerprint_matches(self, hotel_id: str, fingerprint: str) -> bool:
+        """Vérifie que le cache correspond à la même saisie nom/adresse/ville."""
+        meta = self.load_meta(hotel_id)
+        if not meta:
+            return False
+        return meta.get("enrichment_fingerprint") == fingerprint
 
     def save_director_inputs(self, hotel_id: str, inputs: dict) -> None:
         self._write_json(hotel_id, "rod_input/director_inputs.json", inputs)
@@ -84,3 +107,13 @@ class FeatureStoreRepository:
             "monthly_avg": self._read_json(hotel_id, "sales_targets/monthly_avg.json"),
             "monthly_pct": self._read_json(hotel_id, "sales_targets/monthly_pct.json"),
         }
+
+    def save_recap_features(self, hotel_id: str, features: dict[str, float]) -> None:
+        self._write_json(hotel_id, "recap/features.json", {"features": features})
+        self.save_meta(hotel_id, {"has_recap_features": bool(features)})
+
+    def load_recap_features(self, hotel_id: str) -> dict[str, float]:
+        data = self._read_json(hotel_id, "recap/features.json")
+        if not data:
+            return {}
+        return {str(k): float(v) for k, v in (data.get("features") or {}).items()}

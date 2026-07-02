@@ -11,8 +11,14 @@
   <main class="container">
     <header>
       <h1>ROD Simulateur IA</h1>
-      <p>Simulation ROD Excel + prédiction IA + optimisation sous contraintes.</p>
+      <p>ROD Excel (mois moyen × 12) vs IA (profil mensuel). Config store = <strong>sortie</strong>.
+        <a href="/docs">Doc code</a> · <a href="/journal">Journal consignes v1</a></p>
     </header>
+
+    <section class="card" id="brands_card">
+      <h2>Parc hôtelier (Excel ROD)</h2>
+      <div id="brands_info" class="muted">Chargement marques…</div>
+    </section>
 
     <section class="card">
       <h2>Identification hôtel</h2>
@@ -32,9 +38,9 @@
 
     <nav class="tabs">
       <button class="tab active" data-tab="0">1. Infos générales</button>
-      <button class="tab" data-tab="1">2. Configuration store</button>
-      <button class="tab" data-tab="2">3. Contraintes</button>
-      <button class="tab" data-tab="3">4. Résultats</button>
+      <button class="tab" data-tab="1">2. Contraintes</button>
+      <button class="tab" data-tab="2">3. Résultats</button>
+      <button class="tab" data-tab="3">4. Performance ROD vs IA</button>
     </nav>
 
     <section class="panel active" data-panel="0">
@@ -46,41 +52,53 @@
     </section>
 
     <section class="panel" data-panel="1">
-      <div class="card grid">
-        <label>Concept
-          <select id="concept"><option>SIMPLY</option><option>LIBERTY</option><option>CONNECTED</option></select>
-        </label>
-        <label>Mètres linéaires<input id="m_lin" type="number" step="0.1" value="2"></label>
-        <label>Part F&B<input id="fb_share" type="number" step="0.01" value="0.70"></label>
-        <label>Part Non-F&B<input id="non_fb_share" type="number" step="0.01" value="0.30"></label>
-      </div>
-    </section>
-
-    <section class="panel" data-panel="2">
       <div class="card">
-        <h2>Catégories exclues</h2>
-        <label><input type="checkbox" class="excluded" value="ALCOOL"> Exclure alcool</label>
-        <label><input type="checkbox" class="excluded" value="PAP"> Exclure prêt-à-porter</label>
-        <label><input type="checkbox" class="excluded" value="SOUVENIRS"> Exclure souvenirs</label>
-        <h2>Champs figés</h2>
+        <h2>Mix catégories (F&B / NON-F&B)</h2>
+        <p class="muted">Sliders 0–100 % issus du fichier ventes. 0 % = exclu ; 100 % sur une gamme = le reste à 0.</p>
+        <div id="type_mix_panel" class="mix-panel"></div>
+        <div id="gamme_mix_panels"></div>
+        <h2>Champs figés (optimisation)</h2>
         <label><input type="checkbox" class="locked" value="concept"> Concept figé</label>
         <label><input type="checkbox" class="locked" value="m_lin"> Mètres linéaires figés</label>
         <label><input type="checkbox" class="locked" value="fb_share"> Mix F&B figé</label>
       </div>
     </section>
 
-    <section class="panel" data-panel="3">
-      <div class="results">
-        <div class="kpi"><span>CA ROD annuel</span><strong id="rod_ca">0 €</strong></div>
-        <div class="kpi"><span>Marge ROD</span><strong id="rod_margin">0 €</strong></div>
-        <div class="kpi"><span>CA IA annuel</span><strong id="ai_ca">0 €</strong></div>
+    <section class="panel" data-panel="2">
+      <div id="reco_banner" class="reco-banner hidden"></div>
+      <div id="concept_cards" class="concept-grid"></div>
+      <div class="card">
+        <p id="chart_legend" class="chart-legend muted"></p>
+        <canvas id="monthly_chart"></canvas>
       </div>
-      <div class="card"><canvas id="monthly_chart"></canvas></div>
+      <div class="card">
+        <h2>Pipeline IA (concept recommandé)</h2>
+        <div id="ai_pipeline" class="pipeline"></div>
+      </div>
       <div class="card"><pre id="raw_output"></pre></div>
     </section>
 
+    <section class="panel" data-panel="3">
+      <div class="card">
+        <h2>Évaluation sur l'année en cours (hôtels pivots)</h2>
+        <p class="muted">2026 partiel : comparaison sur les <strong>mois présents</strong> dans les ventes. Prédictions ramenées à cette période ; réel annualisé par règle de 3 (×12/n).</p>
+        <div id="perf_summary" class="perf-summary"></div>
+        <table class="perf-table" id="perf_table">
+          <thead>
+            <tr>
+              <th>Hôtel</th><th>Ch.</th><th>TO</th><th>Mois</th>
+              <th>Réel période</th><th>ROD période</th><th>IA période</th>
+              <th>Réel annualisé</th><th>ROD annuel</th><th>IA annuel</th>
+              <th>Écart ROD %</th><th>Écart IA %</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
     <div class="actions">
-      <button id="btn_simulate">Simuler</button>
+      <button id="btn_simulate">Simuler les 3 concepts</button>
       <button id="btn_optimize">Optimiser sous contraintes</button>
     </div>
   </main>

@@ -1,0 +1,894 @@
+{
+  "rows": [
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "avg_montant": 1514.0,
+      "avg_nbr_ventes": 63.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 274.0,
+      "avg_nbr_ventes": 46.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 621.0,
+      "avg_nbr_ventes": 71.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 2630.0,
+      "avg_nbr_ventes": 220.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 29.0,
+      "avg_nbr_ventes": 2.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 1,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 36.5,
+      "avg_nbr_ventes": 4.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 1,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 38.0,
+      "avg_nbr_ventes": 3.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "avg_montant": 1119.0,
+      "avg_nbr_ventes": 43.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 277.5,
+      "avg_nbr_ventes": 43.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 220.5,
+      "avg_nbr_ventes": 46.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 1790.75,
+      "avg_nbr_ventes": 195.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 29.0,
+      "avg_nbr_ventes": 2.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 175.0,
+      "avg_nbr_ventes": 4.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 70.5,
+      "avg_nbr_ventes": 4.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 378.0,
+      "avg_nbr_ventes": 3.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "avg_montant": 1092.5,
+      "avg_nbr_ventes": 62.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 263.5,
+      "avg_nbr_ventes": 39.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 382.0,
+      "avg_nbr_ventes": 77.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 2510.0,
+      "avg_nbr_ventes": 272.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 14.0,
+      "avg_nbr_ventes": 1.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 119.0,
+      "avg_nbr_ventes": 5.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 217.0,
+      "avg_nbr_ventes": 6.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 44.0,
+      "avg_nbr_ventes": 2.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "avg_montant": 1447.5,
+      "avg_nbr_ventes": 80.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 224.0,
+      "avg_nbr_ventes": 46.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 381.5,
+      "avg_nbr_ventes": 63.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 2491.5,
+      "avg_nbr_ventes": 268.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 168.0,
+      "avg_nbr_ventes": 4.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 202.0,
+      "avg_nbr_ventes": 7.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 236.0,
+      "avg_nbr_ventes": 7.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 224.0,
+      "avg_nbr_ventes": 4.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "avg_montant": 1027.5,
+      "avg_nbr_ventes": 55.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 274.0,
+      "avg_nbr_ventes": 42.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 268.5,
+      "avg_nbr_ventes": 53.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 2220.0,
+      "avg_nbr_ventes": 199.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 99.5,
+      "avg_nbr_ventes": 4.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 124.0,
+      "avg_nbr_ventes": 10.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 32.0,
+      "avg_nbr_ventes": 1.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "avg_montant": 707.5,
+      "avg_nbr_ventes": 39.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 243.0,
+      "avg_nbr_ventes": 41.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 393.0,
+      "avg_nbr_ventes": 86.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 3122.0,
+      "avg_nbr_ventes": 295.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 45.0,
+      "avg_nbr_ventes": 3.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 133.0,
+      "avg_nbr_ventes": 4.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 49.0,
+      "avg_nbr_ventes": 2.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 42.0,
+      "avg_nbr_ventes": 1.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "avg_montant": 867.0,
+      "avg_nbr_ventes": 45.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 306.5,
+      "avg_nbr_ventes": 39.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 360.5,
+      "avg_nbr_ventes": 68.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 2815.0,
+      "avg_nbr_ventes": 172.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 15.0,
+      "avg_nbr_ventes": 1.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 75.0,
+      "avg_nbr_ventes": 2.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 24.5,
+      "avg_nbr_ventes": 2.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 33.0,
+      "avg_nbr_ventes": 1.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "avg_montant": 931.5,
+      "avg_nbr_ventes": 46.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 214.0,
+      "avg_nbr_ventes": 35.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 376.5,
+      "avg_nbr_ventes": 55.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 1929.0,
+      "avg_nbr_ventes": 139.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 12.0,
+      "avg_nbr_ventes": 1.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 38.0,
+      "avg_nbr_ventes": 2.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 42.0,
+      "avg_nbr_ventes": 1.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "avg_montant": 2080.5,
+      "avg_nbr_ventes": 92.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 399.0,
+      "avg_nbr_ventes": 65.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 495.0,
+      "avg_nbr_ventes": 80.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 2955.5,
+      "avg_nbr_ventes": 261.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 30.0,
+      "avg_nbr_ventes": 1.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 21.0,
+      "avg_nbr_ventes": 2.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 42.0,
+      "avg_nbr_ventes": 1.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "avg_montant": 2150.5,
+      "avg_nbr_ventes": 99.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 478.0,
+      "avg_nbr_ventes": 66.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 415.0,
+      "avg_nbr_ventes": 71.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 3815.0,
+      "avg_nbr_ventes": 325.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 70.7,
+      "avg_nbr_ventes": 4.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 59.4,
+      "avg_nbr_ventes": 3.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 219.0,
+      "avg_nbr_ventes": 2.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "avg_montant": 1325.0,
+      "avg_nbr_ventes": 60.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 370.5,
+      "avg_nbr_ventes": 44.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 385.0,
+      "avg_nbr_ventes": 68.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 2352.5,
+      "avg_nbr_ventes": 209.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 15.0,
+      "avg_nbr_ventes": 1.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 40.35,
+      "avg_nbr_ventes": 3.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 32.9,
+      "avg_nbr_ventes": 2.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "avg_montant": 1555.5,
+      "avg_nbr_ventes": 60.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "avg_montant": 307.5,
+      "avg_nbr_ventes": 46.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "avg_montant": 404.5,
+      "avg_nbr_ventes": 53.0,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "avg_montant": 2162.5,
+      "avg_nbr_ventes": 207.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "avg_montant": 114.2,
+      "avg_nbr_ventes": 8.5,
+      "nb_years_used": 2,
+      "nb_observations": 2
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "avg_montant": 62.9,
+      "avg_nbr_ventes": 5.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "avg_montant": 22.0,
+      "avg_nbr_ventes": 1.0,
+      "nb_years_used": 1,
+      "nb_observations": 1
+    }
+  ]
+}

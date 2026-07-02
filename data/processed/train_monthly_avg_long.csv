@@ -1,0 +1,457 @@
+hotel_id,month,TYPE,GAMME,avg_montant,avg_nbr_ventes,nb_years_used,nb_observations
+ibis-budget-nice,1,F&B,FOOD SALEE,28.5,10.0,1,1
+ibis-budget-nice,1,F&B,FOOD SUCREE,25.0,12.0,1,1
+ibis-budget-nice,1,F&B,SANS ALCOOL,258.1,78.0,1,1
+ibis-budget-nice,1,NON-F&B,ACCESSOIRES,20.0,2.0,1,1
+ibis-budget-nice,1,NON-F&B,SOS,14.0,1.0,1,1
+ibis-budget-nice,2,F&B,FOOD SALEE,20.0,6.0,1,1
+ibis-budget-nice,2,F&B,FOOD SUCREE,17.5,8.0,1,1
+ibis-budget-nice,2,F&B,SANS ALCOOL,214.8,65.0,1,1
+ibis-budget-nice,2,NON-F&B,ACCESSOIRES,10.0,1.0,1,1
+ibis-budget-nice,2,NON-F&B,PAP,6.0,1.0,1,1
+ibis-budget-nice,3,F&B,FOOD SALEE,19.5,7.0,1,1
+ibis-budget-nice,3,F&B,FOOD SUCREE,41.0,18.0,1,1
+ibis-budget-nice,3,F&B,SANS ALCOOL,518.1,170.0,1,1
+ibis-budget-nice,3,NON-F&B,#REF!,22.0,2.0,1,1
+ibis-budget-nice,3,NON-F&B,ACCESSOIRES,20.5,2.0,2,2
+ibis-budget-nice,4,F&B,FOOD SALEE,55.5,15.0,1,1
+ibis-budget-nice,4,F&B,FOOD SUCREE,39.6,16.0,1,1
+ibis-budget-nice,4,F&B,SANS ALCOOL,498.1,158.0,1,1
+ibis-budget-nice,4,NON-F&B,#REF!,12.0,1.0,1,1
+ibis-budget-nice,4,NON-F&B,ACCESSOIRES,130.55,9.0,2,2
+ibis-budget-nice,4,NON-F&B,COSMETIQUE,14.5,1.5,2,2
+ibis-budget-nice,4,NON-F&B,PAP,44.0,3.0,1,1
+ibis-budget-nice,4,NON-F&B,SOS,11.0,1.0,2,2
+ibis-budget-nice,5,F&B,FOOD SALEE,70.5,14.0,1,1
+ibis-budget-nice,5,F&B,SANS ALCOOL,453.75,127.0,2,2
+ibis-budget-nice,5,NON-F&B,#REF!,167.0,13.0,1,1
+ibis-budget-nice,5,NON-F&B,ACCESSOIRES,152.0,12.5,2,2
+ibis-budget-nice,5,NON-F&B,JEUX / ENFANTS,18.0,1.0,1,1
+ibis-budget-nice,5,NON-F&B,PAP,68.0,6.0,2,2
+ibis-budget-nice,5,NON-F&B,SOS,14.0,1.0,1,1
+ibis-budget-nice,6,F&B,FOOD SALEE,56.75,18.5,2,2
+ibis-budget-nice,6,F&B,SANS ALCOOL,674.3000000000001,192.5,2,2
+ibis-budget-nice,6,NON-F&B,#REF!,295.0,19.0,1,1
+ibis-budget-nice,6,NON-F&B,ACCESSOIRES,214.05,23.5,2,2
+ibis-budget-nice,6,NON-F&B,COSMETIQUE,10.0,1.0,1,1
+ibis-budget-nice,6,NON-F&B,JEUX / ENFANTS,27.0,1.5,2,2
+ibis-budget-nice,6,NON-F&B,PAP,101.0,9.0,2,2
+ibis-budget-nice,6,NON-F&B,SOS,12.0,1.0,2,2
+ibis-budget-nice,7,F&B,FOOD SALEE,90.0,27.5,2,2
+ibis-budget-nice,7,F&B,SANS ALCOOL,740.6,205.0,2,2
+ibis-budget-nice,7,NON-F&B,#REF!,425.0,26.0,1,1
+ibis-budget-nice,7,NON-F&B,ACCESSOIRES,195.25,20.5,2,2
+ibis-budget-nice,7,NON-F&B,COSMETIQUE,20.0,2.0,1,1
+ibis-budget-nice,7,NON-F&B,JEUX / ENFANTS,45.0,2.5,2,2
+ibis-budget-nice,7,NON-F&B,PAP,74.0,7.0,2,2
+ibis-budget-nice,7,NON-F&B,SOS,8.0,1.0,1,1
+ibis-budget-nice,8,F&B,FOOD SALEE,65.0,16.0,2,2
+ibis-budget-nice,8,F&B,SANS ALCOOL,816.4000000000001,219.0,2,2
+ibis-budget-nice,8,NON-F&B,#REF!,360.0,29.0,1,1
+ibis-budget-nice,8,NON-F&B,ACCESSOIRES,365.0,26.333333333333332,3,3
+ibis-budget-nice,8,NON-F&B,COSMETIQUE,19.5,2.0,2,2
+ibis-budget-nice,8,NON-F&B,JEUX / ENFANTS,45.0,2.5,2,2
+ibis-budget-nice,8,NON-F&B,PAP,47.0,4.5,2,2
+ibis-budget-nice,8,NON-F&B,SOS,8.0,1.0,1,1
+ibis-budget-nice,9,F&B,FOOD SALEE,65.5,22.0,2,2
+ibis-budget-nice,9,F&B,FOOD SUCREE,47.5,21.0,1,1
+ibis-budget-nice,9,F&B,SANS ALCOOL,595.1500000000001,170.5,2,2
+ibis-budget-nice,9,NON-F&B,#REF!,424.0,31.0,1,1
+ibis-budget-nice,9,NON-F&B,ACCESSOIRES,189.66666666666666,18.333333333333332,3,3
+ibis-budget-nice,9,NON-F&B,COSMETIQUE,20.0,2.0,2,2
+ibis-budget-nice,9,NON-F&B,PAP,63.333333333333336,6.333333333333333,3,3
+ibis-budget-nice,9,NON-F&B,SOS,8.0,1.0,1,1
+ibis-budget-nice,10,F&B,FOOD SALEE,61.0,20.0,2,2
+ibis-budget-nice,10,F&B,FOOD SUCREE,40.0,14.0,1,1
+ibis-budget-nice,10,F&B,SANS ALCOOL,470.15,135.5,2,2
+ibis-budget-nice,10,NON-F&B,#REF!,116.0,10.0,1,1
+ibis-budget-nice,10,NON-F&B,ACCESSOIRES,138.0,12.666666666666666,3,3
+ibis-budget-nice,10,NON-F&B,PAP,36.666666666666664,4.0,3,3
+ibis-budget-nice,10,NON-F&B,SOS,56.0,3.0,1,1
+ibis-budget-nice,11,F&B,FOOD SALEE,29.5,9.5,2,2
+ibis-budget-nice,11,F&B,FOOD SUCREE,20.5,13.0,1,1
+ibis-budget-nice,11,F&B,SANS ALCOOL,296.40000000000003,88.5,2,2
+ibis-budget-nice,11,NON-F&B,#REF!,84.0,7.0,1,1
+ibis-budget-nice,11,NON-F&B,ACCESSOIRES,12.0,2.0,2,2
+ibis-budget-nice,11,NON-F&B,PAP,7.5,1.0,2,2
+ibis-budget-nice,11,,,6.0,2.0,1,1
+ibis-budget-nice,12,F&B,FOOD SALEE,18.5,6.5,2,2
+ibis-budget-nice,12,F&B,FOOD SUCREE,26.5,9.0,1,1
+ibis-budget-nice,12,F&B,SANS ALCOOL,253.20000000000002,71.0,2,2
+ibis-budget-nice,12,NON-F&B,#REF!,32.0,3.0,1,1
+ibis-budget-nice,12,NON-F&B,ACCESSOIRES,18.5,2.0,2,2
+ibis-budget-nice,12,NON-F&B,PAP,16.0,1.0,1,1
+ibis-budget-nice,12,NON-F&B,SOS,4.0,1.0,1,1
+ibis-budget-nice,12,,,58.0,17.0,1,1
+ibis-budget-strasbourg,1,F&B,FOOD SALEE,82.5,18.0,1,1
+ibis-budget-strasbourg,1,F&B,FOOD SUCREE,176.0,41.0,1,1
+ibis-budget-strasbourg,1,F&B,SANS ALCOOL,442.0,109.0,1,1
+ibis-budget-strasbourg,2,F&B,FOOD SALEE,85.0,16.0,1,1
+ibis-budget-strasbourg,2,F&B,FOOD SUCREE,193.5,28.0,1,1
+ibis-budget-strasbourg,2,F&B,SANS ALCOOL,466.5,85.0,1,1
+ibis-budget-strasbourg,3,F&B,FOOD SALEE,166.5,19.0,1,1
+ibis-budget-strasbourg,3,F&B,FOOD SUCREE,320.0,65.0,1,1
+ibis-budget-strasbourg,3,F&B,SANS ALCOOL,438.0,121.0,1,1
+ibis-budget-strasbourg,4,F&B,FOOD SALEE,202.5,22.0,1,1
+ibis-budget-strasbourg,4,F&B,FOOD SUCREE,231.0,50.0,1,1
+ibis-budget-strasbourg,4,F&B,SANS ALCOOL,644.5,149.0,1,1
+ibis-budget-strasbourg,5,F&B,FOOD SALEE,45.0,11.0,1,1
+ibis-budget-strasbourg,5,F&B,FOOD SUCREE,123.0,31.0,1,1
+ibis-budget-strasbourg,5,F&B,SANS ALCOOL,486.0,124.0,1,1
+ibis-budget-strasbourg,6,F&B,FOOD SALEE,163.5,33.0,1,1
+ibis-budget-strasbourg,6,F&B,FOOD SUCREE,235.5,74.0,1,1
+ibis-budget-strasbourg,6,F&B,SANS ALCOOL,1310.0,251.0,1,1
+ibis-budget-strasbourg,7,F&B,FOOD SALEE,270.5,30.0,1,1
+ibis-budget-strasbourg,7,F&B,FOOD SUCREE,309.5,63.0,1,1
+ibis-budget-strasbourg,7,F&B,SANS ALCOOL,895.5,192.0,1,1
+ibis-budget-strasbourg,8,F&B,FOOD SALEE,205.5,34.0,1,1
+ibis-budget-strasbourg,8,F&B,FOOD SUCREE,222.5,61.0,1,1
+ibis-budget-strasbourg,8,F&B,SANS ALCOOL,1340.5,296.0,1,1
+ibis-budget-strasbourg,9,F&B,FOOD SALEE,80.0,14.0,1,1
+ibis-budget-strasbourg,9,F&B,FOOD SUCREE,130.5,40.0,1,1
+ibis-budget-strasbourg,9,F&B,SANS ALCOOL,428.5,124.0,1,1
+ibis-budget-strasbourg,10,F&B,FOOD SALEE,133.75,19.0,2,2
+ibis-budget-strasbourg,10,F&B,FOOD SUCREE,168.25,39.0,2,2
+ibis-budget-strasbourg,10,F&B,SANS ALCOOL,502.5,121.0,2,2
+ibis-budget-strasbourg,11,F&B,FOOD SALEE,225.0,28.5,2,2
+ibis-budget-strasbourg,11,F&B,FOOD SUCREE,280.5,68.5,2,2
+ibis-budget-strasbourg,11,F&B,SANS ALCOOL,562.5,139.0,2,2
+ibis-budget-strasbourg,12,F&B,FOOD SALEE,147.5,34.5,2,2
+ibis-budget-strasbourg,12,F&B,FOOD SUCREE,364.75,88.5,2,2
+ibis-budget-strasbourg,12,F&B,SANS ALCOOL,1212.75,256.5,2,2
+mercure-montmartre,1,F&B,ALCOOL,1514.0,63.0,1,1
+mercure-montmartre,1,F&B,FOOD SALEE,274.0,46.0,1,1
+mercure-montmartre,1,F&B,FOOD SUCREE,621.0,71.0,1,1
+mercure-montmartre,1,F&B,SANS ALCOOL,2630.0,220.0,1,1
+mercure-montmartre,1,F&B,SOUVENIRS,29.0,2.0,1,1
+mercure-montmartre,1,NON-F&B,COSMETIQUE,36.5,4.0,2,2
+mercure-montmartre,1,NON-F&B,SOS,38.0,3.0,1,1
+mercure-montmartre,2,F&B,ALCOOL,1119.0,43.5,2,2
+mercure-montmartre,2,F&B,FOOD SALEE,277.5,43.5,2,2
+mercure-montmartre,2,F&B,FOOD SUCREE,220.5,46.5,2,2
+mercure-montmartre,2,F&B,SANS ALCOOL,1790.75,195.0,2,2
+mercure-montmartre,2,F&B,SOUVENIRS,29.0,2.0,1,1
+mercure-montmartre,2,NON-F&B,COSMETIQUE,175.0,4.5,2,2
+mercure-montmartre,2,NON-F&B,SOS,70.5,4.0,2,2
+mercure-montmartre,2,NON-F&B,SOUVENIRS,378.0,3.0,1,1
+mercure-montmartre,3,F&B,ALCOOL,1092.5,62.0,2,2
+mercure-montmartre,3,F&B,FOOD SALEE,263.5,39.0,2,2
+mercure-montmartre,3,F&B,FOOD SUCREE,382.0,77.0,2,2
+mercure-montmartre,3,F&B,SANS ALCOOL,2510.0,272.0,2,2
+mercure-montmartre,3,F&B,SOUVENIRS,14.0,1.0,1,1
+mercure-montmartre,3,NON-F&B,COSMETIQUE,119.0,5.5,2,2
+mercure-montmartre,3,NON-F&B,SOS,217.0,6.0,2,2
+mercure-montmartre,3,NON-F&B,SOUVENIRS,44.0,2.0,1,1
+mercure-montmartre,4,F&B,ALCOOL,1447.5,80.0,2,2
+mercure-montmartre,4,F&B,FOOD SALEE,224.0,46.0,2,2
+mercure-montmartre,4,F&B,FOOD SUCREE,381.5,63.5,2,2
+mercure-montmartre,4,F&B,SANS ALCOOL,2491.5,268.0,2,2
+mercure-montmartre,4,F&B,SOUVENIRS,168.0,4.0,1,1
+mercure-montmartre,4,NON-F&B,COSMETIQUE,202.0,7.5,2,2
+mercure-montmartre,4,NON-F&B,SOS,236.0,7.0,1,1
+mercure-montmartre,4,NON-F&B,SOUVENIRS,224.0,4.0,1,1
+mercure-montmartre,5,F&B,ALCOOL,1027.5,55.5,2,2
+mercure-montmartre,5,F&B,FOOD SALEE,274.0,42.5,2,2
+mercure-montmartre,5,F&B,FOOD SUCREE,268.5,53.5,2,2
+mercure-montmartre,5,F&B,SANS ALCOOL,2220.0,199.0,2,2
+mercure-montmartre,5,NON-F&B,COSMETIQUE,99.5,4.5,2,2
+mercure-montmartre,5,NON-F&B,SOS,124.0,10.0,1,1
+mercure-montmartre,5,NON-F&B,SOUVENIRS,32.0,1.0,1,1
+mercure-montmartre,6,F&B,ALCOOL,707.5,39.5,2,2
+mercure-montmartre,6,F&B,FOOD SALEE,243.0,41.5,2,2
+mercure-montmartre,6,F&B,FOOD SUCREE,393.0,86.0,2,2
+mercure-montmartre,6,F&B,SANS ALCOOL,3122.0,295.0,2,2
+mercure-montmartre,6,F&B,SOUVENIRS,45.0,3.0,1,1
+mercure-montmartre,6,NON-F&B,COSMETIQUE,133.0,4.0,2,2
+mercure-montmartre,6,NON-F&B,SOS,49.0,2.0,2,2
+mercure-montmartre,6,NON-F&B,SOUVENIRS,42.0,1.0,1,1
+mercure-montmartre,7,F&B,ALCOOL,867.0,45.0,2,2
+mercure-montmartre,7,F&B,FOOD SALEE,306.5,39.0,2,2
+mercure-montmartre,7,F&B,FOOD SUCREE,360.5,68.5,2,2
+mercure-montmartre,7,F&B,SANS ALCOOL,2815.0,172.0,2,2
+mercure-montmartre,7,F&B,SOUVENIRS,15.0,1.0,1,1
+mercure-montmartre,7,NON-F&B,COSMETIQUE,75.0,2.0,2,2
+mercure-montmartre,7,NON-F&B,SOS,24.5,2.0,2,2
+mercure-montmartre,7,NON-F&B,SOUVENIRS,33.0,1.5,2,2
+mercure-montmartre,8,F&B,ALCOOL,931.5,46.0,2,2
+mercure-montmartre,8,F&B,FOOD SALEE,214.0,35.0,2,2
+mercure-montmartre,8,F&B,FOOD SUCREE,376.5,55.0,2,2
+mercure-montmartre,8,F&B,SANS ALCOOL,1929.0,139.5,2,2
+mercure-montmartre,8,NON-F&B,COSMETIQUE,12.0,1.0,1,1
+mercure-montmartre,8,NON-F&B,SOS,38.0,2.5,2,2
+mercure-montmartre,8,NON-F&B,SOUVENIRS,42.0,1.0,2,2
+mercure-montmartre,9,F&B,ALCOOL,2080.5,92.0,2,2
+mercure-montmartre,9,F&B,FOOD SALEE,399.0,65.5,2,2
+mercure-montmartre,9,F&B,FOOD SUCREE,495.0,80.0,2,2
+mercure-montmartre,9,F&B,SANS ALCOOL,2955.5,261.0,2,2
+mercure-montmartre,9,NON-F&B,COSMETIQUE,30.0,1.0,1,1
+mercure-montmartre,9,NON-F&B,SOS,21.0,2.0,2,2
+mercure-montmartre,9,NON-F&B,SOUVENIRS,42.0,1.0,2,2
+mercure-montmartre,10,F&B,ALCOOL,2150.5,99.5,2,2
+mercure-montmartre,10,F&B,FOOD SALEE,478.0,66.0,2,2
+mercure-montmartre,10,F&B,FOOD SUCREE,415.0,71.0,2,2
+mercure-montmartre,10,F&B,SANS ALCOOL,3815.0,325.0,2,2
+mercure-montmartre,10,NON-F&B,COSMETIQUE,70.7,4.0,1,1
+mercure-montmartre,10,NON-F&B,SOS,59.4,3.5,2,2
+mercure-montmartre,10,NON-F&B,SOUVENIRS,219.0,2.0,1,1
+mercure-montmartre,11,F&B,ALCOOL,1325.0,60.0,2,2
+mercure-montmartre,11,F&B,FOOD SALEE,370.5,44.0,2,2
+mercure-montmartre,11,F&B,FOOD SUCREE,385.0,68.0,2,2
+mercure-montmartre,11,F&B,SANS ALCOOL,2352.5,209.5,2,2
+mercure-montmartre,11,F&B,SOUVENIRS,15.0,1.0,1,1
+mercure-montmartre,11,NON-F&B,COSMETIQUE,40.35,3.5,2,2
+mercure-montmartre,11,NON-F&B,SOS,32.9,2.5,2,2
+mercure-montmartre,12,F&B,ALCOOL,1555.5,60.0,2,2
+mercure-montmartre,12,F&B,FOOD SALEE,307.5,46.0,2,2
+mercure-montmartre,12,F&B,FOOD SUCREE,404.5,53.0,2,2
+mercure-montmartre,12,F&B,SANS ALCOOL,2162.5,207.5,2,2
+mercure-montmartre,12,NON-F&B,COSMETIQUE,114.2,8.5,2,2
+mercure-montmartre,12,NON-F&B,SOS,62.9,5.0,1,1
+mercure-montmartre,12,NON-F&B,SOUVENIRS,22.0,1.0,1,1
+novotel-megeve,1,F&B,ALCOOL,16.0,1.0,1,1
+novotel-megeve,1,F&B,FOOD SALEE,78.0,6.0,1,1
+novotel-megeve,1,F&B,FOOD SUCREE,544.9,41.0,1,1
+novotel-megeve,1,F&B,SANS ALCOOL,108.0,27.0,1,1
+novotel-megeve,1,F&B,SOUVENIRS,16.5,1.0,1,1
+novotel-megeve,1,NON-F&B,#REF!,120.0,6.0,1,1
+novotel-megeve,1,NON-F&B,ACCESSOIRES,183.0,8.0,1,1
+novotel-megeve,1,NON-F&B,JEUX / ENFANTS,248.05,12.0,1,1
+novotel-megeve,1,NON-F&B,PAP,591.0,22.0,1,1
+novotel-megeve,1,NON-F&B,SOS,112.0,6.0,1,1
+novotel-megeve,1,NON-F&B,SOUVENIRS,1.5,2.0,1,1
+novotel-megeve,2,F&B,ALCOOL,40.0,2.0,1,1
+novotel-megeve,2,F&B,FOOD SALEE,79.7,10.0,1,1
+novotel-megeve,2,F&B,FOOD SUCREE,385.8,65.0,1,1
+novotel-megeve,2,F&B,SANS ALCOOL,204.0,45.0,1,1
+novotel-megeve,2,NON-F&B,#REF!,33.0,3.0,1,1
+novotel-megeve,2,NON-F&B,ACCESSOIRES,372.0,16.0,1,1
+novotel-megeve,2,NON-F&B,COSMETIQUE,51.9,6.0,1,1
+novotel-megeve,2,NON-F&B,JEUX / ENFANTS,349.25,25.0,1,1
+novotel-megeve,2,NON-F&B,PAP,340.0,11.0,1,1
+novotel-megeve,2,NON-F&B,SOS,545.5,27.0,1,1
+novotel-megeve,2,NON-F&B,SOUVENIRS,7.5,6.0,1,1
+novotel-megeve,3,F&B,FOOD SALEE,76.0,7.5,2,2
+novotel-megeve,3,F&B,FOOD SUCREE,144.75,25.5,2,2
+novotel-megeve,3,F&B,SANS ALCOOL,94.5,22.0,1,1
+novotel-megeve,3,NON-F&B,#REF!,60.0,5.0,1,1
+novotel-megeve,3,NON-F&B,ACCESSOIRES,106.5,4.5,2,2
+novotel-megeve,3,NON-F&B,COSMETIQUE,68.5,4.5,2,2
+novotel-megeve,3,NON-F&B,JEUX / ENFANTS,259.875,18.5,2,2
+novotel-megeve,3,NON-F&B,PAP,240.0,6.5,2,2
+novotel-megeve,3,NON-F&B,SOS,89.0,10.0,1,1
+novotel-megeve,3,NON-F&B,SOUVENIRS,11.5,3.0,2,2
+novotel-megeve,4,F&B,FOOD SALEE,31.5,5.5,2,2
+novotel-megeve,4,F&B,FOOD SUCREE,145.0,15.0,2,2
+novotel-megeve,4,F&B,SANS ALCOOL,31.0,9.5,2,2
+novotel-megeve,4,NON-F&B,#REF!,33.0,3.0,1,1
+novotel-megeve,4,NON-F&B,ACCESSOIRES,151.0,6.0,2,2
+novotel-megeve,4,NON-F&B,COSMETIQUE,139.75,6.5,2,2
+novotel-megeve,4,NON-F&B,JEUX / ENFANTS,125.075,9.0,2,2
+novotel-megeve,4,NON-F&B,PAP,105.0,3.0,1,1
+novotel-megeve,4,NON-F&B,SOS,61.5,3.5,2,2
+novotel-megeve,4,NON-F&B,SOUVENIRS,130.0,4.0,1,1
+novotel-megeve,5,F&B,ALCOOL,60.0,4.0,1,1
+novotel-megeve,5,F&B,FOOD SALEE,37.5,5.5,2,2
+novotel-megeve,5,F&B,FOOD SUCREE,105.2,12.5,2,2
+novotel-megeve,5,F&B,SANS ALCOOL,57.0,16.0,2,2
+novotel-megeve,5,F&B,SOUVENIRS,14.0,1.0,1,1
+novotel-megeve,5,NON-F&B,#REF!,60.0,4.0,1,1
+novotel-megeve,5,NON-F&B,ACCESSOIRES,207.5,5.5,2,2
+novotel-megeve,5,NON-F&B,COSMETIQUE,238.39999999999998,8.0,2,2
+novotel-megeve,5,NON-F&B,JEUX / ENFANTS,99.2,6.5,2,2
+novotel-megeve,5,NON-F&B,PAP,102.5,2.5,2,2
+novotel-megeve,5,NON-F&B,SOS,58.0,2.5,2,2
+novotel-megeve,5,NON-F&B,SOUVENIRS,32.0,1.0,1,1
+novotel-megeve,6,F&B,ALCOOL,112.0,7.0,1,1
+novotel-megeve,6,F&B,FOOD SALEE,57.0,8.5,2,2
+novotel-megeve,6,F&B,FOOD SUCREE,156.25,16.5,2,2
+novotel-megeve,6,F&B,SANS ALCOOL,60.0,16.5,2,2
+novotel-megeve,6,F&B,SOUVENIRS,7.0,1.0,1,1
+novotel-megeve,6,NON-F&B,#REF!,196.5,13.0,1,1
+novotel-megeve,6,NON-F&B,ACCESSOIRES,210.5,7.0,2,2
+novotel-megeve,6,NON-F&B,COSMETIQUE,134.9,6.5,2,2
+novotel-megeve,6,NON-F&B,JEUX / ENFANTS,159.025,10.0,2,2
+novotel-megeve,6,NON-F&B,PAP,50.0,1.5,2,2
+novotel-megeve,6,NON-F&B,SOS,90.0,6.0,2,2
+novotel-megeve,6,NON-F&B,SOUVENIRS,6.5,3.0,1,1
+novotel-megeve,7,F&B,ALCOOL,26.0,2.0,2,2
+novotel-megeve,7,F&B,FOOD SALEE,96.25,18.5,2,2
+novotel-megeve,7,F&B,FOOD SUCREE,256.5,38.0,2,2
+novotel-megeve,7,F&B,SANS ALCOOL,125.0,32.5,2,2
+novotel-megeve,7,F&B,SOUVENIRS,6.0,1.0,1,1
+novotel-megeve,7,NON-F&B,#REF!,354.5,22.0,1,1
+novotel-megeve,7,NON-F&B,ACCESSOIRES,193.5,6.5,2,2
+novotel-megeve,7,NON-F&B,COSMETIQUE,131.95,8.5,2,2
+novotel-megeve,7,NON-F&B,JEUX / ENFANTS,160.35,10.0,2,2
+novotel-megeve,7,NON-F&B,PAP,154.5,4.5,2,2
+novotel-megeve,7,NON-F&B,SOS,188.0,12.5,2,2
+novotel-megeve,7,NON-F&B,SOUVENIRS,112.0,3.0,1,1
+novotel-megeve,8,F&B,ALCOOL,32.0,3.0,1,1
+novotel-megeve,8,F&B,FOOD SALEE,114.85,19.5,2,2
+novotel-megeve,8,F&B,FOOD SUCREE,297.8,40.0,2,2
+novotel-megeve,8,F&B,SANS ALCOOL,169.25,42.0,2,2
+novotel-megeve,8,F&B,SOUVENIRS,36.7,3.0,1,1
+novotel-megeve,8,NON-F&B,#REF!,917.95,50.0,1,1
+novotel-megeve,8,NON-F&B,ACCESSOIRES,257.0,8.5,2,2
+novotel-megeve,8,NON-F&B,COSMETIQUE,61.2,5.0,2,2
+novotel-megeve,8,NON-F&B,JEUX / ENFANTS,307.55,21.0,2,2
+novotel-megeve,8,NON-F&B,PAP,318.5,10.0,2,2
+novotel-megeve,8,NON-F&B,SOS,267.5,19.5,2,2
+novotel-megeve,8,NON-F&B,SOUVENIRS,35.0,2.0,2,2
+novotel-megeve,9,F&B,ALCOOL,52.0,4.0,1,1
+novotel-megeve,9,F&B,FOOD SALEE,30.5,6.0,2,2
+novotel-megeve,9,F&B,FOOD SUCREE,106.65,16.5,2,2
+novotel-megeve,9,F&B,SANS ALCOOL,81.5,20.5,2,2
+novotel-megeve,9,F&B,SOUVENIRS,33.0,2.0,1,1
+novotel-megeve,9,NON-F&B,#REF!,389.5,25.0,1,1
+novotel-megeve,9,NON-F&B,ACCESSOIRES,394.0,8.0,2,2
+novotel-megeve,9,NON-F&B,COSMETIQUE,110.8,7.5,2,2
+novotel-megeve,9,NON-F&B,JEUX / ENFANTS,115.4,9.0,2,2
+novotel-megeve,9,NON-F&B,PAP,151.0,4.0,2,2
+novotel-megeve,9,NON-F&B,SOS,118.0,9.0,2,2
+novotel-megeve,9,NON-F&B,SOUVENIRS,43.0,3.0,2,2
+novotel-megeve,10,F&B,ALCOOL,140.0,11.0,1,1
+novotel-megeve,10,F&B,FOOD SALEE,39.0,4.0,2,2
+novotel-megeve,10,F&B,FOOD SUCREE,74.4,8.0,2,2
+novotel-megeve,10,F&B,SANS ALCOOL,37.5,10.0,2,2
+novotel-megeve,10,NON-F&B,#REF!,71.95,5.0,1,1
+novotel-megeve,10,NON-F&B,ACCESSOIRES,240.0,5.0,1,1
+novotel-megeve,10,NON-F&B,COSMETIQUE,81.7,4.5,2,2
+novotel-megeve,10,NON-F&B,JEUX / ENFANTS,55.1,4.0,2,2
+novotel-megeve,10,NON-F&B,PAP,35.0,1.5,2,2
+novotel-megeve,10,NON-F&B,SOS,27.5,2.0,2,2
+novotel-megeve,10,NON-F&B,SOUVENIRS,48.0,3.0,2,2
+novotel-megeve,11,F&B,ALCOOL,16.0,2.0,1,1
+novotel-megeve,11,F&B,FOOD SALEE,58.65,11.0,2,2
+novotel-megeve,11,F&B,FOOD SUCREE,102.8,9.5,2,2
+novotel-megeve,11,F&B,SANS ALCOOL,49.5,12.0,2,2
+novotel-megeve,11,NON-F&B,#REF!,139.0,13.0,1,1
+novotel-megeve,11,NON-F&B,ACCESSOIRES,398.5,8.0,2,2
+novotel-megeve,11,NON-F&B,COSMETIQUE,138.45,5.5,2,2
+novotel-megeve,11,NON-F&B,JEUX / ENFANTS,59.925,4.5,2,2
+novotel-megeve,11,NON-F&B,PAP,112.5,3.0,2,2
+novotel-megeve,11,NON-F&B,SOS,167.5,14.0,2,2
+novotel-megeve,11,NON-F&B,SOUVENIRS,10.5,2.5,2,2
+novotel-megeve,11,,,152.0,8.0,1,1
+novotel-megeve,12,F&B,ALCOOL,8.0,1.0,1,1
+novotel-megeve,12,F&B,FOOD SALEE,81.0,16.5,2,2
+novotel-megeve,12,F&B,FOOD SUCREE,396.15,63.0,2,2
+novotel-megeve,12,F&B,SANS ALCOOL,156.25,44.0,2,2
+novotel-megeve,12,F&B,SOUVENIRS,66.5,3.0,2,2
+novotel-megeve,12,NON-F&B,#REF!,97.5,9.5,2,2
+novotel-megeve,12,NON-F&B,ACCESSOIRES,267.5,8.5,2,2
+novotel-megeve,12,NON-F&B,COSMETIQUE,64.7,6.0,2,2
+novotel-megeve,12,NON-F&B,JEUX / ENFANTS,201.95,14.0,2,2
+novotel-megeve,12,NON-F&B,PAP,330.0,10.5,2,2
+novotel-megeve,12,NON-F&B,SOS,228.0,15.5,2,2
+novotel-megeve,12,NON-F&B,SOUVENIRS,50.5,3.5,2,2
+novotel-megeve,12,,,1270.4,80.0,1,1
+novotel-paris-tour-eiffel,1,F&B,FOOD SALEE,2842.6,313.0,1,1
+novotel-paris-tour-eiffel,1,F&B,FOOD SUCREE,1763.5,290.0,1,1
+novotel-paris-tour-eiffel,1,F&B,SANS ALCOOL,3864.5,608.0,1,1
+novotel-paris-tour-eiffel,1,NON-F&B,SOS,2419.0,238.0,1,1
+novotel-paris-tour-eiffel,2,F&B,FOOD SALEE,2892.1,310.0,1,1
+novotel-paris-tour-eiffel,2,F&B,FOOD SUCREE,1853.2,299.0,1,1
+novotel-paris-tour-eiffel,2,F&B,SANS ALCOOL,4201.3,649.0,1,1
+novotel-paris-tour-eiffel,2,NON-F&B,COSMETIQUE,24.0,3.0,1,1
+novotel-paris-tour-eiffel,2,NON-F&B,SOS,3432.0,351.0,1,1
+novotel-paris-tour-eiffel,3,F&B,FOOD SALEE,3653.0,345.0,1,1
+novotel-paris-tour-eiffel,3,F&B,FOOD SUCREE,2109.2,343.0,1,1
+novotel-paris-tour-eiffel,3,F&B,SANS ALCOOL,4495.8,748.0,1,1
+novotel-paris-tour-eiffel,3,NON-F&B,COSMETIQUE,48.0,5.0,1,1
+novotel-paris-tour-eiffel,3,NON-F&B,SOS,3112.0,346.0,1,1
+novotel-paris-tour-eiffel,4,F&B,FOOD SALEE,4827.4,459.0,1,1
+novotel-paris-tour-eiffel,4,F&B,FOOD SUCREE,2330.3,373.0,1,1
+novotel-paris-tour-eiffel,4,F&B,SANS ALCOOL,5331.3,918.0,1,1
+novotel-paris-tour-eiffel,4,NON-F&B,COSMETIQUE,16.0,2.0,1,1
+novotel-paris-tour-eiffel,4,NON-F&B,SOS,2322.0,256.0,1,1
+novotel-paris-tour-eiffel,4,,,28.0,5.0,1,1
+novotel-paris-tour-eiffel,5,F&B,FOOD SALEE,4658.0,487.0,1,1
+novotel-paris-tour-eiffel,5,F&B,FOOD SUCREE,2031.7,359.0,1,1
+novotel-paris-tour-eiffel,5,F&B,SANS ALCOOL,5897.5,972.0,1,1
+novotel-paris-tour-eiffel,5,NON-F&B,COSMETIQUE,48.0,6.0,1,1
+novotel-paris-tour-eiffel,5,NON-F&B,SOS,1324.0,140.0,2,2
+novotel-paris-tour-eiffel,6,F&B,FOOD SALEE,2517.9,281.0,2,2
+novotel-paris-tour-eiffel,6,F&B,FOOD SUCREE,1212.4499999999998,192.0,2,2
+novotel-paris-tour-eiffel,6,F&B,SANS ALCOOL,4787.35,598.5,2,2
+novotel-paris-tour-eiffel,6,NON-F&B,COSMETIQUE,24.0,3.0,1,1
+novotel-paris-tour-eiffel,6,NON-F&B,SOS,1991.0,178.0,2,2
+novotel-paris-tour-eiffel,7,F&B,FOOD SALEE,3397.85,330.5,2,2
+novotel-paris-tour-eiffel,7,F&B,FOOD SUCREE,1604.1499999999999,233.0,2,2
+novotel-paris-tour-eiffel,7,F&B,SANS ALCOOL,6003.085,722.0,2,2
+novotel-paris-tour-eiffel,7,NON-F&B,COSMETIQUE,48.0,6.0,1,1
+novotel-paris-tour-eiffel,7,NON-F&B,SOS,2067.5,176.0,2,2
+novotel-paris-tour-eiffel,7,NON-F&B,SOUVENIRS,18.5,1.0,1,1
+novotel-paris-tour-eiffel,8,F&B,FOOD SALEE,4641.7,487.0,1,1
+novotel-paris-tour-eiffel,8,F&B,FOOD SUCREE,2191.4,331.0,1,1
+novotel-paris-tour-eiffel,8,F&B,SANS ALCOOL,7381.8,1077.0,1,1
+novotel-paris-tour-eiffel,8,NON-F&B,COSMETIQUE,56.0,7.0,1,1
+novotel-paris-tour-eiffel,8,NON-F&B,SOS,3583.0,335.0,1,1
+novotel-paris-tour-eiffel,9,F&B,FOOD SALEE,1874.25,221.5,2,2
+novotel-paris-tour-eiffel,9,F&B,FOOD SUCREE,933.05,158.5,2,2
+novotel-paris-tour-eiffel,9,F&B,SANS ALCOOL,3056.5,498.5,2,2
+novotel-paris-tour-eiffel,9,NON-F&B,COSMETIQUE,20.0,2.5,2,2
+novotel-paris-tour-eiffel,9,NON-F&B,SOS,1900.5,185.0,2,2
+novotel-paris-tour-eiffel,10,F&B,FOOD SALEE,3039.95,368.0,2,2
+novotel-paris-tour-eiffel,10,F&B,FOOD SUCREE,1993.85,345.0,2,2
+novotel-paris-tour-eiffel,10,F&B,SANS ALCOOL,5264.95,823.5,2,2
+novotel-paris-tour-eiffel,10,NON-F&B,COSMETIQUE,40.0,4.0,2,2
+novotel-paris-tour-eiffel,10,NON-F&B,SOS,3562.0,348.5,2,2
+novotel-paris-tour-eiffel,11,F&B,FOOD SALEE,2895.25,341.5,2,2
+novotel-paris-tour-eiffel,11,F&B,FOOD SUCREE,1597.8,278.0,2,2
+novotel-paris-tour-eiffel,11,F&B,SANS ALCOOL,4279.3,698.5,2,2
+novotel-paris-tour-eiffel,11,NON-F&B,COSMETIQUE,16.0,1.5,2,2
+novotel-paris-tour-eiffel,11,NON-F&B,SOS,3134.0,320.0,2,2
+novotel-paris-tour-eiffel,11,,,16.0,2.0,1,1
+novotel-paris-tour-eiffel,12,F&B,FOOD SALEE,3702.15,370.5,2,2
+novotel-paris-tour-eiffel,12,F&B,FOOD SUCREE,2094.8,349.5,2,2
+novotel-paris-tour-eiffel,12,F&B,SANS ALCOOL,5533.45,878.5,2,2
+novotel-paris-tour-eiffel,12,NON-F&B,COSMETIQUE,60.0,6.0,2,2
+novotel-paris-tour-eiffel,12,NON-F&B,SOS,2835.0,297.5,2,2
+novotel-paris-tour-eiffel,12,,,96.0,11.0,1,1
+novotel-porte-italie,1,F&B,FOOD SALEE,23.9,7.0,1,1
+novotel-porte-italie,1,F&B,FOOD SUCREE,35.7,11.0,1,1
+novotel-porte-italie,1,F&B,SANS ALCOOL,26.0,4.0,1,1
+novotel-porte-italie,1,,,66.0,4.0,1,1
+novotel-porte-italie,2,F&B,FOOD SALEE,78.3,17.0,1,1
+novotel-porte-italie,2,F&B,FOOD SUCREE,41.7,12.0,1,1
+novotel-porte-italie,2,F&B,SANS ALCOOL,65.0,11.0,1,1
+novotel-porte-italie,2,,,66.0,4.0,1,1
+novotel-porte-italie,3,F&B,FOOD SALEE,130.0,25.0,1,1
+novotel-porte-italie,3,F&B,FOOD SUCREE,191.6,44.0,1,1
+novotel-porte-italie,3,F&B,SANS ALCOOL,165.5,32.0,1,1
+novotel-porte-italie,3,,,7.5,1.0,1,1
+novotel-porte-italie,4,F&B,FOOD SALEE,80.6,19.0,1,1
+novotel-porte-italie,4,F&B,FOOD SUCREE,78.7,15.0,1,1
+novotel-porte-italie,4,F&B,SANS ALCOOL,132.5,25.0,1,1
+novotel-porte-italie,5,F&B,FOOD SALEE,73.0,16.0,1,1
+novotel-porte-italie,5,F&B,FOOD SUCREE,290.6,67.0,1,1
+novotel-porte-italie,5,F&B,SANS ALCOOL,456.0,77.0,1,1
+novotel-porte-italie,5,,,64.5,5.0,1,1
+novotel-porte-italie,6,F&B,FOOD SALEE,114.2,13.0,1,1
+novotel-porte-italie,6,F&B,FOOD SUCREE,132.5,27.0,1,1
+novotel-porte-italie,6,F&B,SANS ALCOOL,300.5,60.0,1,1
+novotel-porte-italie,6,,,12.0,1.0,1,1
+novotel-porte-italie,7,F&B,FOOD SALEE,146.1,23.0,1,1
+novotel-porte-italie,7,F&B,FOOD SUCREE,182.4,46.0,1,1
+novotel-porte-italie,7,F&B,SANS ALCOOL,431.5,70.0,1,1
+novotel-porte-italie,8,F&B,FOOD SALEE,103.6,18.0,1,1
+novotel-porte-italie,8,F&B,FOOD SUCREE,93.1,24.0,1,1
+novotel-porte-italie,8,F&B,SANS ALCOOL,312.0,49.0,1,1
+novotel-porte-italie,9,F&B,FOOD SALEE,35.8,11.5,2,2
+novotel-porte-italie,9,F&B,FOOD SUCREE,82.6,19.0,2,2
+novotel-porte-italie,9,F&B,SANS ALCOOL,98.75,16.5,2,2
+novotel-porte-italie,10,F&B,FOOD SALEE,96.7,26.0,2,2
+novotel-porte-italie,10,F&B,FOOD SUCREE,174.95000000000002,46.0,2,2
+novotel-porte-italie,10,F&B,SANS ALCOOL,299.5,43.0,1,1
+novotel-porte-italie,10,,,83.4,10.0,1,1
+novotel-porte-italie,11,F&B,FOOD SALEE,93.375,27.0,2,2
+novotel-porte-italie,11,F&B,FOOD SUCREE,158.93,44.5,2,2
+novotel-porte-italie,11,F&B,SANS ALCOOL,221.75,37.0,2,2
+novotel-porte-italie,11,NON-F&B,SOS,0.7,1.0,1,1
+novotel-porte-italie,11,,,43.0,5.0,1,1
+novotel-porte-italie,12,F&B,FOOD SALEE,132.2,33.0,2,2
+novotel-porte-italie,12,F&B,FOOD SUCREE,171.15,47.5,2,2
+novotel-porte-italie,12,F&B,SANS ALCOOL,230.0,35.5,2,2
+novotel-porte-italie,12,NON-F&B,SOS,0.7,1.0,1,1
+novotel-porte-italie,12,,,32.5,4.0,1,1

@@ -1,0 +1,544 @@
+{
+  "rows": [
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 1,
+      "month": 1,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m01",
+      "pct": 0.05270285520821578
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 1,
+      "month": 2,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m02",
+      "pct": 0.05605085957190686
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 1,
+      "month": 3,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m03",
+      "pct": 0.06955573110634616
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 1,
+      "month": 4,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m04",
+      "pct": 0.08110446525975247
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 1,
+      "month": 5,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m05",
+      "pct": 0.049204378738291386
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 1,
+      "month": 6,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m06",
+      "pct": 0.12857841477636084
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 1,
+      "month": 7,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m07",
+      "pct": 0.11101079637362224
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 1,
+      "month": 8,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m08",
+      "pct": 0.13305495993680172
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 1,
+      "month": 9,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m09",
+      "pct": 0.048075837941541584
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 1,
+      "month": 10,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m10",
+      "pct": 0.06052740473234774
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 1,
+      "month": 11,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m11",
+      "pct": 0.08035210472858594
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 1,
+      "month": 12,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m12",
+      "pct": 0.12978219162622728
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 2,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m01_type_fandb",
+      "pct": 1.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m01_type_fandb_gamme_food_salee",
+      "pct": 0.11777301927194861
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m01_type_fandb_gamme_food_sucree",
+      "pct": 0.251249107780157
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m01_type_fandb_gamme_sans_alcool",
+      "pct": 0.6309778729478943
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 2,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m02_type_fandb",
+      "pct": 1.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m02_type_fandb_gamme_food_salee",
+      "pct": 0.11409395973154363
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m02_type_fandb_gamme_food_sucree",
+      "pct": 0.25973154362416107
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m02_type_fandb_gamme_sans_alcool",
+      "pct": 0.6261744966442953
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 2,
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m03_type_fandb",
+      "pct": 1.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m03_type_fandb_gamme_food_salee",
+      "pct": 0.18009734991887508
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m03_type_fandb_gamme_food_sucree",
+      "pct": 0.34613304488912927
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m03_type_fandb_gamme_sans_alcool",
+      "pct": 0.4737696051919957
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 2,
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m04_type_fandb",
+      "pct": 1.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m04_type_fandb_gamme_food_salee",
+      "pct": 0.187847866419295
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m04_type_fandb_gamme_food_sucree",
+      "pct": 0.21428571428571427
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m04_type_fandb_gamme_sans_alcool",
+      "pct": 0.5978664192949907
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 2,
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m05_type_fandb",
+      "pct": 1.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m05_type_fandb_gamme_food_salee",
+      "pct": 0.06880733944954129
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m05_type_fandb_gamme_food_sucree",
+      "pct": 0.18807339449541285
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m05_type_fandb_gamme_sans_alcool",
+      "pct": 0.7431192660550459
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 2,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m06_type_fandb",
+      "pct": 1.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m06_type_fandb_gamme_food_salee",
+      "pct": 0.09566998244587478
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m06_type_fandb_gamme_food_sucree",
+      "pct": 0.13779988297249854
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m06_type_fandb_gamme_sans_alcool",
+      "pct": 0.7665301345816267
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 2,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m07_type_fandb",
+      "pct": 1.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m07_type_fandb_gamme_food_salee",
+      "pct": 0.18332768553032872
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m07_type_fandb_gamme_food_sucree",
+      "pct": 0.2097594035920027
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m07_type_fandb_gamme_sans_alcool",
+      "pct": 0.6069129108776686
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 2,
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m08_type_fandb",
+      "pct": 1.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m08_type_fandb_gamme_food_salee",
+      "pct": 0.11620016963528414
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m08_type_fandb_gamme_food_sucree",
+      "pct": 0.12581283573649985
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m08_type_fandb_gamme_sans_alcool",
+      "pct": 0.757986994628216
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 2,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m09_type_fandb",
+      "pct": 1.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m09_type_fandb_gamme_food_salee",
+      "pct": 0.12519561815336464
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m09_type_fandb_gamme_food_sucree",
+      "pct": 0.20422535211267606
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m09_type_fandb_gamme_sans_alcool",
+      "pct": 0.6705790297339593
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 2,
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m10_type_fandb",
+      "pct": 1.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m10_type_fandb_gamme_food_salee",
+      "pct": 0.16625233064014916
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m10_type_fandb_gamme_food_sucree",
+      "pct": 0.209136109384711
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m10_type_fandb_gamme_sans_alcool",
+      "pct": 0.6246115599751398
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 2,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m11_type_fandb",
+      "pct": 1.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m11_type_fandb_gamme_food_salee",
+      "pct": 0.21067415730337077
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m11_type_fandb_gamme_food_sucree",
+      "pct": 0.26264044943820225
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m11_type_fandb_gamme_sans_alcool",
+      "pct": 0.526685393258427
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 2,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m12_type_fandb",
+      "pct": 1.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m12_type_fandb_gamme_food_salee",
+      "pct": 0.08550724637681159
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m12_type_fandb_gamme_food_sucree",
+      "pct": 0.21144927536231883
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "level": 3,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m12_type_fandb_gamme_sans_alcool",
+      "pct": 0.7030434782608695
+    }
+  ]
+}

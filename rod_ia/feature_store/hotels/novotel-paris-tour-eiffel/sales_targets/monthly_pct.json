@@ -1,0 +1,868 @@
+{
+  "rows": [
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 1,
+      "month": 1,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m01",
+      "pct": 0.07025780237844624
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 1,
+      "month": 2,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m02",
+      "pct": 0.08001941483423793
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 1,
+      "month": 3,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m03",
+      "pct": 0.08657059876524313
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 1,
+      "month": 4,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m04",
+      "pct": 0.09584187245921053
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 1,
+      "month": 5,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m05",
+      "pct": 0.09006232689549724
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 1,
+      "month": 6,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m06",
+      "pct": 0.06795514574561606
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 1,
+      "month": 7,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m07",
+      "pct": 0.08477108776847701
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 1,
+      "month": 8,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m08",
+      "pct": 0.11519025289124867
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 1,
+      "month": 9,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m09",
+      "pct": 0.05022294767985409
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 1,
+      "month": 10,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m10",
+      "pct": 0.08968521767669947
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 1,
+      "month": 11,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m11",
+      "pct": 0.07702415470033093
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 1,
+      "month": 12,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m12",
+      "pct": 0.09239917820513885
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 2,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m01_type_fandb",
+      "pct": 0.7778614457831325
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m01_type_fandb_gamme_food_salee",
+      "pct": 0.33558425613297754
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m01_type_fandb_gamme_food_sucree",
+      "pct": 0.20819068306849572
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m01_type_fandb_gamme_sans_alcool",
+      "pct": 0.45622506079852665
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 2,
+      "month": 1,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m01_type_non_fandb",
+      "pct": 0.22213855421686746
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 1,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m01_type_non_fandb_gamme_sos",
+      "pct": 1.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 2,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m02_type_fandb",
+      "pct": 0.7213487494557593
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m02_type_fandb_gamme_food_salee",
+      "pct": 0.3232624684237587
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m02_type_fandb_gamme_food_sucree",
+      "pct": 0.2071401426240136
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m02_type_fandb_gamme_sans_alcool",
+      "pct": 0.4695973889522277
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 2,
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m02_type_non_fandb",
+      "pct": 0.2786512505442407
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m02_type_non_fandb_gamme_cosmetique",
+      "pct": 0.006944444444444444
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m02_type_non_fandb_gamme_sos",
+      "pct": 0.9930555555555556
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 2,
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m03_type_fandb",
+      "pct": 0.7644954538679386
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m03_type_fandb_gamme_food_salee",
+      "pct": 0.35611230259309806
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m03_type_fandb_gamme_food_sucree",
+      "pct": 0.20561512965490347
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m03_type_fandb_gamme_sans_alcool",
+      "pct": 0.43827256775199847
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 2,
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m03_type_non_fandb",
+      "pct": 0.2355045461320614
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m03_type_non_fandb_gamme_cosmetique",
+      "pct": 0.015189873417721518
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m03_type_non_fandb_gamme_sos",
+      "pct": 0.9848101265822785
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 2,
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m04_type_fandb",
+      "pct": 0.8407270279367216
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m04_type_fandb_gamme_food_salee",
+      "pct": 0.3865321482904956
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m04_type_fandb_gamme_food_sucree",
+      "pct": 0.18658819761390025
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m04_type_fandb_gamme_sans_alcool",
+      "pct": 0.42687965409560413
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 2,
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m04_type_non_fandb",
+      "pct": 0.15738808481992594
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m04_type_non_fandb_gamme_cosmetique",
+      "pct": 0.006843455945252352
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m04_type_non_fandb_gamme_sos",
+      "pct": 0.9931565440547476
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 2,
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m05_type_fandb",
+      "pct": 0.9017135652472921
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m05_type_fandb_gamme_food_salee",
+      "pct": 0.37005847209863985
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m05_type_fandb_gamme_food_sucree",
+      "pct": 0.16141000381339773
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m05_type_fandb_gamme_sans_alcool",
+      "pct": 0.46853152408796234
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 2,
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m05_type_non_fandb",
+      "pct": 0.09828643475270789
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m05_type_non_fandb_gamme_cosmetique",
+      "pct": 0.03498542274052478
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m05_type_non_fandb_gamme_sos",
+      "pct": 0.9650145772594753
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 2,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m06_type_fandb",
+      "pct": 0.8086910288909777
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m06_type_fandb_gamme_food_salee",
+      "pct": 0.2956079692874837
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m06_type_fandb_gamme_food_sucree",
+      "pct": 0.14234476443171276
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m06_type_fandb_gamme_sans_alcool",
+      "pct": 0.5620472662808035
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 2,
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m06_type_non_fandb",
+      "pct": 0.19130897110902237
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m06_type_non_fandb_gamme_cosmetique",
+      "pct": 0.011910669975186104
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m06_type_non_fandb_gamme_sos",
+      "pct": 0.9880893300248139
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 2,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m07_type_fandb",
+      "pct": 0.837583819573433
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m07_type_fandb_gamme_food_salee",
+      "pct": 0.3087527265804853
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m07_type_fandb_gamme_food_sucree",
+      "pct": 0.14576443525879174
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m07_type_fandb_gamme_sans_alcool",
+      "pct": 0.5454828381607231
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 2,
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m07_type_non_fandb",
+      "pct": 0.162416180426567
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m07_type_non_fandb_gamme_cosmetique",
+      "pct": 0.022492970946579195
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m07_type_non_fandb_gamme_sos",
+      "pct": 0.9688378631677601
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m07_type_non_fandb_gamme_souvenirs",
+      "pct": 0.008669165885660732
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 2,
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m08_type_fandb",
+      "pct": 0.7961789861038765
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m08_type_fandb_gamme_food_salee",
+      "pct": 0.3265376471167577
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m08_type_fandb_gamme_food_sucree",
+      "pct": 0.15416218193585604
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m08_type_fandb_gamme_sans_alcool",
+      "pct": 0.5193001709473861
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 2,
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m08_type_non_fandb",
+      "pct": 0.20382101389612353
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m08_type_non_fandb_gamme_cosmetique",
+      "pct": 0.01538884308876065
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m08_type_non_fandb_gamme_sos",
+      "pct": 0.9846111569112393
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 2,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m09_type_fandb",
+      "pct": 0.7532854591935049
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m09_type_fandb_gamme_food_salee",
+      "pct": 0.3196306149595825
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m09_type_fandb_gamme_food_sucree",
+      "pct": 0.1591203656332071
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m09_type_fandb_gamme_sans_alcool",
+      "pct": 0.5212490194072104
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 2,
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m09_type_non_fandb",
+      "pct": 0.24671454080649513
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m09_type_non_fandb_gamme_cosmetique",
+      "pct": 0.010413954699297057
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m09_type_non_fandb_gamme_sos",
+      "pct": 0.9895860453007029
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 2,
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m10_type_fandb",
+      "pct": 0.7408772907936622
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m10_type_fandb_gamme_food_salee",
+      "pct": 0.29517659910183275
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m10_type_fandb_gamme_food_sucree",
+      "pct": 0.19360116518995024
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m10_type_fandb_gamme_sans_alcool",
+      "pct": 0.511222235708217
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 2,
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m10_type_non_fandb",
+      "pct": 0.2591227092063378
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m10_type_non_fandb_gamme_cosmetique",
+      "pct": 0.01110494169905608
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m10_type_non_fandb_gamme_sos",
+      "pct": 0.9888950583009439
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 2,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m11_type_fandb",
+      "pct": 0.7348042233642003
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m11_type_fandb_gamme_food_salee",
+      "pct": 0.33004269095510325
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m11_type_fandb_gamme_food_sucree",
+      "pct": 0.18214047547122492
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m11_type_fandb_gamme_sans_alcool",
+      "pct": 0.48781683357367184
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 2,
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m11_type_non_fandb",
+      "pct": 0.2638555579288595
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m11_type_non_fandb_gamme_cosmetique",
+      "pct": 0.005079365079365079
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m11_type_non_fandb_gamme_sos",
+      "pct": 0.9949206349206349
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 2,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m12_type_fandb",
+      "pct": 0.7911517030457917
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m12_type_fandb_gamme_food_salee",
+      "pct": 0.3267448633764033
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m12_type_fandb_gamme_food_sucree",
+      "pct": 0.18488314622608204
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m12_type_fandb_gamme_sans_alcool",
+      "pct": 0.48837199039751455
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 2,
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m12_type_non_fandb",
+      "pct": 0.2021450416858687
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m12_type_non_fandb_gamme_cosmetique",
+      "pct": 0.02072538860103627
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "level": 3,
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m12_type_non_fandb_gamme_sos",
+      "pct": 0.9792746113989638
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "_source": "ROD - Paramètres & règles + projections nb. d'hôtels.xlsx",
+  "brands": {
+    "IBIS BUDGET": {
+      "total_hotels": 342,
+      "size_bands": {
+        "Plus de 300 ch.": 1,
+        "Entre 50 et 99 ch.": 252,
+        "Entre 100 et 149 ch.": 31,
+        "Entre 150 et 199 ch.": 7,
+        "Entre 0 et 49 ch.": 45,
+        "Entre 250 et 299 ch.": 3,
+        "Entre 200 et 249 ch.": 3
+      }
+    },
+    "IBIS STYLES": {
+      "total_hotels": 267,
+      "size_bands": {
+        "Plus de 300 ch.": 3,
+        "Entre 50 et 99 ch.": 174,
+        "Entre 100 et 149 ch.": 26,
+        "Entre 150 et 199 ch.": 3,
+        "Entre 0 et 49 ch.": 60,
+        "Entre 200 et 249 ch.": 1
+      }
+    },
+    "MERCURE": {
+      "total_hotels": 255,
+      "size_bands": {
+        "Plus de 300 ch.": 7,
+        "Entre 50 et 99 ch.": 155,
+        "Entre 100 et 149 ch.": 45,
+        "Entre 150 et 199 ch.": 15,
+        "Entre 0 et 49 ch.": 28,
+        "Entre 200 et 249 ch.": 5
+      }
+    },
+    "NOVOTEL": {
+      "total_hotels": 117,
+      "size_bands": {
+        "Plus de 300 ch.": 2,
+        "Entre 50 et 99 ch.": 37,
+        "Entre 100 et 149 ch.": 57,
+        "Entre 150 et 199 ch.": 15,
+        "Entre 250 et 299 ch.": 4,
+        "Entre 200 et 249 ch.": 2
+      }
+    },
+    "IBIS": {
+      "total_hotels": 362,
+      "size_bands": {
+        "Plus de 300 ch.": 7,
+        "Entre 50 et 99 ch.": 247,
+        "Entre 100 et 149 ch.": 45,
+        "Entre 150 et 199 ch.": 11,
+        "Entre 0 et 49 ch.": 45,
+        "Entre 250 et 299 ch.": 4,
+        "Entre 200 et 249 ch.": 3,
+        "Total général": 1343
+      }
+    }
+  },
+  "recommendation_rules_sample": []
+}

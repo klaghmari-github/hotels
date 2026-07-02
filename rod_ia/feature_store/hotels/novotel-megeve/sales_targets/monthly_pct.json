@@ -1,0 +1,1552 @@
+{
+  "rows": [
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 1,
+      "month": 1,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m01",
+      "pct": 0.09819246491562972
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 1,
+      "month": 2,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m02",
+      "pct": 0.11714568494466505
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 1,
+      "month": 3,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m03",
+      "pct": 0.05596112085170333
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 1,
+      "month": 4,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m04",
+      "pct": 0.046341036371992814
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 1,
+      "month": 5,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m05",
+      "pct": 0.052103116800373515
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 1,
+      "month": 6,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m06",
+      "pct": 0.060292104284050255
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 1,
+      "month": 7,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m07",
+      "pct": 0.08776503259788483
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 1,
+      "month": 8,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m08",
+      "pct": 0.13692327520591016
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 1,
+      "month": 9,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m09",
+      "pct": 0.07904956678006822
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 1,
+      "month": 10,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m10",
+      "pct": 0.04134739545210263
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 1,
+      "month": 11,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m11",
+      "pct": 0.06834856027021835
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 1,
+      "month": 12,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m12",
+      "pct": 0.15653064152540103
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 2,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m01_type_fandb",
+      "pct": 0.37811733822036203
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "column": "d_pct_mois_m01_type_fandb_gamme_alcool",
+      "pct": 0.02095886822111606
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m01_type_fandb_gamme_food_salee",
+      "pct": 0.10217448257794079
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m01_type_fandb_gamme_food_sucree",
+      "pct": 0.7137804558553839
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m01_type_fandb_gamme_sans_alcool",
+      "pct": 0.1414723604925334
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m01_type_fandb_gamme_souvenirs",
+      "pct": 0.021613832853025938
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 2,
+      "month": 1,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m01_type_non_fandb",
+      "pct": 0.6218826617796379
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 1,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "column": "d_pct_mois_m01_type_non_fandb_gamme_ref",
+      "pct": 0.09557564414001832
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 1,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "column": "d_pct_mois_m01_type_non_fandb_gamme_accessoires",
+      "pct": 0.14575285731352794
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 1,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "column": "d_pct_mois_m01_type_non_fandb_gamme_jeux_enfants",
+      "pct": 0.19756282107442955
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 1,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "column": "d_pct_mois_m01_type_non_fandb_gamme_pap",
+      "pct": 0.4707100473895902
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 1,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m01_type_non_fandb_gamme_sos",
+      "pct": 0.08920393453068377
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 1,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m01_type_non_fandb_gamme_souvenirs",
+      "pct": 0.001194695551750229
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 2,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m02_type_fandb",
+      "pct": 0.29456334461212713
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "column": "d_pct_mois_m02_type_fandb_gamme_alcool",
+      "pct": 0.05637773079633545
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m02_type_fandb_gamme_food_salee",
+      "pct": 0.11233262861169838
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m02_type_fandb_gamme_food_sucree",
+      "pct": 0.5437632135306554
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m02_type_fandb_gamme_sans_alcool",
+      "pct": 0.28752642706131076
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 2,
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m02_type_non_fandb",
+      "pct": 0.7054366553878729
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "column": "d_pct_mois_m02_type_non_fandb_gamme_ref",
+      "pct": 0.019421475443604154
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "column": "d_pct_mois_m02_type_non_fandb_gamme_accessoires",
+      "pct": 0.21893299590971954
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m02_type_non_fandb_gamme_cosmetique",
+      "pct": 0.03054468410675926
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "column": "d_pct_mois_m02_type_non_fandb_gamme_jeux_enfants",
+      "pct": 0.20554394844481064
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "column": "d_pct_mois_m02_type_non_fandb_gamme_pap",
+      "pct": 0.2001000500250125
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m02_type_non_fandb_gamme_sos",
+      "pct": 0.32104287437836565
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 2,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m02_type_non_fandb_gamme_souvenirs",
+      "pct": 0.004413971691728216
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 2,
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m03_type_fandb",
+      "pct": 0.2739815317762086
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m03_type_fandb_gamme_food_salee",
+      "pct": 0.24107850911974624
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m03_type_fandb_gamme_food_sucree",
+      "pct": 0.4591593973037272
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m03_type_fandb_gamme_sans_alcool",
+      "pct": 0.29976209357652656
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 2,
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m03_type_non_fandb",
+      "pct": 0.7260184682237915
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "column": "d_pct_mois_m03_type_non_fandb_gamme_ref",
+      "pct": 0.07182403112374681
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "column": "d_pct_mois_m03_type_non_fandb_gamme_accessoires",
+      "pct": 0.1274876552446506
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m03_type_non_fandb_gamme_cosmetique",
+      "pct": 0.08199910219961096
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "column": "d_pct_mois_m03_type_non_fandb_gamme_jeux_enfants",
+      "pct": 0.3110878348047284
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "column": "d_pct_mois_m03_type_non_fandb_gamme_pap",
+      "pct": 0.28729612449498726
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m03_type_non_fandb_gamme_sos",
+      "pct": 0.10653897950022445
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 3,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m03_type_non_fandb_gamme_souvenirs",
+      "pct": 0.013766272632051473
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 2,
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m04_type_fandb",
+      "pct": 0.21777346312281898
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m04_type_fandb_gamme_food_salee",
+      "pct": 0.15180722891566265
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m04_type_fandb_gamme_food_sucree",
+      "pct": 0.6987951807228916
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m04_type_fandb_gamme_sans_alcool",
+      "pct": 0.1493975903614458
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 2,
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m04_type_non_fandb",
+      "pct": 0.782226536877181
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "column": "d_pct_mois_m04_type_non_fandb_gamme_ref",
+      "pct": 0.04427598698554322
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "column": "d_pct_mois_m04_type_non_fandb_gamme_accessoires",
+      "pct": 0.2025961828732432
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m04_type_non_fandb_gamme_cosmetique",
+      "pct": 0.18750209640089893
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "column": "d_pct_mois_m04_type_non_fandb_gamme_jeux_enfants",
+      "pct": 0.1678126991580854
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "column": "d_pct_mois_m04_type_non_fandb_gamme_pap",
+      "pct": 0.1408781404085466
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m04_type_non_fandb_gamme_sos",
+      "pct": 0.08251433938214872
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 4,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m04_type_non_fandb_gamme_souvenirs",
+      "pct": 0.17442055479153387
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 2,
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m05_type_fandb",
+      "pct": 0.2554839914123028
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "column": "d_pct_mois_m05_type_fandb_gamme_alcool",
+      "pct": 0.21921812203142127
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m05_type_fandb_gamme_food_salee",
+      "pct": 0.1370113262696383
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m05_type_fandb_gamme_food_sucree",
+      "pct": 0.3843624406284253
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m05_type_fandb_gamme_sans_alcool",
+      "pct": 0.20825721592985022
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m05_type_fandb_gamme_souvenirs",
+      "pct": 0.05115089514066496
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 2,
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m05_type_non_fandb",
+      "pct": 0.7445160085876973
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "column": "d_pct_mois_m05_type_non_fandb_gamme_ref",
+      "pct": 0.07522567703109327
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "column": "d_pct_mois_m05_type_non_fandb_gamme_accessoires",
+      "pct": 0.26015546639919757
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m05_type_non_fandb_gamme_cosmetique",
+      "pct": 0.2988966900702106
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "column": "d_pct_mois_m05_type_non_fandb_gamme_jeux_enfants",
+      "pct": 0.12437311935807423
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "column": "d_pct_mois_m05_type_non_fandb_gamme_pap",
+      "pct": 0.12851053159478434
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m05_type_non_fandb_gamme_sos",
+      "pct": 0.07271815446339017
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 5,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m05_type_non_fandb_gamme_souvenirs",
+      "pct": 0.04012036108324975
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 2,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m06_type_fandb",
+      "pct": 0.31641357613890736
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "column": "d_pct_mois_m06_type_fandb_gamme_alcool",
+      "pct": 0.2855321861057999
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m06_type_fandb_gamme_food_salee",
+      "pct": 0.14531548757170173
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m06_type_fandb_gamme_food_sucree",
+      "pct": 0.39834289356277885
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m06_type_fandb_gamme_sans_alcool",
+      "pct": 0.15296367112810708
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m06_type_fandb_gamme_souvenirs",
+      "pct": 0.017845761631612493
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 2,
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m06_type_non_fandb",
+      "pct": 0.6835864238610926
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "column": "d_pct_mois_m06_type_non_fandb_gamme_ref",
+      "pct": 0.23187892733870255
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "column": "d_pct_mois_m06_type_non_fandb_gamme_accessoires",
+      "pct": 0.24839956338319027
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m06_type_non_fandb_gamme_cosmetique",
+      "pct": 0.15918812874295662
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "column": "d_pct_mois_m06_type_non_fandb_gamme_jeux_enfants",
+      "pct": 0.1876567247839042
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "column": "d_pct_mois_m06_type_non_fandb_gamme_pap",
+      "pct": 0.05900227158745612
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m06_type_non_fandb_gamme_sos",
+      "pct": 0.10620408885742101
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 6,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m06_type_non_fandb_gamme_souvenirs",
+      "pct": 0.007670295306369296
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 2,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m07_type_fandb",
+      "pct": 0.28248039677481923
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "column": "d_pct_mois_m07_type_fandb_gamme_alcool",
+      "pct": 0.05100539480137322
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m07_type_fandb_gamme_food_salee",
+      "pct": 0.18881804806277588
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m07_type_fandb_gamme_food_sucree",
+      "pct": 0.5031878371750859
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m07_type_fandb_gamme_sans_alcool",
+      "pct": 0.24521824423737126
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m07_type_fandb_gamme_souvenirs",
+      "pct": 0.011770475723393821
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 2,
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m07_type_non_fandb",
+      "pct": 0.7175196032251809
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "column": "d_pct_mois_m07_type_non_fandb_gamme_ref",
+      "pct": 0.27378745752239725
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "column": "d_pct_mois_m07_type_non_fandb_gamme_accessoires",
+      "pct": 0.14944392956441147
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m07_type_non_fandb_gamme_cosmetique",
+      "pct": 0.10190763052208833
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "column": "d_pct_mois_m07_type_non_fandb_gamme_jeux_enfants",
+      "pct": 0.12384151992585725
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "column": "d_pct_mois_m07_type_non_fandb_gamme_pap",
+      "pct": 0.11932344763670064
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m07_type_non_fandb_gamme_sos",
+      "pct": 0.14519616929255483
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 7,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m07_type_non_fandb_gamme_souvenirs",
+      "pct": 0.0864998455359901
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 2,
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m08_type_fandb",
+      "pct": 0.23109437715341172
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "column": "d_pct_mois_m08_type_fandb_gamme_alcool",
+      "pct": 0.04918536735321242
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m08_type_fandb_gamme_food_salee",
+      "pct": 0.17652935751613894
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m08_type_fandb_gamme_food_sucree",
+      "pct": 0.4577313249308331
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m08_type_fandb_gamme_sans_alcool",
+      "pct": 0.26014448201660006
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m08_type_fandb_gamme_souvenirs",
+      "pct": 0.056409468183215496
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 2,
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m08_type_non_fandb",
+      "pct": 0.7689056228465881
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "column": "d_pct_mois_m08_type_non_fandb_gamme_ref",
+      "pct": 0.4240541414514714
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "column": "d_pct_mois_m08_type_non_fandb_gamme_accessoires",
+      "pct": 0.11872314870420844
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m08_type_non_fandb_gamme_cosmetique",
+      "pct": 0.02827181595602162
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "column": "d_pct_mois_m08_type_non_fandb_gamme_jeux_enfants",
+      "pct": 0.14207511433454983
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "column": "d_pct_mois_m08_type_non_fandb_gamme_pap",
+      "pct": 0.14713355199334782
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m08_type_non_fandb_gamme_sos",
+      "pct": 0.1235737053633298
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 8,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m08_type_non_fandb_gamme_souvenirs",
+      "pct": 0.01616852219707119
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 2,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m09_type_fandb",
+      "pct": 0.18682130002768635
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "column": "d_pct_mois_m09_type_fandb_gamme_alcool",
+      "pct": 0.17124979417092048
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m09_type_fandb_gamme_food_salee",
+      "pct": 0.1004445908117899
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m09_type_fandb_gamme_food_sucree",
+      "pct": 0.3512267413140129
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m09_type_fandb_gamme_sans_alcool",
+      "pct": 0.2684011197101927
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m09_type_fandb_gamme_souvenirs",
+      "pct": 0.10867775399308414
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 2,
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m09_type_non_fandb",
+      "pct": 0.8131786999723136
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "column": "d_pct_mois_m09_type_non_fandb_gamme_ref",
+      "pct": 0.29469622455927974
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "column": "d_pct_mois_m09_type_non_fandb_gamme_accessoires",
+      "pct": 0.29810093061965653
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m09_type_non_fandb_gamme_cosmetique",
+      "pct": 0.08383142921994402
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "column": "d_pct_mois_m09_type_non_fandb_gamme_jeux_enfants",
+      "pct": 0.08731179541499585
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "column": "d_pct_mois_m09_type_non_fandb_gamme_pap",
+      "pct": 0.11424680335930999
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m09_type_non_fandb_gamme_sos",
+      "pct": 0.08927895891654689
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 9,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m09_type_non_fandb_gamme_souvenirs",
+      "pct": 0.03253385791026708
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 2,
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m10_type_fandb",
+      "pct": 0.3421749103099453
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "column": "d_pct_mois_m10_type_fandb_gamme_alcool",
+      "pct": 0.48126503953248545
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m10_type_fandb_gamme_food_salee",
+      "pct": 0.13406668958404952
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m10_type_fandb_gamme_food_sucree",
+      "pct": 0.2557579924372637
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m10_type_fandb_gamme_sans_alcool",
+      "pct": 0.12891027844620145
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 2,
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m10_type_non_fandb",
+      "pct": 0.6578250896900547
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "column": "d_pct_mois_m10_type_non_fandb_gamme_ref",
+      "pct": 0.12865444792132322
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "column": "d_pct_mois_m10_type_non_fandb_gamme_accessoires",
+      "pct": 0.42914617791685294
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m10_type_non_fandb_gamme_cosmetique",
+      "pct": 0.14608851139919535
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "column": "d_pct_mois_m10_type_non_fandb_gamme_jeux_enfants",
+      "pct": 0.09852481001341082
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "column": "d_pct_mois_m10_type_non_fandb_gamme_pap",
+      "pct": 0.06258381761287439
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m10_type_non_fandb_gamme_sos",
+      "pct": 0.04917299955297273
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 10,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m10_type_non_fandb_gamme_souvenirs",
+      "pct": 0.08582923558337059
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 2,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m11_type_fandb",
+      "pct": 0.16149289310301887
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "column": "d_pct_mois_m11_type_fandb_gamme_alcool",
+      "pct": 0.07050011015642212
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m11_type_fandb_gamme_food_salee",
+      "pct": 0.25842696629213485
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m11_type_fandb_gamme_food_sucree",
+      "pct": 0.45296320775501214
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m11_type_fandb_gamme_sans_alcool",
+      "pct": 0.21810971579643093
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 2,
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m11_type_non_fandb",
+      "pct": 0.7303470727411808
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "column": "d_pct_mois_m11_type_non_fandb_gamme_ref",
+      "pct": 0.13542808427718914
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "column": "d_pct_mois_m11_type_non_fandb_gamme_accessoires",
+      "pct": 0.3882596516867617
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m11_type_non_fandb_gamme_cosmetique",
+      "pct": 0.13489221775666788
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "column": "d_pct_mois_m11_type_non_fandb_gamme_jeux_enfants",
+      "pct": 0.05838509316770186
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "column": "d_pct_mois_m11_type_non_fandb_gamme_pap",
+      "pct": 0.10960906101571063
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m11_type_non_fandb_gamme_sos",
+      "pct": 0.16319571306783584
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m11_type_non_fandb_gamme_souvenirs",
+      "pct": 0.010230179028132993
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 2,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m12_type_fandb",
+      "pct": 0.21995059733722755
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "ALCOOL",
+      "column": "d_pct_mois_m12_type_fandb_gamme_alcool",
+      "pct": 0.011301031219098744
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m12_type_fandb_gamme_food_salee",
+      "pct": 0.11442294109337478
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m12_type_fandb_gamme_food_sucree",
+      "pct": 0.5596129396807459
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m12_type_fandb_gamme_sans_alcool",
+      "pct": 0.22072326599802233
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m12_type_fandb_gamme_souvenirs",
+      "pct": 0.0939398220087583
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 2,
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m12_type_non_fandb",
+      "pct": 0.3853252341965854
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "#REF!",
+      "column": "d_pct_mois_m12_type_non_fandb_gamme_ref",
+      "pct": 0.07861952183203644
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "ACCESSOIRES",
+      "column": "d_pct_mois_m12_type_non_fandb_gamme_accessoires",
+      "pct": 0.2156997137443051
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "COSMETIQUE",
+      "column": "d_pct_mois_m12_type_non_fandb_gamme_cosmetique",
+      "pct": 0.052171108333669315
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "JEUX / ENFANTS",
+      "column": "d_pct_mois_m12_type_non_fandb_gamme_jeux_enfants",
+      "pct": 0.16284320445107445
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "PAP",
+      "column": "d_pct_mois_m12_type_non_fandb_gamme_pap",
+      "pct": 0.26609684312381565
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m12_type_non_fandb_gamme_sos",
+      "pct": 0.18384872797645443
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "level": 3,
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOUVENIRS",
+      "column": "d_pct_mois_m12_type_non_fandb_gamme_souvenirs",
+      "pct": 0.04072088053864452
+    }
+  ]
+}

@@ -4749,8 +4749,8 @@
       "hotel_id": "ibis-budget-nice",
       "level": 1,
       "month": 1,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m01",
       "pct": 0.031674698887200134
     },
@@ -4758,8 +4758,8 @@
       "hotel_id": "ibis-budget-nice",
       "level": 1,
       "month": 2,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m02",
       "pct": 0.024590051248367464
     },
@@ -4767,8 +4767,8 @@
       "hotel_id": "ibis-budget-nice",
       "level": 1,
       "month": 3,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m03",
       "pct": 0.056924639695717594
     },
@@ -4776,8 +4776,8 @@
       "hotel_id": "ibis-budget-nice",
       "level": 1,
       "month": 4,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m04",
       "pct": 0.0738022317098319
     },
@@ -4785,8 +4785,8 @@
       "hotel_id": "ibis-budget-nice",
       "level": 1,
       "month": 5,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m05",
       "pct": 0.08645011494604028
     },
@@ -4794,8 +4794,8 @@
       "hotel_id": "ibis-budget-nice",
       "level": 1,
       "month": 6,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m06",
       "pct": 0.12740451077284984
     },
@@ -4803,8 +4803,8 @@
       "hotel_id": "ibis-budget-nice",
       "level": 1,
       "month": 7,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m07",
       "pct": 0.14644507412301136
     },
@@ -4812,8 +4812,8 @@
       "hotel_id": "ibis-budget-nice",
       "level": 1,
       "month": 8,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m08",
       "pct": 0.15818102664762357
     },
@@ -4821,8 +4821,8 @@
       "hotel_id": "ibis-budget-nice",
       "level": 1,
       "month": 9,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m09",
       "pct": 0.12951707387860784
     },
@@ -4830,8 +4830,8 @@
       "hotel_id": "ibis-budget-nice",
       "level": 1,
       "month": 10,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m10",
       "pct": 0.08411911617569559
     },
@@ -4839,8 +4839,8 @@
       "hotel_id": "ibis-budget-nice",
       "level": 1,
       "month": 11,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m11",
       "pct": 0.04178384034338698
     },
@@ -4848,8 +4848,8 @@
       "hotel_id": "ibis-budget-nice",
       "level": 1,
       "month": 12,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m12",
       "pct": 0.03910762157166753
     },
@@ -4858,7 +4858,7 @@
       "level": 2,
       "month": 1,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m01_type_fandb",
       "pct": 0.9016203703703703
     },
@@ -4894,7 +4894,7 @@
       "level": 2,
       "month": 1,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m01_type_non_fandb",
       "pct": 0.09837962962962962
     },
@@ -4921,7 +4921,7 @@
       "level": 2,
       "month": 2,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m02_type_fandb",
       "pct": 0.940365262765561
     },
@@ -4957,7 +4957,7 @@
       "level": 2,
       "month": 2,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m02_type_non_fandb",
       "pct": 0.05963473723443906
     },
@@ -4984,7 +4984,7 @@
       "level": 2,
       "month": 3,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m03_type_fandb",
       "pct": 0.9315730156174529
     },
@@ -5020,7 +5020,7 @@
       "level": 2,
       "month": 3,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m03_type_non_fandb",
       "pct": 0.06842698438254709
     },
@@ -5047,7 +5047,7 @@
       "level": 2,
       "month": 4,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m04_type_fandb",
       "pct": 0.7366656317913692
     },
@@ -5083,7 +5083,7 @@
       "level": 2,
       "month": 4,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m04_type_non_fandb",
       "pct": 0.2633343682086309
     },
@@ -5137,7 +5137,7 @@
       "level": 2,
       "month": 5,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m05_type_fandb",
       "pct": 0.5557911476278823
     },
@@ -5164,7 +5164,7 @@
       "level": 2,
       "month": 5,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m05_type_non_fandb",
       "pct": 0.44420885237211766
     },
@@ -5218,7 +5218,7 @@
       "level": 2,
       "month": 6,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m06_type_fandb",
       "pct": 0.5258974174519818
     },
@@ -5245,7 +5245,7 @@
       "level": 2,
       "month": 6,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m06_type_non_fandb",
       "pct": 0.47410258254801807
     },
@@ -5308,7 +5308,7 @@
       "level": 2,
       "month": 7,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m07_type_fandb",
       "pct": 0.5198235128453861
     },
@@ -5335,7 +5335,7 @@
       "level": 2,
       "month": 7,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m07_type_non_fandb",
       "pct": 0.48017648715461403
     },
@@ -5398,7 +5398,7 @@
       "level": 2,
       "month": 8,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m08_type_fandb",
       "pct": 0.510690074743612
     },
@@ -5425,7 +5425,7 @@
       "level": 2,
       "month": 8,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m08_type_non_fandb",
       "pct": 0.48930992525638795
     },
@@ -5488,7 +5488,7 @@
       "level": 2,
       "month": 9,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m09_type_fandb",
       "pct": 0.5011145313660971
     },
@@ -5524,7 +5524,7 @@
       "level": 2,
       "month": 9,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m09_type_non_fandb",
       "pct": 0.49888546863390293
     },
@@ -5578,7 +5578,7 @@
       "level": 2,
       "month": 10,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m10_type_fandb",
       "pct": 0.6222920336305362
     },
@@ -5614,7 +5614,7 @@
       "level": 2,
       "month": 10,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m10_type_non_fandb",
       "pct": 0.3777079663694638
     },
@@ -5659,7 +5659,7 @@
       "level": 2,
       "month": 11,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m11_type_fandb",
       "pct": 0.759815749067778
     },
@@ -5695,7 +5695,7 @@
       "level": 2,
       "month": 11,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m11_type_non_fandb",
       "pct": 0.2270234700592235
     },
@@ -5731,7 +5731,7 @@
       "level": 2,
       "month": 12,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m12_type_fandb",
       "pct": 0.6988516522146707
     },
@@ -5767,7 +5767,7 @@
       "level": 2,
       "month": 12,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m12_type_non_fandb",
       "pct": 0.1652214670728849
     },
@@ -5811,8 +5811,8 @@
       "hotel_id": "ibis-budget-strasbourg",
       "level": 1,
       "month": 1,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m01",
       "pct": 0.05270285520821578
     },
@@ -5820,8 +5820,8 @@
       "hotel_id": "ibis-budget-strasbourg",
       "level": 1,
       "month": 2,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m02",
       "pct": 0.05605085957190686
     },
@@ -5829,8 +5829,8 @@
       "hotel_id": "ibis-budget-strasbourg",
       "level": 1,
       "month": 3,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m03",
       "pct": 0.06955573110634616
     },
@@ -5838,8 +5838,8 @@
       "hotel_id": "ibis-budget-strasbourg",
       "level": 1,
       "month": 4,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m04",
       "pct": 0.08110446525975247
     },
@@ -5847,8 +5847,8 @@
       "hotel_id": "ibis-budget-strasbourg",
       "level": 1,
       "month": 5,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m05",
       "pct": 0.049204378738291386
     },
@@ -5856,8 +5856,8 @@
       "hotel_id": "ibis-budget-strasbourg",
       "level": 1,
       "month": 6,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m06",
       "pct": 0.12857841477636084
     },
@@ -5865,8 +5865,8 @@
       "hotel_id": "ibis-budget-strasbourg",
       "level": 1,
       "month": 7,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m07",
       "pct": 0.11101079637362224
     },
@@ -5874,8 +5874,8 @@
       "hotel_id": "ibis-budget-strasbourg",
       "level": 1,
       "month": 8,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m08",
       "pct": 0.13305495993680172
     },
@@ -5883,8 +5883,8 @@
       "hotel_id": "ibis-budget-strasbourg",
       "level": 1,
       "month": 9,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m09",
       "pct": 0.048075837941541584
     },
@@ -5892,8 +5892,8 @@
       "hotel_id": "ibis-budget-strasbourg",
       "level": 1,
       "month": 10,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m10",
       "pct": 0.06052740473234774
     },
@@ -5901,8 +5901,8 @@
       "hotel_id": "ibis-budget-strasbourg",
       "level": 1,
       "month": 11,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m11",
       "pct": 0.08035210472858594
     },
@@ -5910,8 +5910,8 @@
       "hotel_id": "ibis-budget-strasbourg",
       "level": 1,
       "month": 12,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m12",
       "pct": 0.12978219162622728
     },
@@ -5920,7 +5920,7 @@
       "level": 2,
       "month": 1,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m01_type_fandb",
       "pct": 1.0
     },
@@ -5956,7 +5956,7 @@
       "level": 2,
       "month": 2,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m02_type_fandb",
       "pct": 1.0
     },
@@ -5992,7 +5992,7 @@
       "level": 2,
       "month": 3,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m03_type_fandb",
       "pct": 1.0
     },
@@ -6028,7 +6028,7 @@
       "level": 2,
       "month": 4,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m04_type_fandb",
       "pct": 1.0
     },
@@ -6064,7 +6064,7 @@
       "level": 2,
       "month": 5,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m05_type_fandb",
       "pct": 1.0
     },
@@ -6100,7 +6100,7 @@
       "level": 2,
       "month": 6,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m06_type_fandb",
       "pct": 1.0
     },
@@ -6136,7 +6136,7 @@
       "level": 2,
       "month": 7,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m07_type_fandb",
       "pct": 1.0
     },
@@ -6172,7 +6172,7 @@
       "level": 2,
       "month": 8,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m08_type_fandb",
       "pct": 1.0
     },
@@ -6208,7 +6208,7 @@
       "level": 2,
       "month": 9,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m09_type_fandb",
       "pct": 1.0
     },
@@ -6244,7 +6244,7 @@
       "level": 2,
       "month": 10,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m10_type_fandb",
       "pct": 1.0
     },
@@ -6280,7 +6280,7 @@
       "level": 2,
       "month": 11,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m11_type_fandb",
       "pct": 1.0
     },
@@ -6316,7 +6316,7 @@
       "level": 2,
       "month": 12,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m12_type_fandb",
       "pct": 1.0
     },
@@ -6351,8 +6351,8 @@
       "hotel_id": "mercure-montmartre",
       "level": 1,
       "month": 1,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m01",
       "pct": 0.08802681287305482
     },
@@ -6360,8 +6360,8 @@
       "hotel_id": "mercure-montmartre",
       "level": 1,
       "month": 2,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m02",
       "pct": 0.06950138395096175
     },
@@ -6369,8 +6369,8 @@
       "hotel_id": "mercure-montmartre",
       "level": 1,
       "month": 3,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m03",
       "pct": 0.07945949739557033
     },
@@ -6378,8 +6378,8 @@
       "hotel_id": "mercure-montmartre",
       "level": 1,
       "month": 4,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m04",
       "pct": 0.09199807599148918
     },
@@ -6387,8 +6387,8 @@
       "hotel_id": "mercure-montmartre",
       "level": 1,
       "month": 5,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m05",
       "pct": 0.06924890062769923
     },
@@ -6396,8 +6396,8 @@
       "hotel_id": "mercure-montmartre",
       "level": 1,
       "month": 6,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m06",
       "pct": 0.08104286738891162
     },
@@ -6405,8 +6405,8 @@
       "hotel_id": "mercure-montmartre",
       "level": 1,
       "month": 7,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m07",
       "pct": 0.07696889918982809
     },
@@ -6414,8 +6414,8 @@
       "hotel_id": "mercure-montmartre",
       "level": 1,
       "month": 8,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m08",
       "pct": 0.06064735012333169
     },
@@ -6423,8 +6423,8 @@
       "hotel_id": "mercure-montmartre",
       "level": 1,
       "month": 9,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m09",
       "pct": 0.10309878345831971
     },
@@ -6432,8 +6432,8 @@
       "hotel_id": "mercure-montmartre",
       "level": 1,
       "month": 10,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m10",
       "pct": 0.12337618988115312
     },
@@ -6441,8 +6441,8 @@
       "hotel_id": "mercure-montmartre",
       "level": 1,
       "month": 11,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m11",
       "pct": 0.0773925576475059
     },
@@ -6450,8 +6450,8 @@
       "hotel_id": "mercure-montmartre",
       "level": 1,
       "month": 12,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m12",
       "pct": 0.07923868147217464
     },
@@ -6460,7 +6460,7 @@
       "level": 2,
       "month": 1,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m01_type_fandb",
       "pct": 0.985512882839086
     },
@@ -6514,7 +6514,7 @@
       "level": 2,
       "month": 1,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m01_type_non_fandb",
       "pct": 0.014487117160913953
     },
@@ -6541,7 +6541,7 @@
       "level": 2,
       "month": 2,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m02_type_fandb",
       "pct": 0.846438027215073
     },
@@ -6595,7 +6595,7 @@
       "level": 2,
       "month": 2,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m02_type_non_fandb",
       "pct": 0.15356197278492703
     },
@@ -6631,7 +6631,7 @@
       "level": 2,
       "month": 3,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m03_type_fandb",
       "pct": 0.91813873330461
     },
@@ -6685,7 +6685,7 @@
       "level": 2,
       "month": 3,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m03_type_non_fandb",
       "pct": 0.08186126669538991
     },
@@ -6721,7 +6721,7 @@
       "level": 2,
       "month": 4,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m04_type_fandb",
       "pct": 0.8768257512326728
     },
@@ -6775,7 +6775,7 @@
       "level": 2,
       "month": 4,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m04_type_non_fandb",
       "pct": 0.12317424876732719
     },
@@ -6811,7 +6811,7 @@
       "level": 2,
       "month": 5,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m05_type_fandb",
       "pct": 0.9368434062538623
     },
@@ -6856,7 +6856,7 @@
       "level": 2,
       "month": 5,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m05_type_non_fandb",
       "pct": 0.06315659374613769
     },
@@ -6892,7 +6892,7 @@
       "level": 2,
       "month": 6,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m06_type_fandb",
       "pct": 0.9526877178160312
     },
@@ -6946,7 +6946,7 @@
       "level": 2,
       "month": 6,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m06_type_non_fandb",
       "pct": 0.04731228218396874
     },
@@ -6982,7 +6982,7 @@
       "level": 2,
       "month": 7,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m07_type_fandb",
       "pct": 0.9705326364950517
     },
@@ -7036,7 +7036,7 @@
       "level": 2,
       "month": 7,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m07_type_non_fandb",
       "pct": 0.02946736350494829
     },
@@ -7072,7 +7072,7 @@
       "level": 2,
       "month": 8,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m08_type_fandb",
       "pct": 0.9740333051086649
     },
@@ -7117,7 +7117,7 @@
       "level": 2,
       "month": 8,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m08_type_non_fandb",
       "pct": 0.025966694891335025
     },
@@ -7153,7 +7153,7 @@
       "level": 2,
       "month": 9,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m09_type_fandb",
       "pct": 0.9845591897725386
     },
@@ -7198,7 +7198,7 @@
       "level": 2,
       "month": 9,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m09_type_non_fandb",
       "pct": 0.015440810227461398
     },
@@ -7234,7 +7234,7 @@
       "level": 2,
       "month": 10,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m10_type_fandb",
       "pct": 0.9515650147066984
     },
@@ -7279,7 +7279,7 @@
       "level": 2,
       "month": 10,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m10_type_non_fandb",
       "pct": 0.048434985293301515
     },
@@ -7315,7 +7315,7 @@
       "level": 2,
       "month": 11,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m11_type_fandb",
       "pct": 0.9837987282278131
     },
@@ -7369,7 +7369,7 @@
       "level": 2,
       "month": 11,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m11_type_non_fandb",
       "pct": 0.016201271772186894
     },
@@ -7396,7 +7396,7 @@
       "level": 2,
       "month": 12,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m12_type_fandb",
       "pct": 0.9569894795964657
     },
@@ -7441,7 +7441,7 @@
       "level": 2,
       "month": 12,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m12_type_non_fandb",
       "pct": 0.04301052040353416
     },
@@ -7476,8 +7476,8 @@
       "hotel_id": "novotel-megeve",
       "level": 1,
       "month": 1,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m01",
       "pct": 0.09819246491562972
     },
@@ -7485,8 +7485,8 @@
       "hotel_id": "novotel-megeve",
       "level": 1,
       "month": 2,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m02",
       "pct": 0.11714568494466505
     },
@@ -7494,8 +7494,8 @@
       "hotel_id": "novotel-megeve",
       "level": 1,
       "month": 3,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m03",
       "pct": 0.05596112085170333
     },
@@ -7503,8 +7503,8 @@
       "hotel_id": "novotel-megeve",
       "level": 1,
       "month": 4,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m04",
       "pct": 0.046341036371992814
     },
@@ -7512,8 +7512,8 @@
       "hotel_id": "novotel-megeve",
       "level": 1,
       "month": 5,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m05",
       "pct": 0.052103116800373515
     },
@@ -7521,8 +7521,8 @@
       "hotel_id": "novotel-megeve",
       "level": 1,
       "month": 6,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m06",
       "pct": 0.060292104284050255
     },
@@ -7530,8 +7530,8 @@
       "hotel_id": "novotel-megeve",
       "level": 1,
       "month": 7,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m07",
       "pct": 0.08776503259788483
     },
@@ -7539,8 +7539,8 @@
       "hotel_id": "novotel-megeve",
       "level": 1,
       "month": 8,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m08",
       "pct": 0.13692327520591016
     },
@@ -7548,8 +7548,8 @@
       "hotel_id": "novotel-megeve",
       "level": 1,
       "month": 9,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m09",
       "pct": 0.07904956678006822
     },
@@ -7557,8 +7557,8 @@
       "hotel_id": "novotel-megeve",
       "level": 1,
       "month": 10,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m10",
       "pct": 0.04134739545210263
     },
@@ -7566,8 +7566,8 @@
       "hotel_id": "novotel-megeve",
       "level": 1,
       "month": 11,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m11",
       "pct": 0.06834856027021835
     },
@@ -7575,8 +7575,8 @@
       "hotel_id": "novotel-megeve",
       "level": 1,
       "month": 12,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m12",
       "pct": 0.15653064152540103
     },
@@ -7585,7 +7585,7 @@
       "level": 2,
       "month": 1,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m01_type_fandb",
       "pct": 0.37811733822036203
     },
@@ -7639,7 +7639,7 @@
       "level": 2,
       "month": 1,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m01_type_non_fandb",
       "pct": 0.6218826617796379
     },
@@ -7702,7 +7702,7 @@
       "level": 2,
       "month": 2,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m02_type_fandb",
       "pct": 0.29456334461212713
     },
@@ -7747,7 +7747,7 @@
       "level": 2,
       "month": 2,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m02_type_non_fandb",
       "pct": 0.7054366553878729
     },
@@ -7819,7 +7819,7 @@
       "level": 2,
       "month": 3,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m03_type_fandb",
       "pct": 0.2739815317762086
     },
@@ -7855,7 +7855,7 @@
       "level": 2,
       "month": 3,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m03_type_non_fandb",
       "pct": 0.7260184682237915
     },
@@ -7927,7 +7927,7 @@
       "level": 2,
       "month": 4,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m04_type_fandb",
       "pct": 0.21777346312281898
     },
@@ -7963,7 +7963,7 @@
       "level": 2,
       "month": 4,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m04_type_non_fandb",
       "pct": 0.782226536877181
     },
@@ -8035,7 +8035,7 @@
       "level": 2,
       "month": 5,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m05_type_fandb",
       "pct": 0.2554839914123028
     },
@@ -8089,7 +8089,7 @@
       "level": 2,
       "month": 5,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m05_type_non_fandb",
       "pct": 0.7445160085876973
     },
@@ -8161,7 +8161,7 @@
       "level": 2,
       "month": 6,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m06_type_fandb",
       "pct": 0.31641357613890736
     },
@@ -8215,7 +8215,7 @@
       "level": 2,
       "month": 6,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m06_type_non_fandb",
       "pct": 0.6835864238610926
     },
@@ -8287,7 +8287,7 @@
       "level": 2,
       "month": 7,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m07_type_fandb",
       "pct": 0.28248039677481923
     },
@@ -8341,7 +8341,7 @@
       "level": 2,
       "month": 7,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m07_type_non_fandb",
       "pct": 0.7175196032251809
     },
@@ -8413,7 +8413,7 @@
       "level": 2,
       "month": 8,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m08_type_fandb",
       "pct": 0.23109437715341172
     },
@@ -8467,7 +8467,7 @@
       "level": 2,
       "month": 8,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m08_type_non_fandb",
       "pct": 0.7689056228465881
     },
@@ -8539,7 +8539,7 @@
       "level": 2,
       "month": 9,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m09_type_fandb",
       "pct": 0.18682130002768635
     },
@@ -8593,7 +8593,7 @@
       "level": 2,
       "month": 9,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m09_type_non_fandb",
       "pct": 0.8131786999723136
     },
@@ -8665,7 +8665,7 @@
       "level": 2,
       "month": 10,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m10_type_fandb",
       "pct": 0.3421749103099453
     },
@@ -8710,7 +8710,7 @@
       "level": 2,
       "month": 10,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m10_type_non_fandb",
       "pct": 0.6578250896900547
     },
@@ -8782,7 +8782,7 @@
       "level": 2,
       "month": 11,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m11_type_fandb",
       "pct": 0.16149289310301887
     },
@@ -8827,7 +8827,7 @@
       "level": 2,
       "month": 11,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m11_type_non_fandb",
       "pct": 0.7303470727411808
     },
@@ -8899,7 +8899,7 @@
       "level": 2,
       "month": 12,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m12_type_fandb",
       "pct": 0.21995059733722755
     },
@@ -8953,7 +8953,7 @@
       "level": 2,
       "month": 12,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m12_type_non_fandb",
       "pct": 0.3853252341965854
     },
@@ -9024,8 +9024,8 @@
       "hotel_id": "novotel-paris-tour-eiffel",
       "level": 1,
       "month": 1,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m01",
       "pct": 0.07025780237844624
     },
@@ -9033,8 +9033,8 @@
       "hotel_id": "novotel-paris-tour-eiffel",
       "level": 1,
       "month": 2,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m02",
       "pct": 0.08001941483423793
     },
@@ -9042,8 +9042,8 @@
       "hotel_id": "novotel-paris-tour-eiffel",
       "level": 1,
       "month": 3,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m03",
       "pct": 0.08657059876524313
     },
@@ -9051,8 +9051,8 @@
       "hotel_id": "novotel-paris-tour-eiffel",
       "level": 1,
       "month": 4,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m04",
       "pct": 0.09584187245921053
     },
@@ -9060,8 +9060,8 @@
       "hotel_id": "novotel-paris-tour-eiffel",
       "level": 1,
       "month": 5,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m05",
       "pct": 0.09006232689549724
     },
@@ -9069,8 +9069,8 @@
       "hotel_id": "novotel-paris-tour-eiffel",
       "level": 1,
       "month": 6,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m06",
       "pct": 0.06795514574561606
     },
@@ -9078,8 +9078,8 @@
       "hotel_id": "novotel-paris-tour-eiffel",
       "level": 1,
       "month": 7,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m07",
       "pct": 0.08477108776847701
     },
@@ -9087,8 +9087,8 @@
       "hotel_id": "novotel-paris-tour-eiffel",
       "level": 1,
       "month": 8,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m08",
       "pct": 0.11519025289124867
     },
@@ -9096,8 +9096,8 @@
       "hotel_id": "novotel-paris-tour-eiffel",
       "level": 1,
       "month": 9,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m09",
       "pct": 0.05022294767985409
     },
@@ -9105,8 +9105,8 @@
       "hotel_id": "novotel-paris-tour-eiffel",
       "level": 1,
       "month": 10,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m10",
       "pct": 0.08968521767669947
     },
@@ -9114,8 +9114,8 @@
       "hotel_id": "novotel-paris-tour-eiffel",
       "level": 1,
       "month": 11,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m11",
       "pct": 0.07702415470033093
     },
@@ -9123,8 +9123,8 @@
       "hotel_id": "novotel-paris-tour-eiffel",
       "level": 1,
       "month": 12,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m12",
       "pct": 0.09239917820513885
     },
@@ -9133,7 +9133,7 @@
       "level": 2,
       "month": 1,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m01_type_fandb",
       "pct": 0.7778614457831325
     },
@@ -9169,7 +9169,7 @@
       "level": 2,
       "month": 1,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m01_type_non_fandb",
       "pct": 0.22213855421686746
     },
@@ -9187,7 +9187,7 @@
       "level": 2,
       "month": 2,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m02_type_fandb",
       "pct": 0.7213487494557593
     },
@@ -9223,7 +9223,7 @@
       "level": 2,
       "month": 2,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m02_type_non_fandb",
       "pct": 0.2786512505442407
     },
@@ -9250,7 +9250,7 @@
       "level": 2,
       "month": 3,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m03_type_fandb",
       "pct": 0.7644954538679386
     },
@@ -9286,7 +9286,7 @@
       "level": 2,
       "month": 3,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m03_type_non_fandb",
       "pct": 0.2355045461320614
     },
@@ -9313,7 +9313,7 @@
       "level": 2,
       "month": 4,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m04_type_fandb",
       "pct": 0.8407270279367216
     },
@@ -9349,7 +9349,7 @@
       "level": 2,
       "month": 4,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m04_type_non_fandb",
       "pct": 0.15738808481992594
     },
@@ -9376,7 +9376,7 @@
       "level": 2,
       "month": 5,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m05_type_fandb",
       "pct": 0.9017135652472921
     },
@@ -9412,7 +9412,7 @@
       "level": 2,
       "month": 5,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m05_type_non_fandb",
       "pct": 0.09828643475270789
     },
@@ -9439,7 +9439,7 @@
       "level": 2,
       "month": 6,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m06_type_fandb",
       "pct": 0.8086910288909777
     },
@@ -9475,7 +9475,7 @@
       "level": 2,
       "month": 6,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m06_type_non_fandb",
       "pct": 0.19130897110902237
     },
@@ -9502,7 +9502,7 @@
       "level": 2,
       "month": 7,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m07_type_fandb",
       "pct": 0.837583819573433
     },
@@ -9538,7 +9538,7 @@
       "level": 2,
       "month": 7,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m07_type_non_fandb",
       "pct": 0.162416180426567
     },
@@ -9574,7 +9574,7 @@
       "level": 2,
       "month": 8,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m08_type_fandb",
       "pct": 0.7961789861038765
     },
@@ -9610,7 +9610,7 @@
       "level": 2,
       "month": 8,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m08_type_non_fandb",
       "pct": 0.20382101389612353
     },
@@ -9637,7 +9637,7 @@
       "level": 2,
       "month": 9,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m09_type_fandb",
       "pct": 0.7532854591935049
     },
@@ -9673,7 +9673,7 @@
       "level": 2,
       "month": 9,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m09_type_non_fandb",
       "pct": 0.24671454080649513
     },
@@ -9700,7 +9700,7 @@
       "level": 2,
       "month": 10,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m10_type_fandb",
       "pct": 0.7408772907936622
     },
@@ -9736,7 +9736,7 @@
       "level": 2,
       "month": 10,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m10_type_non_fandb",
       "pct": 0.2591227092063378
     },
@@ -9763,7 +9763,7 @@
       "level": 2,
       "month": 11,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m11_type_fandb",
       "pct": 0.7348042233642003
     },
@@ -9799,7 +9799,7 @@
       "level": 2,
       "month": 11,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m11_type_non_fandb",
       "pct": 0.2638555579288595
     },
@@ -9826,7 +9826,7 @@
       "level": 2,
       "month": 12,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m12_type_fandb",
       "pct": 0.7911517030457917
     },
@@ -9862,7 +9862,7 @@
       "level": 2,
       "month": 12,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m12_type_non_fandb",
       "pct": 0.2021450416858687
     },
@@ -9888,8 +9888,8 @@
       "hotel_id": "novotel-porte-italie",
       "level": 1,
       "month": 1,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m01",
       "pct": 0.025883536039323852
     },
@@ -9897,8 +9897,8 @@
       "hotel_id": "novotel-porte-italie",
       "level": 1,
       "month": 2,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m02",
       "pct": 0.042854667189117984
     },
@@ -9906,8 +9906,8 @@
       "hotel_id": "novotel-porte-italie",
       "level": 1,
       "month": 3,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m03",
       "pct": 0.08444589000692333
     },
@@ -9915,8 +9915,8 @@
       "hotel_id": "novotel-porte-italie",
       "level": 1,
       "month": 4,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m04",
       "pct": 0.04982068480392283
     },
@@ -9924,8 +9924,8 @@
       "hotel_id": "novotel-porte-italie",
       "level": 1,
       "month": 5,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m05",
       "pct": 0.1509474552266901
     },
@@ -9933,8 +9933,8 @@
       "hotel_id": "novotel-porte-italie",
       "level": 1,
       "month": 6,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m06",
       "pct": 0.095475417897031
     },
@@ -9942,8 +9942,8 @@
       "hotel_id": "novotel-porte-italie",
       "level": 1,
       "month": 7,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m07",
       "pct": 0.12975915164832538
     },
@@ -9951,8 +9951,8 @@
       "hotel_id": "novotel-porte-italie",
       "level": 1,
       "month": 8,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m08",
       "pct": 0.08685326374145147
     },
@@ -9960,8 +9960,8 @@
       "hotel_id": "novotel-porte-italie",
       "level": 1,
       "month": 9,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m09",
       "pct": 0.03707526286899191
     },
@@ -9969,8 +9969,8 @@
       "hotel_id": "novotel-porte-italie",
       "level": 1,
       "month": 10,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m10",
       "pct": 0.11175506935712025
     },
@@ -9978,8 +9978,8 @@
       "hotel_id": "novotel-porte-italie",
       "level": 1,
       "month": 11,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m11",
       "pct": 0.08839927573905093
     },
@@ -9987,8 +9987,8 @@
       "hotel_id": "novotel-porte-italie",
       "level": 1,
       "month": 12,
-      "TYPE": NaN,
-      "GAMME": NaN,
+      "TYPE": null,
+      "GAMME": null,
       "column": "d_pct_mois_m12",
       "pct": 0.09673032548205097
     },
@@ -9997,7 +9997,7 @@
       "level": 2,
       "month": 1,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m01_type_fandb",
       "pct": 0.5646437994722955
     },
@@ -10033,7 +10033,7 @@
       "level": 2,
       "month": 2,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m02_type_fandb",
       "pct": 0.7370517928286853
     },
@@ -10069,7 +10069,7 @@
       "level": 2,
       "month": 3,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m03_type_fandb",
       "pct": 0.9848362312980186
     },
@@ -10105,7 +10105,7 @@
       "level": 2,
       "month": 4,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m04_type_fandb",
       "pct": 1.0
     },
@@ -10141,7 +10141,7 @@
       "level": 2,
       "month": 5,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m05_type_fandb",
       "pct": 0.9270444519850696
     },
@@ -10177,7 +10177,7 @@
       "level": 2,
       "month": 6,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m06_type_fandb",
       "pct": 0.9785407725321889
     },
@@ -10213,7 +10213,7 @@
       "level": 2,
       "month": 7,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m07_type_fandb",
       "pct": 1.0
     },
@@ -10249,7 +10249,7 @@
       "level": 2,
       "month": 8,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m08_type_fandb",
       "pct": 1.0
     },
@@ -10285,7 +10285,7 @@
       "level": 2,
       "month": 9,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m09_type_fandb",
       "pct": 1.0
     },
@@ -10321,7 +10321,7 @@
       "level": 2,
       "month": 10,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m10_type_fandb",
       "pct": 0.8725842181651516
     },
@@ -10357,7 +10357,7 @@
       "level": 2,
       "month": 11,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m11_type_fandb",
       "pct": 0.915597145367983
     },
@@ -10393,7 +10393,7 @@
       "level": 2,
       "month": 11,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m11_type_non_fandb",
       "pct": 0.001351990806462516
     },
@@ -10411,7 +10411,7 @@
       "level": 2,
       "month": 12,
       "TYPE": "F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m12_type_fandb",
       "pct": 0.9413996999382227
     },
@@ -10447,7 +10447,7 @@
       "level": 2,
       "month": 12,
       "TYPE": "NON-F&B",
-      "GAMME": NaN,
+      "GAMME": null,
       "column": "d_pct_mois_m12_type_non_fandb",
       "pct": 0.0012355484952784397
     },

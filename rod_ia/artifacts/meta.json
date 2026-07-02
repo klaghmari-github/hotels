@@ -1,1 +1,7 @@
-{"nb_ch_col": "etape_rod__1_informations_generales__sous_etape_rod__donnees_admin__data__nb_de_chambres", "pivots": [{"etape_rod__1_informations_generales__sous_etape_rod__donnees_admin__data__nb_de_chambres": 129, "HOTEL_NAME": "Ibis budget Nice"}, {"etape_rod__1_informations_generales__sous_etape_rod__donnees_admin__data__nb_de_chambres": 97, "HOTEL_NAME": "Ibis budget Strasbourg Centre R\u00e9publique"}, {"etape_rod__1_informations_generales__sous_etape_rod__donnees_admin__data__nb_de_chambres": 305, "HOTEL_NAME": "Mercure Paris Montmartre Sacr\u00e9-C\u0153ur"}, {"etape_rod__1_informations_generales__sous_etape_rod__donnees_admin__data__nb_de_chambres": 572, "HOTEL_NAME": "Novotel Meg\u00e8ve Mont-Blanc"}, {"etape_rod__1_informations_generales__sous_etape_rod__donnees_admin__data__nb_de_chambres": 764, "HOTEL_NAME": "Novotel Paris Tour Eiffel"}]}
+{
+  "n_hotels": 6,
+  "n_features": 199,
+  "n_targets": 24,
+  "train_mae": 22.028153397948675,
+  "model": "MultiOutputRegressor(XGBRegressor)"
+}

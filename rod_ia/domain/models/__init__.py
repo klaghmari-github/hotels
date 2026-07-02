@@ -1,3 +1,4 @@
+from .enrichment import EnrichResult
 from .hotel import HotelIdentity, HotelOperatingState
 from .identity import HotelRecord, GeoCoordinates
 from .simulation import (
@@ -9,6 +10,7 @@ from .simulation import (
 from .store import CategoryMix, StoreConfiguration
 
 __all__ = [
+    "EnrichResult",
     "HotelIdentity",
     "HotelOperatingState",
     "HotelRecord",

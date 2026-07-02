@@ -1,0 +1,580 @@
+{
+  "rows": [
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 1,
+      "month": 1,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m01",
+      "pct": 0.025883536039323852
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 1,
+      "month": 2,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m02",
+      "pct": 0.042854667189117984
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 1,
+      "month": 3,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m03",
+      "pct": 0.08444589000692333
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 1,
+      "month": 4,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m04",
+      "pct": 0.04982068480392283
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 1,
+      "month": 5,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m05",
+      "pct": 0.1509474552266901
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 1,
+      "month": 6,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m06",
+      "pct": 0.095475417897031
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 1,
+      "month": 7,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m07",
+      "pct": 0.12975915164832538
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 1,
+      "month": 8,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m08",
+      "pct": 0.08685326374145147
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 1,
+      "month": 9,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m09",
+      "pct": 0.03707526286899191
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 1,
+      "month": 10,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m10",
+      "pct": 0.11175506935712025
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 1,
+      "month": 11,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m11",
+      "pct": 0.08839927573905093
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 1,
+      "month": 12,
+      "TYPE": null,
+      "GAMME": null,
+      "column": "d_pct_mois_m12",
+      "pct": 0.09673032548205097
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 2,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m01_type_fandb",
+      "pct": 0.5646437994722955
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m01_type_fandb_gamme_food_salee",
+      "pct": 0.27920560747663553
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m01_type_fandb_gamme_food_sucree",
+      "pct": 0.4170560747663552
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 1,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m01_type_fandb_gamme_sans_alcool",
+      "pct": 0.3037383177570094
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 2,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m02_type_fandb",
+      "pct": 0.7370517928286853
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m02_type_fandb_gamme_food_salee",
+      "pct": 0.42324324324324325
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m02_type_fandb_gamme_food_sucree",
+      "pct": 0.22540540540540543
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 2,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m02_type_fandb_gamme_sans_alcool",
+      "pct": 0.35135135135135137
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 2,
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m03_type_fandb",
+      "pct": 0.9848362312980186
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m03_type_fandb_gamme_food_salee",
+      "pct": 0.2668856497639088
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m03_type_fandb_gamme_food_sucree",
+      "pct": 0.3933483884212687
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 3,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m03_type_fandb_gamme_sans_alcool",
+      "pct": 0.3397659618148224
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 2,
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m04_type_fandb",
+      "pct": 1.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m04_type_fandb_gamme_food_salee",
+      "pct": 0.27621658670322136
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m04_type_fandb_gamme_food_sucree",
+      "pct": 0.2697052775873886
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 4,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m04_type_fandb_gamme_sans_alcool",
+      "pct": 0.45407813570939
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 2,
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m05_type_fandb",
+      "pct": 0.9270444519850696
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m05_type_fandb_gamme_food_salee",
+      "pct": 0.08906783796974134
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m05_type_fandb_gamme_food_sucree",
+      "pct": 0.35456320156173743
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 5,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m05_type_fandb_gamme_sans_alcool",
+      "pct": 0.5563689604685212
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 2,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m06_type_fandb",
+      "pct": 0.9785407725321889
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m06_type_fandb_gamme_food_salee",
+      "pct": 0.20869883040935672
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m06_type_fandb_gamme_food_sucree",
+      "pct": 0.24214181286549705
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 6,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m06_type_fandb_gamme_sans_alcool",
+      "pct": 0.5491593567251462
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 2,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m07_type_fandb",
+      "pct": 1.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m07_type_fandb_gamme_food_salee",
+      "pct": 0.19223684210526315
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m07_type_fandb_gamme_food_sucree",
+      "pct": 0.24000000000000002
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 7,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m07_type_fandb_gamme_sans_alcool",
+      "pct": 0.5677631578947369
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 2,
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m08_type_fandb",
+      "pct": 1.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m08_type_fandb_gamme_food_salee",
+      "pct": 0.20365637900530764
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m08_type_fandb_gamme_food_sucree",
+      "pct": 0.18301552978179672
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 8,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m08_type_fandb_gamme_sans_alcool",
+      "pct": 0.6133280912128957
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 2,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m09_type_fandb",
+      "pct": 1.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m09_type_fandb_gamme_food_salee",
+      "pct": 0.16486299792769976
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m09_type_fandb_gamme_food_sucree",
+      "pct": 0.38038222426893853
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 9,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m09_type_fandb_gamme_sans_alcool",
+      "pct": 0.45475477780336176
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 2,
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m10_type_fandb",
+      "pct": 0.8725842181651516
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m10_type_fandb_gamme_food_salee",
+      "pct": 0.16930753742449442
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m10_type_fandb_gamme_food_sucree",
+      "pct": 0.3063118270156701
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 10,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m10_type_fandb_gamme_sans_alcool",
+      "pct": 0.5243806355598354
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 2,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m11_type_fandb",
+      "pct": 0.915597145367983
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m11_type_fandb_gamme_food_salee",
+      "pct": 0.1969708156226598
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m11_type_fandb_gamme_food_sucree",
+      "pct": 0.3352564575840356
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 11,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m11_type_fandb_gamme_sans_alcool",
+      "pct": 0.46777272679330456
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 2,
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m11_type_non_fandb",
+      "pct": 0.001351990806462516
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 11,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m11_type_non_fandb_gamme_sos",
+      "pct": 1.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 2,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m12_type_fandb",
+      "pct": 0.9413996999382227
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SALEE",
+      "column": "d_pct_mois_m12_type_fandb_gamme_food_salee",
+      "pct": 0.24786725414830785
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "FOOD SUCREE",
+      "column": "d_pct_mois_m12_type_fandb_gamme_food_sucree",
+      "pct": 0.3208962219930627
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 12,
+      "TYPE": "F&B",
+      "GAMME": "SANS ALCOOL",
+      "column": "d_pct_mois_m12_type_fandb_gamme_sans_alcool",
+      "pct": 0.4312365238586294
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 2,
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": null,
+      "column": "d_pct_mois_m12_type_non_fandb",
+      "pct": 0.0012355484952784397
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "level": 3,
+      "month": 12,
+      "TYPE": "NON-F&B",
+      "GAMME": "SOS",
+      "column": "d_pct_mois_m12_type_non_fandb_gamme_sos",
+      "pct": 1.0
+    }
+  ]
+}

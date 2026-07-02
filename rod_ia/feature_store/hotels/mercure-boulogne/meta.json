@@ -1,0 +1,9 @@
+{
+  "hotel_id": "mercure-boulogne",
+  "updated_at": "2026-07-02T01:09:42.324827+00:00",
+  "is_pivot": true,
+  "brand": "MERCURE",
+  "nb_chambres": 191,
+  "has_sales": false,
+  "has_rod": true
+}

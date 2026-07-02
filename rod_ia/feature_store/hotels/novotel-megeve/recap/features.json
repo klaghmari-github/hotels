@@ -1,0 +1,24 @@
+{
+  "features": {
+    "d_recap_0_page_de_connexion_localisation_geo_latitude_r12": 45.8591651916,
+    "d_recap_0_page_de_connexion_localisation_geo_longitude_r11": 6.6190552711,
+    "d_recap_1_informations_generales_donnees_admin_contrat_signe_annee_r15": 1998.0,
+    "d_recap_1_informations_generales_donnees_admin_nb_de_chambres": 572.0,
+    "d_recap_1_informations_generales_donnees_chiffrees_to_annuel_r25": 0.75,
+    "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_bas_mois_r26": 0.75,
+    "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_bas_taux_r27": 0.75,
+    "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_haut_taux_r29": 0.75,
+    "d_recap_2_services_equipements_dispo_dans_le_lobby_fontaine_eau": 0.0,
+    "d_recap_2_services_equipements_dispo_dans_le_lobby_fontaine_eau_r54": 0.0,
+    "d_recap_2_services_equipements_dispo_dans_le_lobby_vitrine_r_frig_r_e_r52": 0.0,
+    "d_recap_2_services_equipements_f_b_bar_r38": 1.0,
+    "d_recap_2_services_equipements_f_b_minibar_r47": 0.0,
+    "d_recap_2_services_equipements_f_b_restaurant_r42": 1.0,
+    "d_recap_4_informations_corner_corner_de_vente_actuel_votre_hotel_dispose_t_il_d_j_d_un_c_r84": 0.0,
+    "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_r_ception_r91": 1.0,
+    "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_m_tres_lin_aires_dedies_a_v_r129": 1.0,
+    "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_moyen_de_guests_par_chambre_r127": 1.8,
+    "d_clients_mois": 23552.1,
+    "d_taux_acheteur": 0.0682953961642486
+  }
+}
