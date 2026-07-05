@@ -84,7 +84,7 @@ def test_pipeline_includes_recap_features(registry, settings, tmp_path):
         sales_path=settings.sales_csv_path,
         identity_registry=registry,
         output_dir=tmp_path,
-        validation_year=2026,
+        evaluation_year=2026,
         recap_path=recap,
         recap_output_dir=tmp_path / "rod_recap",
     )
@@ -112,7 +112,7 @@ def test_porte_italie_gets_imputed_recap(registry, settings, tmp_path):
         sales_path=settings.sales_csv_path,
         identity_registry=registry,
         output_dir=tmp_path,
-        validation_year=2026,
+        evaluation_year=2026,
         recap_path=recap,
     )
     dataset = pipeline.build_training_dataset()

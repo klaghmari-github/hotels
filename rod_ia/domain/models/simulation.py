@@ -5,6 +5,12 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 from typing import Dict, List, Optional
 
+from .director_inputs import (
+    ClientProfile,
+    CornerInfo,
+    HotelGeneralInfo,
+    HotelServices,
+)
 from .hotel import HotelIdentity, HotelOperatingState
 from .store import StoreConfiguration
 
@@ -43,6 +49,11 @@ class RodSimulationRequest:
     identity: HotelIdentity
     operating: HotelOperatingState
     enriched: EnrichedHotelFeatures = field(default_factory=EnrichedHotelFeatures)
+    general: HotelGeneralInfo = field(default_factory=HotelGeneralInfo)
+    services: HotelServices = field(default_factory=HotelServices)
+    client_profile: ClientProfile = field(default_factory=ClientProfile)
+    corner: CornerInfo = field(default_factory=CornerInfo)
+    analyze_with_ai: bool = False
     constraints: Dict[str, object] = field(default_factory=dict)
     store: Optional[StoreConfiguration] = None
 
@@ -55,6 +66,11 @@ class RodSimulationRequest:
                 data.get("operating", data.get("metrics", {}))
             ),
             enriched=EnrichedHotelFeatures.from_dict(data.get("enriched")),
+            general=HotelGeneralInfo.from_dict(data.get("general")),
+            services=HotelServices.from_dict(data.get("services")),
+            client_profile=ClientProfile.from_dict(data.get("client_profile")),
+            corner=CornerInfo.from_dict(data.get("corner")),
+            analyze_with_ai=bool(data.get("analyze_with_ai", False)),
             constraints=dict(data.get("constraints") or {}),
             store=StoreConfiguration.from_dict(store_data) if store_data else None,
         )
@@ -124,13 +140,13 @@ class FullSimulationResponse:
 
 @dataclass
 class PerformanceComparisonRow:
-    """Comparaison sur la période réellement couverte en validation (règle de 3)."""
+    """Comparaison sur la période de test/évaluation (holdout, règle de 3)."""
 
     hotel_id: str
     hotel_name: str
     brand: str
     concept: str
-    validation_year: int
+    evaluation_year: int
     n_months_present: int
     months_present: List[int]
     nb_chambres: int
@@ -147,6 +163,7 @@ class PerformanceComparisonRow:
     rod_ca_mensuel_moyen: float
     ai_ca_mensuel_moyen: float
     actual_ca_mensuel_moyen: float
+    recommended_concept: str = ""
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -156,7 +173,7 @@ class PerformanceComparisonRow:
 class PerformanceReport:
     """Rapport d'évaluation ROD brut vs IA sur hôtels pivots."""
 
-    validation_year: int
+    evaluation_year: int
     rows: List[PerformanceComparisonRow]
     summary: Dict[str, float] = field(default_factory=dict)
     warnings: List[str] = field(default_factory=list)
@@ -164,7 +181,7 @@ class PerformanceReport:
 
     def to_dict(self) -> dict:
         return {
-            "validation_year": self.validation_year,
+            "evaluation_year": self.evaluation_year,
             "comparison_basis": self.comparison_basis,
             "rows": [r.to_dict() for r in self.rows],
             "summary": self.summary,

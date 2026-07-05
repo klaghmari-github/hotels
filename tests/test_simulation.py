@@ -106,7 +106,7 @@ def test_rod_ca_differs_by_hotel_size(container):
     assert nice_ca > stras_ca
 
 
-def test_validation_rule_of_three(container):
+def test_training_excludes_evaluation_year(container):
     from rod_ia.domain.services.sales_targets_pipeline import SalesTargetsPipeline
     from rod_ia.config.settings import get_settings
     from rod_ia.domain.repositories.identity_registry import HotelIdentityRegistry
@@ -116,13 +116,32 @@ def test_validation_rule_of_three(container):
         settings.sales_csv_path,
         HotelIdentityRegistry(settings.identity_registry_path),
         settings.data_processed_dir,
-        validation_year=2026,
+        evaluation_year=2026,
     )
-    cov = sp.validation_coverage_by_hotel()
+    sp.assert_training_holdout()
+    raw_train = sp._extractor.prepare(exclude_year=2026)
+    if not raw_train.empty:
+        assert raw_train["year"].max() < 2026
+
+
+def test_evaluation_rule_of_three(container):
+    from rod_ia.domain.services.sales_targets_pipeline import SalesTargetsPipeline
+    from rod_ia.config.settings import get_settings
+    from rod_ia.domain.repositories.identity_registry import HotelIdentityRegistry
+
+    settings = get_settings()
+    sp = SalesTargetsPipeline(
+        settings.sales_csv_path,
+        HotelIdentityRegistry(settings.identity_registry_path),
+        settings.data_processed_dir,
+        evaluation_year=2026,
+    )
+    cov = sp.evaluation_coverage_by_hotel()
     if cov.empty:
         pytest.skip("Pas de ventes 2026")
-    row = cov.iloc[0]
-    assert row["n_months_present"] < 12
-    assert row["actual_ca_annualized"] == pytest.approx(
-        row["actual_ca_period"] * 12 / row["n_months_present"], rel=1e-6
-    )
+    for _, row in cov.iterrows():
+        assert row["n_months_present"] == 4
+        assert list(row["months_present"]) == [1, 2, 3, 4]
+        assert row["actual_ca_annualized"] == pytest.approx(
+            row["actual_ca_period"] * 12 / row["n_months_present"], rel=1e-6
+        )

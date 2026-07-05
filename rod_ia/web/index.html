@@ -3,105 +3,283 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ROD Simulateur IA</title>
+  <title>ROD — Onboarding Simulateur</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <main class="container">
-    <header>
-      <h1>ROD Simulateur IA</h1>
-      <p>ROD Excel (mois moyen × 12) vs IA (profil mensuel). Config store = <strong>sortie</strong>.
-        <a href="/docs">Doc code</a> · <a href="/journal">Journal consignes v1</a></p>
-    </header>
-
-    <section class="card" id="brands_card">
-      <h2>Parc hôtelier (Excel ROD)</h2>
-      <div id="brands_info" class="muted">Chargement marques…</div>
-    </section>
-
-    <section class="card">
-      <h2>Identification hôtel</h2>
-      <div class="grid">
-        <label>Nom hôtel<input id="hotel_name" value="Ibis budget Nice"></label>
-        <label>Adresse<input id="address" value=""></label>
-        <label>Ville<input id="city" value="Nice"></label>
-        <label>Marque
-          <select id="brand">
-            <option>IBIS_BUDGET</option><option>IBIS_STYLES</option><option>MERCURE</option><option>NOVOTEL</option><option>AUTRE</option>
-          </select>
-        </label>
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand-lockup">
+        <span class="brand-icon">A</span>
+        <span class="brand-name">ROD</span>
       </div>
-      <button id="btn_enrich">Enrichir automatiquement POI + météo</button>
-      <span id="enrich_status" class="status"></span>
-    </section>
-
-    <nav class="tabs">
-      <button class="tab active" data-tab="0">1. Infos générales</button>
-      <button class="tab" data-tab="1">2. Contraintes</button>
-      <button class="tab" data-tab="2">3. Résultats</button>
-      <button class="tab" data-tab="3">4. Performance ROD vs IA</button>
-    </nav>
-
-    <section class="panel active" data-panel="0">
-      <div class="card grid">
-        <label>Nombre de chambres<input id="nb_chambres" type="number" value="129"></label>
-        <label>TO annuel<input id="taux_occupation" type="number" step="0.01" value="0.80"></label>
-        <label>Guests / chambre<input id="guests_per_chambre" type="number" step="0.1" value="1.7"></label>
+      <nav class="header-nav">
+        <a href="/docs">Doc</a>
+        <a href="/exploration">Exploration</a>
+        <a href="/interpretation">Interprétation IA</a>
+        <a href="#perf" id="link_perf">Performance</a>
+      </nav>
+      <div class="user-chip">
+        <div>
+          <strong id="user_name">Directeur d'hôtel</strong>
+          <small id="user_role">Simulation corner</small>
+        </div>
+        <span class="hotel-badge" id="user_hotel_id">—</span>
       </div>
-    </section>
-
-    <section class="panel" data-panel="1">
-      <div class="card">
-        <h2>Mix catégories (F&B / NON-F&B)</h2>
-        <p class="muted">Sliders 0–100 % issus du fichier ventes. 0 % = exclu ; 100 % sur une gamme = le reste à 0.</p>
-        <div id="type_mix_panel" class="mix-panel"></div>
-        <div id="gamme_mix_panels"></div>
-        <h2>Champs figés (optimisation)</h2>
-        <label><input type="checkbox" class="locked" value="concept"> Concept figé</label>
-        <label><input type="checkbox" class="locked" value="m_lin"> Mètres linéaires figés</label>
-        <label><input type="checkbox" class="locked" value="fb_share"> Mix F&B figé</label>
-      </div>
-    </section>
-
-    <section class="panel" data-panel="2">
-      <div id="reco_banner" class="reco-banner hidden"></div>
-      <div id="concept_cards" class="concept-grid"></div>
-      <div class="card">
-        <p id="chart_legend" class="chart-legend muted"></p>
-        <canvas id="monthly_chart"></canvas>
-      </div>
-      <div class="card">
-        <h2>Pipeline IA (concept recommandé)</h2>
-        <div id="ai_pipeline" class="pipeline"></div>
-      </div>
-      <div class="card"><pre id="raw_output"></pre></div>
-    </section>
-
-    <section class="panel" data-panel="3">
-      <div class="card">
-        <h2>Évaluation sur l'année en cours (hôtels pivots)</h2>
-        <p class="muted">2026 partiel : comparaison sur les <strong>mois présents</strong> dans les ventes. Prédictions ramenées à cette période ; réel annualisé par règle de 3 (×12/n).</p>
-        <div id="perf_summary" class="perf-summary"></div>
-        <table class="perf-table" id="perf_table">
-          <thead>
-            <tr>
-              <th>Hôtel</th><th>Ch.</th><th>TO</th><th>Mois</th>
-              <th>Réel période</th><th>ROD période</th><th>IA période</th>
-              <th>Réel annualisé</th><th>ROD annuel</th><th>IA annuel</th>
-              <th>Écart ROD %</th><th>Écart IA %</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
-
-    <div class="actions">
-      <button id="btn_simulate">Simuler les 3 concepts</button>
-      <button id="btn_optimize">Optimiser sous contraintes</button>
     </div>
+  </header>
+
+  <main class="wizard-shell">
+    <div class="wizard-hero">
+      <h1>Onboarding</h1>
+      <p class="wiring-legend"><em>*</em> Paramètre informatif — non utilisé par ROD / IA. Les autres champs influencent la simulation.</p>
+      <nav class="stepper" id="stepper">
+        <button type="button" class="step active" data-step="0"><span>1</span><label>Informations générales</label></button>
+        <button type="button" class="step" data-step="1"><span>2</span><label>Services &amp; équipements</label></button>
+        <button type="button" class="step" data-step="2"><span>3</span><label>Profil de vos clients</label></button>
+        <button type="button" class="step" data-step="3"><span>4</span><label>Boutique / corner</label></button>
+        <button type="button" class="step" data-step="4"><span>5</span><label>Simulation de revenu</label></button>
+      </nav>
+    </div>
+
+    <!-- Étape 1 -->
+    <section class="wizard-panel active" data-panel="0">
+      <p class="panel-hint">Merci de vérifier ou modifier les informations ci-dessous</p>
+      <div class="step1-layout">
+        <div class="step1-form">
+          <div class="field-grid cols-5">
+            <label class="field-card brand-field">
+              <span>Marque</span>
+              <select id="brand">
+                <option value="IBIS">IBIS</option>
+                <option value="IBIS_BUDGET">IBIS BUDGET</option>
+                <option value="IBIS_STYLES">IBIS STYLES</option>
+                <option value="MERCURE">MERCURE</option>
+                <option value="NOVOTEL">NOVOTEL</option>
+                <option value="AUTRE">AUTRE</option>
+              </select>
+            </label>
+            <label class="field-card"><span>Contrat signé</span><input id="contract_year" type="number" value="1975" /></label>
+            <label class="field-card"><span># Chambres</span><input id="nb_chambres" type="number" value="78" /></label>
+            <label class="field-card"><span>Adultes / chambre</span><input id="adults_per_room" type="number" step="0.1" value="1.5" /><small>Entre 1 et 5</small></label>
+            <label class="field-card"><span>Enfants / chambre</span><input id="children_per_room" type="number" step="0.1" value="0.2" /></label>
+          </div>
+          <div class="field-grid cols-5">
+            <label class="field-card"><span>Contrat</span>
+              <select id="contract_type"><option>Franchise</option><option>Management</option><option>Propriétaire</option></select>
+            </label>
+            <label class="field-card"><span>Propriétaire</span><input id="owner" value="FAMILLE P..." /></label>
+            <label class="field-card"><span>DOM / DOF</span><input id="dom_dof" value="Jean-Clau..." /></label>
+            <label class="field-card"><span>TO annuel</span><input id="taux_occupation" type="number" step="1" value="65" /><small>%</small></label>
+            <label class="field-card"><span>Panier moyen *</span><input id="panier_moyen" type="number" step="0.01" value="0" /><small>* par chambre et par nuit</small></label>
+          </div>
+          <div class="field-grid cols-2">
+            <div class="field-card stack">
+              <label><span>Dernière rénovation hôtel</span><select id="reno_hotel" class="year-select"></select></label>
+              <label><span>Dernière rénovation lobby</span><select id="reno_lobby" class="year-select"></select></label>
+              <label><span>PMS</span>
+                <select id="pms"><option>FOLS</option><option>OPERA</option><option>MEWS</option><option>PROTEL</option><option>AUTRE</option></select>
+              </label>
+            </div>
+            <div class="field-card">
+              <span class="section-label">Taux d'occupation</span>
+              <div class="occ-row">
+                <label>Min <select id="occ_min_month"></select></label>
+                <input id="occ_min_pct" type="range" min="0" max="100" value="0" />
+                <output id="occ_min_out">0 %</output>
+              </div>
+              <div class="occ-row">
+                <label>Max <select id="occ_max_month"></select></label>
+                <input id="occ_max_pct" type="range" min="0" max="100" value="85" />
+                <output id="occ_max_out">85 %</output>
+              </div>
+            </div>
+          </div>
+          <div class="field-grid cols-2 identity-row">
+            <label class="field-card"><span>Nom hôtel</span><input id="hotel_name" value="IBIS ALES CENTRE VILLE" /></label>
+            <label class="field-card"><span>Adresse</span><input id="address" value="" placeholder="Adresse complète" /></label>
+            <label class="field-card"><span>Ville</span><input id="city" value="Alès" /></label>
+          </div>
+          <button type="button" id="btn_enrich" class="btn-link">Enrichir POI + météo automatiquement</button>
+          <span id="enrich_status" class="status"></span>
+        </div>
+        <aside class="hotel-preview">
+          <h2 id="preview_name">IBIS ALES CENTRE VILLE</h2>
+          <div class="hotel-photo" id="preview_photo">
+            <span>Hôtel</span>
+          </div>
+          <h3>À proximité</h3>
+          <div id="proximity_panel" class="proximity">
+            <p class="muted">Enrichissez l'hôtel pour afficher les POI</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Étape 2 -->
+    <section class="wizard-panel" data-panel="1">
+      <p class="step-inactive-hint"><em>Étape 2 *</em> — saisie conservée, non branchée sur les moteurs pour l'instant.</p>
+      <div class="services-grid">
+        <div class="service-col fb-col">
+          <h3>F&amp;B</h3>
+          <div class="service-row">
+            <span>Bar</span>
+            <div class="stepper-input"><button type="button" data-stepper="bar_count" data-delta="-1">−</button><input id="bar_count" type="number" value="1" min="0" /><button type="button" data-stepper="bar_count" data-delta="1">+</button></div>
+            <select id="bar_name"><option>BAR N°1</option><option>BAR N°2</option></select>
+          </div>
+          <div class="service-row">
+            <span>Restaurant</span>
+            <div class="stepper-input"><button type="button" data-stepper="restaurant_count" data-delta="-1">−</button><input id="restaurant_count" type="number" value="1" min="0" /><button type="button" data-stepper="restaurant_count" data-delta="1">+</button></div>
+            <select id="restaurant_name"><option>RESTAURANT N°1</option><option>RESTAURANT N°2</option></select>
+          </div>
+          <div class="toggle-row"><span>Room service</span><label class="toggle"><input type="checkbox" id="room_service" /><span></span></label></div>
+          <div class="toggle-row"><span>Minibar</span><label class="toggle"><input type="checkbox" id="minibar" checked /><span></span></label></div>
+          <div class="slider-row" id="minibar_sliders">
+            <label>Chambres avec minibar <input id="minibar_rooms" type="range" min="0" max="200" value="78" /><output id="minibar_rooms_out">78</output></label>
+            <label>Minibar remplis <input id="minibar_filled" type="range" min="0" max="200" value="78" /><output id="minibar_filled_out">78</output></label>
+          </div>
+        </div>
+        <div class="service-col nfb-col">
+          <h3>Non-F&amp;B</h3>
+          <div class="toggle-row"><span>Salles de réunion</span><label class="toggle"><input type="checkbox" id="meeting_rooms" checked /><span></span></label></div>
+          <div class="toggle-row"><span>Salle de sport</span><label class="toggle"><input type="checkbox" id="gym" checked /><span></span></label></div>
+          <div class="toggle-row"><span>Spa</span><label class="toggle"><input type="checkbox" id="spa" checked /><span></span></label></div>
+          <div class="toggle-row"><span>Piscine</span><label class="toggle"><input type="checkbox" id="pool" checked /><span></span></label></div>
+          <div class="toggle-row"><span>Autre</span><label class="toggle"><input type="checkbox" id="other_service" /><span></span></label></div>
+        </div>
+      </div>
+      <div class="lobby-section">
+        <h3>Équipement disponible dans le lobby</h3>
+        <div class="lobby-grid" id="lobby_equipment"></div>
+      </div>
+    </section>
+
+    <!-- Étape 3 -->
+    <section class="wizard-panel" data-panel="2">
+      <div class="profile-section">
+        <h3>Profil de vos clients</h3>
+        <div class="profile-grid">
+          <div class="profile-block">
+            <span>Loisirs</span>
+            <select id="leisure_pct" class="pct-select"></select>
+            <span>Individuels</span><select id="leisure_ind_pct" class="pct-select"></select>
+            <span>Groupes</span><select id="leisure_grp_pct" class="pct-select"></select>
+          </div>
+          <div class="profile-block">
+            <span>Affaires</span>
+            <select id="business_pct" class="pct-select"></select>
+            <span>Individuels</span><select id="business_ind_pct" class="pct-select"></select>
+            <span>Groupes</span><select id="business_grp_pct" class="pct-select"></select>
+          </div>
+          <div class="profile-block">
+            <span>National</span><select id="national_pct" class="pct-select"></select>
+            <span>International</span><select id="international_pct" class="pct-select"></select>
+          </div>
+        </div>
+      </div>
+      <div class="needs-section">
+        <h3>Besoins de vos clients</h3>
+        <div class="needs-grid" id="client_needs_panel"></div>
+      </div>
+    </section>
+
+    <!-- Étape 4 -->
+    <section class="wizard-panel" data-panel="3">
+      <div class="corner-card">
+        <h3>Votre boutique actuelle / votre corner de vente actuel</h3>
+        <div class="corner-question">
+          <div>
+            <strong>Votre hôtel dispose-t-il déjà d'une boutique ou d'un corner de vente ?</strong>
+            <p class="muted">(Distributeurs automatiques, frigos connectés ou autres…)</p>
+          </div>
+          <label class="toggle large"><input type="checkbox" id="has_corner" /><span></span></label>
+        </div>
+        <div id="corner_details" class="corner-details hidden">
+          <label>Emplacement <select id="emplacement"><option>EMPLACEMENT #1</option><option>EMPLACEMENT #2</option><option>LOBBY</option></select></label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Étape 5 -->
+    <section class="wizard-panel" data-panel="4">
+      <div class="sim-params">
+        <div class="sim-kpi"><span>Chambres</span><strong id="sim_chambres">78</strong></div>
+        <div class="sim-kpi slider-kpi">
+          <span>Guests / chambre</span>
+          <input id="sim_guests" type="range" min="1" max="5" step="0.1" value="1.7" />
+          <output id="sim_guests_out">1,7</output>
+        </div>
+        <div class="sim-kpi slider-kpi">
+          <span>Occ.</span>
+          <input id="sim_occ" type="range" min="0" max="100" value="65" />
+          <output id="sim_occ_out">65 %</output>
+        </div>
+        <label class="sim-kpi"><span>Emplacement</span><select id="sim_emplacement"><option>EMPLACEMENT #1</option><option>EMPLACEMENT #2</option></select></label>
+        <div class="sim-kpi stepper-kpi">
+          <span>Mètres linéaires</span>
+          <div class="stepper-input"><button type="button" data-stepper="m_lin" data-delta="-1">−</button><input id="m_lin" type="number" value="5" min="1" max="20" /><button type="button" data-stepper="m_lin" data-delta="1">+</button></div>
+        </div>
+      </div>
+
+      <div class="assortiment-header">
+        <h3>Assortiment produits</h3>
+        <label class="toggle-row ai-toggle"><span>Analyser avec l'IA</span><label class="toggle"><input type="checkbox" id="analyze_with_ai" /><span></span></label></label>
+      </div>
+      <div class="assortiment-bars">
+        <div class="bar-fb"><span>F&amp;B</span><div class="bar-fill" id="bar_fb" style="width:80%"></div><output id="fb_pct_out">80 %</output></div>
+        <div class="bar-nfb"><span>Non-F&amp;B</span><div class="bar-fill" id="bar_nfb" style="width:20%"></div><output id="nfb_pct_out">20 %</output></div>
+      </div>
+      <div class="needs-grid compact" id="assortiment_panel"></div>
+
+      <div class="sim-actions">
+        <button type="button" id="btn_simulate" class="btn-simulate">Simuler</button>
+        <button type="button" id="btn_optimize" class="btn-secondary">Optimiser</button>
+      </div>
+
+      <div id="results_area" class="results-area hidden">
+        <p class="reco-label">Solution recommandée</p>
+        <div id="reco_banner" class="reco-banner"></div>
+        <div id="concept_cards" class="concept-showcase"></div>
+
+        <div id="concept_detail_modal" class="detail-modal hidden" aria-hidden="true">
+          <div class="detail-backdrop" data-close-detail></div>
+          <div class="detail-panel" role="dialog" aria-labelledby="detail_title">
+            <button type="button" class="detail-close" data-close-detail aria-label="Fermer">×</button>
+            <div id="detail_content"></div>
+          </div>
+        </div>
+        <div class="card chart-card">
+          <p id="chart_legend" class="chart-legend muted"></p>
+          <canvas id="monthly_chart"></canvas>
+        </div>
+        <details class="raw-details"><summary>Données brutes</summary><pre id="raw_output"></pre></details>
+      </div>
+    </section>
+
+    <footer class="wizard-footer">
+      <button type="button" id="btn_back" class="btn-back" disabled>Retour</button>
+      <button type="button" id="btn_next" class="btn-next">Valider</button>
+    </footer>
   </main>
+
+  <section id="perf" class="perf-section hidden-admin">
+    <div class="card">
+      <h2>Évaluation ROD vs IA</h2>
+      <div id="perf_summary" class="perf-summary"></div>
+      <table class="perf-table" id="perf_table">
+        <thead><tr>
+          <th>Hôtel</th><th>Concept</th><th>Reco</th><th>Ch.</th><th>TO</th><th>Mois</th>
+          <th>Réel</th><th>ROD</th><th>IA</th><th>Écart ROD</th><th>Écart IA</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
   <script src="/static/script.js"></script>
 </body>
 </html>

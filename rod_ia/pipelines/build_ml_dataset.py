@@ -1,4 +1,4 @@
-"""CLI — délègue à ``SalesTargetsPipeline`` (train < validation_year)."""
+"""CLI — délègue à ``SalesTargetsPipeline`` (entraînement < evaluation_year)."""
 
 from __future__ import annotations
 
@@ -12,7 +12,13 @@ from rod_ia.domain.services.sales_targets_pipeline import SalesTargetsPipeline
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Construire le dataset ML ROD-IA")
-    parser.add_argument("--validation-year", type=int, default=2026)
+    parser.add_argument(
+        "--evaluation-year",
+        "--validation-year",
+        type=int,
+        default=2026,
+        dest="evaluation_year",
+    )
     args = parser.parse_args()
 
     settings = get_settings()
@@ -23,7 +29,7 @@ def main() -> None:
         identity_registry=registry,
         output_dir=settings.data_processed_dir,
         feature_store=feature_store,
-        validation_year=args.validation_year,
+        evaluation_year=args.evaluation_year,
         recap_path=settings.rod_recap_path,
         recap_output_dir=settings.rod_recap_reference_dir,
     )

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Exploration donnees et modele — ROD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand-lockup">
+        <span class="brand-icon">A</span>
+        <span class="brand-name">ROD</span>
+      </div>
+      <nav class="header-nav">
+        <a href="/">Simulateur</a>
+        <a href="/exploration" class="active">Exploration</a>
+        <a href="/interpretation">Interpretation IA</a>
+        <a href="/docs">Doc</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="explore-shell">
+    <header class="explore-hero">
+      <h1>Exploration</h1>
+      <p>Parcours des donnees qui alimentent le modele et inspection des arbres de regression.
+        <a href="/exploration/guide">Guide utilisateur</a></p>
+      <nav class="explore-tabs" id="explore_tabs">
+        <button type="button" class="explore-tab active" data-tab="data">Donnees</button>
+        <button type="button" class="explore-tab" data-tab="model">Modele</button>
+      </nav>
+    </header>
+
+    <section id="panel_data" class="explore-panel active">
+      <div class="card explore-toolbar">
+        <label>Hotel pivot
+          <select id="data_hotel_select">
+            <option value="">Tous les hotels</option>
+          </select>
+        </label>
+        <button type="button" id="btn_reload_data" class="btn-next">Actualiser</button>
+      </div>
+      <div id="data_stages" class="data-stages"></div>
+    </section>
+
+    <section id="panel_model" class="explore-panel">
+      <div class="card">
+        <h2>Selection de l arbre</h2>
+        <p id="model_status" class="muted">Chargement...</p>
+        <div class="field-grid cols-3 explore-controls">
+          <label class="field-card"><span>Sortie predite</span>
+            <select id="model_target_select"></select>
+          </label>
+          <label class="field-card"><span>Numero d arbre</span>
+            <input id="model_tree_number" type="number" min="1" max="200" value="1" />
+          </label>
+          <div class="field-card stack">
+            <span>&nbsp;</span>
+            <button type="button" id="btn_load_tree" class="btn-next">Afficher l arbre</button>
+          </div>
+        </div>
+        <div id="tree_view" class="tree-view"></div>
+      </div>
+
+      <div class="card">
+        <h2>Prediction interactive</h2>
+        <p class="muted">Modifiez quelques variables puis lancez la prediction. Le modele produit 24 sorties mensuelles (CA et ventes).</p>
+        <label class="field-card"><span>Hotel de reference</span>
+          <select id="predict_hotel_select">
+            <option value="">Moyenne des hotels pivots</option>
+          </select>
+        </label>
+        <div id="feature_inputs" class="feature-inputs"></div>
+        <button type="button" id="btn_predict" class="btn-next">Calculer la prediction</button>
+        <div id="predict_results" class="predict-results"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/exploration.js"></script>
+</body>
+</html>

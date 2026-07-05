@@ -28,14 +28,19 @@ if [[ ! -d "$VENV" ]]; then
   exit 1
 fi
 
-if [[ ! -f "$ROOT/rod_ia/artifacts/model.joblib" ]]; then
-  echo "[run] model.joblib absent — exécutez ./init.sh" >&2
-  exit 1
-fi
-
 # shellcheck disable=SC1091
 source "$VENV/bin/activate"
 export PYTHONPATH="$ROOT${PYTHONPATH:+:$PYTHONPATH}"
+
+if [[ ! -f "$ROOT/rod_ia/artifacts/model.joblib" ]]; then
+  if [[ -f "$ROOT/data/processed/dataset_meta.json" ]]; then
+    echo "[run] model.joblib absent — entraînement automatique..."
+    python -m rod_ia.pipelines.train_model
+  else
+    echo "[run] model.joblib et dataset absents — exécutez ./init.sh" >&2
+    exit 1
+  fi
+fi
 
 echo "[run] ROD-IA → http://${HOST}:${PORT}"
 echo "[run] Docs code → http://${HOST}:${PORT}/docs"

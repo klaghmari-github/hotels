@@ -9,8 +9,11 @@ from rod_ia.api.routes.catalog import create_catalog_blueprint
 from rod_ia.api.routes.enrich import create_enrich_blueprint
 from rod_ia.api.routes.health import create_health_blueprint
 from rod_ia.api.routes.hotel import create_hotel_blueprint
+from rod_ia.api.routes.exploration import create_exploration_blueprint
+from rod_ia.api.routes.interpretation import create_interpretation_blueprint
 from rod_ia.api.routes.performance import create_performance_blueprint
 from rod_ia.api.routes.simulate import create_simulate_blueprint
+from rod_ia.api.routes.train import create_train_blueprint
 
 
 def create_app(container: AppContainer | None = None) -> Flask:
@@ -24,6 +27,9 @@ def create_app(container: AppContainer | None = None) -> Flask:
     app.register_blueprint(create_simulate_blueprint(container))
     app.register_blueprint(create_hotel_blueprint(container))
     app.register_blueprint(create_performance_blueprint(container))
+    app.register_blueprint(create_interpretation_blueprint(container))
+    app.register_blueprint(create_exploration_blueprint(container))
+    app.register_blueprint(create_train_blueprint(container))
 
     @app.get("/")
     def index():
@@ -37,12 +43,27 @@ def create_app(container: AppContainer | None = None) -> Flask:
             return send_from_directory(docs_dir, "index.html")
         return "Documentation absente — exécuter: python scripts/generate_code_docs.py", 404
 
+    @app.get("/interpretation")
+    def interpretation():
+        return send_from_directory(container.settings.web_dir, "interpretation.html")
+
+    @app.get("/exploration")
+    def exploration():
+        return send_from_directory(container.settings.web_dir, "exploration.html")
+
+    @app.get("/exploration/guide")
+    def exploration_guide():
+        guide = container.settings.project_root / "docs" / "exploration_interface.md"
+        if guide.exists():
+            return send_from_directory(guide.parent, "exploration_interface.md")
+        return "Guide absent", 404
+
     @app.get("/journal")
     def journal():
-        journal_path = container.settings.project_root / "docs" / "v1.md"
-        if journal_path.exists():
-            return send_from_directory(journal_path.parent, "v1.md")
-        return "Journal v1 absent — voir docs/v1.md", 404
+        consignes_path = container.settings.project_root / "docs" / "consignes.md"
+        if consignes_path.exists():
+            return send_from_directory(consignes_path.parent, "consignes.md")
+        return "Consignes absentes — voir docs/consignes.md", 404
 
     return app
 

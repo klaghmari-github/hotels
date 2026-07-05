@@ -29,6 +29,7 @@ class SalesMixExtractor:
         return pd.read_csv(self.sales_path)
 
     def prepare(self, exclude_year: int | None = 2026) -> pd.DataFrame:
+        """Charge les ventes ; si ``exclude_year`` est défini, exclut cette année (holdout test)."""
         frame = self.load_sales().copy()
         hotel_col = "NOM BOUTIQUE" if "NOM BOUTIQUE" in frame.columns else "HOTEL_NAME"
         date_col = "DATETIME" if "DATETIME" in frame.columns else "DATE"
@@ -62,7 +63,7 @@ class SalesMixExtractor:
         return frame
 
     def monthly_average_targets(self, exclude_year: int | None = 2026) -> pd.DataFrame:
-        """Moyenne mensuelle historique (pas somme) par hotel_id."""
+        """Moyenne mensuelle d'entraînement par hotel_id (années < exclude_year si défini)."""
         frame = self.prepare(exclude_year=exclude_year)
         keys = ["hotel_id", "month", "TYPE", "GAMME"]
         annual = (

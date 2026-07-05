@@ -1,7 +1,0 @@
-{
-  "n_hotels": 6,
-  "n_features": 199,
-  "n_targets": 24,
-  "train_mae": 22.028153397948675,
-  "model": "MultiOutputRegressor(XGBRegressor)"
-}

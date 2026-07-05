@@ -1,6 +1,9 @@
 {
   "hotel_id": "ibis-budget-nice",
-  "updated_at": "2026-07-02T01:16:03.627267+00:00",
-  "enriched": true,
-  "enrichment_fingerprint": "e630d2030319cbdf"
+  "updated_at": "2026-07-05T19:48:25.779514+00:00",
+  "is_pivot": true,
+  "brand": "IBIS BUDGET",
+  "nb_chambres": 129,
+  "has_sales": true,
+  "has_rod": true
 }

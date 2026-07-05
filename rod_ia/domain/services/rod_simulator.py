@@ -63,6 +63,7 @@ class RodSimulator:
             "techno_monthly": cost.techno_monthly,
             "annexes_monthly": cost.annexes_monthly,
             "agencement_monthly": cost.agencement_monthly,
+            "cost_lines": cost.cost_lines,
             "capex": cost.capex,
             "marge_produit_mensuelle": revenue.breakdown.get("marge_produit_mensuelle", 0.0),
             "marge_produit_annuelle": marge_produit_annuelle,

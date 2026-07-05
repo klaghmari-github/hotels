@@ -1,4 +1,4 @@
-"""Pipeline OOP des targets IA — train (< année validation) vs validation (année courante)."""
+"""Pipeline OOP des targets IA — entraînement (< année test) vs test/évaluation (holdout)."""
 
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ from rod_ia.domain.services.sales_percentage_service import SalesPercentageServi
 class SalesTargetsPipelineConfig:
     """Configuration du pipeline targets."""
 
-    validation_year: int = 2026
+    evaluation_year: int = 2026
     sales_path: Path | None = None
     output_dir: Path | None = None
     recap_path: Path | None = None
@@ -33,14 +33,14 @@ class SalesTargetsPipelineConfig:
 
 
 class SalesTargetsPipeline:
-    """Construit les données d'apprentissage et de validation pour l'IA.
+    """Construit les données d'entraînement et le jeu de test/évaluation pour l'IA.
 
-    Stratégie (documentée, pas de brouillon) :
-    1. **Train** : moyenne mensuelle historique sur années < ``validation_year``
+    Stratégie (holdout strict — l'année ``evaluation_year`` n'entre jamais dans le fit) :
+    1. **Entraînement** : moyenne mensuelle sur années < ``evaluation_year``
        par hôtel / mois / TYPE / GAMME + répartitions % (3 niveaux).
-    2. **Validation** : agrégats réels de l'année ``validation_year`` pour
-       évaluer ROD vs IA sur les hôtels pivots.
-    3. **Feature store** : persiste les targets train par ``hotel_id``.
+    2. **Test / évaluation** : agrégats réels de ``evaluation_year`` uniquement
+       pour comparer ROD vs IA au terrain (jamais vus à l'entraînement).
+    3. **Feature store** : persiste les targets d'entraînement par ``hotel_id``.
     """
 
     def __init__(
@@ -49,7 +49,7 @@ class SalesTargetsPipeline:
         identity_registry: HotelIdentityRegistry,
         output_dir: str | Path,
         feature_store: FeatureStoreRepository | None = None,
-        validation_year: int = 2026,
+        evaluation_year: int = 2026,
         recap_path: str | Path | None = None,
         recap_output_dir: str | Path | None = None,
         reference_repository: ReferenceRepository | None = None,
@@ -58,7 +58,7 @@ class SalesTargetsPipeline:
         self.identity_registry = identity_registry
         self.output_dir = Path(output_dir)
         self.feature_store = feature_store
-        self.validation_year = validation_year
+        self.evaluation_year = evaluation_year
         self.recap_path = Path(recap_path) if recap_path else None
         self.recap_output_dir = Path(recap_output_dir) if recap_output_dir else None
         self.reference_repository = reference_repository
@@ -67,14 +67,27 @@ class SalesTargetsPipeline:
         self._recap_wide: pd.DataFrame | None = None
         self._recap_schema_path: Path | None = None
 
-    def build_training_monthly_avg(self) -> pd.DataFrame:
-        """Moyennes mensuelles train (années < validation_year)."""
-        return self._extractor.monthly_average_targets(exclude_year=self.validation_year)
+    def assert_training_holdout(self) -> None:
+        """Vérifie que ``evaluation_year`` est exclue des données d'entraînement."""
+        raw = self._extractor.prepare(exclude_year=self.evaluation_year)
+        if raw.empty:
+            return
+        leaked = raw.loc[raw["year"] >= self.evaluation_year, "year"].unique()
+        if len(leaked):
+            raise ValueError(
+                f"Fuite holdout : années {sorted(int(y) for y in leaked)} "
+                f"présentes dans le jeu d'entraînement (evaluation_year={self.evaluation_year})."
+            )
 
-    def build_validation_actuals(self) -> pd.DataFrame:
-        """CA et ventes réels par hôtel/mois sur l'année de validation."""
+    def build_training_monthly_avg(self) -> pd.DataFrame:
+        """Moyennes mensuelles d'entraînement (années < evaluation_year)."""
+        self.assert_training_holdout()
+        return self._extractor.monthly_average_targets(exclude_year=self.evaluation_year)
+
+    def build_evaluation_actuals(self) -> pd.DataFrame:
+        """CA et ventes réels par hôtel/mois sur l'année de test/évaluation (holdout)."""
         frame = self._extractor.prepare(exclude_year=None)
-        frame = frame[frame["year"] == self.validation_year]
+        frame = frame[frame["year"] == self.evaluation_year]
         if frame.empty:
             return pd.DataFrame(
                 columns=["hotel_id", "month", "TYPE", "GAMME", "montant", "nbr_ventes"]
@@ -89,9 +102,14 @@ class SalesTargetsPipeline:
             .reset_index()
         )
 
-    def validation_coverage_by_hotel(self) -> pd.DataFrame:
-        """Couverture 2026 partielle : mois présents et CA sur la période réelle."""
-        actuals = self.build_validation_actuals()
+    def evaluation_coverage_by_hotel(self) -> pd.DataFrame:
+        """Couverture test/évaluation (ex. 2026) : mois présents et CA sur la période réelle.
+
+        Jeu actuel : janvier–avril (mois 1–4) pour les hôtels pivots ayant des ventes
+        sur ``evaluation_year``. Les années < ``evaluation_year`` servent
+        uniquement à l'entraînement (``build_training_monthly_avg``).
+        """
+        actuals = self.build_evaluation_actuals()
         if actuals.empty:
             return pd.DataFrame(
                 columns=[
@@ -130,9 +148,9 @@ class SalesTargetsPipeline:
             )
         return pd.DataFrame(rows)
 
-    def validation_annual_by_hotel(self) -> pd.DataFrame:
+    def evaluation_annual_by_hotel(self) -> pd.DataFrame:
         """Alias — utilise la règle de 3 sur les mois effectivement présents."""
-        coverage = self.validation_coverage_by_hotel()
+        coverage = self.evaluation_coverage_by_hotel()
         if coverage.empty:
             return pd.DataFrame(columns=["hotel_id", "actual_ca_annuel", "actual_ventes_annuel"])
         out = coverage.rename(
@@ -200,7 +218,8 @@ class SalesTargetsPipeline:
         return self._recap_wide
 
     def build_training_dataset(self) -> pd.DataFrame:
-        """Dataset ML complet (train) avec d_* et t_*."""
+        """Dataset ML complet (entraînement uniquement) avec d_* et t_*."""
+        self.assert_training_holdout()
         monthly_avg = self.build_training_monthly_avg()
         pct_service = SalesPercentageService(monthly_avg)
         pct_wide, pct_long = pct_service.compute_all()
@@ -249,8 +268,9 @@ class SalesTargetsPipeline:
 
         recap_feature_cols = [c for c in feature_cols if c.startswith("d_recap_")]
         meta = {
-            "validation_year": self.validation_year,
-            "train_years": f"< {self.validation_year}",
+            "evaluation_year": self.evaluation_year,
+            "train_years": f"< {self.evaluation_year}",
+            "holdout_policy": "evaluation_year excluded from training targets and model fit",
             "n_rows": len(dataset),
             "n_features": len(feature_cols),
             "n_recap_features": len(recap_feature_cols),
@@ -268,8 +288,8 @@ class SalesTargetsPipeline:
         (self.output_dir / "dataset_meta.json").write_text(
             json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8"
         )
-        (self.output_dir / "validation_actuals_annual.csv").write_text(
-            self.validation_annual_by_hotel().to_csv(index=False), encoding="utf-8"
+        (self.output_dir / "evaluation_actuals_annual.csv").write_text(
+            self.evaluation_annual_by_hotel().to_csv(index=False), encoding="utf-8"
         )
         pct_long.to_csv(self.output_dir / "train_percentages_long.csv", index=False)
         monthly_avg.to_csv(self.output_dir / "train_monthly_avg_long.csv", index=False)

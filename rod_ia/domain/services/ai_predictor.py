@@ -45,7 +45,7 @@ class AIRodRevenuePredictor:
                 self.load_warnings.append(f"Erreur chargement model.joblib: {exc}")
         else:
             self.load_warnings.append(
-                "model.joblib absent — exécuter ./init.sh pour entraîner le modèle."
+                "model.joblib absent — executer ./init.sh ou python -m rod_ia.pipelines.train_model"
             )
         feature_path = self.artifacts_dir / "feature_cols.json"
         if feature_path.exists():

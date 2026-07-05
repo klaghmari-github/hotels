@@ -1,0 +1,131 @@
+{
+  "source_file": "ROD - Simulateurs + détail des coûts.xlsx",
+  "reference_file": "/media/laghmari/ssd-data/dev/hotels/data/reference/rod_reference.json",
+  "n_checks": 13,
+  "n_mismatches": 0,
+  "n_ok": 13,
+  "rows": [
+    {
+      "key": "concepts.SIMPLY.pivot_nb_chambres",
+      "sheet": "SIMULATEUR SIMPLY",
+      "cell": "C9",
+      "excel": 129.0,
+      "json": 129.0,
+      "delta": 0.0,
+      "status": "ok"
+    },
+    {
+      "key": "concepts.SIMPLY.pivot_to",
+      "sheet": "SIMULATEUR SIMPLY",
+      "cell": "C11",
+      "excel": 0.8,
+      "json": 0.8,
+      "delta": 0.0,
+      "status": "ok"
+    },
+    {
+      "key": "concepts.SIMPLY.pivot_m_lin",
+      "sheet": "SIMULATEUR SIMPLY",
+      "cell": "F9",
+      "excel": 6.0,
+      "json": 6.0,
+      "delta": 0.0,
+      "status": "ok"
+    },
+    {
+      "key": "concepts.SIMPLY.base_monthly_ca_fb",
+      "sheet": "SIMULATEUR SIMPLY",
+      "cell": "E34",
+      "excel": 533.0,
+      "json": 533.0,
+      "delta": 0.0,
+      "status": "ok"
+    },
+    {
+      "key": "concepts.SIMPLY.base_monthly_ca_nf",
+      "sheet": "SIMULATEUR SIMPLY",
+      "cell": "E35",
+      "excel": 187.0,
+      "json": 187.0,
+      "delta": 0.0,
+      "status": "ok"
+    },
+    {
+      "key": "concepts.SIMPLY.base_monthly_sales",
+      "sheet": "SIMULATEUR SIMPLY",
+      "cell": "C19",
+      "excel": 231.0,
+      "json": 231.0,
+      "delta": 0.0,
+      "status": "ok"
+    },
+    {
+      "key": "concepts.SIMPLY.margin_fb_pct",
+      "sheet": "SIMULATEUR SIMPLY",
+      "cell": "J9",
+      "excel": 2.6,
+      "json": 2.6,
+      "delta": 0.0,
+      "status": "ok"
+    },
+    {
+      "key": "concepts.SIMPLY.monthly_cost_total",
+      "sheet": "SIMULATEUR SIMPLY",
+      "cell": "H168",
+      "excel": 247.14285714285714,
+      "json": 247.14285714285714,
+      "delta": 0.0,
+      "status": "ok"
+    },
+    {
+      "key": "concepts.LIBERTY.pivot_nb_chambres",
+      "sheet": "SIMULATEUR LIBERTY",
+      "cell": "C9",
+      "excel": 142.0,
+      "json": 142.0,
+      "delta": 0.0,
+      "status": "ok"
+    },
+    {
+      "key": "concepts.LIBERTY.base_monthly_ca",
+      "sheet": "SIMULATEUR LIBERTY",
+      "cell": "E122",
+      "excel": 1479.0,
+      "json": 1479.0,
+      "delta": 0.0,
+      "status": "ok"
+    },
+    {
+      "key": "concepts.CONNECTED.pivot_nb_chambres",
+      "sheet": "SIMULATEUR CONNECTED",
+      "cell": "C9",
+      "excel": 305.0,
+      "json": 305.0,
+      "delta": 0.0,
+      "status": "ok"
+    },
+    {
+      "key": "concepts.CONNECTED.base_monthly_ca",
+      "sheet": "SIMULATEUR CONNECTED",
+      "cell": "E122",
+      "excel": 3634.0,
+      "json": 3634.0,
+      "delta": 0.0,
+      "status": "ok"
+    },
+    {
+      "key": "impact_to.ht_per_0_01_to",
+      "sheet": "REVENUS - IMPACT TO",
+      "cell": "F12",
+      "excel": 9.23397435897436,
+      "json": 9.23397435897436,
+      "delta": 0.0,
+      "status": "ok"
+    }
+  ],
+  "cost_lines_present": {
+    "SIMPLY": true,
+    "LIBERTY": true,
+    "CONNECTED": true
+  }
+}

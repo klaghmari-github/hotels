@@ -13,7 +13,7 @@ def create_performance_blueprint(container: AppContainer) -> Blueprint:
             return jsonify(
                 {
                     "error": "Rapport absent — exécuter ./init.sh",
-                    "validation_year": 2026,
+                    "evaluation_year": 2026,
                     "rows": [],
                     "summary": {},
                 }

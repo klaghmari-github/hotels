@@ -17,10 +17,34 @@ from rod_ia.domain.services.ml_column_naming import MLColumnNaming
 class ModelTrainer:
     """Entraîne et persiste le modèle IA consommé par run.sh."""
 
+    DATASET_FILES = ("dataset_meta.json", "X_descriptive.csv", "y_targets.csv")
+    ARTIFACT_FILES = ("model.joblib", "feature_cols.json", "target_cols.json", "meta.json")
+
     def __init__(self, processed_dir: Path, artifacts_dir: Path) -> None:
         self.processed_dir = Path(processed_dir)
         self.artifacts_dir = Path(artifacts_dir)
         self.artifacts_dir.mkdir(parents=True, exist_ok=True)
+
+    @property
+    def model_path(self) -> Path:
+        return self.artifacts_dir / "model.joblib"
+
+    def dataset_ready(self) -> bool:
+        """True si le dataset d entrainement a ete materialise dans data/processed."""
+        return all((self.processed_dir / name).exists() for name in self.DATASET_FILES)
+
+    def is_model_present(self) -> bool:
+        """True si model.joblib est present a l emplacement attendu."""
+        return self.model_path.is_file()
+
+    def artifacts_complete(self) -> bool:
+        return all((self.artifacts_dir / name).exists() for name in self.ARTIFACT_FILES)
+
+    def load_meta(self) -> dict:
+        meta_path = self.artifacts_dir / "meta.json"
+        if not meta_path.exists():
+            return {}
+        return json.loads(meta_path.read_text(encoding="utf-8"))
 
     def _load_dataset(self) -> tuple[pd.DataFrame, pd.DataFrame, list[str], list[str]]:
         meta_path = self.processed_dir / "dataset_meta.json"
@@ -52,6 +76,7 @@ class ModelTrainer:
         return x_frame[feature_cols], y_frame[global_targets], feature_cols, global_targets
 
     def train(self) -> dict:
+        # Fit uniquement sur le dataset d'entraînement (evaluation_year exclue par le pipeline).
         x_train, y_train, feature_cols, target_cols = self._load_dataset()
         if len(x_train) < 2:
             raise ValueError(
@@ -90,3 +115,23 @@ class ModelTrainer:
             json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8"
         )
         return meta
+
+    def ensure_trained(self, *, force: bool = False) -> dict:
+        """Entraîne si le modèle est absent (ou si force=True).
+
+        Prérequis : ``dataset_ready()`` — sinon lever ``FileNotFoundError``.
+        """
+        if not self.dataset_ready():
+            missing = [n for n in self.DATASET_FILES if not (self.processed_dir / n).exists()]
+            raise FileNotFoundError(
+                f"Dataset d entrainement incomplet ({', '.join(missing)}). "
+                "Executer ./init.sh ou python -m rod_ia.pipelines.train_model --rebuild-dataset."
+            )
+        if force or not self.is_model_present():
+            meta = self.train()
+            meta["status"] = "trained"
+            return meta
+        existing = self.load_meta()
+        existing["status"] = "already_present"
+        existing["model_path"] = str(self.model_path)
+        return existing

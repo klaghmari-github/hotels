@@ -20,7 +20,14 @@ from rod_ia.domain.services.sales_targets_pipeline import SalesTargetsPipeline
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Pipeline init ROD-IA")
-    parser.add_argument("--validation-year", type=int, default=2026)
+    parser.add_argument(
+        "--evaluation-year",
+        "--validation-year",
+        type=int,
+        default=2026,
+        dest="evaluation_year",
+        help="Année holdout test/évaluation (exclue de l'entraînement, défaut 2026)",
+    )
     parser.add_argument("--skip-train", action="store_true")
     args = parser.parse_args()
 
@@ -55,7 +62,7 @@ def main() -> None:
         identity_registry=registry,
         output_dir=settings.data_processed_dir,
         feature_store=container.feature_store,
-        validation_year=args.validation_year,
+        evaluation_year=args.evaluation_year,
         recap_path=recap_path,
         recap_output_dir=settings.rod_recap_reference_dir,
         reference_repository=reference,
@@ -67,10 +74,12 @@ def main() -> None:
     pivot_info = enricher.enrich_all_pivots()
     print(f"Feature store pivots: {pivot_info}")
 
+    trainer = ModelTrainer(settings.data_processed_dir, settings.artifacts_dir)
     if not args.skip_train:
-        trainer = ModelTrainer(settings.data_processed_dir, settings.artifacts_dir)
-        meta = trainer.train()
+        meta = trainer.ensure_trained(force=True)
         print(f"Modèle entraîné: {meta}")
+    elif not trainer.is_model_present():
+        print("Attention: --skip-train actif et model.joblib absent.")
 
     evaluator = ModelEvaluationService(
         pipeline,
@@ -79,10 +88,10 @@ def main() -> None:
         reference,
         feature_store=container.feature_store,
         output_path=settings.data_processed_dir / "performance_report.json",
-        validation_year=args.validation_year,
+        evaluation_year=args.evaluation_year,
     )
     report = evaluator.evaluate()
-    print(f"Évaluation {args.validation_year}: {len(report.rows)} hôtels")
+    print(f"Test/évaluation {args.evaluation_year}: {len(report.rows)} hôtels")
     (settings.data_processed_dir / "performance_report.json").write_text(
         json.dumps(report.to_dict(), ensure_ascii=False, indent=2), encoding="utf-8"
     )
