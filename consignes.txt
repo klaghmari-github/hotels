@@ -1,0 +1,91 @@
+pour moi le plus important c'est la partie dataprep. notament salesprep.
+
+Il y a des données manquantes il y en aura toujours donc l'objectif c'est de calculer une moyenne et la projeter sur les dates manquantes. faire ceci pour differents calculs pour garder cohérence, puis tout agrégé.
+
+L'objectif est de faire des agrégation différentes mais à la fin faire une jointure par nom_hotel, annee,mois, et il faut donc que tous les noms d'hotels et années et mois soient disponible soit directement dans les données, soit générées par la règle de trois.
+
+Le champ type te donne si c'est la catégorie F_B ou N_F_B, le champ GAMME te donne la sous catégorie. le nom de l'hotel c'est le champ nom_boutique. le nombre de ventes c'est la somme des quantités, et le montant des ventes c'est la somme des prix TTC. le nombre de paniers c'est le nombre de tickets de caisse distinct.
+
+je veux un flux qui séléctionne que les données avant 2026. puis pour chaque hote me :
+
+1.a- transforme les données au format group by nom_hotel, annee, aggregate les colonnes  :  nombre_ventes, montant_ventes, nombre_paniers, nombre_produits, nombre_categories_annee_F_B, nombre_categorie_annee_N_F_B, pct_categories_annee_F_B (nombre F_B / nombre total), pct_categories_annee_N_F_B, nombre mois, premier_mois (le premier mois de vente enregistré), dernier_mois (dernier mois de vente enregistré). mois_actifs(c'est le nombre de mois entre le premier mois rentable qui a généré des ventes et le dernier mois rentable qui a généré des ventes), mois_manquants (nombre de mois entre janvier et le premier mois enregistré plus le nombre de mois entre le dernier mois enregistré et le mois de decembre. cest donc pas 12 - nombre_mois car il se peut qu'on a 3 mois mais c'est février juin et septembre. donc les mois manquant c'est pas 9 mais c'est juste janvier et octobre novembre decembre, les autres mois il n y avait effectivement pas de vente et pas juste données manquante, les mois manquant c'est donc 12 - mois actifs).
+
+1.b - générer nom_hotel,anne, nombre_ventes, montant_ventes, nombre_paniers, nombre_produits tel que les colonnes numerique sont normalisé sur 12 mois en divisant la valeur d'origine par les mois actif pour obtenir une moyenne et mutilplier ca par 12 pour obtenir la valeur annuelle. les champs avec le suffixe _F_B ou _N_F_B sont juste ramené pas besoins de normalisé 
+
+1.c généréer nom_hotel,annee,mois,nombre_ventes, montant_ventes, nombre_paniers, nombre_produits en divisant par 12.
+
+2.a- pareil que 1.a mais group by nom_hotel, annee, mois et pour l'aggrégation pareil aussi y compris les champs avec suffixe annee_F_B et annee_N_F_B mais en remplacant "annee" par "mois" 
+
+2.b- pareil que 1.b mais calculer les moyennes par mois en tenant compte du premier et dernier mois et mois actifs, puis ajouter les lignes nom_hotel,anne,mois pour chaque année mois manquant avec les valeurs moyennes calculés. bien sur les champs avec suffixes _F_B et _N_F_B sont déjà au bon format il faut juste les ramenés. 
+
+3.a- transforme les données au format group by nom_hotel, annee, mois, categorie, sous categorie, aggregate les colonnes  :  nombre_ventes, montant_ventes, nombre_paniers, nombre_produits. a partir de maintenant plus besoins des champs avec suffixes _F_B et _N_F_B car on fait groupe by ça déjà. ou on fait group by anne,moi et pour ça on a déjà les calculs fait.
+
+3.b - calculer une moyenne par anne par mois par rapport au nomre de mois actifs pour chaque catégorie et sous catégorie, puis ajouter les lignes correspondantes pour chaque nom_hotel,annee,mois manquant avec les valeurs numeriques correspondant à cette moyenne. 
+
+3.c - générer les données nom_hotel, annee, mois, puis autant de colonne que de categorie pour (nombre_ventes, montant_ventes, nombre_paniers, nombre_produits), puis autant de colonne que de sous cat_sou_cat pour les champs (nombre_ventes, montant_ventes, nombre_paniers, nombre_produits), en gros juste nom_hotel, annee, mois,  et tous les reste en mesures numérique.
+
+4.a- même chose que 3.a mais group by nom_hotel, annee, mois, categorie, sous categorie, heure_vente
+
+4.b même chose que 3.b l'objectif c'est d'avoir toutes les valeurs nom_hotel,annee,mois. 
+
+4.c pareil comme 3.c pour avoir en clé nom_hotel,anne,mois.
+
+5.a- même chose que 4.a mais group by nom_hotel, annee, mois, categorie, sous categorie, is_weekend
+
+5.b même chose que 4.b
+
+5.c meme chose que 4.C
+
+6.a- même chose que 4.a- mais group by nom_hotel, annee, mois, categorie, sous categorie, is_holiday
+
+6.b même chose que 4.b.
+
+6.c meme chose que 4.C
+
+
+
+
+
+7.fais une jointure entre toutes les tables générés avec comme clé nom_hotel, annee, mois. 
+
+Pour les noms de colonnes surtous les dumies, nettoyer en remplacant par exemple les caractere speciaux et apostrophe par "_". le résultat de cette jointure doit être ajouter à la feature store. 
+
+
+
+Cette partie SalesPrep il faut que ca soit fait dans une classe python, en mode orienté objet.
+
+On va pas casser encore le code existant, on va partir sur une nouvelle architecture a construire step by step avant de tout remplacer.
+
+
+
+on va avoir un folder prepare qui contient le flux de la préparation du model.
+
+on va avoir un folder evaluate qui contient le flux de l'evaluation du modèle.
+
+onva avoir un folder serve qui contient le flux d'exécution en prod.
+
+
+
+on commence par le folder prepare. il y aura des sous folders. dans chaque sous folder la data correspondante générée. 
+
+
+
+step1 est RodPrep  qui représente la data que le directeur de l'hotel saisie dans l'interface graphique et que le modèle peut exploiter aussi. pour l'entrainnement c'est fourni dans un fichier excel recapitulatif des données. il faut récupérer ces données depuis l'excel, les nettoyer et générer une dataframe propre a serialiser c'est ce qui va permettre de lier un nom d'hotel à un code hotel à la géolocalisation de l'hotel. 
+
+on aura donc Prepare/RodPrep/Input/fichier excel de recapitulatif et Prepare/RodPrep/Output/dataframe préparée. et Prepare/RodPrep/Src/package avec la ou les classes python nécessaires.  Prepare/RodPrep/Explore/notebook commenté de façon neutre utilisant la classe RodPrep et affichant la dataframe résultat. il y a deja une classe qui fait ca il faut juste bien structurer et organiser dans la nouvelle architecture sans casser l'existante.
+
+
+
+Step 2 Prepare/MeteoPrep/Input/dataframe avec hotel_code, hotel_name, hotel_brand, hotel_adresse, hotel_lat, hotel_lon. Prepare/MeteoPrep/Src/ classe python qui gére la météo selon hotel_lat, hotel_lon si fournie sinon c'est généré en fonction de hotel_adresse. puis Prepare/MeteoPrep/Explore/notebook commenté neutre utilisant la classe MeteoPrep et affichant la dataframe resultat. puis Prepare/MeteoPrep/Output/dataframe resultat. cette classe fournit une fonction pour remplir le dossier Input a partir de lOutput de la casse précédente. on génère a la fin les résultats agrégée par année par mois. on a besoin des données 2024 et 2025 .pour les données metéo j'ai fais une classe qui les ajoutes mais j'ai du mal à interpréter les colonnes a cause de leures noms alors je veux une classe propore qui fait le calcul et qui renome les colonnes de façon lisible pour qu'on sache a quoi correspond un peu pret chaque feature. pareil aussi si un mois est manquant ou une année est manquante remplacer par les données du mois le plus proche de l'année en question disponible par exemple si il manque le mois 03 de 2024 et que l'api ne donne pas cette info alors chercher le mois 03 de 2025 e si encore pas de chance alors chercher le mois 03 2026, et si encore pas de chance alors calculer la moyenne annuelle et diviser par 12 pour trouver la moyenne mensuelle et remplir le trou. 
+
+
+
+Step3 pareil mais pour ProxmitePrep. recuperer les infos de promixité de commerces et de plage. 
+
+
+
+Step4, c'est la partie SalesPrep. avec tout ce qu'on s'est dir de 1.a juqu'au 7. la génération de la dataframe de jointure. Pour l'input ca sera le fichier des ventes. avec la règle que la dernière année dans le fichier est exclut, dans ce cas la dernière année c'est 2026 elle sera exclut pour faire l'apprentissage sur les precédentes et l'evaluation sur 2026. on va ajouter dans input l'output de step1 afin d'inclure dans l'outputu le hotel_code. 
+
+
+
+Step5 : AllPrep. ici les inputs seront la copie des outputs des précédentes steps.  l'objectif c'est de faire une jointure sur hotel_code,annee,mois quand c'est dispo, et quand il y a que hotel_code ca sera une jointure sur hotel_code seulement. les lignes de la dataprep step3 des sales ne doivent pas être dupliquées, donc les jointures doivent se faire sur des champs clés de chaque autre table. 

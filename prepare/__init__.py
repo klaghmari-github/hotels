@@ -1,0 +1,1 @@
+"""Pipeline de préparation des données (architecture prepare/)."""

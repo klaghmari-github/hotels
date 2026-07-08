@@ -1,0 +1,926 @@
+nom_hotel,annee,mois,categorie,sous_categorie,is_holiday,nombre_ventes,montant_ventes,nombre_paniers,nombre_produits
+Ibis budget Nice,2023,8,N_F_B,ACCESSOIRES,0,31.0,370.0,24.0,11.0
+Ibis budget Nice,2023,8,N_F_B,ACCESSOIRES,1,1.0,13.0,1.0,1.0
+Ibis budget Nice,2023,8,N_F_B,COSMETIQUE,0,1.0,10.0,1.0,1.0
+Ibis budget Nice,2023,8,N_F_B,PAP,0,7.0,74.0,7.0,5.0
+Ibis budget Nice,2023,8,N_F_B,SOS,0,1.0,8.0,1.0,1.0
+Ibis budget Nice,2023,9,N_F_B,ACCESSOIRES,0,16.0,186.0,13.0,9.0
+Ibis budget Nice,2023,9,N_F_B,COSMETIQUE,0,3.0,30.0,3.0,1.0
+Ibis budget Nice,2023,9,N_F_B,PAP,0,10.0,98.0,10.0,5.0
+Ibis budget Nice,2023,9,N_F_B,SOS,0,1.0,8.0,1.0,1.0
+Ibis budget Nice,2023,10,N_F_B,ACCESSOIRES,0,17.0,161.0,14.0,8.0
+Ibis budget Nice,2023,10,N_F_B,PAP,0,5.0,45.0,5.0,3.0
+Ibis budget Nice,2023,11,N_F_B,PAP,0,1.0,9.0,1.0,1.0
+Ibis budget Nice,2024,3,N_F_B,ACCESSOIRES,0,2.0,16.0,2.0,2.0
+Ibis budget Nice,2024,4,N_F_B,ACCESSOIRES,0,9.0,117.0,9.0,5.0
+Ibis budget Nice,2024,4,N_F_B,COSMETIQUE,0,2.0,20.0,2.0,1.0
+Ibis budget Nice,2024,4,N_F_B,SOS,0,1.0,8.0,1.0,1.0
+Ibis budget Nice,2024,5,F_B,SANS ALCOOL,0,36.0,87.80000000000001,30.0,8.0
+Ibis budget Nice,2024,5,N_F_B,ACCESSOIRES,0,8.0,97.0,8.0,8.0
+Ibis budget Nice,2024,5,N_F_B,PAP,0,9.0,86.0,7.0,8.0
+Ibis budget Nice,2024,6,F_B,FOOD SALEE,0,21.0,46.0,18.0,3.0
+Ibis budget Nice,2024,6,F_B,SANS ALCOOL,0,196.0,454.40000000000003,143.0,15.0
+Ibis budget Nice,2024,6,N_F_B,ACCESSOIRES,0,20.0,208.1,20.0,12.0
+Ibis budget Nice,2024,6,N_F_B,COSMETIQUE,0,1.0,10.0,1.0,1.0
+Ibis budget Nice,2024,6,N_F_B,JEUX / ENFANTS,0,1.0,18.0,1.0,1.0
+Ibis budget Nice,2024,6,N_F_B,PAP,0,7.0,89.0,7.0,7.0
+Ibis budget Nice,2024,6,N_F_B,SOS,0,1.0,16.0,1.0,1.0
+Ibis budget Nice,2024,7,F_B,FOOD SALEE,0,24.0,59.0,21.0,5.0
+Ibis budget Nice,2024,7,F_B,SANS ALCOOL,0,275.0,648.8000000000001,169.0,16.0
+Ibis budget Nice,2024,7,F_B,SANS ALCOOL,1,6.0,13.8,5.0,5.0
+Ibis budget Nice,2024,7,N_F_B,ACCESSOIRES,0,21.0,188.5,20.0,12.0
+Ibis budget Nice,2024,7,N_F_B,COSMETIQUE,0,2.0,20.0,2.0,1.0
+Ibis budget Nice,2024,7,N_F_B,JEUX / ENFANTS,0,3.0,54.0,3.0,1.0
+Ibis budget Nice,2024,7,N_F_B,PAP,0,6.0,60.0,5.0,2.0
+Ibis budget Nice,2024,7,N_F_B,SOS,0,1.0,8.0,1.0,1.0
+Ibis budget Nice,2024,8,F_B,FOOD SALEE,0,17.0,47.0,12.0,4.0
+Ibis budget Nice,2024,8,F_B,SANS ALCOOL,0,322.0,764.0,207.0,16.0
+Ibis budget Nice,2024,8,N_F_B,ACCESSOIRES,0,23.0,259.0,18.0,11.0
+Ibis budget Nice,2024,8,N_F_B,COSMETIQUE,0,3.0,29.0,3.0,2.0
+Ibis budget Nice,2024,8,N_F_B,JEUX / ENFANTS,0,3.0,54.0,3.0,1.0
+Ibis budget Nice,2024,8,N_F_B,PAP,0,2.0,20.0,2.0,2.0
+Ibis budget Nice,2024,9,F_B,FOOD SALEE,0,17.0,36.5,15.0,4.0
+Ibis budget Nice,2024,9,F_B,FOOD SUCREE,0,25.0,47.5,21.0,6.0
+Ibis budget Nice,2024,9,F_B,SANS ALCOOL,0,194.0,457.20000000000005,130.0,15.0
+Ibis budget Nice,2024,9,N_F_B,ACCESSOIRES,0,14.0,151.0,12.0,8.0
+Ibis budget Nice,2024,9,N_F_B,COSMETIQUE,0,1.0,10.0,1.0,1.0
+Ibis budget Nice,2024,9,N_F_B,PAP,0,7.0,69.0,7.0,5.0
+Ibis budget Nice,2024,10,F_B,FOOD SALEE,0,14.0,30.5,13.0,3.0
+Ibis budget Nice,2024,10,F_B,FOOD SUCREE,0,20.0,40.0,14.0,7.0
+Ibis budget Nice,2024,10,F_B,SANS ALCOOL,0,147.0,336.8,103.0,16.0
+Ibis budget Nice,2024,10,N_F_B,ACCESSOIRES,0,11.0,98.0,8.0,9.0
+Ibis budget Nice,2024,10,N_F_B,PAP,0,4.0,35.0,4.0,3.0
+Ibis budget Nice,2024,10,N_F_B,SOS,0,4.0,56.0,3.0,1.0
+Ibis budget Nice,2024,11,F_B,FOOD SALEE,0,6.0,13.0,5.0,4.0
+Ibis budget Nice,2024,11,F_B,FOOD SUCREE,0,12.0,18.5,12.0,5.0
+Ibis budget Nice,2024,11,F_B,FOOD SUCREE,1,1.0,2.0,1.0,1.0
+Ibis budget Nice,2024,11,F_B,SANS ALCOOL,0,72.0,171.4,55.0,15.0
+Ibis budget Nice,2024,11,F_B,SANS ALCOOL,1,7.0,18.3,4.0,6.0
+Ibis budget Nice,2024,11,N_F_B,ACCESSOIRES,0,2.0,12.0,2.0,2.0
+Ibis budget Nice,2024,11,N_F_B,PAP,0,1.0,6.0,1.0,1.0
+Ibis budget Nice,2024,12,F_B,FOOD SALEE,0,5.0,10.5,4.0,3.0
+Ibis budget Nice,2024,12,F_B,FOOD SALEE,1,2.0,4.5,2.0,2.0
+Ibis budget Nice,2024,12,F_B,FOOD SUCREE,0,14.0,25.0,8.0,6.0
+Ibis budget Nice,2024,12,F_B,FOOD SUCREE,1,1.0,1.5,1.0,1.0
+Ibis budget Nice,2024,12,F_B,SANS ALCOOL,0,83.0,188.10000000000002,58.0,14.0
+Ibis budget Nice,2024,12,F_B,SANS ALCOOL,1,3.0,6.4,2.0,2.0
+Ibis budget Nice,2024,12,N_F_B,ACCESSOIRES,0,1.0,13.0,1.0,1.0
+Ibis budget Nice,2025,1,F_B,FOOD SALEE,0,12.0,24.0,8.0,3.0
+Ibis budget Nice,2025,1,F_B,FOOD SALEE,1,2.0,4.5,2.0,2.0
+Ibis budget Nice,2025,1,F_B,FOOD SUCREE,0,15.0,25.0,12.0,5.0
+Ibis budget Nice,2025,1,F_B,SANS ALCOOL,0,97.0,225.3,69.0,14.0
+Ibis budget Nice,2025,1,F_B,SANS ALCOOL,1,14.0,32.8,9.0,11.0
+Ibis budget Nice,2025,1,N_F_B,ACCESSOIRES,0,2.0,20.0,2.0,2.0
+Ibis budget Nice,2025,1,N_F_B,SOS,0,1.0,14.0,1.0,1.0
+Ibis budget Nice,2025,2,F_B,FOOD SALEE,0,10.0,20.0,6.0,3.0
+Ibis budget Nice,2025,2,F_B,FOOD SUCREE,0,9.0,17.5,8.0,4.0
+Ibis budget Nice,2025,2,F_B,SANS ALCOOL,0,89.0,214.8,65.0,15.0
+Ibis budget Nice,2025,2,N_F_B,ACCESSOIRES,0,1.0,10.0,1.0,1.0
+Ibis budget Nice,2025,2,N_F_B,PAP,0,1.0,6.0,1.0,1.0
+Ibis budget Nice,2025,3,F_B,FOOD SALEE,0,9.0,19.5,7.0,4.0
+Ibis budget Nice,2025,3,F_B,FOOD SUCREE,0,23.0,41.0,18.0,5.0
+Ibis budget Nice,2025,3,F_B,SANS ALCOOL,0,211.0,518.1,170.0,18.0
+Ibis budget Nice,2025,3,N_F_B,#REF!,0,0.0,22.0,2.0,0.0
+Ibis budget Nice,2025,3,N_F_B,ACCESSOIRES,0,2.0,25.0,2.0,2.0
+Ibis budget Nice,2025,4,F_B,FOOD SALEE,0,20.0,55.5,15.0,7.0
+Ibis budget Nice,2025,4,F_B,FOOD SUCREE,0,18.0,39.6,16.0,5.0
+Ibis budget Nice,2025,4,F_B,SANS ALCOOL,0,209.0,498.1,158.0,17.0
+Ibis budget Nice,2025,4,N_F_B,#REF!,0,1.0,12.0,1.0,1.0
+Ibis budget Nice,2025,4,N_F_B,ACCESSOIRES,0,12.0,144.1,9.0,11.0
+Ibis budget Nice,2025,4,N_F_B,COSMETIQUE,0,1.0,9.0,1.0,1.0
+Ibis budget Nice,2025,4,N_F_B,PAP,0,4.0,44.0,3.0,4.0
+Ibis budget Nice,2025,4,N_F_B,SOS,0,1.0,14.0,1.0,1.0
+Ibis budget Nice,2025,5,F_B,FOOD SALEE,0,20.0,68.5,13.0,6.0
+Ibis budget Nice,2025,5,F_B,FOOD SALEE,1,1.0,2.0,1.0,1.0
+Ibis budget Nice,2025,5,F_B,SANS ALCOOL,0,322.0,755.5,205.0,17.0
+Ibis budget Nice,2025,5,F_B,SANS ALCOOL,1,28.0,64.2,19.0,8.0
+Ibis budget Nice,2025,5,N_F_B,#REF!,0,11.0,132.0,11.0,5.0
+Ibis budget Nice,2025,5,N_F_B,#REF!,1,2.0,35.0,2.0,2.0
+Ibis budget Nice,2025,5,N_F_B,ACCESSOIRES,0,17.0,172.0,15.0,10.0
+Ibis budget Nice,2025,5,N_F_B,ACCESSOIRES,1,3.0,35.0,2.0,3.0
+Ibis budget Nice,2025,5,N_F_B,JEUX / ENFANTS,0,1.0,18.0,1.0,1.0
+Ibis budget Nice,2025,5,N_F_B,PAP,0,5.0,50.0,5.0,4.0
+Ibis budget Nice,2025,5,N_F_B,SOS,0,1.0,14.0,1.0,1.0
+Ibis budget Nice,2025,6,F_B,FOOD SALEE,0,25.0,67.5,19.0,6.0
+Ibis budget Nice,2025,6,F_B,SANS ALCOOL,0,382.0,894.2,242.0,18.0
+Ibis budget Nice,2025,6,N_F_B,#REF!,0,23.0,295.0,19.0,8.0
+Ibis budget Nice,2025,6,N_F_B,ACCESSOIRES,0,31.0,220.0,27.0,12.0
+Ibis budget Nice,2025,6,N_F_B,JEUX / ENFANTS,0,2.0,36.0,2.0,1.0
+Ibis budget Nice,2025,6,N_F_B,PAP,0,9.0,113.0,11.0,5.0
+Ibis budget Nice,2025,6,N_F_B,SOS,0,1.0,8.0,1.0,1.0
+Ibis budget Nice,2025,7,F_B,FOOD SALEE,0,40.0,116.5,33.0,9.0
+Ibis budget Nice,2025,7,F_B,FOOD SALEE,1,2.0,4.5,1.0,2.0
+Ibis budget Nice,2025,7,F_B,SANS ALCOOL,0,327.0,779.5,227.0,18.0
+Ibis budget Nice,2025,7,F_B,SANS ALCOOL,1,16.0,39.1,9.0,9.0
+Ibis budget Nice,2025,7,N_F_B,#REF!,0,32.0,410.0,25.0,13.0
+Ibis budget Nice,2025,7,N_F_B,#REF!,1,1.0,15.0,1.0,1.0
+Ibis budget Nice,2025,7,N_F_B,ACCESSOIRES,0,22.0,202.0,21.0,9.0
+Ibis budget Nice,2025,7,N_F_B,JEUX / ENFANTS,0,2.0,36.0,2.0,1.0
+Ibis budget Nice,2025,7,N_F_B,PAP,0,9.0,88.0,9.0,4.0
+Ibis budget Nice,2025,8,F_B,FOOD SALEE,0,26.0,83.0,20.0,8.0
+Ibis budget Nice,2025,8,F_B,SANS ALCOOL,0,358.0,842.3000000000001,223.0,18.0
+Ibis budget Nice,2025,8,F_B,SANS ALCOOL,1,11.0,26.5,8.0,6.0
+Ibis budget Nice,2025,8,N_F_B,#REF!,0,30.0,360.0,29.0,15.0
+Ibis budget Nice,2025,8,N_F_B,ACCESSOIRES,0,49.0,429.0,33.0,14.0
+Ibis budget Nice,2025,8,N_F_B,ACCESSOIRES,1,4.0,24.0,3.0,3.0
+Ibis budget Nice,2025,8,N_F_B,JEUX / ENFANTS,0,2.0,36.0,2.0,1.0
+Ibis budget Nice,2025,9,F_B,FOOD SALEE,0,35.0,94.5,29.0,8.0
+Ibis budget Nice,2025,9,F_B,SANS ALCOOL,0,314.0,733.1,211.0,18.0
+Ibis budget Nice,2025,9,N_F_B,#REF!,0,32.0,424.0,31.0,12.0
+Ibis budget Nice,2025,9,N_F_B,ACCESSOIRES,0,32.0,232.0,30.0,14.0
+Ibis budget Nice,2025,9,N_F_B,PAP,0,2.0,23.0,2.0,2.0
+Ibis budget Nice,2025,10,F_B,FOOD SALEE,0,32.0,91.5,27.0,8.0
+Ibis budget Nice,2025,10,F_B,SANS ALCOOL,0,253.0,603.5,168.0,18.0
+Ibis budget Nice,2025,10,N_F_B,#REF!,0,11.0,116.0,10.0,7.0
+Ibis budget Nice,2025,10,N_F_B,ACCESSOIRES,0,20.0,155.0,16.0,12.0
+Ibis budget Nice,2025,10,N_F_B,PAP,0,3.0,30.0,3.0,2.0
+Ibis budget Nice,2025,11,F_B,FOOD SALEE,0,16.0,42.0,13.0,8.0
+Ibis budget Nice,2025,11,F_B,FOOD SALEE,1,1.0,4.0,1.0,1.0
+Ibis budget Nice,2025,11,F_B,SANS ALCOOL,0,168.0,392.1,113.0,18.0
+Ibis budget Nice,2025,11,F_B,SANS ALCOOL,1,5.0,11.0,5.0,1.0
+Ibis budget Nice,2025,11,NAN,nan,0,3.0,6.0,2.0,1.0
+Ibis budget Nice,2025,11,N_F_B,#REF!,0,6.0,72.0,6.0,2.0
+Ibis budget Nice,2025,11,N_F_B,#REF!,1,1.0,12.0,1.0,1.0
+Ibis budget Nice,2025,11,N_F_B,ACCESSOIRES,0,2.0,12.0,2.0,2.0
+Ibis budget Nice,2025,12,F_B,FOOD SALEE,0,8.0,22.0,7.0,5.0
+Ibis budget Nice,2025,12,F_B,SANS ALCOOL,0,127.0,307.20000000000005,81.0,16.0
+Ibis budget Nice,2025,12,F_B,SANS ALCOOL,1,2.0,4.7,1.0,2.0
+Ibis budget Nice,2025,12,NAN,nan,0,18.0,58.0,17.0,3.0
+Ibis budget Nice,2025,12,N_F_B,#REF!,0,3.0,32.0,3.0,2.0
+Ibis budget Nice,2025,12,N_F_B,ACCESSOIRES,0,3.0,24.0,3.0,3.0
+Ibis budget Nice,2025,12,N_F_B,PAP,0,1.0,16.0,1.0,1.0
+Ibis budget Nice,2025,12,N_F_B,SOS,0,1.0,4.0,1.0,1.0
+Ibis budget Strasbourg Centre République,2024,10,F_B,FOOD SALEE,0,15.0,142.5,13.0,4.0
+Ibis budget Strasbourg Centre République,2024,10,F_B,FOOD SUCREE,0,39.0,138.5,26.0,6.0
+Ibis budget Strasbourg Centre République,2024,10,F_B,SANS ALCOOL,0,97.0,337.5,73.0,12.0
+Ibis budget Strasbourg Centre République,2024,11,F_B,FOOD SALEE,0,26.0,250.0,22.0,4.0
+Ibis budget Strasbourg Centre République,2024,11,F_B,FOOD SALEE,1,1.0,15.0,1.0,1.0
+Ibis budget Strasbourg Centre République,2024,11,F_B,FOOD SUCREE,0,87.0,261.0,69.0,11.0
+Ibis budget Strasbourg Centre République,2024,11,F_B,FOOD SUCREE,1,4.0,13.0,4.0,4.0
+Ibis budget Strasbourg Centre République,2024,11,F_B,SANS ALCOOL,0,120.0,362.5,103.0,14.0
+Ibis budget Strasbourg Centre République,2024,11,F_B,SANS ALCOOL,1,14.0,42.0,11.0,7.0
+Ibis budget Strasbourg Centre République,2024,12,F_B,FOOD SALEE,0,30.0,92.5,28.0,4.0
+Ibis budget Strasbourg Centre République,2024,12,F_B,FOOD SALEE,1,1.0,2.5,1.0,1.0
+Ibis budget Strasbourg Centre République,2024,12,F_B,FOOD SUCREE,0,95.0,302.5,73.0,10.0
+Ibis budget Strasbourg Centre République,2024,12,F_B,FOOD SUCREE,1,6.0,20.0,3.0,3.0
+Ibis budget Strasbourg Centre République,2024,12,F_B,SANS ALCOOL,0,238.0,855.0,179.0,13.0
+Ibis budget Strasbourg Centre République,2024,12,F_B,SANS ALCOOL,1,13.0,63.0,10.0,7.0
+Ibis budget Strasbourg Centre République,2025,1,F_B,FOOD SALEE,0,18.0,75.0,15.0,2.0
+Ibis budget Strasbourg Centre République,2025,1,F_B,FOOD SALEE,1,3.0,7.5,3.0,2.0
+Ibis budget Strasbourg Centre République,2025,1,F_B,FOOD SUCREE,0,50.0,163.0,36.0,8.0
+Ibis budget Strasbourg Centre République,2025,1,F_B,FOOD SUCREE,1,5.0,13.0,5.0,4.0
+Ibis budget Strasbourg Centre République,2025,1,F_B,SANS ALCOOL,0,124.0,394.5,94.0,13.0
+Ibis budget Strasbourg Centre République,2025,1,F_B,SANS ALCOOL,1,17.0,47.5,15.0,6.0
+Ibis budget Strasbourg Centre République,2025,2,F_B,FOOD SALEE,0,21.0,85.0,16.0,3.0
+Ibis budget Strasbourg Centre République,2025,2,F_B,FOOD SUCREE,0,57.0,193.5,28.0,8.0
+Ibis budget Strasbourg Centre République,2025,2,F_B,SANS ALCOOL,0,118.0,466.5,85.0,13.0
+Ibis budget Strasbourg Centre République,2025,3,F_B,FOOD SALEE,0,22.0,166.5,19.0,5.0
+Ibis budget Strasbourg Centre République,2025,3,F_B,FOOD SUCREE,0,98.0,320.0,65.0,10.0
+Ibis budget Strasbourg Centre République,2025,3,F_B,SANS ALCOOL,0,150.0,438.0,121.0,12.0
+Ibis budget Strasbourg Centre République,2025,4,F_B,FOOD SALEE,0,25.0,202.5,22.0,5.0
+Ibis budget Strasbourg Centre République,2025,4,F_B,FOOD SUCREE,0,67.0,231.0,50.0,9.0
+Ibis budget Strasbourg Centre République,2025,4,F_B,SANS ALCOOL,0,201.0,644.5,149.0,11.0
+Ibis budget Strasbourg Centre République,2025,5,F_B,FOOD SALEE,0,11.0,42.5,10.0,4.0
+Ibis budget Strasbourg Centre République,2025,5,F_B,FOOD SALEE,1,1.0,2.5,1.0,1.0
+Ibis budget Strasbourg Centre République,2025,5,F_B,FOOD SUCREE,0,37.0,112.5,27.0,9.0
+Ibis budget Strasbourg Centre République,2025,5,F_B,FOOD SUCREE,1,4.0,10.5,4.0,3.0
+Ibis budget Strasbourg Centre République,2025,5,F_B,SANS ALCOOL,0,133.0,382.5,105.0,10.0
+Ibis budget Strasbourg Centre République,2025,5,F_B,SANS ALCOOL,1,27.0,103.5,19.0,9.0
+Ibis budget Strasbourg Centre République,2025,6,F_B,FOOD SALEE,0,41.0,163.5,33.0,4.0
+Ibis budget Strasbourg Centre République,2025,6,F_B,FOOD SUCREE,0,87.0,235.5,74.0,10.0
+Ibis budget Strasbourg Centre République,2025,6,F_B,SANS ALCOOL,0,352.0,1310.0,251.0,11.0
+Ibis budget Strasbourg Centre République,2025,7,F_B,FOOD SALEE,0,45.0,260.5,29.0,4.0
+Ibis budget Strasbourg Centre République,2025,7,F_B,FOOD SALEE,1,2.0,10.0,1.0,1.0
+Ibis budget Strasbourg Centre République,2025,7,F_B,FOOD SUCREE,0,94.0,304.0,61.0,8.0
+Ibis budget Strasbourg Centre République,2025,7,F_B,FOOD SUCREE,1,2.0,5.5,2.0,2.0
+Ibis budget Strasbourg Centre République,2025,7,F_B,SANS ALCOOL,0,251.0,834.5,183.0,11.0
+Ibis budget Strasbourg Centre République,2025,7,F_B,SANS ALCOOL,1,16.0,61.0,9.0,6.0
+Ibis budget Strasbourg Centre République,2025,8,F_B,FOOD SALEE,0,39.0,195.5,32.0,4.0
+Ibis budget Strasbourg Centre République,2025,8,F_B,FOOD SALEE,1,2.0,10.0,2.0,1.0
+Ibis budget Strasbourg Centre République,2025,8,F_B,FOOD SUCREE,0,77.0,214.5,58.0,8.0
+Ibis budget Strasbourg Centre République,2025,8,F_B,FOOD SUCREE,1,3.0,8.0,3.0,3.0
+Ibis budget Strasbourg Centre République,2025,8,F_B,SANS ALCOOL,0,395.0,1250.5,275.0,11.0
+Ibis budget Strasbourg Centre République,2025,8,F_B,SANS ALCOOL,1,30.0,90.0,21.0,6.0
+Ibis budget Strasbourg Centre République,2025,9,F_B,FOOD SALEE,0,17.0,80.0,14.0,3.0
+Ibis budget Strasbourg Centre République,2025,9,F_B,FOOD SUCREE,0,47.0,130.5,40.0,8.0
+Ibis budget Strasbourg Centre République,2025,9,F_B,SANS ALCOOL,0,143.0,428.5,124.0,11.0
+Ibis budget Strasbourg Centre République,2025,10,F_B,FOOD SALEE,0,32.0,125.0,25.0,3.0
+Ibis budget Strasbourg Centre République,2025,10,F_B,FOOD SUCREE,0,66.0,198.0,52.0,9.0
+Ibis budget Strasbourg Centre République,2025,10,F_B,SANS ALCOOL,0,211.0,667.5,169.0,11.0
+Ibis budget Strasbourg Centre République,2025,11,F_B,FOOD SALEE,0,43.0,180.0,33.0,3.0
+Ibis budget Strasbourg Centre République,2025,11,F_B,FOOD SALEE,1,1.0,5.0,1.0,1.0
+Ibis budget Strasbourg Centre République,2025,11,F_B,FOOD SUCREE,0,89.0,271.5,63.0,8.0
+Ibis budget Strasbourg Centre République,2025,11,F_B,FOOD SUCREE,1,4.0,15.5,1.0,3.0
+Ibis budget Strasbourg Centre République,2025,11,F_B,SANS ALCOOL,0,210.0,693.0,160.0,11.0
+Ibis budget Strasbourg Centre République,2025,11,F_B,SANS ALCOOL,1,7.0,27.5,4.0,3.0
+Ibis budget Strasbourg Centre République,2025,12,F_B,FOOD SALEE,0,47.0,175.0,38.0,3.0
+Ibis budget Strasbourg Centre République,2025,12,F_B,FOOD SALEE,1,4.0,25.0,2.0,1.0
+Ibis budget Strasbourg Centre République,2025,12,F_B,FOOD SUCREE,0,143.0,407.0,101.0,8.0
+Ibis budget Strasbourg Centre République,2025,12,F_B,SANS ALCOOL,0,423.0,1472.5,317.0,11.0
+Ibis budget Strasbourg Centre République,2025,12,F_B,SANS ALCOOL,1,10.0,35.0,7.0,5.0
+Mercure Paris Montmartre Sacré-Cœur,2024,1,N_F_B,COSMETIQUE,0,2.0,1.0,2.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2024,2,F_B,ALCOOL,0,46.0,435.0,37.0,8.0
+Mercure Paris Montmartre Sacré-Cœur,2024,2,F_B,FOOD SALEE,0,45.0,208.0,35.0,11.0
+Mercure Paris Montmartre Sacré-Cœur,2024,2,F_B,FOOD SUCREE,0,31.0,170.0,28.0,13.0
+Mercure Paris Montmartre Sacré-Cœur,2024,2,F_B,SANS ALCOOL,0,243.0,1791.5,177.0,8.0
+Mercure Paris Montmartre Sacré-Cœur,2024,2,N_F_B,COSMETIQUE,0,7.0,290.0,4.0,5.0
+Mercure Paris Montmartre Sacré-Cœur,2024,2,N_F_B,SOS,0,4.0,88.0,4.0,2.0
+Mercure Paris Montmartre Sacré-Cœur,2024,3,F_B,ALCOOL,0,71.0,584.0,57.0,9.0
+Mercure Paris Montmartre Sacré-Cœur,2024,3,F_B,FOOD SALEE,0,31.0,189.0,26.0,7.0
+Mercure Paris Montmartre Sacré-Cœur,2024,3,F_B,FOOD SUCREE,0,107.0,397.0,85.0,11.0
+Mercure Paris Montmartre Sacré-Cœur,2024,3,F_B,SANS ALCOOL,0,423.0,2765.0,320.0,8.0
+Mercure Paris Montmartre Sacré-Cœur,2024,3,N_F_B,COSMETIQUE,0,7.0,160.0,6.0,6.0
+Mercure Paris Montmartre Sacré-Cœur,2024,3,N_F_B,SOS,0,12.0,418.0,9.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2024,3,N_F_B,SOUVENIRS,0,2.0,44.0,2.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2024,4,F_B,ALCOOL,0,113.0,1054.0,87.0,9.0
+Mercure Paris Montmartre Sacré-Cœur,2024,4,F_B,FOOD SALEE,0,55.0,279.0,54.0,11.0
+Mercure Paris Montmartre Sacré-Cœur,2024,4,F_B,FOOD SUCREE,0,86.0,366.0,59.0,8.0
+Mercure Paris Montmartre Sacré-Cœur,2024,4,F_B,SANS ALCOOL,0,462.0,3003.0,352.0,11.0
+Mercure Paris Montmartre Sacré-Cœur,2024,4,F_B,SOUVENIRS,0,6.0,168.0,4.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2024,4,N_F_B,COSMETIQUE,0,13.0,341.0,10.0,8.0
+Mercure Paris Montmartre Sacré-Cœur,2024,4,N_F_B,SOS,0,9.0,236.0,7.0,5.0
+Mercure Paris Montmartre Sacré-Cœur,2024,4,N_F_B,SOUVENIRS,0,5.0,224.0,4.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2024,5,F_B,ALCOOL,0,90.0,941.0,62.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2024,5,F_B,ALCOOL,1,9.0,98.0,6.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2024,5,F_B,FOOD SALEE,0,64.0,410.0,56.0,10.0
+Mercure Paris Montmartre Sacré-Cœur,2024,5,F_B,FOOD SALEE,1,4.0,21.0,4.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2024,5,F_B,FOOD SUCREE,0,63.0,285.0,42.0,6.0
+Mercure Paris Montmartre Sacré-Cœur,2024,5,F_B,FOOD SUCREE,1,4.0,14.0,3.0,2.0
+Mercure Paris Montmartre Sacré-Cœur,2024,5,F_B,SANS ALCOOL,0,365.0,2555.0,260.0,9.0
+Mercure Paris Montmartre Sacré-Cœur,2024,5,F_B,SANS ALCOOL,1,19.0,205.0,13.0,6.0
+Mercure Paris Montmartre Sacré-Cœur,2024,5,N_F_B,COSMETIQUE,0,7.0,163.0,6.0,5.0
+Mercure Paris Montmartre Sacré-Cœur,2024,5,N_F_B,SOS,0,13.0,123.0,9.0,6.0
+Mercure Paris Montmartre Sacré-Cœur,2024,5,N_F_B,SOS,1,1.0,1.0,1.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2024,5,N_F_B,SOUVENIRS,0,1.0,32.0,1.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2024,6,F_B,ALCOOL,0,71.0,674.0,49.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2024,6,F_B,FOOD SALEE,0,56.0,296.0,49.0,10.0
+Mercure Paris Montmartre Sacré-Cœur,2024,6,F_B,FOOD SUCREE,0,107.0,391.0,80.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2024,6,F_B,SANS ALCOOL,0,563.0,4324.0,394.0,10.0
+Mercure Paris Montmartre Sacré-Cœur,2024,6,F_B,SOUVENIRS,0,3.0,45.0,3.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2024,6,N_F_B,COSMETIQUE,0,5.0,157.0,3.0,2.0
+Mercure Paris Montmartre Sacré-Cœur,2024,6,N_F_B,SOS,0,1.0,8.0,1.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2024,6,N_F_B,SOUVENIRS,0,1.0,42.0,1.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2024,7,F_B,ALCOOL,0,96.0,1221.0,63.0,5.0
+Mercure Paris Montmartre Sacré-Cœur,2024,7,F_B,FOOD SALEE,0,58.0,340.0,49.0,6.0
+Mercure Paris Montmartre Sacré-Cœur,2024,7,F_B,FOOD SUCREE,0,128.0,451.0,91.0,6.0
+Mercure Paris Montmartre Sacré-Cœur,2024,7,F_B,SANS ALCOOL,0,362.0,4630.0,228.0,9.0
+Mercure Paris Montmartre Sacré-Cœur,2024,7,F_B,SANS ALCOOL,1,1.0,5.0,1.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2024,7,F_B,SOUVENIRS,0,1.0,15.0,1.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2024,7,N_F_B,COSMETIQUE,0,4.0,108.0,2.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2024,7,N_F_B,SOS,0,3.0,34.0,3.0,2.0
+Mercure Paris Montmartre Sacré-Cœur,2024,7,N_F_B,SOUVENIRS,0,1.0,22.0,1.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2024,8,F_B,ALCOOL,0,98.0,1321.0,67.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2024,8,F_B,FOOD SALEE,0,52.0,288.0,45.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2024,8,F_B,FOOD SALEE,1,1.0,5.0,1.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2024,8,F_B,FOOD SUCREE,0,118.0,555.0,69.0,6.0
+Mercure Paris Montmartre Sacré-Cœur,2024,8,F_B,FOOD SUCREE,1,4.0,13.0,3.0,2.0
+Mercure Paris Montmartre Sacré-Cœur,2024,8,F_B,SANS ALCOOL,0,326.0,2820.0,204.0,9.0
+Mercure Paris Montmartre Sacré-Cœur,2024,8,F_B,SANS ALCOOL,1,16.0,180.0,9.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2024,8,N_F_B,SOS,0,5.0,61.0,4.0,2.0
+Mercure Paris Montmartre Sacré-Cœur,2024,8,N_F_B,SOUVENIRS,0,1.0,42.0,1.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2024,9,F_B,ALCOOL,0,185.0,2750.0,135.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2024,9,F_B,FOOD SALEE,0,96.0,564.0,83.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2024,9,F_B,FOOD SUCREE,0,107.0,494.0,75.0,7.0
+Mercure Paris Montmartre Sacré-Cœur,2024,9,F_B,SANS ALCOOL,0,512.0,4130.0,333.0,9.0
+Mercure Paris Montmartre Sacré-Cœur,2024,9,N_F_B,SOS,0,2.0,12.0,2.0,2.0
+Mercure Paris Montmartre Sacré-Cœur,2024,9,N_F_B,SOUVENIRS,0,1.0,42.0,1.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2024,10,F_B,ALCOOL,0,182.0,2857.0,123.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2024,10,F_B,FOOD SALEE,0,116.0,742.0,96.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2024,10,F_B,FOOD SUCREE,0,98.0,499.0,69.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2024,10,F_B,SANS ALCOOL,0,650.0,5110.0,400.0,9.0
+Mercure Paris Montmartre Sacré-Cœur,2024,10,N_F_B,SOS,0,7.0,91.0,5.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2024,10,N_F_B,SOUVENIRS,0,5.0,219.0,2.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2024,11,F_B,ALCOOL,0,92.0,1330.0,64.0,5.0
+Mercure Paris Montmartre Sacré-Cœur,2024,11,F_B,ALCOOL,1,4.0,128.0,2.0,2.0
+Mercure Paris Montmartre Sacré-Cœur,2024,11,F_B,FOOD SALEE,0,67.0,433.0,52.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2024,11,F_B,FOOD SALEE,1,10.0,106.0,5.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2024,11,F_B,FOOD SUCREE,0,90.0,368.0,62.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2024,11,F_B,FOOD SUCREE,1,4.0,18.0,3.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2024,11,F_B,SANS ALCOOL,0,400.0,2970.0,252.0,9.0
+Mercure Paris Montmartre Sacré-Cœur,2024,11,F_B,SANS ALCOOL,1,37.0,305.0,25.0,7.0
+Mercure Paris Montmartre Sacré-Cœur,2024,11,F_B,SOUVENIRS,0,1.0,15.0,1.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2024,11,N_F_B,COSMETIQUE,0,2.0,25.0,2.0,2.0
+Mercure Paris Montmartre Sacré-Cœur,2024,11,N_F_B,SOS,0,1.0,8.0,1.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2024,12,F_B,ALCOOL,0,104.0,1920.0,69.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2024,12,F_B,ALCOOL,1,9.0,119.0,7.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2024,12,F_B,FOOD SALEE,0,53.0,307.0,44.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2024,12,F_B,FOOD SALEE,1,5.0,31.0,3.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2024,12,F_B,FOOD SUCREE,0,98.0,432.0,60.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2024,12,F_B,SANS ALCOOL,0,330.0,2490.0,231.0,9.0
+Mercure Paris Montmartre Sacré-Cœur,2024,12,F_B,SANS ALCOOL,1,14.0,130.0,9.0,5.0
+Mercure Paris Montmartre Sacré-Cœur,2024,12,N_F_B,COSMETIQUE,0,5.0,80.0,4.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2025,1,F_B,ALCOOL,0,76.0,1397.0,58.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2025,1,F_B,ALCOOL,1,5.0,117.0,5.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2025,1,F_B,FOOD SALEE,0,49.0,253.0,42.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2025,1,F_B,FOOD SALEE,1,5.0,21.0,4.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2025,1,F_B,FOOD SUCREE,0,101.0,416.0,60.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2025,1,F_B,FOOD SUCREE,1,30.0,205.0,11.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2025,1,F_B,SANS ALCOOL,0,267.0,2285.0,187.0,9.0
+Mercure Paris Montmartre Sacré-Cœur,2025,1,F_B,SANS ALCOOL,1,53.0,345.0,33.0,8.0
+Mercure Paris Montmartre Sacré-Cœur,2025,1,F_B,SOUVENIRS,0,1.0,14.0,1.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2025,1,F_B,SOUVENIRS,1,1.0,15.0,1.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2025,1,N_F_B,COSMETIQUE,0,6.0,72.0,6.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2025,1,N_F_B,SOS,0,3.0,38.0,3.0,2.0
+Mercure Paris Montmartre Sacré-Cœur,2025,2,F_B,ALCOOL,0,75.0,1803.0,50.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2025,2,F_B,FOOD SALEE,0,67.0,347.0,52.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2025,2,F_B,FOOD SUCREE,0,83.0,271.0,65.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2025,2,F_B,SANS ALCOOL,0,272.0,1790.0,213.0,9.0
+Mercure Paris Montmartre Sacré-Cœur,2025,2,F_B,SOUVENIRS,0,2.0,29.0,2.0,2.0
+Mercure Paris Montmartre Sacré-Cœur,2025,2,N_F_B,COSMETIQUE,0,5.0,60.0,5.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2025,2,N_F_B,SOS,0,4.0,53.0,4.0,2.0
+Mercure Paris Montmartre Sacré-Cœur,2025,2,N_F_B,SOUVENIRS,0,5.0,378.0,3.0,2.0
+Mercure Paris Montmartre Sacré-Cœur,2025,3,F_B,ALCOOL,0,88.0,1601.0,67.0,5.0
+Mercure Paris Montmartre Sacré-Cœur,2025,3,F_B,FOOD SALEE,0,64.0,338.0,52.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2025,3,F_B,FOOD SUCREE,0,99.0,367.0,69.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2025,3,F_B,SANS ALCOOL,0,309.0,2255.0,224.0,9.0
+Mercure Paris Montmartre Sacré-Cœur,2025,3,F_B,SOUVENIRS,0,1.0,14.0,1.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2025,3,N_F_B,COSMETIQUE,0,5.0,78.0,5.0,2.0
+Mercure Paris Montmartre Sacré-Cœur,2025,3,N_F_B,SOS,0,3.0,16.0,3.0,2.0
+Mercure Paris Montmartre Sacré-Cœur,2025,4,F_B,ALCOOL,0,108.0,1841.0,73.0,5.0
+Mercure Paris Montmartre Sacré-Cœur,2025,4,F_B,FOOD SALEE,0,39.0,169.0,38.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2025,4,F_B,FOOD SUCREE,0,100.0,397.0,68.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2025,4,F_B,SANS ALCOOL,0,256.0,1980.0,184.0,9.0
+Mercure Paris Montmartre Sacré-Cœur,2025,4,N_F_B,COSMETIQUE,0,5.0,63.0,5.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2025,5,F_B,ALCOOL,0,54.0,986.0,42.0,5.0
+Mercure Paris Montmartre Sacré-Cœur,2025,5,F_B,ALCOOL,1,1.0,30.0,1.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2025,5,F_B,FOOD SALEE,0,27.0,117.0,25.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2025,5,F_B,FOOD SUCREE,0,75.0,213.0,58.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2025,5,F_B,FOOD SUCREE,1,6.0,25.0,4.0,2.0
+Mercure Paris Montmartre Sacré-Cœur,2025,5,F_B,SANS ALCOOL,0,186.0,1680.0,125.0,9.0
+Mercure Paris Montmartre Sacré-Cœur,2025,5,N_F_B,COSMETIQUE,0,2.0,24.0,2.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2025,5,N_F_B,COSMETIQUE,1,1.0,12.0,1.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2025,6,F_B,ALCOOL,0,37.0,741.0,30.0,7.0
+Mercure Paris Montmartre Sacré-Cœur,2025,6,F_B,FOOD SALEE,0,40.0,190.0,34.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2025,6,F_B,FOOD SUCREE,0,116.0,395.0,92.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2025,6,F_B,SANS ALCOOL,0,262.0,1920.0,196.0,9.0
+Mercure Paris Montmartre Sacré-Cœur,2025,6,N_F_B,COSMETIQUE,0,7.0,109.0,5.0,2.0
+Mercure Paris Montmartre Sacré-Cœur,2025,6,N_F_B,SOS,0,4.0,90.0,3.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2025,7,F_B,ALCOOL,0,31.0,513.0,27.0,6.0
+Mercure Paris Montmartre Sacré-Cœur,2025,7,F_B,FOOD SALEE,0,37.0,273.0,29.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2025,7,F_B,FOOD SUCREE,0,64.0,270.0,46.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2025,7,F_B,SANS ALCOOL,0,149.0,995.0,115.0,10.0
+Mercure Paris Montmartre Sacré-Cœur,2025,7,N_F_B,COSMETIQUE,0,2.0,42.0,2.0,2.0
+Mercure Paris Montmartre Sacré-Cœur,2025,7,N_F_B,SOS,0,1.0,15.0,1.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2025,7,N_F_B,SOUVENIRS,0,2.0,44.0,2.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2025,8,F_B,ALCOOL,0,33.0,542.0,25.0,7.0
+Mercure Paris Montmartre Sacré-Cœur,2025,8,F_B,FOOD SALEE,0,26.0,132.0,23.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2025,8,F_B,FOOD SALEE,1,1.0,3.0,1.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2025,8,F_B,FOOD SUCREE,0,48.0,159.0,36.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2025,8,F_B,FOOD SUCREE,1,5.0,26.0,2.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2025,8,F_B,SANS ALCOOL,0,94.0,848.0,63.0,5.0
+Mercure Paris Montmartre Sacré-Cœur,2025,8,F_B,SANS ALCOOL,1,4.0,10.0,3.0,2.0
+Mercure Paris Montmartre Sacré-Cœur,2025,8,N_F_B,COSMETIQUE,0,1.0,12.0,1.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2025,8,N_F_B,SOS,0,1.0,15.0,1.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2025,8,N_F_B,SOUVENIRS,0,1.0,42.0,1.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2025,9,F_B,ALCOOL,0,69.0,1411.0,49.0,5.0
+Mercure Paris Montmartre Sacré-Cœur,2025,9,F_B,FOOD SALEE,0,52.0,234.0,48.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2025,9,F_B,FOOD SUCREE,0,129.0,496.0,85.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2025,9,F_B,SANS ALCOOL,0,247.0,1781.0,189.0,5.0
+Mercure Paris Montmartre Sacré-Cœur,2025,9,N_F_B,COSMETIQUE,0,1.0,30.0,1.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2025,9,N_F_B,SOS,0,2.0,30.0,2.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2025,9,N_F_B,SOUVENIRS,0,1.0,42.0,1.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2025,10,F_B,ALCOOL,0,102.0,1444.0,76.0,5.0
+Mercure Paris Montmartre Sacré-Cœur,2025,10,F_B,FOOD SALEE,0,40.0,214.0,36.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2025,10,F_B,FOOD SUCREE,0,97.0,331.0,73.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2025,10,F_B,SANS ALCOOL,0,344.0,2520.0,250.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2025,10,N_F_B,COSMETIQUE,0,5.0,70.7,4.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2025,10,N_F_B,SOS,0,2.0,27.8,2.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2025,11,F_B,ALCOOL,0,63.0,1162.0,52.0,5.0
+Mercure Paris Montmartre Sacré-Cœur,2025,11,F_B,ALCOOL,1,2.0,30.0,2.0,2.0
+Mercure Paris Montmartre Sacré-Cœur,2025,11,F_B,FOOD SALEE,0,33.0,177.0,27.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2025,11,F_B,FOOD SALEE,1,5.0,25.0,4.0,2.0
+Mercure Paris Montmartre Sacré-Cœur,2025,11,F_B,FOOD SUCREE,0,97.0,361.0,67.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2025,11,F_B,FOOD SUCREE,1,8.0,23.0,4.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2025,11,F_B,SANS ALCOOL,0,173.0,1325.0,131.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2025,11,F_B,SANS ALCOOL,1,15.0,105.0,11.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2025,11,N_F_B,COSMETIQUE,0,5.0,55.7,5.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2025,11,N_F_B,SOS,0,3.0,42.8,3.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2025,11,N_F_B,SOS,1,1.0,15.0,1.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2025,12,F_B,ALCOOL,0,52.0,1027.0,41.0,5.0
+Mercure Paris Montmartre Sacré-Cœur,2025,12,F_B,ALCOOL,1,5.0,45.0,3.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2025,12,F_B,FOOD SALEE,0,50.0,252.0,41.0,3.0
+Mercure Paris Montmartre Sacré-Cœur,2025,12,F_B,FOOD SALEE,1,5.0,25.0,4.0,2.0
+Mercure Paris Montmartre Sacré-Cœur,2025,12,F_B,FOOD SUCREE,0,67.0,373.0,44.0,2.0
+Mercure Paris Montmartre Sacré-Cœur,2025,12,F_B,FOOD SUCREE,1,2.0,4.0,2.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2025,12,F_B,SANS ALCOOL,0,222.0,1600.0,167.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2025,12,F_B,SANS ALCOOL,1,13.0,105.0,8.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2025,12,N_F_B,COSMETIQUE,0,13.0,148.4,13.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2025,12,N_F_B,SOS,0,6.0,62.9,5.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2025,12,N_F_B,SOUVENIRS,0,1.0,22.0,1.0,1.0
+Novotel Megève Mont-Blanc,2024,3,F_B,FOOD SALEE,0,15.0,92.0,4.0,6.0
+Novotel Megève Mont-Blanc,2024,3,F_B,FOOD SUCREE,0,10.0,68.0,9.0,7.0
+Novotel Megève Mont-Blanc,2024,3,N_F_B,ACCESSOIRES,0,3.0,59.0,3.0,2.0
+Novotel Megève Mont-Blanc,2024,3,N_F_B,COSMETIQUE,0,9.0,118.0,7.0,5.0
+Novotel Megève Mont-Blanc,2024,3,N_F_B,JEUX / ENFANTS,0,13.0,226.0,14.0,13.0
+Novotel Megève Mont-Blanc,2024,3,N_F_B,PAP,0,3.0,105.0,3.0,3.0
+Novotel Megève Mont-Blanc,2024,3,N_F_B,SOUVENIRS,0,1.0,18.0,1.0,0.0
+Novotel Megève Mont-Blanc,2024,4,F_B,FOOD SALEE,0,7.0,39.0,6.0,4.0
+Novotel Megève Mont-Blanc,2024,4,F_B,FOOD SUCREE,0,23.0,167.5,12.0,11.0
+Novotel Megève Mont-Blanc,2024,4,F_B,SANS ALCOOL,0,8.0,18.5,7.0,2.0
+Novotel Megève Mont-Blanc,2024,4,N_F_B,ACCESSOIRES,0,5.0,73.0,5.0,3.0
+Novotel Megève Mont-Blanc,2024,4,N_F_B,COSMETIQUE,0,14.0,248.5,10.0,8.0
+Novotel Megève Mont-Blanc,2024,4,N_F_B,JEUX / ENFANTS,0,11.0,133.0,7.0,10.0
+Novotel Megève Mont-Blanc,2024,4,N_F_B,SOS,0,4.0,90.0,4.0,0.0
+Novotel Megève Mont-Blanc,2024,4,N_F_B,SOUVENIRS,0,8.0,130.0,4.0,5.0
+Novotel Megève Mont-Blanc,2024,5,F_B,ALCOOL,0,3.0,36.0,2.0,1.0
+Novotel Megève Mont-Blanc,2024,5,F_B,ALCOOL,1,3.0,24.0,2.0,2.0
+Novotel Megève Mont-Blanc,2024,5,F_B,FOOD SALEE,0,4.0,27.0,4.0,4.0
+Novotel Megève Mont-Blanc,2024,5,F_B,FOOD SUCREE,0,22.0,152.5,15.0,10.0
+Novotel Megève Mont-Blanc,2024,5,F_B,SANS ALCOOL,0,30.0,77.5,19.0,8.0
+Novotel Megève Mont-Blanc,2024,5,F_B,SANS ALCOOL,1,4.0,10.5,3.0,3.0
+Novotel Megève Mont-Blanc,2024,5,F_B,SOUVENIRS,0,2.0,14.0,1.0,2.0
+Novotel Megève Mont-Blanc,2024,5,N_F_B,ACCESSOIRES,0,9.0,365.0,8.0,4.0
+Novotel Megève Mont-Blanc,2024,5,N_F_B,COSMETIQUE,0,17.0,380.9,13.0,8.0
+Novotel Megève Mont-Blanc,2024,5,N_F_B,JEUX / ENFANTS,0,5.0,77.0,4.0,5.0
+Novotel Megève Mont-Blanc,2024,5,N_F_B,JEUX / ENFANTS,1,1.0,12.0,1.0,1.0
+Novotel Megève Mont-Blanc,2024,5,N_F_B,PAP,0,2.0,60.0,1.0,2.0
+Novotel Megève Mont-Blanc,2024,5,N_F_B,SOS,0,6.0,112.0,4.0,4.0
+Novotel Megève Mont-Blanc,2024,5,N_F_B,SOUVENIRS,0,2.0,32.0,1.0,2.0
+Novotel Megève Mont-Blanc,2024,6,F_B,ALCOOL,0,12.0,112.0,7.0,3.0
+Novotel Megève Mont-Blanc,2024,6,F_B,FOOD SALEE,0,12.0,66.0,7.0,4.0
+Novotel Megève Mont-Blanc,2024,6,F_B,FOOD SUCREE,0,17.0,116.5,11.0,9.0
+Novotel Megève Mont-Blanc,2024,6,F_B,SANS ALCOOL,0,32.0,82.5,24.0,8.0
+Novotel Megève Mont-Blanc,2024,6,F_B,SOUVENIRS,0,1.0,7.0,1.0,1.0
+Novotel Megève Mont-Blanc,2024,6,N_F_B,ACCESSOIRES,0,6.0,75.0,6.0,2.0
+Novotel Megève Mont-Blanc,2024,6,N_F_B,COSMETIQUE,0,8.0,165.8,8.0,4.0
+Novotel Megève Mont-Blanc,2024,6,N_F_B,JEUX / ENFANTS,0,14.0,187.0,8.0,7.0
+Novotel Megève Mont-Blanc,2024,6,N_F_B,PAP,0,1.0,45.0,1.0,1.0
+Novotel Megève Mont-Blanc,2024,6,N_F_B,SOS,0,6.0,117.0,6.0,2.0
+Novotel Megève Mont-Blanc,2024,7,F_B,ALCOOL,0,5.0,44.0,3.0,3.0
+Novotel Megève Mont-Blanc,2024,7,F_B,FOOD SALEE,0,12.0,64.0,9.0,3.0
+Novotel Megève Mont-Blanc,2024,7,F_B,FOOD SUCREE,0,23.0,154.0,17.0,10.0
+Novotel Megève Mont-Blanc,2024,7,F_B,SANS ALCOOL,0,57.0,149.5,38.0,8.0
+Novotel Megève Mont-Blanc,2024,7,F_B,SANS ALCOOL,1,1.0,3.0,1.0,1.0
+Novotel Megève Mont-Blanc,2024,7,F_B,SOUVENIRS,0,1.0,6.0,1.0,1.0
+Novotel Megève Mont-Blanc,2024,7,N_F_B,ACCESSOIRES,0,7.0,197.0,6.0,4.0
+Novotel Megève Mont-Blanc,2024,7,N_F_B,COSMETIQUE,0,13.0,154.9,11.0,8.0
+Novotel Megève Mont-Blanc,2024,7,N_F_B,JEUX / ENFANTS,0,6.0,105.0,6.0,4.0
+Novotel Megève Mont-Blanc,2024,7,N_F_B,PAP,0,5.0,99.0,4.0,4.0
+Novotel Megève Mont-Blanc,2024,7,N_F_B,SOS,0,11.0,213.0,11.0,3.0
+Novotel Megève Mont-Blanc,2024,7,N_F_B,SOUVENIRS,0,7.0,112.0,3.0,5.0
+Novotel Megève Mont-Blanc,2024,8,F_B,ALCOOL,0,4.0,32.0,3.0,2.0
+Novotel Megève Mont-Blanc,2024,8,F_B,FOOD SALEE,0,17.0,112.7,15.0,6.0
+Novotel Megève Mont-Blanc,2024,8,F_B,FOOD SALEE,1,1.0,7.0,1.0,1.0
+Novotel Megève Mont-Blanc,2024,8,F_B,FOOD SUCREE,0,38.0,246.3,30.0,14.0
+Novotel Megève Mont-Blanc,2024,8,F_B,FOOD SUCREE,1,1.0,5.8,1.0,1.0
+Novotel Megève Mont-Blanc,2024,8,F_B,SANS ALCOOL,0,62.0,166.0,39.0,11.0
+Novotel Megève Mont-Blanc,2024,8,F_B,SANS ALCOOL,1,1.0,2.5,1.0,1.0
+Novotel Megève Mont-Blanc,2024,8,F_B,SOUVENIRS,0,3.0,36.7,3.0,2.0
+Novotel Megève Mont-Blanc,2024,8,N_F_B,ACCESSOIRES,0,11.0,313.0,8.0,7.0
+Novotel Megève Mont-Blanc,2024,8,N_F_B,ACCESSOIRES,1,1.0,10.0,1.0,1.0
+Novotel Megève Mont-Blanc,2024,8,N_F_B,COSMETIQUE,0,9.0,118.4,9.0,6.0
+Novotel Megève Mont-Blanc,2024,8,N_F_B,JEUX / ENFANTS,0,18.0,226.0,14.0,11.0
+Novotel Megève Mont-Blanc,2024,8,N_F_B,JEUX / ENFANTS,1,1.0,15.0,1.0,1.0
+Novotel Megève Mont-Blanc,2024,8,N_F_B,PAP,0,10.0,277.0,9.0,8.0
+Novotel Megève Mont-Blanc,2024,8,N_F_B,SOS,0,7.0,136.0,7.0,3.0
+Novotel Megève Mont-Blanc,2024,8,N_F_B,SOUVENIRS,0,4.0,66.0,2.0,1.0
+Novotel Megève Mont-Blanc,2024,9,F_B,ALCOOL,0,5.0,52.0,4.0,2.0
+Novotel Megève Mont-Blanc,2024,9,F_B,FOOD SALEE,0,1.0,8.5,1.0,1.0
+Novotel Megève Mont-Blanc,2024,9,F_B,FOOD SUCREE,0,19.0,118.3,14.0,9.0
+Novotel Megève Mont-Blanc,2024,9,F_B,SANS ALCOOL,0,28.0,73.0,24.0,10.0
+Novotel Megève Mont-Blanc,2024,9,F_B,SOUVENIRS,0,2.0,33.0,2.0,0.0
+Novotel Megève Mont-Blanc,2024,9,N_F_B,ACCESSOIRES,0,11.0,718.0,10.0,7.0
+Novotel Megève Mont-Blanc,2024,9,N_F_B,COSMETIQUE,0,16.0,187.6,10.0,4.0
+Novotel Megève Mont-Blanc,2024,9,N_F_B,JEUX / ENFANTS,0,5.0,80.0,5.0,2.0
+Novotel Megève Mont-Blanc,2024,9,N_F_B,PAP,0,6.0,122.0,4.0,6.0
+Novotel Megève Mont-Blanc,2024,9,N_F_B,SOS,0,4.0,81.0,4.0,2.0
+Novotel Megève Mont-Blanc,2024,9,N_F_B,SOUVENIRS,0,5.0,82.0,3.0,4.0
+Novotel Megève Mont-Blanc,2024,10,F_B,ALCOOL,0,17.0,140.0,11.0,4.0
+Novotel Megève Mont-Blanc,2024,10,F_B,FOOD SALEE,0,5.0,40.5,4.0,4.0
+Novotel Megève Mont-Blanc,2024,10,F_B,FOOD SUCREE,0,12.0,90.3,9.0,7.0
+Novotel Megève Mont-Blanc,2024,10,F_B,SANS ALCOOL,0,18.0,50.0,12.0,10.0
+Novotel Megève Mont-Blanc,2024,10,N_F_B,ACCESSOIRES,0,6.0,240.0,5.0,4.0
+Novotel Megève Mont-Blanc,2024,10,N_F_B,COSMETIQUE,0,4.0,43.9,4.0,3.0
+Novotel Megève Mont-Blanc,2024,10,N_F_B,JEUX / ENFANTS,0,2.0,14.0,2.0,2.0
+Novotel Megève Mont-Blanc,2024,10,N_F_B,PAP,0,2.0,50.0,2.0,2.0
+Novotel Megève Mont-Blanc,2024,10,N_F_B,SOS,0,2.0,37.0,2.0,2.0
+Novotel Megève Mont-Blanc,2024,10,N_F_B,SOUVENIRS,0,5.0,84.0,3.0,3.0
+Novotel Megève Mont-Blanc,2024,11,F_B,ALCOOL,0,2.0,16.0,2.0,2.0
+Novotel Megève Mont-Blanc,2024,11,F_B,FOOD SALEE,0,2.0,16.3,2.0,2.0
+Novotel Megève Mont-Blanc,2024,11,F_B,FOOD SALEE,1,1.0,8.0,1.0,1.0
+Novotel Megève Mont-Blanc,2024,11,F_B,FOOD SUCREE,0,23.0,134.9,12.0,10.0
+Novotel Megève Mont-Blanc,2024,11,F_B,FOOD SUCREE,1,3.0,27.7,2.0,2.0
+Novotel Megève Mont-Blanc,2024,11,F_B,SANS ALCOOL,0,12.0,31.5,8.0,6.0
+Novotel Megève Mont-Blanc,2024,11,N_F_B,ACCESSOIRES,0,12.0,693.0,12.0,6.0
+Novotel Megève Mont-Blanc,2024,11,N_F_B,COSMETIQUE,0,4.0,46.9,4.0,3.0
+Novotel Megève Mont-Blanc,2024,11,N_F_B,COSMETIQUE,1,4.0,158.5,3.0,2.0
+Novotel Megève Mont-Blanc,2024,11,N_F_B,JEUX / ENFANTS,0,2.0,24.0,2.0,2.0
+Novotel Megève Mont-Blanc,2024,11,N_F_B,PAP,0,2.0,65.0,2.0,2.0
+Novotel Megève Mont-Blanc,2024,11,N_F_B,SOS,0,4.0,64.0,4.0,1.0
+Novotel Megève Mont-Blanc,2024,11,N_F_B,SOUVENIRS,0,1.0,16.0,1.0,1.0
+Novotel Megève Mont-Blanc,2024,12,F_B,ALCOOL,0,1.0,8.0,1.0,1.0
+Novotel Megève Mont-Blanc,2024,12,F_B,FOOD SALEE,0,8.0,64.0,8.0,5.0
+Novotel Megève Mont-Blanc,2024,12,F_B,FOOD SUCREE,0,90.0,415.8,47.0,22.0
+Novotel Megève Mont-Blanc,2024,12,F_B,FOOD SUCREE,1,5.0,18.0,3.0,4.0
+Novotel Megève Mont-Blanc,2024,12,F_B,SANS ALCOOL,0,46.0,119.5,41.0,8.0
+Novotel Megève Mont-Blanc,2024,12,F_B,SANS ALCOOL,1,2.0,5.5,2.0,2.0
+Novotel Megève Mont-Blanc,2024,12,F_B,SOUVENIRS,0,2.0,33.0,1.0,0.0
+Novotel Megève Mont-Blanc,2024,12,N_F_B,#REF!,0,4.0,60.0,4.0,0.0
+Novotel Megève Mont-Blanc,2024,12,N_F_B,ACCESSOIRES,0,9.0,318.0,9.0,4.0
+Novotel Megève Mont-Blanc,2024,12,N_F_B,ACCESSOIRES,1,1.0,11.0,1.0,1.0
+Novotel Megève Mont-Blanc,2024,12,N_F_B,COSMETIQUE,0,5.0,71.9,5.0,2.0
+Novotel Megève Mont-Blanc,2024,12,N_F_B,JEUX / ENFANTS,0,21.0,228.35,14.0,14.0
+Novotel Megève Mont-Blanc,2024,12,N_F_B,JEUX / ENFANTS,1,1.0,3.95,1.0,1.0
+Novotel Megève Mont-Blanc,2024,12,N_F_B,PAP,0,14.0,310.0,10.0,3.0
+Novotel Megève Mont-Blanc,2024,12,N_F_B,SOS,0,2.0,59.0,2.0,2.0
+Novotel Megève Mont-Blanc,2024,12,N_F_B,SOUVENIRS,0,6.0,98.0,5.0,3.0
+Novotel Megève Mont-Blanc,2025,1,F_B,ALCOOL,0,2.0,16.0,1.0,2.0
+Novotel Megève Mont-Blanc,2025,1,F_B,FOOD SALEE,0,6.0,44.7,4.0,4.0
+Novotel Megève Mont-Blanc,2025,1,F_B,FOOD SALEE,1,4.0,33.3,2.0,3.0
+Novotel Megève Mont-Blanc,2025,1,F_B,FOOD SUCREE,0,64.0,389.1,34.0,21.0
+Novotel Megève Mont-Blanc,2025,1,F_B,FOOD SUCREE,1,22.0,155.8,7.0,12.0
+Novotel Megève Mont-Blanc,2025,1,F_B,SANS ALCOOL,0,40.0,102.0,26.0,7.0
+Novotel Megève Mont-Blanc,2025,1,F_B,SANS ALCOOL,1,2.0,6.0,1.0,1.0
+Novotel Megève Mont-Blanc,2025,1,F_B,SOUVENIRS,1,1.0,16.5,1.0,0.0
+Novotel Megève Mont-Blanc,2025,1,N_F_B,#REF!,0,8.0,120.0,6.0,0.0
+Novotel Megève Mont-Blanc,2025,1,N_F_B,ACCESSOIRES,0,8.0,155.0,7.0,1.0
+Novotel Megève Mont-Blanc,2025,1,N_F_B,ACCESSOIRES,1,2.0,28.0,1.0,0.0
+Novotel Megève Mont-Blanc,2025,1,N_F_B,JEUX / ENFANTS,0,17.0,193.35,10.0,15.0
+Novotel Megève Mont-Blanc,2025,1,N_F_B,JEUX / ENFANTS,1,6.0,54.7,2.0,6.0
+Novotel Megève Mont-Blanc,2025,1,N_F_B,PAP,0,29.0,536.0,19.0,2.0
+Novotel Megève Mont-Blanc,2025,1,N_F_B,PAP,1,3.0,55.0,3.0,0.0
+Novotel Megève Mont-Blanc,2025,1,N_F_B,SOS,0,7.0,112.0,6.0,1.0
+Novotel Megève Mont-Blanc,2025,1,N_F_B,SOUVENIRS,0,3.0,1.5,2.0,1.0
+Novotel Megève Mont-Blanc,2025,2,F_B,ALCOOL,0,5.0,40.0,2.0,2.0
+Novotel Megève Mont-Blanc,2025,2,F_B,FOOD SALEE,0,18.0,79.7,10.0,7.0
+Novotel Megève Mont-Blanc,2025,2,F_B,FOOD SUCREE,0,102.0,385.8,65.0,23.0
+Novotel Megève Mont-Blanc,2025,2,F_B,SANS ALCOOL,0,80.0,204.0,45.0,10.0
+Novotel Megève Mont-Blanc,2025,2,N_F_B,#REF!,0,3.0,33.0,3.0,1.0
+Novotel Megève Mont-Blanc,2025,2,N_F_B,ACCESSOIRES,0,19.0,372.0,16.0,4.0
+Novotel Megève Mont-Blanc,2025,2,N_F_B,COSMETIQUE,0,6.0,51.9,6.0,3.0
+Novotel Megève Mont-Blanc,2025,2,N_F_B,JEUX / ENFANTS,0,35.0,349.25,25.0,19.0
+Novotel Megève Mont-Blanc,2025,2,N_F_B,PAP,0,11.0,340.0,11.0,1.0
+Novotel Megève Mont-Blanc,2025,2,N_F_B,SOS,0,42.0,545.5,27.0,4.0
+Novotel Megève Mont-Blanc,2025,2,N_F_B,SOUVENIRS,0,15.0,7.5,6.0,1.0
+Novotel Megève Mont-Blanc,2025,3,F_B,FOOD SALEE,0,18.0,60.0,11.0,5.0
+Novotel Megève Mont-Blanc,2025,3,F_B,FOOD SUCREE,0,67.0,221.5,42.0,16.0
+Novotel Megève Mont-Blanc,2025,3,F_B,SANS ALCOOL,0,36.0,94.5,22.0,8.0
+Novotel Megève Mont-Blanc,2025,3,N_F_B,#REF!,0,6.0,60.0,5.0,1.0
+Novotel Megève Mont-Blanc,2025,3,N_F_B,ACCESSOIRES,0,7.0,154.0,6.0,2.0
+Novotel Megève Mont-Blanc,2025,3,N_F_B,COSMETIQUE,0,2.0,19.0,2.0,2.0
+Novotel Megève Mont-Blanc,2025,3,N_F_B,JEUX / ENFANTS,0,32.0,293.75,23.0,13.0
+Novotel Megève Mont-Blanc,2025,3,N_F_B,PAP,0,12.0,375.0,10.0,3.0
+Novotel Megève Mont-Blanc,2025,3,N_F_B,SOS,0,11.0,89.0,10.0,4.0
+Novotel Megève Mont-Blanc,2025,3,N_F_B,SOUVENIRS,0,10.0,5.0,5.0,1.0
+Novotel Megève Mont-Blanc,2025,4,F_B,FOOD SALEE,0,6.0,24.0,5.0,3.0
+Novotel Megève Mont-Blanc,2025,4,F_B,FOOD SUCREE,0,31.0,122.5,18.0,13.0
+Novotel Megève Mont-Blanc,2025,4,F_B,SANS ALCOOL,0,17.0,43.5,12.0,3.0
+Novotel Megève Mont-Blanc,2025,4,N_F_B,#REF!,0,3.0,33.0,3.0,2.0
+Novotel Megève Mont-Blanc,2025,4,N_F_B,ACCESSOIRES,0,9.0,229.0,7.0,3.0
+Novotel Megève Mont-Blanc,2025,4,N_F_B,COSMETIQUE,0,4.0,31.0,3.0,3.0
+Novotel Megève Mont-Blanc,2025,4,N_F_B,JEUX / ENFANTS,0,13.0,117.15,11.0,8.0
+Novotel Megève Mont-Blanc,2025,4,N_F_B,PAP,0,4.0,105.0,3.0,1.0
+Novotel Megève Mont-Blanc,2025,4,N_F_B,SOS,0,4.0,33.0,3.0,3.0
+Novotel Megève Mont-Blanc,2025,5,F_B,FOOD SALEE,0,11.0,48.0,7.0,5.0
+Novotel Megève Mont-Blanc,2025,5,F_B,FOOD SUCREE,0,14.0,54.9,9.0,10.0
+Novotel Megève Mont-Blanc,2025,5,F_B,FOOD SUCREE,1,1.0,3.0,1.0,1.0
+Novotel Megève Mont-Blanc,2025,5,F_B,SANS ALCOOL,0,10.0,26.0,10.0,3.0
+Novotel Megève Mont-Blanc,2025,5,N_F_B,#REF!,0,4.0,60.0,4.0,1.0
+Novotel Megève Mont-Blanc,2025,5,N_F_B,ACCESSOIRES,0,2.0,32.0,2.0,1.0
+Novotel Megève Mont-Blanc,2025,5,N_F_B,ACCESSOIRES,1,2.0,18.0,1.0,1.0
+Novotel Megève Mont-Blanc,2025,5,N_F_B,COSMETIQUE,0,3.0,95.9,3.0,2.0
+Novotel Megève Mont-Blanc,2025,5,N_F_B,JEUX / ENFANTS,0,10.0,109.4,8.0,7.0
+Novotel Megève Mont-Blanc,2025,5,N_F_B,PAP,0,5.0,145.0,4.0,0.0
+Novotel Megève Mont-Blanc,2025,5,N_F_B,SOS,0,1.0,4.0,1.0,1.0
+Novotel Megève Mont-Blanc,2025,6,F_B,FOOD SALEE,0,16.0,48.0,10.0,4.0
+Novotel Megève Mont-Blanc,2025,6,F_B,FOOD SUCREE,0,45.0,196.0,22.0,14.0
+Novotel Megève Mont-Blanc,2025,6,F_B,SANS ALCOOL,0,15.0,37.5,9.0,3.0
+Novotel Megève Mont-Blanc,2025,6,N_F_B,#REF!,0,15.0,196.5,13.0,7.0
+Novotel Megève Mont-Blanc,2025,6,N_F_B,ACCESSOIRES,0,9.0,346.0,8.0,7.0
+Novotel Megève Mont-Blanc,2025,6,N_F_B,COSMETIQUE,0,7.0,104.0,5.0,5.0
+Novotel Megève Mont-Blanc,2025,6,N_F_B,JEUX / ENFANTS,0,15.0,131.05,12.0,8.0
+Novotel Megève Mont-Blanc,2025,6,N_F_B,PAP,0,2.0,55.0,2.0,0.0
+Novotel Megève Mont-Blanc,2025,6,N_F_B,SOS,0,7.0,63.0,6.0,2.0
+Novotel Megève Mont-Blanc,2025,6,N_F_B,SOUVENIRS,0,13.0,6.5,3.0,1.0
+Novotel Megève Mont-Blanc,2025,7,F_B,ALCOOL,0,1.0,8.0,1.0,1.0
+Novotel Megève Mont-Blanc,2025,7,F_B,FOOD SALEE,0,46.0,128.5,28.0,5.0
+Novotel Megève Mont-Blanc,2025,7,F_B,FOOD SUCREE,0,95.0,359.0,59.0,17.0
+Novotel Megève Mont-Blanc,2025,7,F_B,SANS ALCOOL,0,38.0,95.0,25.0,5.0
+Novotel Megève Mont-Blanc,2025,7,F_B,SANS ALCOOL,1,1.0,2.5,1.0,1.0
+Novotel Megève Mont-Blanc,2025,7,N_F_B,#REF!,0,25.0,354.5,22.0,11.0
+Novotel Megève Mont-Blanc,2025,7,N_F_B,ACCESSOIRES,0,7.0,190.0,7.0,2.0
+Novotel Megève Mont-Blanc,2025,7,N_F_B,COSMETIQUE,0,8.0,105.0,5.0,4.0
+Novotel Megève Mont-Blanc,2025,7,N_F_B,COSMETIQUE,1,1.0,4.0,1.0,1.0
+Novotel Megève Mont-Blanc,2025,7,N_F_B,JEUX / ENFANTS,0,24.0,215.7,14.0,10.0
+Novotel Megève Mont-Blanc,2025,7,N_F_B,PAP,0,6.0,210.0,5.0,0.0
+Novotel Megève Mont-Blanc,2025,7,N_F_B,SOS,0,16.0,163.0,14.0,4.0
+Novotel Megève Mont-Blanc,2025,8,F_B,FOOD SALEE,0,36.0,110.0,23.0,6.0
+Novotel Megève Mont-Blanc,2025,8,F_B,FOOD SUCREE,0,92.0,333.5,48.0,14.0
+Novotel Megève Mont-Blanc,2025,8,F_B,FOOD SUCREE,1,1.0,10.0,1.0,1.0
+Novotel Megève Mont-Blanc,2025,8,F_B,SANS ALCOOL,0,66.0,165.0,43.0,5.0
+Novotel Megève Mont-Blanc,2025,8,F_B,SANS ALCOOL,1,2.0,5.0,1.0,1.0
+Novotel Megève Mont-Blanc,2025,8,N_F_B,#REF!,0,56.0,917.95,50.0,19.0
+Novotel Megève Mont-Blanc,2025,8,N_F_B,ACCESSOIRES,0,11.0,191.0,8.0,3.0
+Novotel Megève Mont-Blanc,2025,8,N_F_B,COSMETIQUE,0,1.0,4.0,1.0,1.0
+Novotel Megève Mont-Blanc,2025,8,N_F_B,JEUX / ENFANTS,0,39.0,374.1,27.0,12.0
+Novotel Megève Mont-Blanc,2025,8,N_F_B,PAP,0,12.0,360.0,11.0,0.0
+Novotel Megève Mont-Blanc,2025,8,N_F_B,SOS,0,35.0,387.0,31.0,4.0
+Novotel Megève Mont-Blanc,2025,8,N_F_B,SOS,1,1.0,12.0,1.0,1.0
+Novotel Megève Mont-Blanc,2025,8,N_F_B,SOUVENIRS,0,4.0,4.0,2.0,1.0
+Novotel Megève Mont-Blanc,2025,9,F_B,FOOD SALEE,0,19.0,52.5,11.0,5.0
+Novotel Megève Mont-Blanc,2025,9,F_B,FOOD SUCREE,0,25.0,95.0,19.0,6.0
+Novotel Megève Mont-Blanc,2025,9,F_B,SANS ALCOOL,0,36.0,90.0,17.0,5.0
+Novotel Megève Mont-Blanc,2025,9,N_F_B,#REF!,0,28.0,389.5,25.0,8.0
+Novotel Megève Mont-Blanc,2025,9,N_F_B,ACCESSOIRES,0,6.0,70.0,6.0,2.0
+Novotel Megève Mont-Blanc,2025,9,N_F_B,COSMETIQUE,0,6.0,34.0,5.0,2.0
+Novotel Megève Mont-Blanc,2025,9,N_F_B,JEUX / ENFANTS,0,19.0,150.8,13.0,7.0
+Novotel Megève Mont-Blanc,2025,9,N_F_B,PAP,0,6.0,180.0,4.0,0.0
+Novotel Megève Mont-Blanc,2025,9,N_F_B,SOS,0,15.0,155.0,14.0,2.0
+Novotel Megève Mont-Blanc,2025,9,N_F_B,SOUVENIRS,0,4.0,4.0,3.0,1.0
+Novotel Megève Mont-Blanc,2025,10,F_B,FOOD SALEE,0,8.0,37.5,4.0,4.0
+Novotel Megève Mont-Blanc,2025,10,F_B,FOOD SUCREE,0,10.0,58.5,7.0,5.0
+Novotel Megève Mont-Blanc,2025,10,F_B,SANS ALCOOL,0,10.0,25.0,8.0,3.0
+Novotel Megève Mont-Blanc,2025,10,N_F_B,#REF!,0,5.0,71.95,5.0,4.0
+Novotel Megève Mont-Blanc,2025,10,N_F_B,COSMETIQUE,0,10.0,119.5,5.0,4.0
+Novotel Megève Mont-Blanc,2025,10,N_F_B,JEUX / ENFANTS,0,11.0,96.2,6.0,7.0
+Novotel Megève Mont-Blanc,2025,10,N_F_B,PAP,0,1.0,20.0,1.0,0.0
+Novotel Megève Mont-Blanc,2025,10,N_F_B,SOS,0,3.0,18.0,2.0,2.0
+Novotel Megève Mont-Blanc,2025,10,N_F_B,SOUVENIRS,0,12.0,12.0,3.0,1.0
+Novotel Megève Mont-Blanc,2025,11,F_B,FOOD SALEE,0,37.0,93.0,19.0,2.0
+Novotel Megève Mont-Blanc,2025,11,F_B,FOOD SUCREE,0,6.0,27.0,4.0,3.0
+Novotel Megève Mont-Blanc,2025,11,F_B,FOOD SUCREE,1,2.0,16.0,1.0,2.0
+Novotel Megève Mont-Blanc,2025,11,F_B,SANS ALCOOL,0,27.0,67.5,16.0,1.0
+Novotel Megève Mont-Blanc,2025,11,NAN,nan,0,12.0,152.0,8.0,4.0
+Novotel Megève Mont-Blanc,2025,11,N_F_B,#REF!,0,16.0,139.0,13.0,3.0
+Novotel Megève Mont-Blanc,2025,11,N_F_B,ACCESSOIRES,0,6.0,104.0,4.0,2.0
+Novotel Megève Mont-Blanc,2025,11,N_F_B,COSMETIQUE,0,6.0,71.5,4.0,3.0
+Novotel Megève Mont-Blanc,2025,11,N_F_B,JEUX / ENFANTS,0,10.0,84.9,6.0,6.0
+Novotel Megève Mont-Blanc,2025,11,N_F_B,JEUX / ENFANTS,1,1.0,10.95,1.0,1.0
+Novotel Megève Mont-Blanc,2025,11,N_F_B,PAP,0,5.0,160.0,4.0,0.0
+Novotel Megève Mont-Blanc,2025,11,N_F_B,SOS,0,25.0,271.0,24.0,3.0
+Novotel Megève Mont-Blanc,2025,11,N_F_B,SOUVENIRS,0,3.0,3.0,3.0,1.0
+Novotel Megève Mont-Blanc,2025,11,N_F_B,SOUVENIRS,1,2.0,2.0,1.0,1.0
+Novotel Megève Mont-Blanc,2025,12,F_B,FOOD SALEE,0,39.0,98.0,25.0,2.0
+Novotel Megève Mont-Blanc,2025,12,F_B,FOOD SUCREE,0,112.0,349.5,74.0,8.0
+Novotel Megève Mont-Blanc,2025,12,F_B,FOOD SUCREE,1,3.0,9.0,2.0,2.0
+Novotel Megève Mont-Blanc,2025,12,F_B,SANS ALCOOL,0,69.0,172.5,44.0,4.0
+Novotel Megève Mont-Blanc,2025,12,F_B,SANS ALCOOL,1,6.0,15.0,1.0,2.0
+Novotel Megève Mont-Blanc,2025,12,F_B,SOUVENIRS,0,5.0,100.0,5.0,1.0
+Novotel Megève Mont-Blanc,2025,12,NAN,nan,0,109.0,1227.0,77.0,35.0
+Novotel Megève Mont-Blanc,2025,12,NAN,nan,1,4.0,43.4,3.0,4.0
+Novotel Megève Mont-Blanc,2025,12,N_F_B,#REF!,0,15.0,120.0,14.0,2.0
+Novotel Megève Mont-Blanc,2025,12,N_F_B,#REF!,1,1.0,15.0,1.0,0.0
+Novotel Megève Mont-Blanc,2025,12,N_F_B,ACCESSOIRES,0,7.0,206.0,7.0,4.0
+Novotel Megève Mont-Blanc,2025,12,N_F_B,COSMETIQUE,0,8.0,57.5,7.0,3.0
+Novotel Megève Mont-Blanc,2025,12,N_F_B,JEUX / ENFANTS,0,18.0,171.6,13.0,8.0
+Novotel Megève Mont-Blanc,2025,12,N_F_B,PAP,0,13.0,350.0,11.0,0.0
+Novotel Megève Mont-Blanc,2025,12,N_F_B,SOS,0,36.0,397.0,29.0,3.0
+Novotel Megève Mont-Blanc,2025,12,N_F_B,SOUVENIRS,0,1.0,1.0,1.0,1.0
+Novotel Megève Mont-Blanc,2025,12,N_F_B,SOUVENIRS,1,2.0,2.0,1.0,1.0
+Novotel Paris Tour Eiffel,2024,5,N_F_B,SOS,0,1.0,3.0,1.0,0.0
+Novotel Paris Tour Eiffel,2024,6,F_B,FOOD SALEE,0,42.0,310.0,34.0,0.0
+Novotel Paris Tour Eiffel,2024,6,F_B,FOOD SUCREE,0,59.0,391.5,37.0,0.0
+Novotel Paris Tour Eiffel,2024,6,F_B,SANS ALCOOL,0,185.0,2376.0,99.0,0.0
+Novotel Paris Tour Eiffel,2024,6,N_F_B,SOS,0,49.0,605.0,38.0,0.0
+Novotel Paris Tour Eiffel,2024,7,F_B,FOOD SALEE,0,55.0,502.0,41.0,0.0
+Novotel Paris Tour Eiffel,2024,7,F_B,FOOD SUCREE,0,97.0,556.6999999999999,48.0,0.0
+Novotel Paris Tour Eiffel,2024,7,F_B,SANS ALCOOL,0,184.0,1351.47,91.0,0.0
+Novotel Paris Tour Eiffel,2024,7,N_F_B,SOS,0,45.0,397.0,39.0,0.0
+Novotel Paris Tour Eiffel,2024,7,N_F_B,SOUVENIRS,0,1.0,18.5,1.0,0.0
+Novotel Paris Tour Eiffel,2024,9,F_B,FOOD SALEE,0,54.0,314.6,39.0,0.0
+Novotel Paris Tour Eiffel,2024,9,F_B,FOOD SUCREE,0,87.0,269.4,48.0,0.0
+Novotel Paris Tour Eiffel,2024,9,F_B,SANS ALCOOL,0,138.0,495.5,69.0,0.0
+Novotel Paris Tour Eiffel,2024,9,N_F_B,COSMETIQUE,0,1.0,8.0,1.0,0.0
+Novotel Paris Tour Eiffel,2024,9,N_F_B,SOS,0,85.0,631.0,67.0,0.0
+Novotel Paris Tour Eiffel,2024,10,F_B,FOOD SALEE,0,443.0,2545.7,339.0,0.0
+Novotel Paris Tour Eiffel,2024,10,F_B,FOOD SUCREE,0,614.0,1918.3999999999999,356.0,0.0
+Novotel Paris Tour Eiffel,2024,10,F_B,SANS ALCOOL,0,1322.0,4531.9,720.0,0.0
+Novotel Paris Tour Eiffel,2024,10,N_F_B,COSMETIQUE,0,6.0,48.0,4.0,0.0
+Novotel Paris Tour Eiffel,2024,10,N_F_B,SOS,0,542.0,4246.0,423.0,0.0
+Novotel Paris Tour Eiffel,2024,11,F_B,FOOD SALEE,0,417.0,2613.6,297.0,0.0
+Novotel Paris Tour Eiffel,2024,11,F_B,FOOD SALEE,1,20.0,139.1,16.0,0.0
+Novotel Paris Tour Eiffel,2024,11,F_B,FOOD SUCREE,0,449.0,1410.2,268.0,0.0
+Novotel Paris Tour Eiffel,2024,11,F_B,FOOD SUCREE,1,30.0,101.3,16.0,0.0
+Novotel Paris Tour Eiffel,2024,11,F_B,SANS ALCOOL,0,1000.0,3478.7999999999997,559.0,0.0
+Novotel Paris Tour Eiffel,2024,11,F_B,SANS ALCOOL,1,85.0,287.8,42.0,0.0
+Novotel Paris Tour Eiffel,2024,11,N_F_B,COSMETIQUE,0,2.0,16.0,1.0,0.0
+Novotel Paris Tour Eiffel,2024,11,N_F_B,SOS,0,459.0,3652.0,368.0,0.0
+Novotel Paris Tour Eiffel,2024,11,N_F_B,SOS,1,26.0,176.0,23.0,0.0
+Novotel Paris Tour Eiffel,2024,12,F_B,FOOD SALEE,0,468.0,2936.2,316.0,0.0
+Novotel Paris Tour Eiffel,2024,12,F_B,FOOD SALEE,1,14.0,87.6,12.0,0.0
+Novotel Paris Tour Eiffel,2024,12,F_B,FOOD SUCREE,0,657.0,2114.2,371.0,0.0
+Novotel Paris Tour Eiffel,2024,12,F_B,FOOD SUCREE,1,27.0,82.3,19.0,0.0
+Novotel Paris Tour Eiffel,2024,12,F_B,SANS ALCOOL,0,1391.0,4825.4,713.0,0.0
+Novotel Paris Tour Eiffel,2024,12,F_B,SANS ALCOOL,1,55.0,180.3,30.0,0.0
+Novotel Paris Tour Eiffel,2024,12,N_F_B,COSMETIQUE,0,7.0,56.0,6.0,0.0
+Novotel Paris Tour Eiffel,2024,12,N_F_B,SOS,0,492.0,3657.0,385.0,0.0
+Novotel Paris Tour Eiffel,2024,12,N_F_B,SOS,1,23.0,174.0,17.0,0.0
+Novotel Paris Tour Eiffel,2025,1,F_B,FOOD SALEE,0,447.0,2842.6,313.0,0.0
+Novotel Paris Tour Eiffel,2025,1,F_B,FOOD SUCREE,0,508.0,1763.5,290.0,0.0
+Novotel Paris Tour Eiffel,2025,1,F_B,SANS ALCOOL,0,1097.0,3864.5,608.0,0.0
+Novotel Paris Tour Eiffel,2025,1,N_F_B,SOS,0,305.0,2419.0,238.0,0.0
+Novotel Paris Tour Eiffel,2025,2,F_B,FOOD SALEE,0,429.0,2892.1,310.0,0.0
+Novotel Paris Tour Eiffel,2025,2,F_B,FOOD SUCREE,0,514.0,1853.2,299.0,0.0
+Novotel Paris Tour Eiffel,2025,2,F_B,SANS ALCOOL,0,1186.0,4201.3,649.0,0.0
+Novotel Paris Tour Eiffel,2025,2,N_F_B,COSMETIQUE,0,3.0,24.0,3.0,0.0
+Novotel Paris Tour Eiffel,2025,2,N_F_B,SOS,0,437.0,3432.0,351.0,0.0
+Novotel Paris Tour Eiffel,2025,3,F_B,FOOD SALEE,0,510.0,3653.0,345.0,0.0
+Novotel Paris Tour Eiffel,2025,3,F_B,FOOD SUCREE,0,576.0,2109.2,343.0,0.0
+Novotel Paris Tour Eiffel,2025,3,F_B,SANS ALCOOL,0,1257.0,4495.8,748.0,0.0
+Novotel Paris Tour Eiffel,2025,3,N_F_B,COSMETIQUE,0,6.0,48.0,5.0,0.0
+Novotel Paris Tour Eiffel,2025,3,N_F_B,SOS,0,441.0,3112.0,346.0,0.0
+Novotel Paris Tour Eiffel,2025,4,F_B,FOOD SALEE,0,648.0,4827.4,459.0,0.0
+Novotel Paris Tour Eiffel,2025,4,F_B,FOOD SUCREE,0,661.0,2330.3,373.0,0.0
+Novotel Paris Tour Eiffel,2025,4,F_B,SANS ALCOOL,0,1493.0,5331.3,918.0,0.0
+Novotel Paris Tour Eiffel,2025,4,NAN,nan,0,7.0,28.0,5.0,0.0
+Novotel Paris Tour Eiffel,2025,4,N_F_B,COSMETIQUE,0,2.0,16.0,2.0,0.0
+Novotel Paris Tour Eiffel,2025,4,N_F_B,SOS,0,307.0,2322.0,256.0,0.0
+Novotel Paris Tour Eiffel,2025,5,F_B,FOOD SALEE,0,610.0,4221.1,443.0,0.0
+Novotel Paris Tour Eiffel,2025,5,F_B,FOOD SALEE,1,65.0,436.9,44.0,0.0
+Novotel Paris Tour Eiffel,2025,5,F_B,FOOD SUCREE,0,553.0,1892.1,331.0,0.0
+Novotel Paris Tour Eiffel,2025,5,F_B,FOOD SUCREE,1,37.0,139.6,28.0,0.0
+Novotel Paris Tour Eiffel,2025,5,F_B,SANS ALCOOL,0,1489.0,5409.5,891.0,0.0
+Novotel Paris Tour Eiffel,2025,5,F_B,SANS ALCOOL,1,139.0,488.0,81.0,0.0
+Novotel Paris Tour Eiffel,2025,5,N_F_B,COSMETIQUE,0,4.0,32.0,4.0,0.0
+Novotel Paris Tour Eiffel,2025,5,N_F_B,COSMETIQUE,1,2.0,16.0,2.0,0.0
+Novotel Paris Tour Eiffel,2025,5,N_F_B,SOS,0,326.0,2430.0,252.0,0.0
+Novotel Paris Tour Eiffel,2025,5,N_F_B,SOS,1,34.0,215.0,27.0,0.0
+Novotel Paris Tour Eiffel,2025,6,F_B,FOOD SALEE,0,676.0,4725.8,528.0,0.0
+Novotel Paris Tour Eiffel,2025,6,F_B,FOOD SUCREE,0,598.0,2033.3999999999999,347.0,0.0
+Novotel Paris Tour Eiffel,2025,6,F_B,SANS ALCOOL,0,1895.0,7198.7,1098.0,0.0
+Novotel Paris Tour Eiffel,2025,6,N_F_B,COSMETIQUE,0,3.0,24.0,3.0,0.0
+Novotel Paris Tour Eiffel,2025,6,N_F_B,SOS,0,440.0,3377.0,318.0,0.0
+Novotel Paris Tour Eiffel,2025,7,F_B,FOOD SALEE,0,841.0,6127.8,599.0,0.0
+Novotel Paris Tour Eiffel,2025,7,F_B,FOOD SALEE,1,25.0,165.9,21.0,0.0
+Novotel Paris Tour Eiffel,2025,7,F_B,FOOD SUCREE,0,767.0,2575.7,405.0,0.0
+Novotel Paris Tour Eiffel,2025,7,F_B,FOOD SUCREE,1,25.0,75.9,13.0,0.0
+Novotel Paris Tour Eiffel,2025,7,F_B,SANS ALCOOL,0,2344.0,10404.3,1313.0,0.0
+Novotel Paris Tour Eiffel,2025,7,F_B,SANS ALCOOL,1,72.0,250.4,40.0,0.0
+Novotel Paris Tour Eiffel,2025,7,N_F_B,COSMETIQUE,0,6.0,48.0,6.0,0.0
+Novotel Paris Tour Eiffel,2025,7,N_F_B,SOS,0,417.0,3588.0,298.0,0.0
+Novotel Paris Tour Eiffel,2025,7,N_F_B,SOS,1,18.0,150.0,15.0,0.0
+Novotel Paris Tour Eiffel,2025,8,F_B,FOOD SALEE,0,683.0,4472.3,472.0,0.0
+Novotel Paris Tour Eiffel,2025,8,F_B,FOOD SALEE,1,21.0,169.4,15.0,0.0
+Novotel Paris Tour Eiffel,2025,8,F_B,FOOD SUCREE,0,620.0,2165.1,325.0,0.0
+Novotel Paris Tour Eiffel,2025,8,F_B,FOOD SUCREE,1,9.0,26.3,6.0,0.0
+Novotel Paris Tour Eiffel,2025,8,F_B,SANS ALCOOL,0,1952.0,7113.5,1037.0,0.0
+Novotel Paris Tour Eiffel,2025,8,F_B,SANS ALCOOL,1,75.0,268.3,40.0,0.0
+Novotel Paris Tour Eiffel,2025,8,N_F_B,COSMETIQUE,0,7.0,56.0,7.0,0.0
+Novotel Paris Tour Eiffel,2025,8,N_F_B,SOS,0,452.0,3440.0,323.0,0.0
+Novotel Paris Tour Eiffel,2025,8,N_F_B,SOS,1,18.0,143.0,12.0,0.0
+Novotel Paris Tour Eiffel,2025,9,F_B,FOOD SALEE,0,504.0,3433.9,404.0,0.0
+Novotel Paris Tour Eiffel,2025,9,F_B,FOOD SUCREE,0,476.0,1596.7,269.0,0.0
+Novotel Paris Tour Eiffel,2025,9,F_B,SANS ALCOOL,0,1491.0,5617.5,928.0,0.0
+Novotel Paris Tour Eiffel,2025,9,N_F_B,COSMETIQUE,0,4.0,32.0,4.0,0.0
+Novotel Paris Tour Eiffel,2025,9,N_F_B,SOS,0,391.0,3170.0,303.0,0.0
+Novotel Paris Tour Eiffel,2025,10,F_B,FOOD SALEE,0,524.0,3534.2,397.0,0.0
+Novotel Paris Tour Eiffel,2025,10,F_B,FOOD SUCREE,0,610.0,2069.3,334.0,0.0
+Novotel Paris Tour Eiffel,2025,10,F_B,SANS ALCOOL,0,1660.0,5998.0,927.0,0.0
+Novotel Paris Tour Eiffel,2025,10,N_F_B,COSMETIQUE,0,4.0,32.0,4.0,0.0
+Novotel Paris Tour Eiffel,2025,10,N_F_B,SOS,0,374.0,2878.0,274.0,0.0
+Novotel Paris Tour Eiffel,2025,11,F_B,FOOD SALEE,0,450.0,2889.5,349.0,0.0
+Novotel Paris Tour Eiffel,2025,11,F_B,FOOD SALEE,1,23.0,148.3,21.0,0.0
+Novotel Paris Tour Eiffel,2025,11,F_B,FOOD SUCREE,0,467.0,1553.8999999999999,253.0,0.0
+Novotel Paris Tour Eiffel,2025,11,F_B,FOOD SUCREE,1,42.0,130.2,19.0,0.0
+Novotel Paris Tour Eiffel,2025,11,F_B,SANS ALCOOL,0,1236.0,4517.7,748.0,0.0
+Novotel Paris Tour Eiffel,2025,11,F_B,SANS ALCOOL,1,80.0,274.3,48.0,0.0
+Novotel Paris Tour Eiffel,2025,11,NAN,nan,0,2.0,16.0,2.0,0.0
+Novotel Paris Tour Eiffel,2025,11,N_F_B,COSMETIQUE,0,2.0,16.0,2.0,0.0
+Novotel Paris Tour Eiffel,2025,11,N_F_B,SOS,0,289.0,2300.0,234.0,0.0
+Novotel Paris Tour Eiffel,2025,11,N_F_B,SOS,1,19.0,140.0,15.0,0.0
+Novotel Paris Tour Eiffel,2025,12,F_B,FOOD SALEE,0,597.0,4154.7,393.0,0.0
+Novotel Paris Tour Eiffel,2025,12,F_B,FOOD SALEE,1,35.0,225.8,20.0,0.0
+Novotel Paris Tour Eiffel,2025,12,F_B,FOOD SUCREE,0,549.0,1904.0,298.0,0.0
+Novotel Paris Tour Eiffel,2025,12,F_B,FOOD SUCREE,1,20.0,89.1,11.0,0.0
+Novotel Paris Tour Eiffel,2025,12,F_B,SANS ALCOOL,0,1595.0,5758.0,964.0,0.0
+Novotel Paris Tour Eiffel,2025,12,F_B,SANS ALCOOL,1,85.0,303.2,50.0,0.0
+Novotel Paris Tour Eiffel,2025,12,NAN,nan,0,12.0,96.0,11.0,0.0
+Novotel Paris Tour Eiffel,2025,12,N_F_B,COSMETIQUE,0,8.0,64.0,6.0,0.0
+Novotel Paris Tour Eiffel,2025,12,N_F_B,SOS,0,246.0,1813.0,189.0,0.0
+Novotel Paris Tour Eiffel,2025,12,N_F_B,SOS,1,4.0,26.0,4.0,0.0
+Novotel Porte d’Italie,2024,9,F_B,FOOD SALEE,0,5.0,12.5,5.0,0.0
+Novotel Porte d’Italie,2024,9,F_B,FOOD SUCREE,0,17.0,46.3,12.0,0.0
+Novotel Porte d’Italie,2024,9,F_B,SANS ALCOOL,0,18.0,92.0,15.0,0.0
+Novotel Porte d’Italie,2024,10,F_B,FOOD SALEE,0,60.0,167.4,48.0,0.0
+Novotel Porte d’Italie,2024,10,F_B,FOOD SUCREE,0,112.0,318.6,84.0,0.0
+Novotel Porte d’Italie,2024,10,F_B,SANS ALCOOL,0,59.0,299.5,43.0,0.0
+Novotel Porte d’Italie,2024,10,NAN,nan,0,13.0,83.4,10.0,0.0
+Novotel Porte d’Italie,2024,11,F_B,FOOD SALEE,0,46.0,126.5,32.0,0.0
+Novotel Porte d’Italie,2024,11,F_B,FOOD SALEE,1,2.0,8.1,2.0,0.0
+Novotel Porte d’Italie,2024,11,F_B,FOOD SUCREE,0,67.0,190.35999999999999,52.0,0.0
+Novotel Porte d’Italie,2024,11,F_B,FOOD SUCREE,1,7.0,19.5,4.0,0.0
+Novotel Porte d’Italie,2024,11,F_B,SANS ALCOOL,0,57.0,292.5,46.0,0.0
+Novotel Porte d’Italie,2024,11,F_B,SANS ALCOOL,1,4.0,20.0,4.0,0.0
+Novotel Porte d’Italie,2024,11,NAN,nan,0,7.0,43.0,5.0,0.0
+Novotel Porte d’Italie,2024,11,N_F_B,SOS,0,1.0,0.7,1.0,0.0
+Novotel Porte d’Italie,2024,12,F_B,FOOD SALEE,0,59.0,205.9,46.0,0.0
+Novotel Porte d’Italie,2024,12,F_B,FOOD SALEE,1,2.0,6.0,2.0,0.0
+Novotel Porte d’Italie,2024,12,F_B,FOOD SUCREE,0,80.0,227.79999999999998,67.0,0.0
+Novotel Porte d’Italie,2024,12,F_B,FOOD SUCREE,1,3.0,8.2,2.0,0.0
+Novotel Porte d’Italie,2024,12,F_B,SANS ALCOOL,0,37.0,190.0,31.0,0.0
+Novotel Porte d’Italie,2024,12,F_B,SANS ALCOOL,1,1.0,5.0,1.0,0.0
+Novotel Porte d’Italie,2024,12,NAN,nan,0,4.0,32.5,4.0,0.0
+Novotel Porte d’Italie,2024,12,N_F_B,SOS,0,1.0,0.7,1.0,0.0
+Novotel Porte d’Italie,2025,1,F_B,FOOD SALEE,0,9.0,23.9,7.0,0.0
+Novotel Porte d’Italie,2025,1,F_B,FOOD SUCREE,0,12.0,35.7,11.0,0.0
+Novotel Porte d’Italie,2025,1,F_B,SANS ALCOOL,0,5.0,26.0,4.0,0.0
+Novotel Porte d’Italie,2025,1,NAN,nan,0,6.0,66.0,4.0,0.0
+Novotel Porte d’Italie,2025,2,F_B,FOOD SALEE,0,24.0,78.3,17.0,0.0
+Novotel Porte d’Italie,2025,2,F_B,FOOD SUCREE,0,15.0,41.7,12.0,0.0
+Novotel Porte d’Italie,2025,2,F_B,SANS ALCOOL,0,15.0,65.0,11.0,0.0
+Novotel Porte d’Italie,2025,2,NAN,nan,0,6.0,66.0,4.0,0.0
+Novotel Porte d’Italie,2025,3,F_B,FOOD SALEE,0,34.0,130.0,25.0,0.0
+Novotel Porte d’Italie,2025,3,F_B,FOOD SUCREE,0,51.0,191.6,44.0,0.0
+Novotel Porte d’Italie,2025,3,F_B,SANS ALCOOL,0,39.0,165.5,32.0,0.0
+Novotel Porte d’Italie,2025,3,NAN,nan,0,1.0,7.5,1.0,0.0
+Novotel Porte d’Italie,2025,4,F_B,FOOD SALEE,0,31.0,80.6,19.0,0.0
+Novotel Porte d’Italie,2025,4,F_B,FOOD SUCREE,0,20.0,78.7,15.0,0.0
+Novotel Porte d’Italie,2025,4,F_B,SANS ALCOOL,0,32.0,132.5,25.0,0.0
+Novotel Porte d’Italie,2025,5,F_B,FOOD SALEE,0,23.0,73.0,16.0,0.0
+Novotel Porte d’Italie,2025,5,F_B,FOOD SUCREE,0,81.0,284.6,65.0,0.0
+Novotel Porte d’Italie,2025,5,F_B,FOOD SUCREE,1,2.0,6.0,2.0,0.0
+Novotel Porte d’Italie,2025,5,F_B,SANS ALCOOL,0,103.0,442.0,75.0,0.0
+Novotel Porte d’Italie,2025,5,F_B,SANS ALCOOL,1,3.0,14.0,2.0,0.0
+Novotel Porte d’Italie,2025,5,NAN,nan,0,6.0,64.5,5.0,0.0
+Novotel Porte d’Italie,2025,6,F_B,FOOD SALEE,0,13.0,114.2,13.0,0.0
+Novotel Porte d’Italie,2025,6,F_B,FOOD SUCREE,0,32.0,132.5,27.0,0.0
+Novotel Porte d’Italie,2025,6,F_B,SANS ALCOOL,0,68.0,300.5,60.0,0.0
+Novotel Porte d’Italie,2025,6,NAN,nan,0,2.0,12.0,1.0,0.0
+Novotel Porte d’Italie,2025,7,F_B,FOOD SALEE,0,31.0,146.1,23.0,0.0
+Novotel Porte d’Italie,2025,7,F_B,FOOD SUCREE,0,55.0,182.4,46.0,0.0
+Novotel Porte d’Italie,2025,7,F_B,SANS ALCOOL,0,93.0,431.5,70.0,0.0
+Novotel Porte d’Italie,2025,8,F_B,FOOD SALEE,0,19.0,95.8,16.0,0.0
+Novotel Porte d’Italie,2025,8,F_B,FOOD SALEE,1,3.0,7.800000000000001,2.0,0.0
+Novotel Porte d’Italie,2025,8,F_B,FOOD SUCREE,0,30.0,87.1,22.0,0.0
+Novotel Porte d’Italie,2025,8,F_B,FOOD SUCREE,1,2.0,6.0,2.0,0.0
+Novotel Porte d’Italie,2025,8,F_B,SANS ALCOOL,0,62.0,288.5,46.0,0.0
+Novotel Porte d’Italie,2025,8,F_B,SANS ALCOOL,1,5.0,23.5,3.0,0.0
+Novotel Porte d’Italie,2025,9,F_B,FOOD SALEE,0,24.0,59.1,18.0,0.0
+Novotel Porte d’Italie,2025,9,F_B,FOOD SUCREE,0,35.0,118.89999999999999,26.0,0.0
+Novotel Porte d’Italie,2025,9,F_B,SANS ALCOOL,0,21.0,105.5,18.0,0.0
+Novotel Porte d’Italie,2025,10,F_B,FOOD SALEE,0,5.0,26.0,4.0,0.0
+Novotel Porte d’Italie,2025,10,F_B,FOOD SUCREE,0,9.0,31.299999999999997,8.0,0.0
+Novotel Porte d’Italie,2025,11,F_B,FOOD SALEE,0,24.0,52.15,20.0,0.0
+Novotel Porte d’Italie,2025,11,F_B,FOOD SUCREE,0,41.0,108.0,33.0,0.0
+Novotel Porte d’Italie,2025,11,F_B,SANS ALCOOL,0,29.0,131.0,24.0,0.0
+Novotel Porte d’Italie,2025,12,F_B,FOOD SALEE,0,19.0,52.5,18.0,0.0
+Novotel Porte d’Italie,2025,12,F_B,FOOD SUCREE,0,33.0,97.3,24.0,0.0
+Novotel Porte d’Italie,2025,12,F_B,FOOD SUCREE,1,3.0,9.0,2.0,0.0
+Novotel Porte d’Italie,2025,12,F_B,SANS ALCOOL,0,52.0,260.0,38.0,0.0
+Novotel Porte d’Italie,2025,12,F_B,SANS ALCOOL,1,1.0,5.0,1.0,0.0
+Ibis budget Nice,2023,1,,,0,23.25,249.75,20.0,11.5
+Ibis budget Nice,2023,2,,,0,23.25,249.75,20.0,11.5
+Ibis budget Nice,2023,3,,,0,23.25,249.75,20.0,11.5
+Ibis budget Nice,2023,4,,,0,23.25,249.75,20.0,11.5
+Ibis budget Nice,2023,5,,,0,23.25,249.75,20.0,11.5
+Ibis budget Nice,2023,6,,,0,23.25,249.75,20.0,11.5
+Ibis budget Nice,2023,7,,,0,23.25,249.75,20.0,11.5
+Ibis budget Nice,2023,12,,,0,23.25,249.75,20.0,11.5
+Ibis budget Nice,2023,1,,,1,0.25,3.25,0.25,0.25
+Ibis budget Nice,2023,2,,,1,0.25,3.25,0.25,0.25
+Ibis budget Nice,2023,3,,,1,0.25,3.25,0.25,0.25
+Ibis budget Nice,2023,4,,,1,0.25,3.25,0.25,0.25
+Ibis budget Nice,2023,5,,,1,0.25,3.25,0.25,0.25
+Ibis budget Nice,2023,6,,,1,0.25,3.25,0.25,0.25
+Ibis budget Nice,2023,7,,,1,0.25,3.25,0.25,0.25
+Ibis budget Nice,2023,12,,,1,0.25,3.25,0.25,0.25
+Ibis budget Nice,2024,1,,,0,167.0,530.96,119.3,27.6
+Ibis budget Nice,2024,2,,,0,167.0,530.96,119.3,27.6
+Ibis budget Nice,2024,1,,,1,2.0,4.65,1.5,1.7
+Ibis budget Nice,2024,2,,,1,2.0,4.65,1.5,1.7
+Ibis budget Strasbourg Centre République,2024,1,,,0,249.0,914.0,195.33333333333334,26.0
+Ibis budget Strasbourg Centre République,2024,2,,,0,249.0,914.0,195.33333333333334,26.0
+Ibis budget Strasbourg Centre République,2024,3,,,0,249.0,914.0,195.33333333333334,26.0
+Ibis budget Strasbourg Centre République,2024,4,,,0,249.0,914.0,195.33333333333334,26.0
+Ibis budget Strasbourg Centre République,2024,5,,,0,249.0,914.0,195.33333333333334,26.0
+Ibis budget Strasbourg Centre République,2024,6,,,0,249.0,914.0,195.33333333333334,26.0
+Ibis budget Strasbourg Centre République,2024,7,,,0,249.0,914.0,195.33333333333334,26.0
+Ibis budget Strasbourg Centre République,2024,8,,,0,249.0,914.0,195.33333333333334,26.0
+Ibis budget Strasbourg Centre République,2024,9,,,0,249.0,914.0,195.33333333333334,26.0
+Ibis budget Strasbourg Centre République,2024,1,,,1,13.0,51.833333333333336,10.0,7.666666666666667
+Ibis budget Strasbourg Centre République,2024,2,,,1,13.0,51.833333333333336,10.0,7.666666666666667
+Ibis budget Strasbourg Centre République,2024,3,,,1,13.0,51.833333333333336,10.0,7.666666666666667
+Ibis budget Strasbourg Centre République,2024,4,,,1,13.0,51.833333333333336,10.0,7.666666666666667
+Ibis budget Strasbourg Centre République,2024,5,,,1,13.0,51.833333333333336,10.0,7.666666666666667
+Ibis budget Strasbourg Centre République,2024,6,,,1,13.0,51.833333333333336,10.0,7.666666666666667
+Ibis budget Strasbourg Centre République,2024,7,,,1,13.0,51.833333333333336,10.0,7.666666666666667
+Ibis budget Strasbourg Centre République,2024,8,,,1,13.0,51.833333333333336,10.0,7.666666666666667
+Ibis budget Strasbourg Centre République,2024,9,,,1,13.0,51.833333333333336,10.0,7.666666666666667
+Novotel Megève Mont-Blanc,2024,1,,,0,112.2,1215.9950000000001,82.6,48.1
+Novotel Megève Mont-Blanc,2024,2,,,0,112.2,1215.9950000000001,82.6,48.1
+Novotel Megève Mont-Blanc,2024,1,,,1,3.1,32.245,2.5,2.5
+Novotel Megève Mont-Blanc,2024,2,,,1,3.1,32.245,2.5,2.5
+Novotel Paris Tour Eiffel,2024,1,,,0,1169.0,5784.88375,722.375,0.0
+Novotel Paris Tour Eiffel,2024,2,,,0,1169.0,5784.88375,722.375,0.0
+Novotel Paris Tour Eiffel,2024,3,,,0,1169.0,5784.88375,722.375,0.0
+Novotel Paris Tour Eiffel,2024,4,,,0,1169.0,5784.88375,722.375,0.0
+Novotel Paris Tour Eiffel,2024,1,,,1,35.0,153.55,21.875,0.0
+Novotel Paris Tour Eiffel,2024,2,,,1,35.0,153.55,21.875,0.0
+Novotel Paris Tour Eiffel,2024,3,,,1,35.0,153.55,21.875,0.0
+Novotel Paris Tour Eiffel,2024,4,,,1,35.0,153.55,21.875,0.0
+Novotel Porte d’Italie,2024,1,,,0,160.75,582.415,125.5,0.0
+Novotel Porte d’Italie,2024,2,,,0,160.75,582.415,125.5,0.0
+Novotel Porte d’Italie,2024,3,,,0,160.75,582.415,125.5,0.0
+Novotel Porte d’Italie,2024,4,,,0,160.75,582.415,125.5,0.0
+Novotel Porte d’Italie,2024,5,,,0,160.75,582.415,125.5,0.0
+Novotel Porte d’Italie,2024,6,,,0,160.75,582.415,125.5,0.0
+Novotel Porte d’Italie,2024,7,,,0,160.75,582.415,125.5,0.0
+Novotel Porte d’Italie,2024,8,,,0,160.75,582.415,125.5,0.0
+Novotel Porte d’Italie,2024,1,,,1,4.75,16.7,3.75,0.0
+Novotel Porte d’Italie,2024,2,,,1,4.75,16.7,3.75,0.0
+Novotel Porte d’Italie,2024,3,,,1,4.75,16.7,3.75,0.0
+Novotel Porte d’Italie,2024,4,,,1,4.75,16.7,3.75,0.0
+Novotel Porte d’Italie,2024,5,,,1,4.75,16.7,3.75,0.0
+Novotel Porte d’Italie,2024,6,,,1,4.75,16.7,3.75,0.0
+Novotel Porte d’Italie,2024,7,,,1,4.75,16.7,3.75,0.0
+Novotel Porte d’Italie,2024,8,,,1,4.75,16.7,3.75,0.0

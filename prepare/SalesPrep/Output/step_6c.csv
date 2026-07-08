@@ -1,0 +1,156 @@
+nom_hotel,annee,mois,holiday_0_nombre_ventes,holiday_1_nombre_ventes,holiday_0_montant_ventes,holiday_1_montant_ventes,holiday_0_nombre_paniers,holiday_1_nombre_paniers,holiday_0_nombre_produits,holiday_1_nombre_produits
+Ibis budget Nice,2023,1,23.25,0.25,249.75,3.25,20.0,0.25,11.5,0.25
+Ibis budget Nice,2023,2,23.25,0.25,249.75,3.25,20.0,0.25,11.5,0.25
+Ibis budget Nice,2023,3,23.25,0.25,249.75,3.25,20.0,0.25,11.5,0.25
+Ibis budget Nice,2023,4,23.25,0.25,249.75,3.25,20.0,0.25,11.5,0.25
+Ibis budget Nice,2023,5,23.25,0.25,249.75,3.25,20.0,0.25,11.5,0.25
+Ibis budget Nice,2023,6,23.25,0.25,249.75,3.25,20.0,0.25,11.5,0.25
+Ibis budget Nice,2023,7,23.25,0.25,249.75,3.25,20.0,0.25,11.5,0.25
+Ibis budget Nice,2023,8,40.0,1.0,462.0,13.0,33.0,1.0,18.0,1.0
+Ibis budget Nice,2023,9,30.0,0.0,322.0,0.0,27.0,0.0,16.0,0.0
+Ibis budget Nice,2023,10,22.0,0.0,206.0,0.0,19.0,0.0,11.0,0.0
+Ibis budget Nice,2023,11,1.0,0.0,9.0,0.0,1.0,0.0,1.0,0.0
+Ibis budget Nice,2023,12,23.25,0.25,249.75,3.25,20.0,0.25,11.5,0.25
+Ibis budget Nice,2024,1,167.0,2.0,530.96,4.65,119.3,1.5,27.6,1.7
+Ibis budget Nice,2024,2,167.0,2.0,530.96,4.65,119.3,1.5,27.6,1.7
+Ibis budget Nice,2024,3,2.0,0.0,16.0,0.0,2.0,0.0,2.0,0.0
+Ibis budget Nice,2024,4,12.0,0.0,145.0,0.0,12.0,0.0,7.0,0.0
+Ibis budget Nice,2024,5,53.0,0.0,270.8,0.0,45.0,0.0,24.0,0.0
+Ibis budget Nice,2024,6,247.0,0.0,841.5,0.0,191.0,0.0,40.0,0.0
+Ibis budget Nice,2024,7,332.0,6.0,1038.3000000000002,13.8,221.0,5.0,38.0,5.0
+Ibis budget Nice,2024,8,370.0,0.0,1173.0,0.0,245.0,0.0,36.0,0.0
+Ibis budget Nice,2024,9,258.0,0.0,771.2,0.0,186.0,0.0,39.0,0.0
+Ibis budget Nice,2024,10,200.0,0.0,596.3,0.0,145.0,0.0,39.0,0.0
+Ibis budget Nice,2024,11,93.0,8.0,220.9,20.3,75.0,5.0,27.0,7.0
+Ibis budget Nice,2024,12,103.0,6.0,236.60000000000002,12.4,71.0,5.0,24.0,5.0
+Ibis budget Nice,2025,1,127.0,16.0,308.3,37.3,92.0,11.0,25.0,13.0
+Ibis budget Nice,2025,2,110.0,0.0,268.3,0.0,81.0,0.0,24.0,0.0
+Ibis budget Nice,2025,3,245.0,0.0,625.6,0.0,199.0,0.0,29.0,0.0
+Ibis budget Nice,2025,4,266.0,0.0,816.3000000000001,0.0,204.0,0.0,47.0,0.0
+Ibis budget Nice,2025,5,377.0,34.0,1210.0,136.2,251.0,24.0,44.0,14.0
+Ibis budget Nice,2025,6,473.0,0.0,1633.7,0.0,321.0,0.0,51.0,0.0
+Ibis budget Nice,2025,7,432.0,19.0,1632.0,58.6,317.0,11.0,54.0,12.0
+Ibis budget Nice,2025,8,465.0,15.0,1750.3000000000002,50.5,307.0,11.0,56.0,9.0
+Ibis budget Nice,2025,9,415.0,0.0,1506.6,0.0,303.0,0.0,54.0,0.0
+Ibis budget Nice,2025,10,319.0,0.0,996.0,0.0,224.0,0.0,47.0,0.0
+Ibis budget Nice,2025,11,195.0,7.0,524.1,27.0,136.0,7.0,31.0,3.0
+Ibis budget Nice,2025,12,161.0,2.0,463.20000000000005,4.7,113.0,1.0,31.0,2.0
+Ibis budget Strasbourg Centre République,2024,1,249.0,13.0,914.0,51.833333333333336,195.33333333333334,10.0,26.0,7.666666666666667
+Ibis budget Strasbourg Centre République,2024,2,249.0,13.0,914.0,51.833333333333336,195.33333333333334,10.0,26.0,7.666666666666667
+Ibis budget Strasbourg Centre République,2024,3,249.0,13.0,914.0,51.833333333333336,195.33333333333334,10.0,26.0,7.666666666666667
+Ibis budget Strasbourg Centre République,2024,4,249.0,13.0,914.0,51.833333333333336,195.33333333333334,10.0,26.0,7.666666666666667
+Ibis budget Strasbourg Centre République,2024,5,249.0,13.0,914.0,51.833333333333336,195.33333333333334,10.0,26.0,7.666666666666667
+Ibis budget Strasbourg Centre République,2024,6,249.0,13.0,914.0,51.833333333333336,195.33333333333334,10.0,26.0,7.666666666666667
+Ibis budget Strasbourg Centre République,2024,7,249.0,13.0,914.0,51.833333333333336,195.33333333333334,10.0,26.0,7.666666666666667
+Ibis budget Strasbourg Centre République,2024,8,249.0,13.0,914.0,51.833333333333336,195.33333333333334,10.0,26.0,7.666666666666667
+Ibis budget Strasbourg Centre République,2024,9,249.0,13.0,914.0,51.833333333333336,195.33333333333334,10.0,26.0,7.666666666666667
+Ibis budget Strasbourg Centre République,2024,10,151.0,0.0,618.5,0.0,112.0,0.0,22.0,0.0
+Ibis budget Strasbourg Centre République,2024,11,233.0,19.0,873.5,70.0,194.0,16.0,29.0,12.0
+Ibis budget Strasbourg Centre République,2024,12,363.0,20.0,1250.0,85.5,280.0,14.0,27.0,11.0
+Ibis budget Strasbourg Centre République,2025,1,192.0,25.0,632.5,68.0,145.0,23.0,23.0,12.0
+Ibis budget Strasbourg Centre République,2025,2,196.0,0.0,745.0,0.0,129.0,0.0,24.0,0.0
+Ibis budget Strasbourg Centre République,2025,3,270.0,0.0,924.5,0.0,205.0,0.0,27.0,0.0
+Ibis budget Strasbourg Centre République,2025,4,293.0,0.0,1078.0,0.0,221.0,0.0,25.0,0.0
+Ibis budget Strasbourg Centre République,2025,5,181.0,32.0,537.5,116.5,142.0,24.0,23.0,13.0
+Ibis budget Strasbourg Centre République,2025,6,480.0,0.0,1709.0,0.0,358.0,0.0,25.0,0.0
+Ibis budget Strasbourg Centre République,2025,7,390.0,20.0,1399.0,76.5,273.0,12.0,23.0,9.0
+Ibis budget Strasbourg Centre République,2025,8,511.0,35.0,1660.5,108.0,365.0,26.0,23.0,10.0
+Ibis budget Strasbourg Centre République,2025,9,207.0,0.0,639.0,0.0,178.0,0.0,22.0,0.0
+Ibis budget Strasbourg Centre République,2025,10,309.0,0.0,990.5,0.0,246.0,0.0,23.0,0.0
+Ibis budget Strasbourg Centre République,2025,11,342.0,12.0,1144.5,48.0,256.0,6.0,22.0,7.0
+Ibis budget Strasbourg Centre République,2025,12,613.0,14.0,2054.5,60.0,456.0,9.0,22.0,6.0
+Mercure Paris Montmartre Sacré-Cœur,2024,1,2.0,0.0,1.0,0.0,2.0,0.0,1.0,0.0
+Mercure Paris Montmartre Sacré-Cœur,2024,2,376.0,0.0,2982.5,0.0,285.0,0.0,47.0,0.0
+Mercure Paris Montmartre Sacré-Cœur,2024,3,653.0,0.0,4557.0,0.0,505.0,0.0,45.0,0.0
+Mercure Paris Montmartre Sacré-Cœur,2024,4,749.0,0.0,5671.0,0.0,577.0,0.0,54.0,0.0
+Mercure Paris Montmartre Sacré-Cœur,2024,5,603.0,37.0,4509.0,339.0,436.0,27.0,41.0,16.0
+Mercure Paris Montmartre Sacré-Cœur,2024,6,807.0,0.0,5937.0,0.0,580.0,0.0,33.0,0.0
+Mercure Paris Montmartre Sacré-Cœur,2024,7,653.0,1.0,6821.0,5.0,438.0,1.0,34.0,1.0
+Mercure Paris Montmartre Sacré-Cœur,2024,8,600.0,21.0,5087.0,198.0,390.0,13.0,25.0,7.0
+Mercure Paris Montmartre Sacré-Cœur,2024,9,903.0,0.0,7992.0,0.0,629.0,0.0,26.0,0.0
+Mercure Paris Montmartre Sacré-Cœur,2024,10,1058.0,0.0,9518.0,0.0,695.0,0.0,27.0,0.0
+Mercure Paris Montmartre Sacré-Cœur,2024,11,653.0,55.0,5149.0,557.0,434.0,35.0,26.0,13.0
+Mercure Paris Montmartre Sacré-Cœur,2024,12,590.0,28.0,5229.0,280.0,408.0,19.0,24.0,11.0
+Mercure Paris Montmartre Sacré-Cœur,2025,1,503.0,94.0,4475.0,703.0,357.0,54.0,25.0,19.0
+Mercure Paris Montmartre Sacré-Cœur,2025,2,513.0,0.0,4731.0,0.0,394.0,0.0,28.0,0.0
+Mercure Paris Montmartre Sacré-Cœur,2025,3,569.0,0.0,4669.0,0.0,421.0,0.0,26.0,0.0
+Mercure Paris Montmartre Sacré-Cœur,2025,4,508.0,0.0,4450.0,0.0,368.0,0.0,23.0,0.0
+Mercure Paris Montmartre Sacré-Cœur,2025,5,344.0,8.0,3020.0,67.0,252.0,6.0,22.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2025,6,466.0,0.0,3445.0,0.0,360.0,0.0,26.0,0.0
+Mercure Paris Montmartre Sacré-Cœur,2025,7,286.0,0.0,2152.0,0.0,222.0,0.0,27.0,0.0
+Mercure Paris Montmartre Sacré-Cœur,2025,8,204.0,10.0,1750.0,39.0,150.0,6.0,22.0,4.0
+Mercure Paris Montmartre Sacré-Cœur,2025,9,501.0,0.0,4024.0,0.0,375.0,0.0,20.0,0.0
+Mercure Paris Montmartre Sacré-Cœur,2025,10,590.0,0.0,4607.5,0.0,441.0,0.0,21.0,0.0
+Mercure Paris Montmartre Sacré-Cœur,2025,11,374.0,31.0,3123.5,198.0,285.0,22.0,23.0,11.0
+Mercure Paris Montmartre Sacré-Cœur,2025,12,411.0,25.0,3485.3,179.0,312.0,17.0,23.0,8.0
+Novotel Megève Mont-Blanc,2024,1,112.2,3.1,1215.9950000000001,32.245,82.6,2.5,48.1,2.5
+Novotel Megève Mont-Blanc,2024,2,112.2,3.1,1215.9950000000001,32.245,82.6,2.5,48.1,2.5
+Novotel Megève Mont-Blanc,2024,3,54.0,0.0,686.0,0.0,41.0,0.0,36.0,0.0
+Novotel Megève Mont-Blanc,2024,4,80.0,0.0,899.5,0.0,55.0,0.0,43.0,0.0
+Novotel Megève Mont-Blanc,2024,5,102.0,8.0,1333.9,46.5,72.0,6.0,50.0,6.0
+Novotel Megève Mont-Blanc,2024,6,109.0,0.0,973.8,0.0,79.0,0.0,41.0,0.0
+Novotel Megève Mont-Blanc,2024,7,147.0,1.0,1298.4,3.0,109.0,1.0,53.0,1.0
+Novotel Megève Mont-Blanc,2024,8,183.0,5.0,1730.1,40.3,139.0,5.0,71.0,5.0
+Novotel Megève Mont-Blanc,2024,9,102.0,0.0,1555.3999999999999,0.0,81.0,0.0,47.0,0.0
+Novotel Megève Mont-Blanc,2024,10,73.0,0.0,789.7,0.0,54.0,0.0,41.0,0.0
+Novotel Megève Mont-Blanc,2024,11,64.0,8.0,1107.6000000000001,194.2,49.0,6.0,35.0,5.0
+Novotel Megève Mont-Blanc,2024,12,208.0,9.0,1785.55,38.45,147.0,7.0,64.0,8.0
+Novotel Megève Mont-Blanc,2025,1,184.0,40.0,1669.65,349.3,115.0,17.0,54.0,22.0
+Novotel Megève Mont-Blanc,2025,2,336.0,0.0,2408.65,0.0,216.0,0.0,75.0,0.0
+Novotel Megève Mont-Blanc,2025,3,201.0,0.0,1371.75,0.0,136.0,0.0,55.0,0.0
+Novotel Megève Mont-Blanc,2025,4,91.0,0.0,738.15,0.0,65.0,0.0,39.0,0.0
+Novotel Megève Mont-Blanc,2025,5,60.0,3.0,575.2,21.0,48.0,2.0,30.0,2.0
+Novotel Megève Mont-Blanc,2025,6,144.0,0.0,1183.55,0.0,90.0,0.0,51.0,0.0
+Novotel Megève Mont-Blanc,2025,7,266.0,2.0,1828.7,6.5,180.0,2.0,59.0,2.0
+Novotel Megève Mont-Blanc,2025,8,352.0,4.0,2846.55,27.0,244.0,3.0,65.0,3.0
+Novotel Megève Mont-Blanc,2025,9,164.0,0.0,1220.8,0.0,117.0,0.0,38.0,0.0
+Novotel Megève Mont-Blanc,2025,10,70.0,0.0,458.65,0.0,41.0,0.0,30.0,0.0
+Novotel Megève Mont-Blanc,2025,11,153.0,5.0,1172.9,28.95,105.0,3.0,28.0,4.0
+Novotel Megève Mont-Blanc,2025,12,432.0,16.0,3250.1,84.4,307.0,8.0,71.0,9.0
+Novotel Paris Tour Eiffel,2024,1,1169.0,35.0,5784.88375,153.55,722.375,21.875,0.0,0.0
+Novotel Paris Tour Eiffel,2024,2,1169.0,35.0,5784.88375,153.55,722.375,21.875,0.0,0.0
+Novotel Paris Tour Eiffel,2024,3,1169.0,35.0,5784.88375,153.55,722.375,21.875,0.0,0.0
+Novotel Paris Tour Eiffel,2024,4,1169.0,35.0,5784.88375,153.55,722.375,21.875,0.0,0.0
+Novotel Paris Tour Eiffel,2024,5,1.0,0.0,3.0,0.0,1.0,0.0,0.0,0.0
+Novotel Paris Tour Eiffel,2024,6,335.0,0.0,3682.5,0.0,208.0,0.0,0.0,0.0
+Novotel Paris Tour Eiffel,2024,7,382.0,0.0,2825.67,0.0,220.0,0.0,0.0,0.0
+Novotel Paris Tour Eiffel,2024,9,365.0,0.0,1718.5,0.0,224.0,0.0,0.0,0.0
+Novotel Paris Tour Eiffel,2024,10,2927.0,0.0,13290.0,0.0,1842.0,0.0,0.0,0.0
+Novotel Paris Tour Eiffel,2024,11,2327.0,161.0,11170.599999999999,704.2,1493.0,97.0,0.0,0.0
+Novotel Paris Tour Eiffel,2024,12,3015.0,119.0,13588.8,524.2,1791.0,78.0,0.0,0.0
+Novotel Paris Tour Eiffel,2025,1,2357.0,0.0,10889.6,0.0,1449.0,0.0,0.0,0.0
+Novotel Paris Tour Eiffel,2025,2,2569.0,0.0,12402.6,0.0,1612.0,0.0,0.0,0.0
+Novotel Paris Tour Eiffel,2025,3,2790.0,0.0,13418.0,0.0,1787.0,0.0,0.0,0.0
+Novotel Paris Tour Eiffel,2025,4,3118.0,0.0,14855.0,0.0,2013.0,0.0,0.0,0.0
+Novotel Paris Tour Eiffel,2025,5,2982.0,277.0,13984.7,1295.5,1921.0,182.0,0.0,0.0
+Novotel Paris Tour Eiffel,2025,6,3612.0,0.0,17358.9,0.0,2294.0,0.0,0.0,0.0
+Novotel Paris Tour Eiffel,2025,7,4375.0,140.0,22743.8,642.2,2621.0,89.0,0.0,0.0
+Novotel Paris Tour Eiffel,2025,8,3714.0,123.0,17246.9,607.0,2164.0,73.0,0.0,0.0
+Novotel Paris Tour Eiffel,2025,9,2866.0,0.0,13850.1,0.0,1908.0,0.0,0.0,0.0
+Novotel Paris Tour Eiffel,2025,10,3172.0,0.0,14511.5,0.0,1936.0,0.0,0.0,0.0
+Novotel Paris Tour Eiffel,2025,11,2446.0,164.0,11293.099999999999,692.8,1588.0,103.0,0.0,0.0
+Novotel Paris Tour Eiffel,2025,12,3007.0,144.0,13789.7,644.1,1861.0,85.0,0.0,0.0
+Novotel Porte d’Italie,2024,1,160.75,4.75,582.415,16.7,125.5,3.75,0.0,0.0
+Novotel Porte d’Italie,2024,2,160.75,4.75,582.415,16.7,125.5,3.75,0.0,0.0
+Novotel Porte d’Italie,2024,3,160.75,4.75,582.415,16.7,125.5,3.75,0.0,0.0
+Novotel Porte d’Italie,2024,4,160.75,4.75,582.415,16.7,125.5,3.75,0.0,0.0
+Novotel Porte d’Italie,2024,5,160.75,4.75,582.415,16.7,125.5,3.75,0.0,0.0
+Novotel Porte d’Italie,2024,6,160.75,4.75,582.415,16.7,125.5,3.75,0.0,0.0
+Novotel Porte d’Italie,2024,7,160.75,4.75,582.415,16.7,125.5,3.75,0.0,0.0
+Novotel Porte d’Italie,2024,8,160.75,4.75,582.415,16.7,125.5,3.75,0.0,0.0
+Novotel Porte d’Italie,2024,9,40.0,0.0,150.8,0.0,32.0,0.0,0.0,0.0
+Novotel Porte d’Italie,2024,10,244.0,0.0,868.9,0.0,185.0,0.0,0.0,0.0
+Novotel Porte d’Italie,2024,11,178.0,13.0,653.0600000000001,47.6,136.0,10.0,0.0,0.0
+Novotel Porte d’Italie,2024,12,181.0,6.0,656.9,19.2,149.0,5.0,0.0,0.0
+Novotel Porte d’Italie,2025,1,32.0,0.0,151.6,0.0,26.0,0.0,0.0,0.0
+Novotel Porte d’Italie,2025,2,60.0,0.0,251.0,0.0,44.0,0.0,0.0,0.0
+Novotel Porte d’Italie,2025,3,125.0,0.0,494.6,0.0,102.0,0.0,0.0,0.0
+Novotel Porte d’Italie,2025,4,83.0,0.0,291.8,0.0,59.0,0.0,0.0,0.0
+Novotel Porte d’Italie,2025,5,213.0,5.0,864.1,20.0,161.0,4.0,0.0,0.0
+Novotel Porte d’Italie,2025,6,115.0,0.0,559.2,0.0,101.0,0.0,0.0,0.0
+Novotel Porte d’Italie,2025,7,179.0,0.0,760.0,0.0,139.0,0.0,0.0,0.0
+Novotel Porte d’Italie,2025,8,111.0,10.0,471.4,37.3,84.0,7.0,0.0,0.0
+Novotel Porte d’Italie,2025,9,80.0,0.0,283.5,0.0,62.0,0.0,0.0,0.0
+Novotel Porte d’Italie,2025,10,14.0,0.0,57.3,0.0,12.0,0.0,0.0,0.0
+Novotel Porte d’Italie,2025,11,94.0,0.0,291.15,0.0,77.0,0.0,0.0,0.0
+Novotel Porte d’Italie,2025,12,104.0,4.0,409.8,14.0,80.0,3.0,0.0,0.0

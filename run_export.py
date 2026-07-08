@@ -123,11 +123,18 @@ def _classify_file(rel_posix: str, path: Path) -> str | None:
             return "config"
         if suffix == ".sh" and name in ROOT_SHELL_SCRIPTS:
             return "script"
-        if name.startswith("run_") and suffix == ".py":
+        if (name.startswith("run_") and suffix == ".py") or name == "consignes.txt":
             return "entrypoint"
         return None
 
     top = parts[0]
+
+    if top == "prepare":
+        if suffix in CODE_EXTENSIONS:
+            return "python"
+        if suffix in DOC_EXTENSIONS:
+            return "documentation"
+        return None
 
     if top == "rod_ia":
         if suffix in CODE_EXTENSIONS:

@@ -1,0 +1,23 @@
+{
+  "holdout_year": 2026,
+  "steps": [
+    "step_1a",
+    "step_1b",
+    "step_1c",
+    "step_2a",
+    "step_2b",
+    "step_3a",
+    "step_3b",
+    "step_3c",
+    "step_4a",
+    "step_4b",
+    "step_4c",
+    "step_5a",
+    "step_5b",
+    "step_5c",
+    "step_6a",
+    "step_6b",
+    "step_6c",
+    "joined"
+  ]
+}
