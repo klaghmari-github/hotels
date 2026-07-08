@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ROD — Administration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body class="admin-app">
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand-lockup">
+        <span class="brand-icon">A</span>
+        <span class="brand-name">ROD</span>
+        <span class="admin-badge">Admin</span>
+      </div>
+      <nav class="header-nav">
+        <a href="/" class="active">Accueil</a>
+        <a href="/simulator">Simulateur</a>
+        <a href="/exploration">Exploration</a>
+        <a href="/interpretation">Interprétation IA</a>
+        <a href="/simulator#perf">Évaluation</a>
+        <a href="/docs">Doc</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="admin-shell">
+    <header class="admin-hero">
+      <h1>Administration ROD-IA</h1>
+      <p>Outils techniques : exploration des données, interprétation du modèle, évaluation des performances.
+        L’interface simulateur pour les directeurs d’hôtel est lancée via <code>run_server.py</code> (port 5000).
+        L’API REST de prédiction est lancée via <code>run_api.py</code> (port 5002).</p>
+    </header>
+
+    <div class="admin-grid">
+      <a href="/simulator" class="admin-card">
+        <h2>Simulateur</h2>
+        <p>Parcours complet avec données brutes, comparaison ROD / IA et section d'évaluation.</p>
+      </a>
+      <a href="/exploration" class="admin-card">
+        <h2>Exploration</h2>
+        <p>Pipeline de données, arbres de régression, comparaison XGBoost vs réseau de neurones.</p>
+      </a>
+      <a href="/interpretation" class="admin-card">
+        <h2>Interprétation IA</h2>
+        <p>Importance des variables, règles globales et règles appliquées à un hôtel simulé.</p>
+      </a>
+      <a href="/simulator#perf" class="admin-card">
+        <h2>Évaluation</h2>
+        <p>Rapport de performance ROD vs IA sur le jeu de test (écart CA, hôtels de référence).</p>
+      </a>
+      <a href="/docs" class="admin-card">
+        <h2>Documentation code</h2>
+        <p>Index des modules Python du projet (produit par init.sh).</p>
+      </a>
+      <a href="/journal" class="admin-card">
+        <h2>Consignes projet</h2>
+        <p>Journal et consignes de développement.</p>
+      </a>
+    </div>
+  </main>
+</body>
+</html>

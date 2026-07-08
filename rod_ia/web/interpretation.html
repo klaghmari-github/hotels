@@ -10,17 +10,20 @@
   <link rel="stylesheet" href="/static/style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
+<body class="admin-app">
   <header class="app-header">
     <div class="header-inner">
       <div class="brand-lockup">
         <span class="brand-icon">A</span>
         <span class="brand-name">ROD</span>
+        <span class="admin-badge">Admin</span>
       </div>
       <nav class="header-nav">
-        <a href="/">Simulateur</a>
+        <a href="/">Accueil</a>
+        <a href="/simulator">Simulateur</a>
         <a href="/exploration">Exploration</a>
-        <a href="/interpretation">Interprétation IA</a>
+        <a href="/interpretation" class="active">Interprétation IA</a>
+        <a href="/simulator#perf">Évaluation</a>
         <a href="/docs">Doc</a>
       </nav>
     </div>
@@ -30,7 +33,7 @@
     <header>
       <h1>Interprétation du modèle IA</h1>
       <p>Importance des variables, règles globales et règles appliquées à l'hôtel simulé.
-        <a href="/">← Retour simulateur</a> · <a href="/journal">Consignes</a></p>
+        <a href="/simulator">← Simulateur admin</a> · <a href="/journal">Consignes</a></p>
     </header>
 
     <section class="card">
@@ -47,6 +50,15 @@
     <section class="card">
       <h2>Configuration du modèle</h2>
       <div id="model_config" class="config-grid"></div>
+    </section>
+
+    <section class="card">
+      <h2>Comparaison XGBoost vs réseau de neurones</h2>
+      <p class="muted">MAE sur le jeu d'entraînement (plus bas = mieux). Le simulateur utilise XGBoost.</p>
+      <div id="model_comparison" class="model-comparison"></div>
+      <div class="model-comparison-chart">
+        <canvas id="chart_model_comparison" height="220"></canvas>
+      </div>
     </section>
 
     <section class="card">
@@ -68,6 +80,7 @@
       <ul id="hotel_rules" class="rules-list"></ul>
     </section>
   </main>
+  <script src="/static/model-comparison.js"></script>
   <script src="/static/interpretation.js"></script>
 </body>
 </html>

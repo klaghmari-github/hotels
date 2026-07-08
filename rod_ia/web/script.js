@@ -642,13 +642,15 @@ function renderResults(data) {
 
   document.getElementById('chart_legend').textContent =
     `Concept recommandé : ${reco}. ROD = mois moyen. IA = profil 12 mois.`;
-  document.getElementById('raw_output').textContent = JSON.stringify(data, null, 2);
+  const rawOutput = document.getElementById('raw_output');
+  if (rawOutput) rawOutput.textContent = JSON.stringify(data, null, 2);
 }
 
 async function loadPerformance() {
-  const res = await fetch('/api/performance');
   const tbody = document.querySelector('#perf_table tbody');
   const summary = document.getElementById('perf_summary');
+  if (!tbody || !summary) return;
+  const res = await fetch('/api/performance');
   if (!res.ok) { summary.textContent = 'Rapport absent — ./init.sh'; return; }
   const data = await res.json();
   const s = data.summary || {};
@@ -745,11 +747,14 @@ function setupBindings() {
     });
   });
 
-  document.getElementById('link_perf').addEventListener('click', e => {
-    e.preventDefault();
-    document.querySelector('.perf-section').scrollIntoView({ behavior: 'smooth' });
-    loadPerformance();
-  });
+  const linkPerf = document.getElementById('link_perf');
+  if (linkPerf) {
+    linkPerf.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelector('.perf-section')?.scrollIntoView({ behavior: 'smooth' });
+      loadPerformance();
+    });
+  }
 }
 
 async function applyFieldWiringMarkers() {
@@ -835,6 +840,7 @@ document.addEventListener('DOMContentLoaded', () => {
   applyFieldWiringMarkers();
   updatePreview();
   updateMixBars();
-  loadPerformance();
+  if (document.getElementById('perf_table')) loadPerformance();
+  if (location.hash === '#perf') loadPerformance();
   goToStep(0);
 });

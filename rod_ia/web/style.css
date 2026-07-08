@@ -734,6 +734,67 @@ input[type=range] { accent-color: var(--navy); width: 100%; }
 .predict-results { margin-top: 20px; }
 .predict-results h3 { font-size: 14px; color: var(--navy); margin: 16px 0 8px; }
 .error { color: var(--red); font-size: 13px; }
+
+.model-comparison { margin-bottom: 16px; }
+.model-comparison-chart {
+  max-width: 640px;
+  margin-top: 8px;
+  padding: 12px;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+}
+.model-comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+.comparison-card {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 14px;
+  position: relative;
+}
+.comparison-card.is-production {
+  border-color: var(--teal);
+  background: var(--teal-bg);
+}
+.comparison-card.summary { border-color: var(--blue); }
+.comparison-card strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 16px;
+  color: var(--navy);
+}
+.comparison-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--teal);
+}
+.comparison-badge.benchmark { color: var(--gray-500); }
+.comparison-metric {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--gray-600);
+}
+.comparison-metric em {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--navy);
+  font-size: 18px;
+}
+.comparison-metric.secondary em { font-size: 15px; color: var(--gray-700); }
+.comparison-card small {
+  display: block;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--gray-400);
+  line-height: 1.4;
+}
 .header-nav a.active { color: var(--white); font-weight: 700; }
 
 /* Pages secondaires (interprétation IA, etc.) */
@@ -867,6 +928,66 @@ input[type=range] { accent-color: var(--navy); width: 100%; }
 .rules-list li strong { display: block; color: var(--navy); font-size: 13px; }
 .rules-list li span { display: block; color: var(--gray-600); font-size: 13px; margin-top: 4px; }
 .rules-list li small { display: block; color: var(--gray-400); font-size: 11px; margin-top: 4px; }
+
+/* Administration */
+.admin-badge {
+  margin-left: 10px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.9);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.admin-shell {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+}
+.admin-hero h1 {
+  margin: 0 0 10px;
+  font-size: 30px;
+  color: var(--navy);
+}
+.admin-hero p {
+  margin: 0 0 28px;
+  color: var(--gray-600);
+  font-size: 15px;
+  line-height: 1.5;
+}
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+.admin-card {
+  display: block;
+  padding: 22px;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.admin-card:hover {
+  border-color: var(--teal);
+  transform: translateY(-2px);
+}
+.admin-card h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  color: var(--navy);
+}
+.admin-card p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--gray-600);
+  line-height: 1.45;
+}
 
 @media (max-width: 1024px) {
   .step1-layout { grid-template-columns: 1fr; }

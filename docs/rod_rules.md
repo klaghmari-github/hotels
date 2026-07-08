@@ -14,7 +14,7 @@ Ce document couvre :
 - leur traduction dans le code (`rod_ia/domain/rules/`, orchestration dans `rod_ia/domain/services/`) ;
 - la distinction entre valeurs d'entrée descriptives et valeurs calculées à partir des ventes réelles ;
 - le traitement des marques d'hôtel dans le pipeline ;
-- la méthode de test et évaluation 2026 (holdout, règle de trois) et l'onglet Performance de l'interface ;
+- la méthode de test et évaluation 2026 (holdout, règle de trois) et la section Évaluation de l’interface d’administration ;
 - un exemple chiffré sur données 2024–2025 appliqué à 2026.
 
 Le modèle IA (XGBoost) est mentionné uniquement pour la comparaison de performance, pas comme objet principal de ce document.
@@ -304,11 +304,12 @@ Rapport produit à l'init : `data/processed/performance_report.json`.
 
 | Composant | Fichier | Rôle |
 |-----------|---------|------|
-| Section HTML | `rod_ia/web/index.html` — `#perf`, `#perf_table` | Tableau comparatif |
+| Section HTML | `rod_ia/web/admin-simulator.html` — `#perf`, `#perf_table` | Tableau comparatif |
 | Chargement données | `rod_ia/web/script.js` — `loadPerformance()` | `GET /api/performance` |
 | API | `rod_ia/api/routes/performance.py` | Lit `performance_report.json` |
+| Accès | `python run_admin.py` → http://127.0.0.1:5001/simulator#perf | Administration uniquement |
 
-L'onglet est alimenté si `./init.sh` a généré le rapport. Sinon le message « Rapport absent — ./init.sh » s'affiche. Au chargement de la page, `loadPerformance()` est appelé automatiquement.
+La section est alimentée si `./init.sh` a produit le rapport. Sinon le message « Rapport absent — ./init.sh » s’affiche.
 
 ### 7.4 Résultats agrégés (juillet 2026)
 

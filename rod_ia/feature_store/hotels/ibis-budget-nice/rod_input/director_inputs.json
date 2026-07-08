@@ -1,0 +1,15 @@
+{
+  "identity": {
+    "hotel_name": "Ibis budget Nice",
+    "city": "Nice",
+    "brand": "IBIS_BUDGET"
+  },
+  "operating": {
+    "nb_chambres": 129,
+    "taux_occupation": 0.8,
+    "guests_per_chambre": 1.7
+  },
+  "corner": {
+    "m_lin": 6
+  }
+}

@@ -12,6 +12,7 @@ from sklearn.multioutput import MultiOutputRegressor
 from xgboost import XGBRegressor
 
 from rod_ia.domain.services.ml_column_naming import MLColumnNaming
+from rod_ia.domain.services.neural_model_trainer import NeuralModelTrainer
 
 
 class ModelTrainer:
@@ -103,13 +104,35 @@ class ModelTrainer:
             json.dumps(target_cols, ensure_ascii=False, indent=2), encoding="utf-8"
         )
         train_pred = model.predict(x_train.values)
-        mae = float(np.mean(np.abs(train_pred - y_train.values)))
+        xgb_mae = float(np.mean(np.abs(train_pred - y_train.values)))
+
+        neural_trainer = NeuralModelTrainer(self.artifacts_dir)
+        neural_meta = neural_trainer.train(x_train, y_train)
+        neural_mae = neural_meta.get("train_mae")
+        loocv_mae = neural_meta.get("loocv_mae")
+
+        comparison: dict = {
+            "xgboost_train_mae": xgb_mae,
+            "neural_train_mae": neural_mae,
+            "neural_loocv_mae": loocv_mae,
+        }
+        if neural_mae is not None and xgb_mae > 0:
+            comparison["neural_vs_xgb_ratio"] = round(neural_mae / xgb_mae, 3)
+            comparison["winner_train_mae"] = (
+                "xgboost" if xgb_mae <= neural_mae else "neural"
+            )
+        if loocv_mae is not None and xgb_mae > 0:
+            comparison["loocv_vs_xgb_ratio"] = round(loocv_mae / xgb_mae, 3)
+
         meta = {
             "n_hotels": len(x_train),
             "n_features": len(feature_cols),
             "n_targets": len(target_cols),
-            "train_mae": mae,
+            "train_mae": xgb_mae,
             "model": "MultiOutputRegressor(XGBRegressor)",
+            "production_model": "xgboost",
+            "model_comparison": comparison,
+            "neural_network": neural_meta,
         }
         (self.artifacts_dir / "meta.json").write_text(
             json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8"

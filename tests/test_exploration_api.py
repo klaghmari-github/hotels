@@ -17,6 +17,8 @@ def client():
 def test_data_exploration_returns_stages(client):
     res = client.get("/api/data-exploration")
     assert res.status_code == 200
+    raw = res.get_data(as_text=True)
+    assert "NaN" not in raw, "La reponse ne doit pas contenir NaN (JSON invalide cote navigateur)"
     data = res.get_json()
     assert len(data.get("stages", [])) == 7
     assert data["stages"][0]["id"] == "source"
@@ -28,6 +30,9 @@ def test_model_exploration_meta(client):
     data = res.get_json()
     assert "n_outputs" in data
     assert "targets" in data
+    assert "production_model" in data
+    if data.get("model_comparison"):
+        assert "xgboost_train_mae" in data["model_comparison"]
 
 
 def test_model_tree_and_predict(client):

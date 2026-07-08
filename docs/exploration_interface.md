@@ -1,104 +1,102 @@
-# Interface d exploration des donnees et du modele
+# Interface d’exploration des données et du modèle
 
-Cette page decrit les onglets accessibles depuis le menu Exploration du simulateur ROD. Elle s adresse aux equipes qui veulent comprendre comment les fichiers sources deviennent des predictions, sans passer par la ligne de commande.
+Page réservée à l’administration technique. Elle décrit le parcours des fichiers sources jusqu’aux prédictions, et permet d’inspecter le modèle XGBoost.
 
-## Acces
+## Accès
 
-Adresse : `/exploration` depuis l application web (apres `./init.sh` ou `./run.sh`).
+| Élément | Valeur |
+|---------|--------|
+| Lancement | `python run_admin.py` |
+| URL | http://127.0.0.1:5001/exploration |
+| Prérequis | `./init.sh` |
 
-Deux onglets :
+L’interface utilisateur (directeurs d’hôtel) ne propose pas cette page. Elle est accessible uniquement via le serveur d’administration.
 
-1. Donnees — parcours du dataset
-2. Modele — arbres de regression et prediction manuelle
+## Onglets
 
-## Onglet Donnees
+1. **Données** — parcours du dataset d’entraînement
+2. **Modèle** — arbres de régression et prédiction manuelle
 
-L objectif est de montrer, etape par etape, comment les ventes brutes et les saisies hotelieres sont transformees avant l entrainement du modele.
+## Onglet Données
 
-Vous pouvez filtrer sur un hotel pivot ou afficher tous les hotels. Chaque bloc est repliable. Les tableaux montrent un echantillon de lignes et de colonnes pour rester lisible a l ecran.
+Chaque étape du pipeline est présentée dans un bloc repliable. Un filtre permet de choisir un hôtel pivot ou d’afficher tous les hôtels. Les tableaux montrent un échantillon de lignes et de colonnes.
 
-### Etape 1 — Donnees source ventes
+### Étape 1 — Données source ventes
 
-Extrait du fichier `001.queryVentes.csv` : boutique, date, type, gamme, montant. C est la matiere premiere avant toute moyenne mensuelle.
+Extrait de `001.queryVentes.csv` : boutique, date, type, gamme, montant.
 
-### Etape 2 — Saisie utilisateur et registre
+### Étape 2 — Saisie utilisateur et registre
 
-Chambres, taux d occupation, guests, marque, ville. Ces valeurs viennent du registre identite et des saisies directeur enregistrees dans le feature store.
+Chambres, taux d’occupation, guests, marque, ville. Valeurs issues du registre identité et des saisies enregistrées dans le feature store.
 
-### Etape 3 — Enrichissement ROD et marques
+### Étape 3 — Enrichissement ROD et marques
 
-Nombre d hotels par marque et par tranche de taille (fichier projections Excel), plus un echantillon des champs recap ROD (TO, chambres, equipements).
+Nombre d’hôtels par marque et par tranche de taille (fichier projections Excel), plus un échantillon des champs récap ROD.
 
-### Etape 4 — Meteo et geolocalisation commerce
+### Étape 4 — Météo et commerces de proximité
 
-Latitude, longitude, comptage de commerces de proximite par rayon, indicateurs meteo mensuels lorsque le cache geo existe pour l hotel. Sinon seules les coordonnees registre sont affichees.
+Coordonnées, comptage de commerces par rayon, indicateurs météo mensuels lorsque le cache géographique existe. Sinon, seules les coordonnées du registre sont affichées.
 
-### Etape 5 — Format numerique nettoye
+### Étape 5 — Format numérique nettoyé
 
-Contenu de `X_descriptive.csv` : variables retenues apres imputation, suppression des champs constants et des doublons. Les colonnes categorielles textuelles ne sont pas injectees dans le modele.
+Contenu de `X_descriptive.csv` après imputation et sélection des variables. Les champs textuels ne sont pas injectés dans le modèle.
 
-### Etape 6 — Ajout des variables cibles
+### Étape 6 — Variables cibles
 
-Vue du dataset complet : features descriptives plus cibles mensuelles `t_m01_ca_total`, ventes par type et gamme, etc.
+Dataset complet : features descriptives et cibles mensuelles (`t_m01_ca_total`, ventes par type et gamme, etc.).
 
-### Etape 7 — Conversion en pourcentages
+### Étape 7 — Conversion en pourcentages
 
-Repartitions mensuelles type F&B / NON-F&B et par gamme, issues de l historique d entrainement (fichier `train_percentages_long.csv`).
+Répartitions mensuelles F&B / non-F&B et par gamme, issues de `train_percentages_long.csv`.
 
-## Onglet Modele
+## Onglet Modèle
 
-Le modele actuel est un XGBoost multi sorties : une serie de 120 arbres par sortie predite, soit 24 sorties globales (CA et ventes totales pour chaque mois).
+Le modèle est un XGBoost multi-sorties : 120 arbres par sortie, 24 sorties globales (CA et ventes totales pour chaque mois).
 
 ### Visualiser un arbre
 
-1. Choisir la sortie (par exemple Avril CA)
-2. Indiquer le numero d arbre entre 1 et 120
-3. Cliquer sur Afficher l arbre
+1. Choisir la sortie (par exemple avril — CA)
+2. Indiquer le numéro d’arbre (1 à 120)
+3. Cliquer sur « Afficher l’arbre »
 
-L arbre montre les seuils sur les variables d entree et les valeurs des feuilles. Les noms de colonnes `f0`, `f1` sont traduits en libelles `d_...` lorsque possible.
+Les seuils et feuilles sont affichés. Les identifiants `f0`, `f1` sont traduits en libellés `d_...` lorsque c’est possible.
 
-### Prediction interactive
+### Prédiction interactive
 
-1. Choisir un hotel de reference (ou laisser la moyenne des pivots)
-2. Modifier quelques variables cles : chambres, TO, guests, parts F&B, etc.
-3. Lancer Calculer la prediction
+1. Choisir un hôtel de référence (ou laisser la moyenne des pivots)
+2. Modifier des variables : chambres, TO, guests, parts F&B, etc.
+3. Lancer le calcul
 
-Resultats affiches :
+Résultats : totaux annuels et mensuels, tableau mois par mois, ventilation estimée par type et gamme (répartition selon les pourcentages historiques de l’hôtel).
 
-- Totaux annuels et mensuels de CA et de ventes (sorties directes du modele)
-- Tableau mois par mois
-- Ventilation estimee par type et gamme : les totaux mensuels sont repartis selon les pourcentages historiques de l hotel. Cette ventilation aide a lire le detail metier ; seules les lignes globales mensuelles sont predites nativement par le modele.
+## Routes HTTP
 
-## APIs utilisees
-
-| Route | Role |
+| Route | Rôle |
 |-------|------|
-| GET `/api/data-exploration?hotel_id=` | Echantillons des sept etapes |
-| GET `/api/model-exploration/meta` | Liste des sorties et des arbres |
-| GET `/api/model-exploration/tree?target_index=&tree_number=` | Structure JSON d un arbre |
-| POST `/api/model-exploration/predict` | Prediction avec surcharge de variables |
+| `GET /api/data-exploration?hotel_id=` | Échantillons des sept étapes |
+| `GET /api/model-exploration/meta` | Liste des sorties et des arbres |
+| `GET /api/model-exploration/tree?target_index=&tree_number=` | Structure JSON d’un arbre |
+| `POST /api/model-exploration/predict` | Prédiction avec surcharge de variables |
 
-## Fichiers code
+## Fichiers source
 
-| Fichier | Role |
+| Fichier | Rôle |
 |---------|------|
-| `rod_ia/domain/services/data_exploration_service.py` | Construction des echantillons |
-| `rod_ia/domain/services/model_exploration_service.py` | Arbres et predictions |
+| `rod_ia/domain/services/data_exploration_service.py` | Construction des échantillons |
+| `rod_ia/domain/services/model_exploration_service.py` | Arbres et prédictions |
 | `rod_ia/api/routes/exploration.py` | Routes HTTP |
 | `rod_ia/web/exploration.html` | Page |
 | `rod_ia/web/exploration.js` | Logique interface |
 
-## Prerequis et entrainement du modele
+## Modèle et artefacts
 
-Le code d apprentissage est dans `model_trainer.py`. Les artefacts sont generes a l execution :
+| Situation | Commande |
+|-----------|----------|
+| Première installation | `./init.sh` |
+| Dataset présent, modèle absent | `python -m rod_ia.pipelines.train_model` |
+| Réentraînement forcé | `python -m rod_ia.pipelines.train_model --force` |
+| Reconstruction dataset + entraînement | `python -m rod_ia.pipelines.train_model --rebuild-dataset` |
 
-| Situation | Action |
-|-----------|--------|
-| Rien n a ete initialise | `./init.sh` |
-| Dataset present, modele absent | `./run.sh` entraine automatiquement, ou `python -m rod_ia.pipelines.train_model` |
-| Forcer un reentrainement | `python -m rod_ia.pipelines.train_model --force` |
-| Regenerer dataset puis entrainer | `python -m rod_ia.pipelines.train_model --rebuild-dataset` |
+Vérification : `GET /api/model/status` (disponible sur le serveur d’administration).
 
-Verification : `GET /api/model/status` (dataset_ready, model_present).
-
-Sans modele charge, l onglet Modele affiche un avertissement et les predictions IA retombent sur le fallback ROD dans le simulateur.
+Sans modèle chargé, l’onglet Modèle affiche un avertissement. Dans le simulateur, les prédictions retombent alors sur les règles ROD.

@@ -47,7 +47,6 @@ echo "[run] Docs code → http://${HOST}:${PORT}/docs"
 echo "[run] Ctrl+C pour arrêter"
 
 exec python -c "
-from rod_ia.api.app_factory import create_app
-app = create_app()
-app.run(host='${HOST}', port=${PORT}, debug=True)
+from rod_ia.api.app_factory import run
+run(mode='user', host='${HOST}', port=${PORT}, open_browser=False)
 "

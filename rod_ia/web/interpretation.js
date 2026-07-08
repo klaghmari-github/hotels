@@ -1,5 +1,6 @@
 let globalChart = null;
 let hotelChart = null;
+let modelComparisonChart = null;
 
 function pct(v) { return (v || 0).toFixed(4); }
 
@@ -110,6 +111,12 @@ async function loadInterpretation() {
     · recommandé : ${data.recommended_concept}`;
 
   renderConfig(data.model_config);
+  modelComparisonChart = renderModelComparison(
+    'model_comparison',
+    'chart_model_comparison',
+    data.model_config,
+    modelComparisonChart,
+  );
   renderHighlights(data);
   globalChart = barChart('chart_global', data.global_feature_importance, 'Importance globale', globalChart);
   hotelChart = barChart('chart_hotel', data.hotel_feature_importance, 'Importance hôtel', hotelChart);

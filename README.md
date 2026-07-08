@@ -17,24 +17,42 @@ Les deux passent ensuite par le même pipeline P&L (marge produit, coûts, marge
 
 | Script | Rôle |
 |--------|------|
-| **`./init.sh`** | Construit tout : extraction Excel, dataset ML, entraînement, évaluation, doc web |
-| **`./run.sh`** | Lance le serveur Flask ; réentraîne automatiquement si `model.joblib` absent mais dataset présent |
-| **`python -m rod_ia.pipelines.train_model`** | Entraînement seul (option `--force`, `--rebuild-dataset`) |
+| **`./init.sh`** | Construction : extraction Excel, dataset, entraînement, évaluation, documentation code |
+| **`python run_server.py`** | Interface simulateur pour les directeurs d’hôtel (port 5000) |
+| **`python run_admin.py`** | Interface d’administration technique (port 5001) |
+| **`python run_api.py`** | API REST de prédiction (port 5002) |
+| **`./run.sh`** | Raccourci vers le simulateur utilisateur (port 5000) |
+| **`python -m rod_ia.pipelines.train_model`** | Entraînement seul (`--force`, `--rebuild-dataset`) |
 | **`./test.sh`** | Tests unitaires pytest |
 
 ```bash
-./init.sh          # une fois, ou après changement de données/code
-./run.sh           # http://127.0.0.1:5000
-./test.sh          # optionnel
+./init.sh                 # une fois, ou après changement de données/code
+python run_server.py      # simulateur → http://127.0.0.1:5000
+python run_admin.py       # administration → http://127.0.0.1:5001
+python run_api.py         # API REST → http://127.0.0.1:5002
 ```
 
-| Page | URL |
-|------|-----|
-| Simulateur | http://127.0.0.1:5000/ |
-| Exploration données / modèle | http://127.0.0.1:5000/exploration |
-| Interprétation IA | http://127.0.0.1:5000/interpretation |
-| Doc code (générée) | http://127.0.0.1:5000/docs |
-| Consignes | http://127.0.0.1:5000/journal |
+### Interfaces web
+
+| Public | Lancement | URL | Contenu |
+|--------|-----------|-----|---------|
+| Directeur d’hôtel | `run_server.py` | http://127.0.0.1:5000/ | Saisie hôtel, simulation ROD, prédictions, recommandation |
+| Administration | `run_admin.py` | http://127.0.0.1:5001/ | Tableau de bord : exploration, interprétation, évaluation, doc code |
+| — | `run_admin.py` | http://127.0.0.1:5001/simulator | Simulateur complet avec données brutes et évaluation |
+| — | `run_admin.py` | http://127.0.0.1:5001/exploration | Parcours dataset et arbres XGBoost |
+| — | `run_admin.py` | http://127.0.0.1:5001/interpretation | Importance des variables et règles |
+| — | `run_admin.py` | http://127.0.0.1:5001/docs | Documentation code |
+| — | `run_admin.py` | http://127.0.0.1:5001/journal | Consignes projet (`docs/consignes.md`) |
+
+### API REST
+
+Serveur autonome, sans interface graphique. Documentation : [`docs/api_rest.md`](docs/api_rest.md).
+
+| Méthode | Route | Description |
+|---------|-------|-------------|
+| POST | `/api/v1/predict` | Prédiction ventes et marges par concept + recommandation |
+| GET | `/api/v1` | Informations sur l’API |
+| GET | `/health` | Contrôle de disponibilité |
 
 ---
 
@@ -82,12 +100,14 @@ flowchart TB
     SIM_HIST["simulations/history.jsonl"]
   end
 
-  subgraph runtime ["./run.sh → Flask API"]
+  subgraph runtime ["run_server / run_admin / run_api"]
     ORCH["SimulationOrchestrator"]
     ROD_SIM["RodSimulator"]
     AI_PNL["AIPnlService"]
     UI["rod_ia/web/"]
+    API["PredictionApiService"]
   end
+  API --> ORCH
 
   CSV --> PIPE
   XLS_SIM --> EXCEL --> ROD_REF
@@ -215,7 +235,7 @@ Au démarrage de l'API (`build_container`), si `dataset_meta.json` existe mais p
 
 ### Interprétation
 
-Page `/interpretation` et API `POST /api/model-interpretation` via `ModelInterpretationService` :
+Page `/interpretation` (administration, port 5001) et API `POST /api/model-interpretation` via `ModelInterpretationService` :
 - Importance globale XGBoost (moyenne des `feature_importances_` sur les 24 estimateurs)
 - Importance pour l'hôtel (importance × écart à la moyenne train)
 - Règles globales (sélection, imputation, entraînement)
@@ -292,9 +312,11 @@ Page `/interpretation` et API `POST /api/model-interpretation` via `ModelInterpr
 ```text
 hotels/
 ├── init.sh                 # Pipeline construction (venv, run_init, doc, smoke test)
-├── run.sh                  # Serveur Flask
+├── run.sh                  # Raccourci simulateur utilisateur
+├── run_server.py           # Interface simulateur (directeurs d'hôtel)
+├── run_admin.py            # Interface administration technique
+├── run_api.py              # API REST de prédiction
 ├── test.sh                 # pytest
-├── run_server.py           # Point d'entrée Python alternatif
 ├── requirements.txt        # Dépendances (Flask, pandas, xgboost, scikit-learn…)
 ├── pyproject.toml
 │
@@ -315,7 +337,7 @@ hotels/
 │
 ├── scripts/                # Utilitaires (doc, extraction règles Excel)
 ├── tests/                  # Tests unitaires pytest
-├── docs/                   # Consignes projet (consignes.md)
+├── docs/                   # Consignes, API REST, règles ROD, guide exploration
 └── old/                    # Brouillons historiques — NE PAS utiliser pour l'IA
 ```
 
@@ -393,6 +415,7 @@ Chaque règle produit une `trace` (rule_id, workbook, sheet, cells, description)
 | `simulation_orchestrator.py` | Orchestre 3 concepts, construit store en sortie, recommande |
 | `optimizer.py` | Optimisation sous contraintes (m_lin, mix F&B) |
 | `enrich_hotel.py` | Géocodage, POI Overpass, météo Meteostat, distance plage |
+| `prediction_api_service.py` | API REST : enrichissement, simulation, réponse structurée |
 
 #### Utilitaires ventes
 
@@ -413,13 +436,16 @@ Chaque règle produit une `trace` (rule_id, workbook, sheet, cells, description)
 
 | Fichier | Rôle |
 |---------|------|
-| `app_factory.py` | Factory Flask, routes pages (`/`, `/interpretation`, `/docs`, `/journal`) |
-| `dependencies.py` | `AppContainer` — injection de toutes les dépendances |
+| `app_factory.py` | Factory Flask web — modes `user` et `admin` |
+| `api_factory.py` | Factory Flask API REST autonome |
+| `dependencies.py` | `AppContainer` — injection des dépendances |
 | `routes/simulate.py` | `POST /api/simulate`, `POST /api/optimize` |
+| `routes/prediction.py` | `POST /api/v1/predict` |
 | `routes/enrich.py` | `POST /api/enrich` — POI + météo |
-| `routes/performance.py` | `GET /api/performance` |
+| `routes/performance.py` | `GET /api/performance` (admin) |
 | `routes/catalog.py` | `GET /api/sales-catalog` |
-| `routes/interpretation.py` | `POST /api/model-interpretation` |
+| `routes/interpretation.py` | `POST /api/model-interpretation` (admin) |
+| `routes/exploration.py` | Exploration données et modèle (admin) |
 | `routes/hotel.py` | Endpoints hôtel |
 | `routes/health.py` | `GET /health` |
 
@@ -427,21 +453,26 @@ Chaque règle produit une `trace` (rule_id, workbook, sheet, cells, description)
 
 | Fichier | Rôle |
 |---------|------|
-| `index.html` | Simulateur principal (4 onglets) |
-| `script.js` | Logique UI : sliders mix, simulation, graphique Chart.js |
-| `style.css` | Styles dark mode |
-| `exploration.html` | Exploration dataset (7 étapes) et arbres XGBoost |
-| `exploration.js` | Tableaux données, visualisation arbre, prédiction interactive |
-| `interpretation.html` | Page interprétation modèle IA |
-| `interpretation.js` | Graphiques importance, listes règles |
-| `docs/index.html` | Documentation code générée (`generate_code_docs.py`) |
+| `index.html` | Simulateur utilisateur (parcours en 5 étapes) |
+| `admin.html` | Accueil administration |
+| `admin-simulator.html` | Simulateur complet avec évaluation et données brutes |
+| `script.js` | Logique simulateur : saisie, simulation, graphiques |
+| `style.css` | Styles |
+| `exploration.html` | Exploration dataset et arbres XGBoost (admin) |
+| `exploration.js` | Tableaux données, visualisation arbre |
+| `interpretation.html` | Interprétation du modèle (admin) |
+| `interpretation.js` | Importance des variables, règles |
+| `docs/index.html` | Documentation code (produite par `init.sh`) |
 
-**Onglets simulateur** :
+**Parcours simulateur utilisateur** (`index.html`) :
 
-1. **Infos générales** — chambres, TO, guests/chambre
-2. **Contraintes** — mix F&B/NON-F&B et GAMME (sliders), champs figés
-3. **Résultats** — 3 concepts ROD vs IA, graphique mensuel, pipeline IA, lien interprétation
-4. **Performance** — tableau ROD vs IA sur hôtels pivots (2026)
+1. Informations générales — identité hôtel, chambres, TO
+2. Services et équipements — F&B, lobby
+3. Profil clients — répartition, besoins
+4. Boutique / corner — corner existant
+5. Simulation de revenu — assortiment, résultats ROD, prédictions, recommandation
+
+L’exploration, l’interprétation et l’évaluation ne sont pas accessibles depuis l’interface utilisateur.
 
 ---
 
@@ -487,26 +518,42 @@ Chaque règle produit une `trace` (rule_id, workbook, sheet, cells, description)
 
 ## API HTTP
 
+### Simulateur web (`run_server.py`, port 5000)
+
 | Méthode | Route | Description |
 |---------|-------|-------------|
-| GET | `/health` | Santé |
-| POST | `/api/simulate` | 3 concepts ROD + IA + recommandation |
+| GET | `/health` | Disponibilité |
+| POST | `/api/simulate` | 3 concepts ROD + prédictions + recommandation |
 | POST | `/api/optimize` | Optimisation sous contraintes |
 | POST | `/api/enrich` | POI + météo → feature store |
-| GET | `/api/performance` | Évaluation ROD vs IA |
-| GET | `/api/brands` | Stats marques (Excel) |
+| GET | `/api/brands` | Statistiques marques |
 | GET | `/api/sales-catalog` | Catégories TYPE / GAMME |
-| POST | `/api/model-interpretation` | Interprétation IA |
-| GET | `/api/model/status` | État dataset + présence `model.joblib` |
-| POST | `/api/model/train` | Réentraînement manuel (`{"force": true}` optionnel) |
-| GET | `/exploration` | Exploration données et modèle |
+| GET | `/api/param-wiring` | Registre des champs branchés sur les moteurs |
+
+### Administration (`run_admin.py`, port 5001)
+
+Routes du simulateur ci-dessus, plus :
+
+| Méthode | Route | Description |
+|---------|-------|-------------|
+| GET | `/api/performance` | Évaluation ROD vs modèle |
+| POST | `/api/model-interpretation` | Interprétation du modèle |
+| GET | `/api/model/status` | État dataset et modèle |
+| POST | `/api/model/train` | Réentraînement (`{"force": true}` optionnel) |
 | GET | `/api/data-exploration` | Échantillons pipeline dataset |
-| GET | `/api/model-exploration/meta` | Métadonnées modèle (sorties, arbres) |
-| GET | `/api/model-exploration/tree` | Structure d'un arbre XGBoost |
+| GET | `/api/model-exploration/meta` | Métadonnées modèle |
+| GET | `/api/model-exploration/tree` | Structure d’un arbre XGBoost |
 | POST | `/api/model-exploration/predict` | Prédiction avec surcharge de variables |
-| GET | `/interpretation` | Page interprétation |
-| GET | `/docs` | Doc code web |
-| GET | `/journal` | Consignes projet (`docs/consignes.md`) |
+
+### API REST (`run_api.py`, port 5002)
+
+| Méthode | Route | Description |
+|---------|-------|-------------|
+| GET | `/health` | Disponibilité |
+| GET | `/api/v1` | Informations API |
+| POST | `/api/v1/predict` | Prédiction complète (entrée renvoyée + contexte + 3 concepts + recommandation) |
+
+Détail des champs et exemples : [`docs/api_rest.md`](docs/api_rest.md).
 
 ---
 
@@ -542,6 +589,8 @@ Chaque règle produit une `trace` (rule_id, workbook, sheet, cells, description)
 | `test_sales_percentages.py` | Répartitions % |
 | `test_beach_distance.py` | Distance plage |
 | `test_operating_state.py` | État opérationnel hôtel |
+| `test_prediction_api.py` | API REST de prédiction |
+| `test_exploration_api.py` | API exploration données et modèle |
 
 ---
 
@@ -558,7 +607,10 @@ Chaque règle produit une `trace` (rule_id, workbook, sheet, cells, description)
 
 | Document | Contenu |
 |----------|---------|
-| [`docs/consignes.md`](docs/consignes.md) | Consignes métier, état d'implémentation, backlog IA |
-| `rod_ia/web/docs/index.html` | Doc code auto-générée |
+| [`docs/consignes.md`](docs/consignes.md) | Consignes métier et état d’implémentation |
+| [`docs/api_rest.md`](docs/api_rest.md) | API REST de prédiction |
+| [`docs/rod_rules.md`](docs/rod_rules.md) | Règles simulateur ROD et évaluation |
+| [`docs/exploration_interface.md`](docs/exploration_interface.md) | Guide page Exploration |
+| `rod_ia/web/docs/index.html` | Documentation code (produite par `init.sh`) |
 
-**Ne pas utiliser `old/`** pour l'IA — tout le code actif est sous `rod_ia/`.
+Le code actif est sous `rod_ia/`. Le répertoire `old/` n’est pas utilisé.

@@ -41,7 +41,21 @@ class DataExplorationService:
         self._sample_cols = sample_cols
 
     @staticmethod
-    def _round_value(val: Any) -> Any:
+    def _json_safe_value(val: Any) -> Any:
+        """Convertit les valeurs pandas/numpy en types JSON valides (null si NaN)."""
+        if val is None:
+            return None
+        try:
+            if pd.isna(val):
+                return None
+        except (TypeError, ValueError):
+            pass
+        if hasattr(val, "item") and not isinstance(val, (str, bytes)):
+            return DataExplorationService._json_safe_value(val.item())
+        if isinstance(val, bool):
+            return val
+        if isinstance(val, int):
+            return val
         if isinstance(val, float):
             return round(val, 4) if abs(val) < 1e6 else round(val, 2)
         return val
@@ -67,11 +81,9 @@ class DataExplorationService:
         truncated = len(use_cols) > self._sample_cols
         show_cols = use_cols[: self._sample_cols]
         subset = frame[show_cols].head(self._sample_rows).copy()
-        for col in subset.select_dtypes(include="float").columns:
-            subset[col] = subset[col].map(self._round_value)
         rows = []
         for record in subset.to_dict(orient="records"):
-            rows.append({k: self._round_value(v) for k, v in record.items()})
+            rows.append({k: self._json_safe_value(v) for k, v in record.items()})
         return {
             "description": description,
             "columns": show_cols,
@@ -190,7 +202,7 @@ class DataExplorationService:
             recap = self._feature_store.load_recap_features(hid)
             for key, val in list(recap.items())[:8]:
                 short = key.replace("d_recap_", "")[:40]
-                row[f"recap_{short}"] = val
+                row[f"recap_{short}"] = self._json_safe_value(val)
             rows.append(row)
         return self._pack_frame(
             pd.DataFrame(rows),
@@ -216,7 +228,9 @@ class DataExplorationService:
                 for k, v in list((enriched.poi or {}).items())[:6]:
                     row[k] = v
                 for k, v in list((enriched.weather_monthly or {}).items())[:10]:
-                    row[k] = round(float(v), 3) if isinstance(v, (int, float)) else v
+                    row[k] = self._json_safe_value(
+                        round(float(v), 3) if isinstance(v, (int, float)) else v
+                    )
             rows.append(row)
         return self._pack_frame(
             pd.DataFrame(rows),

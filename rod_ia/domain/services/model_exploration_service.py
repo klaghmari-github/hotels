@@ -46,20 +46,39 @@ class ModelExplorationService:
     def _target_labels(self) -> list[str]:
         return list(self._predictor.target_cols)
 
-    def _default_feature_row(self, hotel_id: str | None) -> pd.Series:
-        x_path = self._processed_dir / "X_descriptive.csv"
-        full_path = self._processed_dir / "ml_dataset_full.csv"
+    def _load_training_meta(self) -> dict[str, Any]:
+        meta_path = self._predictor.artifacts_dir / "meta.json"
+        if not meta_path.exists():
+            return {}
+        return json.loads(meta_path.read_text(encoding="utf-8"))
+
+    def _align_to_feature_cols(self, row: pd.Series) -> pd.Series:
+        """Aligne une ligne sur les colonnes du modele (0.0 si absentes)."""
         cols = self._feature_labels()
         if not cols:
             return pd.Series(dtype=float)
-        if x_path.exists() and full_path.exists():
-            x = pd.read_csv(x_path).fillna(0.0)
-            full = pd.read_csv(full_path)
-            if hotel_id and "hotel_id" in full.columns:
-                idx = full.index[full["hotel_id"].astype(str) == str(hotel_id)]
-                if len(idx):
-                    return x.loc[idx[0], [c for c in cols if c in x.columns]].reindex(cols).fillna(0.0)
-            return x[cols].mean().reindex(cols).fillna(0.0)
+        return row.reindex(cols).fillna(0.0).astype(float)
+
+    def _default_feature_row(self, hotel_id: str | None) -> pd.Series:
+        cols = self._feature_labels()
+        if not cols:
+            return pd.Series(dtype=float)
+
+        source_path = self._processed_dir / "ml_dataset_full.csv"
+        if not source_path.exists():
+            source_path = self._processed_dir / "X_descriptive.csv"
+        if not source_path.exists():
+            return pd.Series(0.0, index=cols)
+
+        frame = pd.read_csv(source_path).fillna(0.0)
+        if hotel_id and "hotel_id" in frame.columns:
+            match = frame[frame["hotel_id"].astype(str) == str(hotel_id)]
+            if not match.empty:
+                return self._align_to_feature_cols(match.iloc[0])
+
+        present = [c for c in cols if c in frame.columns]
+        if present:
+            return self._align_to_feature_cols(frame[present].mean())
         return pd.Series(0.0, index=cols)
 
     @staticmethod
@@ -82,12 +101,30 @@ class ModelExplorationService:
             {"index": i, "name": name, "label": self._human_target(name)}
             for i, name in enumerate(self._target_labels())
         ]
+        dataset_warnings: list[str] = []
+        meta_path = self._processed_dir / "dataset_meta.json"
+        if meta_path.exists():
+            meta = json.loads(meta_path.read_text(encoding="utf-8"))
+            dataset_cols = meta.get("feature_cols", [])
+            model_cols = self._feature_labels()
+            missing = [c for c in model_cols if c not in dataset_cols]
+            if missing:
+                dataset_warnings.append(
+                    f"{len(missing)} variable(s) du modele absentes du dataset courant "
+                    "(valeur 0 a la prediction). Re-executer ./init.sh pour re-aligner."
+                )
+        warnings = warnings + dataset_warnings
+        training_meta = self._load_training_meta()
+
         return {
             "model_available": model is not None,
             "warnings": warnings,
             "n_outputs": len(targets),
             "n_trees_per_output": n_trees,
             "tree_range": {"min": 1, "max": max(n_trees, 1)},
+            "production_model": training_meta.get("production_model", "xgboost"),
+            "model_comparison": training_meta.get("model_comparison"),
+            "neural_network": training_meta.get("neural_network"),
             "features": [
                 {"name": c, "label": c.replace("d_", "").replace("_", " ")[:60]}
                 for c in self._feature_labels()
@@ -163,7 +200,7 @@ class ModelExplorationService:
         for key, val in overrides.items():
             if key in row.index:
                 row[key] = float(val)
-        frame = pd.DataFrame([row.reindex(cols).fillna(0.0).astype(float)])
+        frame = pd.DataFrame([self._align_to_feature_cols(row)])
         raw = model.predict(frame.values)
         values = raw[0] if hasattr(raw, "__len__") else [float(raw)]
         target_cols = self._target_labels()

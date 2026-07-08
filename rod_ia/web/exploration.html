@@ -8,18 +8,22 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
+<body class="admin-app">
   <header class="app-header">
     <div class="header-inner">
       <div class="brand-lockup">
         <span class="brand-icon">A</span>
         <span class="brand-name">ROD</span>
+        <span class="admin-badge">Admin</span>
       </div>
       <nav class="header-nav">
-        <a href="/">Simulateur</a>
+        <a href="/">Accueil</a>
+        <a href="/simulator">Simulateur</a>
         <a href="/exploration" class="active">Exploration</a>
-        <a href="/interpretation">Interpretation IA</a>
+        <a href="/interpretation">Interprétation IA</a>
+        <a href="/simulator#perf">Évaluation</a>
         <a href="/docs">Doc</a>
       </nav>
     </div>
@@ -49,6 +53,15 @@
     </section>
 
     <section id="panel_model" class="explore-panel">
+      <div class="card">
+        <h2>Comparaison XGBoost vs reseau de neurones</h2>
+        <p class="muted">Benchmark entraine sur le meme dataset. Le modele en production reste XGBoost.</p>
+        <div id="model_comparison" class="model-comparison"></div>
+        <div class="model-comparison-chart">
+          <canvas id="chart_model_comparison" height="220"></canvas>
+        </div>
+      </div>
+
       <div class="card">
         <h2>Selection de l arbre</h2>
         <p id="model_status" class="muted">Chargement...</p>
@@ -82,6 +95,7 @@
     </section>
   </main>
 
+  <script src="/static/model-comparison.js"></script>
   <script src="/static/exploration.js"></script>
 </body>
 </html>

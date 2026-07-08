@@ -3,27 +3,29 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ROD — Simulateur</title>
+  <title>ROD — Simulateur (admin)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
+<body class="admin-app">
   <header class="app-header">
     <div class="header-inner">
       <div class="brand-lockup">
         <span class="brand-icon">A</span>
         <span class="brand-name">ROD</span>
+        <span class="admin-badge">Admin</span>
       </div>
-      <div class="user-chip">
-        <div>
-          <strong id="user_name">Directeur d'hôtel</strong>
-          <small id="user_role">Simulation &amp; estimation</small>
-        </div>
-        <span class="hotel-badge" id="user_hotel_id">—</span>
-      </div>
+      <nav class="header-nav">
+        <a href="/">Accueil</a>
+        <a href="/simulator" class="active">Simulateur</a>
+        <a href="/exploration">Exploration</a>
+        <a href="/interpretation">Interprétation IA</a>
+        <a href="#perf" id="link_perf">Évaluation</a>
+        <a href="/docs">Doc</a>
+      </nav>
     </div>
   </header>
 
@@ -250,6 +252,7 @@
           <p id="chart_legend" class="chart-legend muted"></p>
           <canvas id="monthly_chart"></canvas>
         </div>
+        <details class="raw-details"><summary>Données brutes</summary><pre id="raw_output"></pre></details>
       </div>
     </section>
 
@@ -258,6 +261,20 @@
       <button type="button" id="btn_next" class="btn-next">Valider</button>
     </footer>
   </main>
+
+  <section id="perf" class="perf-section">
+    <div class="card">
+      <h2>Évaluation ROD vs IA</h2>
+      <div id="perf_summary" class="perf-summary"></div>
+      <table class="perf-table" id="perf_table">
+        <thead><tr>
+          <th>Hôtel</th><th>Concept</th><th>Reco</th><th>Ch.</th><th>TO</th><th>Mois</th>
+          <th>Réel</th><th>ROD</th><th>IA</th><th>Écart ROD</th><th>Écart IA</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
 
   <script src="/static/script.js"></script>
 </body>

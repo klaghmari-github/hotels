@@ -1,6 +1,7 @@
 /* Exploration donnees et modele */
 
 const MONTHS = ['Jan','Fev','Mar','Avr','Mai','Jun','Jul','Aou','Sep','Oct','Nov','Dec'];
+let modelComparisonChart = null;
 
 function esc(s) {
   return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -86,6 +87,12 @@ async function loadModelMeta() {
     return null;
   }
   status.textContent = `${data.n_outputs} sorties, ${data.n_trees_per_output} arbres par sortie (numeros 1 a ${data.n_trees_per_output}).`;
+  modelComparisonChart = renderModelComparison(
+    'model_comparison',
+    'chart_model_comparison',
+    data,
+    modelComparisonChart,
+  );
   const treeInput = document.getElementById('model_tree_number');
   treeInput.max = data.n_trees_per_output;
   const sel = document.getElementById('model_target_select');
