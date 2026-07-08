@@ -1,0 +1,9 @@
+hotel_code,hotel_name,plage_distance_km,commerce_fb_100m,commerce_fb_500m,commerce_non_fb_100m,commerce_non_fb_500m,distance_bakery_m,distance_convenience_m,distance_supermarket_m,distance_beach_m,distance_alcohol_m,distance_gift_m,distance_confectionery_m,distance_tobacco_m
+ibis-budget-nice,Ibis budget Nice Californie,0.14119839212669968,1.0,8.0,0.0,0.0,43.6362581766038,292.8429480894517,431.3115309150001,141.19839212669967,,,,
+ibis-budget-strasbourg,Ibis budget Strasbourg Centre République,,0.0,0.0,0.0,0.0,,,,,,,,
+ibis-styles-roissy-cdg,Ibis Styles Roissy CDG,99.999,0.0,3.0,0.0,0.0,425.89122631638077,446.959364434925,465.65382939298183,99999.0,,,,
+novotel-megeve,Novotel Megève Mont-Blanc,3.7764705450756875,1.0,5.0,0.0,1.0,244.8755293669841,60.141030315299346,,3776.4705450756874,497.8486263469644,296.54052315262993,,
+novotel-paris-tour-eiffel,Novotel Paris Centre Tour Eiffel,,0.0,0.0,0.0,0.0,,,,,,,,
+mercure-montmartre,Mercure Paris Montmartre Sacré-Cœur,,0.0,0.0,0.0,0.0,,,,,,,,
+mercure-boulogne,Mercure Paris Boulogne,99.999,0.0,19.0,0.0,4.0,278.0535162630977,164.13044818689195,172.80812218151812,99999.0,432.6356520619819,310.9878414654549,468.4574632661754,384.77835084019733
+novotel-porte-italie,Novotel Porte d'Italie,,0.0,0.0,0.0,0.0,,,,,,,,

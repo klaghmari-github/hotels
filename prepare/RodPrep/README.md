@@ -12,6 +12,7 @@ Produire une table de liaison entre le nom d'hôtel (ventes), le code hôtel can
 |---------|---------|
 | `Input/` | `recapitulatif_rod.xlsx` (copié depuis `sources/raw/` si absent) |
 | `Output/` | `hotel_lookup.parquet`, `rod_features.parquet`, exports CSV intermédiaires |
+| `Explore/` | `explore.ipynb` — exploration pas-à-pas (Excel, format long/wide, `hotel_lookup`) ; remplit `Output/` |
 | `Src/rod_prep/prep.py` | Classe `RodPrep` |
 
 ## Entrées

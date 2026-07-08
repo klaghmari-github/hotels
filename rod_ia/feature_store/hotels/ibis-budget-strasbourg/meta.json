@@ -1,9 +1,6 @@
 {
   "hotel_id": "ibis-budget-strasbourg",
-  "updated_at": "2026-07-07T01:55:57.634151+00:00",
-  "is_pivot": true,
-  "brand": "IBIS BUDGET",
-  "nb_chambres": 97,
-  "has_sales": true,
-  "has_rod": true
+  "updated_at": "2026-07-08T05:27:31.608018+00:00",
+  "enriched": false,
+  "enrichment_fingerprint": "6a5f840b42cdb04a"
 }

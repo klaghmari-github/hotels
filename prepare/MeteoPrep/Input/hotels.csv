@@ -1,0 +1,9 @@
+hotel_code,hotel_name,hotel_brand,hotel_city,hotel_lat,hotel_lon,hotel_adresse
+ibis-budget-nice,Ibis budget Nice Californie,IBIS BUDGET,Nice,43.6675713,7.2143076,Nice
+ibis-budget-strasbourg,Ibis budget Strasbourg Centre République,IBIS BUDGET,Strasbourg,,,Strasbourg
+ibis-styles-roissy-cdg,Ibis Styles Roissy CDG,IBIS STYLES,Roissy,,,Roissy
+novotel-megeve,Novotel Megève Mont-Blanc,NOVOTEL,Megève,,,Megève
+novotel-paris-tour-eiffel,Novotel Paris Centre Tour Eiffel,NOVOTEL,Paris,48.85,2.35,Paris
+mercure-montmartre,Mercure Paris Montmartre Sacré-Cœur,MERCURE,Paris,,,Paris
+mercure-boulogne,Mercure Paris Boulogne,MERCURE,Boulogne-Billancourt,,,Boulogne-Billancourt
+novotel-porte-italie,Novotel Porte d'Italie,NOVOTEL,Paris,,,Paris

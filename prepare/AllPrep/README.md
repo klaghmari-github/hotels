@@ -12,6 +12,7 @@ Assembler toutes les features préparées sans dupliquer les lignes ventes (grai
 |---------|---------|
 | `Input/` | Copies des outputs des étapes précédentes |
 | `Output/` | `dataset_full.parquet`, `dataset_full.csv` |
+| `Explore/` | `explore.ipynb` — exploration pas-à-pas (lecture entrées, jointures intermédiaires, nettoyage colonnes) ; remplit `Output/` |
 | `Src/all_prep/prep.py` | Classe `AllPrep` |
 
 ## Entrées

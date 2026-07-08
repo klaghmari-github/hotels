@@ -12,6 +12,7 @@ Produire une table `hotel_code × annee × mois` avec des indicateurs météo re
 |---------|---------|
 | `Input/` | `hotels.parquet` / `hotels.csv` (produit par RodPrep) |
 | `Output/` | `meteo_monthly.parquet`, `meteo_monthly.csv` |
+| `Explore/` | `explore.ipynb` — exploration pas-à-pas (entrées, enrichissement, renommage, imputation) ; remplit `Output/` |
 | `Src/meteo_prep/prep.py` | Classe `MeteoPrep` |
 
 ## Entrées

@@ -28,3 +28,13 @@ RodPrep → MeteoPrep ──┐
 ```
 
 Chaque étape documente ses champs source, champs calculés et formules dans son `README.md`.
+
+## Exploration interactive
+
+Chaque sous-dossier contient un notebook `Explore/explore.ipynb` qui :
+
+1. Charge les entrées et affiche les DataFrames pandas à chaque étape
+2. Appelle toutes les fonctions de `Src/` (y compris les résultats intermédiaires)
+3. Remplit le dossier `Output/` de l'étape
+
+Ordre recommandé : RodPrep → MeteoPrep / ProximityPrep / SalesPrep → AllPrep.

@@ -12,6 +12,7 @@ Produire une table à grain `hotel_code` avec les indicateurs géographiques uti
 |---------|---------|
 | `Input/` | `hotels.parquet` (copie de `RodPrep/Output/hotel_lookup`) |
 | `Output/` | `proximity.parquet`, `proximity.csv` |
+| `Explore/` | `explore.ipynb` — exploration pas-à-pas (POI, distances plage, construction ligne par hôtel) ; remplit `Output/` |
 | `Src/proximity_prep/prep.py` | Classe `ProximityPrep` |
 
 ## Entrées

@@ -1,4 +1,6 @@
 {
   "hotel_id": "ibis-budget-nice",
-  "updated_at": "2026-07-08T00:33:17.927235+00:00"
+  "updated_at": "2026-07-08T05:26:52.881207+00:00",
+  "enriched": true,
+  "enrichment_fingerprint": "4f2b59c0bf7efcd8"
 }

@@ -12,6 +12,7 @@ Transformer le fichier de ventes ligne à ligne en features mensuelles par hôte
 |---------|---------|
 | `Input/` | `ventes.csv` (copie de `sources/raw/001.queryVentes.csv`) + `hotel_lookup` (RodPrep) |
 | `Output/` | `step_1a` … `step_6c`, `joined`, `meta.json` (CSV + Parquet) |
+| `Explore/` | `explore.ipynb` — exploration pas-à-pas (étapes 1.a à 7, tous les dataframes intermédiaires) ; remplit `Output/` |
 | `Src/sales_prep/` | `pipeline.py`, `aggregations.py` |
 | Feature store | `rod_ia/feature_store/hotels/{code}/sales_prep/monthly_features.*` |
 
