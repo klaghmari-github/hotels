@@ -24,6 +24,7 @@ Les deux passent ensuite par le même pipeline P&L (marge produit, coûts, marge
 | **`./run.sh`** | Raccourci vers le simulateur utilisateur (port 5000) |
 | **`python -m rod_ia.pipelines.train_model`** | Entraînement seul (`--force`, `--rebuild-dataset`) |
 | **`./test.sh`** | Tests unitaires pytest |
+| **`python run_export.py`** | Archive ZIP pour audit (sources + entrées + documentation) |
 
 ```bash
 ./init.sh                 # une fois, ou après changement de données/code
@@ -43,6 +44,14 @@ python run_api.py         # API REST → http://127.0.0.1:5002
 | — | `run_admin.py` | http://127.0.0.1:5001/interpretation | Importance des variables et règles |
 | — | `run_admin.py` | http://127.0.0.1:5001/docs | Documentation code |
 | — | `run_admin.py` | http://127.0.0.1:5001/journal | Consignes projet (`docs/consignes.md`) |
+
+### Export pour audit
+
+```bash
+python run_export.py
+```
+
+Produit `exports/rod-ia-audit-YYYYMMDD-HHMMSS.zip` : code source, `sources/raw/`, documentation, registre identité. Exclut artefacts ML, `data/processed/`, feature store runtime (géo, météo, simulations). Le fichier `EXPORT_MANIFEST.txt` dans l’archive détaille le contenu.
 
 ### API REST
 
@@ -316,7 +325,9 @@ hotels/
 ├── run_server.py           # Interface simulateur (directeurs d'hôtel)
 ├── run_admin.py            # Interface administration technique
 ├── run_api.py              # API REST de prédiction
+├── run_export.py           # Export ZIP pour audit
 ├── test.sh                 # pytest
+├── exports/                # Archives générées (hors git)
 ├── requirements.txt        # Dépendances (Flask, pandas, xgboost, scikit-learn…)
 ├── pyproject.toml
 │

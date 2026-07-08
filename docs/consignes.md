@@ -32,6 +32,7 @@ Aucune constante métier n’est définie en dehors des sources ci-dessus.
 | `run_api.py` | 5002 | Intégration | API REST `POST /api/v1/predict` |
 | `./init.sh` | — | Installation | Extraction, dataset, entraînement, évaluation |
 | `./test.sh` | — | Qualité | Tests unitaires pytest |
+| `run_export.py` | — | Livraison | Archive ZIP pour audit externe |
 
 `./run.sh` est un raccourci vers le simulateur utilisateur (équivalent à `run_server.py`).
 
