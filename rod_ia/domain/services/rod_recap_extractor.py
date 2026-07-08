@@ -26,6 +26,36 @@ RECAP_COLUMN_TO_HOTEL_ID: dict[str, str] = {
 
 MISSING_TOKENS = frozenset({"", "?", "-", "nan", "none", "n/a"})
 
+# Identifiants récap (section « PAGE DE CONNEXION / ID ») — pas des features ML.
+RECAP_HOTEL_CODE_COLUMN = MLColumnNaming.recap_column("0_page_de_connexion_id_code_h")
+RECAP_HOTEL_NAME_ALIAS_COLUMNS = frozenset(
+    {MLColumnNaming.recap_column("0_page_de_connexion_id_nom_de_l_hotel")}
+)
+RECAP_IDENTITY_COLUMNS = frozenset(
+    {RECAP_HOTEL_CODE_COLUMN, *RECAP_HOTEL_NAME_ALIAS_COLUMNS}
+)
+RECAP_GEO_LATITUDE_COLUMN = MLColumnNaming.recap_column(
+    "0_page_de_connexion_localisation_geo_latitude"
+)
+RECAP_GEO_LONGITUDE_COLUMN = MLColumnNaming.recap_column(
+    "0_page_de_connexion_localisation_geo_longitude"
+)
+RECAP_GEO_ADDRESS_COLUMNS = (
+    MLColumnNaming.recap_column(
+        "0_page_de_connexion_localisation_geo_adresse_postale_1"
+    ),
+    MLColumnNaming.recap_column(
+        "0_page_de_connexion_localisation_geo_adresse_postale_2"
+    ),
+)
+RECAP_GEO_CITY_COLUMN = MLColumnNaming.recap_column(
+    "0_page_de_connexion_localisation_geo_ville"
+)
+RECAP_GEO_COORDINATE_COLUMNS = frozenset(
+    {RECAP_GEO_LATITUDE_COLUMN, RECAP_GEO_LONGITUDE_COLUMN}
+)
+RECAP_NON_FEATURE_COLUMNS = RECAP_IDENTITY_COLUMNS | RECAP_GEO_COORDINATE_COLUMNS
+
 
 class RodRecapExtractor:
     """Lit ``RECAP DATA ROD`` et produit un DataFrame wide par ``hotel_id``."""
@@ -53,7 +83,7 @@ class RodRecapExtractor:
 
     @staticmethod
     def _slug(text: str) -> str:
-        text = str(text).strip().lower()
+        text = MLColumnNaming.fold_accents(str(text)).strip().lower()
         text = text.replace("%", "pct")
         text = re.sub(r"[^a-z0-9]+", "_", text)
         return re.sub(r"_+", "_", text).strip("_")[:80]
@@ -189,18 +219,22 @@ class RodRecapExtractor:
         """Pivot long → wide avec préfixe ``d_recap_*`` + métadonnées de champ."""
         long_df = self.extract_long()
         if long_df.empty:
-            return pd.DataFrame(columns=["hotel_id"])
+            return pd.DataFrame(columns=["hotel_code"])
 
+        # field_key -> première ligne Excel ; suffixe _rN seulement si le libellé
+        # réapparaît sur une autre ligne (pas entre hôtels sur la même ligne).
         seen: dict[str, int] = {}
         col_names: list[str] = []
         for _, row in long_df.iterrows():
-            base = f"recap_{row['field_key']}"
-            if base in seen:
-                seen[base] += 1
-                base = f"{base}_r{row['row']}"
-            else:
-                seen[base] = 1
-            col_names.append(MLColumnNaming.descriptive(base))
+            field_key = row["field_key"]
+            excel_row = row["row"]
+            base = f"recap_{field_key}"
+            first_row = seen.get(field_key)
+            if first_row is None:
+                seen[field_key] = excel_row
+            elif first_row != excel_row:
+                field_key = f"{field_key}_r{excel_row}"
+            col_names.append(MLColumnNaming.recap_column(field_key))
 
         long_df = long_df.copy()
         long_df["feature_column"] = col_names
@@ -215,6 +249,12 @@ class RodRecapExtractor:
             .reset_index()
         )
         wide.columns.name = None
+        if RECAP_HOTEL_CODE_COLUMN in wide.columns:
+            wide["code_h"] = wide[RECAP_HOTEL_CODE_COLUMN].astype(str).str.strip()
+            wide.loc[wide["code_h"].isin(("", "nan", "None")), "code_h"] = None
+        drop_cols = [c for c in RECAP_IDENTITY_COLUMNS if c in wide.columns]
+        if drop_cols:
+            wide = wide.drop(columns=drop_cols)
 
         schema = (
             long_df[

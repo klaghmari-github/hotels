@@ -7,21 +7,7 @@
     "row":4
   },
   {
-    "column":"d_recap_0_page_de_connexion_id_code_h_r4",
-    "field_key":"0_page_de_connexion_id_code_h",
-    "data_label":"CODE H",
-    "field_type_hint":"categorical",
-    "row":4
-  },
-  {
     "column":"d_recap_0_page_de_connexion_id_nom_de_l_hotel",
-    "field_key":"0_page_de_connexion_id_nom_de_l_hotel",
-    "data_label":"NOM DE L'HOTEL",
-    "field_type_hint":"categorical",
-    "row":5
-  },
-  {
-    "column":"d_recap_0_page_de_connexion_id_nom_de_l_hotel_r5",
     "field_key":"0_page_de_connexion_id_nom_de_l_hotel",
     "data_label":"NOM DE L'HOTEL",
     "field_type_hint":"categorical",
@@ -35,21 +21,7 @@
     "row":6
   },
   {
-    "column":"d_recap_0_page_de_connexion_localisation_geo_adresse_postale_1_r6",
-    "field_key":"0_page_de_connexion_localisation_geo_adresse_postale_1",
-    "data_label":"ADRESSE POSTALE (1)",
-    "field_type_hint":"categorical",
-    "row":6
-  },
-  {
     "column":"d_recap_0_page_de_connexion_localisation_geo_adresse_postale_2",
-    "field_key":"0_page_de_connexion_localisation_geo_adresse_postale_2",
-    "data_label":"ADRESSE POSTALE (2)",
-    "field_type_hint":"categorical",
-    "row":7
-  },
-  {
-    "column":"d_recap_0_page_de_connexion_localisation_geo_adresse_postale_2_r7",
     "field_key":"0_page_de_connexion_localisation_geo_adresse_postale_2",
     "data_label":"ADRESSE POSTALE (2)",
     "field_type_hint":"categorical",
@@ -63,21 +35,7 @@
     "row":8
   },
   {
-    "column":"d_recap_0_page_de_connexion_localisation_geo_adresse_postale_3_r8",
-    "field_key":"0_page_de_connexion_localisation_geo_adresse_postale_3",
-    "data_label":"ADRESSE POSTALE (3)",
-    "field_type_hint":"categorical",
-    "row":8
-  },
-  {
     "column":"d_recap_0_page_de_connexion_localisation_geo_code_postal",
-    "field_key":"0_page_de_connexion_localisation_geo_code_postal",
-    "data_label":"CODE POSTAL",
-    "field_type_hint":"categorical",
-    "row":9
-  },
-  {
-    "column":"d_recap_0_page_de_connexion_localisation_geo_code_postal_r9",
     "field_key":"0_page_de_connexion_localisation_geo_code_postal",
     "data_label":"CODE POSTAL",
     "field_type_hint":"categorical",
@@ -91,21 +49,7 @@
     "row":10
   },
   {
-    "column":"d_recap_0_page_de_connexion_localisation_geo_ville_r10",
-    "field_key":"0_page_de_connexion_localisation_geo_ville",
-    "data_label":"VILLE",
-    "field_type_hint":"categorical",
-    "row":10
-  },
-  {
     "column":"d_recap_0_page_de_connexion_localisation_geo_longitude",
-    "field_key":"0_page_de_connexion_localisation_geo_longitude",
-    "data_label":"LONGITUDE",
-    "field_type_hint":"numeric",
-    "row":11
-  },
-  {
-    "column":"d_recap_0_page_de_connexion_localisation_geo_longitude_r11",
     "field_key":"0_page_de_connexion_localisation_geo_longitude",
     "data_label":"LONGITUDE",
     "field_type_hint":"numeric",
@@ -119,21 +63,7 @@
     "row":12
   },
   {
-    "column":"d_recap_0_page_de_connexion_localisation_geo_latitude_r12",
-    "field_key":"0_page_de_connexion_localisation_geo_latitude",
-    "data_label":"LATITUDE",
-    "field_type_hint":"numeric",
-    "row":12
-  },
-  {
     "column":"d_recap_1_informations_generales_donnees_admin_marque",
-    "field_key":"1_informations_generales_donnees_admin_marque",
-    "data_label":"MARQUE",
-    "field_type_hint":"categorical",
-    "row":13
-  },
-  {
-    "column":"d_recap_1_informations_generales_donnees_admin_marque_r13",
     "field_key":"1_informations_generales_donnees_admin_marque",
     "data_label":"MARQUE",
     "field_type_hint":"categorical",
@@ -147,21 +77,7 @@
     "row":14
   },
   {
-    "column":"d_recap_1_informations_generales_donnees_admin_nb_de_chambres_r14",
-    "field_key":"1_informations_generales_donnees_admin_nb_de_chambres",
-    "data_label":"NB. DE CHAMBRES",
-    "field_type_hint":"numeric",
-    "row":14
-  },
-  {
     "column":"d_recap_1_informations_generales_donnees_admin_contrat_signe_annee",
-    "field_key":"1_informations_generales_donnees_admin_contrat_signe_annee",
-    "data_label":"CONTRAT SIGNE (ANNEE)",
-    "field_type_hint":"numeric",
-    "row":15
-  },
-  {
-    "column":"d_recap_1_informations_generales_donnees_admin_contrat_signe_annee_r15",
     "field_key":"1_informations_generales_donnees_admin_contrat_signe_annee",
     "data_label":"CONTRAT SIGNE (ANNEE)",
     "field_type_hint":"numeric",
@@ -175,21 +91,7 @@
     "row":16
   },
   {
-    "column":"d_recap_1_informations_generales_donnees_admin_contrat_type_r16",
-    "field_key":"1_informations_generales_donnees_admin_contrat_type",
-    "data_label":"CONTRAT (TYPE)",
-    "field_type_hint":"categorical",
-    "row":16
-  },
-  {
     "column":"d_recap_1_informations_generales_donnees_admin_proprietaire",
-    "field_key":"1_informations_generales_donnees_admin_proprietaire",
-    "data_label":"PROPRIETAIRE",
-    "field_type_hint":"categorical",
-    "row":17
-  },
-  {
-    "column":"d_recap_1_informations_generales_donnees_admin_proprietaire_r17",
     "field_key":"1_informations_generales_donnees_admin_proprietaire",
     "data_label":"PROPRIETAIRE",
     "field_type_hint":"categorical",
@@ -203,21 +105,7 @@
     "row":18
   },
   {
-    "column":"d_recap_1_informations_generales_donnees_admin_dom_dof_r18",
-    "field_key":"1_informations_generales_donnees_admin_dom_dof",
-    "data_label":"DOM\/DOF",
-    "field_type_hint":"categorical",
-    "row":18
-  },
-  {
     "column":"d_recap_1_informations_generales_donnees_admin_derniere_reno_hotel",
-    "field_key":"1_informations_generales_donnees_admin_derniere_reno_hotel",
-    "data_label":"DERNIERE RENO HOTEL",
-    "field_type_hint":"categorical",
-    "row":19
-  },
-  {
-    "column":"d_recap_1_informations_generales_donnees_admin_derniere_reno_hotel_r19",
     "field_key":"1_informations_generales_donnees_admin_derniere_reno_hotel",
     "data_label":"DERNIERE RENO HOTEL",
     "field_type_hint":"categorical",
@@ -231,21 +119,7 @@
     "row":20
   },
   {
-    "column":"d_recap_1_informations_generales_donnees_admin_derniere_reno_lobby_r20",
-    "field_key":"1_informations_generales_donnees_admin_derniere_reno_lobby",
-    "data_label":"DERNIERE RENO LOBBY",
-    "field_type_hint":"categorical",
-    "row":20
-  },
-  {
     "column":"d_recap_1_informations_generales_donnees_admin_pms",
-    "field_key":"1_informations_generales_donnees_admin_pms",
-    "data_label":"PMS",
-    "field_type_hint":"categorical",
-    "row":21
-  },
-  {
-    "column":"d_recap_1_informations_generales_donnees_admin_pms_r21",
     "field_key":"1_informations_generales_donnees_admin_pms",
     "data_label":"PMS",
     "field_type_hint":"categorical",
@@ -259,21 +133,7 @@
     "row":22
   },
   {
-    "column":"d_recap_1_informations_generales_donnees_chiffrees_adultes_par_chambre_r22",
-    "field_key":"1_informations_generales_donnees_chiffrees_adultes_par_chambre",
-    "data_label":"# ADULTES PAR CHAMBRE",
-    "field_type_hint":"numeric",
-    "row":22
-  },
-  {
     "column":"d_recap_1_informations_generales_donnees_chiffrees_enfants_par_chambre",
-    "field_key":"1_informations_generales_donnees_chiffrees_enfants_par_chambre",
-    "data_label":"# ENFANTS PAR CHAMBRE",
-    "field_type_hint":"numeric",
-    "row":23
-  },
-  {
-    "column":"d_recap_1_informations_generales_donnees_chiffrees_enfants_par_chambre_r23",
     "field_key":"1_informations_generales_donnees_chiffrees_enfants_par_chambre",
     "data_label":"# ENFANTS PAR CHAMBRE",
     "field_type_hint":"numeric",
@@ -287,21 +147,7 @@
     "row":24
   },
   {
-    "column":"d_recap_1_informations_generales_donnees_chiffrees_panier_moyen_r24",
-    "field_key":"1_informations_generales_donnees_chiffrees_panier_moyen",
-    "data_label":"PANIER MOYEN",
-    "field_type_hint":"numeric",
-    "row":24
-  },
-  {
     "column":"d_recap_1_informations_generales_donnees_chiffrees_to_annuel",
-    "field_key":"1_informations_generales_donnees_chiffrees_to_annuel",
-    "data_label":"TO ANNUEL",
-    "field_type_hint":"numeric",
-    "row":25
-  },
-  {
-    "column":"d_recap_1_informations_generales_donnees_chiffrees_to_annuel_r25",
     "field_key":"1_informations_generales_donnees_chiffrees_to_annuel",
     "data_label":"TO ANNUEL",
     "field_type_hint":"numeric",
@@ -315,21 +161,7 @@
     "row":26
   },
   {
-    "column":"d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_bas_mois_r26",
-    "field_key":"1_informations_generales_donnees_chiffrees_to_le_plus_bas_mois",
-    "data_label":"TO LE PLUS BAS (MOIS)",
-    "field_type_hint":"numeric",
-    "row":26
-  },
-  {
     "column":"d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_bas_taux",
-    "field_key":"1_informations_generales_donnees_chiffrees_to_le_plus_bas_taux",
-    "data_label":"TO LE PLUS BAS (TAUX)",
-    "field_type_hint":"numeric",
-    "row":27
-  },
-  {
-    "column":"d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_bas_taux_r27",
     "field_key":"1_informations_generales_donnees_chiffrees_to_le_plus_bas_taux",
     "data_label":"TO LE PLUS BAS (TAUX)",
     "field_type_hint":"numeric",
@@ -343,21 +175,7 @@
     "row":28
   },
   {
-    "column":"d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_haut_mois_r28",
-    "field_key":"1_informations_generales_donnees_chiffrees_to_le_plus_haut_mois",
-    "data_label":"TO LE PLUS HAUT (MOIS)",
-    "field_type_hint":"numeric",
-    "row":28
-  },
-  {
     "column":"d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_haut_taux",
-    "field_key":"1_informations_generales_donnees_chiffrees_to_le_plus_haut_taux",
-    "data_label":"TO LE PLUS HAUT (TAUX)",
-    "field_type_hint":"numeric",
-    "row":29
-  },
-  {
-    "column":"d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_haut_taux_r29",
     "field_key":"1_informations_generales_donnees_chiffrees_to_le_plus_haut_taux",
     "data_label":"TO LE PLUS HAUT (TAUX)",
     "field_type_hint":"numeric",
@@ -371,21 +189,7 @@
     "row":30
   },
   {
-    "column":"d_recap_1_informations_generales_localisation_environnement_a_proximite_a_100m_r30",
-    "field_key":"1_informations_generales_localisation_environnement_a_proximite_a_100m",
-    "data_label":"A PROXIMITE (A 100m)",
-    "field_type_hint":"categorical",
-    "row":30
-  },
-  {
     "column":"d_recap_1_informations_generales_localisation_environnement_nb_restauration",
-    "field_key":"1_informations_generales_localisation_environnement_nb_restauration",
-    "data_label":"NB. RESTAURATION…",
-    "field_type_hint":"numeric",
-    "row":31
-  },
-  {
-    "column":"d_recap_1_informations_generales_localisation_environnement_nb_restauration_r31",
     "field_key":"1_informations_generales_localisation_environnement_nb_restauration",
     "data_label":"NB. RESTAURATION…",
     "field_type_hint":"numeric",
@@ -399,13 +203,6 @@
     "row":32
   },
   {
-    "column":"d_recap_1_informations_generales_localisation_environnement_nb_supermarch_s_r32",
-    "field_key":"1_informations_generales_localisation_environnement_nb_supermarch_s",
-    "data_label":"NB. SUPERMARCHÉS…",
-    "field_type_hint":"numeric",
-    "row":32
-  },
-  {
     "column":"d_recap_1_informations_generales_localisation_environnement_nb_autres_commerces",
     "field_key":"1_informations_generales_localisation_environnement_nb_autres_commerces",
     "data_label":"NB. AUTRES COMMERCES…",
@@ -413,21 +210,7 @@
     "row":33
   },
   {
-    "column":"d_recap_1_informations_generales_localisation_environnement_nb_autres_commerces_r33",
-    "field_key":"1_informations_generales_localisation_environnement_nb_autres_commerces",
-    "data_label":"NB. AUTRES COMMERCES…",
-    "field_type_hint":"numeric",
-    "row":33
-  },
-  {
     "column":"d_recap_1_informations_generales_localisation_environnement_a_proximite_a_500m",
-    "field_key":"1_informations_generales_localisation_environnement_a_proximite_a_500m",
-    "data_label":"A PROXIMITE (A 500m)",
-    "field_type_hint":"categorical",
-    "row":34
-  },
-  {
-    "column":"d_recap_1_informations_generales_localisation_environnement_a_proximite_a_500m_r34",
     "field_key":"1_informations_generales_localisation_environnement_a_proximite_a_500m",
     "data_label":"A PROXIMITE (A 500m)",
     "field_type_hint":"categorical",
@@ -462,21 +245,7 @@
     "row":38
   },
   {
-    "column":"d_recap_2_services_equipements_f_b_bar_r38",
-    "field_key":"2_services_equipements_f_b_bar",
-    "data_label":"BAR",
-    "field_type_hint":"boolean",
-    "row":38
-  },
-  {
     "column":"d_recap_2_services_equipements_f_b_horaires_d_ouverture",
-    "field_key":"2_services_equipements_f_b_horaires_d_ouverture",
-    "data_label":"HORAIRES D'OUVERTURE",
-    "field_type_hint":"categorical",
-    "row":39
-  },
-  {
-    "column":"d_recap_2_services_equipements_f_b_horaires_d_ouverture_r39",
     "field_key":"2_services_equipements_f_b_horaires_d_ouverture",
     "data_label":"HORAIRES D'OUVERTURE",
     "field_type_hint":"categorical",
@@ -490,13 +259,6 @@
     "row":40
   },
   {
-    "column":"d_recap_2_services_equipements_f_b_jours_d_ouverture_r40",
-    "field_key":"2_services_equipements_f_b_jours_d_ouverture",
-    "data_label":"JOURS D'OUVERTURE",
-    "field_type_hint":"categorical",
-    "row":40
-  },
-  {
     "column":"d_recap_2_services_equipements_f_b_mois_d_ouverture",
     "field_key":"2_services_equipements_f_b_mois_d_ouverture",
     "data_label":"MOIS D'OUVERTURE",
@@ -504,21 +266,7 @@
     "row":41
   },
   {
-    "column":"d_recap_2_services_equipements_f_b_mois_d_ouverture_r41",
-    "field_key":"2_services_equipements_f_b_mois_d_ouverture",
-    "data_label":"MOIS D'OUVERTURE",
-    "field_type_hint":"categorical",
-    "row":41
-  },
-  {
     "column":"d_recap_2_services_equipements_f_b_restaurant",
-    "field_key":"2_services_equipements_f_b_restaurant",
-    "data_label":"RESTAURANT",
-    "field_type_hint":"boolean",
-    "row":42
-  },
-  {
-    "column":"d_recap_2_services_equipements_f_b_restaurant_r42",
     "field_key":"2_services_equipements_f_b_restaurant",
     "data_label":"RESTAURANT",
     "field_type_hint":"boolean",
@@ -553,21 +301,7 @@
     "row":46
   },
   {
-    "column":"d_recap_2_services_equipements_f_b_room_service_r46",
-    "field_key":"2_services_equipements_f_b_room_service",
-    "data_label":"ROOM-SERVICE",
-    "field_type_hint":"boolean",
-    "row":46
-  },
-  {
     "column":"d_recap_2_services_equipements_f_b_minibar",
-    "field_key":"2_services_equipements_f_b_minibar",
-    "data_label":"MINIBAR",
-    "field_type_hint":"boolean",
-    "row":47
-  },
-  {
-    "column":"d_recap_2_services_equipements_f_b_minibar_r47",
     "field_key":"2_services_equipements_f_b_minibar",
     "data_label":"MINIBAR",
     "field_type_hint":"boolean",
@@ -581,21 +315,7 @@
     "row":48
   },
   {
-    "column":"d_recap_2_services_equipements_non_f_b_salles_de_reunion_r48",
-    "field_key":"2_services_equipements_non_f_b_salles_de_reunion",
-    "data_label":"SALLES DE REUNION",
-    "field_type_hint":"categorical",
-    "row":48
-  },
-  {
     "column":"d_recap_2_services_equipements_non_f_b_salle_de_sport",
-    "field_key":"2_services_equipements_non_f_b_salle_de_sport",
-    "data_label":"SALLE DE SPORT",
-    "field_type_hint":"categorical",
-    "row":49
-  },
-  {
-    "column":"d_recap_2_services_equipements_non_f_b_salle_de_sport_r49",
     "field_key":"2_services_equipements_non_f_b_salle_de_sport",
     "data_label":"SALLE DE SPORT",
     "field_type_hint":"categorical",
@@ -609,21 +329,7 @@
     "row":50
   },
   {
-    "column":"d_recap_2_services_equipements_non_f_b_spa_r50",
-    "field_key":"2_services_equipements_non_f_b_spa",
-    "data_label":"SPA",
-    "field_type_hint":"boolean",
-    "row":50
-  },
-  {
     "column":"d_recap_2_services_equipements_non_f_b_piscine",
-    "field_key":"2_services_equipements_non_f_b_piscine",
-    "data_label":"PISCINE",
-    "field_type_hint":"boolean",
-    "row":51
-  },
-  {
-    "column":"d_recap_2_services_equipements_non_f_b_piscine_r51",
     "field_key":"2_services_equipements_non_f_b_piscine",
     "data_label":"PISCINE",
     "field_type_hint":"boolean",
@@ -637,21 +343,7 @@
     "row":52
   },
   {
-    "column":"d_recap_2_services_equipements_dispo_dans_le_lobby_vitrine_r_frig_r_e_r52",
-    "field_key":"2_services_equipements_dispo_dans_le_lobby_vitrine_r_frig_r_e",
-    "data_label":"VITRINE RÉFRIGÉRÉE",
-    "field_type_hint":"boolean",
-    "row":52
-  },
-  {
     "column":"d_recap_2_services_equipements_dispo_dans_le_lobby_micro_ondes",
-    "field_key":"2_services_equipements_dispo_dans_le_lobby_micro_ondes",
-    "data_label":"MICRO-ONDES",
-    "field_type_hint":"boolean",
-    "row":53
-  },
-  {
-    "column":"d_recap_2_services_equipements_dispo_dans_le_lobby_micro_ondes_r53",
     "field_key":"2_services_equipements_dispo_dans_le_lobby_micro_ondes",
     "data_label":"MICRO-ONDES",
     "field_type_hint":"boolean",
@@ -665,21 +357,7 @@
     "row":54
   },
   {
-    "column":"d_recap_2_services_equipements_dispo_dans_le_lobby_fontaine_eau_r54",
-    "field_key":"2_services_equipements_dispo_dans_le_lobby_fontaine_eau",
-    "data_label":"FONTAINE À EAU",
-    "field_type_hint":"boolean",
-    "row":54
-  },
-  {
     "column":"d_recap_2_services_equipements_dispo_dans_le_lobby_machine_caf",
-    "field_key":"2_services_equipements_dispo_dans_le_lobby_machine_caf",
-    "data_label":"MACHINE À CAFÉ",
-    "field_type_hint":"boolean",
-    "row":55
-  },
-  {
-    "column":"d_recap_2_services_equipements_dispo_dans_le_lobby_machine_caf_r55",
     "field_key":"2_services_equipements_dispo_dans_le_lobby_machine_caf",
     "data_label":"MACHINE À CAFÉ",
     "field_type_hint":"boolean",
@@ -693,21 +371,7 @@
     "row":56
   },
   {
-    "column":"d_recap_2_services_equipements_dispo_dans_le_lobby_bouilloire_r56",
-    "field_key":"2_services_equipements_dispo_dans_le_lobby_bouilloire",
-    "data_label":"BOUILLOIRE",
-    "field_type_hint":"boolean",
-    "row":56
-  },
-  {
     "column":"d_recap_2_services_equipements_dispo_dans_le_lobby_assises",
-    "field_key":"2_services_equipements_dispo_dans_le_lobby_assises",
-    "data_label":"ASSISES",
-    "field_type_hint":"categorical",
-    "row":57
-  },
-  {
-    "column":"d_recap_2_services_equipements_dispo_dans_le_lobby_assises_r57",
     "field_key":"2_services_equipements_dispo_dans_le_lobby_assises",
     "data_label":"ASSISES",
     "field_type_hint":"categorical",
@@ -721,21 +385,7 @@
     "row":58
   },
   {
-    "column":"d_recap_3_profil_de_vos_clients_loisirs_loisirs_pct_r58",
-    "field_key":"3_profil_de_vos_clients_loisirs_loisirs_pct",
-    "data_label":"LOISIRS (%)",
-    "field_type_hint":"numeric_pct",
-    "row":58
-  },
-  {
     "column":"d_recap_3_profil_de_vos_clients_loisirs_loisirs_individuels_pct",
-    "field_key":"3_profil_de_vos_clients_loisirs_loisirs_individuels_pct",
-    "data_label":"LOISIRS INDIVIDUELS (%)",
-    "field_type_hint":"numeric_pct",
-    "row":59
-  },
-  {
-    "column":"d_recap_3_profil_de_vos_clients_loisirs_loisirs_individuels_pct_r59",
     "field_key":"3_profil_de_vos_clients_loisirs_loisirs_individuels_pct",
     "data_label":"LOISIRS INDIVIDUELS (%)",
     "field_type_hint":"numeric_pct",
@@ -749,21 +399,7 @@
     "row":60
   },
   {
-    "column":"d_recap_3_profil_de_vos_clients_loisirs_top_1_solo_r60",
-    "field_key":"3_profil_de_vos_clients_loisirs_top_1_solo",
-    "data_label":"TOP 1 > SOLO",
-    "field_type_hint":"boolean",
-    "row":60
-  },
-  {
     "column":"d_recap_3_profil_de_vos_clients_loisirs_top_1_couples",
-    "field_key":"3_profil_de_vos_clients_loisirs_top_1_couples",
-    "data_label":"TOP 1 > COUPLES",
-    "field_type_hint":"boolean",
-    "row":61
-  },
-  {
-    "column":"d_recap_3_profil_de_vos_clients_loisirs_top_1_couples_r61",
     "field_key":"3_profil_de_vos_clients_loisirs_top_1_couples",
     "data_label":"TOP 1 > COUPLES",
     "field_type_hint":"boolean",
@@ -777,21 +413,7 @@
     "row":62
   },
   {
-    "column":"d_recap_3_profil_de_vos_clients_loisirs_top_1_amis_r62",
-    "field_key":"3_profil_de_vos_clients_loisirs_top_1_amis",
-    "data_label":"TOP 1 > AMIS",
-    "field_type_hint":"boolean",
-    "row":62
-  },
-  {
     "column":"d_recap_3_profil_de_vos_clients_loisirs_top_1_familles",
-    "field_key":"3_profil_de_vos_clients_loisirs_top_1_familles",
-    "data_label":"TOP 1 > FAMILLES",
-    "field_type_hint":"boolean",
-    "row":63
-  },
-  {
-    "column":"d_recap_3_profil_de_vos_clients_loisirs_top_1_familles_r63",
     "field_key":"3_profil_de_vos_clients_loisirs_top_1_familles",
     "data_label":"TOP 1 > FAMILLES",
     "field_type_hint":"boolean",
@@ -805,21 +427,7 @@
     "row":64
   },
   {
-    "column":"d_recap_3_profil_de_vos_clients_loisirs_loisirs_groupes_pct_r64",
-    "field_key":"3_profil_de_vos_clients_loisirs_loisirs_groupes_pct",
-    "data_label":"LOISIRS GROUPES (%)",
-    "field_type_hint":"numeric_pct",
-    "row":64
-  },
-  {
     "column":"d_recap_3_profil_de_vos_clients_affaires_affaires_pct",
-    "field_key":"3_profil_de_vos_clients_affaires_affaires_pct",
-    "data_label":"AFFAIRES (%)",
-    "field_type_hint":"numeric_pct",
-    "row":65
-  },
-  {
-    "column":"d_recap_3_profil_de_vos_clients_affaires_affaires_pct_r65",
     "field_key":"3_profil_de_vos_clients_affaires_affaires_pct",
     "data_label":"AFFAIRES (%)",
     "field_type_hint":"numeric_pct",
@@ -833,21 +441,7 @@
     "row":66
   },
   {
-    "column":"d_recap_3_profil_de_vos_clients_affaires_affaires_individuels_pct_r66",
-    "field_key":"3_profil_de_vos_clients_affaires_affaires_individuels_pct",
-    "data_label":"AFFAIRES INDIVIDUELS (%)",
-    "field_type_hint":"numeric_pct",
-    "row":66
-  },
-  {
     "column":"d_recap_3_profil_de_vos_clients_affaires_affaires_groupes_pct",
-    "field_key":"3_profil_de_vos_clients_affaires_affaires_groupes_pct",
-    "data_label":"AFFAIRES GROUPES (%)",
-    "field_type_hint":"numeric_pct",
-    "row":67
-  },
-  {
-    "column":"d_recap_3_profil_de_vos_clients_affaires_affaires_groupes_pct_r67",
     "field_key":"3_profil_de_vos_clients_affaires_affaires_groupes_pct",
     "data_label":"AFFAIRES GROUPES (%)",
     "field_type_hint":"numeric_pct",
@@ -861,21 +455,7 @@
     "row":68
   },
   {
-    "column":"d_recap_3_profil_de_vos_clients_national_vs_inter_national_pct_r68",
-    "field_key":"3_profil_de_vos_clients_national_vs_inter_national_pct",
-    "data_label":"NATIONAL (%)",
-    "field_type_hint":"numeric_pct",
-    "row":68
-  },
-  {
     "column":"d_recap_3_profil_de_vos_clients_national_vs_inter_international_pct",
-    "field_key":"3_profil_de_vos_clients_national_vs_inter_international_pct",
-    "data_label":"INTERNATIONAL (%)",
-    "field_type_hint":"numeric_pct",
-    "row":69
-  },
-  {
-    "column":"d_recap_3_profil_de_vos_clients_national_vs_inter_international_pct_r69",
     "field_key":"3_profil_de_vos_clients_national_vs_inter_international_pct",
     "data_label":"INTERNATIONAL (%)",
     "field_type_hint":"numeric_pct",
@@ -889,21 +469,7 @@
     "row":70
   },
   {
-    "column":"d_recap_3_profil_de_vos_clients_besoins_de_vos_clients_f_b_boissons_non_alcoolis_es_r70",
-    "field_key":"3_profil_de_vos_clients_besoins_de_vos_clients_f_b_boissons_non_alcoolis_es",
-    "data_label":"BOISSONS NON ALCOOLISÉES",
-    "field_type_hint":"categorical",
-    "row":70
-  },
-  {
     "column":"d_recap_3_profil_de_vos_clients_besoins_de_vos_clients_f_b_boissons_alcoolis_es",
-    "field_key":"3_profil_de_vos_clients_besoins_de_vos_clients_f_b_boissons_alcoolis_es",
-    "data_label":"BOISSONS ALCOOLISÉES",
-    "field_type_hint":"categorical",
-    "row":71
-  },
-  {
-    "column":"d_recap_3_profil_de_vos_clients_besoins_de_vos_clients_f_b_boissons_alcoolis_es_r71",
     "field_key":"3_profil_de_vos_clients_besoins_de_vos_clients_f_b_boissons_alcoolis_es",
     "data_label":"BOISSONS ALCOOLISÉES",
     "field_type_hint":"categorical",
@@ -917,21 +483,7 @@
     "row":72
   },
   {
-    "column":"d_recap_3_profil_de_vos_clients_besoins_de_vos_clients_f_b_produits_sal_s_secs_r72",
-    "field_key":"3_profil_de_vos_clients_besoins_de_vos_clients_f_b_produits_sal_s_secs",
-    "data_label":"PRODUITS SALÉS SECS",
-    "field_type_hint":"categorical",
-    "row":72
-  },
-  {
     "column":"d_recap_3_profil_de_vos_clients_besoins_de_vos_clients_f_b_produits_sal_s_frais",
-    "field_key":"3_profil_de_vos_clients_besoins_de_vos_clients_f_b_produits_sal_s_frais",
-    "data_label":"PRODUITS SALÉS FRAIS",
-    "field_type_hint":"categorical",
-    "row":73
-  },
-  {
-    "column":"d_recap_3_profil_de_vos_clients_besoins_de_vos_clients_f_b_produits_sal_s_frais_r73",
     "field_key":"3_profil_de_vos_clients_besoins_de_vos_clients_f_b_produits_sal_s_frais",
     "data_label":"PRODUITS SALÉS FRAIS",
     "field_type_hint":"categorical",
@@ -945,21 +497,7 @@
     "row":74
   },
   {
-    "column":"d_recap_3_profil_de_vos_clients_besoins_de_vos_clients_f_b_produits_sucr_s_secs_r74",
-    "field_key":"3_profil_de_vos_clients_besoins_de_vos_clients_f_b_produits_sucr_s_secs",
-    "data_label":"PRODUITS SUCRÉS SECS",
-    "field_type_hint":"categorical",
-    "row":74
-  },
-  {
     "column":"d_recap_3_profil_de_vos_clients_besoins_de_vos_clients_f_b_produits_sucr_s_frais",
-    "field_key":"3_profil_de_vos_clients_besoins_de_vos_clients_f_b_produits_sucr_s_frais",
-    "data_label":"PRODUITS SUCRÉS FRAIS",
-    "field_type_hint":"categorical",
-    "row":75
-  },
-  {
-    "column":"d_recap_3_profil_de_vos_clients_besoins_de_vos_clients_f_b_produits_sucr_s_frais_r75",
     "field_key":"3_profil_de_vos_clients_besoins_de_vos_clients_f_b_produits_sucr_s_frais",
     "data_label":"PRODUITS SUCRÉS FRAIS",
     "field_type_hint":"categorical",
@@ -973,21 +511,7 @@
     "row":76
   },
   {
-    "column":"d_recap_3_profil_de_vos_clients_besoins_de_vos_clients_f_b_epicerie_fine_r76",
-    "field_key":"3_profil_de_vos_clients_besoins_de_vos_clients_f_b_epicerie_fine",
-    "data_label":"EPICERIE FINE",
-    "field_type_hint":"categorical",
-    "row":76
-  },
-  {
     "column":"d_recap_3_profil_de_vos_clients_besoins_de_vos_clients_non_f_b_produits_sos",
-    "field_key":"3_profil_de_vos_clients_besoins_de_vos_clients_non_f_b_produits_sos",
-    "data_label":"PRODUITS SOS",
-    "field_type_hint":"categorical",
-    "row":77
-  },
-  {
-    "column":"d_recap_3_profil_de_vos_clients_besoins_de_vos_clients_non_f_b_produits_sos_r77",
     "field_key":"3_profil_de_vos_clients_besoins_de_vos_clients_non_f_b_produits_sos",
     "data_label":"PRODUITS SOS",
     "field_type_hint":"categorical",
@@ -1001,21 +525,7 @@
     "row":78
   },
   {
-    "column":"d_recap_3_profil_de_vos_clients_besoins_de_vos_clients_non_f_b_hygi_ne_r78",
-    "field_key":"3_profil_de_vos_clients_besoins_de_vos_clients_non_f_b_hygi_ne",
-    "data_label":"HYGIÈNE",
-    "field_type_hint":"categorical",
-    "row":78
-  },
-  {
     "column":"d_recap_3_profil_de_vos_clients_besoins_de_vos_clients_non_f_b_produits_cosm_tiques",
-    "field_key":"3_profil_de_vos_clients_besoins_de_vos_clients_non_f_b_produits_cosm_tiques",
-    "data_label":"PRODUITS COSMÉTIQUES",
-    "field_type_hint":"categorical",
-    "row":79
-  },
-  {
-    "column":"d_recap_3_profil_de_vos_clients_besoins_de_vos_clients_non_f_b_produits_cosm_tiques_r79",
     "field_key":"3_profil_de_vos_clients_besoins_de_vos_clients_non_f_b_produits_cosm_tiques",
     "data_label":"PRODUITS COSMÉTIQUES",
     "field_type_hint":"categorical",
@@ -1029,21 +539,7 @@
     "row":80
   },
   {
-    "column":"d_recap_3_profil_de_vos_clients_besoins_de_vos_clients_non_f_b_articles_pour_enfants_r80",
-    "field_key":"3_profil_de_vos_clients_besoins_de_vos_clients_non_f_b_articles_pour_enfants",
-    "data_label":"ARTICLES POUR ENFANTS",
-    "field_type_hint":"categorical",
-    "row":80
-  },
-  {
     "column":"d_recap_3_profil_de_vos_clients_besoins_de_vos_clients_non_f_b_pr_t_porter",
-    "field_key":"3_profil_de_vos_clients_besoins_de_vos_clients_non_f_b_pr_t_porter",
-    "data_label":"PRÊT-À-PORTER",
-    "field_type_hint":"categorical",
-    "row":81
-  },
-  {
-    "column":"d_recap_3_profil_de_vos_clients_besoins_de_vos_clients_non_f_b_pr_t_porter_r81",
     "field_key":"3_profil_de_vos_clients_besoins_de_vos_clients_non_f_b_pr_t_porter",
     "data_label":"PRÊT-À-PORTER",
     "field_type_hint":"categorical",
@@ -1057,21 +553,7 @@
     "row":82
   },
   {
-    "column":"d_recap_3_profil_de_vos_clients_besoins_de_vos_clients_non_f_b_accessoires_r82",
-    "field_key":"3_profil_de_vos_clients_besoins_de_vos_clients_non_f_b_accessoires",
-    "data_label":"ACCESSOIRES",
-    "field_type_hint":"categorical",
-    "row":82
-  },
-  {
     "column":"d_recap_3_profil_de_vos_clients_besoins_de_vos_clients_non_f_b_souvenirs",
-    "field_key":"3_profil_de_vos_clients_besoins_de_vos_clients_non_f_b_souvenirs",
-    "data_label":"SOUVENIRS",
-    "field_type_hint":"categorical",
-    "row":83
-  },
-  {
-    "column":"d_recap_3_profil_de_vos_clients_besoins_de_vos_clients_non_f_b_souvenirs_r83",
     "field_key":"3_profil_de_vos_clients_besoins_de_vos_clients_non_f_b_souvenirs",
     "data_label":"SOUVENIRS",
     "field_type_hint":"categorical",
@@ -1085,21 +567,7 @@
     "row":84
   },
   {
-    "column":"d_recap_4_informations_corner_corner_de_vente_actuel_votre_hotel_dispose_t_il_d_j_d_un_c_r84",
-    "field_key":"4_informations_corner_corner_de_vente_actuel_votre_hotel_dispose_t_il_d_j_d_un_c",
-    "data_label":"VOTRE HOTEL DISPOSE-T-IL DÉJÀ D’UN CORNER DE VENTE ?",
-    "field_type_hint":"boolean",
-    "row":84
-  },
-  {
     "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_liste_des_produits_f_b",
-    "field_key":"4_informations_corner_votre_corner_actuel_offre_f_b_liste_des_produits_f_b",
-    "data_label":"LISTE DES PRODUITS F&B",
-    "field_type_hint":"categorical",
-    "row":85
-  },
-  {
-    "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_liste_des_produits_f_b_r85",
     "field_key":"4_informations_corner_votre_corner_actuel_offre_f_b_liste_des_produits_f_b",
     "data_label":"LISTE DES PRODUITS F&B",
     "field_type_hint":"categorical",
@@ -1113,21 +581,7 @@
     "row":90
   },
   {
-    "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_canaux_de_vente_r90",
-    "field_key":"4_informations_corner_votre_corner_actuel_offre_f_b_canaux_de_vente",
-    "data_label":"CANAUX DE VENTE",
-    "field_type_hint":"categorical",
-    "row":90
-  },
-  {
     "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_r_ception",
-    "field_key":"4_informations_corner_votre_corner_actuel_offre_f_b_r_ception",
-    "data_label":"RÉCEPTION",
-    "field_type_hint":"boolean",
-    "row":91
-  },
-  {
-    "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_r_ception_r91",
     "field_key":"4_informations_corner_votre_corner_actuel_offre_f_b_r_ception",
     "data_label":"RÉCEPTION",
     "field_type_hint":"boolean",
@@ -1141,21 +595,7 @@
     "row":92
   },
   {
-    "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_snacking_comptoir_r92",
-    "field_key":"4_informations_corner_votre_corner_actuel_offre_f_b_snacking_comptoir",
-    "data_label":"SNACKING\/COMPTOIR",
-    "field_type_hint":"categorical",
-    "row":92
-  },
-  {
     "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_distributeur_auto",
-    "field_key":"4_informations_corner_votre_corner_actuel_offre_f_b_distributeur_auto",
-    "data_label":"DISTRIBUTEUR AUTO.",
-    "field_type_hint":"boolean",
-    "row":93
-  },
-  {
-    "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_distributeur_auto_r93",
     "field_key":"4_informations_corner_votre_corner_actuel_offre_f_b_distributeur_auto",
     "data_label":"DISTRIBUTEUR AUTO.",
     "field_type_hint":"boolean",
@@ -1169,21 +609,7 @@
     "row":94
   },
   {
-    "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_frigo_connect_r94",
-    "field_key":"4_informations_corner_votre_corner_actuel_offre_f_b_frigo_connect",
-    "data_label":"FRIGO CONNECTÉ",
-    "field_type_hint":"boolean",
-    "row":94
-  },
-  {
     "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_caisse_code_barres",
-    "field_key":"4_informations_corner_votre_corner_actuel_offre_f_b_caisse_code_barres",
-    "data_label":"CAISSE CODE-BARRES",
-    "field_type_hint":"boolean",
-    "row":95
-  },
-  {
-    "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_caisse_code_barres_r95",
     "field_key":"4_informations_corner_votre_corner_actuel_offre_f_b_caisse_code_barres",
     "data_label":"CAISSE CODE-BARRES",
     "field_type_hint":"boolean",
@@ -1197,21 +623,7 @@
     "row":96
   },
   {
-    "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_r_appro_r96",
-    "field_key":"4_informations_corner_votre_corner_actuel_offre_f_b_r_appro",
-    "data_label":"RÉAPPRO.",
-    "field_type_hint":"categorical",
-    "row":96
-  },
-  {
     "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_hotel_staff",
-    "field_key":"4_informations_corner_votre_corner_actuel_offre_f_b_hotel_staff",
-    "data_label":"HOTEL STAFF",
-    "field_type_hint":"categorical",
-    "row":97
-  },
-  {
-    "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_hotel_staff_r97",
     "field_key":"4_informations_corner_votre_corner_actuel_offre_f_b_hotel_staff",
     "data_label":"HOTEL STAFF",
     "field_type_hint":"categorical",
@@ -1225,21 +637,7 @@
     "row":98
   },
   {
-    "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_fournisseur_r98",
-    "field_key":"4_informations_corner_votre_corner_actuel_offre_f_b_fournisseur",
-    "data_label":"FOURNISSEUR",
-    "field_type_hint":"categorical",
-    "row":98
-  },
-  {
     "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_liste_des_produits_non_f",
-    "field_key":"4_informations_corner_votre_corner_actuel_offre_non_f_b_liste_des_produits_non_f",
-    "data_label":"LISTE DES PRODUITS NON-F&B",
-    "field_type_hint":"categorical",
-    "row":99
-  },
-  {
-    "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_liste_des_produits_non_f_r99",
     "field_key":"4_informations_corner_votre_corner_actuel_offre_non_f_b_liste_des_produits_non_f",
     "data_label":"LISTE DES PRODUITS NON-F&B",
     "field_type_hint":"categorical",
@@ -1253,21 +651,7 @@
     "row":104
   },
   {
-    "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_canaux_de_vente_r104",
-    "field_key":"4_informations_corner_votre_corner_actuel_offre_non_f_b_canaux_de_vente",
-    "data_label":"CANAUX DE VENTE",
-    "field_type_hint":"categorical",
-    "row":104
-  },
-  {
     "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_r_ception",
-    "field_key":"4_informations_corner_votre_corner_actuel_offre_non_f_b_r_ception",
-    "data_label":"RÉCEPTION",
-    "field_type_hint":"boolean",
-    "row":105
-  },
-  {
-    "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_r_ception_r105",
     "field_key":"4_informations_corner_votre_corner_actuel_offre_non_f_b_r_ception",
     "data_label":"RÉCEPTION",
     "field_type_hint":"boolean",
@@ -1281,21 +665,7 @@
     "row":106
   },
   {
-    "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_distributeur_auto_r106",
-    "field_key":"4_informations_corner_votre_corner_actuel_offre_non_f_b_distributeur_auto",
-    "data_label":"DISTRIBUTEUR AUTO.",
-    "field_type_hint":"boolean",
-    "row":106
-  },
-  {
     "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_armoire_connect_e",
-    "field_key":"4_informations_corner_votre_corner_actuel_offre_non_f_b_armoire_connect_e",
-    "data_label":"ARMOIRE CONNECTÉE",
-    "field_type_hint":"boolean",
-    "row":107
-  },
-  {
-    "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_armoire_connect_e_r107",
     "field_key":"4_informations_corner_votre_corner_actuel_offre_non_f_b_armoire_connect_e",
     "data_label":"ARMOIRE CONNECTÉE",
     "field_type_hint":"boolean",
@@ -1309,21 +679,7 @@
     "row":108
   },
   {
-    "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_caisse_code_barres_r108",
-    "field_key":"4_informations_corner_votre_corner_actuel_offre_non_f_b_caisse_code_barres",
-    "data_label":"CAISSE CODE-BARRES",
-    "field_type_hint":"boolean",
-    "row":108
-  },
-  {
     "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_r_appro",
-    "field_key":"4_informations_corner_votre_corner_actuel_offre_non_f_b_r_appro",
-    "data_label":"RÉAPPRO.",
-    "field_type_hint":"categorical",
-    "row":109
-  },
-  {
-    "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_r_appro_r109",
     "field_key":"4_informations_corner_votre_corner_actuel_offre_non_f_b_r_appro",
     "data_label":"RÉAPPRO.",
     "field_type_hint":"categorical",
@@ -1337,21 +693,7 @@
     "row":110
   },
   {
-    "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_hotel_staff_r110",
-    "field_key":"4_informations_corner_votre_corner_actuel_offre_non_f_b_hotel_staff",
-    "data_label":"HOTEL STAFF",
-    "field_type_hint":"categorical",
-    "row":110
-  },
-  {
     "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_fournisseur",
-    "field_key":"4_informations_corner_votre_corner_actuel_offre_non_f_b_fournisseur",
-    "data_label":"FOURNISSEUR",
-    "field_type_hint":"categorical",
-    "row":111
-  },
-  {
-    "column":"d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_fournisseur_r111",
     "field_key":"4_informations_corner_votre_corner_actuel_offre_non_f_b_fournisseur",
     "data_label":"FOURNISSEUR",
     "field_type_hint":"categorical",
@@ -1365,21 +707,7 @@
     "row":112
   },
   {
-    "column":"d_recap_4_informations_corner_corner_de_vente_actuel_xpct_de_mes_clients_passent_devant_r112",
-    "field_key":"4_informations_corner_corner_de_vente_actuel_xpct_de_mes_clients_passent_devant_",
-    "data_label":"X% DE MES CLIENTS PASSENT DEVANT CE CORNER",
-    "field_type_hint":"numeric_pct",
-    "row":112
-  },
-  {
     "column":"d_recap_4_informations_corner_corner_de_vente_actuel_m_tres_lin_aires_estimation",
-    "field_key":"4_informations_corner_corner_de_vente_actuel_m_tres_lin_aires_estimation",
-    "data_label":"MÈTRES LINÉAIRES (ESTIMATION)",
-    "field_type_hint":"numeric",
-    "row":113
-  },
-  {
-    "column":"d_recap_4_informations_corner_corner_de_vente_actuel_m_tres_lin_aires_estimation_r113",
     "field_key":"4_informations_corner_corner_de_vente_actuel_m_tres_lin_aires_estimation",
     "data_label":"MÈTRES LINÉAIRES (ESTIMATION)",
     "field_type_hint":"numeric",
@@ -1393,21 +721,7 @@
     "row":114
   },
   {
-    "column":"d_recap_4_informations_corner_corner_de_vente_actuel_m_tres_carr_s_estimation_r114",
-    "field_key":"4_informations_corner_corner_de_vente_actuel_m_tres_carr_s_estimation",
-    "data_label":"MÈTRES CARRÉS (ESTIMATION)",
-    "field_type_hint":"numeric",
-    "row":114
-  },
-  {
     "column":"d_recap_4_informations_corner_quipements_disponibles_wifi",
-    "field_key":"4_informations_corner_quipements_disponibles_wifi",
-    "data_label":"WIFI",
-    "field_type_hint":"categorical",
-    "row":115
-  },
-  {
-    "column":"d_recap_4_informations_corner_quipements_disponibles_wifi_r115",
     "field_key":"4_informations_corner_quipements_disponibles_wifi",
     "data_label":"WIFI",
     "field_type_hint":"categorical",
@@ -1421,21 +735,7 @@
     "row":116
   },
   {
-    "column":"d_recap_4_informations_corner_quipements_disponibles_internet_filaire_prise_rj45_r116",
-    "field_key":"4_informations_corner_quipements_disponibles_internet_filaire_prise_rj45",
-    "data_label":"INTERNET FILAIRE (PRISE RJ45)",
-    "field_type_hint":"categorical",
-    "row":116
-  },
-  {
     "column":"d_recap_4_informations_corner_quipements_disponibles_alimentation_lectrique",
-    "field_key":"4_informations_corner_quipements_disponibles_alimentation_lectrique",
-    "data_label":"ALIMENTATION ÉLECTRIQUE",
-    "field_type_hint":"categorical",
-    "row":117
-  },
-  {
-    "column":"d_recap_4_informations_corner_quipements_disponibles_alimentation_lectrique_r117",
     "field_key":"4_informations_corner_quipements_disponibles_alimentation_lectrique",
     "data_label":"ALIMENTATION ÉLECTRIQUE",
     "field_type_hint":"categorical",
@@ -1449,21 +749,7 @@
     "row":118
   },
   {
-    "column":"d_recap_4_informations_corner_quipements_disponibles_vid_osurveillance_r118",
-    "field_key":"4_informations_corner_quipements_disponibles_vid_osurveillance",
-    "data_label":"VIDÉOSURVEILLANCE",
-    "field_type_hint":"categorical",
-    "row":118
-  },
-  {
     "column":"d_recap_4_informations_corner_autre_emplacement_dispo_xpct_de_mes_clients_passent_devant",
-    "field_key":"4_informations_corner_autre_emplacement_dispo_xpct_de_mes_clients_passent_devant",
-    "data_label":"X% DE MES CLIENTS PASSENT DEVANT CET EMPLACEMENT",
-    "field_type_hint":"numeric_pct",
-    "row":119
-  },
-  {
-    "column":"d_recap_4_informations_corner_autre_emplacement_dispo_xpct_de_mes_clients_passent_devant_r119",
     "field_key":"4_informations_corner_autre_emplacement_dispo_xpct_de_mes_clients_passent_devant",
     "data_label":"X% DE MES CLIENTS PASSENT DEVANT CET EMPLACEMENT",
     "field_type_hint":"numeric_pct",
@@ -1477,21 +763,7 @@
     "row":120
   },
   {
-    "column":"d_recap_4_informations_corner_autre_emplacement_dispo_m_tres_lin_aires_estimation_r120",
-    "field_key":"4_informations_corner_autre_emplacement_dispo_m_tres_lin_aires_estimation",
-    "data_label":"MÈTRES LINÉAIRES (ESTIMATION)",
-    "field_type_hint":"numeric",
-    "row":120
-  },
-  {
     "column":"d_recap_4_informations_corner_autre_emplacement_dispo_m_tres_carr_s_estimation",
-    "field_key":"4_informations_corner_autre_emplacement_dispo_m_tres_carr_s_estimation",
-    "data_label":"MÈTRES CARRÉS (ESTIMATION)",
-    "field_type_hint":"numeric",
-    "row":121
-  },
-  {
-    "column":"d_recap_4_informations_corner_autre_emplacement_dispo_m_tres_carr_s_estimation_r121",
     "field_key":"4_informations_corner_autre_emplacement_dispo_m_tres_carr_s_estimation",
     "data_label":"MÈTRES CARRÉS (ESTIMATION)",
     "field_type_hint":"numeric",
@@ -1533,21 +805,7 @@
     "row":126
   },
   {
-    "column":"d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_nb_de_chambres_r126",
-    "field_key":"5_simulateur_de_revenus_ecran_de_contr_le_parametres_nb_de_chambres",
-    "data_label":"NB. DE CHAMBRES",
-    "field_type_hint":"numeric",
-    "row":126
-  },
-  {
     "column":"d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_moyen_de_guests_par_chambre",
-    "field_key":"5_simulateur_de_revenus_ecran_de_contr_le_parametres_moyen_de_guests_par_chambre",
-    "data_label":"# MOYEN DE GUESTS PAR CHAMBRE",
-    "field_type_hint":"numeric",
-    "row":127
-  },
-  {
-    "column":"d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_moyen_de_guests_par_chambre_r127",
     "field_key":"5_simulateur_de_revenus_ecran_de_contr_le_parametres_moyen_de_guests_par_chambre",
     "data_label":"# MOYEN DE GUESTS PAR CHAMBRE",
     "field_type_hint":"numeric",
@@ -1561,13 +819,6 @@
     "row":128
   },
   {
-    "column":"d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_to_annuel_moyen_r128",
-    "field_key":"5_simulateur_de_revenus_ecran_de_contr_le_parametres_to_annuel_moyen",
-    "data_label":"TO ANNUEL MOYEN",
-    "field_type_hint":"numeric",
-    "row":128
-  },
-  {
     "column":"d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_m_tres_lin_aires_dedies_a_v",
     "field_key":"5_simulateur_de_revenus_ecran_de_contr_le_parametres_m_tres_lin_aires_dedies_a_v",
     "data_label":"MÈTRES LINÉAIRES DEDIES A VOTRE CORNER (ACTUEL OU FUTUR)",
@@ -1575,21 +826,7 @@
     "row":129
   },
   {
-    "column":"d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_m_tres_lin_aires_dedies_a_v_r129",
-    "field_key":"5_simulateur_de_revenus_ecran_de_contr_le_parametres_m_tres_lin_aires_dedies_a_v",
-    "data_label":"MÈTRES LINÉAIRES DEDIES A VOTRE CORNER (ACTUEL OU FUTUR)",
-    "field_type_hint":"boolean",
-    "row":129
-  },
-  {
     "column":"d_recap_5_simulateur_de_revenus_mix_produits_choisi_par_l_h_tel_dans_un_1er_temps_puis_o",
-    "field_key":"5_simulateur_de_revenus_mix_produits_choisi_par_l_h_tel_dans_un_1er_temps_puis_o",
-    "data_label":"% DE PRODUITS F&B",
-    "field_type_hint":"numeric_pct",
-    "row":130
-  },
-  {
-    "column":"d_recap_5_simulateur_de_revenus_mix_produits_choisi_par_l_h_tel_dans_un_1er_temps_puis_o_r130",
     "field_key":"5_simulateur_de_revenus_mix_produits_choisi_par_l_h_tel_dans_un_1er_temps_puis_o",
     "data_label":"% DE PRODUITS F&B",
     "field_type_hint":"numeric_pct",

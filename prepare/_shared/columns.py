@@ -9,7 +9,7 @@ import unicodedata
 def sanitize_column_name(name: str) -> str:
     """Remplace caractères spéciaux et apostrophes par des underscores."""
     text = unicodedata.normalize("NFKD", str(name))
-    text = text.encode("ascii", "ignore").decode("ascii")
+    text = "".join(c for c in text if not unicodedata.combining(c))
     text = text.replace("'", "_").replace("%", "pct")
     text = re.sub(r"[^a-zA-Z0-9]+", "_", text)
     text = re.sub(r"_+", "_", text).strip("_").lower()

@@ -134,7 +134,7 @@ class EnrichHotelService:
         warnings: list[str],
     ) -> EnrichResult:
         """Cas 2 : calcul frais puis persistance feature store."""
-        geo = self._geocode_hotel(hotel_name, address, city)
+        geo = geocode_hotel(hotel_name, address, city, settings=self.settings)
         if not geo:
             empty = EnrichedHotelFeatures()
             self.feature_store.save_enriched(hotel_id, empty, fingerprint=fingerprint)
@@ -205,27 +205,41 @@ class EnrichHotelService:
     def _geocode_hotel(
         self, hotel_name: str, address: str, city: str
     ) -> Optional[Dict]:
-        query = ", ".join(
-            part
-            for part in [hotel_name, address, city, self.settings.default_country]
-            if part
-        )
-        response = requests.get(
-            self.settings.nominatim_url,
-            params={"q": query, "format": "json", "limit": 1, "addressdetails": 1},
-            headers={"User-Agent": self.settings.user_agent},
-            timeout=20,
-        )
-        response.raise_for_status()
-        data = response.json()
-        if not data:
-            return None
-        item = data[0]
-        return {
-            "lat": float(item["lat"]),
-            "lon": float(item["lon"]),
-            "address_resolved": item.get("display_name", ""),
-        }
+        return geocode_hotel(hotel_name, address, city, settings=self.settings)
+
+
+def geocode_hotel(
+    hotel_name: str,
+    address: str = "",
+    city: str = "",
+    *,
+    settings: Settings | None = None,
+) -> Optional[Dict[str, float | str]]:
+    """Géocode un hôtel via Nominatim (nom + adresse + ville)."""
+    settings = settings or get_settings()
+    query = ", ".join(
+        part
+        for part in [hotel_name, address, city, settings.default_country]
+        if part
+    )
+    if not query:
+        return None
+    response = requests.get(
+        settings.nominatim_url,
+        params={"q": query, "format": "json", "limit": 1, "addressdetails": 1},
+        headers={"User-Agent": settings.user_agent},
+        timeout=20,
+    )
+    response.raise_for_status()
+    data = response.json()
+    if not data:
+        return None
+    item = data[0]
+    return {
+        "lat": float(item["lat"]),
+        "lon": float(item["lon"]),
+        "address_resolved": item.get("display_name", ""),
+    }
 
     def _fetch_weather_12_months(self, lat: float, lon: float) -> Dict[str, float]:
         if not HAS_METEOSTAT:

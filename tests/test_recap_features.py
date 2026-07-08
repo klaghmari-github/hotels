@@ -13,7 +13,12 @@ from rod_ia.domain.repositories.identity_registry import HotelIdentityRegistry
 from rod_ia.domain.services.feature_imputer import FeatureImputer
 from rod_ia.domain.services.feature_selector import FeatureSelector
 from rod_ia.domain.services.ml_column_naming import MLColumnNaming
-from rod_ia.domain.services.rod_recap_extractor import RodRecapExtractor
+from rod_ia.domain.services.rod_recap_extractor import (
+    RECAP_GEO_COORDINATE_COLUMNS,
+    RECAP_HOTEL_CODE_COLUMN,
+    RECAP_HOTEL_NAME_ALIAS_COLUMNS,
+    RodRecapExtractor,
+)
 from rod_ia.domain.services.sales_targets_pipeline import SalesTargetsPipeline
 
 
@@ -37,8 +42,148 @@ def test_recap_extractor_produces_hotel_columns(registry, settings):
         pytest.skip("Fichier récap absent")
     wide = RodRecapExtractor(recap, registry).extract_wide()
     assert len(wide) == 7
+    assert "hotel_id" in wide.columns
+    assert "code_h" in wide.columns
     recap_cols = [c for c in wide.columns if c.startswith("d_recap_")]
     assert len(recap_cols) >= 50
+
+
+def _rod_prep_src_path() -> Path:
+    return Path(__file__).resolve().parents[1] / "prepare/RodPrep/Src"
+
+
+def _registry_copy(tmp_path: Path, settings) -> Path:
+    import shutil
+
+    tmp_path.mkdir(parents=True, exist_ok=True)
+    target = tmp_path / "hotel_identity_registry.json"
+    shutil.copy2(settings.identity_registry_path, target)
+    return target
+
+
+def test_rod_prep_geo_priority_recap_over_registry(registry, settings, tmp_path):
+    """Les coordonnées saisies dans le récap priment sur le registre."""
+    recap = _find_recap(settings)
+    if not recap:
+        pytest.skip("Fichier récap absent")
+    import sys
+
+    sys.path.insert(0, str(_rod_prep_src_path()))
+    from rod_prep.prep import RodPrep
+
+    prep = RodPrep(
+        Path(__file__).resolve().parents[1] / "prepare/RodPrep/Input",
+        settings.data_reference_dir / "rod_recap_geo_test",
+        registry_path=_registry_copy(tmp_path, settings),
+    )
+    lookup = prep.run(geocode_missing=False)
+    row = lookup[lookup["hotel_code"] == "HB6A3"].iloc[0]
+    assert row["hotel_geo_source"] == "recap"
+    assert row["hotel_lat"] == pytest.approx(48.591522)
+    assert row["hotel_lon"] == pytest.approx(7.754599)
+
+
+def test_rod_prep_geocodes_when_recap_and_registry_empty(
+    registry, settings, tmp_path, monkeypatch
+):
+    recap = _find_recap(settings)
+    if not recap:
+        pytest.skip("Fichier récap absent")
+    import sys
+
+    sys.path.insert(0, str(_rod_prep_src_path()))
+    import rod_prep.prep as rod_prep_module
+    from rod_prep.prep import RodPrep
+
+    monkeypatch.setattr(
+        rod_prep_module,
+        "geocode_hotel",
+        lambda hotel_name, address="", city="", **_: {
+            "lat": 48.88,
+            "lon": 2.33,
+            "address_resolved": "Paris",
+        },
+    )
+
+    prep = RodPrep(
+        Path(__file__).resolve().parents[1] / "prepare/RodPrep/Input",
+        settings.data_reference_dir / "rod_recap_geo_test2",
+        registry_path=_registry_copy(tmp_path / "geo2", settings),
+    )
+    lookup = prep.run(geocode_missing=True)
+    row = lookup[lookup["hotel_code"] == "H0373"].iloc[0]
+    assert row["hotel_geo_source"] == "recap"
+    porte = lookup[lookup["nom_hotel"] == "Novotel Porte d'Italie"].iloc[0]
+    assert porte["hotel_geo_source"] == "nominatim"
+    assert porte["hotel_lat"] == pytest.approx(48.88)
+
+
+def test_rod_prep_hotel_code_is_accor_code(registry, settings, tmp_path):
+    """``hotel_code`` = CODE H Accor ; les alias de nom restent dans hotel_name / nom_hotel."""
+    recap = _find_recap(settings)
+    if not recap:
+        pytest.skip("Fichier récap absent")
+    import sys
+
+    sys.path.insert(0, str(_rod_prep_src_path()))
+    from rod_prep.prep import RodPrep
+
+    out_dir = settings.data_reference_dir / "rod_recap_code_test"
+    prep = RodPrep(
+        Path(__file__).resolve().parents[1] / "prepare/RodPrep/Input",
+        out_dir,
+        registry_path=_registry_copy(tmp_path, settings),
+    )
+    lookup = prep.run(geocode_missing=False)
+    features = pd.read_csv(out_dir / "rod_features.csv")
+    assert set(lookup["hotel_code"].dropna()) == {
+        "H2075",
+        "HB6A3",
+        "H0815",
+        "HB5I0",
+        "H3546",
+        "H0373",
+        "H6188",
+    }
+    assert "hotel_id" not in lookup.columns
+    assert "hotel_code" in features.columns
+    assert RECAP_HOTEL_CODE_COLUMN not in features.columns
+    assert not RECAP_GEO_COORDINATE_COLUMNS.intersection(features.columns)
+    assert not RECAP_HOTEL_NAME_ALIAS_COLUMNS.intersection(features.columns)
+
+
+def test_recap_extractor_no_hotel_split_columns(registry, settings):
+    """Un champ Excel ne doit pas être éclaté entre hôtels (bug _rN)."""
+    recap = _find_recap(settings)
+    if not recap:
+        pytest.skip("Fichier récap absent")
+    from rod_ia.domain.services.ml_column_naming import MLColumnNaming
+
+    wide = RodRecapExtractor(recap, registry).extract_wide()
+    col = MLColumnNaming.recap_column(
+        "5_simulateur_de_revenus_ecran_de_controle_parametres_nb_de_chambres"
+    )
+    suffixed = f"{col}_r126"
+    assert col in wide.columns
+    assert suffixed not in wide.columns
+    assert wide[col].notna().all()
+
+
+def test_recap_column_names_fold_accents_and_strip_prefixes():
+    from rod_ia.domain.services.ml_column_naming import MLColumnNaming
+
+    col = MLColumnNaming.recap_column(
+        "1_informations_generales_localisation_environnement_nb_supermarches"
+    )
+    assert col == "d_recap_generales_localisation_environnement_nb_supermarches"
+    assert "_s" not in col.split("supermarches")[0]
+
+    col = MLColumnNaming.recap_column(
+        "5_simulateur_de_revenus_ecran_de_controle_parametres_nb_de_chambres"
+    )
+    assert col == "d_recap_de_controle_parametres_nb_de_chambres"
+    assert "informations_" not in col
+    assert "simulateur_de_revenus_ecran_" not in col
 
 
 def test_feature_imputer_fills_missing_booleans(registry, settings):

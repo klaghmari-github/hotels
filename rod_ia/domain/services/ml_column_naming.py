@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import unicodedata
 from dataclasses import asdict, dataclass
 from typing import Iterable
 
@@ -41,11 +42,32 @@ class MLColumnNaming:
 
     TARGET_PREFIX = "t_"
     DESCRIPTIVE_PREFIX = "d_"
+    _RECAP_STRIP_PREFIXES = (
+        re.compile(r"^d_recap_\d+_informations_"),
+        re.compile(r"^d_recap_\d+_simulateur_de_revenus_ecran_"),
+    )
+
+    @staticmethod
+    def fold_accents(value: str) -> str:
+        text = unicodedata.normalize("NFKD", str(value))
+        return "".join(c for c in text if not unicodedata.combining(c))
 
     @classmethod
     def descriptive(cls, name: str) -> str:
         base = cls._sanitize(name)
         return base if base.startswith(cls.DESCRIPTIVE_PREFIX) else f"{cls.DESCRIPTIVE_PREFIX}{base}"
+
+    @classmethod
+    def recap_column(cls, field_key: str) -> str:
+        """Colonne récap ``d_recap_*`` (accents conservés en ASCII, préfixes raccourcis)."""
+        return cls.shorten_recap_column(cls.descriptive(f"recap_{field_key}"))
+
+    @classmethod
+    def shorten_recap_column(cls, name: str) -> str:
+        text = name
+        for pattern in cls._RECAP_STRIP_PREFIXES:
+            text = pattern.sub("d_recap_", text)
+        return text
 
     @classmethod
     def target(cls, name: str) -> str:
@@ -116,9 +138,9 @@ class MLColumnNaming:
             )
         return manifest
 
-    @staticmethod
-    def _sanitize(value: str) -> str:
-        text = str(value).strip().lower()
+    @classmethod
+    def _sanitize(cls, value: str) -> str:
+        text = cls.fold_accents(value).strip().lower()
         text = text.replace("&", "and")
         text = re.sub(r"[^a-z0-9]+", "_", text)
         return re.sub(r"_+", "_", text).strip("_")
