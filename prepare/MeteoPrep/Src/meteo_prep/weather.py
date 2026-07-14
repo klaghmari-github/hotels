@@ -1,7 +1,8 @@
 """Agrégation météo mensuelle indépendante du cas d'usage hôtel.
 
 Entrée : coordonnées géographiques + liste d'années.
-Sortie : indicateurs météo par (année, mois, lat, lon).
+Sortie : indicateurs météo par (année, mois) + colonnes de coordonnées
+telles que fournies en entrée (pas de renommage).
 """
 
 from __future__ import annotations
@@ -31,7 +32,9 @@ READABLE_WEATHER = {
 
 METEO_RAW_COLS = ("temp", "dwpt", "rhum", "prcp", "snow", "wspd", "pres", "tsun")
 
-OUTPUT_ID_COLS = ("lat", "lon", "annee", "mois")
+# Colonnes temporelles toujours présentes en sortie (les noms lat/lon
+# suivent lat_col / lon_col fournis par l'appelant).
+OUTPUT_TIME_COLS = ("annee", "mois")
 
 
 def default_target_years(now: datetime | None = None) -> tuple[int, ...]:
@@ -91,26 +94,39 @@ class MonthlyWeather:
         """Borne inclusive (min, max) des années demandées."""
         return min(self.years), max(self.years)
 
-    def for_point(self, lat: float, lon: float) -> pd.DataFrame:
+    def for_point(
+        self,
+        lat: float,
+        lon: float,
+        *,
+        lat_col: str = "lat",
+        lon_col: str = "lon",
+    ) -> pd.DataFrame:
         """Indicateurs pour un point ``(lat, lon)`` sur toutes les années.
 
         Retourne un DataFrame indexé conceptuellement par
-        ``(annee, mois)`` avec colonnes ``lat``, ``lon``, ``annee``, ``mois``
-        et les métriques ``meteo_*`` (mean / min / max).
+        ``(annee, mois)`` avec colonnes de coordonnées (noms ``lat_col`` /
+        ``lon_col``), ``annee``, ``mois`` et les métriques ``meteo_*``
+        (mean / min / max).
 
         La grille année × mois (12 mois par année demandée) est toujours
         produite ; les cellules sans observation restent NaN.
+        Les noms de colonnes de coordonnées ne sont pas renommés.
         """
         lat_f = as_coord(lat)
         lon_f = as_coord(lon)
         if lat_f is None or lon_f is None:
-            return self._empty_grid(lat=lat_f, lon=lon_f)
+            return self._empty_grid(
+                lat=lat_f, lon=lon_f, lat_col=lat_col, lon_col=lon_col
+            )
 
         try:
             by_ym = self.fetch_by_year_month(lat_f, lon_f)
         except Exception:
             by_ym = {}
-        return self._grid_from_observations(lat_f, lon_f, by_ym)
+        return self._grid_from_observations(
+            lat_f, lon_f, by_ym, lat_col=lat_col, lon_col=lon_col
+        )
 
     @classmethod
     def compute_meteo_final(
@@ -139,7 +155,8 @@ class MonthlyWeather:
         years :
             Liste d'années cibles. ``None`` / vide → année en cours.
         lat_col, lon_col :
-            Noms des colonnes de coordonnées dans ``geo``.
+            Noms des colonnes de coordonnées dans ``geo`` ; réutilisés à
+            l'identique en sortie (aucun renommage).
         id_cols :
             Identifiants optionnels à propager (ex. ``hotel_code``).
         impute :
@@ -149,8 +166,9 @@ class MonthlyWeather:
         Returns
         -------
         pd.DataFrame
-            Une ligne par (point, année, mois) avec colonnes
-            ``lat``, ``lon``, ``annee``, ``mois``, éventuels ``id_cols``,
+            Une ligne par (point, année, mois) avec les colonnes de
+            coordonnées sous les noms ``lat_col`` / ``lon_col`` (aucun
+            renommage), ``annee``, ``mois``, éventuels ``id_cols``,
             et métriques ``meteo_*``.
         """
         target_years = resolve_years(years)
@@ -172,7 +190,7 @@ class MonthlyWeather:
         if impute:
             present_ids = [c for c in (id_cols or ()) if c in raw.columns]
             group_cols: Sequence[str] = (
-                present_ids if present_ids else ("lat", "lon")
+                present_ids if present_ids else (lat_col, lon_col)
             )
             raw = impute_previous_year_month(
                 raw,
@@ -184,7 +202,7 @@ class MonthlyWeather:
         out = raw[raw["annee"].isin(target_years)].copy()
         sort_keys = [
             c
-            for c in list(id_cols or ()) + ["lat", "lon", "annee", "mois"]
+            for c in list(id_cols or ()) + [lat_col, lon_col, "annee", "mois"]
             if c in out.columns
         ]
         if sort_keys:
@@ -208,7 +226,8 @@ class MonthlyWeather:
         locations :
             DataFrame ou séquence de mappings avec au minimum lat/lon.
         lat_col, lon_col :
-            Noms des colonnes de coordonnées (défaut ``lat`` / ``lon``).
+            Noms des colonnes de coordonnées en entrée et en sortie
+            (défaut ``lat`` / ``lon``). Pas de renommage.
         id_cols :
             Colonnes d'identifiants optionnelles à propager en sortie
             (ex. un id de point). Aucune sémantique métier imposée.
@@ -223,7 +242,12 @@ class MonthlyWeather:
 
         parts: list[pd.DataFrame] = []
         for _, row in frame.iterrows():
-            point_df = self.for_point(row[lat_col], row[lon_col])
+            point_df = self.for_point(
+                row[lat_col],
+                row[lon_col],
+                lat_col=lat_col,
+                lon_col=lon_col,
+            )
             for col in keep_ids:
                 point_df[col] = row[col]
             # Ordre : ids puis grille météo
@@ -231,7 +255,7 @@ class MonthlyWeather:
             parts.append(point_df[ordered])
 
         if not parts:
-            base_cols = list(keep_ids) + list(OUTPUT_ID_COLS)
+            base_cols = list(keep_ids) + [lat_col, lon_col, *OUTPUT_TIME_COLS]
             return pd.DataFrame(columns=base_cols)
 
         return pd.concat(parts, ignore_index=True)
@@ -334,13 +358,16 @@ class MonthlyWeather:
         lat: float,
         lon: float,
         by_ym: Mapping[tuple[int, int], Mapping[str, float]],
+        *,
+        lat_col: str = "lat",
+        lon_col: str = "lon",
     ) -> pd.DataFrame:
         rows: list[dict[str, Any]] = []
         for year in self.years:
             for month in range(1, 13):
                 row: dict[str, Any] = {
-                    "lat": lat,
-                    "lon": lon,
+                    lat_col: lat,
+                    lon_col: lon,
                     "annee": int(year),
                     "mois": month,
                 }
@@ -355,9 +382,11 @@ class MonthlyWeather:
         *,
         lat: float | None = None,
         lon: float | None = None,
+        lat_col: str = "lat",
+        lon_col: str = "lon",
     ) -> pd.DataFrame:
         rows = [
-            {"lat": lat, "lon": lon, "annee": int(year), "mois": month}
+            {lat_col: lat, lon_col: lon, "annee": int(year), "mois": month}
             for year in self.years
             for month in range(1, 13)
         ]

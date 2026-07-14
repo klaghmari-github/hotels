@@ -280,6 +280,39 @@ def test_compute_meteo_final_geo_and_years():
     assert frame.loc[frame["mois"] == 8, "meteo_temperature_c_mean"].iloc[0] == pytest.approx(18.0)
 
 
+def test_compute_meteo_final_preserves_lat_lon_column_names():
+    """lat_col / lon_col fournis sont conservés tels quels (pas de renommage)."""
+    geo = pd.DataFrame(
+        [
+            {
+                "hotel_code": "H1",
+                "hotel_name": "Nice",
+                "hotel_lat": 43.7,
+                "hotel_lon": 7.2,
+            }
+        ]
+    )
+    fake = {(2026, m): {"meteo_temperature_c_mean": float(m)} for m in range(1, 13)}
+
+    with patch.object(MonthlyWeather, "fetch_by_year_month", return_value=fake):
+        frame = MonthlyWeather.compute_meteo_final(
+            geo,
+            years=(2026,),
+            lat_col="hotel_lat",
+            lon_col="hotel_lon",
+            id_cols=("hotel_code", "hotel_name"),
+            impute=False,
+        )
+
+    assert "hotel_lat" in frame.columns
+    assert "hotel_lon" in frame.columns
+    assert "lat" not in frame.columns
+    assert "lon" not in frame.columns
+    assert frame["hotel_lat"].tolist() == pytest.approx([43.7] * 12)
+    assert frame["hotel_lon"].tolist() == pytest.approx([7.2] * 12)
+    assert (frame["hotel_code"] == "H1").all()
+
+
 def test_meteo_prep_compute_meteo_final_from_geo(meteo_dirs):
     input_dir, output_dir = meteo_dirs
     _write_hotels(input_dir)
@@ -294,6 +327,8 @@ def test_meteo_prep_compute_meteo_final_from_geo(meteo_dirs):
 
     assert set(frame["annee"].unique()) == {2026}
     assert len(frame) == 12
-    assert "lat" not in frame.columns  # schéma pipeline hôtel
+    assert "lat" not in frame.columns
+    assert "lon" not in frame.columns
+    assert "hotel_lat" in frame.columns and "hotel_lon" in frame.columns
     assert (frame["hotel_code"] == "H2075").all()
     assert frame.loc[frame["mois"] == 3, "meteo_temperature_c_mean"].iloc[0] == pytest.approx(3.0)

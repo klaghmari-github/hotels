@@ -146,11 +146,11 @@ class MeteoPrep:
             id_cols=id_cols or None,
             impute=True,
         )
-        drop_geo = [c for c in ("lat", "lon") if c in frame.columns]
-        if drop_geo:
-            frame = frame.drop(columns=drop_geo)
+        # Pas de renommage : hotel_lat / hotel_lon restent tels quels.
         if frame.empty and id_cols:
-            frame = pd.DataFrame(columns=list(id_cols) + ["annee", "mois"])
+            frame = pd.DataFrame(
+                columns=list(id_cols) + ["hotel_lat", "hotel_lon", "annee", "mois"]
+            )
         return frame
 
     def _compute_meteo_final_via_hotels(
