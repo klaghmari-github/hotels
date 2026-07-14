@@ -74,10 +74,12 @@ class EnrichHotelService:
         city: str = "",
         force_refresh: bool = False,
         hotel_id: str | None = None,
+        lat: float | None = None,
+        lon: float | None = None,
     ) -> EnrichResult:
         warnings: list[str] = []
         resolved_id, warnings = self._resolve_hotel_id(hotel_name, city, hotel_id, warnings)
-        fingerprint = self._enrichment_fingerprint(hotel_name, address, city)
+        fingerprint = self._enrichment_fingerprint(hotel_name, address, city, lat, lon)
 
         if not force_refresh:
             cached = self._load_from_cache(resolved_id, fingerprint)
@@ -85,7 +87,14 @@ class EnrichHotelService:
                 return cached
 
         return self._compute_and_persist(
-            resolved_id, hotel_name, address, city, fingerprint, warnings
+            resolved_id,
+            hotel_name,
+            address,
+            city,
+            fingerprint,
+            warnings,
+            lat=lat,
+            lon=lon,
         )
 
     def _resolve_hotel_id(
@@ -132,37 +141,47 @@ class EnrichHotelService:
         city: str,
         fingerprint: str,
         warnings: list[str],
+        lat: float | None = None,
+        lon: float | None = None,
     ) -> EnrichResult:
-        """Cas 2 : calcul frais puis persistance feature store."""
-        geo = geocode_hotel(hotel_name, address, city, settings=self.settings)
-        if not geo:
-            empty = EnrichedHotelFeatures()
-            self.feature_store.save_enriched(hotel_id, empty, fingerprint=fingerprint)
-            warnings.append("Géocodage échoué.")
-            return EnrichResult(
-                hotel_id=hotel_id,
-                features=empty,
-                source="failed",
-                warnings=warnings,
-            )
+        """Cas 2 : calcul frais puis persistance feature store.
 
-        lat, lon = geo["lat"], geo["lon"]
-        if self.identity_registry.get(hotel_id):
-            warnings.extend(
-                self.identity_registry.update_nominatim_coords(hotel_id, lat, lon)
-            )
-            self.identity_registry.save()
+        Si ``lat``/``lon`` sont fournis, le géocodage Nominatim est ignoré.
+        """
+        address_resolved = ""
+        lat_f = self._as_coord(lat)
+        lon_f = self._as_coord(lon)
 
-        weather = self._fetch_weather_12_months(lat, lon)
+        if lat_f is None or lon_f is None:
+            geo = self._geocode_hotel(hotel_name, address, city)
+            if not geo:
+                empty = EnrichedHotelFeatures()
+                self.feature_store.save_enriched(hotel_id, empty, fingerprint=fingerprint)
+                warnings.append("Géocodage échoué.")
+                return EnrichResult(
+                    hotel_id=hotel_id,
+                    features=empty,
+                    source="failed",
+                    warnings=warnings,
+                )
+            lat_f, lon_f = float(geo["lat"]), float(geo["lon"])
+            address_resolved = str(geo.get("address_resolved", ""))
+            if self.identity_registry.get(hotel_id):
+                warnings.extend(
+                    self.identity_registry.update_nominatim_coords(hotel_id, lat_f, lon_f)
+                )
+                self.identity_registry.save()
+
+        weather = self._fetch_weather_12_months(lat_f, lon_f)
         try:
-            pois = self._fetch_poi(lat, lon)
+            pois = self._fetch_poi(lat_f, lon_f)
             poi_features, nearest = self._compute_poi_features(pois)
         except Exception as exc:
             poi_features, nearest = {}, {}
             warnings.append(f"POI indisponibles: {exc}")
 
         try:
-            beach_m = self._fetch_nearest_beach_m(lat, lon)
+            beach_m = self._fetch_nearest_beach_m(lat_f, lon_f)
             nearest["nearest_beach_m"] = beach_m
             nearest["nearest_beach_km"] = beach_m / 1000.0
         except Exception as exc:
@@ -171,9 +190,9 @@ class EnrichHotelService:
             warnings.append(f"Plages indisponibles: {exc}")
 
         features = EnrichedHotelFeatures(
-            lat=lat,
-            lon=lon,
-            address_resolved=geo.get("address_resolved", ""),
+            lat=lat_f,
+            lon=lon_f,
+            address_resolved=address_resolved,
             poi=self._prefix_descriptive(poi_features),
             weather_monthly=self._prefix_descriptive(weather),
             nearest=self._prefix_descriptive(nearest),
@@ -190,8 +209,23 @@ class EnrichHotelService:
         )
 
     @staticmethod
-    def _enrichment_fingerprint(hotel_name: str, address: str, city: str) -> str:
-        raw = f"{hotel_name.strip().lower()}|{address.strip().lower()}|{city.strip().lower()}"
+    def _enrichment_fingerprint(
+        hotel_name: str,
+        address: str,
+        city: str,
+        lat: float | None = None,
+        lon: float | None = None,
+    ) -> str:
+        coords = ""
+        if lat is not None and lon is not None:
+            try:
+                coords = f"|{float(lat):.6f}|{float(lon):.6f}"
+            except (TypeError, ValueError):
+                coords = ""
+        raw = (
+            f"{hotel_name.strip().lower()}|{address.strip().lower()}"
+            f"|{city.strip().lower()}{coords}"
+        )
         return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
 
     @staticmethod
@@ -207,41 +241,8 @@ class EnrichHotelService:
     ) -> Optional[Dict]:
         return geocode_hotel(hotel_name, address, city, settings=self.settings)
 
-
-def geocode_hotel(
-    hotel_name: str,
-    address: str = "",
-    city: str = "",
-    *,
-    settings: Settings | None = None,
-) -> Optional[Dict[str, float | str]]:
-    """Géocode un hôtel via Nominatim (nom + adresse + ville)."""
-    settings = settings or get_settings()
-    query = ", ".join(
-        part
-        for part in [hotel_name, address, city, settings.default_country]
-        if part
-    )
-    if not query:
-        return None
-    response = requests.get(
-        settings.nominatim_url,
-        params={"q": query, "format": "json", "limit": 1, "addressdetails": 1},
-        headers={"User-Agent": settings.user_agent},
-        timeout=20,
-    )
-    response.raise_for_status()
-    data = response.json()
-    if not data:
-        return None
-    item = data[0]
-    return {
-        "lat": float(item["lat"]),
-        "lon": float(item["lon"]),
-        "address_resolved": item.get("display_name", ""),
-    }
-
     def _fetch_weather_12_months(self, lat: float, lon: float) -> Dict[str, float]:
+        """Agrège la météo horaire Meteostat (stations proches de lat/lon)."""
         if not HAS_METEOSTAT:
             return {}
         end = datetime.utcnow().replace(day=1)
@@ -385,3 +386,49 @@ out center tags;
         )
         slug = "".join(c if c.isalnum() else "_" for c in raw).strip("_")
         return slug[:80] or "unknown_hotel"
+
+    @staticmethod
+    def _as_coord(value: float | None) -> float | None:
+        if value is None:
+            return None
+        try:
+            coord = float(value)
+        except (TypeError, ValueError):
+            return None
+        if math.isnan(coord):
+            return None
+        return coord
+
+
+def geocode_hotel(
+    hotel_name: str,
+    address: str = "",
+    city: str = "",
+    *,
+    settings: Settings | None = None,
+) -> Optional[Dict[str, float | str]]:
+    """Géocode un hôtel via Nominatim (nom + adresse + ville)."""
+    settings = settings or get_settings()
+    query = ", ".join(
+        part
+        for part in [hotel_name, address, city, settings.default_country]
+        if part
+    )
+    if not query:
+        return None
+    response = requests.get(
+        settings.nominatim_url,
+        params={"q": query, "format": "json", "limit": 1, "addressdetails": 1},
+        headers={"User-Agent": settings.user_agent},
+        timeout=20,
+    )
+    response.raise_for_status()
+    data = response.json()
+    if not data:
+        return None
+    item = data[0]
+    return {
+        "lat": float(item["lat"]),
+        "lon": float(item["lon"]),
+        "address_resolved": item.get("display_name", ""),
+    }

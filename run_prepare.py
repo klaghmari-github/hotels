@@ -50,10 +50,19 @@ def run_pipeline(*, skip_meteo: bool = False, skip_proximity: bool = False) -> N
     print("[prepare] Step 2 — MeteoPrep")
     meteo_frame = None
     if not skip_meteo:
-        meteo = MeteoPrep(paths["meteo_input"], paths["meteo_output"])
+        # Années ventes typiques + année en cours (défaut MeteoPrep = année en cours seule)
+        from datetime import datetime
+
+        current = datetime.utcnow().year
+        meteo_years = tuple(range(current - 3, current + 1))
+        meteo = MeteoPrep(
+            paths["meteo_input"],
+            paths["meteo_output"],
+            target_years=meteo_years,
+        )
         meteo.fill_input_from_rod(paths["rod_output"])
         meteo_frame = meteo.run()
-        print(f"  → {len(meteo_frame)} lignes météo")
+        print(f"  → {len(meteo_frame)} lignes météo (années {meteo_years})")
 
     print("[prepare] Step 3 — ProximityPrep")
     prox_frame = None

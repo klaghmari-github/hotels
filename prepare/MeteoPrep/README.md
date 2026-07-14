@@ -4,32 +4,36 @@ Récupération et structuration des données météo mensuelles par hôtel, avec
 
 ## Objectif
 
-Produire une table `hotel_code × annee × mois` avec des indicateurs météo renommés (température, humidité, précipitations…) pour les années 2024 et 2025.
+Produire une table `hotel_code × annee × mois` avec des indicateurs météo renommés (température, humidité, précipitations…).
+
+**Années cibles :** si non fournies → **année en cours**. Les mois manquants d'une année sont complétés par le **même mois de l'année précédente** (jamais d'imputation à 0).
 
 ## Fichiers
 
 | Dossier | Contenu |
 |---------|---------|
-| `Input/` | `hotels.parquet` / `hotels.csv` (produit par RodPrep) |
+| `Input/` | `hotels.parquet` / `hotels.csv` (champs d'identité issus de RodPrep) |
 | `Output/` | `meteo_monthly.parquet`, `meteo_monthly.csv` |
-| `Explore/` | `explore.ipynb` — exploration pas-à-pas (entrées, enrichissement, renommage, imputation) ; remplit `Output/` |
+| `Explore/` | `explore.ipynb` — exploration pas-à-pas ; remplit `Output/` |
 | `Src/meteo_prep/prep.py` | Classe `MeteoPrep` |
 
-## Entrées
+## Entrées (identité hôtel)
 
-| Champ source | Origine | Description |
-|--------------|---------|-------------|
-| `hotel_code` | RodPrep | Code hôtel canonique |
+| Champ | Origine | Rôle |
+|-------|---------|------|
+| `hotel_code` | RodPrep | Identifiant hôtel (code Accor) |
 | `hotel_name` | RodPrep | Nom affiché |
 | `hotel_brand` | RodPrep | Marque |
 | `hotel_city` | RodPrep | Ville |
-| `hotel_lat` | RodPrep | Latitude |
-| `hotel_lon` | RodPrep | Longitude |
-| `hotel_adresse` | Dérivé | Copie de `hotel_city` (utilisé si lat/lon absentes) |
+| `hotel_lat` | RodPrep | **Latitude** — point météo |
+| `hotel_lon` | RodPrep | **Longitude** — point météo |
+| `hotel_adresse` | Optionnel | Fallback uniquement si lat/lon absentes |
 
-## Source météo (API / cache)
+Les coordonnées sont renseignées par RodPrep (récap, registre ou géocodage). La météo s'appuie sur `hotel_lat` / `hotel_lon` (stations Meteostat les plus proches du point).
 
-Données horaires Meteostat via `EnrichHotelService`, agrégées par mois. Clés brutes dans le feature store :
+## Source météo
+
+Données horaires Meteostat au point `(hotel_lat, hotel_lon)` (stations les plus proches), agrégées par mois via `EnrichHotelService._fetch_weather_12_months`. Seule la météo est demandée (pas de POI / plage).
 
 | Préfixe brut | Exemple |
 |--------------|---------|
@@ -40,10 +44,11 @@ Statistiques : `mean`, `min`, `max`.
 
 ## Traitement
 
-1. Pour chaque hôtel, appel `EnrichHotelService.enrich()` (cache feature store ou calcul).
-2. Renommage des colonnes météo en libellés lisibles.
-3. Génération d'une ligne par `(hotel_code, annee, mois)` pour 2024 et 2025.
-4. Imputation des trous par hôtel et par année.
+1. `fill_input_from_rod` : copie les champs d'identité depuis `RodPrep/Output/hotel_lookup` (sans `hotel_code` null).
+2. Pour chaque hôtel : météo au point `(hotel_lat, hotel_lon)` agrégée par `(année, mois)` ; si coords manquantes, géocodage nom/ville/adresse.
+3. Génération d'une grille `hotel_code × annee × mois` (années cibles + année N-1 pour imputation).
+4. Imputation des mois manquants : même mois de l'année précédente (pas de fill à 0).
+5. Filtrage sur les années cibles puis écriture `Output/`.
 
 ## Sorties calculées
 
@@ -51,7 +56,7 @@ Statistiques : `mean`, `min`, `max`.
 |-------|---------|
 | `hotel_code` | Reprise entrée |
 | `hotel_name` | Reprise entrée |
-| `annee` | 2024 ou 2025 (constante `TARGET_YEARS`) |
+| `annee` | Années cibles (`target_years`, défaut = année en cours) |
 | `mois` | 1 à 12 |
 | `meteo_temperature_c_mean` | Renommage de `d_m{MM}_temp_mean` |
 | `meteo_temperature_c_min` | Renommage de `d_m{MM}_temp_min` |
@@ -76,16 +81,19 @@ meteo_{READABLE_MAP[metric]}_{stat}
 
 avec `READABLE_MAP = {temp: temperature_c, dwpt: point_rosee_c, rhum: humidite_pct, …}`.
 
-**Imputation (par `hotel_code`, `annee`) :**
+**Imputation (par `hotel_code`, colonne `meteo_*`) :**
 
-1. `ffill()` puis `bfill()` sur la série mensuelle.
-2. Si valeur encore manquante : moyenne de la colonne sur l'année.
-3. Sinon : `0.0`.
+1. Si valeur manquante pour `(annee=Y, mois=M)` → reprendre `(Y-1, M)`, puis `(Y-2, M)`, …
+2. **Jamais** d'imputation à `0.0` : si aucune année antérieure n'a la valeur, le NaN est conservé.
 
-**Note :** le profil météo provient du cache enrichissement (fenêtre glissante ~12 mois). Les années 2024 et 2025 reçoivent le même profil mensuel type tant que l'API ne fournit pas d'historique annuel distinct par hôtel.
+**Année absente dans les observations API :** rattachée à l'année en cours.
+
+**Note :** `run_prepare.py` passe explicitement une plage d'années (N-3 … N) pour couvrir la jointure ventes.
 
 ## Exécution
 
 ```bash
 python run_prepare.py   # sans --skip-meteo
 ```
+
+Ou notebook : `prepare/MeteoPrep/Explore/explore.ipynb`.

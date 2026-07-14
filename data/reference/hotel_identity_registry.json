@@ -17,8 +17,8 @@
       "geo_source": "nominatim",
       "lat_rod": null,
       "lon_rod": null,
-      "lat_nominatim": 43.6892582,
-      "lon_nominatim": 7.2403791,
+      "lat_nominatim": 43.7,
+      "lon_nominatim": 7.25,
       "has_sales": true,
       "has_rod": true,
       "nb_chambres": 129
