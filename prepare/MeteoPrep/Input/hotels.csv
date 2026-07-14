@@ -1,8 +1,8 @@
-hotel_code,hotel_name,hotel_brand,hotel_city,hotel_lat,hotel_lon,hotel_adresse
-H2075,Ibis budget Nice Californie,IBIS BUDGET,Nice,43.689186,7.240512,Nice
-HB6A3,Ibis budget Strasbourg Centre République,IBIS BUDGET,Strasbourg,48.591522,7.754599,Strasbourg
-H0815,Ibis Styles Roissy CDG,IBIS STYLES,Roissy,49.006733,2.519843,Roissy
-H6188,Mercure Paris Boulogne,MERCURE,Boulogne-Billancourt,48.833827,2.256274,Boulogne-Billancourt
-H0373,Mercure Paris Montmartre Sacré-Cœur,MERCURE,Paris,48.885048,2.329923,Paris
-HB5I0,Novotel Megève Mont-Blanc,NOVOTEL,Megève,45.8591651916,6.6190552711,Megève
-H3546,Novotel Paris Centre Tour Eiffel,NOVOTEL,Paris,48.849778,2.282836,Paris
+hotel_code,hotel_name,hotel_brand,hotel_city,hotel_lat,hotel_lon
+H2075,Ibis budget Nice Californie,IBIS BUDGET,Nice,43.689186,7.240512
+HB6A3,Ibis budget Strasbourg Centre République,IBIS BUDGET,Strasbourg,48.591522,7.754599
+H0815,Ibis Styles Roissy CDG,IBIS STYLES,Roissy,49.006733,2.519843
+H6188,Mercure Paris Boulogne,MERCURE,Boulogne-Billancourt,48.833827,2.256274
+H0373,Mercure Paris Montmartre Sacré-Cœur,MERCURE,Paris,48.885048,2.329923
+HB5I0,Novotel Megève Mont-Blanc,NOVOTEL,Megève,45.8591651916,6.6190552711
+H3546,Novotel Paris Centre Tour Eiffel,NOVOTEL,Paris,48.849778,2.282836
