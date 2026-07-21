@@ -5,13 +5,14 @@ Pipeline de préparation des données pour le modèle — **package Python impor
 ## Architecture
 
 ```
-RodPrep ──► MeteoPrep ──┐
-        ├──► ProximityPrep ┼──► AllPrep → dataset_full
-        └──► SalesPrep ───┘
+RodPrep ──► MeteoPrep ────┐
+        ├──► ProximityPrep ─┼──► AllPrep → dataset_full
+        ├──► HolidaysPrep ──┤
+        └──► SalesPrep ─────┘
 ```
 
 **RodPrep est la source de vérité** : code Accor (`hotel_code` = `code_h`), noms, marque, ville, `hotel_lat` / `hotel_lon`.  
-MeteoPrep, ProximityPrep et SalesPrep **consomment** cette table ; ils ne redéfinissent pas l’identité hôtel.
+MeteoPrep, ProximityPrep, HolidaysPrep et SalesPrep **consomment** cette table ; ils ne redéfinissent pas l’identité hôtel.
 
 ## Package Python
 
@@ -20,6 +21,7 @@ MeteoPrep, ProximityPrep et SalesPrep **consomment** cette table ; ils ne redéf
 | `prepare.rod_prep` | Extraction Excel récap + lookup identité |
 | `prepare.meteo_prep` | Météo mensuelle au point (lat, lon) |
 | `prepare.proximity_prep` | POI commerces + distance plage |
+| `prepare.holidays_prep` | Fériés + vacances scolaires par mois (zone via coords) |
 | `prepare.sales_prep` | Agrégations ventes 1.a→7 + `hotel_code` |
 | `prepare.all_prep` | Jointure finale |
 | `prepare.pipeline` | Orchestrateur `PreparePipeline` |
@@ -29,18 +31,14 @@ MeteoPrep, ProximityPrep et SalesPrep **consomment** cette table ; ils ne redéf
 ### Usage
 
 ```python
-from prepare import PreparePipeline, RodPrep, MeteoPrep, ProximityPrep, SalesPrep
+from prepare import PreparePipeline, RodPrep, HolidaysPrep, default_paths
 
-# Pipeline complet
 result = PreparePipeline().run()
-print(result.dataset_path)
-print(result.meta)
-
-# Ou étape par étape (RodPrep d'abord)
-from prepare import default_paths
+# ou seulement HolidaysPrep
 paths = default_paths()
-lookup = RodPrep(paths.rod_input, paths.rod_output).run()
-# …
+prep = HolidaysPrep(paths.holidays_input, paths.holidays_output, target_years=(2024, 2025))
+prep.fill_input_from_rod(paths.rod_output)
+df = prep.run()  # → Output/holidays_monthly.xlsx
 ```
 
 ### CLI
@@ -48,6 +46,7 @@ lookup = RodPrep(paths.rod_input, paths.rod_output).run()
 ```bash
 python run_prepare.py
 python run_prepare.py --skip-meteo --skip-proximity
+python run_prepare.py --skip-holidays
 python -m prepare --holdout-year 2026
 ```
 

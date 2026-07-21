@@ -46,6 +46,14 @@ class PreparePaths:
         return self.root / "ProximityPrep" / "Output"
 
     @property
+    def holidays_input(self) -> Path:
+        return self.root / "HolidaysPrep" / "Input"
+
+    @property
+    def holidays_output(self) -> Path:
+        return self.root / "HolidaysPrep" / "Output"
+
+    @property
     def sales_input(self) -> Path:
         return self.root / "SalesPrep" / "Input"
 
@@ -69,6 +77,8 @@ class PreparePaths:
             "meteo_output": self.meteo_output,
             "prox_input": self.proximity_input,
             "prox_output": self.proximity_output,
+            "holidays_input": self.holidays_input,
+            "holidays_output": self.holidays_output,
             "sales_input": self.sales_input,
             "sales_output": self.sales_output,
             "all_input": self.all_input,

@@ -11,6 +11,7 @@ import pytest
 import prepare
 from prepare import (
     AllPrep,
+    HolidaysPrep,
     MeteoPrep,
     PreparePipeline,
     PreparePaths,
@@ -28,6 +29,7 @@ def test_package_exports():
     assert RodPrep is not None
     assert MeteoPrep is not None
     assert ProximityPrep is not None
+    assert HolidaysPrep is not None
     assert SalesPrep is not None
     assert AllPrep is not None
     assert PreparePipeline is not None
@@ -40,13 +42,16 @@ def test_default_paths_layout():
     assert paths.rod_output == PACKAGE_DIR / "RodPrep" / "Output"
     assert paths.meteo_input == PACKAGE_DIR / "MeteoPrep" / "Input"
     assert paths.proximity_output == PACKAGE_DIR / "ProximityPrep" / "Output"
+    assert paths.holidays_output == PACKAGE_DIR / "HolidaysPrep" / "Output"
     assert paths.sales_output == PACKAGE_DIR / "SalesPrep" / "Output"
     assert paths.all_output == PACKAGE_DIR / "AllPrep" / "Output"
     assert (PROJECT_ROOT / "prepare").is_dir()
     assert (PACKAGE_DIR / "rod_prep").is_dir()
     assert (PACKAGE_DIR / "meteo_prep").is_dir()
     assert (PACKAGE_DIR / "proximity_prep").is_dir()
+    assert (PACKAGE_DIR / "holidays_prep").is_dir()
     assert (PACKAGE_DIR / "sales_prep").is_dir()
+
 
 
 def test_paths_override_root(tmp_path: Path):
@@ -65,6 +70,8 @@ def test_pipeline_order_rod_first_then_consumers(tmp_path: Path):
         paths.meteo_output,
         paths.proximity_input,
         paths.proximity_output,
+        paths.holidays_input,
+        paths.holidays_output,
         paths.sales_input,
         paths.sales_output,
         paths.all_input,
@@ -108,6 +115,18 @@ def test_pipeline_order_rod_first_then_consumers(tmp_path: Path):
             }
         ]
     )
+    holidays = pd.DataFrame(
+        [
+            {
+                "hotel_code": "H2075",
+                "annee": 2025,
+                "mois": 1,
+                "nb_jours_feries": 1,
+                "nb_jours_vacances_scolaires": 0,
+                "nb_jours_vacances_hors_feries": 0,
+            }
+        ]
+    )
     sales = pd.DataFrame(
         [
             {
@@ -129,6 +148,7 @@ def test_pipeline_order_rod_first_then_consumers(tmp_path: Path):
                 "nombre_ventes": 10.0,
                 "meteo_temperature_c_mean": 10.0,
                 "plage_distance_km": 0.2,
+                "nb_jours_feries": 1,
             }
         ]
     )
@@ -148,6 +168,10 @@ def test_pipeline_order_rod_first_then_consumers(tmp_path: Path):
         order.append("proximity")
         return prox
 
+    def hol_side_effect(*_a, **_k):
+        order.append("holidays")
+        return holidays
+
     def sales_side_effect(*_a, **_k):
         order.append("sales")
         return sales
@@ -160,17 +184,20 @@ def test_pipeline_order_rod_first_then_consumers(tmp_path: Path):
         patch.object(pipe, "run_rod", side_effect=rod_side_effect),
         patch.object(pipe, "run_meteo", side_effect=meteo_side_effect),
         patch.object(pipe, "run_proximity", side_effect=prox_side_effect),
+        patch.object(pipe, "run_holidays", side_effect=hol_side_effect),
         patch.object(pipe, "run_sales", side_effect=sales_side_effect),
         patch.object(pipe, "run_all", side_effect=all_side_effect),
     ):
-        result = pipe.run(skip_meteo=False, skip_proximity=False)
+        result = pipe.run(skip_meteo=False, skip_proximity=False, skip_holidays=False)
 
-    assert order == ["rod", "meteo", "proximity", "sales", "all"]
+    assert order == ["rod", "meteo", "proximity", "holidays", "sales", "all"]
     assert result.hotel_lookup.loc[0, "hotel_code"] == "H2075"
     assert result.meteo is not None
     assert result.proximity is not None
+    assert result.holidays is not None
     assert result.sales_joined.loc[0, "hotel_code"] == "H2075"
     assert len(result.dataset_full) == 1
+
 
 
 def test_all_prep_joins_on_hotel_code(tmp_path: Path):

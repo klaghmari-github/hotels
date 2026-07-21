@@ -1,16 +1,23 @@
-"""Tests ProximityPrep — identité RodPrep, coords prioritaires, pas de nom-as-code."""
+"""Tests ProximityPrep — commerces 100–500 m, plage 1–5 km, codes Accor."""
 
 from __future__ import annotations
 
 from pathlib import Path
-from unittest.mock import MagicMock
 
 import pandas as pd
 import pytest
 
-from prepare.proximity_prep import HOTEL_IDENTITY_COLS, ProximityPrep, as_coord
-from rod_ia.domain.models.enrichment import EnrichResult
-from rod_ia.domain.models.simulation import EnrichedHotelFeatures
+from prepare.proximity_prep import (
+    BEACH_RADII_KM,
+    COMMERCE_RADII_M,
+    HOTEL_IDENTITY_COLS,
+    ProximityFeatures,
+    ProximityPrep,
+    as_coord,
+    beach_presence_flags,
+    count_commerce_by_category,
+    empty_proximity_features,
+)
 
 
 @pytest.fixture
@@ -22,46 +29,61 @@ def prox_dirs(tmp_path: Path) -> tuple[Path, Path]:
     return input_dir, output_dir
 
 
-def _mock_enrich(
-    *,
-    lat: float = 43.69,
-    lon: float = 7.24,
-    source: str = "computed",
-    poi: dict | None = None,
-    nearest: dict | None = None,
-) -> MagicMock:
-    features = EnrichedHotelFeatures(
-        lat=lat,
-        lon=lon,
-        poi=poi
-        or {
-            "d_poi_fb_0_0_1km": 2.0,
-            "d_poi_fb_0_0_5km": 10.0,
-            "d_poi_not_fb_0_0_1km": 1.0,
-            "d_poi_not_fb_0_0_5km": 4.0,
-        },
-        nearest=nearest
-        or {
-            "d_nearest_beach_km": 0.15,
-            "d_nearest_beach_m": 150.0,
-            "d_nearest_bakery_m": 40.0,
-        },
-    )
-    enrich = MagicMock()
-    enrich.enrich.return_value = EnrichResult(
-        hotel_id="H2075",
-        features=features,
-        source=source,
-        warnings=[],
-    )
-    return enrich
-
-
 def test_as_coord_invalid():
     assert as_coord(None) is None
     assert as_coord(float("nan")) is None
     assert as_coord("x") is None
     assert as_coord("43.5") == pytest.approx(43.5)
+
+
+def test_count_commerce_by_category_cumulative_radii():
+    shops = [
+        {"shop": "bakery", "distance_m": 50},
+        {"shop": "bakery", "distance_m": 150},
+        {"shop": "convenience", "distance_m": 250},
+        {"shop": "pharmacy", "distance_m": 450},
+        {"shop": "supermarket", "distance_m": 600},  # hors 500 m
+    ]
+    feats = count_commerce_by_category(shops)
+
+    assert feats["commerce_bakery_100m"] == 1
+    assert feats["commerce_bakery_200m"] == 2
+    assert feats["commerce_bakery_500m"] == 2
+    assert feats["commerce_convenience_100m"] == 0
+    assert feats["commerce_convenience_300m"] == 1
+    assert feats["commerce_pharmacy_400m"] == 0
+    assert feats["commerce_pharmacy_500m"] == 1
+    assert feats["commerce_supermarket_500m"] == 0  # > 500
+
+    # Agrégats F&B / non-F&B
+    assert feats["commerce_fb_100m"] == 1  # bakery 50
+    assert feats["commerce_fb_300m"] == 3  # 2 bakery + convenience
+    assert feats["commerce_non_fb_500m"] == 1  # pharmacy
+
+
+def test_beach_presence_flags_by_km():
+    # Plage à 1.5 km
+    feats = beach_presence_flags([1500.0])
+    assert feats["plage_1km"] == 0.0
+    assert feats["plage_2km"] == 1.0
+    assert feats["plage_3km"] == 1.0
+    assert feats["plage_5km"] == 1.0
+    assert feats["plage_distance_km"] == pytest.approx(1.5)
+
+    empty = beach_presence_flags([])
+    assert all(empty[f"plage_{k}km"] == 0.0 for k in BEACH_RADII_KM)
+    assert pd.isna(empty["plage_distance_km"])
+
+
+def test_empty_features_has_all_expected_columns():
+    feats = empty_proximity_features()
+    for r in COMMERCE_RADII_M:
+        assert f"commerce_fb_{r}m" in feats
+        assert f"commerce_non_fb_{r}m" in feats
+        assert f"commerce_bakery_{r}m" in feats
+    for k in BEACH_RADII_KM:
+        assert f"plage_{k}km" in feats
+    assert "plage_distance_km" in feats
 
 
 def test_fill_input_from_rod_keeps_accor_codes_and_coords(prox_dirs, tmp_path: Path):
@@ -83,28 +105,29 @@ def test_fill_input_from_rod_keeps_accor_codes_and_coords(prox_dirs, tmp_path: P
             {
                 "hotel_code": None,
                 "hotel_name": "Novotel Porte d'Italie",
-                "nom_hotel": "Novotel Porte d'Italie",
-                "hotel_brand": "NOVOTEL",
                 "hotel_city": "Paris",
                 "hotel_lat": None,
                 "hotel_lon": None,
-                "d_recap_foo": 0,
             },
             {
                 "hotel_code": "HB6A3",
                 "hotel_name": "Ibis budget Strasbourg",
-                "nom_hotel": "Ibis budget Strasbourg Centre République",
-                "hotel_brand": "IBIS BUDGET",
                 "hotel_city": "Strasbourg",
                 "hotel_lat": 48.591522,
                 "hotel_lon": 7.754599,
-                "d_recap_foo": 2,
             },
         ]
     )
     lookup.to_parquet(rod_out / "hotel_lookup.parquet", index=False)
 
-    prep = ProximityPrep(input_dir, output_dir, enrich=_mock_enrich())
+    prep = ProximityPrep(
+        input_dir,
+        output_dir,
+        features=ProximityFeatures(
+            fetch_shops=lambda lat, lon: [],
+            fetch_beaches=lambda lat, lon: [],
+        ),
+    )
     path = prep.fill_input_from_rod(rod_out)
     frame = pd.read_parquet(path)
 
@@ -112,18 +135,15 @@ def test_fill_input_from_rod_keeps_accor_codes_and_coords(prox_dirs, tmp_path: P
     assert "d_recap_foo" not in frame.columns
     assert set(frame["hotel_code"]) == {"H2075", "HB6A3"}
     assert frame["hotel_lat"].notna().all()
-    assert not frame["hotel_code"].str.contains("-", regex=False).any()
-    assert "Ibis" not in " ".join(frame["hotel_code"].tolist())
 
 
-def test_run_passes_lat_lon_and_accor_code(prox_dirs):
+def test_run_uses_coords_and_outputs_full_grid(prox_dirs):
     input_dir, output_dir = prox_dirs
     hotels = pd.DataFrame(
         [
             {
                 "hotel_code": "H2075",
                 "hotel_name": "Ibis budget Nice Californie",
-                "hotel_brand": "IBIS BUDGET",
                 "hotel_city": "Nice",
                 "hotel_lat": 43.689186,
                 "hotel_lon": 7.240512,
@@ -132,26 +152,61 @@ def test_run_passes_lat_lon_and_accor_code(prox_dirs):
     )
     hotels.to_parquet(input_dir / "hotels.parquet", index=False)
 
-    enrich = _mock_enrich()
-    prep = ProximityPrep(input_dir, output_dir, enrich=enrich)
+    def fake_shops(lat, lon):
+        assert lat == pytest.approx(43.689186)
+        assert lon == pytest.approx(7.240512)
+        return [
+            {"shop": "bakery", "distance_m": 80},
+            {"shop": "convenience", "distance_m": 220},
+            {"shop": "gift", "distance_m": 350},
+        ]
+
+    def fake_beaches(lat, lon):
+        return [3200.0]  # 3.2 km
+
+    prep = ProximityPrep(
+        input_dir,
+        output_dir,
+        features=ProximityFeatures(
+            fetch_shops=fake_shops,
+            fetch_beaches=fake_beaches,
+        ),
+    )
     frame = prep.run()
 
     assert len(frame) == 1
-    assert frame.loc[0, "hotel_code"] == "H2075"
-    assert frame.loc[0, "geo_source"] == "rod_coords"
-    assert frame.loc[0, "commerce_fb_100m"] == 2.0
-    assert frame.loc[0, "plage_distance_km"] == pytest.approx(0.15)
-    assert frame.loc[0, "distance_beach_m"] == pytest.approx(150.0)
-    assert frame.loc[0, "distance_bakery_m"] == pytest.approx(40.0)
+    row = frame.iloc[0]
+    assert row["hotel_code"] == "H2075"
+    assert row["geo_source"] == "rod_coords"
 
-    kwargs = enrich.enrich.call_args.kwargs
-    assert kwargs["hotel_id"] == "H2075"
-    assert kwargs["lat"] == pytest.approx(43.689186)
-    assert kwargs["lon"] == pytest.approx(7.240512)
-    assert kwargs["hotel_name"] == "Ibis budget Nice Californie"
+    # Commerces par catégorie / rayon
+    assert row["commerce_bakery_100m"] == 1
+    assert row["commerce_bakery_500m"] == 1
+    assert row["commerce_convenience_100m"] == 0
+    assert row["commerce_convenience_300m"] == 1
+    assert row["commerce_gift_400m"] == 1
+    assert row["commerce_fb_100m"] == 1
+    assert row["commerce_fb_300m"] == 2
+    assert row["commerce_non_fb_500m"] == 1
+
+    # Plage 1–5 km
+    assert row["plage_1km"] == 0
+    assert row["plage_2km"] == 0
+    assert row["plage_3km"] == 0
+    assert row["plage_4km"] == 1
+    assert row["plage_5km"] == 1
+    assert row["plage_distance_km"] == pytest.approx(3.2)
+
+    # Toutes les colonnes rayon présentes
+    for r in COMMERCE_RADII_M:
+        assert f"commerce_fb_{r}m" in frame.columns
+    for k in BEACH_RADII_KM:
+        assert f"plage_{k}km" in frame.columns
+
+    assert (output_dir / "proximity.parquet").exists()
 
 
-def test_run_fallback_geocode_when_coords_missing(prox_dirs):
+def test_run_fallback_geocode_when_coords_missing(prox_dirs, monkeypatch):
     input_dir, output_dir = prox_dirs
     hotels = pd.DataFrame(
         [
@@ -166,33 +221,26 @@ def test_run_fallback_geocode_when_coords_missing(prox_dirs):
     )
     hotels.to_parquet(input_dir / "hotels.parquet", index=False)
 
-    enrich = _mock_enrich(lat=45.75, lon=4.85)
-    prep = ProximityPrep(input_dir, output_dir, enrich=enrich)
-    frame = prep.run()
+    monkeypatch.setattr(
+        "prepare.proximity_prep.prep.geocode_hotel",
+        lambda *a, **k: {"lat": 45.75, "lon": 4.85, "address_resolved": "Lyon"},
+    )
 
+    seen: list[tuple[float, float]] = []
+
+    def fake_shops(lat, lon):
+        seen.append((lat, lon))
+        return []
+
+    prep = ProximityPrep(
+        input_dir,
+        output_dir,
+        features=ProximityFeatures(
+            fetch_shops=fake_shops,
+            fetch_beaches=lambda lat, lon: [],
+        ),
+    )
+    frame = prep.run()
     assert frame.loc[0, "hotel_code"] == "H9999"
     assert frame.loc[0, "geo_source"] == "name_geocode"
-    kwargs = enrich.enrich.call_args.kwargs
-    assert kwargs["lat"] is None
-    assert kwargs["lon"] is None
-    assert kwargs["hotel_name"] == "Hotel Sans Coords"
-
-
-def test_run_writes_output_files(prox_dirs):
-    input_dir, output_dir = prox_dirs
-    pd.DataFrame(
-        [
-            {
-                "hotel_code": "H2075",
-                "hotel_name": "Nice",
-                "hotel_city": "Nice",
-                "hotel_lat": 43.7,
-                "hotel_lon": 7.2,
-            }
-        ]
-    ).to_parquet(input_dir / "hotels.parquet", index=False)
-
-    prep = ProximityPrep(input_dir, output_dir, enrich=_mock_enrich())
-    prep.run()
-    assert (output_dir / "proximity.parquet").exists()
-    assert (output_dir / "proximity.csv").exists()
+    assert seen and seen[0][0] == pytest.approx(45.75)

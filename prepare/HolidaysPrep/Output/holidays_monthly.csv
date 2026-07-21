@@ -1,0 +1,169 @@
+hotel_code,hotel_name,hotel_lat,hotel_lon,departement,commune,zone_scolaire,localisation,annee,mois,nb_jours_feries,nb_jours_vacances_scolaires,nb_jours_vacances_hors_feries,nb_jours_dans_mois
+H0373,Mercure Paris Montmartre Sacré-Cœur,48.885048,2.329923,75,Paris,C,Paris (75),2024,1,1,7,6,31
+H0373,Mercure Paris Montmartre Sacré-Cœur,48.885048,2.329923,75,Paris,C,Paris (75),2024,2,0,16,16,29
+H0373,Mercure Paris Montmartre Sacré-Cœur,48.885048,2.329923,75,Paris,C,Paris (75),2024,3,0,0,0,31
+H0373,Mercure Paris Montmartre Sacré-Cœur,48.885048,2.329923,75,Paris,C,Paris (75),2024,4,1,16,16,30
+H0373,Mercure Paris Montmartre Sacré-Cœur,48.885048,2.329923,75,Paris,C,Paris (75),2024,5,4,4,3,31
+H0373,Mercure Paris Montmartre Sacré-Cœur,48.885048,2.329923,75,Paris,C,Paris (75),2024,6,0,0,0,30
+H0373,Mercure Paris Montmartre Sacré-Cœur,48.885048,2.329923,75,Paris,C,Paris (75),2024,7,1,26,25,31
+H0373,Mercure Paris Montmartre Sacré-Cœur,48.885048,2.329923,75,Paris,C,Paris (75),2024,8,1,31,30,31
+H0373,Mercure Paris Montmartre Sacré-Cœur,48.885048,2.329923,75,Paris,C,Paris (75),2024,9,0,1,1,30
+H0373,Mercure Paris Montmartre Sacré-Cœur,48.885048,2.329923,75,Paris,C,Paris (75),2024,10,0,13,13,31
+H0373,Mercure Paris Montmartre Sacré-Cœur,48.885048,2.329923,75,Paris,C,Paris (75),2024,11,2,3,2,30
+H0373,Mercure Paris Montmartre Sacré-Cœur,48.885048,2.329923,75,Paris,C,Paris (75),2024,12,1,11,10,31
+H0373,Mercure Paris Montmartre Sacré-Cœur,48.885048,2.329923,75,Paris,C,Paris (75),2025,1,1,5,4,31
+H0373,Mercure Paris Montmartre Sacré-Cœur,48.885048,2.329923,75,Paris,C,Paris (75),2025,2,0,14,14,28
+H0373,Mercure Paris Montmartre Sacré-Cœur,48.885048,2.329923,75,Paris,C,Paris (75),2025,3,0,2,2,31
+H0373,Mercure Paris Montmartre Sacré-Cœur,48.885048,2.329923,75,Paris,C,Paris (75),2025,4,1,16,15,30
+H0373,Mercure Paris Montmartre Sacré-Cœur,48.885048,2.329923,75,Paris,C,Paris (75),2025,5,3,3,2,31
+H0373,Mercure Paris Montmartre Sacré-Cœur,48.885048,2.329923,75,Paris,C,Paris (75),2025,6,1,1,1,30
+H0373,Mercure Paris Montmartre Sacré-Cœur,48.885048,2.329923,75,Paris,C,Paris (75),2025,7,1,27,26,31
+H0373,Mercure Paris Montmartre Sacré-Cœur,48.885048,2.329923,75,Paris,C,Paris (75),2025,8,1,31,30,31
+H0373,Mercure Paris Montmartre Sacré-Cœur,48.885048,2.329923,75,Paris,C,Paris (75),2025,9,0,0,0,30
+H0373,Mercure Paris Montmartre Sacré-Cœur,48.885048,2.329923,75,Paris,C,Paris (75),2025,10,0,14,14,31
+H0373,Mercure Paris Montmartre Sacré-Cœur,48.885048,2.329923,75,Paris,C,Paris (75),2025,11,2,2,1,30
+H0373,Mercure Paris Montmartre Sacré-Cœur,48.885048,2.329923,75,Paris,C,Paris (75),2025,12,1,12,11,31
+H0815,Ibis Styles Roissy CDG,49.006733,2.519843,95,Roissy-en-France,C,Roissy-en-France (95),2024,1,1,7,6,31
+H0815,Ibis Styles Roissy CDG,49.006733,2.519843,95,Roissy-en-France,C,Roissy-en-France (95),2024,2,0,16,16,29
+H0815,Ibis Styles Roissy CDG,49.006733,2.519843,95,Roissy-en-France,C,Roissy-en-France (95),2024,3,0,0,0,31
+H0815,Ibis Styles Roissy CDG,49.006733,2.519843,95,Roissy-en-France,C,Roissy-en-France (95),2024,4,1,16,16,30
+H0815,Ibis Styles Roissy CDG,49.006733,2.519843,95,Roissy-en-France,C,Roissy-en-France (95),2024,5,4,4,3,31
+H0815,Ibis Styles Roissy CDG,49.006733,2.519843,95,Roissy-en-France,C,Roissy-en-France (95),2024,6,0,0,0,30
+H0815,Ibis Styles Roissy CDG,49.006733,2.519843,95,Roissy-en-France,C,Roissy-en-France (95),2024,7,1,26,25,31
+H0815,Ibis Styles Roissy CDG,49.006733,2.519843,95,Roissy-en-France,C,Roissy-en-France (95),2024,8,1,31,30,31
+H0815,Ibis Styles Roissy CDG,49.006733,2.519843,95,Roissy-en-France,C,Roissy-en-France (95),2024,9,0,1,1,30
+H0815,Ibis Styles Roissy CDG,49.006733,2.519843,95,Roissy-en-France,C,Roissy-en-France (95),2024,10,0,13,13,31
+H0815,Ibis Styles Roissy CDG,49.006733,2.519843,95,Roissy-en-France,C,Roissy-en-France (95),2024,11,2,3,2,30
+H0815,Ibis Styles Roissy CDG,49.006733,2.519843,95,Roissy-en-France,C,Roissy-en-France (95),2024,12,1,11,10,31
+H0815,Ibis Styles Roissy CDG,49.006733,2.519843,95,Roissy-en-France,C,Roissy-en-France (95),2025,1,1,5,4,31
+H0815,Ibis Styles Roissy CDG,49.006733,2.519843,95,Roissy-en-France,C,Roissy-en-France (95),2025,2,0,14,14,28
+H0815,Ibis Styles Roissy CDG,49.006733,2.519843,95,Roissy-en-France,C,Roissy-en-France (95),2025,3,0,2,2,31
+H0815,Ibis Styles Roissy CDG,49.006733,2.519843,95,Roissy-en-France,C,Roissy-en-France (95),2025,4,1,16,15,30
+H0815,Ibis Styles Roissy CDG,49.006733,2.519843,95,Roissy-en-France,C,Roissy-en-France (95),2025,5,3,3,2,31
+H0815,Ibis Styles Roissy CDG,49.006733,2.519843,95,Roissy-en-France,C,Roissy-en-France (95),2025,6,1,1,1,30
+H0815,Ibis Styles Roissy CDG,49.006733,2.519843,95,Roissy-en-France,C,Roissy-en-France (95),2025,7,1,27,26,31
+H0815,Ibis Styles Roissy CDG,49.006733,2.519843,95,Roissy-en-France,C,Roissy-en-France (95),2025,8,1,31,30,31
+H0815,Ibis Styles Roissy CDG,49.006733,2.519843,95,Roissy-en-France,C,Roissy-en-France (95),2025,9,0,0,0,30
+H0815,Ibis Styles Roissy CDG,49.006733,2.519843,95,Roissy-en-France,C,Roissy-en-France (95),2025,10,0,14,14,31
+H0815,Ibis Styles Roissy CDG,49.006733,2.519843,95,Roissy-en-France,C,Roissy-en-France (95),2025,11,2,2,1,30
+H0815,Ibis Styles Roissy CDG,49.006733,2.519843,95,Roissy-en-France,C,Roissy-en-France (95),2025,12,1,12,11,31
+H2075,Ibis budget Nice Californie,43.689186,7.240512,06,Nice,B,Nice (06),2024,1,1,7,6,31
+H2075,Ibis budget Nice Californie,43.689186,7.240512,06,Nice,B,Nice (06),2024,2,0,6,6,29
+H2075,Ibis budget Nice Californie,43.689186,7.240512,06,Nice,B,Nice (06),2024,3,0,10,10,31
+H2075,Ibis budget Nice Californie,43.689186,7.240512,06,Nice,B,Nice (06),2024,4,1,11,11,30
+H2075,Ibis budget Nice Californie,43.689186,7.240512,06,Nice,B,Nice (06),2024,5,4,9,7,31
+H2075,Ibis budget Nice Californie,43.689186,7.240512,06,Nice,B,Nice (06),2024,6,0,0,0,30
+H2075,Ibis budget Nice Californie,43.689186,7.240512,06,Nice,B,Nice (06),2024,7,1,26,25,31
+H2075,Ibis budget Nice Californie,43.689186,7.240512,06,Nice,B,Nice (06),2024,8,1,31,30,31
+H2075,Ibis budget Nice Californie,43.689186,7.240512,06,Nice,B,Nice (06),2024,9,0,1,1,30
+H2075,Ibis budget Nice Californie,43.689186,7.240512,06,Nice,B,Nice (06),2024,10,0,13,13,31
+H2075,Ibis budget Nice Californie,43.689186,7.240512,06,Nice,B,Nice (06),2024,11,2,3,2,30
+H2075,Ibis budget Nice Californie,43.689186,7.240512,06,Nice,B,Nice (06),2024,12,1,11,10,31
+H2075,Ibis budget Nice Californie,43.689186,7.240512,06,Nice,B,Nice (06),2025,1,1,5,4,31
+H2075,Ibis budget Nice Californie,43.689186,7.240512,06,Nice,B,Nice (06),2025,2,0,16,16,28
+H2075,Ibis budget Nice Californie,43.689186,7.240512,06,Nice,B,Nice (06),2025,3,0,0,0,31
+H2075,Ibis budget Nice Californie,43.689186,7.240512,06,Nice,B,Nice (06),2025,4,1,17,16,30
+H2075,Ibis budget Nice Californie,43.689186,7.240512,06,Nice,B,Nice (06),2025,5,3,3,2,31
+H2075,Ibis budget Nice Californie,43.689186,7.240512,06,Nice,B,Nice (06),2025,6,1,1,1,30
+H2075,Ibis budget Nice Californie,43.689186,7.240512,06,Nice,B,Nice (06),2025,7,1,27,26,31
+H2075,Ibis budget Nice Californie,43.689186,7.240512,06,Nice,B,Nice (06),2025,8,1,31,30,31
+H2075,Ibis budget Nice Californie,43.689186,7.240512,06,Nice,B,Nice (06),2025,9,0,0,0,30
+H2075,Ibis budget Nice Californie,43.689186,7.240512,06,Nice,B,Nice (06),2025,10,0,14,14,31
+H2075,Ibis budget Nice Californie,43.689186,7.240512,06,Nice,B,Nice (06),2025,11,2,2,1,30
+H2075,Ibis budget Nice Californie,43.689186,7.240512,06,Nice,B,Nice (06),2025,12,1,12,11,31
+H3546,Novotel Paris Centre Tour Eiffel,48.849778,2.282836,75,Paris,C,Paris (75),2024,1,1,7,6,31
+H3546,Novotel Paris Centre Tour Eiffel,48.849778,2.282836,75,Paris,C,Paris (75),2024,2,0,16,16,29
+H3546,Novotel Paris Centre Tour Eiffel,48.849778,2.282836,75,Paris,C,Paris (75),2024,3,0,0,0,31
+H3546,Novotel Paris Centre Tour Eiffel,48.849778,2.282836,75,Paris,C,Paris (75),2024,4,1,16,16,30
+H3546,Novotel Paris Centre Tour Eiffel,48.849778,2.282836,75,Paris,C,Paris (75),2024,5,4,4,3,31
+H3546,Novotel Paris Centre Tour Eiffel,48.849778,2.282836,75,Paris,C,Paris (75),2024,6,0,0,0,30
+H3546,Novotel Paris Centre Tour Eiffel,48.849778,2.282836,75,Paris,C,Paris (75),2024,7,1,26,25,31
+H3546,Novotel Paris Centre Tour Eiffel,48.849778,2.282836,75,Paris,C,Paris (75),2024,8,1,31,30,31
+H3546,Novotel Paris Centre Tour Eiffel,48.849778,2.282836,75,Paris,C,Paris (75),2024,9,0,1,1,30
+H3546,Novotel Paris Centre Tour Eiffel,48.849778,2.282836,75,Paris,C,Paris (75),2024,10,0,13,13,31
+H3546,Novotel Paris Centre Tour Eiffel,48.849778,2.282836,75,Paris,C,Paris (75),2024,11,2,3,2,30
+H3546,Novotel Paris Centre Tour Eiffel,48.849778,2.282836,75,Paris,C,Paris (75),2024,12,1,11,10,31
+H3546,Novotel Paris Centre Tour Eiffel,48.849778,2.282836,75,Paris,C,Paris (75),2025,1,1,5,4,31
+H3546,Novotel Paris Centre Tour Eiffel,48.849778,2.282836,75,Paris,C,Paris (75),2025,2,0,14,14,28
+H3546,Novotel Paris Centre Tour Eiffel,48.849778,2.282836,75,Paris,C,Paris (75),2025,3,0,2,2,31
+H3546,Novotel Paris Centre Tour Eiffel,48.849778,2.282836,75,Paris,C,Paris (75),2025,4,1,16,15,30
+H3546,Novotel Paris Centre Tour Eiffel,48.849778,2.282836,75,Paris,C,Paris (75),2025,5,3,3,2,31
+H3546,Novotel Paris Centre Tour Eiffel,48.849778,2.282836,75,Paris,C,Paris (75),2025,6,1,1,1,30
+H3546,Novotel Paris Centre Tour Eiffel,48.849778,2.282836,75,Paris,C,Paris (75),2025,7,1,27,26,31
+H3546,Novotel Paris Centre Tour Eiffel,48.849778,2.282836,75,Paris,C,Paris (75),2025,8,1,31,30,31
+H3546,Novotel Paris Centre Tour Eiffel,48.849778,2.282836,75,Paris,C,Paris (75),2025,9,0,0,0,30
+H3546,Novotel Paris Centre Tour Eiffel,48.849778,2.282836,75,Paris,C,Paris (75),2025,10,0,14,14,31
+H3546,Novotel Paris Centre Tour Eiffel,48.849778,2.282836,75,Paris,C,Paris (75),2025,11,2,2,1,30
+H3546,Novotel Paris Centre Tour Eiffel,48.849778,2.282836,75,Paris,C,Paris (75),2025,12,1,12,11,31
+H6188,Mercure Paris Boulogne,48.833827,2.256274,92,Boulogne-Billancourt,C,Boulogne-Billancourt (92),2024,1,1,7,6,31
+H6188,Mercure Paris Boulogne,48.833827,2.256274,92,Boulogne-Billancourt,C,Boulogne-Billancourt (92),2024,2,0,16,16,29
+H6188,Mercure Paris Boulogne,48.833827,2.256274,92,Boulogne-Billancourt,C,Boulogne-Billancourt (92),2024,3,0,0,0,31
+H6188,Mercure Paris Boulogne,48.833827,2.256274,92,Boulogne-Billancourt,C,Boulogne-Billancourt (92),2024,4,1,16,16,30
+H6188,Mercure Paris Boulogne,48.833827,2.256274,92,Boulogne-Billancourt,C,Boulogne-Billancourt (92),2024,5,4,4,3,31
+H6188,Mercure Paris Boulogne,48.833827,2.256274,92,Boulogne-Billancourt,C,Boulogne-Billancourt (92),2024,6,0,0,0,30
+H6188,Mercure Paris Boulogne,48.833827,2.256274,92,Boulogne-Billancourt,C,Boulogne-Billancourt (92),2024,7,1,26,25,31
+H6188,Mercure Paris Boulogne,48.833827,2.256274,92,Boulogne-Billancourt,C,Boulogne-Billancourt (92),2024,8,1,31,30,31
+H6188,Mercure Paris Boulogne,48.833827,2.256274,92,Boulogne-Billancourt,C,Boulogne-Billancourt (92),2024,9,0,1,1,30
+H6188,Mercure Paris Boulogne,48.833827,2.256274,92,Boulogne-Billancourt,C,Boulogne-Billancourt (92),2024,10,0,13,13,31
+H6188,Mercure Paris Boulogne,48.833827,2.256274,92,Boulogne-Billancourt,C,Boulogne-Billancourt (92),2024,11,2,3,2,30
+H6188,Mercure Paris Boulogne,48.833827,2.256274,92,Boulogne-Billancourt,C,Boulogne-Billancourt (92),2024,12,1,11,10,31
+H6188,Mercure Paris Boulogne,48.833827,2.256274,92,Boulogne-Billancourt,C,Boulogne-Billancourt (92),2025,1,1,5,4,31
+H6188,Mercure Paris Boulogne,48.833827,2.256274,92,Boulogne-Billancourt,C,Boulogne-Billancourt (92),2025,2,0,14,14,28
+H6188,Mercure Paris Boulogne,48.833827,2.256274,92,Boulogne-Billancourt,C,Boulogne-Billancourt (92),2025,3,0,2,2,31
+H6188,Mercure Paris Boulogne,48.833827,2.256274,92,Boulogne-Billancourt,C,Boulogne-Billancourt (92),2025,4,1,16,15,30
+H6188,Mercure Paris Boulogne,48.833827,2.256274,92,Boulogne-Billancourt,C,Boulogne-Billancourt (92),2025,5,3,3,2,31
+H6188,Mercure Paris Boulogne,48.833827,2.256274,92,Boulogne-Billancourt,C,Boulogne-Billancourt (92),2025,6,1,1,1,30
+H6188,Mercure Paris Boulogne,48.833827,2.256274,92,Boulogne-Billancourt,C,Boulogne-Billancourt (92),2025,7,1,27,26,31
+H6188,Mercure Paris Boulogne,48.833827,2.256274,92,Boulogne-Billancourt,C,Boulogne-Billancourt (92),2025,8,1,31,30,31
+H6188,Mercure Paris Boulogne,48.833827,2.256274,92,Boulogne-Billancourt,C,Boulogne-Billancourt (92),2025,9,0,0,0,30
+H6188,Mercure Paris Boulogne,48.833827,2.256274,92,Boulogne-Billancourt,C,Boulogne-Billancourt (92),2025,10,0,14,14,31
+H6188,Mercure Paris Boulogne,48.833827,2.256274,92,Boulogne-Billancourt,C,Boulogne-Billancourt (92),2025,11,2,2,1,30
+H6188,Mercure Paris Boulogne,48.833827,2.256274,92,Boulogne-Billancourt,C,Boulogne-Billancourt (92),2025,12,1,12,11,31
+HB5I0,Novotel Megève Mont-Blanc,45.8591651916,6.6190552711,74,Megève,A,Megève (74),2024,1,1,7,6,31
+HB5I0,Novotel Megève Mont-Blanc,45.8591651916,6.6190552711,74,Megève,A,Megève (74),2024,2,0,13,13,29
+HB5I0,Novotel Megève Mont-Blanc,45.8591651916,6.6190552711,74,Megève,A,Megève (74),2024,3,0,3,3,31
+HB5I0,Novotel Megève Mont-Blanc,45.8591651916,6.6190552711,74,Megève,A,Megève (74),2024,4,1,16,16,30
+HB5I0,Novotel Megève Mont-Blanc,45.8591651916,6.6190552711,74,Megève,A,Megève (74),2024,5,4,4,3,31
+HB5I0,Novotel Megève Mont-Blanc,45.8591651916,6.6190552711,74,Megève,A,Megève (74),2024,6,0,0,0,30
+HB5I0,Novotel Megève Mont-Blanc,45.8591651916,6.6190552711,74,Megève,A,Megève (74),2024,7,1,26,25,31
+HB5I0,Novotel Megève Mont-Blanc,45.8591651916,6.6190552711,74,Megève,A,Megève (74),2024,8,1,31,30,31
+HB5I0,Novotel Megève Mont-Blanc,45.8591651916,6.6190552711,74,Megève,A,Megève (74),2024,9,0,1,1,30
+HB5I0,Novotel Megève Mont-Blanc,45.8591651916,6.6190552711,74,Megève,A,Megève (74),2024,10,0,13,13,31
+HB5I0,Novotel Megève Mont-Blanc,45.8591651916,6.6190552711,74,Megève,A,Megève (74),2024,11,2,3,2,30
+HB5I0,Novotel Megève Mont-Blanc,45.8591651916,6.6190552711,74,Megève,A,Megève (74),2024,12,1,11,10,31
+HB5I0,Novotel Megève Mont-Blanc,45.8591651916,6.6190552711,74,Megève,A,Megève (74),2025,1,1,5,4,31
+HB5I0,Novotel Megève Mont-Blanc,45.8591651916,6.6190552711,74,Megève,A,Megève (74),2025,2,0,7,7,28
+HB5I0,Novotel Megève Mont-Blanc,45.8591651916,6.6190552711,74,Megève,A,Megève (74),2025,3,0,9,9,31
+HB5I0,Novotel Megève Mont-Blanc,45.8591651916,6.6190552711,74,Megève,A,Megève (74),2025,4,1,12,11,30
+HB5I0,Novotel Megève Mont-Blanc,45.8591651916,6.6190552711,74,Megève,A,Megève (74),2025,5,3,7,5,31
+HB5I0,Novotel Megève Mont-Blanc,45.8591651916,6.6190552711,74,Megève,A,Megève (74),2025,6,1,1,1,30
+HB5I0,Novotel Megève Mont-Blanc,45.8591651916,6.6190552711,74,Megève,A,Megève (74),2025,7,1,27,26,31
+HB5I0,Novotel Megève Mont-Blanc,45.8591651916,6.6190552711,74,Megève,A,Megève (74),2025,8,1,31,30,31
+HB5I0,Novotel Megève Mont-Blanc,45.8591651916,6.6190552711,74,Megève,A,Megève (74),2025,9,0,0,0,30
+HB5I0,Novotel Megève Mont-Blanc,45.8591651916,6.6190552711,74,Megève,A,Megève (74),2025,10,0,14,14,31
+HB5I0,Novotel Megève Mont-Blanc,45.8591651916,6.6190552711,74,Megève,A,Megève (74),2025,11,2,2,1,30
+HB5I0,Novotel Megève Mont-Blanc,45.8591651916,6.6190552711,74,Megève,A,Megève (74),2025,12,1,12,11,31
+HB6A3,Ibis budget Strasbourg Centre République,48.591522,7.754599,67,Strasbourg,B,Strasbourg (67),2024,1,1,7,6,31
+HB6A3,Ibis budget Strasbourg Centre République,48.591522,7.754599,67,Strasbourg,B,Strasbourg (67),2024,2,0,6,6,29
+HB6A3,Ibis budget Strasbourg Centre République,48.591522,7.754599,67,Strasbourg,B,Strasbourg (67),2024,3,1,10,10,31
+HB6A3,Ibis budget Strasbourg Centre République,48.591522,7.754599,67,Strasbourg,B,Strasbourg (67),2024,4,1,11,11,30
+HB6A3,Ibis budget Strasbourg Centre République,48.591522,7.754599,67,Strasbourg,B,Strasbourg (67),2024,5,4,9,7,31
+HB6A3,Ibis budget Strasbourg Centre République,48.591522,7.754599,67,Strasbourg,B,Strasbourg (67),2024,6,0,0,0,30
+HB6A3,Ibis budget Strasbourg Centre République,48.591522,7.754599,67,Strasbourg,B,Strasbourg (67),2024,7,1,26,25,31
+HB6A3,Ibis budget Strasbourg Centre République,48.591522,7.754599,67,Strasbourg,B,Strasbourg (67),2024,8,1,31,30,31
+HB6A3,Ibis budget Strasbourg Centre République,48.591522,7.754599,67,Strasbourg,B,Strasbourg (67),2024,9,0,1,1,30
+HB6A3,Ibis budget Strasbourg Centre République,48.591522,7.754599,67,Strasbourg,B,Strasbourg (67),2024,10,0,13,13,31
+HB6A3,Ibis budget Strasbourg Centre République,48.591522,7.754599,67,Strasbourg,B,Strasbourg (67),2024,11,2,3,2,30
+HB6A3,Ibis budget Strasbourg Centre République,48.591522,7.754599,67,Strasbourg,B,Strasbourg (67),2024,12,2,11,9,31
+HB6A3,Ibis budget Strasbourg Centre République,48.591522,7.754599,67,Strasbourg,B,Strasbourg (67),2025,1,1,5,4,31
+HB6A3,Ibis budget Strasbourg Centre République,48.591522,7.754599,67,Strasbourg,B,Strasbourg (67),2025,2,0,16,16,28
+HB6A3,Ibis budget Strasbourg Centre République,48.591522,7.754599,67,Strasbourg,B,Strasbourg (67),2025,3,0,0,0,31
+HB6A3,Ibis budget Strasbourg Centre République,48.591522,7.754599,67,Strasbourg,B,Strasbourg (67),2025,4,2,17,15,30
+HB6A3,Ibis budget Strasbourg Centre République,48.591522,7.754599,67,Strasbourg,B,Strasbourg (67),2025,5,3,3,2,31
+HB6A3,Ibis budget Strasbourg Centre République,48.591522,7.754599,67,Strasbourg,B,Strasbourg (67),2025,6,1,1,1,30
+HB6A3,Ibis budget Strasbourg Centre République,48.591522,7.754599,67,Strasbourg,B,Strasbourg (67),2025,7,1,27,26,31
+HB6A3,Ibis budget Strasbourg Centre République,48.591522,7.754599,67,Strasbourg,B,Strasbourg (67),2025,8,1,31,30,31
+HB6A3,Ibis budget Strasbourg Centre République,48.591522,7.754599,67,Strasbourg,B,Strasbourg (67),2025,9,0,0,0,30
+HB6A3,Ibis budget Strasbourg Centre République,48.591522,7.754599,67,Strasbourg,B,Strasbourg (67),2025,10,0,14,14,31
+HB6A3,Ibis budget Strasbourg Centre République,48.591522,7.754599,67,Strasbourg,B,Strasbourg (67),2025,11,2,2,1,30
+HB6A3,Ibis budget Strasbourg Centre République,48.591522,7.754599,67,Strasbourg,B,Strasbourg (67),2025,12,2,12,10,31

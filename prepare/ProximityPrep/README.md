@@ -1,137 +1,84 @@
 # ProximityPrep — Étape 3
 
-Extraction des données de proximité : commerces alimentaires / non alimentaires et distance à la plage.
+Indicateurs de proximité autour de l’hôtel : **commerces par catégorie** et **présence de plage**.
 
 ## Objectif
 
-Produire une table à grain `hotel_code` (code Accor) avec les indicateurs géographiques utilisables par le modèle, en libellés explicites.
+À partir des coords RodPrep (`hotel_lat` / `hotel_lon`) et du **code Accor** (`hotel_code`) :
 
-**Même contrat que MeteoPrep** : les coordonnées viennent de RodPrep ; on ne regéocode pas si `hotel_lat` / `hotel_lon` sont présents.
+1. **Commerces** — pour chaque catégorie OSM et chaque rayon **100 → 500 m** (pas de 100 m) :  
+   nombre de commerces à distance ≤ rayon.
+2. **Plage** — pour chaque rayon **1 → 5 km** (pas de 1 km) :  
+   indicateur **0/1** (au moins une plage dans le rayon).
 
 ## Architecture
 
 | Module | Classe | Rôle |
 |--------|--------|------|
-| `Src/proximity_prep/prep.py` | `ProximityPrep` | Orchestration : I/O hôtels, délégation POI/plage, écriture `Output/` |
-| `rod_ia.domain.services.enrich_hotel` | `EnrichHotelService` | Géocode (fallback), Overpass POI, distance plage, cache feature store |
+| `prepare/proximity_prep/features.py` | `ProximityFeatures` | Calcul pur : point → features (Overpass) |
+| `prepare/proximity_prep/prep.py` | `ProximityPrep` | I/O hôtels RodPrep, orchestration, écriture Output |
 
-## Fichiers
+## Entrées (depuis RodPrep)
 
-| Dossier | Contenu |
-|---------|---------|
-| `Input/` | `hotels.parquet` / `hotels.csv` (identité issue de RodPrep) |
-| `Output/` | `proximity.parquet`, `proximity.csv` |
-| `Explore/` | `explore.ipynb` — exploration pas-à-pas ; remplit `Output/` |
-| `Src/proximity_prep/prep.py` | Classe `ProximityPrep` |
+| Champ | Rôle |
+|-------|------|
+| `hotel_code` | Code Accor — clé de jointure |
+| `hotel_name` | Nom (fallback géocode si pas de coords) |
+| `hotel_city` | Ville (fallback géocode) |
+| `hotel_lat` / `hotel_lon` | Point de calcul (prioritaire) |
 
-## Entrées (identité hôtel)
+## Sorties — commerces
 
-| Champ | Origine | Rôle |
-|-------|---------|------|
-| `hotel_code` | RodPrep (`code_h`) | **Code Accor** — clé de jointure (jamais un nom ni un slug) |
-| `hotel_name` | RodPrep | Nom affiché ; fallback géocode si lat/lon absents |
-| `hotel_brand` | RodPrep | Marque (propagée si présente) |
-| `hotel_city` | RodPrep | Ville (fallback géocode) |
-| `hotel_lat` | RodPrep | **Latitude** — point POI/plage (prioritaire) |
-| `hotel_lon` | RodPrep | **Longitude** — point POI/plage (prioritaire) |
+Rayons : **100, 200, 300, 400, 500** m (cumulatif : distance ≤ R).
 
-Sans `hotel_code` valide, la ligne est **exclue** de l'input (`fill_input_from_rod`).  
-Sans `hotel_lat` / `hotel_lon`, fallback géocode par `hotel_name` + `hotel_city`.
+### Par catégorie OSM
 
-## Source géographique (API / cache)
+| Préfixe | Catégories |
+|---------|------------|
+| F&B | `convenience`, `bakery`, `supermarket`, `alcohol`, `confectionery`, `beverages`, `grocery`, `ice_cream`, `fast_food` |
+| Non-F&B | `cosmetics`, `gift`, `tobacco`, `kiosk`, `pharmacy`, `chemist` |
 
-Données produites par `EnrichHotelService` et stockées dans `feature_store/hotels/{hotel_code}/geo/enriched.json` (clé = **code Accor**).
+Colonnes : `commerce_{categorie}_{R}m`  
+Ex. `commerce_bakery_100m`, `commerce_pharmacy_500m`.
 
-Si `lat`/`lon` sont fournis à `enrich()`, Nominatim est **ignoré**.
+### Agrégats
 
-### POI commerces (rayons 0,1 et 0,5 km)
+| Colonne | Définition |
+|---------|------------|
+| `commerce_fb_{R}m` | Somme des catégories F&B dans le rayon R |
+| `commerce_non_fb_{R}m` | Somme des catégories non-F&B dans le rayon R |
 
-Comptage de nodes OpenStreetMap (`shop=*`) par rayon et par famille :
+## Sorties — plage
 
-| Champ source (cache) | Description |
-|---------------------|-------------|
-| `d_poi_fb_0_0_1km` | Commerces F&B dans 100 m |
-| `d_poi_fb_0_0_5km` | Commerces F&B dans 500 m |
-| `d_poi_not_fb_0_0_1km` | Commerces non-F&B dans 100 m |
-| `d_poi_not_fb_0_0_5km` | Commerces non-F&B dans 500 m |
+| Colonne | Définition |
+|---------|------------|
+| `plage_1km` … `plage_5km` | `1` s’il existe une plage à ≤ N km, sinon `0` |
+| `plage_distance_km` | Distance à la plage la plus proche (km), NaN si aucune ≤ 5 km |
 
-Familles F&B : convenience, bakery, supermarket, alcohol, fast_food…  
-Familles non-F&B : cosmetics, gift, pharmacy, kiosk, tobacco…
+Tags OSM plage : `natural=beach`, `leisure=beach_resort`, `leisure=swimming_area`.
 
-### Distances ponctuelles
-
-| Champ source (cache) | Description |
-|---------------------|-------------|
-| `d_nearest_beach_m` | Distance minimale à une plage (m) |
-| `d_nearest_beach_km` | Idem en kilomètres |
-| `d_nearest_{type}_m` | Distance au commerce le plus proche par type |
-
-Plages : tags OSM `natural=beach`, `leisure=beach_resort`, `leisure=swimming_area` (rayon 5 km).
-
-## Traitement
-
-1. `fill_input_from_rod` : copie identité depuis `RodPrep/Output/hotel_lookup` (drop `hotel_code` null).
-2. Pour chaque hôtel :
-   - si `hotel_lat` / `hotel_lon` OK → POI + plage sur ce point (`geo_source=rod_coords`) ;
-   - sinon → géocode par nom + ville puis POI (`geo_source=name_geocode`) ;
-   - échec → ligne avec zéros / NaN (`geo_source=failed`).
-3. Renommage en colonnes lisibles.
-4. Une ligne par `hotel_code` Accor.
-
-## Sorties calculées
-
-| Champ | Méthode |
-|-------|---------|
-| `hotel_code` | Code Accor RodPrep |
-| `hotel_name` | Reprise entrée |
-| `hotel_lat`, `hotel_lon` | Coords utilisées (Rod ou géocode) |
-| `geo_source` | `rod_coords` \| `name_geocode` \| `failed` |
-| `plage_distance_km` | `d_nearest_beach_km` ou `nearest_beach_km` |
-| `commerce_fb_100m` | `d_poi_fb_0_0_1km` |
-| `commerce_fb_500m` | `d_poi_fb_0_0_5km` |
-| `commerce_non_fb_100m` | `d_poi_not_fb_0_0_1km` |
-| `commerce_non_fb_500m` | `d_poi_not_fb_0_0_5km` |
-| `distance_{type}_m` | Pour chaque clé `d_nearest_{type}_m` |
-
-## Formules et règles
-
-**Distance plage :**
+## Exemple de ligne
 
 ```
-plage_distance_km = min(distance OSM vers plage) / 1000
+hotel_code          H2075
+commerce_bakery_100m     1
+commerce_bakery_200m     2
+…
+commerce_fb_500m        12
+commerce_non_fb_500m     3
+plage_1km                1
+plage_2km                1
+…
+plage_5km                1
+plage_distance_km     0.13
 ```
-
-Si aucune plage dans le rayon : sentinelle `99999` m (conservée telle quelle).
-
-**Comptage POI :**
-
-```
-commerce_fb_{rayon} = COUNT(nodes shop ∈ FB_TYPES dans rayon)
-```
-
-Rayons : 0,1 km et 0,5 km.
-
-**Identité — ne pas confondre :**
-
-| Identifiant | Exemple | Rôle |
-|-------------|---------|------|
-| `hotel_code` (Accor / code_h) | `H2075` | Clé prepare / AllPrep |
-| Slug registre | `ibis-budget-nice` | Registry interne (hors sortie Proximity) |
-| `hotel_name` / `nom_hotel` | `Ibis budget Nice` | Libellé, jointure ventes |
 
 ## Exécution
 
 ```bash
-python run_prepare.py   # sans --skip-proximity
+python run_prepare.py
+# ou
+python -c "from prepare import ProximityPrep, default_paths; p=default_paths(); \
+  prep=ProximityPrep(p.proximity_input, p.proximity_output); \
+  prep.fill_input_from_rod(p.rod_output); print(prep.run())"
 ```
-
-Ou en Python :
-
-```python
-from proximity_prep.prep import ProximityPrep
-prep = ProximityPrep("prepare/ProximityPrep/Input", "prepare/ProximityPrep/Output")
-prep.fill_input_from_rod("prepare/RodPrep/Output")
-frame = prep.run()
-```
-
-Ou notebook : `prepare/ProximityPrep/Explore/explore.ipynb`.

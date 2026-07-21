@@ -11,13 +11,14 @@ Sous-packages importables :
 - :mod:`prepare.rod_prep` — code Accor, noms, géoloc (source de vérité)
 - :mod:`prepare.meteo_prep` — météo mensuelle sur ``hotel_lat``/``hotel_lon``
 - :mod:`prepare.proximity_prep` — POI / plage sur les mêmes coords
+- :mod:`prepare.holidays_prep` — fériés + vacances scolaires par mois (zone via coords)
 - :mod:`prepare.sales_prep` — agrégations ventes + attache ``hotel_code``
 - :mod:`prepare.all_prep` — jointure finale
 - :mod:`prepare._shared` — utilitaires colonnes / mois / chargement ventes
 
 Exemple ::
 
-    from prepare import PreparePipeline, RodPrep, MeteoPrep, ProximityPrep, SalesPrep
+    from prepare import PreparePipeline, RodPrep, MeteoPrep, ProximityPrep, HolidaysPrep
 
     result = PreparePipeline().run(skip_meteo=False, skip_proximity=False)
     print(result.dataset_path)
@@ -26,6 +27,7 @@ Exemple ::
 from __future__ import annotations
 
 from prepare.all_prep import AllPrep
+from prepare.holidays_prep import HolidaysPrep
 from prepare.meteo_prep import (
     HOTEL_IDENTITY_COLS as METEO_HOTEL_IDENTITY_COLS,
     MeteoPrep,
@@ -42,6 +44,7 @@ from prepare.sales_prep import SalesPrep
 
 __all__ = [
     "AllPrep",
+    "HolidaysPrep",
     "METEO_HOTEL_IDENTITY_COLS",
     "MeteoPrep",
     "MonthlyWeather",

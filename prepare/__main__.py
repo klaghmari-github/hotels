@@ -21,6 +21,11 @@ def main() -> int:
         help="Ignore ProximityPrep (pas d'appel Overpass)",
     )
     parser.add_argument(
+        "--skip-holidays",
+        action="store_true",
+        help="Ignore HolidaysPrep (vacances / fériés)",
+    )
+    parser.add_argument(
         "--holdout-year",
         type=int,
         default=2026,
@@ -39,6 +44,7 @@ def main() -> int:
         result = PreparePipeline(holdout_year=args.holdout_year).run(
             skip_meteo=args.skip_meteo,
             skip_proximity=args.skip_proximity,
+            skip_holidays=args.skip_holidays,
             geocode_missing=not args.no_geocode,
         )
         print(f"[prepare] OK — {result.meta}")

@@ -27,6 +27,7 @@ class AllPrep:
         sales = self._read("sales_joined")
         meteo = self._read("meteo_monthly")
         proximity = self._read("proximity")
+        holidays = self._read("holidays_monthly")
         rod = self._read("rod_hotel_lookup")
 
         result = sales
@@ -37,6 +38,29 @@ class AllPrep:
 
         if not proximity.empty and not result.empty and "hotel_code" in result.columns:
             result = result.merge(proximity, on="hotel_code", how="left", suffixes=("", "_prox"))
+
+        if not holidays.empty and not result.empty:
+            keys = [
+                k
+                for k in ("hotel_code", "annee", "mois")
+                if k in result.columns and k in holidays.columns
+            ]
+            if keys:
+                # Ne garder que les compteurs (évite de dupliquer lat/lon/zone en conflit)
+                hol_cols = keys + [
+                    c
+                    for c in (
+                        "nb_jours_feries",
+                        "nb_jours_vacances_scolaires",
+                        "nb_jours_vacances_hors_feries",
+                        "zone_scolaire",
+                        "departement",
+                    )
+                    if c in holidays.columns and c not in keys
+                ]
+                result = result.merge(
+                    holidays[hol_cols], on=keys, how="left", suffixes=("", "_hol")
+                )
 
         if not rod.empty and not result.empty and "hotel_code" in result.columns:
             rod_keys = [c for c in rod.columns if c not in result.columns or c == "hotel_code"]

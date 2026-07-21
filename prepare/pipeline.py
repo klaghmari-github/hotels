@@ -5,8 +5,9 @@ Ordre imposé (RodPrep en premier — source de vérité identité / codeH / gé
   1. RodPrep        → hotel_lookup (hotel_code Accor, lat/lon, nom_hotel, …)
   2. MeteoPrep      ← hotel_lookup (coords)
   3. ProximityPrep  ← hotel_lookup (coords + code Accor)
-  4. SalesPrep      ← nom_hotel ↔ hotel_code (lookup RodPrep)
-  5. AllPrep        ← jointure des sorties
+  4. HolidaysPrep   ← hotel_lookup (coords → zone scolaire + fériés / mois)
+  5. SalesPrep      ← nom_hotel ↔ hotel_code (lookup RodPrep)
+  6. AllPrep        ← jointure des sorties
 
 Usage :
 
@@ -27,6 +28,7 @@ from typing import Any
 import pandas as pd
 
 from prepare.all_prep import AllPrep
+from prepare.holidays_prep import HolidaysPrep
 from prepare.meteo_prep import MeteoPrep
 from prepare.paths import PreparePaths, default_paths
 from prepare.proximity_prep import ProximityPrep
@@ -42,6 +44,7 @@ class PrepareResult:
     hotel_lookup: pd.DataFrame
     meteo: pd.DataFrame | None
     proximity: pd.DataFrame | None
+    holidays: pd.DataFrame | None
     sales_joined: pd.DataFrame
     dataset_full: pd.DataFrame
     paths: PreparePaths
@@ -105,8 +108,27 @@ class PreparePipeline:
         prox.fill_input_from_rod(rod_output or self.paths.rod_output)
         return prox.run()
 
+    def run_holidays(
+        self,
+        rod_output: Path | None = None,
+        *,
+        target_years: tuple[int, ...] | None = None,
+    ) -> pd.DataFrame:
+        """Étape 4 — fériés + vacances scolaires par mois (zone via coords)."""
+        years = target_years
+        if years is None:
+            current = datetime.utcnow().year
+            years = tuple(range(current - 3, current + 1))
+        hol = HolidaysPrep(
+            self.paths.holidays_input,
+            self.paths.holidays_output,
+            target_years=years,
+        )
+        hol.fill_input_from_rod(rod_output or self.paths.rod_output)
+        return hol.run()
+
     def run_sales(self, hotel_lookup: pd.DataFrame) -> pd.DataFrame:
-        """Étape 4 — agrégations ventes + attache hotel_code Accor."""
+        """Étape 5 — agrégations ventes + attache hotel_code Accor."""
         sales_path = self.settings.sales_csv_path
         self.paths.sales_input.mkdir(parents=True, exist_ok=True)
         sales_input_copy = self.paths.sales_input / "ventes.csv"
@@ -130,8 +152,9 @@ class PreparePipeline:
         sales_joined: pd.DataFrame,
         meteo: pd.DataFrame | None = None,
         proximity: pd.DataFrame | None = None,
+        holidays: pd.DataFrame | None = None,
     ) -> pd.DataFrame:
-        """Étape 5 — jointure finale sur hotel_code (et annee/mois si dispo)."""
+        """Étape 6 — jointure finale sur hotel_code (et annee/mois si dispo)."""
         self.paths.all_input.mkdir(parents=True, exist_ok=True)
         sales_joined.to_parquet(
             self.paths.all_input / "sales_joined.parquet", index=False
@@ -147,6 +170,10 @@ class PreparePipeline:
             proximity.to_parquet(
                 self.paths.all_input / "proximity.parquet", index=False
             )
+        if holidays is not None and not holidays.empty:
+            holidays.to_parquet(
+                self.paths.all_input / "holidays_monthly.parquet", index=False
+            )
         return AllPrep(self.paths.all_input, self.paths.all_output).run()
 
     # ------------------------------------------------------------------
@@ -158,10 +185,12 @@ class PreparePipeline:
         *,
         skip_meteo: bool = False,
         skip_proximity: bool = False,
+        skip_holidays: bool = False,
         geocode_missing: bool = True,
         meteo_years: tuple[int, ...] | None = None,
+        holidays_years: tuple[int, ...] | None = None,
     ) -> PrepareResult:
-        """Exécute le pipeline dans l'ordre Rod → Meteo → Proximity → Sales → All."""
+        """Exécute Rod → Meteo → Proximity → Holidays → Sales → All."""
         print("[prepare] Step 1 — RodPrep")
         hotel_lookup = self.run_rod(geocode_missing=geocode_missing)
         n_codes = hotel_lookup["hotel_code"].notna().sum() if "hotel_code" in hotel_lookup.columns else 0
@@ -184,16 +213,25 @@ class PreparePipeline:
         else:
             print("[prepare] Step 3 — ProximityPrep (skip)")
 
-        print("[prepare] Step 4 — SalesPrep")
+        hol_frame: pd.DataFrame | None = None
+        if not skip_holidays:
+            print("[prepare] Step 4 — HolidaysPrep")
+            hol_frame = self.run_holidays(target_years=holidays_years)
+            print(f"  → {len(hol_frame)} lignes fériés/vacances")
+        else:
+            print("[prepare] Step 4 — HolidaysPrep (skip)")
+
+        print("[prepare] Step 5 — SalesPrep")
         sales_joined = self.run_sales(hotel_lookup)
         print(f"  → {len(sales_joined)} lignes jointes ventes")
 
-        print("[prepare] Step 5 — AllPrep")
+        print("[prepare] Step 6 — AllPrep")
         dataset = self.run_all(
             hotel_lookup=hotel_lookup,
             sales_joined=sales_joined,
             meteo=meteo_frame,
             proximity=prox_frame,
+            holidays=hol_frame,
         )
         print(f"[prepare] Terminé — dataset final : {len(dataset)} lignes")
         print(f"[prepare] Sortie : {self.paths.all_output / 'dataset_full.parquet'}")
@@ -202,18 +240,21 @@ class PreparePipeline:
             hotel_lookup=hotel_lookup,
             meteo=meteo_frame,
             proximity=prox_frame,
+            holidays=hol_frame,
             sales_joined=sales_joined,
             dataset_full=dataset,
             paths=self.paths,
             meta={
                 "skip_meteo": skip_meteo,
                 "skip_proximity": skip_proximity,
+                "skip_holidays": skip_holidays,
                 "holdout_year": self.holdout_year,
                 "n_hotels": len(hotel_lookup),
                 "n_sales_rows": len(sales_joined),
                 "n_dataset_rows": len(dataset),
             },
         )
+
 
 
 def run_pipeline(

@@ -1,13 +1,18 @@
-"""ProximityPrep — commerces de proximité et distance plage.
+"""ProximityPrep — commerces par catégorie (100–500 m) et présence plage (1–5 km).
 
-Orchestration pipeline : charge les hôtels (``hotel_code`` Accor + coordonnées
-déjà résolues par RodPrep), délègue POI/plage à ``EnrichHotelService``,
-sérialise une table à grain ``hotel_code``.
+Orchestration pipeline :
+  - charge les hôtels (``hotel_code`` Accor + coords RodPrep) ;
+  - calcule les indicateurs via :class:`ProximityFeatures` au point
+    ``(hotel_lat, hotel_lon)`` ;
+  - sérialise une table à grain ``hotel_code``.
 
-Même contrat d'entrée que MeteoPrep :
-  - ``hotel_code`` = code Accor (``code_h`` de RodPrep), **jamais** un nom
-  - ``hotel_lat`` / ``hotel_lon`` fournis par RodPrep
-  - géocodage par nom uniquement en fallback si coords absentes
+Spécification
+-------------
+* **Commerces** : pour chaque catégorie OSM (bakery, convenience, …) et
+  chaque rayon 100, 200, 300, 400, 500 m → nombre de commerces ≤ rayon.
+  Agrégats ``commerce_fb_{R}m`` / ``commerce_non_fb_{R}m``.
+* **Plage** : pour chaque rayon 1, 2, 3, 4, 5 km → indicateur 0/1
+  (au moins une plage dans le rayon) + ``plage_distance_km`` (plus proche).
 """
 
 from __future__ import annotations
@@ -17,12 +22,17 @@ from typing import Any
 
 import pandas as pd
 
+from prepare.proximity_prep.features import (
+    BEACH_RADII_KM,
+    COMMERCE_RADII_M,
+    SHOP_CATEGORIES,
+    ProximityFeatures,
+    empty_proximity_features,
+)
 from rod_ia.config.settings import Settings, get_settings
-from rod_ia.domain.repositories.feature_store_repository import FeatureStoreRepository
-from rod_ia.domain.repositories.identity_registry import HotelIdentityRegistry
-from rod_ia.domain.services.enrich_hotel import EnrichHotelService
+from rod_ia.domain.services.enrich_hotel import geocode_hotel
 
-# Champs d'identité hôtel (RodPrep) utilisés par ProximityPrep — miroir MeteoPrep.
+# Champs d'identité hôtel (RodPrep) — miroir MeteoPrep.
 HOTEL_IDENTITY_COLS = [
     "hotel_code",
     "hotel_name",
@@ -60,25 +70,24 @@ class ProximityPrep:
         output_dir: Path,
         *,
         settings: Settings | None = None,
-        enrich: EnrichHotelService | None = None,
+        features: ProximityFeatures | None = None,
+        # compat anciens appels / tests
+        enrich: Any = None,
     ) -> None:
         self.input_dir = Path(input_dir)
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self._settings = settings or get_settings()
-        if enrich is not None:
-            self._enrich = enrich
-        else:
-            registry = HotelIdentityRegistry(self._settings.identity_registry_path)
-            store = FeatureStoreRepository(self._settings.feature_store_dir)
-            self._enrich = EnrichHotelService(store, registry, self._settings)
+        self._features = features or ProximityFeatures(self._settings)
+        # ``enrich`` conservé pour compat signature (ignoré si features fourni)
+        self._enrich = enrich
 
     def fill_input_from_rod(self, rod_output_dir: Path) -> Path:
         """Copie les champs d'identité depuis la sortie RodPrep.
 
         - ``hotel_code`` = code Accor (pas un slug, pas un nom)
         - ``hotel_lat`` / ``hotel_lon`` déjà résolus par RodPrep
-        - lignes sans ``hotel_code`` exclues (impossible à joindre ensuite)
+        - lignes sans ``hotel_code`` exclues
         """
         source = Path(rod_output_dir) / "hotel_lookup.parquet"
         if not source.exists():
@@ -110,36 +119,28 @@ class ProximityPrep:
         raise FileNotFoundError(f"Entrée ProximityPrep absente dans {self.input_dir}")
 
     def run(self, *, force_refresh: bool = False) -> pd.DataFrame:
+        _ = force_refresh  # réservé (pas de cache interne ProximityFeatures)
         hotels = self.load_input()
         rows: list[dict[str, Any]] = []
-        for _, hotel in hotels.iterrows():
+        for i, (_, hotel) in enumerate(hotels.iterrows()):
+            if i > 0:
+                # Évite le rate-limit Overpass entre hôtels
+                import time
+
+                time.sleep(1.0)
             try:
-                rows.append(self._row_for_hotel(hotel, force_refresh=force_refresh))
+                rows.append(self._row_for_hotel(hotel))
             except Exception as exc:
                 rows.append(self._empty_row(hotel, warnings=[str(exc)]))
         frame = pd.DataFrame(rows)
+
         if frame.empty:
-            frame = pd.DataFrame(
-                columns=[
-                    "hotel_code",
-                    "hotel_name",
-                    "hotel_lat",
-                    "hotel_lon",
-                    "geo_source",
-                    "plage_distance_km",
-                    "commerce_fb_100m",
-                    "commerce_fb_500m",
-                    "commerce_non_fb_100m",
-                    "commerce_non_fb_500m",
-                ]
-            )
+            frame = pd.DataFrame(columns=self._base_columns() + self._feature_columns())
         frame.to_parquet(self.output_dir / "proximity.parquet", index=False)
         frame.to_csv(self.output_dir / "proximity.csv", index=False)
         return frame
 
-    def _row_for_hotel(
-        self, hotel: pd.Series | dict[str, Any], *, force_refresh: bool = False
-    ) -> dict[str, Any]:
+    def _row_for_hotel(self, hotel: pd.Series | dict[str, Any]) -> dict[str, Any]:
         code = self._normalize_code(hotel.get("hotel_code"))
         name = str(hotel.get("hotel_name") or code or "").strip()
         city = str(hotel.get("hotel_city") or "").strip()
@@ -152,53 +153,36 @@ class ProximityPrep:
                 warnings=["hotel_code Accor absent — ligne ignorée pour jointure."],
             )
 
-        # hotel_id feature-store = code Accor (pas un slug, pas un nom).
-        # lat/lon fournis → pas de re-géocodage (coords RodPrep prioritaires).
-        result = self._enrich.enrich(
-            hotel_name=name,
-            city=city,
-            hotel_id=code,
-            lat=lat,
-            lon=lon,
-            force_refresh=force_refresh,
-        )
-        features = result.features
-        poi = features.poi or {}
-        nearest = features.nearest or {}
+        geo_source = "rod_coords"
+        warnings: list[str] = []
 
-        used_lat = as_coord(features.lat) if features.lat is not None else lat
-        used_lon = as_coord(features.lon) if features.lon is not None else lon
-        if lat is not None and lon is not None:
-            geo_source = "rod_coords"
-        elif used_lat is not None and used_lon is not None:
+        if lat is None or lon is None:
+            geo = geocode_hotel(name, "", city, settings=self._settings)
+            if not geo:
+                return self._empty_row(
+                    hotel,
+                    warnings=["Coordonnées absentes et géocodage nom échoué."],
+                )
+            lat = float(geo["lat"])
+            lon = float(geo["lon"])
             geo_source = "name_geocode"
-        else:
-            geo_source = "failed"
+
+        try:
+            feats = self._features.for_point(lat, lon)
+        except Exception as exc:
+            feats = empty_proximity_features()
+            warnings.append(f"Calcul proximité en erreur: {exc}")
 
         row: dict[str, Any] = {
             "hotel_code": code,
             "hotel_name": name,
-            "hotel_lat": used_lat,
-            "hotel_lon": used_lon,
+            "hotel_lat": lat,
+            "hotel_lon": lon,
             "geo_source": geo_source,
-            "plage_distance_km": nearest.get("d_nearest_beach_km")
-            or nearest.get("nearest_beach_km"),
-            "commerce_fb_100m": poi.get("d_poi_fb_0_0_1km", 0) or 0,
-            "commerce_fb_500m": poi.get("d_poi_fb_0_0_5km", 0) or 0,
-            "commerce_non_fb_100m": poi.get("d_poi_not_fb_0_0_1km", 0) or 0,
-            "commerce_non_fb_500m": poi.get("d_poi_not_fb_0_0_5km", 0) or 0,
         }
-        for key, value in nearest.items():
-            if key.startswith("d_nearest_") and key.endswith("_m"):
-                clean = key.replace("d_nearest_", "distance_", 1)
-                row[clean] = value
-            elif key.startswith("nearest_") and key.endswith("_m") and not key.endswith("_km"):
-                # clés non préfixées d_ (ex. nearest_beach_m avant prefix)
-                clean = key.replace("nearest_", "distance_", 1)
-                row.setdefault(clean, value)
-
-        if result.warnings:
-            row["warnings"] = "; ".join(result.warnings)
+        row.update(feats)
+        if warnings:
+            row["warnings"] = "; ".join(warnings)
         return row
 
     def _empty_row(
@@ -215,15 +199,28 @@ class ProximityPrep:
             "hotel_lat": as_coord(hotel.get("hotel_lat")),
             "hotel_lon": as_coord(hotel.get("hotel_lon")),
             "geo_source": "failed",
-            "plage_distance_km": None,
-            "commerce_fb_100m": 0,
-            "commerce_fb_500m": 0,
-            "commerce_non_fb_100m": 0,
-            "commerce_non_fb_500m": 0,
         }
+        row.update(empty_proximity_features())
         if warnings:
             row["warnings"] = "; ".join(warnings)
         return row
+
+    @staticmethod
+    def _base_columns() -> list[str]:
+        return ["hotel_code", "hotel_name", "hotel_lat", "hotel_lon", "geo_source"]
+
+    @staticmethod
+    def _feature_columns() -> list[str]:
+        cols: list[str] = []
+        for radius_m in COMMERCE_RADII_M:
+            for cat in SHOP_CATEGORIES:
+                cols.append(f"commerce_{cat}_{radius_m}m")
+            cols.append(f"commerce_fb_{radius_m}m")
+            cols.append(f"commerce_non_fb_{radius_m}m")
+        for radius_km in BEACH_RADII_KM:
+            cols.append(f"plage_{radius_km}km")
+        cols.append("plage_distance_km")
+        return cols
 
     @staticmethod
     def _normalize_code(value: Any) -> str | None:
