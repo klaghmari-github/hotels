@@ -1,0 +1,3754 @@
+[
+  {
+    "column": "hotel_id",
+    "prefix": "",
+    "role": "informational",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne informational générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_ca_total",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_ventes_total",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_ca_total",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_ventes_total",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_ca_total",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_ventes_total",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_ca_total",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_ventes_total",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_ca_total",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_ventes_total",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_ca_total",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_ventes_total",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m07_ca_total",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m07_ventes_total",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m08_ca_total",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m08_ventes_total",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m09_ca_total",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m09_ventes_total",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m10_ca_total",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m10_ventes_total",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_ca_total",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_ventes_total",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_ca_total",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_ventes_total",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_fandb_food_salee_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_fandb_food_salee_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_fandb_food_sucree_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_fandb_food_sucree_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_fandb_sans_alcool_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_fandb_sans_alcool_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_non_fandb_accessoires_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_non_fandb_accessoires_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_non_fandb_sos_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_non_fandb_sos_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_fandb_food_salee_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_fandb_food_salee_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_fandb_food_sucree_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_fandb_food_sucree_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_fandb_sans_alcool_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_fandb_sans_alcool_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_non_fandb_accessoires_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_non_fandb_accessoires_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_non_fandb_pap_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_non_fandb_pap_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_fandb_food_salee_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_fandb_food_salee_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_fandb_food_sucree_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_fandb_food_sucree_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_fandb_sans_alcool_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_fandb_sans_alcool_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_non_fandb_ref_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_non_fandb_ref_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_non_fandb_accessoires_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_non_fandb_accessoires_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_fandb_food_salee_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_fandb_food_salee_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_fandb_food_sucree_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_fandb_food_sucree_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_fandb_sans_alcool_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_fandb_sans_alcool_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_non_fandb_ref_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_non_fandb_ref_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_non_fandb_accessoires_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_non_fandb_accessoires_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_non_fandb_cosmetique_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_non_fandb_cosmetique_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_non_fandb_pap_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_non_fandb_pap_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_non_fandb_sos_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_non_fandb_sos_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_fandb_food_salee_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_fandb_food_salee_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_fandb_sans_alcool_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_fandb_sans_alcool_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_non_fandb_ref_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_non_fandb_ref_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_non_fandb_accessoires_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_non_fandb_accessoires_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_non_fandb_jeux_enfants_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_non_fandb_jeux_enfants_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_non_fandb_pap_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_non_fandb_pap_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_non_fandb_sos_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_non_fandb_sos_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_fandb_food_salee_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_fandb_food_salee_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_fandb_sans_alcool_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_fandb_sans_alcool_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_non_fandb_ref_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_non_fandb_ref_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_non_fandb_accessoires_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_non_fandb_accessoires_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_non_fandb_cosmetique_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_non_fandb_cosmetique_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_non_fandb_jeux_enfants_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_non_fandb_jeux_enfants_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_non_fandb_pap_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_non_fandb_pap_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_non_fandb_sos_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_non_fandb_sos_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m07_fandb_food_salee_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m07_fandb_food_salee_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m07_fandb_sans_alcool_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m07_fandb_sans_alcool_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m07_non_fandb_ref_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m07_non_fandb_ref_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m07_non_fandb_accessoires_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m07_non_fandb_accessoires_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m07_non_fandb_cosmetique_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m07_non_fandb_cosmetique_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m07_non_fandb_jeux_enfants_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m07_non_fandb_jeux_enfants_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m07_non_fandb_pap_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m07_non_fandb_pap_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m07_non_fandb_sos_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m07_non_fandb_sos_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m08_fandb_food_salee_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m08_fandb_food_salee_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m08_fandb_sans_alcool_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m08_fandb_sans_alcool_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m08_non_fandb_ref_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m08_non_fandb_ref_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m08_non_fandb_accessoires_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m08_non_fandb_accessoires_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m08_non_fandb_cosmetique_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m08_non_fandb_cosmetique_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m08_non_fandb_jeux_enfants_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m08_non_fandb_jeux_enfants_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m08_non_fandb_pap_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m08_non_fandb_pap_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m08_non_fandb_sos_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m08_non_fandb_sos_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m09_fandb_food_salee_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m09_fandb_food_salee_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m09_fandb_food_sucree_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m09_fandb_food_sucree_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m09_fandb_sans_alcool_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m09_fandb_sans_alcool_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m09_non_fandb_ref_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m09_non_fandb_ref_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m09_non_fandb_accessoires_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m09_non_fandb_accessoires_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m09_non_fandb_cosmetique_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m09_non_fandb_cosmetique_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m09_non_fandb_pap_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m09_non_fandb_pap_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m09_non_fandb_sos_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m09_non_fandb_sos_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m10_fandb_food_salee_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m10_fandb_food_salee_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m10_fandb_food_sucree_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m10_fandb_food_sucree_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m10_fandb_sans_alcool_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m10_fandb_sans_alcool_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m10_non_fandb_ref_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m10_non_fandb_ref_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m10_non_fandb_accessoires_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m10_non_fandb_accessoires_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m10_non_fandb_pap_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m10_non_fandb_pap_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m10_non_fandb_sos_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m10_non_fandb_sos_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_fandb_food_salee_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_fandb_food_salee_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_fandb_food_sucree_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_fandb_food_sucree_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_fandb_sans_alcool_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_fandb_sans_alcool_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_non_fandb_ref_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_non_fandb_ref_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_non_fandb_accessoires_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_non_fandb_accessoires_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_non_fandb_pap_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_non_fandb_pap_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_nan_nan_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_nan_nan_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_fandb_food_salee_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_fandb_food_salee_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_fandb_food_sucree_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_fandb_food_sucree_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_fandb_sans_alcool_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_fandb_sans_alcool_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_non_fandb_ref_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_non_fandb_ref_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_non_fandb_accessoires_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_non_fandb_accessoires_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_non_fandb_pap_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_non_fandb_pap_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_non_fandb_sos_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_non_fandb_sos_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_nan_nan_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_nan_nan_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_fandb_food_sucree_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_fandb_food_sucree_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_fandb_food_sucree_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_fandb_food_sucree_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m07_fandb_food_sucree_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m07_fandb_food_sucree_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m08_fandb_food_sucree_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m08_fandb_food_sucree_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_fandb_alcool_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_fandb_alcool_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_fandb_souvenirs_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_fandb_souvenirs_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_non_fandb_cosmetique_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_non_fandb_cosmetique_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_fandb_alcool_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_fandb_alcool_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_fandb_souvenirs_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_fandb_souvenirs_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_non_fandb_cosmetique_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_non_fandb_cosmetique_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_non_fandb_sos_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_non_fandb_sos_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_non_fandb_souvenirs_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_non_fandb_souvenirs_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_fandb_alcool_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_fandb_alcool_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_fandb_souvenirs_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_fandb_souvenirs_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_non_fandb_cosmetique_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_non_fandb_cosmetique_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_non_fandb_sos_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_non_fandb_sos_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_non_fandb_souvenirs_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_non_fandb_souvenirs_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_fandb_alcool_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_fandb_alcool_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_fandb_souvenirs_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_fandb_souvenirs_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_non_fandb_souvenirs_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_non_fandb_souvenirs_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_fandb_alcool_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_fandb_alcool_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_non_fandb_cosmetique_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_non_fandb_cosmetique_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_non_fandb_souvenirs_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_non_fandb_souvenirs_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_fandb_alcool_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_fandb_alcool_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_fandb_souvenirs_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_fandb_souvenirs_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_non_fandb_souvenirs_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_non_fandb_souvenirs_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m07_fandb_alcool_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m07_fandb_alcool_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m07_fandb_souvenirs_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m07_fandb_souvenirs_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m07_non_fandb_souvenirs_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m07_non_fandb_souvenirs_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m08_fandb_alcool_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m08_fandb_alcool_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m08_non_fandb_souvenirs_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m08_non_fandb_souvenirs_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m09_fandb_alcool_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m09_fandb_alcool_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m09_non_fandb_souvenirs_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m09_non_fandb_souvenirs_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m10_fandb_alcool_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m10_fandb_alcool_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m10_non_fandb_cosmetique_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m10_non_fandb_cosmetique_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m10_non_fandb_souvenirs_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m10_non_fandb_souvenirs_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_fandb_alcool_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_fandb_alcool_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_fandb_souvenirs_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_fandb_souvenirs_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_non_fandb_cosmetique_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_non_fandb_cosmetique_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_non_fandb_sos_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_non_fandb_sos_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_fandb_alcool_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_fandb_alcool_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_non_fandb_cosmetique_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_non_fandb_cosmetique_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_non_fandb_souvenirs_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_non_fandb_souvenirs_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_non_fandb_ref_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_non_fandb_ref_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_non_fandb_jeux_enfants_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_non_fandb_jeux_enfants_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_non_fandb_pap_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_non_fandb_pap_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_non_fandb_souvenirs_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_non_fandb_souvenirs_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_non_fandb_ref_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_non_fandb_ref_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_non_fandb_jeux_enfants_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_non_fandb_jeux_enfants_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_non_fandb_jeux_enfants_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_non_fandb_jeux_enfants_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_non_fandb_pap_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_non_fandb_pap_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_non_fandb_jeux_enfants_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_non_fandb_jeux_enfants_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_fandb_souvenirs_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_fandb_souvenirs_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m08_fandb_souvenirs_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m08_fandb_souvenirs_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m09_fandb_souvenirs_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m09_fandb_souvenirs_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m09_non_fandb_jeux_enfants_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m09_non_fandb_jeux_enfants_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m10_non_fandb_jeux_enfants_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m10_non_fandb_jeux_enfants_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_non_fandb_jeux_enfants_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_non_fandb_jeux_enfants_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_non_fandb_souvenirs_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m11_non_fandb_souvenirs_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_fandb_souvenirs_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_fandb_souvenirs_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_non_fandb_jeux_enfants_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m12_non_fandb_jeux_enfants_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_nan_nan_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m04_nan_nan_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_nan_nan_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m01_nan_nan_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_nan_nan_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m02_nan_nan_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_nan_nan_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m03_nan_nan_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_nan_nan_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m05_nan_nan_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_nan_nan_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m06_nan_nan_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m10_nan_nan_montant",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "t_m10_nan_nan_nbr_ventes",
+    "prefix": "t_",
+    "role": "target",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne target générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m01",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m01_type_fandb",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m01_type_fandb_gamme_alcool",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m01_type_fandb_gamme_food_salee",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m01_type_fandb_gamme_food_sucree",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m01_type_fandb_gamme_sans_alcool",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m01_type_fandb_gamme_souvenirs",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m01_type_non_fandb",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m01_type_non_fandb_gamme_accessoires",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m01_type_non_fandb_gamme_cosmetique",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m01_type_non_fandb_gamme_jeux_enfants",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m01_type_non_fandb_gamme_pap",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m01_type_non_fandb_gamme_ref",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m01_type_non_fandb_gamme_sos",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m01_type_non_fandb_gamme_souvenirs",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m02",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m02_type_fandb",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m02_type_fandb_gamme_alcool",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m02_type_fandb_gamme_food_salee",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m02_type_fandb_gamme_food_sucree",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m02_type_fandb_gamme_sans_alcool",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m02_type_fandb_gamme_souvenirs",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m02_type_non_fandb",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m02_type_non_fandb_gamme_accessoires",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m02_type_non_fandb_gamme_cosmetique",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m02_type_non_fandb_gamme_jeux_enfants",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m02_type_non_fandb_gamme_pap",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m02_type_non_fandb_gamme_ref",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m02_type_non_fandb_gamme_sos",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m02_type_non_fandb_gamme_souvenirs",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m03",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m03_type_fandb",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m03_type_fandb_gamme_alcool",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m03_type_fandb_gamme_food_salee",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m03_type_fandb_gamme_food_sucree",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m03_type_fandb_gamme_sans_alcool",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m03_type_fandb_gamme_souvenirs",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m03_type_non_fandb",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m03_type_non_fandb_gamme_accessoires",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m03_type_non_fandb_gamme_cosmetique",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m03_type_non_fandb_gamme_jeux_enfants",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m03_type_non_fandb_gamme_pap",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m03_type_non_fandb_gamme_ref",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m03_type_non_fandb_gamme_sos",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m03_type_non_fandb_gamme_souvenirs",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m04",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m04_type_fandb",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m04_type_fandb_gamme_alcool",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m04_type_fandb_gamme_food_salee",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m04_type_fandb_gamme_food_sucree",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m04_type_fandb_gamme_sans_alcool",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m04_type_fandb_gamme_souvenirs",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m04_type_non_fandb",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m04_type_non_fandb_gamme_accessoires",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m04_type_non_fandb_gamme_cosmetique",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m04_type_non_fandb_gamme_jeux_enfants",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m04_type_non_fandb_gamme_pap",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m04_type_non_fandb_gamme_ref",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m04_type_non_fandb_gamme_sos",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m04_type_non_fandb_gamme_souvenirs",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m05",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m05_type_fandb",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m05_type_fandb_gamme_alcool",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m05_type_fandb_gamme_food_salee",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m05_type_fandb_gamme_food_sucree",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m05_type_fandb_gamme_sans_alcool",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m05_type_fandb_gamme_souvenirs",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m05_type_non_fandb",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m05_type_non_fandb_gamme_accessoires",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m05_type_non_fandb_gamme_cosmetique",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m05_type_non_fandb_gamme_jeux_enfants",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m05_type_non_fandb_gamme_pap",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m05_type_non_fandb_gamme_ref",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m05_type_non_fandb_gamme_sos",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m05_type_non_fandb_gamme_souvenirs",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m06",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m06_type_fandb",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m06_type_fandb_gamme_alcool",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m06_type_fandb_gamme_food_salee",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m06_type_fandb_gamme_food_sucree",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m06_type_fandb_gamme_sans_alcool",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m06_type_fandb_gamme_souvenirs",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m06_type_non_fandb",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m06_type_non_fandb_gamme_accessoires",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m06_type_non_fandb_gamme_cosmetique",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m06_type_non_fandb_gamme_jeux_enfants",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m06_type_non_fandb_gamme_pap",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m06_type_non_fandb_gamme_ref",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m06_type_non_fandb_gamme_sos",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m06_type_non_fandb_gamme_souvenirs",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m07",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m07_type_fandb",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m07_type_fandb_gamme_alcool",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m07_type_fandb_gamme_food_salee",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m07_type_fandb_gamme_food_sucree",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m07_type_fandb_gamme_sans_alcool",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m07_type_fandb_gamme_souvenirs",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m07_type_non_fandb",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m07_type_non_fandb_gamme_accessoires",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m07_type_non_fandb_gamme_cosmetique",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m07_type_non_fandb_gamme_jeux_enfants",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m07_type_non_fandb_gamme_pap",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m07_type_non_fandb_gamme_ref",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m07_type_non_fandb_gamme_sos",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m07_type_non_fandb_gamme_souvenirs",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m08",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m08_type_fandb",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m08_type_fandb_gamme_alcool",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m08_type_fandb_gamme_food_salee",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m08_type_fandb_gamme_food_sucree",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m08_type_fandb_gamme_sans_alcool",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m08_type_fandb_gamme_souvenirs",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m08_type_non_fandb",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m08_type_non_fandb_gamme_accessoires",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m08_type_non_fandb_gamme_cosmetique",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m08_type_non_fandb_gamme_jeux_enfants",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m08_type_non_fandb_gamme_pap",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m08_type_non_fandb_gamme_ref",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m08_type_non_fandb_gamme_sos",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m08_type_non_fandb_gamme_souvenirs",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m09",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m09_type_fandb",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m09_type_fandb_gamme_alcool",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m09_type_fandb_gamme_food_salee",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m09_type_fandb_gamme_food_sucree",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m09_type_fandb_gamme_sans_alcool",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m09_type_fandb_gamme_souvenirs",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m09_type_non_fandb",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m09_type_non_fandb_gamme_accessoires",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m09_type_non_fandb_gamme_cosmetique",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m09_type_non_fandb_gamme_jeux_enfants",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m09_type_non_fandb_gamme_pap",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m09_type_non_fandb_gamme_ref",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m09_type_non_fandb_gamme_sos",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m09_type_non_fandb_gamme_souvenirs",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m10",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m10_type_fandb",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m10_type_fandb_gamme_alcool",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m10_type_fandb_gamme_food_salee",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m10_type_fandb_gamme_food_sucree",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m10_type_fandb_gamme_sans_alcool",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m10_type_non_fandb",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m10_type_non_fandb_gamme_accessoires",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m10_type_non_fandb_gamme_cosmetique",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m10_type_non_fandb_gamme_jeux_enfants",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m10_type_non_fandb_gamme_pap",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m10_type_non_fandb_gamme_ref",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m10_type_non_fandb_gamme_sos",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m10_type_non_fandb_gamme_souvenirs",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m11",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m11_type_fandb",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m11_type_fandb_gamme_alcool",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m11_type_fandb_gamme_food_salee",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m11_type_fandb_gamme_food_sucree",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m11_type_fandb_gamme_sans_alcool",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m11_type_fandb_gamme_souvenirs",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m11_type_non_fandb",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m11_type_non_fandb_gamme_accessoires",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m11_type_non_fandb_gamme_cosmetique",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m11_type_non_fandb_gamme_jeux_enfants",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m11_type_non_fandb_gamme_pap",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m11_type_non_fandb_gamme_ref",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m11_type_non_fandb_gamme_sos",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m11_type_non_fandb_gamme_souvenirs",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m12",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m12_type_fandb",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m12_type_fandb_gamme_alcool",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m12_type_fandb_gamme_food_salee",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m12_type_fandb_gamme_food_sucree",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m12_type_fandb_gamme_sans_alcool",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m12_type_fandb_gamme_souvenirs",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m12_type_non_fandb",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m12_type_non_fandb_gamme_accessoires",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m12_type_non_fandb_gamme_cosmetique",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m12_type_non_fandb_gamme_jeux_enfants",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m12_type_non_fandb_gamme_pap",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m12_type_non_fandb_gamme_ref",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m12_type_non_fandb_gamme_sos",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_pct_mois_m12_type_non_fandb_gamme_souvenirs",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_recap_0_page_de_connexion_localisation_geo_latitude_r12",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_recap_0_page_de_connexion_localisation_geo_longitude_r11",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_recap_1_informations_generales_donnees_admin_contrat_signe_annee_r15",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_recap_1_informations_generales_donnees_admin_nb_de_chambres",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_recap_1_informations_generales_donnees_chiffrees_to_annuel_r25",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_bas_mois_r26",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_bas_taux_r27",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_haut_taux_r29",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_fontaine_eau",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_fontaine_eau_r54",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_vitrine_r_frig_r_e_r52",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_recap_2_services_equipements_f_b_bar_r38",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_recap_2_services_equipements_f_b_minibar_r47",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_recap_2_services_equipements_f_b_restaurant_r42",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_recap_4_informations_corner_corner_de_vente_actuel_votre_hotel_dispose_t_il_d_j_d_un_c_r84",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_r_ception_r91",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_m_tres_lin_aires_dedies_a_v_r129",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_moyen_de_guests_par_chambre_r127",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "name_display",
+    "prefix": "",
+    "role": "informational",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne informational générée par sales_targets_pipeline"
+  },
+  {
+    "column": "name_ventes",
+    "prefix": "",
+    "role": "informational",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne informational générée par sales_targets_pipeline"
+  },
+  {
+    "column": "name_rod",
+    "prefix": "",
+    "role": "informational",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne informational générée par sales_targets_pipeline"
+  },
+  {
+    "column": "city",
+    "prefix": "",
+    "role": "informational",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne informational générée par sales_targets_pipeline"
+  },
+  {
+    "column": "brand",
+    "prefix": "",
+    "role": "informational",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne informational générée par sales_targets_pipeline"
+  },
+  {
+    "column": "lat",
+    "prefix": "",
+    "role": "informational",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne informational générée par sales_targets_pipeline"
+  },
+  {
+    "column": "lon",
+    "prefix": "",
+    "role": "informational",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne informational générée par sales_targets_pipeline"
+  },
+  {
+    "column": "geo_source",
+    "prefix": "",
+    "role": "informational",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne informational générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_clients_mois",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  },
+  {
+    "column": "d_taux_acheteur",
+    "prefix": "d_",
+    "role": "descriptive",
+    "source": "sales_targets_pipeline",
+    "description": "Colonne descriptive générée par sales_targets_pipeline"
+  }
+]

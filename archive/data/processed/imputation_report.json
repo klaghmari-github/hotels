@@ -1,0 +1,2014 @@
+{
+  "entries": [
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_0_page_de_connexion_localisation_geo_latitude",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 43.689186
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_0_page_de_connexion_localisation_geo_latitude",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 43.689186
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_0_page_de_connexion_localisation_geo_latitude",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 43.689186
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_0_page_de_connexion_localisation_geo_latitude",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 43.689186
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_0_page_de_connexion_localisation_geo_latitude",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 43.689186
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_0_page_de_connexion_localisation_geo_latitude_r12",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 48.72065
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_0_page_de_connexion_localisation_geo_latitude_r12",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 48.72065
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_0_page_de_connexion_localisation_geo_longitude",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 7.240512
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_0_page_de_connexion_localisation_geo_longitude",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 7.240512
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_0_page_de_connexion_localisation_geo_longitude",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 7.240512
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_0_page_de_connexion_localisation_geo_longitude",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 7.240512
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_0_page_de_connexion_localisation_geo_longitude",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 7.240512
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_0_page_de_connexion_localisation_geo_longitude_r11",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 4.47448913555
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_0_page_de_connexion_localisation_geo_longitude_r11",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 4.47448913555
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_1_informations_generales_donnees_admin_contrat_signe_annee_r15",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 1998.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_1_informations_generales_donnees_admin_contrat_signe_annee_r15",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 1998.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_1_informations_generales_donnees_admin_contrat_signe_annee_r15",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 1998.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_1_informations_generales_donnees_admin_contrat_signe_annee_r15",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 1998.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_1_informations_generales_donnees_admin_nb_de_chambres",
+      "strategy": "registry_nb_chambres",
+      "justification": "Chambres absentes → registre identité.",
+      "imputed_value": 97.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_1_informations_generales_donnees_admin_nb_de_chambres",
+      "strategy": "registry_nb_chambres",
+      "justification": "Chambres absentes → registre identité.",
+      "imputed_value": 305.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_1_informations_generales_donnees_admin_nb_de_chambres",
+      "strategy": "registry_nb_chambres",
+      "justification": "Chambres absentes → registre identité.",
+      "imputed_value": 572.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_1_informations_generales_donnees_admin_nb_de_chambres",
+      "strategy": "registry_nb_chambres",
+      "justification": "Chambres absentes → registre identité.",
+      "imputed_value": 764.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_1_informations_generales_donnees_admin_nb_de_chambres",
+      "strategy": "registry_nb_chambres",
+      "justification": "Chambres absentes → registre identité.",
+      "imputed_value": 100.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_1_informations_generales_donnees_admin_nb_de_chambres_r14",
+      "strategy": "registry_nb_chambres",
+      "justification": "Chambres absentes → registre identité.",
+      "imputed_value": 129.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_1_informations_generales_donnees_admin_nb_de_chambres_r14",
+      "strategy": "registry_nb_chambres",
+      "justification": "Chambres absentes → registre identité.",
+      "imputed_value": 100.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_annuel_r25",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque IBIS BUDGET.",
+      "imputed_value": 0.78
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_annuel_r25",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque MERCURE.",
+      "imputed_value": 0.72
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_annuel_r25",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque NOVOTEL.",
+      "imputed_value": 0.75
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_annuel_r25",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque NOVOTEL.",
+      "imputed_value": 0.75
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_annuel_r25",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque NOVOTEL.",
+      "imputed_value": 0.75
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_bas_mois_r26",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque IBIS BUDGET.",
+      "imputed_value": 0.78
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_bas_mois_r26",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque IBIS BUDGET.",
+      "imputed_value": 0.78
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_bas_mois_r26",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque MERCURE.",
+      "imputed_value": 0.72
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_bas_mois_r26",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque NOVOTEL.",
+      "imputed_value": 0.75
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_bas_mois_r26",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque NOVOTEL.",
+      "imputed_value": 0.75
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_bas_mois_r26",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque NOVOTEL.",
+      "imputed_value": 0.75
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_bas_taux_r27",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque IBIS BUDGET.",
+      "imputed_value": 0.78
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_bas_taux_r27",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque MERCURE.",
+      "imputed_value": 0.72
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_bas_taux_r27",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque NOVOTEL.",
+      "imputed_value": 0.75
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_bas_taux_r27",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque NOVOTEL.",
+      "imputed_value": 0.75
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_bas_taux_r27",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque NOVOTEL.",
+      "imputed_value": 0.75
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_haut_mois_r28",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque IBIS BUDGET.",
+      "imputed_value": 0.78
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_haut_mois_r28",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque IBIS BUDGET.",
+      "imputed_value": 0.78
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_haut_mois_r28",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque MERCURE.",
+      "imputed_value": 0.72
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_haut_mois_r28",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque NOVOTEL.",
+      "imputed_value": 0.75
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_haut_mois_r28",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque NOVOTEL.",
+      "imputed_value": 0.75
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_haut_mois_r28",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque NOVOTEL.",
+      "imputed_value": 0.75
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_haut_taux_r29",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque IBIS BUDGET.",
+      "imputed_value": 0.78
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_haut_taux_r29",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque MERCURE.",
+      "imputed_value": 0.72
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_haut_taux_r29",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque NOVOTEL.",
+      "imputed_value": 0.75
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_haut_taux_r29",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque NOVOTEL.",
+      "imputed_value": 0.75
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_1_informations_generales_donnees_chiffrees_to_le_plus_haut_taux_r29",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque NOVOTEL.",
+      "imputed_value": 0.75
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_bouilloire_r56",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_bouilloire_r56",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_fontaine_eau",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_fontaine_eau",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_fontaine_eau",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_fontaine_eau",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_fontaine_eau",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_fontaine_eau_r54",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_fontaine_eau_r54",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_machine_caf",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_machine_caf",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_machine_caf",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_machine_caf",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_machine_caf",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_machine_caf_r55",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_machine_caf_r55",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_micro_ondes",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_micro_ondes",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_micro_ondes",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_micro_ondes",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_micro_ondes",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_micro_ondes_r53",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_micro_ondes_r53",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_vitrine_r_frig_r_e",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_vitrine_r_frig_r_e",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_vitrine_r_frig_r_e",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_vitrine_r_frig_r_e",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_vitrine_r_frig_r_e",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_vitrine_r_frig_r_e_r52",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_2_services_equipements_dispo_dans_le_lobby_vitrine_r_frig_r_e_r52",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_2_services_equipements_f_b_bar",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_2_services_equipements_f_b_bar",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_2_services_equipements_f_b_bar",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_2_services_equipements_f_b_bar",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_2_services_equipements_f_b_bar",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_2_services_equipements_f_b_bar_r38",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_2_services_equipements_f_b_bar_r38",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_2_services_equipements_f_b_minibar_r47",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_2_services_equipements_f_b_minibar_r47",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_2_services_equipements_f_b_minibar_r47",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_2_services_equipements_f_b_minibar_r47",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_2_services_equipements_f_b_minibar_r47",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_2_services_equipements_f_b_restaurant",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_2_services_equipements_f_b_restaurant",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_2_services_equipements_f_b_restaurant",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_2_services_equipements_f_b_restaurant",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_2_services_equipements_f_b_restaurant",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_2_services_equipements_f_b_restaurant_r42",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_2_services_equipements_f_b_restaurant_r42",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_2_services_equipements_f_b_room_service_r46",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_2_services_equipements_f_b_room_service_r46",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_2_services_equipements_f_b_room_service_r46",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_2_services_equipements_f_b_room_service_r46",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_2_services_equipements_f_b_room_service_r46",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_2_services_equipements_non_f_b_piscine",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_2_services_equipements_non_f_b_piscine",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_2_services_equipements_non_f_b_piscine",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_2_services_equipements_non_f_b_piscine",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_2_services_equipements_non_f_b_piscine",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_2_services_equipements_non_f_b_piscine_r51",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_2_services_equipements_non_f_b_piscine_r51",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_2_services_equipements_non_f_b_spa",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_2_services_equipements_non_f_b_spa",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_2_services_equipements_non_f_b_spa",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_2_services_equipements_non_f_b_spa",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_2_services_equipements_non_f_b_spa",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_2_services_equipements_non_f_b_spa_r50",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_2_services_equipements_non_f_b_spa_r50",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_3_profil_de_vos_clients_affaires_affaires_pct_r65",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 0.4
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_3_profil_de_vos_clients_affaires_affaires_pct_r65",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 0.4
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_3_profil_de_vos_clients_affaires_affaires_pct_r65",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 0.4
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_3_profil_de_vos_clients_affaires_affaires_pct_r65",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 0.4
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_3_profil_de_vos_clients_affaires_affaires_pct_r65",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 0.4
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_3_profil_de_vos_clients_loisirs_loisirs_pct_r58",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 0.6
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_3_profil_de_vos_clients_loisirs_loisirs_pct_r58",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 0.6
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_3_profil_de_vos_clients_loisirs_loisirs_pct_r58",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 0.6
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_3_profil_de_vos_clients_loisirs_loisirs_pct_r58",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 0.6
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_3_profil_de_vos_clients_loisirs_loisirs_pct_r58",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 0.6
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_3_profil_de_vos_clients_loisirs_top_1_amis",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_3_profil_de_vos_clients_loisirs_top_1_amis",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_3_profil_de_vos_clients_loisirs_top_1_amis",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_3_profil_de_vos_clients_loisirs_top_1_amis",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_3_profil_de_vos_clients_loisirs_top_1_amis",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_3_profil_de_vos_clients_loisirs_top_1_amis_r62",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_3_profil_de_vos_clients_loisirs_top_1_amis_r62",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_3_profil_de_vos_clients_loisirs_top_1_amis_r62",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_3_profil_de_vos_clients_loisirs_top_1_amis_r62",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_3_profil_de_vos_clients_loisirs_top_1_amis_r62",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_3_profil_de_vos_clients_loisirs_top_1_couples_r61",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_3_profil_de_vos_clients_loisirs_top_1_couples_r61",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_3_profil_de_vos_clients_loisirs_top_1_couples_r61",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_3_profil_de_vos_clients_loisirs_top_1_couples_r61",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_3_profil_de_vos_clients_loisirs_top_1_couples_r61",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_3_profil_de_vos_clients_loisirs_top_1_familles_r63",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_3_profil_de_vos_clients_loisirs_top_1_familles_r63",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_3_profil_de_vos_clients_loisirs_top_1_familles_r63",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_3_profil_de_vos_clients_loisirs_top_1_familles_r63",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_3_profil_de_vos_clients_national_vs_inter_international_pct_r69",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 0.4
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_3_profil_de_vos_clients_national_vs_inter_international_pct_r69",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 0.4
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_3_profil_de_vos_clients_national_vs_inter_international_pct_r69",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 0.4
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_3_profil_de_vos_clients_national_vs_inter_international_pct_r69",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 0.4
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_3_profil_de_vos_clients_national_vs_inter_international_pct_r69",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 0.4
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_3_profil_de_vos_clients_national_vs_inter_national_pct_r68",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 0.6
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_3_profil_de_vos_clients_national_vs_inter_national_pct_r68",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 0.6
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_3_profil_de_vos_clients_national_vs_inter_national_pct_r68",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 0.6
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_3_profil_de_vos_clients_national_vs_inter_national_pct_r68",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 0.6
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_3_profil_de_vos_clients_national_vs_inter_national_pct_r68",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 0.6
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_4_informations_corner_autre_emplacement_dispo_m_tres_carr_s_estimation_r121",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 3.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_4_informations_corner_autre_emplacement_dispo_m_tres_carr_s_estimation_r121",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 3.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_4_informations_corner_autre_emplacement_dispo_m_tres_carr_s_estimation_r121",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 3.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_4_informations_corner_autre_emplacement_dispo_m_tres_carr_s_estimation_r121",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 3.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_4_informations_corner_autre_emplacement_dispo_m_tres_carr_s_estimation_r121",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 3.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_4_informations_corner_autre_emplacement_dispo_m_tres_lin_aires_estimation_r120",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 3.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_4_informations_corner_autre_emplacement_dispo_m_tres_lin_aires_estimation_r120",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 3.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_4_informations_corner_autre_emplacement_dispo_m_tres_lin_aires_estimation_r120",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 3.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_4_informations_corner_autre_emplacement_dispo_m_tres_lin_aires_estimation_r120",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 3.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_4_informations_corner_autre_emplacement_dispo_m_tres_lin_aires_estimation_r120",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 3.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_4_informations_corner_autre_emplacement_dispo_xpct_de_mes_clients_passent_devant_r119",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 100.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_4_informations_corner_autre_emplacement_dispo_xpct_de_mes_clients_passent_devant_r119",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 100.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_4_informations_corner_autre_emplacement_dispo_xpct_de_mes_clients_passent_devant_r119",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 100.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_4_informations_corner_autre_emplacement_dispo_xpct_de_mes_clients_passent_devant_r119",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 100.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_4_informations_corner_autre_emplacement_dispo_xpct_de_mes_clients_passent_devant_r119",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 100.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_m_tres_carr_s_estimation",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 6.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_m_tres_carr_s_estimation",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 6.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_m_tres_carr_s_estimation",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 6.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_m_tres_carr_s_estimation",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 6.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_m_tres_carr_s_estimation",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 6.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_m_tres_carr_s_estimation_r114",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 2.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_m_tres_carr_s_estimation_r114",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 2.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_m_tres_carr_s_estimation_r114",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 2.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_m_tres_carr_s_estimation_r114",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 2.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_m_tres_carr_s_estimation_r114",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 2.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_m_tres_lin_aires_estimation",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 3.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_m_tres_lin_aires_estimation",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 3.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_m_tres_lin_aires_estimation",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 3.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_m_tres_lin_aires_estimation",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 3.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_m_tres_lin_aires_estimation",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 3.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_m_tres_lin_aires_estimation_r113",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 2.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_m_tres_lin_aires_estimation_r113",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 2.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_m_tres_lin_aires_estimation_r113",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 2.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_m_tres_lin_aires_estimation_r113",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 2.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_m_tres_lin_aires_estimation_r113",
+      "strategy": "global_median",
+      "justification": "Numérique absent → médiane des hôtels renseignés.",
+      "imputed_value": 2.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_votre_hotel_dispose_t_il_d_j_d_un_c",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_votre_hotel_dispose_t_il_d_j_d_un_c",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_votre_hotel_dispose_t_il_d_j_d_un_c",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_votre_hotel_dispose_t_il_d_j_d_un_c",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_votre_hotel_dispose_t_il_d_j_d_un_c",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_votre_hotel_dispose_t_il_d_j_d_un_c_r84",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_4_informations_corner_corner_de_vente_actuel_votre_hotel_dispose_t_il_d_j_d_un_c_r84",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_caisse_code_barres",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_caisse_code_barres",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_caisse_code_barres",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_caisse_code_barres",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_caisse_code_barres",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_caisse_code_barres_r95",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_caisse_code_barres_r95",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_distributeur_auto",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_distributeur_auto",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_distributeur_auto",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_distributeur_auto",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_distributeur_auto",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_distributeur_auto_r93",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_distributeur_auto_r93",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_frigo_connect",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_frigo_connect",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_frigo_connect",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_frigo_connect",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_frigo_connect",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_frigo_connect_r94",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_frigo_connect_r94",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_r_ception",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_r_ception",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_r_ception",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_r_ception",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_r_ception",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_r_ception_r91",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_f_b_r_ception_r91",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_armoire_connect_e",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_armoire_connect_e",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_armoire_connect_e",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_armoire_connect_e",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_armoire_connect_e",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_armoire_connect_e_r107",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_armoire_connect_e_r107",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_caisse_code_barres",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_caisse_code_barres",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_caisse_code_barres",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_caisse_code_barres",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_caisse_code_barres",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_caisse_code_barres_r108",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_caisse_code_barres_r108",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_distributeur_auto",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_distributeur_auto",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_distributeur_auto",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_distributeur_auto",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_distributeur_auto",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_distributeur_auto_r106",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_distributeur_auto_r106",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_r_ception",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_r_ception",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_r_ception",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_r_ception",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_r_ception",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_r_ception_r105",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_4_informations_corner_votre_corner_actuel_offre_non_f_b_r_ception_r105",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_m_tres_lin_aires_dedies_a_v",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_m_tres_lin_aires_dedies_a_v",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_m_tres_lin_aires_dedies_a_v",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_m_tres_lin_aires_dedies_a_v",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_m_tres_lin_aires_dedies_a_v",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_m_tres_lin_aires_dedies_a_v_r129",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_m_tres_lin_aires_dedies_a_v_r129",
+      "strategy": "boolean_zero",
+      "justification": "Champ booléen absent → 0 (faux).",
+      "imputed_value": 0.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_moyen_de_guests_par_chambre_r127",
+      "strategy": "brand_pilot_guests",
+      "justification": "Guests/ch absent → pilote Excel par marque.",
+      "imputed_value": 1.7
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_moyen_de_guests_par_chambre_r127",
+      "strategy": "brand_pilot_guests",
+      "justification": "Guests/ch absent → pilote Excel par marque.",
+      "imputed_value": 2.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_moyen_de_guests_par_chambre_r127",
+      "strategy": "brand_pilot_guests",
+      "justification": "Guests/ch absent → pilote Excel par marque.",
+      "imputed_value": 1.8
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_moyen_de_guests_par_chambre_r127",
+      "strategy": "brand_pilot_guests",
+      "justification": "Guests/ch absent → pilote Excel par marque.",
+      "imputed_value": 1.8
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_moyen_de_guests_par_chambre_r127",
+      "strategy": "brand_pilot_guests",
+      "justification": "Guests/ch absent → pilote Excel par marque.",
+      "imputed_value": 1.8
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_nb_de_chambres",
+      "strategy": "registry_nb_chambres",
+      "justification": "Chambres absentes → registre identité.",
+      "imputed_value": 97.0
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_nb_de_chambres",
+      "strategy": "registry_nb_chambres",
+      "justification": "Chambres absentes → registre identité.",
+      "imputed_value": 305.0
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_nb_de_chambres",
+      "strategy": "registry_nb_chambres",
+      "justification": "Chambres absentes → registre identité.",
+      "imputed_value": 572.0
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_nb_de_chambres",
+      "strategy": "registry_nb_chambres",
+      "justification": "Chambres absentes → registre identité.",
+      "imputed_value": 764.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_nb_de_chambres",
+      "strategy": "registry_nb_chambres",
+      "justification": "Chambres absentes → registre identité.",
+      "imputed_value": 100.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_nb_de_chambres_r126",
+      "strategy": "registry_nb_chambres",
+      "justification": "Chambres absentes → registre identité.",
+      "imputed_value": 129.0
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_nb_de_chambres_r126",
+      "strategy": "registry_nb_chambres",
+      "justification": "Chambres absentes → registre identité.",
+      "imputed_value": 100.0
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_to_annuel_moyen_r128",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque IBIS BUDGET.",
+      "imputed_value": 0.78
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_to_annuel_moyen_r128",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque MERCURE.",
+      "imputed_value": 0.72
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_to_annuel_moyen_r128",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque NOVOTEL.",
+      "imputed_value": 0.75
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_to_annuel_moyen_r128",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque NOVOTEL.",
+      "imputed_value": 0.75
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_recap_5_simulateur_de_revenus_ecran_de_contr_le_parametres_to_annuel_moyen_r128",
+      "strategy": "brand_pilot_to",
+      "justification": "TO absent → pilote marque NOVOTEL.",
+      "imputed_value": 0.75
+    },
+    {
+      "hotel_id": "ibis-budget-nice",
+      "column": "d_taux_acheteur",
+      "strategy": "excel_rule_c21",
+      "justification": "taux acheteur = ventes_mensuelles / clients_mois (C21).",
+      "imputed_value": 0.44558197548711326
+    },
+    {
+      "hotel_id": "ibis-budget-strasbourg",
+      "column": "d_taux_acheteur",
+      "strategy": "excel_rule_c21",
+      "justification": "taux acheteur = ventes_mensuelles / clients_mois (C21).",
+      "imputed_value": 0.932100404806168
+    },
+    {
+      "hotel_id": "mercure-montmartre",
+      "column": "d_taux_acheteur",
+      "strategy": "excel_rule_c21",
+      "justification": "taux acheteur = ventes_mensuelles / clients_mois (C21).",
+      "imputed_value": 0.37232374809638985
+    },
+    {
+      "hotel_id": "novotel-megeve",
+      "column": "d_taux_acheteur",
+      "strategy": "excel_rule_c21",
+      "justification": "taux acheteur = ventes_mensuelles / clients_mois (C21).",
+      "imputed_value": 0.06829539616424862
+    },
+    {
+      "hotel_id": "novotel-paris-tour-eiffel",
+      "column": "d_taux_acheteur",
+      "strategy": "excel_rule_c21",
+      "justification": "taux acheteur = ventes_mensuelles / clients_mois (C21).",
+      "imputed_value": 0.6450725895408754
+    },
+    {
+      "hotel_id": "novotel-porte-italie",
+      "column": "d_taux_acheteur",
+      "strategy": "excel_rule_c21",
+      "justification": "taux acheteur = ventes_mensuelles / clients_mois (C21).",
+      "imputed_value": 0.2755312689738919
+    }
+  ],
+  "count": 287
+}

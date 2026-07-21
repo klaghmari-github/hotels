@@ -1,0 +1,7 @@
+hotel_id,n_months_present,months_present,actual_ca_raw_period,actual_ca_annuel,actual_ventes_raw_period,actual_ca_mensuel_moyen_period,actual_ca_mensuel_moyen
+ibis-budget-nice,4,"[1, 2, 3, 4]",1341.2000000000003,4023.600000000001,299.0,335.30000000000007,335.30000000000007
+ibis-budget-strasbourg,4,"[1, 2, 3, 4]",2137.5,6412.5,491.0,534.375,534.375
+mercure-montmartre,4,"[1, 2, 3, 4]",11123.8,33371.399999999994,1077.0,2780.95,2780.95
+novotel-megeve,4,"[1, 2, 3, 4]",9163.05,27489.149999999998,910.0,2290.7625,2290.7625
+novotel-paris-tour-eiffel,4,"[1, 2, 3, 4]",38073.5,114220.5,5202.0,9518.375,9518.375
+novotel-porte-italie,4,"[1, 2, 3, 4]",813.35,2440.05,192.0,203.3375,203.3375

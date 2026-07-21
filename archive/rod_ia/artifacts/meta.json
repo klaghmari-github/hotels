@@ -1,0 +1,27 @@
+{
+  "n_hotels": 6,
+  "n_features": 199,
+  "n_targets": 24,
+  "train_mae": 22.028153397948675,
+  "model": "MultiOutputRegressor(XGBRegressor)",
+  "production_model": "xgboost",
+  "model_comparison": {
+    "xgboost_train_mae": 22.028153397948675,
+    "neural_train_mae": 593.5231323242188,
+    "neural_loocv_mae": 2844.9161682128906,
+    "neural_vs_xgb_ratio": 26.944,
+    "winner_train_mae": "xgboost",
+    "loocv_vs_xgb_ratio": 129.149
+  },
+  "neural_network": {
+    "status": "trained",
+    "architecture": "seasonal_dual_tower",
+    "description": "Projection 32D + tronc résiduel + encodage saisonnier sin/cos + Conv1D temporelle + sorties CA/ventes par mois (softplus)",
+    "n_params": 10874,
+    "epochs_run": 400,
+    "train_mae": 593.5231323242188,
+    "loocv_mae": 2844.9161682128906,
+    "use_log1p_targets": true,
+    "model_path": "/media/laghmari/ssd-data/dev/hotels/rod_ia/artifacts/neural_model.keras"
+  }
+}
