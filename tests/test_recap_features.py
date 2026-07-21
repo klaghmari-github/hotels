@@ -48,10 +48,6 @@ def test_recap_extractor_produces_hotel_columns(registry, settings):
     assert len(recap_cols) >= 50
 
 
-def _rod_prep_src_path() -> Path:
-    return Path(__file__).resolve().parents[1] / "prepare/RodPrep/Src"
-
-
 def _registry_copy(tmp_path: Path, settings) -> Path:
     import shutil
 
@@ -66,10 +62,7 @@ def test_rod_prep_geo_priority_recap_over_registry(registry, settings, tmp_path)
     recap = _find_recap(settings)
     if not recap:
         pytest.skip("Fichier récap absent")
-    import sys
-
-    sys.path.insert(0, str(_rod_prep_src_path()))
-    from rod_prep.prep import RodPrep
+    from prepare.rod_prep import RodPrep
 
     prep = RodPrep(
         Path(__file__).resolve().parents[1] / "prepare/RodPrep/Input",
@@ -89,11 +82,8 @@ def test_rod_prep_geocodes_when_recap_and_registry_empty(
     recap = _find_recap(settings)
     if not recap:
         pytest.skip("Fichier récap absent")
-    import sys
-
-    sys.path.insert(0, str(_rod_prep_src_path()))
-    import rod_prep.prep as rod_prep_module
-    from rod_prep.prep import RodPrep
+    import prepare.rod_prep.prep as rod_prep_module
+    from prepare.rod_prep import RodPrep
 
     monkeypatch.setattr(
         rod_prep_module,
@@ -123,10 +113,7 @@ def test_rod_prep_hotel_code_is_accor_code(registry, settings, tmp_path):
     recap = _find_recap(settings)
     if not recap:
         pytest.skip("Fichier récap absent")
-    import sys
-
-    sys.path.insert(0, str(_rod_prep_src_path()))
-    from rod_prep.prep import RodPrep
+    from prepare.rod_prep import RodPrep
 
     out_dir = settings.data_reference_dir / "rod_recap_code_test"
     prep = RodPrep(

@@ -32,4 +32,15 @@ pythonpath = ["."]
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["rod_ia*"]
+include = ["rod_ia*", "prepare*"]
+# Exclure les shims Input/Output/Explore et les dossiers données par étape
+exclude = [
+    "prepare.RodPrep*",
+    "prepare.MeteoPrep*",
+    "prepare.ProximityPrep*",
+    "prepare.SalesPrep*",
+    "prepare.AllPrep*",
+]
+
+[project.scripts]
+run-prepare = "prepare.__main__:main"

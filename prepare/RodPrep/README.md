@@ -61,15 +61,18 @@ Feuille **RECAP DATA ROD** — une colonne par hôtel pivot, lignes descriptives
 
 | Champ | Méthode |
 |-------|---------|
-| `hotel_code` | `hotel_id` du registre |
-| `hotel_name` | `name_display`, sinon `name_ventes`, sinon `hotel_id` |
+| `hotel_code` | **Code Accor** (`code_h` du récap Excel) — **pas** le slug registre ni le nom |
+| `hotel_name` | `name_display`, sinon `name_ventes`, sinon slug registre |
 | `nom_hotel` | `name_ventes` (clé de jointure ventes) |
 | `hotel_brand` | `brand` |
 | `hotel_city` | `city` |
-| `hotel_lat` | `lat_nominatim` ou `lat_canonical` |
-| `hotel_lon` | `lon_nominatim` ou `lon_canonical` |
+| `hotel_lat` | priorités : lat récap → registry → géocode Nominatim (nom + adresse + ville) |
+| `hotel_lon` | idem pour longitude |
+| `hotel_geo_source` | `recap` \| `registry` \| `nominatim` |
 | `nb_chambres` | `nb_chambres` du registre |
 | `d_recap_*` | Une colonne par variable du récap (préfixe ML `d_recap_`) |
+
+**Ne pas confondre :** `hotel_code` (ex. `H2075`) ≠ slug registre (ex. `ibis-budget-nice`) ≠ `hotel_name` / `nom_hotel`.
 
 ### `rod_features` (wide récap seul)
 
@@ -92,7 +95,9 @@ feature_column = "d_recap_" + field_key
 **Jointure lookup :**
 
 ```
-hotel_lookup = registre LEFT JOIN rod_features ON hotel_code = hotel_id
+# hotel_id interne = slug registre (liaison Excel colonne ↔ registre)
+# hotel_code public = code_h Accor du récap
+hotel_lookup = registre ⋈ rod_features (via hotel_id/slug) → expose hotel_code = code_h
 ```
 
 ## Exécution

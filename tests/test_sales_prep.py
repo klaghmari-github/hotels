@@ -6,14 +6,9 @@ from pathlib import Path
 
 import pandas as pd
 
-import sys
-
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "prepare" / "SalesPrep" / "Src"))
-
-from sales_prep import aggregations as agg
-from sales_prep.pipeline import SalesPrep
 from prepare._shared.months import compute_year_month_stats, missing_boundary_months
+from prepare.sales_prep import SalesPrep
+from prepare.sales_prep import aggregations as agg
 from rod_ia.config.settings import get_settings
 
 
@@ -36,6 +31,32 @@ def test_sales_prep_pipeline_on_real_csv():
     assert not joined.empty
     assert "nom_hotel" in joined.columns or "nom_hotel" in str(joined.columns)
     assert len(prep.artifacts["step_2b"]) >= len(prep.artifacts["step_2a"])
+    # Sans lookup RodPrep : hotel_code reste NA (jamais remplacé par le nom)
+    assert "hotel_code" in joined.columns
+    assert not (joined["hotel_code"].notna() & (joined["hotel_code"] == joined["nom_hotel"])).any()
+
+
+def test_sales_prep_attaches_accor_code_from_lookup(tmp_path: Path):
+    settings = get_settings()
+    sales_path = settings.sales_csv_path
+    if not sales_path.exists():
+        return
+    lookup = pd.DataFrame(
+        [
+            {"nom_hotel": "Ibis budget Nice", "hotel_code": "H2075"},
+            {"nom_hotel": "Novotel Paris Tour Eiffel", "hotel_code": "H3546"},
+        ]
+    )
+    prep = SalesPrep(
+        sales_path=sales_path,
+        output_dir=tmp_path / "out",
+        rod_lookup=lookup,
+        holdout_year=2026,
+    )
+    joined = prep.run()
+    codes = joined.loc[joined["nom_hotel"] == "Ibis budget Nice", "hotel_code"].dropna().unique()
+    assert list(codes) == ["H2075"]
+    assert not (joined["hotel_code"].notna() & (joined["hotel_code"] == joined["nom_hotel"])).any()
 
 
 def test_step_1a_aggregation_synthetic():

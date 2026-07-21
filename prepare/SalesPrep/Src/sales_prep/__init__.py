@@ -1,3 +1,4 @@
-from .pipeline import SalesPrep
+"""Shim de compat notebooks — préférer ``from prepare.sales_prep import SalesPrep``."""
 
-__all__ = ["SalesPrep"]
+from prepare.sales_prep import *  # noqa: F403
+from prepare.sales_prep import __all__  # noqa: F401

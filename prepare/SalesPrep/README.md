@@ -55,7 +55,7 @@ Seules les années strictement antérieures à la dernière année du fichier so
 | `heure_vente` | 2 premiers caractères de `HEURE`, ou heure extraite de la date |
 | `is_weekend` | `1` si samedi ou dimanche, sinon `0` |
 | `is_holiday` | `1` si jour férié fixe France, sinon `0` |
-| `hotel_code` | Jointure `nom_hotel` ↔ `hotel_lookup` (RodPrep) |
+| `hotel_code` | Jointure `nom_hotel` ↔ `hotel_lookup` (RodPrep) — **code Accor uniquement**, jamais le nom d'hôtel en fallback |
 
 **Jours fériés retenus :** 1/1, 1/5, 8/5, 14/7, 15/8, 1/11, 11/11, 25/12.
 
