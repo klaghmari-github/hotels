@@ -1,16 +1,17 @@
 """HolidaysPrep — jours fériés et vacances scolaires par hôtel × année × mois.
 
 Entrée : identité RodPrep (``hotel_code`` Accor + ``hotel_lat`` / ``hotel_lon``).
-Sortie : table mensuelle + Excel dans ``Output/``.
+Sortie principale : ``hotel_holidays_data.xlsx`` (+ parquet/csv).
 
 Colonnes clés :
-  - ``nb_jours_feries``
-  - ``nb_jours_vacances_scolaires`` (tous les jours de vacances dans le mois)
-  - ``nb_jours_vacances_hors_feries`` (vacances scolaires hors jours fériés)
+  - ``nb_jours_feries`` / ``jours_feries`` (array ISO dates)
+  - ``nb_jours_vacances_scolaires`` / ``jours_vacances_scolaires``
+  - ``nb_jours_vacances_hors_feries`` / ``jours_vacances_hors_feries``
 """
 
 from __future__ import annotations
 
+import json
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Sequence
@@ -18,6 +19,19 @@ from typing import Any, Sequence
 import pandas as pd
 
 from prepare.holidays_prep.calendar import SchoolHolidayCalendar
+
+# Fichiers de sortie canoniques
+OUTPUT_XLSX = "hotel_holidays_data.xlsx"
+OUTPUT_PARQUET = "hotel_holidays_data.parquet"
+OUTPUT_CSV = "hotel_holidays_data.csv"
+# Alias rétrocompat
+LEGACY_STEM = "holidays_monthly"
+
+ARRAY_COLS = (
+    "jours_feries",
+    "jours_vacances_scolaires",
+    "jours_vacances_hors_feries",
+)
 
 
 def as_coord(value: Any) -> float | None:
@@ -30,6 +44,35 @@ def as_coord(value: Any) -> float | None:
     if pd.isna(coord):
         return None
     return coord
+
+
+def dates_to_json_array(dates: Sequence[str] | None) -> str:
+    """Sérialise une liste de dates ISO en JSON array (compatible Excel)."""
+    if not dates:
+        return "[]"
+    return json.dumps(list(dates), ensure_ascii=False)
+
+
+def parse_json_array(value: Any) -> list[str]:
+    """Parse un champ array (liste Python, JSON string, ou vide)."""
+    if value is None or (isinstance(value, float) and pd.isna(value)):
+        return []
+    if isinstance(value, (list, tuple)):
+        return [str(x) for x in value]
+    text = str(value).strip()
+    if not text or text == "[]":
+        return []
+    try:
+        data = json.loads(text)
+        if isinstance(data, list):
+            return [str(x) for x in data]
+    except json.JSONDecodeError:
+        pass
+    # fallback séparateurs
+    for sep in ("|", ";", ","):
+        if sep in text:
+            return [p.strip() for p in text.split(sep) if p.strip()]
+    return [text]
 
 
 HOTEL_IDENTITY_COLS = [
@@ -57,6 +100,8 @@ class HolidaysPrep:
         *,
         target_years: Sequence[int] | None = None,
         calendar: SchoolHolidayCalendar | None = None,
+        # Copie optionnelle vers SalesPrep/Input
+        sales_input_dir: Path | None = None,
     ) -> None:
         self.input_dir = Path(input_dir)
         self.output_dir = Path(output_dir)
@@ -67,6 +112,7 @@ class HolidaysPrep:
             else default_target_years()
         )
         self.calendar = calendar or SchoolHolidayCalendar()
+        self.sales_input_dir = Path(sales_input_dir) if sales_input_dir else None
 
     def fill_input_from_rod(self, rod_output_dir: Path) -> Path:
         """Copie l'identité hôtel depuis RodPrep (code Accor + coords)."""
@@ -124,9 +170,7 @@ class HolidaysPrep:
         lon = as_coord(hotel.get("hotel_lon"))
 
         if not code:
-            return self._empty_rows(
-                hotel, warnings=["hotel_code Accor absent"]
-            )
+            return self._empty_rows(hotel, warnings=["hotel_code Accor absent"])
         if lat is None or lon is None:
             return self._empty_rows(
                 hotel, warnings=["Coordonnées hotel_lat/hotel_lon absentes"]
@@ -154,6 +198,10 @@ class HolidaysPrep:
                     "nb_jours_vacances_scolaires": m.nb_jours_vacances_scolaires,
                     "nb_jours_vacances_hors_feries": m.nb_jours_vacances_hors_feries,
                     "nb_jours_dans_mois": m.nb_jours_dans_mois,
+                    # Arrays (listes Python → parquet list ; Excel = JSON)
+                    "jours_feries": list(m.jours_feries),
+                    "jours_vacances_scolaires": list(m.jours_vacances_scolaires),
+                    "jours_vacances_hors_feries": list(m.jours_vacances_hors_feries),
                 }
             )
         return rows
@@ -189,16 +237,27 @@ class HolidaysPrep:
                         "nb_jours_vacances_scolaires": None,
                         "nb_jours_vacances_hors_feries": None,
                         "nb_jours_dans_mois": monthrange_days(year, month),
+                        "jours_feries": [],
+                        "jours_vacances_scolaires": [],
+                        "jours_vacances_hors_feries": [],
                     }
                 )
         return rows
 
     def _write_outputs(self, frame: pd.DataFrame) -> None:
-        parquet = self.output_dir / "holidays_monthly.parquet"
-        csv = self.output_dir / "holidays_monthly.csv"
-        xlsx = self.output_dir / "holidays_monthly.xlsx"
-        frame.to_parquet(parquet, index=False)
-        frame.to_csv(csv, index=False)
+        # Parquet conserve les listes natives
+        parquet_path = self.output_dir / OUTPUT_PARQUET
+        frame.to_parquet(parquet_path, index=False)
+
+        # CSV / Excel : arrays en JSON string
+        excel_frame = frame.copy()
+        for col in ARRAY_COLS:
+            if col in excel_frame.columns:
+                excel_frame[col] = excel_frame[col].map(
+                    lambda v: dates_to_json_array(v if isinstance(v, (list, tuple)) else parse_json_array(v))
+                )
+
+        excel_frame.to_csv(self.output_dir / OUTPUT_CSV, index=False)
 
         summary = pd.DataFrame()
         if not frame.empty and "hotel_code" in frame.columns:
@@ -223,11 +282,34 @@ class HolidaysPrep:
                 .reset_index()
             )
 
-        with pd.ExcelWriter(xlsx, engine="openpyxl") as writer:
-            frame.to_excel(writer, index=False, sheet_name="holidays_monthly")
+        xlsx_path = self.output_dir / OUTPUT_XLSX
+        with pd.ExcelWriter(xlsx_path, engine="openpyxl") as writer:
+            excel_frame.to_excel(writer, index=False, sheet_name="hotel_holidays")
             if not summary.empty:
                 summary.to_excel(writer, index=False, sheet_name="resume_annuel")
 
+        # Alias rétrocompat
+        for stem, ext in (
+            (LEGACY_STEM, ".parquet"),
+            (LEGACY_STEM, ".csv"),
+            (LEGACY_STEM, ".xlsx"),
+        ):
+            src = {
+                ".parquet": parquet_path,
+                ".csv": self.output_dir / OUTPUT_CSV,
+                ".xlsx": xlsx_path,
+            }[ext]
+            dst = self.output_dir / f"{stem}{ext}"
+            if src.exists():
+                dst.write_bytes(src.read_bytes())
+
+        # Alimente SalesPrep/Input si configuré
+        if self.sales_input_dir is not None:
+            self.sales_input_dir.mkdir(parents=True, exist_ok=True)
+            target = self.sales_input_dir / OUTPUT_XLSX
+            target.write_bytes(xlsx_path.read_bytes())
+            # parquet aussi pour jointure typée
+            (self.sales_input_dir / OUTPUT_PARQUET).write_bytes(parquet_path.read_bytes())
 
     @staticmethod
     def _output_columns() -> list[str]:
@@ -246,6 +328,9 @@ class HolidaysPrep:
             "nb_jours_vacances_scolaires",
             "nb_jours_vacances_hors_feries",
             "nb_jours_dans_mois",
+            "jours_feries",
+            "jours_vacances_scolaires",
+            "jours_vacances_hors_feries",
         ]
 
     @staticmethod
@@ -262,3 +347,32 @@ def monthrange_days(year: int, month: int) -> int:
     from calendar import monthrange
 
     return monthrange(year, month)[1]
+
+
+def load_hotel_holidays(path: Path) -> pd.DataFrame:
+    """Charge ``hotel_holidays_data`` (xlsx / parquet / csv) pour SalesPrep."""
+    path = Path(path)
+    if path.is_dir():
+        for name in (OUTPUT_PARQUET, OUTPUT_XLSX, OUTPUT_CSV, f"{LEGACY_STEM}.parquet"):
+            candidate = path / name
+            if candidate.exists():
+                path = candidate
+                break
+    if not path.exists():
+        raise FileNotFoundError(f"hotel_holidays_data introuvable : {path}")
+
+    if path.suffix.lower() in {".parquet"}:
+        frame = pd.read_parquet(path)
+    elif path.suffix.lower() in {".xlsx", ".xls"}:
+        # Feuille principale
+        try:
+            frame = pd.read_excel(path, sheet_name="hotel_holidays")
+        except ValueError:
+            frame = pd.read_excel(path, sheet_name=0)
+    else:
+        frame = pd.read_csv(path)
+
+    for col in ARRAY_COLS:
+        if col in frame.columns:
+            frame[col] = frame[col].map(parse_json_array)
+    return frame

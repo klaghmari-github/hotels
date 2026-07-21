@@ -1,4 +1,4 @@
-"""Pipeline SalesPrep — étapes 1 à 7 et jointure finale."""
+"""Pipeline SalesPrep — étapes 1 à 7, jointure finale, enrichissement holidays."""
 
 from __future__ import annotations
 
@@ -7,13 +7,42 @@ from pathlib import Path
 
 import pandas as pd
 
+from prepare.holidays_prep.prep import (
+    ARRAY_COLS,
+    OUTPUT_XLSX as HOLIDAYS_XLSX,
+    dates_to_json_array,
+    load_hotel_holidays,
+    parse_json_array,
+)
 from prepare.sales_prep import aggregations as agg
 from prepare._shared.columns import sanitize_dataframe_columns
 from prepare._shared.sales_base import load_sales_frame
 
+# Sortie canonique ventes enrichies
+SALES_OUTPUT_XLSX = "hotel_sales_data.xlsx"
+SALES_OUTPUT_PARQUET = "hotel_sales_data.parquet"
+SALES_OUTPUT_CSV = "hotel_sales_data.csv"
+
+# Colonnes holidays jointes aux ventes (hors clés)
+HOLIDAY_FEATURE_COLS = [
+    "zone_scolaire",
+    "departement",
+    "nb_jours_feries",
+    "nb_jours_vacances_scolaires",
+    "nb_jours_vacances_hors_feries",
+    "nb_jours_dans_mois",
+    "jours_feries",
+    "jours_vacances_scolaires",
+    "jours_vacances_hors_feries",
+]
+
 
 class SalesPrep:
-    """Préparation des ventes selon consignes.txt (agrégations et imputations)."""
+    """Préparation des ventes selon consignes.txt (agrégations et imputations).
+
+    Si ``holidays_path`` / ``holidays`` est fourni, la jointure finale est
+    enrichie avec ``hotel_holidays_data`` (grain hotel_code × annee × mois).
+    """
 
     def __init__(
         self,
@@ -22,12 +51,16 @@ class SalesPrep:
         rod_lookup: pd.DataFrame | None = None,
         holdout_year: int | None = None,
         feature_store_dir: Path | None = None,
+        holidays_path: Path | None = None,
+        holidays: pd.DataFrame | None = None,
     ) -> None:
         self.sales_path = Path(sales_path)
         self.output_dir = Path(output_dir)
         self.rod_lookup = rod_lookup
         self.holdout_year = holdout_year
         self.feature_store_dir = Path(feature_store_dir) if feature_store_dir else None
+        self.holidays_path = Path(holidays_path) if holidays_path else None
+        self.holidays = holidays
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self._artifacts: dict[str, pd.DataFrame] = {}
 
@@ -65,6 +98,7 @@ class SalesPrep:
             keys=["nom_hotel", "hotel_code", "annee", "mois"],
         )
         joined = self._attach_hotel_code(joined)
+        joined = self._attach_holidays(joined)
 
         self._artifacts = {
             "step_1a": s1a,
@@ -87,8 +121,65 @@ class SalesPrep:
             "joined": joined,
         }
         self._persist()
+        self._write_hotel_sales_data(joined)
         self._write_feature_store(joined)
         return joined
+
+    def _load_holidays(self) -> pd.DataFrame | None:
+        if self.holidays is not None and not self.holidays.empty:
+            frame = self.holidays.copy()
+            for col in ARRAY_COLS:
+                if col in frame.columns:
+                    frame[col] = frame[col].map(
+                        lambda v: v
+                        if isinstance(v, list)
+                        else parse_json_array(v)
+                    )
+            return frame
+        if self.holidays_path is None:
+            return None
+        path = self.holidays_path
+        if path.is_dir():
+            return load_hotel_holidays(path)
+        if not path.exists():
+            return None
+        return load_hotel_holidays(path)
+
+    def _attach_holidays(self, frame: pd.DataFrame) -> pd.DataFrame:
+        """Joint ``hotel_holidays_data`` sur hotel_code × annee × mois."""
+        if frame is None or frame.empty:
+            return frame
+        holidays = self._load_holidays()
+        if holidays is None or holidays.empty:
+            return frame
+
+        keys = ["hotel_code", "annee", "mois"]
+        if not all(k in frame.columns for k in keys):
+            return frame
+        if not all(k in holidays.columns for k in keys):
+            return frame
+
+        # Évite de coller hotel_name / lat en doublon
+        feat_cols = [c for c in HOLIDAY_FEATURE_COLS if c in holidays.columns]
+        hol = holidays[keys + feat_cols].drop_duplicates(subset=keys)
+
+        # Drop éventuelles colonnes holidays déjà présentes (re-run)
+        drop = [c for c in feat_cols if c in frame.columns]
+        out = frame.drop(columns=drop) if drop else frame.copy()
+
+        # Types de jointure homogènes
+        out = out.copy()
+        hol = hol.copy()
+        out["hotel_code"] = out["hotel_code"].astype(str)
+        hol["hotel_code"] = hol["hotel_code"].astype(str)
+        out["annee"] = pd.to_numeric(out["annee"], errors="coerce").astype("Int64")
+        out["mois"] = pd.to_numeric(out["mois"], errors="coerce").astype("Int64")
+        hol["annee"] = pd.to_numeric(hol["annee"], errors="coerce").astype("Int64")
+        hol["mois"] = pd.to_numeric(hol["mois"], errors="coerce").astype("Int64")
+
+        merged = out.merge(hol, on=keys, how="left")
+        return merged
+
 
     def _attach_hotel_code(self, frame: pd.DataFrame) -> pd.DataFrame:
         """Attache le code Accor RodPrep via ``nom_hotel``.
@@ -153,14 +244,51 @@ class SalesPrep:
         return result
 
     def _persist(self) -> None:
-        meta = {"holdout_year": self.holdout_year, "steps": list(self._artifacts.keys())}
+        meta = {
+            "holdout_year": self.holdout_year,
+            "steps": list(self._artifacts.keys()),
+            "holidays_attached": self.holidays is not None
+            or (self.holidays_path is not None and Path(self.holidays_path).exists()),
+        }
         (self.output_dir / "meta.json").write_text(
             json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8"
         )
         for name, df in self._artifacts.items():
             path = self.output_dir / f"{name}.parquet"
             df.to_parquet(path, index=False)
-            df.to_csv(self.output_dir / f"{name}.csv", index=False)
+            # CSV : arrays en JSON
+            csv_df = df.copy()
+            for col in ARRAY_COLS:
+                if col in csv_df.columns:
+                    csv_df[col] = csv_df[col].map(
+                        lambda v: dates_to_json_array(v)
+                        if isinstance(v, (list, tuple))
+                        else dates_to_json_array(parse_json_array(v))
+                    )
+            csv_df.to_csv(self.output_dir / f"{name}.csv", index=False)
+
+    def _write_hotel_sales_data(self, joined: pd.DataFrame) -> None:
+        """Écrit ``hotel_sales_data`` (xlsx/parquet/csv) — ventes + holidays."""
+        if joined is None or joined.empty:
+            return
+        joined.to_parquet(self.output_dir / SALES_OUTPUT_PARQUET, index=False)
+
+        excel_df = joined.copy()
+        for col in ARRAY_COLS:
+            if col in excel_df.columns:
+                excel_df[col] = excel_df[col].map(
+                    lambda v: dates_to_json_array(v)
+                    if isinstance(v, (list, tuple))
+                    else dates_to_json_array(parse_json_array(v))
+                )
+        excel_df.to_csv(self.output_dir / SALES_OUTPUT_CSV, index=False)
+        excel_df.to_excel(
+            self.output_dir / SALES_OUTPUT_XLSX,
+            index=False,
+            sheet_name="hotel_sales",
+        )
+        # Alias joined pour rétrocompat
+        joined.to_parquet(self.output_dir / "joined.parquet", index=False)
 
     def _write_feature_store(self, joined: pd.DataFrame) -> None:
         if self.feature_store_dir is None or joined.empty:
@@ -171,7 +299,15 @@ class SalesPrep:
             target = self.feature_store_dir / str(hotel_code) / "sales_prep"
             target.mkdir(parents=True, exist_ok=True)
             group.to_parquet(target / "monthly_features.parquet", index=False)
-            group.to_csv(target / "monthly_features.csv", index=False)
+            csv_df = group.copy()
+            for col in ARRAY_COLS:
+                if col in csv_df.columns:
+                    csv_df[col] = csv_df[col].map(
+                        lambda v: dates_to_json_array(v)
+                        if isinstance(v, (list, tuple))
+                        else dates_to_json_array(parse_json_array(v))
+                    )
+            csv_df.to_csv(target / "monthly_features.csv", index=False)
 
     @property
     def artifacts(self) -> dict[str, pd.DataFrame]:

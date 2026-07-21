@@ -59,6 +59,83 @@ def test_sales_prep_attaches_accor_code_from_lookup(tmp_path: Path):
     assert not (joined["hotel_code"].notna() & (joined["hotel_code"] == joined["nom_hotel"])).any()
 
 
+def test_sales_prep_exploits_hotel_holidays_data(tmp_path: Path):
+    """hotel_sales_data joint hotel_holidays_data (compteurs + arrays de jours)."""
+    settings = get_settings()
+    sales_path = settings.sales_csv_path
+    if not sales_path.exists():
+        return
+
+    lookup = pd.DataFrame(
+        [
+            {"nom_hotel": "Ibis budget Nice", "hotel_code": "H2075"},
+        ]
+    )
+    holidays = pd.DataFrame(
+        [
+            {
+                "hotel_code": "H2075",
+                "annee": 2024,
+                "mois": 1,
+                "zone_scolaire": "B",
+                "departement": "06",
+                "nb_jours_feries": 1,
+                "nb_jours_vacances_scolaires": 7,
+                "nb_jours_vacances_hors_feries": 6,
+                "nb_jours_dans_mois": 31,
+                "jours_feries": ["2024-01-01"],
+                "jours_vacances_scolaires": [
+                    "2024-01-01",
+                    "2024-01-02",
+                    "2024-01-03",
+                    "2024-01-04",
+                    "2024-01-05",
+                    "2024-01-06",
+                    "2024-01-07",
+                ],
+                "jours_vacances_hors_feries": [
+                    "2024-01-02",
+                    "2024-01-03",
+                    "2024-01-04",
+                    "2024-01-05",
+                    "2024-01-06",
+                    "2024-01-07",
+                ],
+            }
+        ]
+    )
+    # Étendre holidays pour toutes années/mois possibles du holdout
+    # (jointure left — au moins jan 2024 matché si présent dans ventes)
+    out = tmp_path / "out"
+    prep = SalesPrep(
+        sales_path=sales_path,
+        output_dir=out,
+        rod_lookup=lookup,
+        holdout_year=2026,
+        holidays=holidays,
+    )
+    joined = prep.run()
+    assert "nb_jours_feries" in joined.columns
+    assert "jours_feries" in joined.columns
+    assert "jours_vacances_hors_feries" in joined.columns
+
+    matched = joined[
+        (joined["hotel_code"] == "H2075")
+        & (joined["annee"] == 2024)
+        & (joined["mois"] == 1)
+    ]
+    if not matched.empty:
+        row = matched.iloc[0]
+        assert row["nb_jours_feries"] == 1
+        assert row["zone_scolaire"] == "B"
+        assert "2024-01-01" in row["jours_feries"]
+        assert "2024-01-01" not in row["jours_vacances_hors_feries"]
+
+    assert (out / "hotel_sales_data.xlsx").exists()
+    assert (out / "hotel_sales_data.parquet").exists()
+
+
+
 def test_step_1a_aggregation_synthetic():
     frame = pd.DataFrame(
         {

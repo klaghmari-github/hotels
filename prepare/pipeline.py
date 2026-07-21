@@ -123,12 +123,18 @@ class PreparePipeline:
             self.paths.holidays_input,
             self.paths.holidays_output,
             target_years=years,
+            sales_input_dir=self.paths.sales_input,
         )
         hol.fill_input_from_rod(rod_output or self.paths.rod_output)
         return hol.run()
 
-    def run_sales(self, hotel_lookup: pd.DataFrame) -> pd.DataFrame:
-        """Étape 5 — agrégations ventes + attache hotel_code Accor."""
+    def run_sales(
+        self,
+        hotel_lookup: pd.DataFrame,
+        *,
+        holidays: pd.DataFrame | None = None,
+    ) -> pd.DataFrame:
+        """Étape 5 — agrégations ventes + attache hotel_code + hotel_holidays_data."""
         sales_path = self.settings.sales_csv_path
         self.paths.sales_input.mkdir(parents=True, exist_ok=True)
         sales_input_copy = self.paths.sales_input / "ventes.csv"
@@ -136,14 +142,31 @@ class PreparePipeline:
             sales_input_copy.write_bytes(sales_path.read_bytes())
 
         lookup_cols = hotel_lookup[["nom_hotel", "hotel_code"]].drop_duplicates()
+        # Holidays : frame fourni, sinon fichier dans SalesPrep/Input ou HolidaysPrep/Output
+        holidays_path = None
+        if holidays is None:
+            for candidate in (
+                self.paths.sales_input / "hotel_holidays_data.parquet",
+                self.paths.sales_input / "hotel_holidays_data.xlsx",
+                self.paths.holidays_output / "hotel_holidays_data.parquet",
+                self.paths.holidays_output / "hotel_holidays_data.xlsx",
+                self.paths.holidays_output / "holidays_monthly.parquet",
+            ):
+                if candidate.exists():
+                    holidays_path = candidate
+                    break
+
         sales = SalesPrep(
             sales_path=sales_path,
             output_dir=self.paths.sales_output,
             rod_lookup=lookup_cols,
             holdout_year=self.holdout_year,
             feature_store_dir=self.settings.feature_store_dir,
+            holidays_path=holidays_path,
+            holidays=holidays,
         )
         return sales.run()
+
 
     def run_all(
         self,
@@ -221,9 +244,10 @@ class PreparePipeline:
         else:
             print("[prepare] Step 4 — HolidaysPrep (skip)")
 
-        print("[prepare] Step 5 — SalesPrep")
-        sales_joined = self.run_sales(hotel_lookup)
+        print("[prepare] Step 5 — SalesPrep (+ hotel_holidays_data)")
+        sales_joined = self.run_sales(hotel_lookup, holidays=hol_frame)
         print(f"  → {len(sales_joined)} lignes jointes ventes")
+
 
         print("[prepare] Step 6 — AllPrep")
         dataset = self.run_all(

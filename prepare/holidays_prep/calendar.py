@@ -319,6 +319,14 @@ class MonthlyHolidayCounts:
     nb_jours_vacances_scolaires: int
     nb_jours_vacances_hors_feries: int
     nb_jours_dans_mois: int
+    # Listes des jours concernés (ISO YYYY-MM-DD), triées
+    jours_feries: tuple[str, ...]
+    jours_vacances_scolaires: tuple[str, ...]
+    jours_vacances_hors_feries: tuple[str, ...]
+
+
+def _dates_to_iso(days: Iterable[date]) -> tuple[str, ...]:
+    return tuple(sorted(d.isoformat() for d in days))
 
 
 def monthly_counts_for_year(
@@ -327,7 +335,7 @@ def monthly_counts_for_year(
     periods: Sequence[SchoolPeriod],
     departement: str | None = None,
 ) -> list[MonthlyHolidayCounts]:
-    """12 lignes (jan–déc) : fériés vs vacances hors fériés."""
+    """12 lignes (jan–déc) : fériés vs vacances hors fériés (+ listes de jours)."""
     public = french_public_holidays(year, departement=departement)
     rows: list[MonthlyHolidayCounts] = []
     for month in range(1, 13):
@@ -343,9 +351,13 @@ def monthly_counts_for_year(
                 nb_jours_vacances_scolaires=len(vacances),
                 nb_jours_vacances_hors_feries=len(vacances_hors),
                 nb_jours_dans_mois=n_days,
+                jours_feries=_dates_to_iso(feries),
+                jours_vacances_scolaires=_dates_to_iso(vacances),
+                jours_vacances_hors_feries=_dates_to_iso(vacances_hors),
             )
         )
     return rows
+
 
 
 class SchoolHolidayCalendar:

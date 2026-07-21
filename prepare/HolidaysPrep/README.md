@@ -34,10 +34,28 @@ df = prep.run()
 
 | Fichier | Contenu |
 |---------|---------|
-| `holidays_monthly.xlsx` | Feuille `holidays_monthly` + `resume_annuel` |
-| `holidays_monthly.parquet` / `.csv` | Même grain `hotel_code × annee × mois` |
+| **`hotel_holidays_data.xlsx`** | Feuille `hotel_holidays` + `resume_annuel` |
+| `hotel_holidays_data.parquet` / `.csv` | Grain `hotel_code × annee × mois` |
+| Copie auto | `SalesPrep/Input/hotel_holidays_data.*` (si `sales_input_dir`) |
+
+### Colonnes array (listes de jours ISO)
+
+| Champ | Contenu |
+|-------|---------|
+| `jours_feries` | `["2024-01-01", "2024-05-01", …]` |
+| `jours_vacances_scolaires` | Tous les jours de vacances du mois |
+| `jours_vacances_hors_feries` | Vacances **sans** les fériés |
+
+- **Parquet** : listes Python natives  
+- **Excel / CSV** : JSON array string  
+
+## Lien SalesPrep
+
+`hotel_sales_data` joint `hotel_holidays_data` sur `hotel_code × annee × mois`  
+→ compteurs + arrays disponibles dans `SalesPrep/Output/hotel_sales_data.xlsx`.
 
 ## Notes
 
 - La **date de fin** du calendrier scolaire education.gouv = jour de reprise → **exclue**.
-- Un jour à la fois férié et en vacances compte dans `nb_jours_feries` et `nb_jours_vacances_scolaires`, mais **pas** dans `nb_jours_vacances_hors_feries`.
+- Un jour à la fois férié et en vacances compte dans `nb_jours_feries` et `nb_jours_vacances_scolaires`, mais **pas** dans `nb_jours_vacances_hors_feries` ni dans `jours_vacances_hors_feries`.
+

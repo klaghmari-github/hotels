@@ -64,6 +64,10 @@ def test_school_holiday_days_and_monthly_split():
     assert by_month[11].nb_jours_vacances_hors_feries == 3
     assert by_month[10].nb_jours_vacances_scolaires == 12  # 20-31 oct
     assert by_month[10].nb_jours_vacances_hors_feries == 12
+    assert "2024-11-01" in by_month[11].jours_feries
+    assert "2024-11-01" in by_month[11].jours_vacances_scolaires
+    assert "2024-11-01" not in by_month[11].jours_vacances_hors_feries
+
 
 
 
@@ -121,13 +125,22 @@ def test_holidays_prep_run_writes_excel(tmp_path: Path):
     assert july["nb_jours_vacances_scolaires"] == 27  # 5-31 juil
     assert july["nb_jours_feries"] == 1  # 14 juil
     assert july["nb_jours_vacances_hors_feries"] == 26
+    # Arrays de jours
+    assert "2025-07-14" in july["jours_feries"]
+    assert "2025-07-05" in july["jours_vacances_scolaires"]
+    assert "2025-07-14" not in july["jours_vacances_hors_feries"]
+    assert "2025-07-15" in july["jours_vacances_hors_feries"]
 
-    assert (output_dir / "holidays_monthly.xlsx").exists()
-    assert (output_dir / "holidays_monthly.parquet").exists()
-    assert (output_dir / "holidays_monthly.csv").exists()
+    assert (output_dir / "hotel_holidays_data.xlsx").exists()
+    assert (output_dir / "hotel_holidays_data.parquet").exists()
+    assert (output_dir / "hotel_holidays_data.csv").exists()
 
-    xl = pd.read_excel(output_dir / "holidays_monthly.xlsx", sheet_name="holidays_monthly")
+    xl = pd.read_excel(output_dir / "hotel_holidays_data.xlsx", sheet_name="hotel_holidays")
     assert len(xl) == 12
-    resume = pd.read_excel(output_dir / "holidays_monthly.xlsx", sheet_name="resume_annuel")
+    assert "jours_feries" in xl.columns
+    # Excel stocke les arrays en JSON
+    assert "2025-07-14" in str(xl.loc[xl["mois"] == 7, "jours_feries"].iloc[0])
+    resume = pd.read_excel(output_dir / "hotel_holidays_data.xlsx", sheet_name="resume_annuel")
     assert len(resume) == 1
     assert resume.loc[0, "nb_jours_feries"] >= 1
+
