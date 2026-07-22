@@ -204,6 +204,167 @@ def api_rebuild_join():
 
 
 # ---------------------------------------------------------------------------
+# API — modèle XGBoost (config + build + liste)
+# ---------------------------------------------------------------------------
+
+@app.get("/api/model/config")
+def api_model_config():
+    """
+    Schéma de configuration pour l'écran d'apprentissage.
+
+    Query : ``source`` = ``data`` (All Data) ou ``sales``.
+    """
+    try:
+        from model_train import get_config_payload
+
+        source = request.args.get("source", "data").strip() or "data"
+        return jsonify(get_config_payload(source=source))
+    except FileNotFoundError as exc:
+        return jsonify({"error": str(exc)}), 404
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
+@app.get("/api/model/list")
+def api_model_list():
+    """Liste des modèles sauvegardés dans ``models/``."""
+    try:
+        from model_train import list_models
+
+        return jsonify({"models": list_models()})
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
+@app.post("/api/model/build")
+def api_model_build():
+    """
+    Lance l'apprentissage XGBoost et sauvegarde le modèle.
+
+    Body JSON
+    ---------
+    {
+      "source": "data",
+      "feature_groups": { "pct_mix": true, "pct_sous_cat": true, ... },
+      "targets": ["nombre_ventes", "montant_ventes"],
+      "xgb_params": { "n_estimators": 200, "max_depth": 6, ... },
+      "test_size": 0.2,
+      "model_name": "xgb_sales"
+    }
+    """
+    body = request.get_json(force=True, silent=True) or {}
+    try:
+        from model_train import train_model
+
+        result = train_model(
+            source=str(body.get("source") or "data"),
+            feature_groups=body.get("feature_groups"),
+            targets=body.get("targets"),
+            xgb_params=body.get("xgb_params"),
+            test_size=float(body.get("test_size") or 0.2),
+            model_name=body.get("model_name"),
+        )
+        return jsonify(result)
+    except ImportError as exc:
+        return jsonify({"error": str(exc)}), 500
+    except FileNotFoundError as exc:
+        return jsonify({"error": str(exc)}), 404
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 500
+
+
+@app.get("/api/model/<model_id>")
+def api_model_detail(model_id: str):
+    """Métadonnées d'un modèle sauvegardé."""
+    try:
+        from model_train import MODELS_DIR
+        import json as _json
+
+        meta_path = MODELS_DIR / model_id / "meta.json"
+        if not meta_path.exists():
+            return jsonify({"error": f"Modèle inconnu : {model_id}"}), 404
+        meta = _json.loads(meta_path.read_text(encoding="utf-8"))
+        meta["id"] = model_id
+        meta["path"] = str(meta_path.parent)
+        return jsonify(meta)
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
+@app.get("/api/model/<model_id>/explore")
+def api_model_explore(model_id: str):
+    """Vue d'ensemble pour Model Explore (targets, n arbres, importances)."""
+    try:
+        from model_explore import explore_overview
+
+        return jsonify(explore_overview(model_id))
+    except FileNotFoundError as exc:
+        return jsonify({"error": str(exc)}), 404
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
+@app.get("/api/model/<model_id>/tree")
+def api_model_tree(model_id: str):
+    """
+    Structure d'un arbre de décision.
+
+    Query : ``target`` (index), ``tree`` (index 0-based).
+    """
+    try:
+        from model_explore import get_tree
+
+        target = int(request.args.get("target", 0))
+        tree = int(request.args.get("tree", 0))
+        return jsonify(get_tree(model_id, target_index=target, tree_index=tree))
+    except FileNotFoundError as exc:
+        return jsonify({"error": str(exc)}), 404
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
+@app.get("/api/model/<model_id>/tree-metrics")
+def api_model_tree_metrics(model_id: str):
+    """
+    Performance cumulative de chaque arbre vs performance globale.
+
+    Query : ``target`` (index de la cible).
+    """
+    try:
+        from model_explore import tree_performances
+
+        target = int(request.args.get("target", 0))
+        return jsonify(tree_performances(model_id, target_index=target))
+    except FileNotFoundError as exc:
+        return jsonify({"error": str(exc)}), 404
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
+@app.get("/api/model/<model_id>/importance")
+def api_model_importance(model_id: str):
+    """Feature importance globale ou par target (``?target=0``)."""
+    try:
+        from model_explore import feature_importance_payload
+
+        t = request.args.get("target")
+        target_index = int(t) if t is not None and t != "" else None
+        return jsonify(feature_importance_payload(model_id, target_index=target_index))
+    except FileNotFoundError as exc:
+        return jsonify({"error": str(exc)}), 404
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
+# ---------------------------------------------------------------------------
 # Entrée CLI
 # ---------------------------------------------------------------------------
 

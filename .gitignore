@@ -30,6 +30,7 @@ exports/
 *.joblib
 rod_ia/artifacts/
 old/artifacts/
+accord/models/
 
 # Raw source data (large Excel/CSV exports — place locally, not in git)
 sources/raw/

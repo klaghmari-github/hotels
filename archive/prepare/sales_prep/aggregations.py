@@ -231,14 +231,66 @@ def _pivot_measures(
 
 
 def step_3c_category_wide(step_3b: pd.DataFrame) -> pd.DataFrame:
+    """Wide cat + sous_cat en volumes, + pourcentages (inputs modèle).
+
+    Pourcentages générés :
+    - ``pct_cat_{f_b|n_f_b}_{measure}`` : part de la catégorie dans le mois
+    - ``pct_sous_cat_{slug}_{measure}`` : part de la sous-catégorie **dans sa
+      catégorie** (F_B ou N_F_B) pour le mois / hôtel
+    """
     keys = ["nom_hotel", "annee", "mois"]
     by_cat = _pivot_measures(step_3b, keys, "categorie", "cat")
     by_sub = _pivot_measures(step_3b, keys, "sous_categorie", "sous_cat")
+    if by_cat.empty and by_sub.empty:
+        return pd.DataFrame(columns=keys)
     if by_cat.empty:
-        return by_sub
-    if by_sub.empty:
-        return by_cat
-    return by_cat.merge(by_sub, on=keys, how="outer")
+        wide = by_sub
+    elif by_sub.empty:
+        wide = by_cat
+    else:
+        wide = by_cat.merge(by_sub, on=keys, how="outer")
+
+    # --- % catégorie F_B / N_F_B (sur chaque mesure) ---
+    for measure in MEASURES:
+        fb_col = f"cat_f_b_{measure}"
+        nfb_col = f"cat_n_f_b_{measure}"
+        if fb_col not in wide.columns and nfb_col not in wide.columns:
+            continue
+        fb = wide[fb_col] if fb_col in wide.columns else 0.0
+        nfb = wide[nfb_col] if nfb_col in wide.columns else 0.0
+        total = fb.fillna(0) + nfb.fillna(0)
+        wide[f"pct_cat_f_b_{measure}"] = (fb.fillna(0) / total).where(total > 0, 0.0)
+        wide[f"pct_cat_n_f_b_{measure}"] = (nfb.fillna(0) / total).where(total > 0, 0.0)
+
+    # --- % sous-catégorie dans sa catégorie parente ---
+    if not step_3b.empty and {"categorie", "sous_categorie"}.issubset(step_3b.columns):
+        long = step_3b.copy()
+        long["sous_categorie"] = long["sous_categorie"].astype(str)
+        long["categorie"] = long["categorie"].astype(str)
+        for measure in MEASURES:
+            if measure not in long.columns:
+                continue
+            cat_tot = long.groupby(
+                ["nom_hotel", "annee", "mois", "categorie"], dropna=False
+            )[measure].transform("sum")
+            long[f"_pct_{measure}"] = (
+                long[measure] / cat_tot.replace(0, pd.NA)
+            ).fillna(0.0)
+            pivot = long.pivot_table(
+                index=keys,
+                columns="sous_categorie",
+                values=f"_pct_{measure}",
+                aggfunc="sum",
+                fill_value=0.0,
+            )
+            pivot.columns = [
+                sanitize_column_name(f"pct_sous_cat_{col}_{measure}")
+                for col in pivot.columns
+            ]
+            wide = wide.merge(pivot.reset_index(), on=keys, how="left")
+
+    return wide
+
 
 
 def _grouped_step(frame: pd.DataFrame, extra_keys: list[str]) -> pd.DataFrame:

@@ -217,7 +217,9 @@ _WEATHER_EDITABLE = [
     "meteo_ensoleillement_min_max",
 ]
 
-# --- Sales : uniquement la base mensuelle (pas cat_/heure_/weekend_ dérivés) ---
+# --- Sales : base mensuelle + mix % (inputs modèle) ---
+# Les volumes cat_/sous_cat_/heure_/weekend_ restent dans le fichier
+# mais ne sont pas tous exposés (trop larges pour l'édition manuelle).
 _SALES_EDITABLE = [
     "hotel_code",
     "nom_hotel",
@@ -227,6 +229,16 @@ _SALES_EDITABLE = [
     "montant_ventes",
     "nombre_paniers",
     "nombre_produits",
+    "pct_categories_mois_f_b",
+    "pct_categories_mois_n_f_b",
+    "pct_cat_f_b_nombre_ventes",
+    "pct_cat_n_f_b_nombre_ventes",
+    "pct_cat_f_b_montant_ventes",
+    "pct_cat_n_f_b_montant_ventes",
+    "nb_jours_feries",
+    "nb_jours_vacances_scolaires",
+    "nb_jours_vacances_hors_feries",
+    "zone_scolaire",
 ]
 
 # --- Holidays : compteurs + listes de jours (feuille resume_annuel non éditée) ---
@@ -289,7 +301,7 @@ DATASETS: dict[str, DatasetSchema] = {
     "sales": DatasetSchema(
         id="sales",
         label="Hotel Sales Data",
-        description="Ventes mensuelles — quantités, montants, paniers (saisie base)",
+        description="Ventes mensuelles + mix % F&B / sous-cat (inputs modèle)",
         filename="hotel_sales_data.xlsx",
         sheet="hotel_sales",
         editable_columns=_SALES_EDITABLE,

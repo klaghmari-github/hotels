@@ -15,10 +15,9 @@
     "step_5a",
     "step_5b",
     "step_5c",
-    "step_6a",
-    "step_6b",
-    "step_6c",
+    "step_6_holidays",
     "joined"
   ],
+  "note_decimals": "nombre_ventes peut être décimal après 2.b (imputation moyenne mois actifs)",
   "holidays_attached": true
 }

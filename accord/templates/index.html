@@ -27,81 +27,257 @@
         </div>
       </div>
       <nav class="nav-tabs" id="nav-tabs" aria-label="Jeux de données"></nav>
+      <div class="nav-footer">
+        <button type="button" class="nav-item" id="nav-model-build" data-panel="model-build">
+          <span class="nav-icon">⚡</span>
+          <span>
+            <span class="nav-label">Model Build</span>
+            <span class="nav-desc">Configurer, entraîner, sauvegarder</span>
+          </span>
+        </button>
+        <button type="button" class="nav-item" id="nav-model-explore" data-panel="model-explore">
+          <span class="nav-icon">🌳</span>
+          <span>
+            <span class="nav-label">Model Explore</span>
+            <span class="nav-desc">Arbres, perfs, feature importance</span>
+          </span>
+        </button>
+      </div>
     </aside>
 
     <main class="main">
-      <header class="topbar">
-        <div class="topbar-left">
-          <h1 id="panel-title">Chargement…</h1>
-          <p id="panel-desc" class="subtitle"></p>
-        </div>
-        <div class="topbar-actions">
-          <div class="search-wrap">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3-3"/></svg>
-            <input type="search" id="search-input" placeholder="Filtrer…" autocomplete="off" />
+      <!-- ===== Vue table (datasets) ===== -->
+      <div id="view-table" class="view">
+        <header class="topbar">
+          <div class="topbar-left">
+            <h1 id="panel-title">Chargement…</h1>
+            <p id="panel-desc" class="subtitle"></p>
           </div>
-          <button type="button" class="btn btn-ghost" id="btn-reload" title="Recharger depuis Excel">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M8 16H3v5"/></svg>
-            Recharger
-          </button>
-          <button type="button" class="btn btn-ghost hidden" id="btn-rebuild" title="Recalculer All Data (fill météo + proximité via lat/lon)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v6h6"/><path d="M20 20v-6h-6"/><path d="M20 9A8 8 0 0 0 7 6L4 10"/><path d="M4 15a8 8 0 0 0 13 3l3-4"/></svg>
-            Rebuild All Data
-          </button>
-          <button type="button" class="btn btn-ghost" id="btn-add">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-            Ligne
-          </button>
-          <button type="button" class="btn btn-primary" id="btn-save" disabled>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
-            Enregistrer
-          </button>
-        </div>
-      </header>
+          <div class="topbar-actions">
+            <div class="search-wrap">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3-3"/></svg>
+              <input type="search" id="search-input" placeholder="Filtrer…" autocomplete="off" />
+            </div>
+            <button type="button" class="btn btn-ghost" id="btn-reload" title="Recharger depuis Excel">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M8 16H3v5"/></svg>
+              Recharger
+            </button>
+            <button type="button" class="btn btn-ghost hidden" id="btn-rebuild" title="Recalculer All Data (fill météo + proximité via lat/lon)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v6h6"/><path d="M20 20v-6h-6"/><path d="M20 9A8 8 0 0 0 7 6L4 10"/><path d="M4 15a8 8 0 0 0 13 3l3-4"/></svg>
+              Rebuild All Data
+            </button>
+            <button type="button" class="btn btn-ghost" id="btn-add">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              Ligne
+            </button>
+            <button type="button" class="btn btn-primary" id="btn-save" disabled>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+              Enregistrer
+            </button>
+          </div>
+        </header>
 
-      <section class="meta-bar">
-        <span class="chip" id="chip-file"></span>
-        <span class="chip chip-muted" id="chip-stats"></span>
-        <span class="chip chip-warn hidden" id="chip-dirty">Modifications non enregistrées</span>
-        <span class="status" id="status-msg"></span>
-      </section>
+        <section class="meta-bar">
+          <span class="chip" id="chip-file"></span>
+          <span class="chip chip-muted" id="chip-stats"></span>
+          <span class="chip chip-warn hidden" id="chip-dirty">Modifications non enregistrées</span>
+          <span class="status" id="status-msg"></span>
+        </section>
 
-      <section class="table-panel">
-        <div class="table-scroll" id="table-scroll">
-          <table class="data-table" id="data-table">
-            <thead id="table-head"></thead>
-            <tbody id="table-body">
-              <tr><td class="empty-state">Chargement des données…</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
+        <section class="table-panel">
+          <div class="table-scroll" id="table-scroll">
+            <table class="data-table" id="data-table">
+              <thead id="table-head"></thead>
+              <tbody id="table-body">
+                <tr><td class="empty-state">Chargement des données…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
 
-      <footer class="pager">
-        <div class="pager-left">
-          <label class="pager-size">
-            Lignes / page
-            <select id="page-size">
-              <option value="15">15</option>
-              <option value="25" selected>25</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>
-          </label>
+        <footer class="pager">
+          <div class="pager-left">
+            <label class="pager-size">
+              Lignes / page
+              <select id="page-size">
+                <option value="15">15</option>
+                <option value="25" selected>25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </label>
+          </div>
+          <div class="pager-center">
+            <button type="button" class="btn btn-icon" id="btn-first" title="Première">«</button>
+            <button type="button" class="btn btn-icon" id="btn-prev" title="Précédente">‹</button>
+            <span class="pager-info" id="pager-info">—</span>
+            <button type="button" class="btn btn-icon" id="btn-next" title="Suivante">›</button>
+            <button type="button" class="btn btn-icon" id="btn-last" title="Dernière">»</button>
+          </div>
+          <div class="pager-right">
+            <button type="button" class="btn btn-danger-ghost" id="btn-delete" disabled>
+              Supprimer sélection
+            </button>
+          </div>
+        </footer>
+      </div>
+
+      <!-- ===== Vue Model Build ===== -->
+      <div id="view-model-build" class="view hidden">
+        <header class="topbar">
+          <div class="topbar-left">
+            <h1>Model Build</h1>
+            <p class="subtitle">
+              Entraînement XGBoost — inputs mix % F&amp;B / sous-catégories ; targets = volumes de ventes.
+            </p>
+          </div>
+          <div class="topbar-actions">
+            <button type="button" class="btn btn-ghost" id="btn-model-refresh" title="Recharger la config">
+              Recharger config
+            </button>
+            <button type="button" class="btn btn-primary" id="btn-model-build">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              Build
+            </button>
+          </div>
+        </header>
+
+        <section class="meta-bar">
+          <span class="chip" id="model-chip-source"></span>
+          <span class="chip chip-muted" id="model-chip-stats"></span>
+          <span class="status" id="model-status"></span>
+        </section>
+
+        <div class="model-layout">
+          <div class="model-col">
+            <section class="card">
+              <h2 class="card-title">Source &amp; split</h2>
+              <div class="form-grid">
+                <label class="field">
+                  <span>Source données</span>
+                  <select id="model-source">
+                    <option value="data">All Data (data.xlsx)</option>
+                    <option value="sales">Hotel Sales Data</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Test size</span>
+                  <input type="number" id="model-test-size" min="0.05" max="0.5" step="0.05" value="0.2" />
+                </label>
+                <label class="field">
+                  <span>Nom modèle</span>
+                  <input type="text" id="model-name" value="xgb_sales" maxlength="40" />
+                </label>
+              </div>
+            </section>
+
+            <section class="card">
+              <h2 class="card-title">Features (inputs)</h2>
+              <p class="card-hint">Les % F&amp;B et sous-catégories sont les inputs principaux du modèle.</p>
+              <div id="model-feature-groups" class="check-list"></div>
+            </section>
+
+            <section class="card">
+              <h2 class="card-title">Targets (à prédire)</h2>
+              <p class="card-hint">Volumes de ventes (nombre / montant) par mois.</p>
+              <div class="target-actions">
+                <button type="button" class="btn btn-ghost btn-sm" id="btn-targets-default">Défaut</button>
+                <button type="button" class="btn btn-ghost btn-sm" id="btn-targets-all">Tous volumes</button>
+                <button type="button" class="btn btn-ghost btn-sm" id="btn-targets-none">Aucun</button>
+              </div>
+              <div id="model-targets" class="check-list check-list-scroll"></div>
+            </section>
+          </div>
+
+          <div class="model-col">
+            <section class="card">
+              <h2 class="card-title">Hyperparamètres XGBoost</h2>
+              <div id="model-params" class="form-grid form-grid-3"></div>
+            </section>
+
+            <section class="card">
+              <h2 class="card-title">Résultat</h2>
+              <div id="model-result" class="model-result empty">
+                Cliquez <strong>Build</strong> pour entraîner et sauvegarder le modèle.
+              </div>
+            </section>
+
+            <section class="card">
+              <h2 class="card-title">Modèles sauvegardés</h2>
+              <div id="model-list" class="model-list empty">Aucun modèle pour l’instant.</div>
+            </section>
+          </div>
         </div>
-        <div class="pager-center">
-          <button type="button" class="btn btn-icon" id="btn-first" title="Première">«</button>
-          <button type="button" class="btn btn-icon" id="btn-prev" title="Précédente">‹</button>
-          <span class="pager-info" id="pager-info">—</span>
-          <button type="button" class="btn btn-icon" id="btn-next" title="Suivante">›</button>
-          <button type="button" class="btn btn-icon" id="btn-last" title="Dernière">»</button>
+      </div>
+
+      <!-- ===== Vue Model Explore ===== -->
+      <div id="view-model-explore" class="view hidden">
+        <header class="topbar">
+          <div class="topbar-left">
+            <h1>Model Explore</h1>
+            <p class="subtitle">
+              Visualiser les arbres de décision, comparer la perf de chaque arbre au modèle global, feature importance.
+            </p>
+          </div>
+          <div class="topbar-actions">
+            <button type="button" class="btn btn-ghost" id="btn-explore-refresh">Recharger</button>
+          </div>
+        </header>
+
+        <section class="meta-bar">
+          <span class="chip" id="explore-chip-model"></span>
+          <span class="chip chip-muted" id="explore-chip-stats"></span>
+          <span class="status" id="explore-status"></span>
+        </section>
+
+        <div class="model-layout explore-layout">
+          <div class="model-col">
+            <section class="card">
+              <h2 class="card-title">Sélection</h2>
+              <div class="form-grid">
+                <label class="field" style="grid-column: 1 / -1">
+                  <span>Modèle</span>
+                  <select id="explore-model-select"></select>
+                </label>
+                <label class="field">
+                  <span>Target (arbre)</span>
+                  <select id="explore-target-select"></select>
+                </label>
+                <label class="field">
+                  <span>Arbre # <span id="explore-tree-label">0</span></span>
+                  <input type="range" id="explore-tree-slider" min="0" max="0" value="0" step="1" />
+                </label>
+              </div>
+              <div class="explore-global-metrics" id="explore-global-metrics"></div>
+            </section>
+
+            <section class="card">
+              <h2 class="card-title">Feature importance</h2>
+              <div class="target-actions">
+                <button type="button" class="btn btn-ghost btn-sm" id="btn-imp-global">Globale</button>
+                <button type="button" class="btn btn-ghost btn-sm" id="btn-imp-target">Par target</button>
+              </div>
+              <div id="explore-importance" class="imp-bars empty">Choisissez un modèle…</div>
+            </section>
+          </div>
+
+          <div class="model-col">
+            <section class="card card-wide">
+              <h2 class="card-title">Performance par arbre vs globale</h2>
+              <p class="card-hint">
+                Courbe cumulative : après k arbres, R² / RMSE sur le jeu de test, comparés au modèle complet.
+              </p>
+              <div id="explore-perf-chart" class="perf-chart empty">—</div>
+              <div id="explore-perf-table" class="perf-table-wrap"></div>
+            </section>
+
+            <section class="card card-wide">
+              <h2 class="card-title">Arbre de décision <span id="explore-tree-title" class="card-title-muted"></span></h2>
+              <div id="explore-tree-view" class="tree-view empty">Sélectionnez un modèle pour afficher un arbre.</div>
+            </section>
+          </div>
         </div>
-        <div class="pager-right">
-          <button type="button" class="btn btn-danger-ghost" id="btn-delete" disabled>
-            Supprimer sélection
-          </button>
-        </div>
-      </footer>
+      </div>
     </main>
   </div>
 

@@ -118,12 +118,12 @@ Ibis budget Nice,2025,10,N_F_B,ACCESSOIRES,20.0,155.0,16.0,12.0,H2075
 Ibis budget Nice,2025,10,N_F_B,PAP,3.0,30.0,3.0,2.0,H2075
 Ibis budget Nice,2025,11,F_B,FOOD SALEE,17.0,46.0,14.0,8.0,H2075
 Ibis budget Nice,2025,11,F_B,SANS ALCOOL,173.0,403.1,118.0,18.0,H2075
-Ibis budget Nice,2025,11,NAN,nan,3.0,6.0,2.0,1.0,H2075
+Ibis budget Nice,2025,11,NAN,,3.0,6.0,2.0,1.0,H2075
 Ibis budget Nice,2025,11,N_F_B,#REF!,7.0,84.0,7.0,3.0,H2075
 Ibis budget Nice,2025,11,N_F_B,ACCESSOIRES,2.0,12.0,2.0,2.0,H2075
 Ibis budget Nice,2025,12,F_B,FOOD SALEE,8.0,22.0,7.0,5.0,H2075
 Ibis budget Nice,2025,12,F_B,SANS ALCOOL,129.0,311.90000000000003,82.0,16.0,H2075
-Ibis budget Nice,2025,12,NAN,nan,18.0,58.0,17.0,3.0,H2075
+Ibis budget Nice,2025,12,NAN,,18.0,58.0,17.0,3.0,H2075
 Ibis budget Nice,2025,12,N_F_B,#REF!,3.0,32.0,3.0,2.0,H2075
 Ibis budget Nice,2025,12,N_F_B,ACCESSOIRES,3.0,24.0,3.0,3.0,H2075
 Ibis budget Nice,2025,12,N_F_B,PAP,1.0,16.0,1.0,1.0,H2075
@@ -529,7 +529,7 @@ Novotel Megève Mont-Blanc,2025,10,N_F_B,SOUVENIRS,12.0,12.0,3.0,1.0,HB5I0
 Novotel Megève Mont-Blanc,2025,11,F_B,FOOD SALEE,37.0,93.0,19.0,2.0,HB5I0
 Novotel Megève Mont-Blanc,2025,11,F_B,FOOD SUCREE,8.0,43.0,5.0,5.0,HB5I0
 Novotel Megève Mont-Blanc,2025,11,F_B,SANS ALCOOL,27.0,67.5,16.0,1.0,HB5I0
-Novotel Megève Mont-Blanc,2025,11,NAN,nan,12.0,152.0,8.0,4.0,HB5I0
+Novotel Megève Mont-Blanc,2025,11,NAN,,12.0,152.0,8.0,4.0,HB5I0
 Novotel Megève Mont-Blanc,2025,11,N_F_B,#REF!,16.0,139.0,13.0,3.0,HB5I0
 Novotel Megève Mont-Blanc,2025,11,N_F_B,ACCESSOIRES,6.0,104.0,4.0,2.0,HB5I0
 Novotel Megève Mont-Blanc,2025,11,N_F_B,COSMETIQUE,6.0,71.5,4.0,3.0,HB5I0
@@ -541,7 +541,7 @@ Novotel Megève Mont-Blanc,2025,12,F_B,FOOD SALEE,39.0,98.0,25.0,2.0,HB5I0
 Novotel Megève Mont-Blanc,2025,12,F_B,FOOD SUCREE,115.0,358.5,76.0,8.0,HB5I0
 Novotel Megève Mont-Blanc,2025,12,F_B,SANS ALCOOL,75.0,187.5,45.0,4.0,HB5I0
 Novotel Megève Mont-Blanc,2025,12,F_B,SOUVENIRS,5.0,100.0,5.0,1.0,HB5I0
-Novotel Megève Mont-Blanc,2025,12,NAN,nan,113.0,1270.4,80.0,35.0,HB5I0
+Novotel Megève Mont-Blanc,2025,12,NAN,,113.0,1270.4,80.0,35.0,HB5I0
 Novotel Megève Mont-Blanc,2025,12,N_F_B,#REF!,16.0,135.0,15.0,2.0,HB5I0
 Novotel Megève Mont-Blanc,2025,12,N_F_B,ACCESSOIRES,7.0,206.0,7.0,4.0,HB5I0
 Novotel Megève Mont-Blanc,2025,12,N_F_B,COSMETIQUE,8.0,57.5,7.0,3.0,HB5I0
@@ -596,7 +596,7 @@ Novotel Paris Tour Eiffel,2025,3,N_F_B,SOS,441.0,3112.0,346.0,0.0,H3546
 Novotel Paris Tour Eiffel,2025,4,F_B,FOOD SALEE,648.0,4827.4,459.0,0.0,H3546
 Novotel Paris Tour Eiffel,2025,4,F_B,FOOD SUCREE,661.0,2330.3,373.0,0.0,H3546
 Novotel Paris Tour Eiffel,2025,4,F_B,SANS ALCOOL,1493.0,5331.3,918.0,0.0,H3546
-Novotel Paris Tour Eiffel,2025,4,NAN,nan,7.0,28.0,5.0,0.0,H3546
+Novotel Paris Tour Eiffel,2025,4,NAN,,7.0,28.0,5.0,0.0,H3546
 Novotel Paris Tour Eiffel,2025,4,N_F_B,COSMETIQUE,2.0,16.0,2.0,0.0,H3546
 Novotel Paris Tour Eiffel,2025,4,N_F_B,SOS,307.0,2322.0,256.0,0.0,H3546
 Novotel Paris Tour Eiffel,2025,5,F_B,FOOD SALEE,675.0,4658.0,487.0,0.0,H3546
@@ -632,13 +632,13 @@ Novotel Paris Tour Eiffel,2025,10,N_F_B,SOS,374.0,2878.0,274.0,0.0,H3546
 Novotel Paris Tour Eiffel,2025,11,F_B,FOOD SALEE,473.0,3037.8,370.0,0.0,H3546
 Novotel Paris Tour Eiffel,2025,11,F_B,FOOD SUCREE,509.0,1684.1,272.0,0.0,H3546
 Novotel Paris Tour Eiffel,2025,11,F_B,SANS ALCOOL,1316.0,4792.0,796.0,0.0,H3546
-Novotel Paris Tour Eiffel,2025,11,NAN,nan,2.0,16.0,2.0,0.0,H3546
+Novotel Paris Tour Eiffel,2025,11,NAN,,2.0,16.0,2.0,0.0,H3546
 Novotel Paris Tour Eiffel,2025,11,N_F_B,COSMETIQUE,2.0,16.0,2.0,0.0,H3546
 Novotel Paris Tour Eiffel,2025,11,N_F_B,SOS,308.0,2440.0,249.0,0.0,H3546
 Novotel Paris Tour Eiffel,2025,12,F_B,FOOD SALEE,632.0,4380.5,413.0,0.0,H3546
 Novotel Paris Tour Eiffel,2025,12,F_B,FOOD SUCREE,569.0,1993.1,309.0,0.0,H3546
 Novotel Paris Tour Eiffel,2025,12,F_B,SANS ALCOOL,1680.0,6061.2,1014.0,0.0,H3546
-Novotel Paris Tour Eiffel,2025,12,NAN,nan,12.0,96.0,11.0,0.0,H3546
+Novotel Paris Tour Eiffel,2025,12,NAN,,12.0,96.0,11.0,0.0,H3546
 Novotel Paris Tour Eiffel,2025,12,N_F_B,COSMETIQUE,8.0,64.0,6.0,0.0,H3546
 Novotel Paris Tour Eiffel,2025,12,N_F_B,SOS,250.0,1839.0,193.0,0.0,H3546
 Novotel Porte d’Italie,2024,9,F_B,FOOD SALEE,5.0,12.5,5.0,0.0,
@@ -647,40 +647,40 @@ Novotel Porte d’Italie,2024,9,F_B,SANS ALCOOL,18.0,92.0,15.0,0.0,
 Novotel Porte d’Italie,2024,10,F_B,FOOD SALEE,60.0,167.4,48.0,0.0,
 Novotel Porte d’Italie,2024,10,F_B,FOOD SUCREE,112.0,318.6,84.0,0.0,
 Novotel Porte d’Italie,2024,10,F_B,SANS ALCOOL,59.0,299.5,43.0,0.0,
-Novotel Porte d’Italie,2024,10,NAN,nan,13.0,83.4,10.0,0.0,
+Novotel Porte d’Italie,2024,10,NAN,,13.0,83.4,10.0,0.0,
 Novotel Porte d’Italie,2024,11,F_B,FOOD SALEE,48.0,134.6,34.0,0.0,
 Novotel Porte d’Italie,2024,11,F_B,FOOD SUCREE,74.0,209.85999999999999,56.0,0.0,
 Novotel Porte d’Italie,2024,11,F_B,SANS ALCOOL,61.0,312.5,50.0,0.0,
-Novotel Porte d’Italie,2024,11,NAN,nan,7.0,43.0,5.0,0.0,
+Novotel Porte d’Italie,2024,11,NAN,,7.0,43.0,5.0,0.0,
 Novotel Porte d’Italie,2024,11,N_F_B,SOS,1.0,0.7,1.0,0.0,
 Novotel Porte d’Italie,2024,12,F_B,FOOD SALEE,61.0,211.9,48.0,0.0,
 Novotel Porte d’Italie,2024,12,F_B,FOOD SUCREE,83.0,236.0,69.0,0.0,
 Novotel Porte d’Italie,2024,12,F_B,SANS ALCOOL,38.0,195.0,32.0,0.0,
-Novotel Porte d’Italie,2024,12,NAN,nan,4.0,32.5,4.0,0.0,
+Novotel Porte d’Italie,2024,12,NAN,,4.0,32.5,4.0,0.0,
 Novotel Porte d’Italie,2024,12,N_F_B,SOS,1.0,0.7,1.0,0.0,
 Novotel Porte d’Italie,2025,1,F_B,FOOD SALEE,9.0,23.9,7.0,0.0,
 Novotel Porte d’Italie,2025,1,F_B,FOOD SUCREE,12.0,35.7,11.0,0.0,
 Novotel Porte d’Italie,2025,1,F_B,SANS ALCOOL,5.0,26.0,4.0,0.0,
-Novotel Porte d’Italie,2025,1,NAN,nan,6.0,66.0,4.0,0.0,
+Novotel Porte d’Italie,2025,1,NAN,,6.0,66.0,4.0,0.0,
 Novotel Porte d’Italie,2025,2,F_B,FOOD SALEE,24.0,78.3,17.0,0.0,
 Novotel Porte d’Italie,2025,2,F_B,FOOD SUCREE,15.0,41.7,12.0,0.0,
 Novotel Porte d’Italie,2025,2,F_B,SANS ALCOOL,15.0,65.0,11.0,0.0,
-Novotel Porte d’Italie,2025,2,NAN,nan,6.0,66.0,4.0,0.0,
+Novotel Porte d’Italie,2025,2,NAN,,6.0,66.0,4.0,0.0,
 Novotel Porte d’Italie,2025,3,F_B,FOOD SALEE,34.0,130.0,25.0,0.0,
 Novotel Porte d’Italie,2025,3,F_B,FOOD SUCREE,51.0,191.6,44.0,0.0,
 Novotel Porte d’Italie,2025,3,F_B,SANS ALCOOL,39.0,165.5,32.0,0.0,
-Novotel Porte d’Italie,2025,3,NAN,nan,1.0,7.5,1.0,0.0,
+Novotel Porte d’Italie,2025,3,NAN,,1.0,7.5,1.0,0.0,
 Novotel Porte d’Italie,2025,4,F_B,FOOD SALEE,31.0,80.6,19.0,0.0,
 Novotel Porte d’Italie,2025,4,F_B,FOOD SUCREE,20.0,78.7,15.0,0.0,
 Novotel Porte d’Italie,2025,4,F_B,SANS ALCOOL,32.0,132.5,25.0,0.0,
 Novotel Porte d’Italie,2025,5,F_B,FOOD SALEE,23.0,73.0,16.0,0.0,
 Novotel Porte d’Italie,2025,5,F_B,FOOD SUCREE,83.0,290.6,67.0,0.0,
 Novotel Porte d’Italie,2025,5,F_B,SANS ALCOOL,106.0,456.0,77.0,0.0,
-Novotel Porte d’Italie,2025,5,NAN,nan,6.0,64.5,5.0,0.0,
+Novotel Porte d’Italie,2025,5,NAN,,6.0,64.5,5.0,0.0,
 Novotel Porte d’Italie,2025,6,F_B,FOOD SALEE,13.0,114.2,13.0,0.0,
 Novotel Porte d’Italie,2025,6,F_B,FOOD SUCREE,32.0,132.5,27.0,0.0,
 Novotel Porte d’Italie,2025,6,F_B,SANS ALCOOL,68.0,300.5,60.0,0.0,
-Novotel Porte d’Italie,2025,6,NAN,nan,2.0,12.0,1.0,0.0,
+Novotel Porte d’Italie,2025,6,NAN,,2.0,12.0,1.0,0.0,
 Novotel Porte d’Italie,2025,7,F_B,FOOD SALEE,31.0,146.1,23.0,0.0,
 Novotel Porte d’Italie,2025,7,F_B,FOOD SUCREE,55.0,182.4,46.0,0.0,
 Novotel Porte d’Italie,2025,7,F_B,SANS ALCOOL,93.0,431.5,70.0,0.0,
@@ -845,14 +845,14 @@ Novotel Porte d’Italie,2024,5,F_B,SANS ALCOOL,44.0,224.75,35.0,0.0,
 Novotel Porte d’Italie,2024,6,F_B,SANS ALCOOL,44.0,224.75,35.0,0.0,
 Novotel Porte d’Italie,2024,7,F_B,SANS ALCOOL,44.0,224.75,35.0,0.0,
 Novotel Porte d’Italie,2024,8,F_B,SANS ALCOOL,44.0,224.75,35.0,0.0,
-Novotel Porte d’Italie,2024,1,NAN,nan,6.0,39.725,4.75,0.0,
-Novotel Porte d’Italie,2024,2,NAN,nan,6.0,39.725,4.75,0.0,
-Novotel Porte d’Italie,2024,3,NAN,nan,6.0,39.725,4.75,0.0,
-Novotel Porte d’Italie,2024,4,NAN,nan,6.0,39.725,4.75,0.0,
-Novotel Porte d’Italie,2024,5,NAN,nan,6.0,39.725,4.75,0.0,
-Novotel Porte d’Italie,2024,6,NAN,nan,6.0,39.725,4.75,0.0,
-Novotel Porte d’Italie,2024,7,NAN,nan,6.0,39.725,4.75,0.0,
-Novotel Porte d’Italie,2024,8,NAN,nan,6.0,39.725,4.75,0.0,
+Novotel Porte d’Italie,2024,1,NAN,,6.0,39.725,4.75,0.0,
+Novotel Porte d’Italie,2024,2,NAN,,6.0,39.725,4.75,0.0,
+Novotel Porte d’Italie,2024,3,NAN,,6.0,39.725,4.75,0.0,
+Novotel Porte d’Italie,2024,4,NAN,,6.0,39.725,4.75,0.0,
+Novotel Porte d’Italie,2024,5,NAN,,6.0,39.725,4.75,0.0,
+Novotel Porte d’Italie,2024,6,NAN,,6.0,39.725,4.75,0.0,
+Novotel Porte d’Italie,2024,7,NAN,,6.0,39.725,4.75,0.0,
+Novotel Porte d’Italie,2024,8,NAN,,6.0,39.725,4.75,0.0,
 Novotel Porte d’Italie,2024,1,N_F_B,SOS,0.5,0.35,0.5,0.0,
 Novotel Porte d’Italie,2024,2,N_F_B,SOS,0.5,0.35,0.5,0.0,
 Novotel Porte d’Italie,2024,3,N_F_B,SOS,0.5,0.35,0.5,0.0,

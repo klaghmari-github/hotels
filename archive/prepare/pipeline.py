@@ -156,6 +156,18 @@ class PreparePipeline:
                     holidays_path = candidate
                     break
 
+        # Copie clean vers accord/data si le dossier existe (hors archive)
+        accord_data = None
+        try:
+            candidate = self.paths.root.parent.parent / "accord" / "data"
+            # archive/prepare → parent=archive → parent=hotels → accord/data
+            if not candidate.is_dir():
+                candidate = self.paths.root.parent / "accord" / "data"
+            if candidate.is_dir():
+                accord_data = candidate
+        except Exception:
+            accord_data = None
+
         sales = SalesPrep(
             sales_path=sales_path,
             output_dir=self.paths.sales_output,
@@ -164,6 +176,7 @@ class PreparePipeline:
             feature_store_dir=self.settings.feature_store_dir,
             holidays_path=holidays_path,
             holidays=holidays,
+            copy_to=accord_data,
         )
         return sales.run()
 
