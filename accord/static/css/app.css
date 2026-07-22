@@ -169,18 +169,6 @@ body {
   line-height: 1.35;
 }
 
-.sidebar-footer {
-  padding: 0.75rem 0.5rem 0.25rem;
-  border-top: 1px solid var(--border);
-}
-
-.hint {
-  margin: 0;
-  font-size: 0.72rem;
-  color: var(--text-faint);
-  line-height: 1.45;
-}
-
 /* —— Main —— */
 .main {
   display: flex;

@@ -179,7 +179,7 @@
       title.textContent = payload.label;
       desc.textContent = payload.description || "";
       chipFile.textContent = payload.filename;
-      chipStats.textContent = `${payload.total_rows} lignes · page ${payload.page}/${payload.total_pages} · ${payload.columns.length} colonnes saisissables`;
+      chipStats.textContent = `${payload.total_rows} lignes · page ${payload.page}/${payload.total_pages}`;
       renderTable(payload);
       pagerInfo.textContent = `Page ${payload.page} / ${payload.total_pages} · ${payload.total_rows} lignes`;
       setStatus("");

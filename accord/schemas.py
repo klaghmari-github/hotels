@@ -318,11 +318,8 @@ DATASETS: dict[str, DatasetSchema] = {
     "data": DatasetSchema(
         id="data",
         label="All Data",
-        description=(
-            "Jointure complète hotel × année × mois — "
-            "identité + brand + weather + proximity + holidays + sales "
-            "(seules les ventes peuvent rester vides)"
-        ),
+        description="Jointure complète hotel × année × mois",
+
         filename="data.xlsx",
         sheet="data",
         editable_columns=[],  # toutes les colonnes du fichier
