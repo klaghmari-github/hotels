@@ -1,0 +1,419 @@
+"""
+Couche données Excel pour Accord Data Studio.
+
+Responsabilités
+---------------
+- Charger les fichiers ``accord/data/*.xlsx`` en DataFrame (cache mémoire).
+- Exposer uniquement les **colonnes saisissables** (schéma dans ``schemas.py``).
+- Paginer / filtrer pour l'UI.
+- Réécrire l'Excel après modification, en préservant les autres feuilles.
+
+Thread-safety
+-------------
+Un ``RLock`` protège le cache : lecture/écriture concurrentes (plusieurs
+requêtes Flask) ne corrompent pas le DataFrame ni le fichier.
+"""
+
+from __future__ import annotations
+
+import json
+import math
+import threading
+from pathlib import Path
+from typing import Any
+
+import pandas as pd
+
+from schemas import DatasetSchema, get_schema
+
+# Verrou partagé pour le cache et les écritures disque
+_lock = threading.RLock()
+
+# Cache : dataset_id → DataFrame complet (toutes les colonnes du fichier,
+# y compris celles non éditables — on ne les affiche pas mais on les conserve
+# à la sauvegarde pour ne pas perdre de données calculées).
+_cache: dict[str, pd.DataFrame] = {}
+
+# Identifiant de l'onglet jointure (spécial : rebuild possible)
+JOINED_DATASET_ID = "data"
+
+
+# ---------------------------------------------------------------------------
+# Sérialisation cellules → JSON (pour le front)
+# ---------------------------------------------------------------------------
+
+def _cell_to_json(value: Any) -> Any:
+    """
+    Convertit une cellule pandas en type JSON-serializable.
+
+    Gère NaN, numpy scalars, timestamps, listes, et chaînes JSON d'arrays
+    (ex. listes de dates stockées comme ``'["2024-01-01"]'`` dans Excel).
+    """
+    if value is None or (isinstance(value, float) and pd.isna(value)):
+        return None
+    if isinstance(value, (list, tuple)):
+        return list(value)
+    # numpy.int64 / float64 → type Python natif
+    if hasattr(value, "item"):
+        try:
+            return value.item()
+        except Exception:
+            pass
+    if isinstance(value, pd.Timestamp):
+        return value.isoformat()
+    try:
+        if pd.isna(value):
+            return None
+    except (TypeError, ValueError):
+        pass
+    if isinstance(value, str):
+        text = value.strip()
+        # Array stocké en texte Excel → liste pour l'UI
+        if text.startswith("[") and text.endswith("]"):
+            try:
+                return json.loads(text.replace("'", '"'))
+            except json.JSONDecodeError:
+                return value
+        return value
+    return value
+
+
+# ---------------------------------------------------------------------------
+# Chargement
+# ---------------------------------------------------------------------------
+
+def _load_raw(schema: DatasetSchema) -> pd.DataFrame:
+    """Lit le fichier Excel du schéma (ou DataFrame vide si absent)."""
+    # Onglet « data » : s'assurer que data.xlsx existe (jointure)
+    if schema.id == JOINED_DATASET_ID:
+        from join_data import ensure_data_xlsx
+
+        ensure_data_xlsx(force_rebuild=False)
+
+    path = schema.path
+    if not path.exists():
+        # Fichier manquant : squelette avec colonnes éditables pour permettre la saisie
+        return pd.DataFrame(columns=schema.editable_columns)
+    try:
+        return pd.read_excel(path, sheet_name=schema.sheet)
+    except ValueError:
+        # Nom de feuille introuvable → première feuille
+        return pd.read_excel(path, sheet_name=0)
+
+
+def get_frame(dataset_id: str, *, reload: bool = False) -> pd.DataFrame:
+    """
+    Retourne une **copie** du DataFrame en cache (ou recharge depuis le disque).
+
+    On renvoie une copie pour éviter qu'un appelant mute le cache par accident
+    hors des fonctions ``update_*`` protégées par le lock.
+    """
+    with _lock:
+        if reload or dataset_id not in _cache:
+            schema = get_schema(dataset_id)
+            _cache[dataset_id] = _load_raw(schema)
+        return _cache[dataset_id].copy()
+
+
+def rebuild_joined_data() -> dict[str, Any]:
+    """
+    Recalcule la jointure de tous les onglets et écrit ``data/data.xlsx``.
+
+    Invalide le cache de l'onglet ``data``.
+    """
+    from join_data import build_joined_dataframe, save_joined_excel
+
+    with _lock:
+        frame = build_joined_dataframe()
+        path = save_joined_excel(frame)
+        _cache[JOINED_DATASET_ID] = frame
+    return {
+        "ok": True,
+        "path": str(path),
+        "rows": len(frame),
+        "columns": list(frame.columns),
+        "n_columns": len(frame.columns),
+    }
+
+
+def _ensure_editable_cols(frame: pd.DataFrame, schema: DatasetSchema) -> list[str]:
+    """
+    Intersection schéma ∩ colonnes réelles du fichier, dans l'ordre du schéma.
+
+    Cas spécial ``data`` (jointure) : le schéma a ``editable_columns`` vide →
+    on expose **toutes** les colonnes du fichier (c'est le résultat de la jointure).
+    """
+    if schema.id == JOINED_DATASET_ID or not schema.editable_columns:
+        # Clés en tête si présentes, puis le reste dans l'ordre du fichier
+        keys = [c for c in schema.key_columns if c in frame.columns]
+        rest = [c for c in frame.columns if c not in keys]
+        return keys + rest
+    return [c for c in schema.editable_columns if c in frame.columns]
+
+
+# ---------------------------------------------------------------------------
+# Pagination / filtre (lecture UI)
+# ---------------------------------------------------------------------------
+
+def page_payload(
+    dataset_id: str,
+    *,
+    page: int = 1,
+    page_size: int | None = None,
+    q: str = "",
+) -> dict[str, Any]:
+    """
+    Construit la charge utile d'une page pour le front.
+
+    Étapes
+    ------
+    1. Charger le DataFrame complet (cache).
+    2. Ne garder que les colonnes éditables.
+    3. Filtrer éventuellement par texte ``q`` (toutes colonnes).
+    4. Découper [start:end] selon page / page_size.
+    5. Annoter chaque ligne avec ``_index`` (index pandas pour les updates).
+    """
+    schema = get_schema(dataset_id)
+    frame = get_frame(dataset_id)
+    cols = _ensure_editable_cols(frame, schema)
+    view = frame[cols].copy() if cols else frame.copy()
+
+    # Filtre plein-texte (insensible à la casse) sur toutes les colonnes affichées
+    if q and not view.empty:
+        mask = pd.Series(False, index=view.index)
+        for c in view.columns:
+            mask = mask | view[c].astype(str).str.contains(q, case=False, na=False)
+        view = view[mask]
+
+    total = len(view)
+    size = page_size or schema.page_size
+    size = max(1, min(int(size), 200))  # borne pour éviter de charger trop d'UI
+    pages = max(1, math.ceil(total / size)) if total else 1
+    page = max(1, min(int(page), pages))
+    start = (page - 1) * size
+    end = start + size
+    chunk = view.iloc[start:end]
+
+    # Index absolus dans le DataFrame d'origine (pas 0..n de la page)
+    abs_indices = [int(i) for i in chunk.index.tolist()]
+
+    rows = []
+    for pos, (idx, series) in enumerate(chunk.iterrows()):
+        rows.append(
+            {
+                "_index": int(idx),          # clé de mise à jour côté serveur
+                "_row": start + pos + 1,     # numéro humain 1-based (affichage)
+                **{c: _cell_to_json(series[c]) for c in cols},
+            }
+        )
+
+    return {
+        "dataset_id": dataset_id,
+        "label": schema.label,
+        "description": schema.description,
+        "filename": schema.filename,
+        "columns": cols,
+        "key_columns": [c for c in schema.key_columns if c in cols],
+        "boolean_columns": [c for c in schema.boolean_columns if c in cols],
+        "array_columns": [c for c in schema.array_columns if c in cols],
+        "page": page,
+        "page_size": size,
+        "total_rows": total,
+        "total_pages": pages,
+        "rows": rows,
+        "abs_indices": abs_indices,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Coercion des valeurs saisies (front → type Excel)
+# ---------------------------------------------------------------------------
+
+def _coerce_value(col: str, value: Any, schema: DatasetSchema) -> Any:
+    """
+    Normalise une valeur envoyée par l'UI avant écriture dans le DataFrame.
+
+    - Arrays → JSON string (compatible cellule Excel)
+    - Booléens → 0 / 1
+    - Nombres en string → int / float si possible
+    - Chaîne vide → None (cellule vide)
+    """
+    if value is None or value == "":
+        return None
+
+    # --- Listes de jours (holidays) ---
+    if col in schema.array_columns:
+        if isinstance(value, list):
+            return json.dumps(value, ensure_ascii=False)
+        if isinstance(value, str):
+            text = value.strip()
+            if not text:
+                return "[]"
+            if text.startswith("["):
+                # Déjà du JSON
+                return text
+            # Saisie libre "2024-01-01, 2024-05-01"
+            parts = [p.strip() for p in text.replace(";", ",").split(",") if p.strip()]
+            return json.dumps(parts, ensure_ascii=False)
+        return "[]"
+
+    # --- Flags 0/1 ---
+    if col in schema.boolean_columns:
+        if isinstance(value, bool):
+            return int(value)
+        if isinstance(value, (int, float)):
+            return int(value)
+        s = str(value).strip().lower()
+        if s in {"1", "true", "oui", "yes", "x"}:
+            return 1
+        if s in {"0", "false", "non", "no", ""}:
+            return 0
+        try:
+            return int(float(s))
+        except ValueError:
+            return 0
+
+    # --- Numérique ou texte ---
+    if isinstance(value, (int, float, bool)):
+        return value
+    if isinstance(value, str):
+        text = value.strip()
+        if text == "":
+            return None
+        try:
+            # float si décimal / notation scientifique, sinon int
+            if "." in text or "e" in text.lower():
+                return float(text)
+            return int(text)
+        except ValueError:
+            return text
+    return value
+
+
+# ---------------------------------------------------------------------------
+# Mutations + sauvegarde
+# ---------------------------------------------------------------------------
+
+def update_rows(dataset_id: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
+    """
+    Applique les modifications de lignes (par ``_index``) puis écrit l'Excel.
+
+    Les clés techniques ``_index``, ``_row``, etc. sont ignorées.
+    Les colonnes hors schéma éditable sont ignorées (sécurité).
+    """
+    schema = get_schema(dataset_id)
+    with _lock:
+        # Travail sur le cache réel (pas une copie) pour persister les changements
+        if dataset_id not in _cache:
+            _cache[dataset_id] = _load_raw(schema)
+        frame = _cache[dataset_id]
+        editable = set(_ensure_editable_cols(frame, schema))
+
+        for row in rows:
+            if "_index" not in row:
+                continue
+            idx = int(row["_index"])
+            if idx not in frame.index:
+                continue
+            for col, val in row.items():
+                if col.startswith("_"):
+                    continue
+                if col not in editable:
+                    continue
+                if col not in frame.columns:
+                    # Colonne déclarée éditable mais absente → on la crée
+                    frame[col] = None
+                frame.at[idx, col] = _coerce_value(col, val, schema)
+
+        _cache[dataset_id] = frame
+        path = _save_excel(dataset_id, frame, schema)
+    return {"ok": True, "saved_to": str(path), "updated": len(rows)}
+
+
+def add_row(dataset_id: str, values: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Ajoute une ligne en fin de table (valeurs optionnelles) et sauvegarde."""
+    schema = get_schema(dataset_id)
+    values = values or {}
+    with _lock:
+        if dataset_id not in _cache:
+            _cache[dataset_id] = _load_raw(schema)
+        frame = _cache[dataset_id]
+        editable = _ensure_editable_cols(frame, schema) or list(schema.editable_columns)
+
+        # Construire la nouvelle ligne : toutes les colonnes existantes + éditables
+        new: dict[str, Any] = {}
+        for col in frame.columns:
+            if col in values:
+                new[col] = _coerce_value(col, values[col], schema)
+            else:
+                new[col] = None
+        for col in editable:
+            if col not in new:
+                new[col] = (
+                    _coerce_value(col, values.get(col), schema)
+                    if col in values
+                    else None
+                )
+
+        frame = pd.concat([frame, pd.DataFrame([new])], ignore_index=True)
+        _cache[dataset_id] = frame
+        path = _save_excel(dataset_id, frame, schema)
+        new_index = int(frame.index[-1])
+    return {"ok": True, "index": new_index, "saved_to": str(path)}
+
+
+def delete_rows(dataset_id: str, indices: list[int]) -> dict[str, Any]:
+    """Supprime les lignes aux index donnés, réindexe, sauvegarde."""
+    schema = get_schema(dataset_id)
+    with _lock:
+        if dataset_id not in _cache:
+            _cache[dataset_id] = _load_raw(schema)
+        frame = _cache[dataset_id]
+        drop = [i for i in indices if i in frame.index]
+        frame = frame.drop(index=drop).reset_index(drop=True)
+        _cache[dataset_id] = frame
+        path = _save_excel(dataset_id, frame, schema)
+    return {"ok": True, "deleted": len(drop), "saved_to": str(path)}
+
+
+def reload_dataset(dataset_id: str) -> dict[str, Any]:
+    """Force le rechargement depuis le disque (ignore le cache)."""
+    frame = get_frame(dataset_id, reload=True)
+    schema = get_schema(dataset_id)
+    return {
+        "ok": True,
+        "rows": len(frame),
+        "columns": list(frame.columns),
+        "editable": _ensure_editable_cols(frame, schema),
+    }
+
+
+def _save_excel(dataset_id: str, frame: pd.DataFrame, schema: DatasetSchema) -> Path:
+    """
+    Écrit le DataFrame dans le fichier Excel du schéma.
+
+    Si le fichier avait d'autres feuilles (ex. ``resume_annuel``), elles sont
+    relues puis réécrites pour ne pas les perdre.
+    """
+    path = schema.path
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    # Préserver les feuilles secondaires (non éditées par l'UI)
+    other_sheets: dict[str, pd.DataFrame] = {}
+    if path.exists():
+        try:
+            xl = pd.ExcelFile(path)
+            for name in xl.sheet_names:
+                if name != schema.sheet and name != str(schema.sheet):
+                    other_sheets[name] = pd.read_excel(path, sheet_name=name)
+        except Exception:
+            # Fichier corrompu / verrouillé : on écrase au mieux la feuille principale
+            pass
+
+    sheet_name = schema.sheet if isinstance(schema.sheet, str) else "Sheet1"
+    with pd.ExcelWriter(path, engine="openpyxl") as writer:
+        frame.to_excel(writer, index=False, sheet_name=sheet_name)
+        for name, df in other_sheets.items():
+            # Excel limite les noms de feuille à 31 caractères
+            df.to_excel(writer, index=False, sheet_name=name[:31])
+    return path
