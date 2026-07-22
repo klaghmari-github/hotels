@@ -157,7 +157,9 @@ def _fill_identity(result: pd.DataFrame, hotels: pd.DataFrame) -> pd.DataFrame:
 
 
 def _meteo_missing_mask(frame: pd.DataFrame) -> pd.Series:
-    """True si aucune colonne meteo_* n'est renseignée sur la ligne."""
+    """True si la température moyenne (métrique pivot) est absente."""
+    if "meteo_temperature_c_mean" in frame.columns:
+        return frame["meteo_temperature_c_mean"].isna()
     meteo_cols = [c for c in frame.columns if c.startswith("meteo_")]
     if not meteo_cols:
         return pd.Series(True, index=frame.index)
@@ -175,22 +177,83 @@ def _proximity_missing_mask(frame: pd.DataFrame) -> pd.Series:
     return frame[prox_cols].isna().all(axis=1)
 
 
+def _impute_meteo_in_frame(frame: pd.DataFrame) -> pd.DataFrame:
+    """
+    Imputation intra-table : pour chaque hôtel, mois manquant
+    ← même mois des années antérieures (puis postérieures).
+    """
+    if frame.empty or "hotel_code" not in frame.columns:
+        return frame
+    out = frame.copy()
+    meteo_cols = [c for c in out.columns if c.startswith("meteo_")]
+    if not meteo_cols:
+        return out
+    if "annee" not in out.columns or "mois" not in out.columns:
+        return out
+
+    for code, group in out.groupby(out["hotel_code"].astype(str), sort=False):
+        idx_list = list(group.index)
+        # index (annee, mois) → position
+        by_ym: dict[tuple[int, int], Any] = {}
+        for i in idx_list:
+            y, m = out.at[i, "annee"], out.at[i, "mois"]
+            if pd.isna(y) or pd.isna(m):
+                continue
+            by_ym[(int(y), int(m))] = i
+
+        years = sorted({y for y, _ in by_ym.keys()})
+        for (year, month), i in list(by_ym.items()):
+            for col in meteo_cols:
+                if pd.notna(out.at[i, col]):
+                    continue
+                # N-1, N-2, … puis N+1, N+2, …
+                candidates = [y for y in years if y < year][::-1] + [
+                    y for y in years if y > year
+                ]
+                for y2 in candidates:
+                    j = by_ym.get((y2, month))
+                    if j is None:
+                        continue
+                    val = out.at[j, col]
+                    if pd.notna(val):
+                        out.at[i, col] = val
+                        break
+    return out
+
+
 def _fill_weather_gaps(
     result: pd.DataFrame,
     *,
     years: list[int],
     fetch: bool = True,
 ) -> pd.DataFrame:
-    """Complète les lignes sans météo via WeatherFromGeo(lat, lon)."""
-    if not fetch or result.empty:
+    """
+    Complète les lignes sans météo via WeatherFromGeo(lat, lon).
+
+    - Fetch pour **tous** les hôtels ayant des coords (pas seulement un sous-ensemble)
+      afin de couvrir les années absentes du fichier weather source.
+    - Imputation N←N-1 intégrée dans WeatherFromGeo + passe finale sur le frame.
+    """
+    if result.empty:
         return result
     out = result.copy()
+
+    # Colonnes météo cibles
+    from geo_weather import meteo_column_names
+
+    for c in meteo_column_names():
+        if c not in out.columns:
+            out[c] = pd.NA
+
+    if not fetch:
+        return _impute_meteo_in_frame(out)
+
     mask = _meteo_missing_mask(out)
     if not mask.any():
-        return out
+        return _impute_meteo_in_frame(out)
 
-    # Points uniques à interroger
-    need = out.loc[mask, ["hotel_code", "hotel_lat", "hotel_lon"]].drop_duplicates(
+    # Tous les hôtels avec coords (même ceux partiellement remplis)
+    need = out[["hotel_code", "hotel_lat", "hotel_lon"]].drop_duplicates(
         subset=["hotel_code"]
     )
     need = need[
@@ -198,7 +261,7 @@ def _fill_weather_gaps(
         & need["hotel_lon"].map(lambda v: weather_as_coord(v) is not None)
     ]
     if need.empty:
-        return out
+        return _impute_meteo_in_frame(out)
 
     engine = WeatherFromGeo(years=years)
     fetched = engine.for_hotels(
@@ -206,35 +269,46 @@ def _fill_weather_gaps(
         lat_col="hotel_lat",
         lon_col="hotel_lon",
         id_cols=("hotel_code",),
+        impute=True,
     )
     if fetched.empty:
-        return out
+        return _impute_meteo_in_frame(out)
 
     meteo_cols = [c for c in fetched.columns if c.startswith("meteo_")]
-    # Ajouter colonnes manquantes
     for c in meteo_cols:
         if c not in out.columns:
             out[c] = pd.NA
 
-    # Index (hotel_code, annee, mois) → métriques
     fetched = _normalize_keys(fetched, list(JOIN_KEYS_MONTHLY))
-    lookup = fetched.set_index(["hotel_code", "annee", "mois"])
+    # Évite MultiIndex ambigu
+    fetched = fetched.drop_duplicates(subset=list(JOIN_KEYS_MONTHLY), keep="first")
+    lookup = {
+        (str(r.hotel_code).strip(), int(r.annee), int(r.mois)): r
+        for r in fetched.itertuples(index=False)
+    }
 
-    for idx in out.index[mask]:
+    # Remplir **toutes** les lignes manquantes (pas seulement le mask initial
+    # : après fetch on re-scanne)
+    for idx in out.index:
+        if pd.notna(out.at[idx, "meteo_temperature_c_mean"]):
+            continue
         code = str(out.at[idx, "hotel_code"]).strip()
-        year = int(out.at[idx, "annee"]) if pd.notna(out.at[idx, "annee"]) else None
-        month = int(out.at[idx, "mois"]) if pd.notna(out.at[idx, "mois"]) else None
-        if year is None or month is None:
+        try:
+            year = int(out.at[idx, "annee"])
+            month = int(out.at[idx, "mois"])
+        except (TypeError, ValueError):
             continue
-        key = (code, year, month)
-        if key not in lookup.index:
+        row = lookup.get((code, year, month))
+        if row is None:
             continue
-        row = lookup.loc[key]
-        if isinstance(row, pd.DataFrame):
-            row = row.iloc[0]
         for c in meteo_cols:
-            if c in row.index and pd.isna(out.at[idx, c]):
-                out.at[idx, c] = row[c]
+            val = getattr(row, c, None)
+            if val is not None and not (isinstance(val, float) and pd.isna(val)):
+                if pd.isna(out.at[idx, c]):
+                    out.at[idx, c] = val
+
+    # Dernière passe : imputer depuis d'autres années du même hôtel
+    out = _impute_meteo_in_frame(out)
     return out
 
 
