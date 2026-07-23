@@ -82,6 +82,29 @@ def _cell_to_json(value: Any) -> Any:
 # Chargement
 # ---------------------------------------------------------------------------
 
+def _project_to_schema(frame: pd.DataFrame, schema: DatasetSchema) -> pd.DataFrame:
+    """
+    Aligne le DataFrame sur les colonnes affichées / éditables du schéma.
+
+    - Onglet ``data`` (jointure) : toutes les colonnes du fichier.
+    - Autres : uniquement ``editable_columns`` (ordre du schéma), colonnes
+      manquantes créées à ``None``.
+    """
+    if schema.id == JOINED_DATASET_ID or not schema.editable_columns:
+        return frame.copy() if frame is not None else pd.DataFrame()
+    cols = list(schema.editable_columns)
+    if frame is None or frame.empty:
+        return pd.DataFrame(columns=cols)
+    data: dict[str, Any] = {}
+    n = len(frame)
+    for col in cols:
+        if col in frame.columns:
+            data[col] = frame[col].to_numpy()
+        else:
+            data[col] = [None] * n
+    return pd.DataFrame(data)
+
+
 def _load_raw(schema: DatasetSchema) -> pd.DataFrame:
     """Lit le fichier Excel du schéma (ou DataFrame vide si absent)."""
     # Onglet « data » : s'assurer que data.xlsx existe (jointure)
@@ -93,12 +116,13 @@ def _load_raw(schema: DatasetSchema) -> pd.DataFrame:
     path = schema.path
     if not path.exists():
         # Fichier manquant : squelette avec colonnes éditables pour permettre la saisie
-        return pd.DataFrame(columns=schema.editable_columns)
+        return pd.DataFrame(columns=list(schema.editable_columns or []))
     try:
-        return pd.read_excel(path, sheet_name=schema.sheet)
+        frame = pd.read_excel(path, sheet_name=schema.sheet)
     except ValueError:
         # Nom de feuille introuvable → première feuille
-        return pd.read_excel(path, sheet_name=0)
+        frame = pd.read_excel(path, sheet_name=0)
+    return _project_to_schema(frame, schema)
 
 
 def get_frame(dataset_id: str, *, reload: bool = False) -> pd.DataFrame:
@@ -138,17 +162,18 @@ def rebuild_joined_data() -> dict[str, Any]:
 
 def _ensure_editable_cols(frame: pd.DataFrame, schema: DatasetSchema) -> list[str]:
     """
-    Intersection schéma ∩ colonnes réelles du fichier, dans l'ordre du schéma.
+    Colonnes exposées à l'UI (= schéma éditable, ou tout pour All Data).
 
-    Cas spécial ``data`` (jointure) : le schéma a ``editable_columns`` vide →
-    on expose **toutes** les colonnes du fichier (c'est le résultat de la jointure).
+    Les DataFrames sont déjà projetés sur le schéma à la charge / sauvegarde :
+    fichier Excel ↔ colonnes affichées.
     """
     if schema.id == JOINED_DATASET_ID or not schema.editable_columns:
         # Clés en tête si présentes, puis le reste dans l'ordre du fichier
         keys = [c for c in schema.key_columns if c in frame.columns]
         rest = [c for c in frame.columns if c not in keys]
         return keys + rest
-    return [c for c in schema.editable_columns if c in frame.columns]
+    # Toujours l'ordre du schéma (colonnes créées vides si absentes)
+    return list(schema.editable_columns)
 
 
 # ---------------------------------------------------------------------------
@@ -392,8 +417,9 @@ def _save_excel(dataset_id: str, frame: pd.DataFrame, schema: DatasetSchema) -> 
     """
     Écrit le DataFrame dans le fichier Excel du schéma.
 
-    Si le fichier avait d'autres feuilles (ex. ``resume_annuel``), elles sont
-    relues puis réécrites pour ne pas les perdre.
+    Les datasets éditables sont **projetés** sur ``editable_columns`` pour que
+    le fichier Excel corresponde exactement à l'UI. Les feuilles secondaires
+    (ex. ``resume_annuel``) sont préservées.
     """
     path = schema.path
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -410,9 +436,10 @@ def _save_excel(dataset_id: str, frame: pd.DataFrame, schema: DatasetSchema) -> 
             # Fichier corrompu / verrouillé : on écrase au mieux la feuille principale
             pass
 
+    to_write = _project_to_schema(frame, schema)
     sheet_name = schema.sheet if isinstance(schema.sheet, str) else "Sheet1"
     with pd.ExcelWriter(path, engine="openpyxl") as writer:
-        frame.to_excel(writer, index=False, sheet_name=sheet_name)
+        to_write.to_excel(writer, index=False, sheet_name=sheet_name)
         for name, df in other_sheets.items():
             # Excel limite les noms de feuille à 31 caractères
             df.to_excel(writer, index=False, sheet_name=name[:31])

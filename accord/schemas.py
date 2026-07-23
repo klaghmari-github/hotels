@@ -88,12 +88,10 @@ _BRAND_EDITABLE = [
     "Nb_Resto_1",
     "Nb_Resto_2",
     "Nb_Resto_3",
-    "Nb_Resto_Total",
     "Nb_Bar_0",
     "Nb_Bar_1",
     "Nb_Bar_2",
     "Nb_Bar_3",
-    "Nb_Bar_Total",
 ]
 
 # --- Hotel data : fiche directeur (one-hot brand exclus = dérivés de hotel_brand) ---
@@ -217,10 +215,10 @@ _WEATHER_EDITABLE = [
     "meteo_ensoleillement_min_max",
 ]
 
-# --- Sales : base mensuelle + mix % (inputs modèle) ---
-# Les volumes cat_/sous_cat_/heure_/weekend_ restent dans le fichier
-# mais ne sont pas tous exposés (trop larges pour l'édition manuelle).
-_SALES_EDITABLE = [
+# --- Sales : indicateurs de ventes uniquement (pas de fériés — cf. holidays) ---
+# Clés + volumes mensuels + mix F&B / sous-catégories (inputs modèle).
+# Les jours fériés / vacances se joignent depuis hotel_holidays_data.
+_SALES_CORE = [
     "hotel_code",
     "nom_hotel",
     "annee",
@@ -229,17 +227,46 @@ _SALES_EDITABLE = [
     "montant_ventes",
     "nombre_paniers",
     "nombre_produits",
+    "nombre_categories_mois_f_b",
+    "nombre_categories_mois_n_f_b",
     "pct_categories_mois_f_b",
     "pct_categories_mois_n_f_b",
+    # mix catégorie F_B / N_F_B par mesure
     "pct_cat_f_b_nombre_ventes",
     "pct_cat_n_f_b_nombre_ventes",
     "pct_cat_f_b_montant_ventes",
     "pct_cat_n_f_b_montant_ventes",
-    "nb_jours_feries",
-    "nb_jours_vacances_scolaires",
-    "nb_jours_vacances_hors_feries",
-    "zone_scolaire",
+    "pct_cat_f_b_nombre_paniers",
+    "pct_cat_n_f_b_nombre_paniers",
+    "pct_cat_f_b_nombre_produits",
+    "pct_cat_n_f_b_nombre_produits",
 ]
+
+# Mix sous-catégories (part dans la catégorie) — inputs modèle
+_SALES_PCT_SOUS_CAT = [
+    f"pct_sous_cat_{slug}_{measure}"
+    for slug in (
+        "ref",
+        "accessoires",
+        "alcool",
+        "cosmetique",
+        "food_salee",
+        "food_sucree",
+        "jeux_enfants",
+        "pap",
+        "sans_alcool",
+        "sos",
+        "souvenirs",
+    )
+    for measure in (
+        "nombre_ventes",
+        "montant_ventes",
+        "nombre_paniers",
+        "nombre_produits",
+    )
+]
+
+_SALES_EDITABLE = _SALES_CORE + _SALES_PCT_SOUS_CAT
 
 # --- Holidays : compteurs + listes de jours (feuille resume_annuel non éditée) ---
 _HOLIDAYS_EDITABLE = [
@@ -301,7 +328,7 @@ DATASETS: dict[str, DatasetSchema] = {
     "sales": DatasetSchema(
         id="sales",
         label="Hotel Sales Data",
-        description="Ventes mensuelles + mix % F&B / sous-cat (inputs modèle)",
+        description="Ventes mensuelles + mix % F&B / sous-cat (sans fériés)",
         filename="hotel_sales_data.xlsx",
         sheet="hotel_sales",
         editable_columns=_SALES_EDITABLE,
@@ -314,7 +341,7 @@ DATASETS: dict[str, DatasetSchema] = {
         label="Hotel Holidays Data",
         description="Jours fériés & vacances scolaires par hôtel × mois",
         filename="hotel_holidays_data.xlsx",
-        sheet="holidays_monthly",
+        sheet="hotel_holidays",
         editable_columns=_HOLIDAYS_EDITABLE,
         key_columns=["hotel_code", "annee", "mois"],
         array_columns=[
