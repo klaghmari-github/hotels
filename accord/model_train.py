@@ -13,7 +13,7 @@ Volumes mensuels : ``nombre_ventes``, ``montant_ventes``, et plus si demandé
 (``nombre_paniers``, ``nombre_produits``, volumes ``cat_*`` / ``sous_cat_*``).
 
 Le bouton **Build** de l'UI appelle :func:`train_model` qui :
-1. charge ``data/data.xlsx`` (All Data) ou ``hotel_sales_data.xlsx``
+1. charge ``data/all_data.xlsx`` (All Data) ou ``hotel_sales_data.xlsx``
 2. construit X / y
 3. entraîne un multi-output XGBoost
 4. sauvegarde le modèle + meta dans ``models/``
@@ -105,19 +105,26 @@ FEATURE_GROUPS = {
 
 
 def _load_frame(source: str = "data") -> pd.DataFrame:
-    """Charge All Data (data.xlsx) ou hotel_sales_data.xlsx."""
+    """Charge All Data (all_data.xlsx) ou hotel_sales_data.xlsx."""
     if source == "sales":
         path = DATA_DIR / "hotel_sales_data.xlsx"
         sheet = "hotel_sales"
     else:
-        path = DATA_DIR / "data.xlsx"
-        sheet = "data"
+        path = DATA_DIR / "all_data.xlsx"
+        if not path.exists():
+            legacy = DATA_DIR / "data.xlsx"
+            path = legacy if legacy.exists() else path
+        sheet = "all_data"
     if not path.exists():
         raise FileNotFoundError(f"Fichier introuvable : {path}")
     try:
         return pd.read_excel(path, sheet_name=sheet)
     except ValueError:
-        return pd.read_excel(path, sheet_name=0)
+        # Ancien nom de feuille « data » ou première feuille
+        try:
+            return pd.read_excel(path, sheet_name="data")
+        except ValueError:
+            return pd.read_excel(path, sheet_name=0)
 
 
 def _is_numeric_series(s: pd.Series) -> bool:

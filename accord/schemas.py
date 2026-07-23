@@ -352,15 +352,13 @@ DATASETS: dict[str, DatasetSchema] = {
         icon="calendar",
         page_size=25,
     ),
-    # All Data : jointure complète (grille parfaite + fill météo/proximité)
-    # id conservé "data" pour l'API / data.xlsx ; label UI = "All Data"
-    "data": DatasetSchema(
-        id="data",
+    # All Data : jointure complète de tous les onglets → all_data.xlsx
+    "all_data": DatasetSchema(
+        id="all_data",
         label="All Data",
-        description="Jointure complète hotel × année × mois",
-
-        filename="data.xlsx",
-        sheet="data",
+        description="Jointure de tous les onglets (hotel × année × mois)",
+        filename="all_data.xlsx",
+        sheet="all_data",
         editable_columns=[],  # toutes les colonnes du fichier
         key_columns=["hotel_code", "annee", "mois"],
         array_columns=[

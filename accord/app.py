@@ -188,16 +188,21 @@ def api_reload(dataset_id: str):
         return jsonify({"error": str(exc)}), 404
 
 
-@app.post("/api/datasets/data/rebuild")
+@app.post("/api/datasets/all_data/rebuild")
+@app.post("/api/datasets/data/rebuild")  # alias rétro-compat
 def api_rebuild_join():
     """
-    Recalcule la jointure de tous les onglets → ``data/data.xlsx``.
+    **Reconstruire** : jointure de tous les onglets → ``data/all_data.xlsx``,
+    puis le fichier est rechargé en cache pour l'UI.
 
-    Clés : ``hotel_code`` × ``annee`` × ``mois``
-    (+ hotel sur ``hotel_code``, brand sur ``hotel_brand`` / ``Marque``).
+    Body optionnel JSON : ``{ "fill_weather": false, "fill_proximity": false }``
     """
+    body = request.get_json(force=True, silent=True) or {}
     try:
-        result = rebuild_joined_data()
+        result = rebuild_joined_data(
+            fill_weather=bool(body.get("fill_weather", False)),
+            fill_proximity=bool(body.get("fill_proximity", False)),
+        )
         return jsonify(result)
     except Exception as exc:
         return jsonify({"error": str(exc)}), 400

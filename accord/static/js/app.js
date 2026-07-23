@@ -167,9 +167,9 @@
       searchInput.value = "";
     }
     state.currentId = id;
-    // Bouton rebuild visible uniquement sur l'onglet All Data
+    // Bouton Reconstruire visible uniquement sur l'onglet All Data
     if (btnRebuild) {
-      btnRebuild.classList.toggle("hidden", id !== "data");
+      btnRebuild.classList.toggle("hidden", id !== "all_data" && id !== "data");
     }
     renderNav();
     setModelNavActive(null);
@@ -460,24 +460,37 @@
   }
 
   /**
-   * Recalcule data.xlsx = All Data
-   * grille hotel×année×mois + fill weather/proximity via lat/lon.
+   * Reconstruire : jointure de tous les onglets → all_data.xlsx → recharge UI.
+   * Distinct de « Recharger » qui lit seulement le fichier existant.
    */
   async function rebuildJoin() {
     if (state.dirty.size && !confirm("Les modifications non sauvées seront perdues. Continuer ?")) {
       return;
     }
-    setStatus("Rebuild All Data (météo + proximité)…");
+    setStatus("Reconstruction de la jointure (all_data.xlsx)…");
+    if (btnRebuild) btnRebuild.disabled = true;
     try {
-      const res = await api("/api/datasets/data/rebuild", { method: "POST" });
+      const res = await api("/api/datasets/all_data/rebuild", {
+        method: "POST",
+        body: JSON.stringify({ fill_weather: false, fill_proximity: false }),
+      });
       state.dirty.clear();
       state.selected.clear();
-      toast(`All Data OK · ${res.rows} lignes · ${res.n_columns} colonnes`);
+      toast(
+        `Reconstruit · ${res.rows} lignes · ${res.n_columns} colonnes → ${
+          (res.filename || "all_data.xlsx")
+        }`
+      );
       state.page = 1;
+      // Recharger explicitement depuis le fichier fraîchement écrit
+      await api(`/api/datasets/${state.currentId}/reload`, { method: "POST" });
       await fetchPage();
+      setStatus("");
     } catch (err) {
       toast(err.message, "err");
       setStatus(err.message);
+    } finally {
+      if (btnRebuild) btnRebuild.disabled = false;
     }
   }
 

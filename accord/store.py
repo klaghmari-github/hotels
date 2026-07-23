@@ -34,8 +34,8 @@ _lock = threading.RLock()
 # à la sauvegarde pour ne pas perdre de données calculées).
 _cache: dict[str, pd.DataFrame] = {}
 
-# Identifiant de l'onglet jointure (spécial : rebuild possible)
-JOINED_DATASET_ID = "data"
+# Identifiant de l'onglet jointure (spécial : reconstruct possible)
+JOINED_DATASET_ID = "all_data"
 
 
 # ---------------------------------------------------------------------------
@@ -107,7 +107,7 @@ def _project_to_schema(frame: pd.DataFrame, schema: DatasetSchema) -> pd.DataFra
 
 def _load_raw(schema: DatasetSchema) -> pd.DataFrame:
     """Lit le fichier Excel du schéma (ou DataFrame vide si absent)."""
-    # Onglet « data » : s'assurer que data.xlsx existe (jointure)
+    # Onglet All Data : s'assurer que all_data.xlsx existe (jointure)
     if schema.id == JOINED_DATASET_ID:
         from join_data import ensure_data_xlsx
 
@@ -117,11 +117,26 @@ def _load_raw(schema: DatasetSchema) -> pd.DataFrame:
     if not path.exists():
         # Fichier manquant : squelette avec colonnes éditables pour permettre la saisie
         return pd.DataFrame(columns=list(schema.editable_columns or []))
+    read_kwargs: dict[str, Any] = {}
+    if schema.id == JOINED_DATASET_ID:
+        # Codes texte forcés en str pour ne pas retomber en float NaN
+        from join_data import _NON_NUMERIC_COLS
+
+        read_kwargs["dtype"] = {c: str for c in _NON_NUMERIC_COLS}
     try:
-        frame = pd.read_excel(path, sheet_name=schema.sheet)
+        frame = pd.read_excel(path, sheet_name=schema.sheet, **read_kwargs)
     except ValueError:
         # Nom de feuille introuvable → première feuille
-        frame = pd.read_excel(path, sheet_name=0)
+        frame = pd.read_excel(path, sheet_name=0, **read_kwargs)
+    # All Data : Excel peut réintroduire des NaN numériques → re-fill 0
+    if schema.id == JOINED_DATASET_ID:
+        from join_data import fill_numeric_nulls
+
+        # dtype=str peut produire "nan" littéral
+        for c in frame.columns:
+            if c in getattr(frame, "columns", []) and frame[c].dtype == object:
+                frame[c] = frame[c].replace({"nan": "", "None": "", "<NA>": ""})
+        frame = fill_numeric_nulls(frame)
     return _project_to_schema(frame, schema)
 
 
@@ -139,21 +154,33 @@ def get_frame(dataset_id: str, *, reload: bool = False) -> pd.DataFrame:
         return _cache[dataset_id].copy()
 
 
-def rebuild_joined_data() -> dict[str, Any]:
+def rebuild_joined_data(
+    *,
+    fill_weather: bool = False,
+    fill_proximity: bool = False,
+) -> dict[str, Any]:
     """
-    Recalcule la jointure de tous les onglets et écrit ``data/data.xlsx``.
+    Recalcule la jointure de **tous** les onglets et écrit ``all_data.xlsx``.
 
-    Invalide le cache de l'onglet ``data``.
+    Sources : brand, hotel, weather, sales, holidays.
+    Invalide le cache de l'onglet ``all_data`` puis charge le nouveau fichier.
     """
     from join_data import build_joined_dataframe, save_joined_excel
 
     with _lock:
-        frame = build_joined_dataframe()
+        # Invalider les caches sources pour lire les Excel à jour
+        for src_id in ("brand", "hotel", "weather", "sales", "holidays", JOINED_DATASET_ID):
+            _cache.pop(src_id, None)
+        frame = build_joined_dataframe(
+            fill_weather=fill_weather,
+            fill_proximity=fill_proximity,
+        )
         path = save_joined_excel(frame)
         _cache[JOINED_DATASET_ID] = frame
     return {
         "ok": True,
         "path": str(path),
+        "filename": path.name,
         "rows": len(frame),
         "columns": list(frame.columns),
         "n_columns": len(frame.columns),

@@ -27,8 +27,8 @@ from geo_proximity import ProximityFromGeo, as_coord as prox_as_coord
 from geo_weather import WeatherFromGeo, as_coord as weather_as_coord
 from schemas import DATA_DIR, get_schema
 
-DATA_FILENAME = "data.xlsx"
-DATA_SHEET = "data"
+DATA_FILENAME = "all_data.xlsx"
+DATA_SHEET = "all_data"
 JOIN_KEYS_MONTHLY = ("hotel_code", "annee", "mois")
 
 
@@ -461,7 +461,170 @@ def build_joined_dataframe(
 
     # Dedup colonnes au cas où
     result = result.loc[:, ~result.columns.duplicated(keep="first")]
+
+    # Pas de null dans les champs numériques (left join sans match → 0)
+    result = fill_numeric_nulls(result)
     return result
+
+
+# Colonnes textuelles / listes : ne jamais les forcer en 0
+_NON_NUMERIC_COLS = frozenset(
+    {
+        "hotel_code",
+        "hotel_name",
+        "nom_hotel",
+        "hotel_brand",
+        "hotel_city",
+        "hotel_adresse_postale_1",
+        "hotel_adresse_postale_2",
+        "hotel_code_postal",
+        "zone_scolaire",
+        "departement",
+        "commune",
+        "localisation",
+        "Marque",
+        "jours_feries",
+        "jours_vacances_scolaires",
+        "jours_vacances_hors_feries",
+        "hotel_geo_source",
+    }
+)
+
+
+def _is_null(value: object) -> bool:
+    if value is None:
+        return True
+    if isinstance(value, (list, tuple)):
+        return False
+    try:
+        return bool(pd.isna(value))
+    except (TypeError, ValueError):
+        return False
+
+
+def _as_text_cell(value: object) -> object:
+    """Normalise une cellule texte (codes département, etc.)."""
+    if isinstance(value, (list, tuple)):
+        return value
+    if _is_null(value):
+        return ""
+    if isinstance(value, float) and value == int(value):
+        # 75.0 → "75" (code département lu comme float)
+        return str(int(value))
+    if isinstance(value, int) and not isinstance(value, bool):
+        return str(value)
+    text = str(value).replace("\u00a0", " ").strip()
+    if text.lower() in {"nan", "none", "<na>"}:
+        return ""
+    return text
+
+
+def _looks_like_array_col(series: pd.Series) -> bool:
+    sample = series.dropna().head(12)
+    if sample.empty:
+        return False
+    for v in sample:
+        if isinstance(v, (list, tuple)):
+            return True
+        if isinstance(v, str) and v.strip().startswith("["):
+            return True
+    return False
+
+
+def fill_numeric_nulls(frame: pd.DataFrame) -> pd.DataFrame:
+    """
+    Garantit l'absence de null dans les champs **numériques**.
+
+    - numériques / booléens → ``fillna(0)``
+    - object quasi numériques (left join) → coerce + ``fillna(0)``
+    - codes texte (ex. ``departement`` en float) → string, null → ``""``
+    - arrays de jours → null → ``[]`` / ``"[]"``
+    """
+    if frame is None or frame.empty:
+        return frame
+    out = frame.copy()
+
+    for col in out.columns:
+        series = out[col]
+
+        # --- Identifiants / zones / adresses / arrays ---
+        if col in _NON_NUMERIC_COLS or _looks_like_array_col(series):
+            if _looks_like_array_col(series) or col.startswith("jours_"):
+                out[col] = [
+                    (
+                        v
+                        if isinstance(v, (list, tuple))
+                        else (
+                            "[]"
+                            if _is_null(v) or (isinstance(v, str) and not v.strip())
+                            else v
+                        )
+                    )
+                    for v in series.tolist()
+                ]
+            else:
+                out[col] = [_as_text_cell(v) for v in series.tolist()]
+            continue
+
+        if pd.api.types.is_bool_dtype(series):
+            out[col] = series.fillna(False)
+            continue
+
+        if pd.api.types.is_numeric_dtype(series):
+            filled = series.fillna(0)
+            if str(filled.dtype) == "Int64":
+                filled = filled.astype("int64")
+            out[col] = filled
+            continue
+
+        # object / string : tenter numérique
+        coerced = pd.to_numeric(series, errors="coerce")
+        non_null = series.notna() & series.map(
+            lambda v: not isinstance(v, (list, tuple))
+        )
+        if non_null.any() and coerced[non_null].notna().mean() >= 0.8:
+            out[col] = coerced.fillna(0)
+        elif not non_null.any():
+            # Colonne entièrement vide : 0 si nom de métrique, sinon texte vide
+            name = str(col).lower()
+            if any(
+                k in name
+                for k in (
+                    "nombre",
+                    "montant",
+                    "pct",
+                    "meteo_",
+                    "nb_",
+                    "hotel_lat",
+                    "hotel_lon",
+                    "hotel_to",
+                    "hotel_nb",
+                    "hotel_metres",
+                    "hotel_affaires",
+                    "hotel_loisirs",
+                    "hotel_international",
+                    "hotel_national",
+                    "hotel_contrat",
+                    "hotel_derniere",
+                    "hotel_lobby",
+                    "hotel_f_b",
+                    "hotel_non_f_b",
+                    "hotel_dispo",
+                    "hotel_corner",
+                    "annee",
+                    "mois",
+                )
+            ):
+                out[col] = 0
+            else:
+                out[col] = ""
+        else:
+            out[col] = [_as_text_cell(v) for v in series.tolist()]
+
+    # Filet final sur tous les dtypes numériques
+    for col in out.select_dtypes(include=["number", "bool"]).columns:
+        out[col] = out[col].fillna(0 if not pd.api.types.is_bool_dtype(out[col]) else False)
+    return out
 
 
 def data_xlsx_path() -> Path:
@@ -469,18 +632,80 @@ def data_xlsx_path() -> Path:
 
 
 def save_joined_excel(frame: pd.DataFrame | None = None, **build_kwargs: Any) -> Path:
-    """Écrit ``accord/data/data.xlsx`` (All Data)."""
+    """Écrit ``accord/data/all_data.xlsx`` (All Data)."""
     if frame is None:
         frame = build_joined_dataframe(**build_kwargs)
+    else:
+        frame = fill_numeric_nulls(frame)
+
+    # Séparer texte / numérique pour un Excel propre (pas de NaN numériques)
+    text_cols = []
+    for col in frame.columns:
+        if col in _NON_NUMERIC_COLS or _looks_like_array_col(frame[col]):
+            text_cols.append(col)
+            frame[col] = [
+                (
+                    ""
+                    if _is_null(v)
+                    else (
+                        str(v)
+                        if not isinstance(v, (list, tuple))
+                        else v
+                    )
+                )
+                for v in frame[col].tolist()
+            ]
+        elif pd.api.types.is_numeric_dtype(frame[col]):
+            frame[col] = frame[col].fillna(0)
+
     path = data_xlsx_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     with pd.ExcelWriter(path, engine="openpyxl") as writer:
         frame.to_excel(writer, index=False, sheet_name=DATA_SHEET)
+        # Forcer type string openpyxl sur colonnes texte (évite float+NaN au rechargement)
+        try:
+            ws = writer.sheets[DATA_SHEET]
+            headers = {cell.value: cell.column for cell in ws[1]}
+            for col in text_cols:
+                idx = headers.get(col)
+                if not idx:
+                    continue
+                for row in range(2, ws.max_row + 1):
+                    cell = ws.cell(row=row, column=idx)
+                    val = cell.value
+                    if val is None or (isinstance(val, float) and pd.isna(val)) or val == "":
+                        # Espace insécable : cellule non vide pour Excel/pandas
+                        # (évite colonne float + NaN au rechargement)
+                        cell.value = "\u00a0"
+                    else:
+                        cell.value = str(val)
+                    cell.data_type = "s"
+                    cell.number_format = "@"
+            # Double filet : cellules numériques None → 0
+            for col in frame.columns:
+                if col in text_cols:
+                    continue
+                idx = headers.get(col)
+                if not idx:
+                    continue
+                for row in range(2, ws.max_row + 1):
+                    cell = ws.cell(row=row, column=idx)
+                    if cell.value is None or (
+                        isinstance(cell.value, float) and pd.isna(cell.value)
+                    ):
+                        cell.value = 0
+        except Exception:
+            pass
     return path
 
 
 def ensure_data_xlsx(*, force_rebuild: bool = False, **build_kwargs: Any) -> Path:
+    """Garantit la présence de ``all_data.xlsx`` (jointure si absent ou forcé)."""
     path = data_xlsx_path()
+    # Migration douce : ancien nom data.xlsx
+    legacy = DATA_DIR / "data.xlsx"
+    if not path.exists() and legacy.exists() and not force_rebuild:
+        legacy.rename(path)
     if force_rebuild or not path.exists():
         return save_joined_excel(**build_kwargs)
     return path

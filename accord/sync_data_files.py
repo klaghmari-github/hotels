@@ -9,7 +9,7 @@ Pour chaque dataset (hors All Data) :
 
 Holidays : privilégie ``archive/prepare/HolidaysPrep/Output`` (arrays de jours).
 Sales : reprend les indicateurs ventes de l'xlsx courant (sans fériés).
-Puis reconstruit ``data.xlsx`` (jointure).
+Puis reconstruit ``all_data.xlsx`` (jointure).
 """
 
 from __future__ import annotations
@@ -168,10 +168,10 @@ def main() -> int:
     except Exception:
         pass
 
-    print("  [data] rebuild join…")
+    print("  [all_data] rebuild join…")
     r = sync_all_data(fill_weather=False, fill_proximity=False)
     results.append(r)
-    print(f"  [data] rows={r['rows']} cols={r['cols']} → {r['path']}")
+    print(f"  [all_data] rows={r['rows']} cols={r['cols']} → {r['path']}")
 
     # Vérification : colonnes fichier == schéma pour chaque dataset éditable
     print("\nVérification fichier ↔ schéma :")

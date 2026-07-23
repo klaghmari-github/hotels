@@ -11,17 +11,18 @@ Interface web de **saisie WYSIWYG** des fichiers Excel `accord/data/`.
 | Hotel Weather Data | `hotel_weather_data.xlsx` | Identité + métriques météo |
 | Hotel Sales Data | `hotel_sales_data.xlsx` | Base ventes mensuelles (pas cat_/heure_ calculés) |
 | Hotel Holidays Data | `hotel_holidays_data.xlsx` | Fériés / vacances + arrays de jours |
-| **All Data** | `data.xlsx` | Grille hotel × année × mois + fill auto météo / proximité |
+| **All Data** | `all_data.xlsx` | Jointure de tous les onglets (hotel × année × mois) |
 
 ### Onglet All Data
 
-- Fichier : `accord/data/data.xlsx`
+- Fichier : `accord/data/all_data.xlsx`
 - Grille **parfaite** : chaque hôtel (`hotel_data`) × chaque année × 12 mois
 - Identité (`hotel_name`, brand, lat/lon) toujours remplie depuis `hotel_data`
 - **Météo** : trous comblés via `WeatherFromGeo(lat, lon)` (Meteostat)
 - **Proximité** : trous comblés via `ProximityFromGeo(lat, lon)` (Overpass)
 - **Ventes** : seules colonnes autorisées à rester vides
-- Bouton **Rebuild All Data** (ou `POST /api/datasets/data/rebuild`)
+- **Recharger** : relit `all_data.xlsx` sans refaire la jointure
+- **Reconstruire** : jointure de tous les onglets → réécrit `all_data.xlsx` → recharge l’UI (`POST /api/datasets/all_data/rebuild`)
 - Pas de colonnes en double
 
 ## Lancer
