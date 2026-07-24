@@ -203,27 +203,43 @@ def api_rebuild_join():
             fill_weather=bool(body.get("fill_weather", False)),
             fill_proximity=bool(body.get("fill_proximity", False)),
         )
+        # invalide aussi model_data (dérivé)
+        try:
+            from store import _cache
+
+            _cache.pop("model_data", None)
+        except Exception:
+            pass
+        return jsonify(result)
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
+@app.post("/api/datasets/model_data/rebuild")
+def api_rebuild_model_data():
+    """Reconstruit model_data.xlsx depuis all_data."""
+    try:
+        from model_data import rebuild_model_data
+        from store import _cache
+
+        result = rebuild_model_data()
+        _cache.pop("model_data", None)
         return jsonify(result)
     except Exception as exc:
         return jsonify({"error": str(exc)}), 400
 
 
 # ---------------------------------------------------------------------------
-# API — modèle XGBoost (config + build + liste)
+# API — modèle XGBoost (build design + explore + deploy)
 # ---------------------------------------------------------------------------
 
 @app.get("/api/model/config")
 def api_model_config():
-    """
-    Schéma de configuration pour l'écran d'apprentissage.
-
-    Query : ``source`` = ``data`` (All Data) ou ``sales``.
-    """
+    """Config Model Build : hyperparams + dernier modèle (source = model_data)."""
     try:
         from model_train import get_config_payload
 
-        source = request.args.get("source", "data").strip() or "data"
-        return jsonify(get_config_payload(source=source))
+        return jsonify(get_config_payload())
     except FileNotFoundError as exc:
         return jsonify({"error": str(exc)}), 404
     except Exception as exc:
@@ -232,11 +248,17 @@ def api_model_config():
 
 @app.get("/api/model/list")
 def api_model_list():
-    """Liste des modèles sauvegardés dans ``models/``."""
+    """Liste des modèles design, triés par performance."""
     try:
-        from model_train import list_models
+        from model_train import get_last_trained, get_top_model, list_design_models
 
-        return jsonify({"models": list_models()})
+        return jsonify(
+            {
+                "models": list_design_models(),
+                "last_trained": get_last_trained(),
+                "top_model": get_top_model(),
+            }
+        )
     except Exception as exc:
         return jsonify({"error": str(exc)}), 400
 
@@ -244,29 +266,15 @@ def api_model_list():
 @app.post("/api/model/build")
 def api_model_build():
     """
-    Lance l'apprentissage XGBoost et sauvegarde le modèle.
-
-    Body JSON
-    ---------
-    {
-      "source": "data",
-      "feature_groups": { "pct_mix": true, "pct_sous_cat": true, ... },
-      "targets": ["nombre_ventes", "montant_ventes"],
-      "xgb_params": { "n_estimators": 200, "max_depth": 6, ... },
-      "test_size": 0.2,
-      "model_name": "xgb_sales"
-    }
+    Entraîne + sauvegarde dans ``models/design/<name>/``
+    (model.pkl + config.json). Écrase si même nom.
     """
     body = request.get_json(force=True, silent=True) or {}
     try:
-        from model_train import train_model
+        from model_train import build_and_save
 
-        result = train_model(
-            source=str(body.get("source") or "data"),
-            feature_groups=body.get("feature_groups"),
-            targets=body.get("targets"),
+        result = build_and_save(
             xgb_params=body.get("xgb_params"),
-            test_size=float(body.get("test_size") or 0.2),
             model_name=body.get("model_name"),
         )
         return jsonify(result)
@@ -280,14 +288,31 @@ def api_model_build():
         return jsonify({"error": str(exc)}), 500
 
 
+@app.post("/api/model/deploy")
+def api_model_deploy():
+    """
+    Copie le modèle design sélectionné vers ``models/deploy/model.pkl``
+    + ``model.json`` (un seul modèle déployé).
+    """
+    body = request.get_json(force=True, silent=True) or {}
+    try:
+        from model_train import deploy_model
+
+        return jsonify(deploy_model(body.get("model_name") or body.get("id")))
+    except FileNotFoundError as exc:
+        return jsonify({"error": str(exc)}), 404
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
 @app.get("/api/model/<model_id>")
 def api_model_detail(model_id: str):
-    """Métadonnées d'un modèle sauvegardé."""
+    """Métadonnées d'un modèle design."""
     try:
-        from model_train import MODELS_DIR
+        from model_train import DESIGN_DIR
         import json as _json
 
-        meta_path = MODELS_DIR / model_id / "meta.json"
+        meta_path = DESIGN_DIR / model_id / "config.json"
         if not meta_path.exists():
             return jsonify({"error": f"Modèle inconnu : {model_id}"}), 404
         meta = _json.loads(meta_path.read_text(encoding="utf-8"))
@@ -300,7 +325,7 @@ def api_model_detail(model_id: str):
 
 @app.get("/api/model/<model_id>/explore")
 def api_model_explore(model_id: str):
-    """Vue d'ensemble pour Model Explore (targets, n arbres, importances)."""
+    """Vue d'ensemble Model Explore."""
     try:
         from model_explore import explore_overview
 
@@ -313,58 +338,57 @@ def api_model_explore(model_id: str):
 
 @app.get("/api/model/<model_id>/tree")
 def api_model_tree(model_id: str):
-    """
-    Structure d'un arbre de décision.
-
-    Query : ``target`` (index), ``tree`` (index 0-based).
-    """
+    """Structure d'un arbre (cible principale par défaut)."""
     try:
         from model_explore import get_tree
 
-        target = int(request.args.get("target", 0))
+        target = request.args.get("target")
         tree = int(request.args.get("tree", 0))
-        return jsonify(get_tree(model_id, target_index=target, tree_index=tree))
+        t_idx = int(target) if target not in (None, "") else None
+        return jsonify(get_tree(model_id, target_index=t_idx, tree_index=tree))
     except FileNotFoundError as exc:
         return jsonify({"error": str(exc)}), 404
     except ValueError as exc:
         return jsonify({"error": str(exc)}), 400
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
+@app.get("/api/model/<model_id>/trees")
+def api_model_trees_table(model_id: str):
+    """Table des arbres (profondeur, n features, perf cumulative)."""
+    try:
+        from model_explore import trees_table
+
+        return jsonify(trees_table(model_id))
+    except FileNotFoundError as exc:
+        return jsonify({"error": str(exc)}), 404
     except Exception as exc:
         return jsonify({"error": str(exc)}), 400
 
 
 @app.get("/api/model/<model_id>/tree-metrics")
 def api_model_tree_metrics(model_id: str):
-    """
-    Performance cumulative de chaque arbre vs performance globale.
-
-    Query : ``target`` (index de la cible).
-    """
+    """Alias → table des arbres."""
     try:
-        from model_explore import tree_performances
+        from model_explore import trees_table
 
-        target = int(request.args.get("target", 0))
-        return jsonify(tree_performances(model_id, target_index=target))
+        return jsonify(trees_table(model_id))
     except FileNotFoundError as exc:
         return jsonify({"error": str(exc)}), 404
-    except ValueError as exc:
-        return jsonify({"error": str(exc)}), 400
     except Exception as exc:
         return jsonify({"error": str(exc)}), 400
 
 
 @app.get("/api/model/<model_id>/importance")
 def api_model_importance(model_id: str):
-    """Feature importance globale ou par target (``?target=0``)."""
+    """Feature importance (cible principale)."""
     try:
         from model_explore import feature_importance_payload
 
-        t = request.args.get("target")
-        target_index = int(t) if t is not None and t != "" else None
-        return jsonify(feature_importance_payload(model_id, target_index=target_index))
+        return jsonify(feature_importance_payload(model_id))
     except FileNotFoundError as exc:
         return jsonify({"error": str(exc)}), 404
-    except ValueError as exc:
-        return jsonify({"error": str(exc)}), 400
     except Exception as exc:
         return jsonify({"error": str(exc)}), 400
 

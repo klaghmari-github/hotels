@@ -167,10 +167,20 @@
       searchInput.value = "";
     }
     state.currentId = id;
-    // Bouton Reconstruire visible uniquement sur l'onglet All Data
+    // Bouton Reconstruire : All Data ou Model Data
     if (btnRebuild) {
-      btnRebuild.classList.toggle("hidden", id !== "all_data" && id !== "data");
+      const canRebuild = id === "all_data" || id === "data" || id === "model_data";
+      btnRebuild.classList.toggle("hidden", !canRebuild);
+      btnRebuild.title =
+        id === "model_data"
+          ? "Reconstruire model_data depuis all_data"
+          : "Reconstruire : jointure de tous les onglets → all_data.xlsx";
     }
+    // Lecture seule : masquer add/save/delete sur model_data
+    const ro = state.datasets.find((d) => d.id === id)?.readonly;
+    if ($("#btn-add")) $("#btn-add").classList.toggle("hidden", !!ro);
+    if ($("#btn-save")) $("#btn-save").classList.toggle("hidden", !!ro);
+    if ($("#btn-delete")) $("#btn-delete").classList.toggle("hidden", !!ro);
     renderNav();
     setModelNavActive(null);
     await fetchPage();
@@ -246,11 +256,35 @@
    * Chaque cellule = <input> lié à row._index + nom de colonne.
    * Les valeurs dirty locales ont priorité sur le payload serveur.
    */
+  function renderModelDataStats(payload) {
+    const host = $("#model-data-stats");
+    if (!host) return;
+    const st = payload.model_stats || {};
+    if (payload.dataset_id !== "model_data" || !st.n_target) {
+      host.classList.add("hidden");
+      host.innerHTML = "";
+      return;
+    }
+    host.classList.remove("hidden");
+    host.innerHTML = `
+      <span class="stat-chip id">ID / détail · ${st.n_id_detail ?? "—"}</span>
+      <span class="stat-chip desc">Descriptives · ${st.n_descriptive ?? "—"}</span>
+      <span class="stat-chip target">Cibles · ${st.n_target ?? "—"}</span>
+      <span class="stat-chip train">Train · ${st.n_train ?? "—"} lignes</span>
+      <span class="stat-chip eval">Éval ${st.eval_year ?? ""} · ${st.n_eval ?? "—"} lignes</span>
+      <span class="stat-chip">Cible principale · ${escapeHtml(st.main_target || "montant_ventes")}</span>
+    `;
+  }
+
   function renderTable(payload) {
     const cols = payload.columns || [];
     const keys = new Set(payload.key_columns || []);
     const bools = new Set(payload.boolean_columns || []);
     const arrays = new Set(payload.array_columns || []);
+    const roles = payload.column_roles || {};
+    const readonly = !!payload.readonly;
+
+    renderModelDataStats(payload);
 
     // --- En-tête ---
     thead.innerHTML = "";
@@ -259,6 +293,10 @@
     cols.forEach((c) => {
       const th = document.createElement("th");
       if (keys.has(c)) th.classList.add("key-col");
+      const role = roles[c];
+      if (role === "id_detail") th.classList.add("col-id-detail", "key-col");
+      else if (role === "target") th.classList.add("col-target");
+      else if (role === "descriptive") th.classList.add("col-descriptive");
       th.innerHTML = `<span class="col-label" title="${escapeHtml(c)}">${escapeHtml(c)}</span>`;
       hr.appendChild(th);
     });
@@ -291,6 +329,7 @@
       const data = dirtyRow || row;
       if (dirtyRow) tr.classList.add("dirty");
       if (state.selected.has(row._index)) tr.classList.add("selected");
+      if (row._is_eval) tr.classList.add("eval-row");
 
       // Checkbox de sélection (suppression en lot)
       const tdCheck = document.createElement("td");
@@ -334,8 +373,13 @@
           input.placeholder = "0/1";
         }
 
-        input.addEventListener("input", () => onCellEdit(row, col, input.value, payload));
-        input.addEventListener("change", () => onCellEdit(row, col, input.value, payload));
+        if (readonly) {
+          input.readOnly = true;
+          input.classList.add("readonly");
+        } else {
+          input.addEventListener("input", () => onCellEdit(row, col, input.value, payload));
+          input.addEventListener("change", () => onCellEdit(row, col, input.value, payload));
+        }
         td.appendChild(input);
         tr.appendChild(td);
       });
@@ -460,30 +504,33 @@
   }
 
   /**
-   * Reconstruire : jointure de tous les onglets → all_data.xlsx → recharge UI.
-   * Distinct de « Recharger » qui lit seulement le fichier existant.
+   * Reconstruire All Data (jointure) ou Model Data (filtre ML).
    */
   async function rebuildJoin() {
     if (state.dirty.size && !confirm("Les modifications non sauvées seront perdues. Continuer ?")) {
       return;
     }
-    setStatus("Reconstruction de la jointure (all_data.xlsx)…");
+    const id = state.currentId;
+    const isModel = id === "model_data";
+    setStatus(isModel ? "Reconstruction model_data…" : "Reconstruction all_data…");
     if (btnRebuild) btnRebuild.disabled = true;
     try {
-      const res = await api("/api/datasets/all_data/rebuild", {
+      const url = isModel
+        ? "/api/datasets/model_data/rebuild"
+        : "/api/datasets/all_data/rebuild";
+      const res = await api(url, {
         method: "POST",
-        body: JSON.stringify({ fill_weather: false, fill_proximity: false }),
+        body: JSON.stringify(
+          isModel ? {} : { fill_weather: false, fill_proximity: false }
+        ),
       });
       state.dirty.clear();
       state.selected.clear();
       toast(
-        `Reconstruit · ${res.rows} lignes · ${res.n_columns} colonnes → ${
-          (res.filename || "all_data.xlsx")
-        }`
+        `Reconstruit · ${res.rows} lignes · ${res.n_columns || (res.columns || []).length} colonnes`
       );
       state.page = 1;
-      // Recharger explicitement depuis le fichier fraîchement écrit
-      await api(`/api/datasets/${state.currentId}/reload`, { method: "POST" });
+      await api(`/api/datasets/${id}/reload`, { method: "POST" });
       await fetchPage();
       setStatus("");
     } catch (err) {
@@ -557,14 +604,14 @@
   });
 
   // -------------------------------------------------------------------------
-  // Panneau Model Build
+
+  // -------------------------------------------------------------------------
+  // Panneau Model Build (hyperparams + build&save design)
   // -------------------------------------------------------------------------
 
   async function openModelBuildPanel() {
     if (state.dirty.size) {
-      const ok = confirm(
-        "Des modifications non enregistrées seront perdues. Continuer ?"
-      );
+      const ok = confirm("Des modifications non enregistrées seront perdues. Continuer ?");
       if (!ok) return;
     }
     showModelBuildPanel();
@@ -572,11 +619,10 @@
   }
 
   async function loadModelConfig() {
-    const source = ($("#model-source") && $("#model-source").value) || "data";
     const status = $("#model-status");
-    if (status) status.textContent = "Chargement config…";
+    if (status) status.textContent = "Chargement…";
     try {
-      const cfg = await api(`/api/model/config?source=${encodeURIComponent(source)}`);
+      const cfg = await api("/api/model/config");
       state.modelConfig = cfg;
       renderModelConfig(cfg);
       if (status) status.textContent = "";
@@ -589,32 +635,13 @@
   function renderModelConfig(cfg) {
     const chipSrc = $("#model-chip-source");
     const chipStats = $("#model-chip-stats");
-    if (chipSrc) chipSrc.textContent = `source · ${cfg.source}`;
+    if (chipSrc) chipSrc.textContent = "source · model_data";
     if (chipStats) {
-      chipStats.textContent = `${cfg.n_rows} lignes · ${cfg.n_columns} colonnes`;
+      chipStats.textContent = `train ${cfg.n_train ?? "—"} · éval ${cfg.n_eval ?? "—"} · ${cfg.n_features ?? "—"} feat · ${cfg.n_targets ?? "—"} cibles`;
     }
+    const nameEl = $("#model-name");
+    if (nameEl && cfg.model_name) nameEl.value = cfg.model_name;
 
-    // Feature groups
-    const fgHost = $("#model-feature-groups");
-    if (fgHost) {
-      fgHost.innerHTML = "";
-      Object.entries(cfg.feature_groups || {}).forEach(([key, g]) => {
-        const label = document.createElement("label");
-        label.className = "check-item";
-        label.innerHTML = `
-          <input type="checkbox" data-fg="${escapeHtml(key)}" ${g.default ? "checked" : ""} />
-          <span>
-            <span class="ci-label">${escapeHtml(g.label)}</span>
-            <span class="ci-meta">${escapeHtml(g.description || "")} · ${g.n_columns || 0} cols</span>
-          </span>`;
-        fgHost.appendChild(label);
-      });
-    }
-
-    // Targets
-    renderTargetChecks(cfg.default_targets || [], cfg.targets || []);
-
-    // Params
     const pHost = $("#model-params");
     if (pHost) {
       pHost.innerHTML = "";
@@ -633,63 +660,14 @@
         pHost.appendChild(field);
       });
     }
-
-    // Models list
     renderModelList(cfg.models || []);
-  }
-
-  function renderTargetChecks(selected, allTargets) {
-    const host = $("#model-targets");
-    if (!host) return;
-    const sel = new Set(selected);
-    // Priorité : défaut d'abord, puis volumes simples, puis le reste
-    const preferred = ["nombre_ventes", "montant_ventes", "nombre_paniers", "nombre_produits"];
-    const ordered = [
-      ...preferred.filter((t) => allTargets.includes(t)),
-      ...allTargets.filter((t) => !preferred.includes(t)),
-    ];
-    // Limite affichage pour ne pas saturer (les volumes dérivés sont nombreux)
-    const show = ordered.slice(0, 80);
-    host.innerHTML = "";
-    show.forEach((t) => {
-      const label = document.createElement("label");
-      label.className = "check-item";
-      label.innerHTML = `
-        <input type="checkbox" data-target="${escapeHtml(t)}" ${sel.has(t) ? "checked" : ""} />
-        <span class="ci-label">${escapeHtml(t)}</span>`;
-      host.appendChild(label);
-    });
-    if (ordered.length > show.length) {
-      const more = document.createElement("div");
-      more.className = "ci-meta";
-      more.style.padding = "0.35rem 0.55rem";
-      more.textContent = `… et ${ordered.length - show.length} autres non listés (utilisez « Tous volumes » pour les cibles par défaut + cat_*)`;
-      host.appendChild(more);
-    }
-    host.dataset.allTargets = JSON.stringify(ordered);
-  }
-
-  function getSelectedTargets() {
-    return Array.from(document.querySelectorAll("#model-targets input[data-target]:checked")).map(
-      (el) => el.dataset.target
-    );
-  }
-
-  function getFeatureGroups() {
-    const out = {};
-    document.querySelectorAll("#model-feature-groups input[data-fg]").forEach((el) => {
-      out[el.dataset.fg] = el.checked;
-    });
-    return out;
   }
 
   function getXgbParams() {
     const out = {};
     document.querySelectorAll("#model-params input[data-param]").forEach((el) => {
-      const name = el.dataset.param;
-      const raw = el.value;
-      const n = Number(raw);
-      out[name] = Number.isFinite(n) ? n : raw;
+      const n = Number(el.value);
+      out[el.dataset.param] = Number.isFinite(n) ? n : el.value;
     });
     return out;
   }
@@ -699,27 +677,21 @@
     if (!host) return;
     if (!models.length) {
       host.className = "model-list empty";
-      host.textContent = "Aucun modèle pour l’instant.";
+      host.textContent = "Aucun modèle design pour l’instant.";
       return;
     }
     host.className = "model-list";
     host.innerHTML = models
       .map((m) => {
         const r2 =
-          m.metrics_test && m.metrics_test.mean_r2 != null
-            ? Number(m.metrics_test.mean_r2).toFixed(3)
-            : "—";
-        const rmse =
-          m.metrics_test && m.metrics_test.mean_rmse != null
-            ? Number(m.metrics_test.mean_rmse).toFixed(2)
+          m.score_r2 != null
+            ? Number(m.score_r2).toFixed(3)
+            : m.metrics_eval?.mean_r2 != null
+            ? Number(m.metrics_eval.mean_r2).toFixed(3)
             : "—";
         return `<div class="model-card">
-          <div class="mc-id">${escapeHtml(m.id || "")}</div>
-          <div class="mc-meta">
-            ${escapeHtml(m.created_at || "")} ·
-            ${m.n_features || "?"} feat · ${m.n_targets || "?"} targets ·
-            test R² ${r2} · RMSE ${rmse}
-          </div>
+          <div class="mc-id">#${m.rank || "—"} · ${escapeHtml(m.name || m.id || "")}</div>
+          <div class="mc-meta">R² ${r2} · ${m.n_features || "?"} feat · ${m.n_targets || "?"} targets</div>
         </div>`;
       })
       .join("");
@@ -729,84 +701,53 @@
     const host = $("#model-result");
     if (!host) return;
     host.className = "model-result";
-    const mt = res.metrics_test || {};
+    const mt = res.metrics_eval || res.metrics_test || {};
     const r2 = mt.mean_r2 != null ? Number(mt.mean_r2).toFixed(4) : "—";
     const rmse = mt.mean_rmse != null ? Number(mt.mean_rmse).toFixed(3) : "—";
-    const mae = mt.mean_mae != null ? Number(mt.mean_mae).toFixed(3) : "—";
-    const r2n = Number(mt.mean_r2);
-    const r2Class = Number.isFinite(r2n) ? (r2n >= 0.5 ? "good" : r2n >= 0.2 ? "warn" : "") : "";
-
-    const per = mt.per_target || {};
-    const perRows = Object.entries(per)
-      .map(
-        ([name, m]) =>
-          `<tr><td>${escapeHtml(name)}</td><td>${fmt(m.r2)}</td><td>${fmt(m.rmse)}</td><td>${fmt(m.mae)}</td></tr>`
-      )
-      .join("");
-
-    const imp = (res.top_feature_importance || [])
-      .map(
-        (x) =>
-          `<li><span>${escapeHtml(x.feature)}</span><span>${Number(x.importance).toFixed(4)}</span></li>`
-      )
-      .join("");
-
+    const main = res.main_target || "montant_ventes";
+    const mainM = (mt.per_target || {})[main] || {};
     host.innerHTML = `
-      <div><strong>Modèle</strong> · <code>${escapeHtml(res.id)}</code></div>
+      <div><strong>Modèle</strong> · <code>${escapeHtml(res.name || res.id)}</code> · sauvegardé design</div>
       <div class="ci-meta" style="margin-top:0.25rem">
-        ${res.n_rows_used} lignes · train ${res.n_train} / test ${res.n_test} ·
-        ${res.n_features} features · ${res.n_targets} targets<br/>
-        Sauvegardé : <code>${escapeHtml(res.path || "")}</code>
+        train ${res.n_train} / éval ${res.n_eval} · ${res.n_features} feat · ${res.n_targets} targets
       </div>
       <div class="metrics-grid">
-        <div class="metric-box ${r2Class}"><span class="m-label">R² test (moy.)</span><span class="m-value">${r2}</span></div>
-        <div class="metric-box"><span class="m-label">RMSE test</span><span class="m-value">${rmse}</span></div>
-        <div class="metric-box"><span class="m-label">MAE test</span><span class="m-value">${mae}</span></div>
-      </div>
-      <div style="overflow:auto;max-height:180px">
-        <table class="data-table" style="min-width:100%;width:100%;font-size:0.78rem">
-          <thead><tr><th>Target</th><th>R²</th><th>RMSE</th><th>MAE</th></tr></thead>
-          <tbody>${perRows || "<tr><td colspan=4 class='empty-state'>—</td></tr>"}</tbody>
-        </table>
+        <div class="metric-box good"><span class="m-label">R² éval (moy.)</span><span class="m-value">${r2}</span></div>
+        <div class="metric-box"><span class="m-label">RMSE éval</span><span class="m-value">${rmse}</span></div>
+        <div class="metric-box"><span class="m-label">R² ${escapeHtml(main)}</span><span class="m-value">${
+          mainM.r2 != null ? Number(mainM.r2).toFixed(3) : "—"
+        }</span></div>
       </div>
       <div style="margin-top:0.65rem;font-weight:600;font-size:0.8rem;color:var(--text-muted)">Top importances</div>
-      <ul class="imp-list">${imp || "<li>—</li>"}</ul>
+      <ul class="imp-list">${(res.top_feature_importance || [])
+        .slice(0, 12)
+        .map(
+          (x) =>
+            `<li><span>${escapeHtml(x.feature)}</span><span>${Number(x.importance).toFixed(4)}</span></li>`
+        )
+        .join("")}</ul>
     `;
-  }
-
-  function fmt(v) {
-    if (v == null || Number.isNaN(Number(v))) return "—";
-    return Number(v).toFixed(3);
   }
 
   async function buildModel() {
     const btn = $("#btn-model-build");
     const status = $("#model-status");
     const body = {
-      source: ($("#model-source") && $("#model-source").value) || "data",
-      feature_groups: getFeatureGroups(),
-      targets: getSelectedTargets(),
-      xgb_params: getXgbParams(),
-      test_size: Number(($("#model-test-size") && $("#model-test-size").value) || 0.2),
       model_name: ($("#model-name") && $("#model-name").value) || "xgb_sales",
+      xgb_params: getXgbParams(),
     };
-    if (!body.targets.length) {
-      toast("Sélectionnez au moins une target", "err");
-      return;
-    }
     if (btn) btn.disabled = true;
-    if (status) status.textContent = "Apprentissage en cours…";
+    if (status) status.textContent = "Apprentissage + sauvegarde design…";
     try {
       const res = await api("/api/model/build", {
         method: "POST",
         body: JSON.stringify(body),
       });
       renderBuildResult(res);
-      toast(`Modèle OK · R² test ${(res.metrics_test && res.metrics_test.mean_r2 != null) ? Number(res.metrics_test.mean_r2).toFixed(3) : "—"}`);
-      // Refresh list
+      toast(`Build OK · ${res.name} · R² ${(res.metrics_eval && res.metrics_eval.mean_r2 != null) ? Number(res.metrics_eval.mean_r2).toFixed(3) : "—"}`);
       const list = await api("/api/model/list");
       renderModelList(list.models || []);
-      if (status) status.textContent = `Sauvegardé · ${res.id}`;
+      if (status) status.textContent = `Sauvé · design/${res.name}`;
     } catch (err) {
       toast(err.message, "err");
       if (status) status.textContent = err.message;
@@ -816,44 +757,8 @@
   }
 
   if (navModelBuild) navModelBuild.addEventListener("click", openModelBuildPanel);
-  const btnModelRefresh = $("#btn-model-refresh");
-  if (btnModelRefresh) btnModelRefresh.addEventListener("click", loadModelConfig);
   const btnModelBuild = $("#btn-model-build");
   if (btnModelBuild) btnModelBuild.addEventListener("click", buildModel);
-  const modelSource = $("#model-source");
-  if (modelSource) {
-    modelSource.addEventListener("change", loadModelConfig);
-  }
-  const btnTDef = $("#btn-targets-default");
-  if (btnTDef) {
-    btnTDef.addEventListener("click", () => {
-      const cfg = state.modelConfig;
-      if (!cfg) return;
-      renderTargetChecks(cfg.default_targets || [], cfg.targets || []);
-    });
-  }
-  const btnTAll = $("#btn-targets-all");
-  if (btnTAll) {
-    btnTAll.addEventListener("click", () => {
-      const cfg = state.modelConfig;
-      if (!cfg) return;
-      const all = (cfg.targets || []).filter(
-        (t) =>
-          ["nombre_ventes", "montant_ventes", "nombre_paniers", "nombre_produits"].includes(t) ||
-          t.startsWith("cat_") ||
-          t.startsWith("sous_cat_")
-      );
-      renderTargetChecks(all.slice(0, 40), cfg.targets || []);
-    });
-  }
-  const btnTNone = $("#btn-targets-none");
-  if (btnTNone) {
-    btnTNone.addEventListener("click", () => {
-      document.querySelectorAll("#model-targets input[data-target]").forEach((el) => {
-        el.checked = false;
-      });
-    });
-  }
 
   // -------------------------------------------------------------------------
   // Panneau Model Explore
@@ -861,9 +766,7 @@
 
   async function openModelExplorePanel() {
     if (state.dirty.size) {
-      const ok = confirm(
-        "Des modifications non enregistrées seront perdues. Continuer ?"
-      );
+      const ok = confirm("Des modifications non enregistrées seront perdues. Continuer ?");
       if (!ok) return;
     }
     showModelExplorePanel();
@@ -872,18 +775,19 @@
 
   async function loadExploreModels() {
     const status = $("#explore-status");
-    if (status) status.textContent = "Chargement des modèles…";
+    if (status) status.textContent = "Chargement…";
     try {
       const data = await api("/api/model/list");
       state.explore.models = data.models || [];
-      fillExploreModelSelect(state.explore.models);
+      fillExploreModelSelect(state.explore.models, data.top_model);
+      updateExploreBanner(data.last_trained, data.top_model);
       if (state.explore.models.length) {
         const sel = $("#explore-model-select");
         const id = (sel && sel.value) || state.explore.models[0].id;
         await loadExploreModel(id);
       } else {
         clearExploreUI();
-        if (status) status.textContent = "Aucun modèle — utilisez Model Build d’abord.";
+        if (status) status.textContent = "Aucun modèle design — utilisez Model Build.";
       }
     } catch (err) {
       if (status) status.textContent = err.message;
@@ -891,10 +795,24 @@
     }
   }
 
-  function fillExploreModelSelect(models) {
+  function updateExploreBanner(last, top) {
+    const elL = $("#explore-chip-last");
+    const elT = $("#explore-chip-top");
+    if (elL) {
+      elL.textContent = last
+        ? `Dernier entraîné : ${last.name || last.id}`
+        : "Dernier entraîné : —";
+    }
+    if (elT) {
+      elT.textContent = top
+        ? `Top model : #${top.rank} ${top.name || top.id}`
+        : "Top model : —";
+    }
+  }
+
+  function fillExploreModelSelect(models, top) {
     const sel = $("#explore-model-select");
     if (!sel) return;
-    const prev = sel.value;
     sel.innerHTML = "";
     if (!models.length) {
       sel.innerHTML = `<option value="">— aucun —</option>`;
@@ -902,60 +820,50 @@
     }
     models.forEach((m) => {
       const opt = document.createElement("option");
-      opt.value = m.id;
-      const r2 =
-        m.metrics_test && m.metrics_test.mean_r2 != null
-          ? Number(m.metrics_test.mean_r2).toFixed(3)
-          : "—";
-      opt.textContent = `${m.id}  (R² ${r2})`;
+      opt.value = m.id || m.name;
+      const r2 = m.score_r2 != null ? Number(m.score_r2).toFixed(3) : "—";
+      opt.textContent = `#${m.rank} · ${m.name || m.id} · R² ${r2}`;
       sel.appendChild(opt);
     });
-    if (prev && models.some((m) => m.id === prev)) sel.value = prev;
+    if (top && (top.id || top.name)) {
+      sel.value = top.id || top.name;
+    }
   }
 
   function clearExploreUI() {
-    const imp = $("#explore-importance");
-    if (imp) {
-      imp.className = "imp-bars empty";
-      imp.textContent = "Aucun modèle…";
-    }
-    const tree = $("#explore-tree-view");
-    if (tree) {
-      tree.className = "tree-view empty";
-      tree.textContent = "Aucun arbre à afficher.";
-    }
-    const chart = $("#explore-perf-chart");
-    if (chart) {
-      chart.className = "perf-chart empty";
-      chart.textContent = "—";
-    }
-    const tbl = $("#explore-perf-table");
-    if (tbl) tbl.innerHTML = "";
-    const gm = $("#explore-global-metrics");
-    if (gm) gm.innerHTML = "";
+    ["explore-importance", "explore-tree-view", "explore-trees-table", "explore-main-metrics", "explore-global-metrics"].forEach((id) => {
+      const el = $("#" + id);
+      if (!el) return;
+      el.innerHTML = "—";
+      el.classList.add("empty");
+    });
   }
 
   async function loadExploreModel(modelId) {
     if (!modelId) return;
     const status = $("#explore-status");
-    if (status) status.textContent = "Analyse du modèle…";
+    if (status) status.textContent = "Analyse…";
     try {
       const overview = await api(`/api/model/${encodeURIComponent(modelId)}/explore`);
       state.explore.overview = overview;
-      const chipM = $("#explore-chip-model");
+      updateExploreBanner(overview.last_trained, overview.top_model);
       const chipS = $("#explore-chip-stats");
-      if (chipM) chipM.textContent = overview.id;
       if (chipS) {
-        chipS.textContent = `${overview.n_features} feat · ${overview.n_targets} targets · ${overview.n_train || "?"} train`;
+        chipS.textContent = `${overview.n_features} feat · ${overview.n_trees} arbres · rank #${overview.rank || "—"}`;
       }
-      fillExploreTargets(overview.targets || []);
-      renderExploreGlobalMetrics(overview);
-      renderImportanceBars(
-        state.explore.impScope === "target"
-          ? (overview.targets[0] && overview.targets[0].feature_importance) || []
-          : overview.global_feature_importance || []
-      );
-      await refreshExploreTarget();
+      renderMainMetrics(overview);
+      renderImportanceBars(overview.global_feature_importance || []);
+      const trees = await api(`/api/model/${encodeURIComponent(modelId)}/trees`);
+      state.explore.treeMetrics = trees;
+      renderTreesTable(trees);
+      const slider = $("#explore-tree-slider");
+      if (slider) {
+        slider.max = String(Math.max(0, (overview.n_trees || 1) - 1));
+        slider.value = "0";
+        const lab = $("#explore-tree-label");
+        if (lab) lab.textContent = "0";
+      }
+      await loadExploreTreeOnly();
       if (status) status.textContent = "";
     } catch (err) {
       if (status) status.textContent = err.message;
@@ -963,34 +871,27 @@
     }
   }
 
-  function fillExploreTargets(targets) {
-    const sel = $("#explore-target-select");
-    if (!sel) return;
-    sel.innerHTML = "";
-    targets.forEach((t) => {
-      const opt = document.createElement("option");
-      opt.value = String(t.index);
-      opt.textContent = `${t.name}  (${t.n_trees} arbres)`;
-      opt.dataset.nTrees = String(t.n_trees);
-      sel.appendChild(opt);
-    });
-  }
-
-  function renderExploreGlobalMetrics(overview) {
-    const host = $("#explore-global-metrics");
+  function renderMainMetrics(ov) {
+    const host = $("#explore-main-metrics");
+    const label = $("#explore-main-target-label");
+    if (label) label.textContent = `${ov.main_target || "montant_ventes"} (évaluation)`;
     if (!host) return;
-    const mt = overview.metrics_test || {};
-    const boxes = [
-      { label: "R² test", value: mt.mean_r2, cls: "good" },
-      { label: "RMSE test", value: mt.mean_rmse, cls: "" },
-      { label: "MAE test", value: mt.mean_mae, cls: "" },
-    ];
-    host.innerHTML = boxes
-      .map((b) => {
-        const v = b.value != null && Number.isFinite(Number(b.value)) ? Number(b.value).toFixed(3) : "—";
-        return `<div class="metric-box ${b.cls}"><span class="m-label">${b.label}</span><span class="m-value">${v}</span></div>`;
-      })
-      .join("");
+    const m = ov.main_target_metrics || {};
+    const g = ov.metrics_eval || {};
+    host.innerHTML = `
+      <div class="metric-box good"><span class="m-label">R² ${escapeHtml(ov.main_target || "")}</span><span class="m-value">${fmt(m.r2)}</span></div>
+      <div class="metric-box"><span class="m-label">RMSE</span><span class="m-value">${fmt(m.rmse)}</span></div>
+      <div class="metric-box"><span class="m-label">MAE</span><span class="m-value">${fmt(m.mae)}</span></div>
+      <div class="metric-box"><span class="m-label">R² moy. multi-cibles</span><span class="m-value">${fmt(g.mean_r2)}</span></div>
+    `;
+    const gm = $("#explore-global-metrics");
+    if (gm) {
+      gm.innerHTML = `
+        <div class="metric-box"><span class="m-label">Train lignes</span><span class="m-value">${ov.n_train ?? "—"}</span></div>
+        <div class="metric-box"><span class="m-label">Éval lignes</span><span class="m-value">${ov.n_eval ?? "—"}</span></div>
+        <div class="metric-box"><span class="m-label">Année éval</span><span class="m-value">${ov.eval_year ?? "—"}</span></div>
+      `;
+    }
   }
 
   function renderImportanceBars(items) {
@@ -1017,183 +918,45 @@
       .join("");
   }
 
-  async function refreshExploreTarget() {
-    const modelId = $("#explore-model-select") && $("#explore-model-select").value;
-    const targetSel = $("#explore-target-select");
-    if (!modelId || !targetSel || !targetSel.value) return;
-    const target = Number(targetSel.value) || 0;
-    const opt = targetSel.selectedOptions[0];
-    const nTrees = Number((opt && opt.dataset.nTrees) || 0);
-    const slider = $("#explore-tree-slider");
-    if (slider) {
-      slider.max = String(Math.max(0, nTrees - 1));
-      if (Number(slider.value) > nTrees - 1) slider.value = "0";
-      const lab = $("#explore-tree-label");
-      if (lab) lab.textContent = slider.value;
-    }
-
-    // Importance par target si mode target
-    if (state.explore.impScope === "target" && state.explore.overview) {
-      const t = (state.explore.overview.targets || []).find((x) => x.index === target);
-      if (t) renderImportanceBars(t.feature_importance || []);
-    }
-
-    const status = $("#explore-status");
-    if (status) status.textContent = "Calcul perfs arbres…";
-    try {
-      const [metrics, tree] = await Promise.all([
-        api(
-          `/api/model/${encodeURIComponent(modelId)}/tree-metrics?target=${target}`
-        ),
-        api(
-          `/api/model/${encodeURIComponent(modelId)}/tree?target=${target}&tree=${
-            (slider && slider.value) || 0
-          }`
-        ),
-      ]);
-      state.explore.treeMetrics = metrics;
-      renderPerfChart(metrics);
-      renderPerfTable(metrics, Number((slider && slider.value) || 0));
-      renderTreeView(tree);
-      if (status) status.textContent = "";
-    } catch (err) {
-      if (status) status.textContent = err.message;
-      toast(err.message, "err");
-    }
-  }
-
-  async function loadExploreTreeOnly() {
-    const modelId = $("#explore-model-select") && $("#explore-model-select").value;
-    const targetSel = $("#explore-target-select");
-    const slider = $("#explore-tree-slider");
-    if (!modelId || !targetSel) return;
-    const target = Number(targetSel.value) || 0;
-    const treeIdx = Number((slider && slider.value) || 0);
-    const lab = $("#explore-tree-label");
-    if (lab) lab.textContent = String(treeIdx);
-    try {
-      const tree = await api(
-        `/api/model/${encodeURIComponent(modelId)}/tree?target=${target}&tree=${treeIdx}`
-      );
-      renderTreeView(tree);
-      if (state.explore.treeMetrics) {
-        renderPerfTable(state.explore.treeMetrics, treeIdx);
-      }
-    } catch (err) {
-      toast(err.message, "err");
-    }
-  }
-
-  function renderPerfChart(metrics) {
-    const host = $("#explore-perf-chart");
+  function renderTreesTable(data) {
+    const host = $("#explore-trees-table");
+    const note = $("#explore-trees-note");
+    if (note && data.note) note.textContent = data.note;
     if (!host) return;
-    const series = metrics.series || [];
-    if (!series.length) {
-      host.className = "perf-chart empty";
-      host.textContent = "Pas de série de performance.";
+    const rows = data.trees || [];
+    if (!rows.length) {
+      host.innerHTML = `<div class="empty">${escapeHtml(data.note || "Aucun arbre")}</div>`;
       return;
     }
-    host.className = "perf-chart";
-    const w = 560;
-    const h = 180;
-    const pad = { t: 16, r: 16, b: 28, l: 44 };
-    const iw = w - pad.l - pad.r;
-    const ih = h - pad.t - pad.b;
-    const xs = series.map((s) => s.n_trees_used);
-    const r2s = series.map((s) => s.r2);
-    const rmses = series.map((s) => s.rmse);
-    const gR2 = metrics.global && metrics.global.r2;
-    const gRmse = metrics.global && metrics.global.rmse;
-
-    const xMin = Math.min(...xs);
-    const xMax = Math.max(...xs);
-    const r2Min = Math.min(...r2s, gR2 != null ? gR2 : 0, 0);
-    const r2Max = Math.max(...r2s, gR2 != null ? gR2 : 1, 0.01);
-    const rmseMin = Math.min(...rmses, gRmse != null ? gRmse : 0);
-    const rmseMax = Math.max(...rmses, gRmse != null ? gRmse : 1, 0.01);
-
-    const xScale = (x) => pad.l + ((x - xMin) / Math.max(xMax - xMin, 1)) * iw;
-    const yR2 = (v) => pad.t + ih - ((v - r2Min) / Math.max(r2Max - r2Min, 1e-9)) * ih;
-    const yRmse = (v) => pad.t + ih - ((v - rmseMin) / Math.max(rmseMax - rmseMin, 1e-9)) * ih;
-
-    const pathR2 = series
-      .map((s, i) => `${i === 0 ? "M" : "L"}${xScale(s.n_trees_used).toFixed(1)},${yR2(s.r2).toFixed(1)}`)
-      .join(" ");
-    const pathRmse = series
-      .map(
-        (s, i) =>
-          `${i === 0 ? "M" : "L"}${xScale(s.n_trees_used).toFixed(1)},${yRmse(s.rmse).toFixed(1)}`
-      )
-      .join(" ");
-
-    let globalLines = "";
-    if (gR2 != null) {
-      const y = yR2(gR2);
-      globalLines += `<line x1="${pad.l}" y1="${y}" x2="${w - pad.r}" y2="${y}" stroke="#3ecf8e" stroke-dasharray="4 3" stroke-width="1.2"/>`;
-    }
-    if (gRmse != null) {
-      const y = yRmse(gRmse);
-      globalLines += `<line x1="${pad.l}" y1="${y}" x2="${w - pad.r}" y2="${y}" stroke="#f0b429" stroke-dasharray="2 3" stroke-width="1"/>`;
-    }
-
-    host.innerHTML = `
-      <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
-        <line x1="${pad.l}" y1="${pad.t}" x2="${pad.l}" y2="${h - pad.b}" stroke="rgba(255,255,255,0.1)"/>
-        <line x1="${pad.l}" y1="${h - pad.b}" x2="${w - pad.r}" y2="${h - pad.b}" stroke="rgba(255,255,255,0.1)"/>
-        ${globalLines}
-        <path d="${pathRmse}" fill="none" stroke="#f0b429" stroke-width="1.5" opacity="0.7"/>
-        <path d="${pathR2}" fill="none" stroke="#3d7eff" stroke-width="2"/>
-        <text x="${pad.l}" y="12" fill="#8b97a8" font-size="10">R² ↑  /  RMSE ↓</text>
-        <text x="${w - pad.r}" y="${h - 8}" fill="#8b97a8" font-size="10" text-anchor="end"># arbres</text>
-      </svg>
-      <div class="perf-legend">
-        <span><i style="background:#3d7eff"></i> R² cumulé</span>
-        <span><i style="background:#f0b429"></i> RMSE cumulé</span>
-        <span><i style="background:#3ecf8e"></i> R² global</span>
-        <span>global R² ${gR2 != null ? Number(gR2).toFixed(3) : "—"} · RMSE ${gRmse != null ? Number(gRmse).toFixed(2) : "—"}</span>
-      </div>`;
-  }
-
-  function renderPerfTable(metrics, activeTree) {
-    const host = $("#explore-perf-table");
-    if (!host) return;
-    const series = metrics.series || [];
-    const g = metrics.global || {};
-    // Show subset: first, last, and around active + every N
-    const rows = series.filter((s, i) => {
-      if (i === 0 || i === series.length - 1) return true;
-      if (s.tree_index === activeTree) return true;
-      return i % Math.max(1, Math.floor(series.length / 12)) === 0;
-    });
     host.innerHTML = `
       <table>
         <thead>
           <tr>
-            <th>Arbre</th><th>n</th><th>R²</th><th>RMSE</th><th>Δ R²→global</th><th>R²/global</th>
+            <th>Arbre</th><th>Profondeur</th><th>n features</th>
+            <th>R² cumulé</th><th>RMSE cumulé</th><th>MAE</th>
           </tr>
         </thead>
         <tbody>
           ${rows
-            .map((s) => {
-              const act = s.tree_index === activeTree ? "active" : "";
-              return `<tr class="${act}" data-tree="${s.tree_index}">
+            .map(
+              (s) => `<tr data-tree="${s.tree_index}">
                 <td>#${s.tree_index}</td>
-                <td>${s.n_trees_used}</td>
-                <td>${fmt(s.r2)}</td>
-                <td>${fmt(s.rmse)}</td>
-                <td>${fmt(s.r2_gap_to_global)}</td>
-                <td>${s.r2_vs_global != null ? fmt(s.r2_vs_global) : "—"}</td>
-              </tr>`;
-            })
+                <td>${s.depth}</td>
+                <td>${s.n_features}</td>
+                <td>${fmt(s.r2_cumulative)}</td>
+                <td>${fmt(s.rmse_cumulative)}</td>
+                <td>${fmt(s.mae_cumulative)}</td>
+              </tr>`
+            )
             .join("")}
-          <tr>
-            <td><strong>Global</strong></td>
-            <td>${metrics.n_trees || "—"}</td>
-            <td><strong>${fmt(g.r2)}</strong></td>
-            <td><strong>${fmt(g.rmse)}</strong></td>
-            <td>0</td>
-            <td>1</td>
-          </tr>
+          ${
+            data.global
+              ? `<tr><td><strong>Global</strong></td><td colspan="2">${data.n_trees} arbres</td>
+              <td><strong>${fmt(data.global.r2)}</strong></td>
+              <td><strong>${fmt(data.global.rmse)}</strong></td>
+              <td><strong>${fmt(data.global.mae)}</strong></td></tr>`
+              : ""
+          }
         </tbody>
       </table>`;
     host.querySelectorAll("tr[data-tree]").forEach((tr) => {
@@ -1207,7 +970,42 @@
     });
   }
 
-  /** Layout récursif d'un arbre JSON → positions pour SVG. */
+  async function loadExploreTreeOnly() {
+    const modelId = $("#explore-model-select") && $("#explore-model-select").value;
+    const slider = $("#explore-tree-slider");
+    if (!modelId) return;
+    const treeIdx = Number((slider && slider.value) || 0);
+    const lab = $("#explore-tree-label");
+    if (lab) lab.textContent = String(treeIdx);
+    try {
+      const tree = await api(
+        `/api/model/${encodeURIComponent(modelId)}/tree?tree=${treeIdx}`
+      );
+      renderTreeView(tree);
+      const meta = $("#explore-tree-meta");
+      if (meta) {
+        // find cumulative metrics for this tree
+        const rows = (state.explore.treeMetrics && state.explore.treeMetrics.trees) || [];
+        // nearest row
+        let best = null;
+        rows.forEach((r) => {
+          if (r.tree_index <= treeIdx) best = r;
+        });
+        meta.textContent = best
+          ? `Profondeur ${tree.depth} · ${tree.n_features} features · R² cumulé ${fmt(
+              best.r2_cumulative
+            )} · RMSE ${fmt(best.rmse_cumulative)} (cible ${tree.target_name})`
+          : `Profondeur ${tree.depth} · ${tree.n_features} features · cible ${tree.target_name}`;
+      }
+      // highlight table row
+      document.querySelectorAll("#explore-trees-table tr[data-tree]").forEach((tr) => {
+        tr.classList.toggle("active", Number(tr.dataset.tree) === treeIdx);
+      });
+    } catch (err) {
+      toast(err.message, "err");
+    }
+  }
+
   function layoutTree(node, depth = 0, xCounter = { n: 0 }) {
     if (!node) return null;
     if (node.is_leaf) {
@@ -1223,18 +1021,13 @@
 
   function renderTreeView(payload) {
     const host = $("#explore-tree-view");
-    const title = $("#explore-tree-title");
     if (!host) return;
-    if (title) {
-      title.textContent = `· ${payload.target_name} · arbre #${payload.tree_index} / ${payload.n_trees - 1}`;
-    }
     const laid = layoutTree(payload.tree);
     if (!laid) {
       host.className = "tree-view empty";
       host.textContent = "Arbre vide.";
       return;
     }
-
     const nodeW = 148;
     const nodeH = 42;
     const gapX = 24;
@@ -1249,17 +1042,14 @@
       walk(n.right);
     }
     walk(laid);
-
     const width = Math.max(400, (maxX + 1) * (nodeW + gapX) + 40);
     const height = Math.max(200, (maxY + 1) * gapY + 60);
-
     function pos(n) {
       return {
         cx: 20 + n.x * (nodeW + gapX) + nodeW / 2,
         cy: 24 + n.y * gapY,
       };
     }
-
     const edges = [];
     const nodes = [];
     function collect(n, parent = null, side = null) {
@@ -1280,18 +1070,14 @@
       collect(n.right, n, "non (≥)");
     }
     collect(laid);
-
     const edgeSvg = edges
-      .map(
-        (e) => {
-          const mx = (e.x1 + e.x2) / 2;
-          const my = (e.y1 + e.y2) / 2;
-          return `<path class="tree-edge" d="M${e.x1},${e.y1} C${e.x1},${my} ${e.x2},${my} ${e.x2},${e.y2}"/>
-            <text class="tree-edge-label" x="${mx}" y="${my - 2}" text-anchor="middle">${escapeHtml(e.label || "")}</text>`;
-        }
-      )
+      .map((e) => {
+        const mx = (e.x1 + e.x2) / 2;
+        const my = (e.y1 + e.y2) / 2;
+        return `<path class="tree-edge" d="M${e.x1},${e.y1} C${e.x1},${my} ${e.x2},${my} ${e.x2},${e.y2}"/>
+          <text class="tree-edge-label" x="${mx}" y="${my - 2}" text-anchor="middle">${escapeHtml(e.label || "")}</text>`;
+      })
       .join("");
-
     const nodeSvg = nodes
       .map(({ n, p }) => {
         const cls = n.is_leaf ? "tree-node tree-node-leaf" : "tree-node tree-node-split";
@@ -1310,7 +1096,6 @@
         </g>`;
       })
       .join("");
-
     host.className = "tree-view";
     host.innerHTML = `<svg class="tree-svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">${edgeSvg}${nodeSvg}</svg>`;
   }
@@ -1320,17 +1105,37 @@
     return t.length > n ? t.slice(0, n - 1) + "…" : t;
   }
 
+  function fmt(v) {
+    if (v == null || Number.isNaN(Number(v))) return "—";
+    return Number(v).toFixed(3);
+  }
+
+  async function deployCurrentModel() {
+    const sel = $("#explore-model-select");
+    const name = sel && sel.value;
+    if (!name) {
+      toast("Aucun modèle sélectionné", "err");
+      return;
+    }
+    try {
+      const res = await api("/api/model/deploy", {
+        method: "POST",
+        body: JSON.stringify({ model_name: name }),
+      });
+      toast(`Deploy OK · ${res.deployed_from} → deploy/model`);
+    } catch (err) {
+      toast(err.message, "err");
+    }
+  }
+
   if (navModelExplore) navModelExplore.addEventListener("click", openModelExplorePanel);
   const btnExploreRefresh = $("#btn-explore-refresh");
   if (btnExploreRefresh) btnExploreRefresh.addEventListener("click", loadExploreModels);
-
+  const btnExploreDeploy = $("#btn-explore-deploy");
+  if (btnExploreDeploy) btnExploreDeploy.addEventListener("click", deployCurrentModel);
   const exploreModelSel = $("#explore-model-select");
   if (exploreModelSel) {
     exploreModelSel.addEventListener("change", () => loadExploreModel(exploreModelSel.value));
-  }
-  const exploreTargetSel = $("#explore-target-select");
-  if (exploreTargetSel) {
-    exploreTargetSel.addEventListener("change", refreshExploreTarget);
   }
   const exploreSlider = $("#explore-tree-slider");
   if (exploreSlider) {
@@ -1339,26 +1144,6 @@
       if (lab) lab.textContent = exploreSlider.value;
     });
     exploreSlider.addEventListener("change", loadExploreTreeOnly);
-  }
-  const btnImpGlobal = $("#btn-imp-global");
-  if (btnImpGlobal) {
-    btnImpGlobal.addEventListener("click", () => {
-      state.explore.impScope = "global";
-      const ov = state.explore.overview;
-      if (ov) renderImportanceBars(ov.global_feature_importance || []);
-    });
-  }
-  const btnImpTarget = $("#btn-imp-target");
-  if (btnImpTarget) {
-    btnImpTarget.addEventListener("click", () => {
-      state.explore.impScope = "target";
-      const ov = state.explore.overview;
-      const targetSel = $("#explore-target-select");
-      if (!ov || !targetSel) return;
-      const idx = Number(targetSel.value) || 0;
-      const t = (ov.targets || []).find((x) => x.index === idx);
-      renderImportanceBars((t && t.feature_importance) || []);
-    });
   }
 
   // Démarrage

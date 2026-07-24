@@ -42,39 +42,45 @@ JOINED_DATASET_ID = "all_data"
 # Sérialisation cellules → JSON (pour le front)
 # ---------------------------------------------------------------------------
 
-def _cell_to_json(value: Any) -> Any:
+def _cell_to_json(value: Any, *, numeric_null_as_zero: bool = False) -> Any:
     """
     Convertit une cellule pandas en type JSON-serializable.
 
     Gère NaN, numpy scalars, timestamps, listes, et chaînes JSON d'arrays
     (ex. listes de dates stockées comme ``'["2024-01-01"]'`` dans Excel).
+
+    Si ``numeric_null_as_zero`` : les NaN numériques deviennent ``0`` (All Data).
     """
-    if value is None or (isinstance(value, float) and pd.isna(value)):
-        return None
+    # NaN / NA
+    try:
+        if value is None or (isinstance(value, float) and pd.isna(value)):
+            return 0 if numeric_null_as_zero else None
+        if pd.isna(value):
+            return 0 if numeric_null_as_zero else None
+    except (TypeError, ValueError):
+        pass
+
     if isinstance(value, (list, tuple)):
         return list(value)
     # numpy.int64 / float64 → type Python natif
-    if hasattr(value, "item"):
+    if hasattr(value, "item") and not isinstance(value, (bytes, str)):
         try:
-            return value.item()
+            value = value.item()
         except Exception:
             pass
     if isinstance(value, pd.Timestamp):
         return value.isoformat()
-    try:
-        if pd.isna(value):
-            return None
-    except (TypeError, ValueError):
-        pass
     if isinstance(value, str):
-        text = value.strip()
+        text = value.strip().replace("\u00a0", " ").strip()
+        if text.lower() in {"", "nan", "none", "<na>"}:
+            return "" if not numeric_null_as_zero else ""
         # Array stocké en texte Excel → liste pour l'UI
         if text.startswith("[") and text.endswith("]"):
             try:
                 return json.loads(text.replace("'", '"'))
             except json.JSONDecodeError:
                 return value
-        return value
+        return text
     return value
 
 
@@ -112,6 +118,10 @@ def _load_raw(schema: DatasetSchema) -> pd.DataFrame:
         from join_data import ensure_data_xlsx
 
         ensure_data_xlsx(force_rebuild=False)
+    if schema.id == "model_data":
+        from model_data import ensure_model_data
+
+        ensure_model_data(force=False)
 
     path = schema.path
     if not path.exists():
@@ -227,6 +237,13 @@ def page_payload(
     """
     schema = get_schema(dataset_id)
     frame = get_frame(dataset_id)
+    # All Data : jamais de null numériques dans l'UI
+    if dataset_id == JOINED_DATASET_ID:
+        from join_data import fill_numeric_nulls
+
+        frame = fill_numeric_nulls(frame)
+        with _lock:
+            _cache[JOINED_DATASET_ID] = frame
     cols = _ensure_editable_cols(frame, schema)
     view = frame[cols].copy() if cols else frame.copy()
 
@@ -249,25 +266,86 @@ def page_payload(
     # Index absolus dans le DataFrame d'origine (pas 0..n de la page)
     abs_indices = [int(i) for i in chunk.index.tolist()]
 
+    num_zero = dataset_id in (JOINED_DATASET_ID, "model_data")
+    # Rôles de colonnes (model_data)
+    column_roles: dict[str, str] = {}
+    model_stats: dict[str, Any] = {}
+    if dataset_id == "model_data":
+        from model_data import load_model_data_meta
+
+        md_meta = load_model_data_meta()
+        column_roles = dict(md_meta.get("column_roles") or {})
+        if "_is_eval" not in column_roles and "_is_eval" in cols:
+            column_roles["_is_eval"] = "meta"
+        model_stats = {
+            "n_id_detail": md_meta.get("n_id_detail"),
+            "n_descriptive": md_meta.get("n_descriptive"),
+            "n_target": md_meta.get("n_target"),
+            "n_train": md_meta.get("n_train"),
+            "n_eval": md_meta.get("n_eval"),
+            "eval_year": md_meta.get("eval_year"),
+            "main_target": md_meta.get("main_target"),
+            "id_detail_columns": md_meta.get("id_detail_columns") or [],
+            "descriptive_columns": md_meta.get("descriptive_columns") or [],
+            "target_columns": md_meta.get("target_columns") or [],
+        }
+        # colonnes affichées : cacher _is_eval en en-tête data mais garder pour bold
+        display_cols = [c for c in cols if c != "_is_eval"]
+    else:
+        display_cols = cols
+
     rows = []
     for pos, (idx, series) in enumerate(chunk.iterrows()):
-        rows.append(
-            {
-                "_index": int(idx),          # clé de mise à jour côté serveur
-                "_row": start + pos + 1,     # numéro humain 1-based (affichage)
-                **{c: _cell_to_json(series[c]) for c in cols},
-            }
-        )
+        is_eval_row = False
+        if "_is_eval" in series.index:
+            try:
+                is_eval_row = int(series["_is_eval"]) == 1
+            except Exception:
+                is_eval_row = bool(series["_is_eval"])
+        row_dict: dict[str, Any] = {
+            "_index": int(idx),          # clé de mise à jour côté serveur
+            "_row": start + pos + 1,     # numéro humain 1-based (affichage)
+            "_is_eval": is_eval_row,
+        }
+        for c in display_cols:
+            val = _cell_to_json(series[c], numeric_null_as_zero=num_zero)
+            # All Data / model_data : si colonne numérique encore null → 0
+            if num_zero and val is None:
+                # texte / arrays restent None → ""
+                if c in (
+                    "hotel_code",
+                    "hotel_name",
+                    "nom_hotel",
+                    "hotel_brand",
+                    "hotel_city",
+                    "hotel_adresse_postale_1",
+                    "hotel_adresse_postale_2",
+                    "hotel_code_postal",
+                    "zone_scolaire",
+                    "departement",
+                    "commune",
+                    "jours_feries",
+                    "jours_vacances_scolaires",
+                    "jours_vacances_hors_feries",
+                ):
+                    val = "" if not str(c).startswith("jours_") else []
+                else:
+                    val = 0
+            row_dict[c] = val
+        rows.append(row_dict)
 
     return {
         "dataset_id": dataset_id,
         "label": schema.label,
         "description": schema.description,
         "filename": schema.filename,
-        "columns": cols,
-        "key_columns": [c for c in schema.key_columns if c in cols],
-        "boolean_columns": [c for c in schema.boolean_columns if c in cols],
-        "array_columns": [c for c in schema.array_columns if c in cols],
+        "columns": display_cols,
+        "key_columns": [c for c in schema.key_columns if c in display_cols],
+        "boolean_columns": [c for c in schema.boolean_columns if c in display_cols],
+        "array_columns": [c for c in schema.array_columns if c in display_cols],
+        "column_roles": column_roles,
+        "model_stats": model_stats,
+        "readonly": bool(schema.readonly),
         "page": page,
         "page_size": size,
         "total_rows": total,

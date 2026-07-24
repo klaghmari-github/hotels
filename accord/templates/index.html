@@ -62,7 +62,7 @@
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M8 16H3v5"/></svg>
               Recharger
             </button>
-            <button type="button" class="btn btn-ghost hidden" id="btn-rebuild" title="Reconstruire : jointure de tous les onglets → all_data.xlsx puis chargement">
+            <button type="button" class="btn btn-ghost hidden" id="btn-rebuild" title="Reconstruire le fichier dérivé (All Data ou Model Data)">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v6h6"/><path d="M20 20v-6h-6"/><path d="M20 9A8 8 0 0 0 7 6L4 10"/><path d="M4 15a8 8 0 0 0 13 3l3-4"/></svg>
               Reconstruire
             </button>
@@ -94,6 +94,8 @@
             </table>
           </div>
         </section>
+
+        <div id="model-data-stats" class="model-data-stats hidden"></div>
 
         <footer class="pager">
           <div class="pager-left">
@@ -128,82 +130,47 @@
           <div class="topbar-left">
             <h1>Model Build</h1>
             <p class="subtitle">
-              Entraînement XGBoost — inputs mix % F&amp;B / sous-catégories ; targets = volumes de ventes.
+              XGBoost sur <strong>model_data</strong> — features = variables descriptives, split = dernière année (éval).
             </p>
           </div>
           <div class="topbar-actions">
-            <button type="button" class="btn btn-ghost" id="btn-model-refresh" title="Recharger la config">
-              Recharger config
-            </button>
-            <button type="button" class="btn btn-primary" id="btn-model-build">
+            <button type="button" class="btn btn-primary" id="btn-model-build" title="Entraîner et sauvegarder dans models/design">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-              Build
+              Build &amp; Save
             </button>
           </div>
         </header>
 
         <section class="meta-bar">
-          <span class="chip" id="model-chip-source"></span>
+          <span class="chip" id="model-chip-source">model_data</span>
           <span class="chip chip-muted" id="model-chip-stats"></span>
           <span class="status" id="model-status"></span>
         </section>
 
-        <div class="model-layout">
+        <div class="model-layout model-build-layout">
           <div class="model-col">
             <section class="card">
-              <h2 class="card-title">Source &amp; split</h2>
-              <div class="form-grid">
-                <label class="field">
-                  <span>Source données</span>
-                  <select id="model-source">
-                    <option value="data">All Data (all_data.xlsx)</option>
-                    <option value="sales">Hotel Sales Data</option>
-                  </select>
-                </label>
-                <label class="field">
-                  <span>Test size</span>
-                  <input type="number" id="model-test-size" min="0.05" max="0.5" step="0.05" value="0.2" />
-                </label>
-                <label class="field">
-                  <span>Nom modèle</span>
-                  <input type="text" id="model-name" value="xgb_sales" maxlength="40" />
-                </label>
-              </div>
+              <h2 class="card-title">Nom du modèle</h2>
+              <p class="card-hint">Fichier : <code>models/design/&lt;nom&gt;/</code> (écrasé si même nom).</p>
+              <label class="field">
+                <span>Nom</span>
+                <input type="text" id="model-name" value="xgb_sales" maxlength="60" />
+              </label>
             </section>
-
-            <section class="card">
-              <h2 class="card-title">Features (inputs)</h2>
-              <p class="card-hint">Les % F&amp;B et sous-catégories sont les inputs principaux du modèle.</p>
-              <div id="model-feature-groups" class="check-list"></div>
-            </section>
-
-            <section class="card">
-              <h2 class="card-title">Targets (à prédire)</h2>
-              <p class="card-hint">Volumes de ventes (nombre / montant) par mois.</p>
-              <div class="target-actions">
-                <button type="button" class="btn btn-ghost btn-sm" id="btn-targets-default">Défaut</button>
-                <button type="button" class="btn btn-ghost btn-sm" id="btn-targets-all">Tous volumes</button>
-                <button type="button" class="btn btn-ghost btn-sm" id="btn-targets-none">Aucun</button>
-              </div>
-              <div id="model-targets" class="check-list check-list-scroll"></div>
-            </section>
-          </div>
-
-          <div class="model-col">
             <section class="card">
               <h2 class="card-title">Hyperparamètres XGBoost</h2>
               <div id="model-params" class="form-grid form-grid-3"></div>
             </section>
-
+          </div>
+          <div class="model-col">
             <section class="card">
-              <h2 class="card-title">Résultat</h2>
+              <h2 class="card-title">Résultat entraînement</h2>
               <div id="model-result" class="model-result empty">
-                Cliquez <strong>Build</strong> pour entraîner et sauvegarder le modèle.
+                Cliquez <strong>Build &amp; Save</strong> pour entraîner et enregistrer dans <code>models/design/</code>.
               </div>
             </section>
-
             <section class="card">
-              <h2 class="card-title">Modèles sauvegardés</h2>
+              <h2 class="card-title">Modèles design</h2>
               <div id="model-list" class="model-list empty">Aucun modèle pour l’instant.</div>
             </section>
           </div>
@@ -216,16 +183,22 @@
           <div class="topbar-left">
             <h1>Model Explore</h1>
             <p class="subtitle">
-              Visualiser les arbres de décision, comparer la perf de chaque arbre au modèle global, feature importance.
+              Explorer les modèles de <code>models/design</code> — perf, importances, arbres.
             </p>
           </div>
           <div class="topbar-actions">
-            <button type="button" class="btn btn-ghost" id="btn-explore-refresh">Recharger</button>
+            <button type="button" class="btn btn-ghost" id="btn-explore-refresh" title="Recharger la liste et les graphiques">
+              Recharger
+            </button>
+            <button type="button" class="btn btn-primary" id="btn-explore-deploy" title="Copier vers models/deploy/model">
+              Deploy
+            </button>
           </div>
         </header>
 
-        <section class="meta-bar">
-          <span class="chip" id="explore-chip-model"></span>
+        <section class="meta-bar explore-banner">
+          <span class="chip" id="explore-chip-last">Dernier entraîné : —</span>
+          <span class="chip chip-accent" id="explore-chip-top">Top model : —</span>
           <span class="chip chip-muted" id="explore-chip-stats"></span>
           <span class="status" id="explore-status"></span>
         </section>
@@ -233,47 +206,43 @@
         <div class="model-layout explore-layout">
           <div class="model-col">
             <section class="card">
-              <h2 class="card-title">Sélection</h2>
-              <div class="form-grid">
-                <label class="field" style="grid-column: 1 / -1">
-                  <span>Modèle</span>
-                  <select id="explore-model-select"></select>
-                </label>
-                <label class="field">
-                  <span>Target (arbre)</span>
-                  <select id="explore-target-select"></select>
-                </label>
-                <label class="field">
-                  <span>Arbre # <span id="explore-tree-label">0</span></span>
-                  <input type="range" id="explore-tree-slider" min="0" max="0" value="0" step="1" />
-                </label>
-              </div>
+              <h2 class="card-title">Modèle à explorer</h2>
+              <label class="field">
+                <span>Classement par performance</span>
+                <select id="explore-model-select"></select>
+              </label>
               <div class="explore-global-metrics" id="explore-global-metrics"></div>
             </section>
 
             <section class="card">
+              <h2 class="card-title">Perf. cible principale</h2>
+              <p class="card-hint" id="explore-main-target-label">montant_ventes (évaluation)</p>
+              <div id="explore-main-metrics" class="metrics-grid"></div>
+            </section>
+
+            <section class="card">
               <h2 class="card-title">Feature importance</h2>
-              <div class="target-actions">
-                <button type="button" class="btn btn-ghost btn-sm" id="btn-imp-global">Globale</button>
-                <button type="button" class="btn btn-ghost btn-sm" id="btn-imp-target">Par target</button>
-              </div>
               <div id="explore-importance" class="imp-bars empty">Choisissez un modèle…</div>
             </section>
           </div>
 
           <div class="model-col">
             <section class="card card-wide">
-              <h2 class="card-title">Performance par arbre vs globale</h2>
-              <p class="card-hint">
-                Courbe cumulative : après k arbres, R² / RMSE sur le jeu de test, comparés au modèle complet.
+              <h2 class="card-title">Arbres de décision (table)</h2>
+              <p class="card-hint" id="explore-trees-note">
+                Perf = prédiction cumulative après k arbres (boosting XGBoost).
               </p>
-              <div id="explore-perf-chart" class="perf-chart empty">—</div>
-              <div id="explore-perf-table" class="perf-table-wrap"></div>
+              <div id="explore-trees-table" class="perf-table-wrap"></div>
             </section>
 
             <section class="card card-wide">
-              <h2 class="card-title">Arbre de décision <span id="explore-tree-title" class="card-title-muted"></span></h2>
-              <div id="explore-tree-view" class="tree-view empty">Sélectionnez un modèle pour afficher un arbre.</div>
+              <h2 class="card-title">Visualiser un arbre</h2>
+              <label class="field">
+                <span>Arbre # <span id="explore-tree-label">0</span></span>
+                <input type="range" id="explore-tree-slider" min="0" max="0" value="0" step="1" />
+              </label>
+              <div id="explore-tree-meta" class="ci-meta" style="margin:0.5rem 0"></div>
+              <div id="explore-tree-view" class="tree-view empty">Sélectionnez un arbre…</div>
             </section>
           </div>
         </div>

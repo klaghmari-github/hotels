@@ -49,6 +49,8 @@ class DatasetSchema:
         Listes (ex. dates ISO) sérialisées en JSON dans Excel.
     page_size :
         Taille de page par défaut pour la pagination.
+    readonly :
+        Si True, pas d'édition (ex. model_data dérivé).
     """
 
     id: str
@@ -62,6 +64,7 @@ class DatasetSchema:
     array_columns: list[str] = field(default_factory=list)
     icon: str = "table"
     page_size: int = 25
+    readonly: bool = False
 
     @property
     def path(self) -> Path:
@@ -369,6 +372,19 @@ DATASETS: dict[str, DatasetSchema] = {
         icon="table",
         page_size=25,
     ),
+    # Model Data : sous-ensemble pour l'apprentissage (dérivé d'all_data)
+    "model_data": DatasetSchema(
+        id="model_data",
+        label="Model Data",
+        description="Dataset ML — hôtels avec ventes, features / cibles",
+        filename="model_data.xlsx",
+        sheet="model_data",
+        editable_columns=[],  # toutes les colonnes du fichier
+        key_columns=["hotel_code", "annee", "mois"],
+        icon="chart",
+        page_size=25,
+        readonly=True,
+    ),
 }
 
 
@@ -388,6 +404,7 @@ def list_datasets() -> list[dict[str, Any]]:
             "key_columns": d.key_columns,
             "boolean_columns": d.boolean_columns,
             "array_columns": d.array_columns,
+            "readonly": d.readonly,
         }
         for d in DATASETS.values()
     ]

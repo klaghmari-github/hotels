@@ -381,6 +381,65 @@ body {
   color: var(--accent);
 }
 
+/* Model Data : rôles de colonnes */
+.data-table th.col-id-detail {
+  color: #f0d56a;
+  background: #2a2410;
+}
+.data-table th.col-descriptive {
+  color: var(--text-muted);
+}
+.data-table th.col-target {
+  color: #5dffb0;
+  background: #0f2a1e;
+}
+
+.data-table tbody tr.eval-row td {
+  font-weight: 700;
+}
+.data-table tbody tr.eval-row .cell-input {
+  font-weight: 700;
+  color: #e8f0ff;
+}
+
+.model-data-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.35rem 0.15rem 0.15rem;
+}
+.model-data-stats .stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  color: var(--text-muted);
+}
+.model-data-stats .stat-chip.id { color: #f0d56a; border-color: rgba(240, 213, 106, 0.35); }
+.model-data-stats .stat-chip.desc { color: var(--text-muted); }
+.model-data-stats .stat-chip.target { color: #5dffb0; border-color: rgba(93, 255, 176, 0.3); }
+.model-data-stats .stat-chip.train { color: #8bb4ff; }
+.model-data-stats .stat-chip.eval { color: #ffb86b; }
+
+.chip-accent {
+  background: rgba(201, 162, 39, 0.16);
+  border-color: rgba(201, 162, 39, 0.35);
+  color: #f0d56a;
+}
+
+.explore-banner {
+  gap: 0.65rem;
+}
+
+.model-build-layout {
+  max-height: calc(100vh - 150px);
+}
+
 .data-table th .col-label {
   display: block;
   overflow: hidden;

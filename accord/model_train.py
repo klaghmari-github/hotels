@@ -1,22 +1,11 @@
 """
-Entraînement XGBoost pour prédiction des ventes mensuelles.
+Entraînement XGBoost à partir de ``model_data``.
 
-Inputs (features)
------------------
-- Mix F&B / N_F_B : ``pct_categories_mois_*``, ``pct_cat_*``
-- Mix sous-catégories dans leur catégorie : ``pct_sous_cat_*``
-- Contexte optionnel : mois, année, fériés / vacances, météo, fiche hôtel
-
-Targets (à prédire)
--------------------
-Volumes mensuels : ``nombre_ventes``, ``montant_ventes``, et plus si demandé
-(``nombre_paniers``, ``nombre_produits``, volumes ``cat_*`` / ``sous_cat_*``).
-
-Le bouton **Build** de l'UI appelle :func:`train_model` qui :
-1. charge ``data/all_data.xlsx`` (All Data) ou ``hotel_sales_data.xlsx``
-2. construit X / y
-3. entraîne un multi-output XGBoost
-4. sauvegarde le modèle + meta dans ``models/``
+- Features = colonnes descriptives
+- Targets = colonnes cibles (ventes)
+- Split = année d'évaluation (dernière année) vs apprentissage
+- Stockage design : ``models/design/<name>/model.pkl`` + ``config.json``
+- Deploy : ``models/deploy/model.pkl`` + ``model.json``
 """
 
 from __future__ import annotations
@@ -24,6 +13,7 @@ from __future__ import annotations
 import json
 import pickle
 import re
+import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -31,11 +21,22 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parent
-DATA_DIR = ROOT / "data"
-MODELS_DIR = ROOT / "models"
+from model_data import (
+    DATA_DIR,
+    MAIN_TARGET,
+    MODEL_DATA_FILENAME,
+    MODEL_DATA_SHEET,
+    ensure_model_data,
+    load_model_data_meta,
+    rebuild_model_data,
+)
 
-# Hyperparamètres XGBoost exposés dans l'UI (valeurs par défaut sensées)
+ROOT = Path(__file__).resolve().parent
+MODELS_DIR = ROOT / "models"
+DESIGN_DIR = MODELS_DIR / "design"
+DEPLOY_DIR = MODELS_DIR / "deploy"
+LAST_TRAINED_FILE = MODELS_DIR / "last_trained.json"
+
 DEFAULT_XGB_PARAMS: dict[str, Any] = {
     "n_estimators": 200,
     "max_depth": 6,
@@ -52,7 +53,6 @@ DEFAULT_XGB_PARAMS: dict[str, Any] = {
     "tree_method": "hist",
 }
 
-# Schéma des paramètres pour le formulaire (type + bornes)
 PARAM_SCHEMA: list[dict[str, Any]] = [
     {"name": "n_estimators", "label": "n_estimators", "type": "int", "min": 10, "max": 2000, "step": 10},
     {"name": "max_depth", "label": "max_depth", "type": "int", "min": 1, "max": 20, "step": 1},
@@ -66,159 +66,39 @@ PARAM_SCHEMA: list[dict[str, Any]] = [
     {"name": "random_state", "label": "random_state", "type": "int", "min": 0, "max": 99999, "step": 1},
 ]
 
-# Cibles par défaut (volumes mensuels)
-DEFAULT_TARGETS = [
-    "nombre_ventes",
-    "montant_ventes",
-    "nombre_paniers",
-    "nombre_produits",
-]
 
-# Groupes de features (toggles UI)
-FEATURE_GROUPS = {
-    "pct_mix": {
-        "label": "Mix F&B / N_F_B (%)",
-        "description": "pct_categories_mois_* et pct_cat_*",
-        "default": True,
-    },
-    "pct_sous_cat": {
-        "label": "Mix sous-catégories (%)",
-        "description": "pct_sous_cat_* (part dans sa catégorie)",
-        "default": True,
-    },
-    "calendar": {
-        "label": "Calendrier",
-        "description": "mois, année, fériés / vacances",
-        "default": True,
-    },
-    "weather": {
-        "label": "Météo",
-        "description": "colonnes meteo_*",
-        "default": True,
-    },
-    "hotel": {
-        "label": "Fiche hôtel",
-        "description": "nb chambres, TO, équipements…",
-        "default": False,
-    },
-}
+def _slug(name: str) -> str:
+    s = re.sub(r"[^a-zA-Z0-9_-]+", "_", (name or "xgb_sales").strip())[:60]
+    return s or "xgb_sales"
 
 
-def _load_frame(source: str = "data") -> pd.DataFrame:
-    """Charge All Data (all_data.xlsx) ou hotel_sales_data.xlsx."""
-    if source == "sales":
-        path = DATA_DIR / "hotel_sales_data.xlsx"
-        sheet = "hotel_sales"
-    else:
-        path = DATA_DIR / "all_data.xlsx"
-        if not path.exists():
-            legacy = DATA_DIR / "data.xlsx"
-            path = legacy if legacy.exists() else path
-        sheet = "all_data"
+def _load_model_frame() -> tuple[pd.DataFrame, dict[str, Any]]:
+    ensure_model_data(force=False)
+    path = DATA_DIR / MODEL_DATA_FILENAME
     if not path.exists():
-        raise FileNotFoundError(f"Fichier introuvable : {path}")
+        rebuild_model_data()
     try:
-        return pd.read_excel(path, sheet_name=sheet)
+        frame = pd.read_excel(path, sheet_name=MODEL_DATA_SHEET)
     except ValueError:
-        # Ancien nom de feuille « data » ou première feuille
-        try:
-            return pd.read_excel(path, sheet_name="data")
-        except ValueError:
-            return pd.read_excel(path, sheet_name=0)
+        frame = pd.read_excel(path, sheet_name=0)
+    meta = load_model_data_meta()
+    if not meta:
+        # recompute roles
+        from model_data import classify_columns, build_model_dataframe
 
-
-def _is_numeric_series(s: pd.Series) -> bool:
-    return pd.api.types.is_numeric_dtype(s)
-
-
-def discover_columns(frame: pd.DataFrame) -> dict[str, list[str]]:
-    """Classe les colonnes en groupes feature / target pour l'UI."""
-    cols = list(frame.columns)
-
-    pct_mix = [
-        c
-        for c in cols
-        if c.startswith("pct_categories_")
-        or re.match(r"^pct_cat_", c)
-    ]
-    pct_sous = [c for c in cols if c.startswith("pct_sous_cat_")]
-    calendar = [
-        c
-        for c in (
-            "annee",
-            "mois",
-            "nb_jours_feries",
-            "nb_jours_vacances_scolaires",
-            "nb_jours_vacances_hors_feries",
-            "nb_jours_dans_mois",
-        )
-        if c in frame.columns
-    ]
-    weather = [c for c in cols if c.startswith("meteo_") and _is_numeric_series(frame[c])]
-    hotel = [
-        c
-        for c in cols
-        if c.startswith("hotel_")
-        and c not in {"hotel_code", "hotel_name", "hotel_brand", "hotel_city", "hotel_adresse_postale_1", "hotel_adresse_postale_2", "hotel_geo_source"}
-        and _is_numeric_series(frame[c])
-    ]
-
-    # Targets = volumes (pas les pct, pas les meta)
-    volume_prefixes = ("nombre_ventes", "montant_ventes", "nombre_paniers", "nombre_produits")
-    targets: list[str] = []
-    for c in cols:
-        if c in volume_prefixes:
-            targets.append(c)
-            continue
-        if c.startswith(("cat_", "sous_cat_", "heure_", "weekend_")) and any(
-            c.endswith(m) for m in volume_prefixes
-        ):
-            targets.append(c)
-
-    return {
-        "pct_mix": sorted(pct_mix),
-        "pct_sous_cat": sorted(pct_sous),
-        "calendar": calendar,
-        "weather": sorted(weather),
-        "hotel": sorted(hotel),
-        "targets": targets,
-        "default_targets": [t for t in DEFAULT_TARGETS if t in frame.columns],
-    }
-
-
-def _select_features(
-    frame: pd.DataFrame,
-    groups: dict[str, bool],
-    extra_features: list[str] | None = None,
-) -> list[str]:
-    discovered = discover_columns(frame)
-    selected: list[str] = []
-    for gname, enabled in groups.items():
-        if not enabled:
-            continue
-        selected.extend(discovered.get(gname, []))
-    if extra_features:
-        for c in extra_features:
-            if c in frame.columns and c not in selected:
-                selected.append(c)
-    # Dédup en gardant l'ordre
-    seen: set[str] = set()
-    out: list[str] = []
-    for c in selected:
-        if c not in seen and c in frame.columns and _is_numeric_series(frame[c]):
-            seen.add(c)
-            out.append(c)
-    return out
+        _, meta = build_model_dataframe(frame.drop(columns=["_is_eval"], errors="ignore"))
+    return frame, meta
 
 
 def _metrics(y_true: np.ndarray, y_pred: np.ndarray, names: list[str]) -> dict[str, Any]:
-    """RMSE / MAE / R² par target + moyenne."""
     from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
     per_target: dict[str, dict[str, float]] = {}
     for i, name in enumerate(names):
-        yt = y_true[:, i]
-        yp = y_pred[:, i]
+        yt = y_true[:, i] if y_true.ndim == 2 else y_true
+        yp = y_pred[:, i] if y_pred.ndim == 2 else y_pred
+        if y_true.ndim == 2:
+            yt, yp = y_true[:, i], y_pred[:, i]
         mask = np.isfinite(yt) & np.isfinite(yp)
         if mask.sum() < 2:
             per_target[name] = {"rmse": float("nan"), "mae": float("nan"), "r2": float("nan"), "n": int(mask.sum())}
@@ -230,7 +110,7 @@ def _metrics(y_true: np.ndarray, y_pred: np.ndarray, names: list[str]) -> dict[s
             "r2": float(r2_score(yt_m, yp_m)),
             "n": int(mask.sum()),
         }
-    # Moyenne simple des métriques finies
+
     def _avg(key: str) -> float:
         vals = [v[key] for v in per_target.values() if np.isfinite(v[key])]
         return float(np.mean(vals)) if vals else float("nan")
@@ -243,66 +123,126 @@ def _metrics(y_true: np.ndarray, y_pred: np.ndarray, names: list[str]) -> dict[s
     }
 
 
-def get_config_payload(source: str = "data") -> dict[str, Any]:
-    """Payload pour l'écran de configuration du modèle."""
-    frame = _load_frame(source)
-    discovered = discover_columns(frame)
-    models = list_models()
+def get_config_payload() -> dict[str, Any]:
+    """Config UI Model Build (hyperparams + dernier modèle)."""
+    try:
+        frame, meta = _load_model_frame()
+        n_rows = len(frame)
+    except Exception as exc:
+        return {
+            "error": str(exc),
+            "xgb_params": DEFAULT_XGB_PARAMS,
+            "param_schema": PARAM_SCHEMA,
+            "model_name": "xgb_sales",
+            "models": list_design_models(),
+        }
+
+    last = get_last_trained()
+    params = DEFAULT_XGB_PARAMS
+    model_name = "xgb_sales"
+    if last and last.get("xgb_params"):
+        params = {**DEFAULT_XGB_PARAMS, **last["xgb_params"]}
+        model_name = last.get("name") or last.get("id") or model_name
+
     return {
-        "source": source,
-        "n_rows": len(frame),
-        "n_columns": len(frame.columns),
-        "feature_groups": {
-            k: {
-                **v,
-                "columns": discovered.get(k, []),
-                "n_columns": len(discovered.get(k, [])),
-            }
-            for k, v in FEATURE_GROUPS.items()
-        },
-        "targets": discovered["targets"],
-        "default_targets": discovered["default_targets"],
-        "xgb_params": DEFAULT_XGB_PARAMS,
+        "source": "model_data",
+        "n_rows": n_rows,
+        "n_train": meta.get("n_train"),
+        "n_eval": meta.get("n_eval"),
+        "eval_year": meta.get("eval_year"),
+        "n_features": meta.get("n_descriptive"),
+        "n_targets": meta.get("n_target"),
+        "feature_cols": meta.get("descriptive_columns") or [],
+        "target_cols": meta.get("target_columns") or [],
+        "main_target": meta.get("main_target") or MAIN_TARGET,
+        "xgb_params": params,
         "param_schema": PARAM_SCHEMA,
-        "test_size": 0.2,
-        "models": models,
-        "models_dir": str(MODELS_DIR),
+        "model_name": model_name,
+        "last_trained": last,
+        "models": list_design_models(),
+        "design_dir": str(DESIGN_DIR),
+        "deploy_dir": str(DEPLOY_DIR),
     }
 
 
-def list_models() -> list[dict[str, Any]]:
-    """Liste les modèles sauvegardés (meta.json)."""
-    MODELS_DIR.mkdir(parents=True, exist_ok=True)
+def list_design_models() -> list[dict[str, Any]]:
+    """Liste les modèles design, triés par perf (R² montant_ventes eval, puis mean_r2)."""
+    DESIGN_DIR.mkdir(parents=True, exist_ok=True)
     out: list[dict[str, Any]] = []
-    for meta_path in sorted(MODELS_DIR.glob("*/meta.json"), reverse=True):
+    for conf_path in DESIGN_DIR.glob("*/config.json"):
         try:
-            meta = json.loads(meta_path.read_text(encoding="utf-8"))
-            meta["id"] = meta_path.parent.name
-            meta["path"] = str(meta_path.parent)
+            meta = json.loads(conf_path.read_text(encoding="utf-8"))
+            meta["id"] = conf_path.parent.name
+            meta["name"] = meta.get("name") or conf_path.parent.name
+            meta["path"] = str(conf_path.parent)
             out.append(meta)
         except Exception:
             continue
+
+    def score(m: dict[str, Any]) -> float:
+        mt = m.get("metrics_eval") or m.get("metrics_test") or {}
+        per = (mt.get("per_target") or {})
+        main = m.get("main_target") or MAIN_TARGET
+        if main in per and per[main].get("r2") is not None:
+            try:
+                return float(per[main]["r2"])
+            except (TypeError, ValueError):
+                pass
+        try:
+            return float(mt.get("mean_r2") or float("-inf"))
+        except (TypeError, ValueError):
+            return float("-inf")
+
+    out.sort(key=score, reverse=True)
+    for i, m in enumerate(out):
+        m["rank"] = i + 1
+        m["score_r2"] = score(m)
     return out
+
+
+def get_last_trained() -> dict[str, Any] | None:
+    if LAST_TRAINED_FILE.exists():
+        try:
+            info = json.loads(LAST_TRAINED_FILE.read_text(encoding="utf-8"))
+            name = info.get("name") or info.get("id")
+            if name:
+                conf = DESIGN_DIR / name / "config.json"
+                if conf.exists():
+                    meta = json.loads(conf.read_text(encoding="utf-8"))
+                    meta["id"] = name
+                    meta["name"] = name
+                    return meta
+            return info
+        except Exception:
+            pass
+    models = list_design_models()
+    if not models:
+        return None
+    # plus récent par created_at
+    models_by_date = sorted(
+        models, key=lambda m: m.get("created_at") or "", reverse=True
+    )
+    return models_by_date[0]
+
+
+def get_top_model() -> dict[str, Any] | None:
+    models = list_design_models()
+    return models[0] if models else None
 
 
 def train_model(
     *,
-    source: str = "data",
-    feature_groups: dict[str, bool] | None = None,
-    targets: list[str] | None = None,
     xgb_params: dict[str, Any] | None = None,
-    test_size: float = 0.2,
     model_name: str | None = None,
+    save: bool = False,
 ) -> dict[str, Any]:
     """
-    Entraîne un multi-output XGBoost et sauvegarde sous ``models/<id>/``.
+    Entraîne sur model_data.
 
-    Returns
-    -------
-    dict avec metrics, chemins, features, targets, params.
+    Si ``save=True``, écrit immédiatement dans design/<name>/.
+    Sinon retourne le bundle en mémoire (client doit appeler save_model).
     """
     try:
-        from sklearn.model_selection import train_test_split
         from sklearn.multioutput import MultiOutputRegressor
         from xgboost import XGBRegressor
     except ImportError as exc:
@@ -310,184 +250,271 @@ def train_model(
             "xgboost et scikit-learn sont requis : pip install xgboost scikit-learn"
         ) from exc
 
-    frame = _load_frame(source)
-    groups = {k: v["default"] for k, v in FEATURE_GROUPS.items()}
-    if feature_groups:
-        groups.update({k: bool(v) for k, v in feature_groups.items() if k in groups})
+    # Toujours rafraîchir model_data
+    rebuild_model_data()
+    frame, meta = _load_model_frame()
 
-    feature_cols = _select_features(frame, groups)
-    target_cols = targets or [t for t in DEFAULT_TARGETS if t in frame.columns]
-    target_cols = [t for t in target_cols if t in frame.columns]
-    # Ne pas prédire une feature avec elle-même
-    target_cols = [t for t in target_cols if t not in feature_cols]
+    feature_cols = [c for c in (meta.get("descriptive_columns") or []) if c in frame.columns]
+    target_cols = [c for c in (meta.get("target_columns") or []) if c in frame.columns]
+    main_target = meta.get("main_target") or MAIN_TARGET
+    if main_target not in target_cols and MAIN_TARGET in target_cols:
+        main_target = MAIN_TARGET
 
     if not feature_cols:
-        raise ValueError("Aucune feature sélectionnée (activez au moins un groupe).")
+        raise ValueError("Aucune feature descriptive dans model_data.")
     if not target_cols:
-        raise ValueError("Aucune cible valide.")
+        raise ValueError("Aucune cible dans model_data.")
 
-    work = frame[feature_cols + target_cols].copy()
+    # Split eval
+    if "_is_eval" in frame.columns:
+        is_eval = frame["_is_eval"].astype(int) == 1
+    elif "annee" in frame.columns and meta.get("eval_year") is not None:
+        is_eval = pd.to_numeric(frame["annee"], errors="coerce") == int(meta["eval_year"])
+    else:
+        is_eval = pd.Series(False, index=frame.index)
+        # fallback 20% last rows
+        n = len(frame)
+        is_eval.iloc[int(n * 0.8) :] = True
+
+    work = frame.copy()
     for c in feature_cols + target_cols:
-        work[c] = pd.to_numeric(work[c], errors="coerce")
-    # Lignes avec au moins une cible renseignée
-    work = work.dropna(subset=target_cols, how="all")
-    # Impute features NaN par médiane (puis 0)
-    for c in feature_cols:
-        med = work[c].median()
-        if pd.isna(med):
-            med = 0.0
-        work[c] = work[c].fillna(med)
-    for c in target_cols:
-        work[c] = work[c].fillna(0.0)
+        work[c] = pd.to_numeric(work[c], errors="coerce").fillna(0.0)
 
-    if len(work) < 10:
-        raise ValueError(f"Trop peu de lignes exploitables ({len(work)}).")
+    train_df = work.loc[~is_eval]
+    eval_df = work.loc[is_eval]
+    if len(train_df) < 5:
+        raise ValueError(f"Trop peu de lignes d'apprentissage ({len(train_df)}).")
+    if len(eval_df) < 1:
+        raise ValueError("Aucune ligne d'évaluation (dernière année).")
 
-    X = work[feature_cols].to_numpy(dtype=float)
-    y = work[target_cols].to_numpy(dtype=float)
+    X_train = train_df[feature_cols].to_numpy(dtype=float)
+    y_train = train_df[target_cols].to_numpy(dtype=float)
+    X_eval = eval_df[feature_cols].to_numpy(dtype=float)
+    y_eval = eval_df[target_cols].to_numpy(dtype=float)
 
     params = {**DEFAULT_XGB_PARAMS}
     if xgb_params:
         for k, v in xgb_params.items():
-            if k in DEFAULT_XGB_PARAMS:
-                if isinstance(DEFAULT_XGB_PARAMS[k], int) and not isinstance(
-                    DEFAULT_XGB_PARAMS[k], bool
-                ):
-                    params[k] = int(v)
-                elif isinstance(DEFAULT_XGB_PARAMS[k], float):
-                    params[k] = float(v)
-                else:
-                    params[k] = v
-
-    # Split temporel si année/mois dispo, sinon aléatoire
-    strat = None
-    if "annee" in frame.columns and len(work) == len(
-        frame.loc[work.index] if work.index.equals(frame.index) else work
-    ):
-        pass  # index may differ after dropna
-    ts = float(test_size)
-    ts = min(max(ts, 0.05), 0.5)
-
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=ts, random_state=int(params.get("random_state", 42))
-    )
+            if k not in DEFAULT_XGB_PARAMS:
+                continue
+            if isinstance(DEFAULT_XGB_PARAMS[k], int) and not isinstance(DEFAULT_XGB_PARAMS[k], bool):
+                params[k] = int(v)
+            elif isinstance(DEFAULT_XGB_PARAMS[k], float):
+                params[k] = float(v)
+            else:
+                params[k] = v
 
     base = XGBRegressor(**params)
-    if y_train.ndim == 1 or y_train.shape[1] == 1:
+    if y_train.shape[1] == 1:
         model = base
-        if y_train.ndim == 2:
-            y_train = y_train.ravel()
-            y_test = y_test.ravel()
-        model.fit(X_train, y_train)
+        model.fit(X_train, y_train.ravel())
         y_pred_train = model.predict(X_train).reshape(-1, 1)
-        y_pred_test = model.predict(X_test).reshape(-1, 1)
-        y_train_m = y_train.reshape(-1, 1)
-        y_test_m = y_test.reshape(-1, 1)
+        y_pred_eval = model.predict(X_eval).reshape(-1, 1)
+        y_train_m, y_eval_m = y_train, y_eval
     else:
         model = MultiOutputRegressor(base, n_jobs=1)
         model.fit(X_train, y_train)
         y_pred_train = model.predict(X_train)
-        y_pred_test = model.predict(X_test)
-        y_train_m = y_train
-        y_test_m = y_test
+        y_pred_eval = model.predict(X_eval)
+        y_train_m, y_eval_m = y_train, y_eval
 
     metrics_train = _metrics(y_train_m, y_pred_train, target_cols)
-    metrics_test = _metrics(y_test_m, y_pred_test, target_cols)
+    metrics_eval = _metrics(y_eval_m, y_pred_eval, target_cols)
 
-    # Feature importance (moyenne sur multi-output)
     importance: dict[str, float] = {}
     try:
         if isinstance(model, MultiOutputRegressor):
-            imps = []
-            for est in model.estimators_:
-                if hasattr(est, "feature_importances_"):
-                    imps.append(est.feature_importances_)
+            imps = [est.feature_importances_ for est in model.estimators_ if hasattr(est, "feature_importances_")]
             if imps:
                 mean_imp = np.mean(np.vstack(imps), axis=0)
-                importance = {
-                    feature_cols[i]: float(mean_imp[i])
-                    for i in range(len(feature_cols))
-                }
+                importance = {feature_cols[i]: float(mean_imp[i]) for i in range(len(feature_cols))}
         elif hasattr(model, "feature_importances_"):
             importance = {
-                feature_cols[i]: float(model.feature_importances_[i])
-                for i in range(len(feature_cols))
+                feature_cols[i]: float(model.feature_importances_[i]) for i in range(len(feature_cols))
             }
     except Exception:
         importance = {}
+    top_imp = sorted(importance.items(), key=lambda x: -x[1])[:40]
 
-    # Top-20 importances
-    top_imp = sorted(importance.items(), key=lambda x: -x[1])[:20]
+    name = _slug(model_name or "xgb_sales")
+    bundle = {
+        "model": model,
+        "feature_cols": feature_cols,
+        "target_cols": target_cols,
+        "params": params,
+        "main_target": main_target,
+    }
 
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
-    slug = re.sub(r"[^a-zA-Z0-9_-]+", "_", (model_name or "xgb_sales").strip())[:40]
-    model_id = f"{slug}_{stamp}"
-    out_dir = MODELS_DIR / model_id
+    config = {
+        "name": name,
+        "id": name,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "source": "model_data",
+        "eval_year": meta.get("eval_year"),
+        "n_rows_used": int(len(work)),
+        "n_train": int(len(train_df)),
+        "n_eval": int(len(eval_df)),
+        "feature_cols": feature_cols,
+        "n_features": len(feature_cols),
+        "target_cols": target_cols,
+        "n_targets": len(target_cols),
+        "main_target": main_target,
+        "xgb_params": params,
+        "metrics_train": metrics_train,
+        "metrics_eval": metrics_eval,
+        # alias for explore compatibility
+        "metrics_test": metrics_eval,
+        "top_feature_importance": [{"feature": k, "importance": v} for k, v in top_imp],
+        "feature_importance": importance,
+        "model_file": "model.pkl",
+        "config_file": "config.json",
+    }
+
+    result = {
+        "ok": True,
+        "id": name,
+        "name": name,
+        "bundle": bundle,
+        "config": config,
+        "metrics_train": metrics_train,
+        "metrics_eval": metrics_eval,
+        "metrics_test": metrics_eval,
+        "n_train": int(len(train_df)),
+        "n_eval": int(len(eval_df)),
+        "n_features": len(feature_cols),
+        "n_targets": len(target_cols),
+        "feature_cols": feature_cols,
+        "target_cols": target_cols,
+        "main_target": main_target,
+        "top_feature_importance": config["top_feature_importance"],
+        "xgb_params": params,
+        "saved": False,
+    }
+
+    if save:
+        saved = save_design_model(name, bundle, config)
+        result.update(saved)
+        result["saved"] = True
+
+    # remember last trained (in memory file even if not saved? save always on build per user)
+    return result
+
+
+def save_design_model(
+    name: str,
+    bundle: dict[str, Any],
+    config: dict[str, Any],
+) -> dict[str, Any]:
+    """Écrit / écrase ``models/design/<name>/``."""
+    name = _slug(name)
+    DESIGN_DIR.mkdir(parents=True, exist_ok=True)
+    out_dir = DESIGN_DIR / name
+    # écrase
+    if out_dir.exists():
+        shutil.rmtree(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
     model_path = out_dir / "model.pkl"
     with model_path.open("wb") as f:
-        pickle.dump(
-            {
-                "model": model,
-                "feature_cols": feature_cols,
-                "target_cols": target_cols,
-                "params": params,
-            },
-            f,
-        )
+        pickle.dump(bundle, f)
 
-    meta = {
-        "id": model_id,
-        "created_at": datetime.now(timezone.utc).isoformat(),
-        "source": source,
-        "n_rows_used": int(len(work)),
-        "n_train": int(len(X_train)),
-        "n_test": int(len(X_test)),
-        "test_size": ts,
-        "feature_groups": groups,
-        "feature_cols": feature_cols,
-        "n_features": len(feature_cols),
-        "target_cols": target_cols,
-        "n_targets": len(target_cols),
-        "xgb_params": params,
-        "metrics_train": metrics_train,
-        "metrics_test": metrics_test,
-        "top_feature_importance": [{"feature": k, "importance": v} for k, v in top_imp],
-        "model_file": str(model_path.name),
-    }
-    (out_dir / "meta.json").write_text(
-        json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8"
+    config = {**config, "name": name, "id": name, "path": str(out_dir)}
+    conf_path = out_dir / "config.json"
+    conf_path.write_text(json.dumps(config, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    LAST_TRAINED_FILE.parent.mkdir(parents=True, exist_ok=True)
+    LAST_TRAINED_FILE.write_text(
+        json.dumps({"name": name, "id": name, "created_at": config.get("created_at")}, indent=2),
+        encoding="utf-8",
     )
 
     return {
         "ok": True,
-        "id": model_id,
+        "id": name,
+        "name": name,
         "path": str(out_dir),
         "model_file": str(model_path),
-        "metrics_train": metrics_train,
-        "metrics_test": metrics_test,
-        "n_rows_used": int(len(work)),
-        "n_train": int(len(X_train)),
-        "n_test": int(len(X_test)),
-        "n_features": len(feature_cols),
-        "n_targets": len(target_cols),
-        "feature_cols": feature_cols,
-        "target_cols": target_cols,
-        "top_feature_importance": meta["top_feature_importance"],
-        "xgb_params": params,
+        "config_file": str(conf_path),
     }
 
 
-def load_model(model_id: str) -> dict[str, Any]:
-    """Charge un modèle sauvegardé."""
-    model_path = MODELS_DIR / model_id / "model.pkl"
-    meta_path = MODELS_DIR / model_id / "meta.json"
-    if not model_path.exists():
+def build_and_save(
+    *,
+    xgb_params: dict[str, Any] | None = None,
+    model_name: str | None = None,
+) -> dict[str, Any]:
+    """Build = entraînement + sauvegarde design."""
+    result = train_model(xgb_params=xgb_params, model_name=model_name, save=True)
+    # ne pas renvoyer le bundle pickle-able énorme dans JSON
+    result.pop("bundle", None)
+    return result
+
+
+def deploy_model(model_name: str | None = None) -> dict[str, Any]:
+    """
+    Copie le modèle design vers ``models/deploy/model.pkl`` + ``model.json``.
+    Un seul modèle déployé à la fois.
+    """
+    name = _slug(model_name or "")
+    if not name or name == "xgb_sales" and model_name is None:
+        top = get_top_model() or get_last_trained()
+        if not top:
+            raise FileNotFoundError("Aucun modèle à déployer.")
+        name = _slug(top.get("name") or top.get("id") or "")
+
+    src_dir = DESIGN_DIR / name
+    if not src_dir.exists():
+        raise FileNotFoundError(f"Modèle design introuvable : {name}")
+
+    DEPLOY_DIR.mkdir(parents=True, exist_ok=True)
+    # purge deploy
+    for p in DEPLOY_DIR.iterdir():
+        if p.is_file():
+            p.unlink()
+        elif p.is_dir():
+            shutil.rmtree(p)
+
+    src_model = src_dir / "model.pkl"
+    src_conf = src_dir / "config.json"
+    if not src_model.exists():
+        raise FileNotFoundError(f"model.pkl manquant pour {name}")
+
+    dst_model = DEPLOY_DIR / "model.pkl"
+    dst_conf = DEPLOY_DIR / "model.json"
+    shutil.copy2(src_model, dst_model)
+    if src_conf.exists():
+        conf = json.loads(src_conf.read_text(encoding="utf-8"))
+        conf["deployed_at"] = datetime.now(timezone.utc).isoformat()
+        conf["deployed_from"] = name
+        dst_conf.write_text(json.dumps(conf, ensure_ascii=False, indent=2), encoding="utf-8")
+    else:
+        dst_conf.write_text(json.dumps({"name": name, "deployed_from": name}, indent=2), encoding="utf-8")
+
+    return {
+        "ok": True,
+        "deployed_from": name,
+        "model_file": str(dst_model),
+        "config_file": str(dst_conf),
+    }
+
+
+def load_design_model(model_id: str) -> dict[str, Any]:
+    path = DESIGN_DIR / _slug(model_id) / "model.pkl"
+    conf_path = DESIGN_DIR / _slug(model_id) / "config.json"
+    if not path.exists():
         raise FileNotFoundError(f"Modèle introuvable : {model_id}")
-    with model_path.open("rb") as f:
+    with path.open("rb") as f:
         bundle = pickle.load(f)
     meta = {}
-    if meta_path.exists():
-        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    if conf_path.exists():
+        meta = json.loads(conf_path.read_text(encoding="utf-8"))
     return {"bundle": bundle, "meta": meta}
+
+
+# Compat aliases
+def list_models() -> list[dict[str, Any]]:
+    return list_design_models()
+
+
+def load_model(model_id: str) -> dict[str, Any]:
+    return load_design_model(model_id)
