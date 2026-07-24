@@ -224,6 +224,20 @@ _WEATHER_EDITABLE = [
     "meteo_ensoleillement_min_max",
 ]
 
+# --- Proximity : commerces 100–500 m + plage 1–5 km (static par hôtel) ---
+def _proximity_editable() -> list[str]:
+    """Construit la liste des colonnes proximité (ids + features)."""
+    try:
+        from geo_proximity import id_and_feature_columns
+
+        return id_and_feature_columns()
+    except Exception:
+        # Fallback minimal si import circulaire / module absent
+        return ["hotel_code", "hotel_name", "hotel_lat", "hotel_lon"]
+
+
+_PROXIMITY_EDITABLE = _proximity_editable()
+
 # --- Sales : indicateurs de ventes uniquement (pas de fériés — cf. holidays) ---
 # Clés + volumes mensuels + mix F&B / sous-catégories (inputs modèle).
 # Les jours fériés / vacances se joignent depuis hotel_holidays_data.
@@ -301,6 +315,7 @@ _HOLIDAYS_EDITABLE = [
 # Chaque entrée pilote un onglet de la sidebar et le fichier Excel associé.
 # L'id est utilisé dans l'URL API : /api/datasets/<id>
 
+# Ordre sidebar : Brand → Hotel → Sales → Weather → Proximity → Holidays → All → Model
 DATASETS: dict[str, DatasetSchema] = {
     "brand": DatasetSchema(
         id="brand",
@@ -325,10 +340,53 @@ DATASETS: dict[str, DatasetSchema] = {
         icon="hotel",
         page_size=15,
     ),
+    # Ventes brutes (tickets) — saisie / import ; base du rebuild sales
+    "sales_raw": DatasetSchema(
+        id="sales_raw",
+        label="Hotel Sales Raw Data",
+        description="Tickets bruts — boutique, produit, TYPE, GAMME, prix HT/TTC",
+        filename="hotel_sales_raw_data.xlsx",
+        sheet="sales_raw",
+        editable_columns=[
+            "nom_boutique",
+            "date",
+            "heure",
+            "statut",
+            "code_ean",
+            "nom_produit",
+            "quantite",
+            "prix_ht",
+            "vat",
+            "prix_ttc",
+            "type_raw",
+            "gamme_raw",
+            "marque_produit",
+            "fournisseur",
+            "order_id",
+            "operateur",
+            "machine",
+        ],
+        key_columns=["nom_boutique", "date", "order_id"],
+        icon="chart",
+        page_size=25,
+    ),
+    # Ventes agrégées — lecture seule, reconstruites depuis sales_raw
+    "sales": DatasetSchema(
+        id="sales",
+        label="Hotel Sales Data",
+        description="Ventes mensuelles agrégées — Reconstruire depuis Sales Raw",
+        filename="hotel_sales_data.xlsx",
+        sheet="hotel_sales",
+        editable_columns=_SALES_EDITABLE,
+        key_columns=["hotel_code", "nom_hotel", "annee", "mois"],
+        icon="chart",
+        page_size=25,
+        readonly=True,
+    ),
     "weather": DatasetSchema(
         id="weather",
         label="Hotel Weather Data",
-        description="Météo mensuelle par hôtel — température, pluie, vent…",
+        description="Météo mensuelle — Reconstruire via lat/lon + années de ventes",
         filename="hotel_weather_data.xlsx",
         sheet="Sheet1",
         editable_columns=_WEATHER_EDITABLE,
@@ -336,21 +394,21 @@ DATASETS: dict[str, DatasetSchema] = {
         icon="cloud",
         page_size=25,
     ),
-    "sales": DatasetSchema(
-        id="sales",
-        label="Hotel Sales Data",
-        description="Ventes mensuelles + mix % F&B / sous-cat (sans fériés)",
-        filename="hotel_sales_data.xlsx",
-        sheet="hotel_sales",
-        editable_columns=_SALES_EDITABLE,
-        key_columns=["hotel_code", "nom_hotel", "annee", "mois"],
-        icon="chart",
-        page_size=25,
+    "proximity": DatasetSchema(
+        id="proximity",
+        label="Hotel Proximity Data",
+        description="Commerces 100–500 m + plage 1–5 km — Reconstruire via Overpass",
+        filename="hotel_proximity_data.xlsx",
+        sheet="hotel_proximity",
+        editable_columns=_PROXIMITY_EDITABLE,
+        key_columns=["hotel_code", "hotel_name"],
+        icon="map",
+        page_size=15,
     ),
     "holidays": DatasetSchema(
         id="holidays",
         label="Hotel Holidays Data",
-        description="Jours fériés & vacances scolaires par hôtel × mois",
+        description="Fériés & vacances scolaires — Reconstruire par hôtel × mois",
         filename="hotel_holidays_data.xlsx",
         sheet="hotel_holidays",
         editable_columns=_HOLIDAYS_EDITABLE,

@@ -74,6 +74,7 @@
     building: "🏛",
     hotel: "🛎",
     cloud: "☁",
+    map: "📍",
     chart: "📈",
     calendar: "📅",
     table: "▦",
@@ -179,17 +180,35 @@
       searchInput.value = "";
     }
     state.currentId = id;
-    // Bouton Reconstruire : All Data ou Model Data
+    // Bouton Reconstruire : sales, weather, proximity, holidays, all_data, model_data
     if (btnRebuild) {
-      const canRebuild = id === "all_data" || id === "data" || id === "model_data";
-      btnRebuild.classList.toggle("hidden", !canRebuild);
-      btnRebuild.title =
-        id === "model_data"
-          ? "Reconstruire model_data depuis all_data"
-          : "Reconstruire : jointure de tous les onglets → all_data.xlsx";
+      const rebuildTabs = new Set([
+        "sales",
+        "weather",
+        "proximity",
+        "holidays",
+        "all_data",
+        "data",
+        "model_data",
+      ]);
+      btnRebuild.classList.toggle("hidden", !rebuildTabs.has(id));
+      const titles = {
+        sales:
+          "Reconstruire hotel_sales_data depuis hotel_sales_raw_data (agrégats + mix %)",
+        weather:
+          "Recalculer météo (hôtels × années de ventes × mois terminés) → hotel_weather_data.xlsx",
+        proximity:
+          "Recalculer proximité Overpass pour chaque hôtel → hotel_proximity_data.xlsx",
+        holidays:
+          "Recalculer fériés & vacances (hôtels × années de ventes × mois terminés)",
+        model_data: "Reconstruire model_data depuis all_data",
+        all_data: "Jointure de tous les onglets → all_data.xlsx",
+        data: "Jointure de tous les onglets → all_data.xlsx",
+      };
+      btnRebuild.title = titles[id] || "Reconstruire";
     }
-    // Lecture seule : masquer add/save/delete sur model_data
-    const ro = state.datasets.find((d) => d.id === id)?.readonly;
+    // Lecture seule (sales agrégé, model_data) : masquer add/save/delete
+    const ro = state.datasets.find((d) => d.id === id)?.readonly || id === "sales";
     if ($("#btn-add")) $("#btn-add").classList.toggle("hidden", !!ro);
     if ($("#btn-save")) $("#btn-save").classList.toggle("hidden", !!ro);
     if ($("#btn-delete")) $("#btn-delete").classList.toggle("hidden", !!ro);
@@ -523,25 +542,64 @@
       return;
     }
     const id = state.currentId;
-    const isModel = id === "model_data";
-    setStatus(isModel ? "Reconstruction model_data…" : "Reconstruction all_data…");
+    const rebuildMap = {
+      sales: {
+        url: "/api/datasets/sales/rebuild",
+        body: {},
+        msg: "Agrégation ventes brutes → hotel_sales_data…",
+      },
+      weather: {
+        url: "/api/datasets/weather/rebuild",
+        body: {},
+        msg: "Calcul météo (peut prendre 1–2 min)…",
+      },
+      proximity: {
+        url: "/api/datasets/proximity/rebuild",
+        body: {},
+        msg: "Calcul proximité Overpass (peut prendre 1–2 min)…",
+      },
+      holidays: {
+        url: "/api/datasets/holidays/rebuild",
+        body: {},
+        msg: "Calcul fériés & vacances scolaires…",
+      },
+      model_data: {
+        url: "/api/datasets/model_data/rebuild",
+        body: {},
+        msg: "Reconstruction model_data…",
+      },
+      all_data: {
+        url: "/api/datasets/all_data/rebuild",
+        body: { fill_weather: false, fill_proximity: false },
+        msg: "Reconstruction all_data…",
+      },
+      data: {
+        url: "/api/datasets/all_data/rebuild",
+        body: { fill_weather: false, fill_proximity: false },
+        msg: "Reconstruction all_data…",
+      },
+    };
+    const cfg = rebuildMap[id];
+    if (!cfg) {
+      toast("Reconstruire non disponible sur cet onglet", "err");
+      return;
+    }
+    setStatus(cfg.msg);
     if (btnRebuild) btnRebuild.disabled = true;
     try {
-      const url = isModel
-        ? "/api/datasets/model_data/rebuild"
-        : "/api/datasets/all_data/rebuild";
-      const res = await api(url, {
+      const res = await api(cfg.url, {
         method: "POST",
-        body: JSON.stringify(
-          isModel ? {} : { fill_weather: false, fill_proximity: false }
-        ),
+        body: JSON.stringify(cfg.body || {}),
       });
       state.dirty.clear();
       state.selected.clear();
       toast(
-        `Reconstruit · ${res.rows} lignes · ${res.n_columns || (res.columns || []).length} colonnes`
+        `Reconstruit · ${res.rows} lignes · ${
+          res.n_columns || (res.columns || []).length
+        } colonnes`
       );
       state.page = 1;
+      // Recharge le Excel fraîchement écrit dans l'UI
       await api(`/api/datasets/${id}/reload`, { method: "POST" });
       await fetchPage();
       setStatus("");

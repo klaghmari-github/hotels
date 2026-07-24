@@ -492,3 +492,93 @@ class WeatherFromGeo:
     @staticmethod
     def meteo_columns() -> list[str]:
         return meteo_column_names()
+
+
+# ---------------------------------------------------------------------------
+# Persistance hotel_weather_data.xlsx (rebuild depuis hotel_data + sales years)
+# ---------------------------------------------------------------------------
+
+from pathlib import Path  # noqa: E402
+
+WEATHER_FILENAME = "hotel_weather_data.xlsx"
+WEATHER_SHEET = "Sheet1"
+_DATA_DIR = Path(__file__).resolve().parent / "data"
+
+
+def weather_path() -> Path:
+    return _DATA_DIR / WEATHER_FILENAME
+
+
+def rebuild_hotel_weather_data() -> dict[str, Any]:
+    """
+    Recalcule ``hotel_weather_data.xlsx``.
+
+    * Hôtels = ``hotel_data.xlsx``
+    * Années = années présentes dans ``hotel_sales_data.xlsx``
+    * Mois = mois **terminés** uniquement (mois en cours exclu)
+
+    Pour chaque (hôtel, année, mois) : indicateurs Meteostat via lat/lon.
+    """
+    from geo_common import (
+        filter_frame_to_pairs,
+        load_hotels,
+        sales_years,
+        year_month_pairs,
+    )
+
+    hotels = load_hotels()
+    if hotels.empty:
+        raise ValueError("hotel_data.xlsx vide ou introuvable.")
+
+    years = sales_years()
+    if not years:
+        raise ValueError("Aucune année de ventes trouvée dans hotel_sales_data.")
+
+    pairs = year_month_pairs(years)
+    if not pairs:
+        raise ValueError("Aucun mois terminé à générer pour les années de ventes.")
+
+    engine = WeatherFromGeo(years=tuple(years))
+    parts: list[pd.DataFrame] = []
+    for _, h in hotels.iterrows():
+        part = engine.for_point(
+            h.get("hotel_lat"),
+            h.get("hotel_lon"),
+            impute=True,
+        )
+        if part is None or part.empty:
+            continue
+        part = part.copy()
+        if "hotel_code" in hotels.columns:
+            part["hotel_code"] = h.get("hotel_code")
+        if "hotel_name" in hotels.columns:
+            part["hotel_name"] = h.get("hotel_name")
+        part = filter_frame_to_pairs(part, pairs)
+        parts.append(part)
+
+    if not parts:
+        raise ValueError("Aucune ligne météo générée (Meteostat indisponible ?).")
+
+    frame = pd.concat(parts, ignore_index=True)
+    # Ordre colonnes UI
+    id_cols = [c for c in ("hotel_code", "hotel_name", "annee", "mois", "hotel_lat", "hotel_lon") if c in frame.columns]
+    meteo_cols = [c for c in meteo_column_names() if c in frame.columns]
+    rest = [c for c in frame.columns if c not in id_cols and c not in meteo_cols]
+    frame = frame[id_cols + meteo_cols + rest]
+
+    # Fill nulls numériques météo à 0 pour l'UI
+    for c in meteo_cols:
+        frame[c] = pd.to_numeric(frame[c], errors="coerce").fillna(0.0)
+
+    path = weather_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    frame.to_excel(path, index=False, sheet_name=WEATHER_SHEET)
+    return {
+        "ok": True,
+        "path": str(path),
+        "rows": len(frame),
+        "columns": list(frame.columns),
+        "n_columns": len(frame.columns),
+        "years": years,
+        "n_hotels": int(hotels["hotel_code"].nunique()) if "hotel_code" in hotels.columns else len(hotels),
+    }

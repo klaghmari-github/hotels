@@ -91,6 +91,7 @@ hotel_data / brand / weather / sales / holidays
 | Hotel Brand Data | `hotel_brand_data.xlsx` | Oui | Effectifs `Nb_*` par marque |
 | Hotel Data | `hotel_data.xlsx` | Oui | Fiche hôtel (identité, équipements, corner) |
 | Hotel Weather Data | `hotel_weather_data.xlsx` | Oui | Météo mensuelle |
+| Hotel Proximity Data | `hotel_proximity_data.xlsx` | Oui | Commerces 100–500 m + plage 1–5 km |
 | Hotel Sales Data | `hotel_sales_data.xlsx` | Oui | Ventes + mix % (sans fériés) |
 | Hotel Holidays Data | `hotel_holidays_data.xlsx` | Oui | Fériés / vacances + listes de jours |
 | **All Data** | `all_data.xlsx` | Oui | Jointure complète |
@@ -227,8 +228,9 @@ python extract_couts.py
 | `schemas.py` | `DatasetSchema` + registre `DATASETS` (colonnes éditables, clés, readonly) |
 | `store.py` | Cache thread-safe, pagination, coercion types, projection schéma ↔ Excel |
 | `join_data.py` | Grille hotel×année×mois, merges anti-doublons, fill météo/proximité, `fill_numeric_nulls` |
-| `geo_weather.py` | Meteostat 2.x : stations proches + agrégats mensuels |
-| `geo_proximity.py` | Overpass : commerces / plage par distance |
+| `geo_weather.py` | Meteostat 2.x : stations proches + agrégats mensuels → `hotel_weather_data` |
+| `geo_proximity.py` | Overpass : commerces 100–500 m / plage 1–5 km → `hotel_proximity_data.xlsx` (load or compute) |
+| `geo_holidays.py` | Assure `hotel_holidays_data.xlsx` (fichier local, archive, ou grille minimale) |
 | `model_data.py` | Filtre hôtels, rôles id/desc/cible, split année éval |
 | `model_train.py` | XGB multi-output, design/, deploy/, last_trained |
 | `model_explore.py` | Parse dump XGBoost, profondeur, features, perfs cumulées |

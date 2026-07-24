@@ -405,6 +405,18 @@ def build_joined_dataframe(
     holidays = _read_source("holidays")
     weather = _read_source("weather")
     brand = _read_source("brand")
+    # Proximity : charger le fichier data/ (ou le construire si absent)
+    proximity = _read_source("proximity")
+    if proximity.empty and not hotels.empty:
+        try:
+            from geo_proximity import ensure_hotel_proximity_data
+
+            # force_refresh=False : lit le xlsx s'il existe, sinon calcule Overpass
+            proximity = ensure_hotel_proximity_data(
+                force_refresh=False, hotels=hotels, pause_s=1.0
+            )
+        except Exception:
+            proximity = pd.DataFrame()
 
     if hotels.empty:
         # Sans master hôtel on ne peut pas garantir l'identité
@@ -424,6 +436,11 @@ def build_joined_dataframe(
     if not weather.empty:
         result = _merge_new(result, weather, on=list(JOIN_KEYS_MONTHLY), how="left")
 
+    # Proximity : grain hôtel (pas mensuel) → jointure sur hotel_code
+    if not proximity.empty and "hotel_code" in proximity.columns:
+        # Ne pas ré-injecter lat/lon/name si déjà présents
+        result = _merge_new(result, proximity, on=["hotel_code"], how="left")
+
     # Hotel master (toutes colonnes fiche)
     if not hotels.empty:
         result = _merge_new(result, hotels, on=["hotel_code"], how="left")
@@ -436,7 +453,7 @@ def build_joined_dataframe(
 
     years = _collect_years(result)
 
-    # Comblement auto météo / proximité
+    # Comblement auto météo / proximité (si encore des trous et flags activés)
     result = _fill_weather_gaps(result, years=years, fetch=fill_weather)
     result = _fill_proximity_gaps(result, hotels, fetch=fill_proximity)
 

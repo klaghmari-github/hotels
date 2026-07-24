@@ -129,6 +129,29 @@ def _load_raw(schema: DatasetSchema) -> pd.DataFrame:
         from model_data import ensure_model_data
 
         ensure_model_data(force=False)
+    if schema.id == "proximity":
+        # Crée hotel_proximity_data.xlsx si absent (calcul Overpass ou vide)
+        try:
+            from geo_proximity import ensure_hotel_proximity_data
+
+            ensure_hotel_proximity_data(force_refresh=False)
+        except Exception:
+            pass
+    if schema.id == "holidays":
+        try:
+            from geo_holidays import ensure_hotel_holidays_data
+
+            ensure_hotel_holidays_data(force_refresh=False)
+        except Exception:
+            pass
+    if schema.id == "sales_raw":
+        # Importe le CSV archive une fois si le xlsx raw n'existe pas
+        try:
+            from sales_prep import ensure_raw_sales_from_archive
+
+            ensure_raw_sales_from_archive()
+        except Exception:
+            pass
 
     path = schema.path
     if not path.exists():
@@ -186,7 +209,16 @@ def rebuild_joined_data(
 
     with _lock:
         # Invalider les caches sources pour lire les Excel à jour
-        for src_id in ("brand", "hotel", "weather", "sales", "holidays", JOINED_DATASET_ID):
+        for src_id in (
+            "brand",
+            "hotel",
+            "weather",
+            "proximity",
+            "sales",
+            "holidays",
+            JOINED_DATASET_ID,
+            "model_data",
+        ):
             _cache.pop(src_id, None)
         frame = build_joined_dataframe(
             fill_weather=fill_weather,

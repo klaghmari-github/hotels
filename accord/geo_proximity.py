@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import math
 import time
+from pathlib import Path
 from typing import Any, Callable, Sequence
 
 import pandas as pd
@@ -297,3 +298,147 @@ out center tags;
     @staticmethod
     def proximity_columns() -> list[str]:
         return list(empty_proximity_features().keys())
+
+
+# ---------------------------------------------------------------------------
+# Persistance sous accord/data/hotel_proximity_data.xlsx
+# ---------------------------------------------------------------------------
+
+PROXIMITY_FILENAME = "hotel_proximity_data.xlsx"
+PROXIMITY_SHEET = "hotel_proximity"
+DATA_DIR = Path(__file__).resolve().parent / "data"
+
+
+def proximity_path() -> Path:
+    """Chemin du fichier Excel de proximité."""
+    return DATA_DIR / PROXIMITY_FILENAME
+
+
+def id_and_feature_columns() -> list[str]:
+    """Colonnes standard du fichier proximité (ids + features numériques)."""
+    return ["hotel_code", "hotel_name", "hotel_lat", "hotel_lon", *ProximityFromGeo.proximity_columns()]
+
+
+def load_proximity_frame(path: Path | None = None) -> pd.DataFrame:
+    """Charge hotel_proximity_data.xlsx si présent, sinon DataFrame vide."""
+    path = path or proximity_path()
+    if not path.exists():
+        return pd.DataFrame(columns=id_and_feature_columns())
+    try:
+        frame = pd.read_excel(path, sheet_name=PROXIMITY_SHEET)
+    except ValueError:
+        frame = pd.read_excel(path, sheet_name=0)
+    return frame
+
+
+def save_proximity_frame(frame: pd.DataFrame, path: Path | None = None) -> Path:
+    """Écrit le DataFrame proximité (remplit les colonnes manquantes à 0)."""
+    path = path or proximity_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    out = frame.copy()
+    # Colonnes features manquantes → 0
+    for col in ProximityFromGeo.proximity_columns():
+        if col not in out.columns:
+            out[col] = 0.0
+        else:
+            out[col] = pd.to_numeric(out[col], errors="coerce").fillna(0.0)
+    # plage_distance_km : 0 si inconnu pour éviter null UI (ou garder NaN→0)
+    if "plage_distance_km" in out.columns:
+        out["plage_distance_km"] = pd.to_numeric(out["plage_distance_km"], errors="coerce").fillna(0.0)
+    cols = [c for c in id_and_feature_columns() if c in out.columns]
+    rest = [c for c in out.columns if c not in cols]
+    out = out[cols + rest]
+    out.to_excel(path, index=False, sheet_name=PROXIMITY_SHEET)
+    return path
+
+
+def _hotels_from_data() -> pd.DataFrame:
+    """Lit hotel_data.xlsx pour les coords."""
+    hotel_path = DATA_DIR / "hotel_data.xlsx"
+    if not hotel_path.exists():
+        return pd.DataFrame()
+    try:
+        return pd.read_excel(hotel_path, sheet_name=0)
+    except Exception:
+        return pd.DataFrame()
+
+
+def ensure_hotel_proximity_data(
+    *,
+    force_refresh: bool = False,
+    pause_s: float = 1.0,
+    hotels: pd.DataFrame | None = None,
+) -> pd.DataFrame:
+    """
+    Garantit ``data/hotel_proximity_data.xlsx``.
+
+    * Si le fichier existe et ``force_refresh=False`` → charge et retourne.
+    * Sinon calcule via Overpass pour chaque hôtel de ``hotel_data``
+      (lat/lon), sauvegarde, retourne.
+
+    Parameters
+    ----------
+    force_refresh :
+        Recalcule même si le fichier existe.
+    pause_s :
+        Pause entre hôtels (rate-limit Overpass).
+    hotels :
+        DataFrame optionnel (sinon lit hotel_data.xlsx).
+    """
+    path = proximity_path()
+    if path.exists() and not force_refresh:
+        frame = load_proximity_frame(path)
+        if not frame.empty and "hotel_code" in frame.columns:
+            return frame
+
+    hotels = hotels if hotels is not None else _hotels_from_data()
+    if hotels is None or hotels.empty:
+        empty = pd.DataFrame(columns=id_and_feature_columns())
+        save_proximity_frame(empty, path)
+        return empty
+
+    engine = ProximityFromGeo()
+    frame = engine.for_hotels(
+        hotels,
+        lat_col="hotel_lat",
+        lon_col="hotel_lon",
+        id_cols=("hotel_code", "hotel_name"),
+        pause_s=pause_s,
+    )
+    # Remplir features manquantes / NaN
+    for col in ProximityFromGeo.proximity_columns():
+        if col not in frame.columns:
+            frame[col] = 0.0
+        else:
+            frame[col] = pd.to_numeric(frame[col], errors="coerce").fillna(0.0)
+    save_proximity_frame(frame, path)
+    return frame
+
+
+def rebuild_hotel_proximity_data(*, pause_s: float = 1.0) -> dict[str, Any]:
+    """
+    Recalcule ``hotel_proximity_data.xlsx`` pour **chaque hôtel** de hotel_data.
+
+    * Commerces par catégorie OSM : 100 → 500 m
+    * Plage : présence 1 → 5 km + distance km
+    * Écrit le Excel puis prêt pour rechargement UI
+    """
+    from geo_common import load_hotels
+
+    hotels = load_hotels()
+    if hotels.empty:
+        raise ValueError("hotel_data.xlsx vide ou introuvable.")
+
+    frame = ensure_hotel_proximity_data(
+        force_refresh=True,
+        pause_s=pause_s,
+        hotels=hotels,
+    )
+    return {
+        "ok": True,
+        "path": str(proximity_path()),
+        "rows": len(frame),
+        "columns": list(frame.columns),
+        "n_columns": len(frame.columns),
+        "n_hotels": len(frame),
+    }

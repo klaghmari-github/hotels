@@ -242,6 +242,82 @@ def api_rebuild_model_data():
         return jsonify({"error": str(exc)}), 400
 
 
+@app.post("/api/datasets/sales/rebuild")
+def api_rebuild_sales():
+    """
+    Reconstruit ``hotel_sales_data.xlsx`` depuis ``hotel_sales_raw_data.xlsx``.
+
+    Normalise TYPE/GAMME, mappe les boutiques → hotel_code (hotel_data),
+    agrège mensuellement + indicateurs %.
+    """
+    try:
+        from sales_prep import ensure_raw_sales_from_archive, rebuild_hotel_sales_data
+        from store import _cache
+
+        ensure_raw_sales_from_archive()
+        result = rebuild_hotel_sales_data(drop_unmatched=True)
+        _cache.pop("sales", None)
+        _cache.pop("sales_raw", None)
+        return jsonify(result)
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
+@app.post("/api/datasets/weather/rebuild")
+def api_rebuild_weather():
+    """
+    Recalcule ``hotel_weather_data.xlsx``.
+
+    Hôtels = hotel_data ; années = hotel_sales ; mois terminés uniquement
+    (mois en cours exclu). Meteostat via lat/lon.
+    """
+    try:
+        from geo_weather import rebuild_hotel_weather_data
+        from store import _cache
+
+        result = rebuild_hotel_weather_data()
+        _cache.pop("weather", None)
+        return jsonify(result)
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
+@app.post("/api/datasets/proximity/rebuild")
+def api_rebuild_proximity():
+    """
+    Recalcule ``hotel_proximity_data.xlsx`` via Overpass pour chaque hôtel
+    de hotel_data (commerces 100–500 m, plage 1–5 km).
+    """
+    try:
+        from geo_proximity import rebuild_hotel_proximity_data
+        from store import _cache
+
+        result = rebuild_hotel_proximity_data(pause_s=1.0)
+        _cache.pop("proximity", None)
+        return jsonify(result)
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
+@app.post("/api/datasets/holidays/rebuild")
+def api_rebuild_holidays():
+    """
+    Recalcule ``hotel_holidays_data.xlsx``.
+
+    Hôtels = hotel_data ; années = hotel_sales ; mois terminés uniquement.
+    Jours fériés FR + vacances scolaires par zone.
+    """
+    try:
+        from geo_holidays import rebuild_hotel_holidays_data
+        from store import _cache
+
+        result = rebuild_hotel_holidays_data()
+        _cache.pop("holidays", None)
+        return jsonify(result)
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
 # ---------------------------------------------------------------------------
 # API — modèle XGBoost (build design + explore + deploy)
 # ---------------------------------------------------------------------------

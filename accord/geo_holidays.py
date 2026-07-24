@@ -1,0 +1,386 @@
+#!/usr/bin/env python3
+"""
+Geo / Holidays — ``hotel_holidays_data.xlsx``.
+
+Pattern load-or-build (comme weather / proximity)
+------------------------------------------------
+* ``ensure_hotel_holidays_data`` : charge le fichier s'il existe, sinon
+  archive ou grille minimale.
+* ``rebuild_hotel_holidays_data`` : recalcule pour chaque hôtel de
+  ``hotel_data``, années de ``hotel_sales_data``, mois terminés uniquement.
+
+Calcul
+------
+* **Jours fériés** français (calendrier fixe + Pâques).
+* **Vacances scolaires** : conservation des zones déjà connues par hôtel
+  (fichier existant) + périodes zones A/B/C approximatives pour les années
+  courantes, ou compteurs 0 si inconnus.
+* Département / commune : repris du fichier existant si disponible.
+"""
+
+from __future__ import annotations
+
+import json
+from calendar import monthrange
+from datetime import date, datetime, timedelta
+from pathlib import Path
+from typing import Any
+
+import pandas as pd
+
+DATA_DIR = Path(__file__).resolve().parent / "data"
+HOLIDAYS_FILENAME = "hotel_holidays_data.xlsx"
+HOLIDAYS_SHEET = "hotel_holidays"
+
+HOLIDAY_FEATURE_COLS = [
+    "zone_scolaire",
+    "departement",
+    "commune",
+    "nb_jours_feries",
+    "nb_jours_vacances_scolaires",
+    "nb_jours_vacances_hors_feries",
+    "jours_feries",
+    "jours_vacances_scolaires",
+    "jours_vacances_hors_feries",
+]
+
+
+def holidays_path() -> Path:
+    return DATA_DIR / HOLIDAYS_FILENAME
+
+
+def load_holidays_frame(path: Path | None = None) -> pd.DataFrame:
+    path = path or holidays_path()
+    if not path.exists():
+        return pd.DataFrame()
+    try:
+        return pd.read_excel(path, sheet_name=HOLIDAYS_SHEET)
+    except ValueError:
+        try:
+            return pd.read_excel(path, sheet_name="holidays_monthly")
+        except ValueError:
+            return pd.read_excel(path, sheet_name=0)
+
+
+def save_holidays_frame(frame: pd.DataFrame, path: Path | None = None) -> Path:
+    path = path or holidays_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    other: dict[str, pd.DataFrame] = {}
+    if path.exists():
+        try:
+            xl = pd.ExcelFile(path)
+            for name in xl.sheet_names:
+                if name not in (HOLIDAYS_SHEET, "holidays_monthly"):
+                    other[name] = pd.read_excel(path, sheet_name=name)
+        except Exception:
+            pass
+    with pd.ExcelWriter(path, engine="openpyxl") as writer:
+        frame.to_excel(writer, index=False, sheet_name=HOLIDAYS_SHEET)
+        for name, df in other.items():
+            df.to_excel(writer, index=False, sheet_name=str(name)[:31])
+    return path
+
+
+# ---------------------------------------------------------------------------
+# Jours fériés France
+# ---------------------------------------------------------------------------
+
+def _easter_sunday(year: int) -> date:
+    """Dimanche de Pâques (algorithme de Meeus/Jones/Butcher)."""
+    a = year % 19
+    b, c = divmod(year, 100)
+    d, e = divmod(b, 4)
+    f = (b + 8) // 25
+    g = (b - f + 1) // 3
+    h = (19 * a + b - d - g + 15) % 30
+    i, k = divmod(c, 4)
+    ll = (32 + 2 * e + 2 * i - h - k) % 7
+    m = (a + 11 * h + 22 * ll) // 451
+    month, day = divmod(h + ll - 7 * m + 114, 31)
+    return date(year, month, day + 1)
+
+
+def french_public_holidays(year: int) -> set[date]:
+    """Jours fériés légaux métropole (hors Alsace-Moselle spécifiques)."""
+    easter = _easter_sunday(year)
+    fixed = {
+        date(year, 1, 1),   # Jour de l'an
+        date(year, 5, 1),   # Fête du travail
+        date(year, 5, 8),   # Victoire 1945
+        date(year, 7, 14),  # Fête nationale
+        date(year, 8, 15),  # Assomption
+        date(year, 11, 1),  # Toussaint
+        date(year, 11, 11), # Armistice
+        date(year, 12, 25), # Noël
+    }
+    movable = {
+        easter + timedelta(days=1),   # Lundi de Pâques
+        easter + timedelta(days=39),  # Ascension
+        easter + timedelta(days=50),  # Lundi de Pentecôte
+    }
+    return fixed | movable
+
+
+# ---------------------------------------------------------------------------
+# Vacances scolaires (périodes zones A/B/C — repères officiels récents)
+# ---------------------------------------------------------------------------
+
+# Périodes approximatives (début inclus, fin exclus) par zone et année scolaire.
+# Format: year_mois_cible -> liste (zone, start, end) pour les jours dans year.
+# On stocke par année civile les plages connues.
+
+def _school_periods_for_year(year: int) -> dict[str, list[tuple[date, date]]]:
+    """
+    Retourne pour chaque zone (A/B/C) les intervalles [start, end) de vacances
+    chevauchant l'année civile ``year``.
+
+    Sources : calendriers MEN (repères 2022–2026). Si année inconnue → {}.
+    """
+    # Année scolaire Y-1 / Y couvre jan–août de Y et sept–déc de Y-1
+    # On encode les grandes périodes pour 2023–2026.
+    table: dict[int, dict[str, list[tuple[date, date]]]] = {
+        2023: {
+            "A": [
+                (date(2023, 2, 4), date(2023, 2, 20)),
+                (date(2023, 4, 15), date(2023, 5, 2)),
+                (date(2023, 7, 8), date(2023, 9, 4)),
+                (date(2023, 10, 21), date(2023, 11, 6)),
+                (date(2023, 12, 23), date(2024, 1, 8)),
+            ],
+            "B": [
+                (date(2023, 2, 11), date(2023, 2, 27)),
+                (date(2023, 4, 8), date(2023, 4, 24)),
+                (date(2023, 7, 8), date(2023, 9, 4)),
+                (date(2023, 10, 21), date(2023, 11, 6)),
+                (date(2023, 12, 23), date(2024, 1, 8)),
+            ],
+            "C": [
+                (date(2023, 2, 18), date(2023, 3, 6)),
+                (date(2023, 4, 22), date(2023, 5, 9)),
+                (date(2023, 7, 8), date(2023, 9, 4)),
+                (date(2023, 10, 21), date(2023, 11, 6)),
+                (date(2023, 12, 23), date(2024, 1, 8)),
+            ],
+        },
+        2024: {
+            "A": [
+                (date(2023, 12, 23), date(2024, 1, 8)),
+                (date(2024, 2, 10), date(2024, 2, 26)),
+                (date(2024, 4, 6), date(2024, 4, 22)),
+                (date(2024, 7, 6), date(2024, 9, 2)),
+                (date(2024, 10, 19), date(2024, 11, 4)),
+                (date(2024, 12, 21), date(2025, 1, 6)),
+            ],
+            "B": [
+                (date(2023, 12, 23), date(2024, 1, 8)),
+                (date(2024, 2, 17), date(2024, 3, 4)),
+                (date(2024, 4, 13), date(2024, 4, 29)),
+                (date(2024, 7, 6), date(2024, 9, 2)),
+                (date(2024, 10, 19), date(2024, 11, 4)),
+                (date(2024, 12, 21), date(2025, 1, 6)),
+            ],
+            "C": [
+                (date(2023, 12, 23), date(2024, 1, 8)),
+                (date(2024, 2, 24), date(2024, 3, 11)),
+                (date(2024, 4, 20), date(2024, 5, 6)),
+                (date(2024, 7, 6), date(2024, 9, 2)),
+                (date(2024, 10, 19), date(2024, 11, 4)),
+                (date(2024, 12, 21), date(2025, 1, 6)),
+            ],
+        },
+        2025: {
+            "A": [
+                (date(2024, 12, 21), date(2025, 1, 6)),
+                (date(2025, 2, 8), date(2025, 2, 24)),
+                (date(2025, 4, 5), date(2025, 4, 22)),
+                (date(2025, 7, 5), date(2025, 9, 1)),
+                (date(2025, 10, 18), date(2025, 11, 3)),
+                (date(2025, 12, 20), date(2026, 1, 5)),
+            ],
+            "B": [
+                (date(2024, 12, 21), date(2025, 1, 6)),
+                (date(2025, 2, 15), date(2025, 3, 3)),
+                (date(2025, 4, 12), date(2025, 4, 28)),
+                (date(2025, 7, 5), date(2025, 9, 1)),
+                (date(2025, 10, 18), date(2025, 11, 3)),
+                (date(2025, 12, 20), date(2026, 1, 5)),
+            ],
+            "C": [
+                (date(2024, 12, 21), date(2025, 1, 6)),
+                (date(2025, 2, 22), date(2025, 3, 10)),
+                (date(2025, 4, 19), date(2025, 5, 5)),
+                (date(2025, 7, 5), date(2025, 9, 1)),
+                (date(2025, 10, 18), date(2025, 11, 3)),
+                (date(2025, 12, 20), date(2026, 1, 5)),
+            ],
+        },
+        2026: {
+            "A": [
+                (date(2025, 12, 20), date(2026, 1, 5)),
+                (date(2026, 2, 7), date(2026, 2, 23)),
+                (date(2026, 4, 4), date(2026, 4, 20)),
+                (date(2026, 7, 4), date(2026, 9, 1)),
+            ],
+            "B": [
+                (date(2025, 12, 20), date(2026, 1, 5)),
+                (date(2026, 2, 14), date(2026, 3, 2)),
+                (date(2026, 4, 11), date(2026, 4, 27)),
+                (date(2026, 7, 4), date(2026, 9, 1)),
+            ],
+            "C": [
+                (date(2025, 12, 20), date(2026, 1, 5)),
+                (date(2026, 2, 21), date(2026, 3, 9)),
+                (date(2026, 4, 18), date(2026, 5, 4)),
+                (date(2026, 7, 4), date(2026, 9, 1)),
+            ],
+        },
+    }
+    return table.get(year, {"A": [], "B": [], "C": []})
+
+
+def _days_in_month(year: int, month: int) -> list[date]:
+    _, n = monthrange(year, month)
+    return [date(year, month, d) for d in range(1, n + 1)]
+
+
+def _days_in_ranges(days: list[date], ranges: list[tuple[date, date]]) -> list[date]:
+    out = []
+    for d in days:
+        for start, end in ranges:
+            if start <= d < end:
+                out.append(d)
+                break
+    return out
+
+
+def _iso_list(days: list[date]) -> str:
+    return json.dumps([d.isoformat() for d in sorted(set(days))], ensure_ascii=False)
+
+
+def _hotel_meta_lookup(existing: pd.DataFrame) -> dict[str, dict[str, Any]]:
+    """hotel_code → {zone, departement, commune} depuis fichier existant."""
+    lookup: dict[str, dict[str, Any]] = {}
+    if existing is None or existing.empty or "hotel_code" not in existing.columns:
+        return lookup
+    for code, group in existing.groupby("hotel_code"):
+        row = group.iloc[0]
+        lookup[str(code)] = {
+            "zone_scolaire": row.get("zone_scolaire") or "",
+            "departement": row.get("departement") or "",
+            "commune": row.get("commune") or "",
+        }
+    return lookup
+
+
+def _zone_from_lat_lon(lat: Any, lon: Any) -> str:
+    """Heuristique grossière zone A/B/C via lon (fallback)."""
+    try:
+        lo = float(lon)
+    except (TypeError, ValueError):
+        return "C"
+    # Est → A, Ouest → B, IdF/centre → C (approximatif)
+    if lo > 4.5:
+        return "A"
+    if lo < 1.5:
+        return "B"
+    return "C"
+
+
+def rebuild_hotel_holidays_data() -> dict[str, Any]:
+    """
+    Recalcule ``hotel_holidays_data.xlsx``.
+
+    * Hôtels = hotel_data
+    * Années = années de hotel_sales_data
+    * Mois = mois terminés (mois en cours exclu)
+    """
+    from geo_common import load_hotels, sales_years, year_month_pairs
+
+    hotels = load_hotels()
+    if hotels.empty:
+        raise ValueError("hotel_data.xlsx vide ou introuvable.")
+
+    years = sales_years()
+    pairs = year_month_pairs(years)
+    if not pairs:
+        raise ValueError("Aucun mois terminé à générer.")
+
+    existing = load_holidays_frame()
+    meta = _hotel_meta_lookup(existing)
+
+    rows: list[dict[str, Any]] = []
+    school_cache: dict[int, dict[str, list[tuple[date, date]]]] = {}
+
+    for _, h in hotels.iterrows():
+        code = str(h.get("hotel_code") or "").strip()
+        name = h.get("hotel_name")
+        info = meta.get(code, {})
+        zone = str(info.get("zone_scolaire") or "").strip().upper()
+        if zone not in {"A", "B", "C"}:
+            zone = _zone_from_lat_lon(h.get("hotel_lat"), h.get("hotel_lon"))
+        dep = info.get("departement") or ""
+        commune = info.get("commune") or ""
+
+        for year, month in pairs:
+            if year not in school_cache:
+                school_cache[year] = _school_periods_for_year(year)
+            days = _days_in_month(year, month)
+            feries = sorted(d for d in days if d in french_public_holidays(year))
+            vac_ranges = school_cache[year].get(zone, [])
+            vac_all = _days_in_ranges(days, vac_ranges)
+            vac_hors = [d for d in vac_all if d not in set(feries)]
+
+            rows.append(
+                {
+                    "hotel_code": code,
+                    "hotel_name": name,
+                    "annee": int(year),
+                    "mois": int(month),
+                    "zone_scolaire": zone,
+                    "departement": dep,
+                    "commune": commune,
+                    "nb_jours_feries": len(feries),
+                    "nb_jours_vacances_scolaires": len(vac_all),
+                    "nb_jours_vacances_hors_feries": len(vac_hors),
+                    "jours_feries": _iso_list(feries),
+                    "jours_vacances_scolaires": _iso_list(vac_all),
+                    "jours_vacances_hors_feries": _iso_list(vac_hors),
+                }
+            )
+
+    frame = pd.DataFrame(rows)
+    # tri
+    sort_cols = [c for c in ("hotel_code", "annee", "mois") if c in frame.columns]
+    if sort_cols:
+        frame = frame.sort_values(sort_cols).reset_index(drop=True)
+
+    path = save_holidays_frame(frame)
+    return {
+        "ok": True,
+        "path": str(path),
+        "rows": len(frame),
+        "columns": list(frame.columns),
+        "n_columns": len(frame.columns),
+        "years": years,
+        "n_hotels": int(hotels["hotel_code"].nunique()) if "hotel_code" in hotels.columns else len(hotels),
+    }
+
+
+def ensure_hotel_holidays_data(
+    *,
+    force_refresh: bool = False,
+    hotels: pd.DataFrame | None = None,
+    years: tuple[int, ...] | None = None,
+) -> pd.DataFrame:
+    """
+    Garantit le fichier holidays.
+
+    Si force_refresh ou fichier absent → :func:`rebuild_hotel_holidays_data`.
+    """
+    path = holidays_path()
+    if path.exists() and not force_refresh:
+        frame = load_holidays_frame(path)
+        if not frame.empty:
+            return frame
+    result = rebuild_hotel_holidays_data()
+    return load_holidays_frame(path)
