@@ -1,19 +1,25 @@
 """
-Schémas des jeux de données Accord.
+Schémas des jeux de données — Accord · Data & Model Studio.
 
 Principe
 --------
 Chaque onglet de l'UI correspond à un fichier Excel sous ``accord/data/``.
-On n'expose **que les colonnes saisissables** (``editable_columns``) :
-les colonnes calculées (pourcentages, one-hot, agrégats dérivés, etc.)
-restent dans le fichier mais ne sont ni affichées ni écrasées par l'UI
-(le DataFrame complet est rechargé/sauvegardé côté ``store.py``).
+
+* Pour les datasets **éditables**, ``editable_columns`` définit l'ordre et le
+  sous-ensemble de colonnes affichées / modifiables. Le reste du fichier
+  (colonnes calculées hors UI) n'est plus conservé à la sauvegarde si
+  ``store._project_to_schema`` projette strictement sur le schéma.
+* Pour **All Data** et **Model Data**, ``editable_columns`` est vide : on
+  expose **toutes** les colonnes du fichier (``store._ensure_editable_cols``).
+* ``readonly=True`` (Model Data) : l'UI masque ajout / save / delete.
 
 Ajouter un onglet
 -----------------
 1. Placer le ``.xlsx`` dans ``data/``.
-2. Déclarer un ``DatasetSchema`` dans ``DATASETS``.
+2. Déclarer un ``DatasetSchema`` dans ``DATASETS`` (ordre = ordre sidebar).
 3. Lister les colonnes éditables (et booléens / arrays si besoin).
+
+Voir aussi ``store.py`` (persistance) et ``README.md``.
 """
 
 from __future__ import annotations
@@ -290,8 +296,10 @@ _HOLIDAYS_EDITABLE = [
 
 
 # =============================================================================
-# Registre des onglets (ordre d'affichage = ordre d'insertion)
+# Registre des onglets (ordre d'affichage = ordre d'insertion dans le dict)
 # =============================================================================
+# Chaque entrée pilote un onglet de la sidebar et le fichier Excel associé.
+# L'id est utilisé dans l'URL API : /api/datasets/<id>
 
 DATASETS: dict[str, DatasetSchema] = {
     "brand": DatasetSchema(
@@ -391,7 +399,12 @@ DATASETS: dict[str, DatasetSchema] = {
 
 
 def list_datasets() -> list[dict[str, Any]]:
-    """Sérialise tous les schémas pour l'API ``GET /api/datasets``."""
+    """
+    Sérialise tous les schémas pour l'API ``GET /api/datasets``.
+
+    Le front utilise cette liste pour peindre la sidebar et initialiser
+    page_size / readonly par onglet.
+    """
     return [
         {
             "id": d.id,
@@ -411,7 +424,14 @@ def list_datasets() -> list[dict[str, Any]]:
 
 
 def get_schema(dataset_id: str) -> DatasetSchema:
-    """Retourne le schéma ou lève ``KeyError`` si l'id est inconnu."""
+    """
+    Retourne le schéma pour ``dataset_id``.
+
+    Raises
+    ------
+    KeyError
+        Si l'identifiant n'existe pas dans :data:`DATASETS`.
+    """
     if dataset_id not in DATASETS:
         raise KeyError(f"Dataset inconnu: {dataset_id}")
     return DATASETS[dataset_id]

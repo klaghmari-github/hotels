@@ -1,10 +1,22 @@
 """
-Exploration des modèles design (XGBoost).
+Exploration des modèles design (XGBoost) pour l'onglet Model Explore.
 
-- Importance des features
-- Perf globale vs cible principale (montant_ventes)
-- Table des arbres : profondeur, n features distinctes, perf si calculable
-- Visualisation d'un arbre sélectionné
+Fonctions exposées à l'API
+--------------------------
+* :func:`explore_overview` — méta, importances, perfs train/éval, n arbres.
+* :func:`trees_table` — une ligne par arbre (profondeur, n features,
+  R²/RMSE **cumulés** sur le jeu d'évaluation).
+* :func:`get_tree` — dump XGBoost parsé en arbre JSON pour le SVG UI.
+* :func:`feature_importance_payload` — barre d'importances.
+
+Note sur la « perf par arbre »
+-----------------------------
+En boosting, l'arbre *k* prédit un **correctif** (résidu), pas la cible.
+On évalue donc la prédiction **cumulative** après les *k+1* premiers arbres
+(``booster.predict(..., iteration_range=(0, k+1))``) — seule métrique
+interprétable côté métier.
+
+Les modèles sont lus depuis ``models/design/<id>/`` via ``model_train``.
 """
 
 from __future__ import annotations

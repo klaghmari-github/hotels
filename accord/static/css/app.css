@@ -1,7 +1,19 @@
 /*
- * Accord Data Studio — styles
- * Thème sombre premium (navy + or). Variables CSS en tête pour retoucher
- * facilement la palette sans toucher aux composants.
+ * Accord · Data & Model Studio — styles
+ * =====================================
+ * Thème sombre premium (navy + or).
+ *
+ * Organisation
+ * ------------
+ * :root          — palette (bg, accent or, primary bleu, success vert)
+ * .app-shell     — grille sidebar + main
+ * .nav-*         — onglets latéraux
+ * .data-table    — table WYSIWYG + rôles colonnes Model Data
+ *   th.col-id-detail / .col-descriptive / .col-target
+ *   tr.eval-row  — lignes d'évaluation (dernière année) en gras
+ * .model-*       — cartes Model Build / Explore
+ * .tree-*        — SVG arbres de décision
+ * .toast-*       — notifications bas-droite
  */
 
 :root {

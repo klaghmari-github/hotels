@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 """
-Point d'entrée CLI d'Accord Data Studio.
+Point d'entrée CLI d'**Accord · Data & Model Studio**.
 
 Usage
 -----
     cd accord
     python run.py
-    python run.py --port 8080 --debug
+    python run.py --host 0.0.0.0 --port 8080 --debug
 
-Délègue à ``app.main()`` (Flask).
+Délègue entièrement à :func:`app.main` (serveur Flask de développement).
+
+Ce module ne contient volontairement aucune logique métier : il permet de
+lancer l'application avec ``python run.py`` depuis le répertoire ``accord/``.
 """
 
 from app import main

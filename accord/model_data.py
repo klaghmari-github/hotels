@@ -1,18 +1,44 @@
 """
-Construction de ``model_data.xlsx`` pour l'apprentissage.
+Construction de ``model_data.xlsx`` pour l'apprentissage XGBoost.
 
-Règles
+Entrée
 ------
-1. Partir de ``all_data.xlsx``
-2. Garder uniquement les hôtels ayant au moins une ligne avec ventes > 0
-3. Supprimer les colonnes constantes (une seule valeur)
-4. Rôles de colonnes :
-   - **id_detail** (jaune) : identifiants + détail hôtel + année + mois
-   - **descriptive** : features numériques / contextuelles
-   - **target** : variables de vente numériques (sauf pct nombre_ventes cat/sous-cat)
-5. Ordre : id_detail | descriptive | target
-6. Tri : année, mois, marque, hôtel
-7. Dernière année = évaluation ; reste = apprentissage
+``all_data.xlsx`` (jointure complète hotel × année × mois).
+
+Règles métier
+-------------
+1. **Filtrer** les hôtels sans aucune vente (> 0) — lignes éliminées.
+2. **Supprimer** les colonnes constantes (inutiles au modèle).
+3. **Rôles de colonnes** (couleurs UI) :
+
+   * **id_detail** (jaune) : code, nom, marque, adresse, ville, lat/lon,
+     année, mois, zone scolaire, département…
+   * **descriptive** (neutre) : features d'entrée du modèle —
+
+     - météo, équipements, brand stats, holidays counts…
+     - **mix saisi par le directeur** uniquement en *nombre de ventes* :
+       ``pct_categories_mois_*``, ``nombre_categories_mois_*``,
+       ``pct_cat_*_nombre_ventes``, ``pct_sous_cat_*_nombre_ventes``
+
+   * **target** (vert) : variables de ventes à prédire —
+
+     - volumes : ``nombre_ventes``, ``montant_ventes``, ``nombre_paniers``,
+       ``nombre_produits``
+     - **tous les autres pct** ventes (montant, paniers, produits…)
+
+4. Ordre des colonnes : id_detail | descriptive | target.
+5. Tri : année → mois → marque → hôtel.
+6. **Dernière année = évaluation** (``_is_eval=1``, gras dans l'UI) ;
+   le reste = apprentissage.
+7. Cible principale pour le ranking des modèles : ``montant_ventes``.
+
+Sorties
+-------
+* ``data/model_data.xlsx`` — feuille ``model_data``
+* ``data/model_data_meta.json`` — rôles, n_train / n_eval, listes de colonnes
+
+Consommateurs : ``model_train`` (features/targets), ``store.page_payload``
+(couleurs + stats), UI onglet Model Data.
 """
 
 from __future__ import annotations

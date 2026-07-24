@@ -1,11 +1,29 @@
 """
 Entraînement XGBoost à partir de ``model_data``.
 
-- Features = colonnes descriptives
-- Targets = colonnes cibles (ventes)
-- Split = année d'évaluation (dernière année) vs apprentissage
-- Stockage design : ``models/design/<name>/model.pkl`` + ``config.json``
-- Deploy : ``models/deploy/model.pkl`` + ``model.json``
+Pipeline
+--------
+1. (Re)construit ``model_data`` via :func:`model_data.rebuild_model_data`.
+2. Features = colonnes **descriptives** (méta).
+3. Targets = colonnes **cibles** (volumes + pct non-mix).
+4. Split temporel : lignes ``_is_eval=0`` → train, ``_is_eval=1`` → éval
+   (dernière année calendaire présente dans les données).
+5. Multi-output : un ``XGBRegressor`` par cible
+   (``sklearn.multioutput.MultiOutputRegressor``).
+6. Sauvegarde **design** : ``models/design/<nom>/model.pkl`` + ``config.json``
+   (écrase le dossier si le nom existe déjà).
+7. **Deploy** : copie vers ``models/deploy/model.pkl`` + ``model.json``
+   (un seul modèle déployé à la fois).
+
+UI
+--
+* Model Build appelle :func:`build_and_save` (train + save design).
+* Model Explore liste :func:`list_design_models` (tri R² montant_ventes éval).
+* Deploy appelle :func:`deploy_model`.
+
+Fichiers annexes
+----------------
+* ``models/last_trained.json`` — pointeur du dernier build.
 """
 
 from __future__ import annotations

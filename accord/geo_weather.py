@@ -1,14 +1,22 @@
 """
 WeatherFromGeo — météo mensuelle à partir de (lat, lon).
 
-Compatible **Meteostat 2.x** (stations.nearby + monthly/daily/hourly).
+Utilisé optionnellement lors du rebuild All Data
+(``join_data.build_joined_dataframe(fill_weather=True)``) pour combler
+les trous de ``hotel_weather_data``.
+
+Compatible **Meteostat 2.x** (``stations.nearby`` + monthly/daily/hourly).
 
 Stratégie
 ---------
-1. Station météo la plus proche (``stations.nearby(Point)``)
-2. Série **monthly** (historique long, rapide)
-3. Fallback daily / hourly si couverture insuffisante
-4. **Imputation** mois manquant ← même mois N-1, N-2, … (jamais fill 0)
+1. Station météo la plus proche (``stations.nearby(Point)``).
+2. Série **monthly** (historique long, rapide).
+3. Fallback daily / hourly si couverture insuffisante.
+4. **Imputation** mois manquant ← même mois N-1, N-2, … (jamais fill 0
+   ici — le fill 0 global se fait ailleurs pour les mesures sales).
+
+Si Meteostat n'est pas installé, ``HAS_METEOSTAT`` est False et les appels
+retournent des frames vides sans lever d'exception bloquante.
 """
 
 from __future__ import annotations

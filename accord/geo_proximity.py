@@ -1,10 +1,18 @@
 """
 ProximityFromGeo — commerces / plage à partir de (lat, lon).
 
-Indépendant du domaine hôtel : Overpass (OpenStreetMap).
+Utilisé optionnellement lors du rebuild All Data
+(``fill_proximity=True``) pour enrichir la jointure.
 
-- Commerces par catégorie : rayons 100→500 m (pas 100 m)
-- Présence plage : 1→5 km (0/1) + distance km
+Source : **Overpass API** (OpenStreetMap) — indépendant du domaine hôtel.
+
+Features produites
+------------------
+* Commerces par catégorie OSM : rayons 100 → 500 m (pas de 100 m).
+* Présence de plage : 0/1 aux distances 1 → 5 km + distance km min.
+
+Les requêtes réseau peuvent être lentes / rate-limitées ; le rebuild
+All Data désactive souvent ce fill par défaut pour rester réactif.
 """
 
 from __future__ import annotations

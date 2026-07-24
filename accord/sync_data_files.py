@@ -1,15 +1,26 @@
 #!/usr/bin/env python3
 """
-Aligne les Excel de ``accord/data/`` sur les colonnes affichées dans l'UI.
+Aligne les Excel de ``data/`` sur les colonnes affichées dans l'UI.
 
-Pour chaque dataset (hors All Data) :
-  - lit le xlsx actuel (ou une source archive de secours)
-  - ne conserve que ``schema.editable_columns``
-  - réécrit le fichier (feuille nommée comme dans le schéma)
+Rôle
+----
+Script de maintenance (hors UI) pour garantir que chaque fichier Excel
+correspond **exactement** au schéma ``schemas.DATASETS`` :
 
-Holidays : privilégie ``archive/prepare/HolidaysPrep/Output`` (arrays de jours).
-Sales : reprend les indicateurs ventes de l'xlsx courant (sans fériés).
-Puis reconstruit ``all_data.xlsx`` (jointure).
+1. Pour chaque dataset éditable (brand, hotel, weather, sales, holidays) :
+   - lit le xlsx actuel (ou une source de secours sous ``../archive/``)
+   - projette sur ``editable_columns``
+   - réécrit le fichier (nom de feuille = schéma)
+2. Reconstruit ``all_data.xlsx`` (jointure, sans fill réseau météo/prox
+   par défaut pour rester hors-ligne).
+
+Usage
+-----
+    python sync_data_files.py
+
+Après coup, reconstruire aussi Model Data depuis l'UI ou ::
+
+    python -c "from model_data import rebuild_model_data; rebuild_model_data()"
 """
 
 from __future__ import annotations

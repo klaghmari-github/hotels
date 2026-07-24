@@ -1,10 +1,21 @@
 <!DOCTYPE html>
 <!--
-  Accord Data Studio — page unique
-  Structure :
-    aside.sidebar  → navigation onglets (brand / hotel / weather / sales / holidays)
-    main           → barre d'actions, table WYSIWYG paginée, pager
-  Données chargées via /api/datasets/* (voir static/js/app.js).
+  Accord · Data & Model Studio — page unique (shell UI)
+
+  Structure
+  ---------
+  aside.sidebar
+    - nav-tabs        : onglets datasets (brand, hotel, weather, sales,
+                        holidays, all_data, model_data)
+    - nav-footer      : Model Build + Model Explore
+
+  main
+    #view-table       : table WYSIWYG paginée + Recharger / Reconstruire
+    #view-model-build : hyperparams XGBoost + Build & Save
+    #view-model-explore : liste modèles, perf, arbres, Deploy
+
+  Données via /api/datasets/* et /api/model/* (static/js/app.js).
+  Voir README.md pour l'architecture complète.
 -->
 <html lang="fr">
 <head>

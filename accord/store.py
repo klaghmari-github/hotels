@@ -1,17 +1,24 @@
 """
-Couche données Excel pour Accord Data Studio.
+Couche données Excel — Accord · Data & Model Studio.
 
 Responsabilités
 ---------------
-- Charger les fichiers ``accord/data/*.xlsx`` en DataFrame (cache mémoire).
-- Exposer uniquement les **colonnes saisissables** (schéma dans ``schemas.py``).
-- Paginer / filtrer pour l'UI.
-- Réécrire l'Excel après modification, en préservant les autres feuilles.
+* Charger les fichiers ``data/*.xlsx`` en DataFrame (**cache** mémoire).
+* Projeter sur le schéma UI (:func:`_project_to_schema`) pour que le fichier
+  et l'affichage restent alignés.
+* Paginer / filtrer pour l'UI (:func:`page_payload`).
+* Coercer les types saisis (nombres, booléens 0/1, arrays JSON).
+* Réécrire l'Excel après mutation (update / add / delete).
+* Cas spéciaux :
+
+  - **all_data** : fill nulls numériques ; rebuild via ``join_data``.
+  - **model_data** : readonly ; stats + ``column_roles`` pour couleurs UI ;
+    lignes ``_is_eval`` marquées pour le gras.
 
 Thread-safety
 -------------
-Un ``RLock`` protège le cache : lecture/écriture concurrentes (plusieurs
-requêtes Flask) ne corrompent pas le DataFrame ni le fichier.
+Un ``RLock`` protège le cache : lectures/écritures concurrentes (plusieurs
+requêtes Flask) ne corrompent pas le DataFrame ni le fichier disque.
 """
 
 from __future__ import annotations

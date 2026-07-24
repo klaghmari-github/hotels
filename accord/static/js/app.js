@@ -1,16 +1,28 @@
 /**
- * Accord Data Studio — front-end
- * ==============================
- * Tables éditables paginées : les cellules modifiées sont gardées en mémoire
- * (state.dirty) puis envoyées au serveur (PUT) pour réécriture Excel.
+ * Accord · Data & Model Studio — front-end
+ * ========================================
+ *
+ * Application monolithe navigateur (IIFE) qui pilote :
+ *
+ * 1. **Onglets datasets** — tables WYSIWYG paginées sur les Excel `data/`.
+ *    - state.dirty : Map<_index, ligne> des modifications non sauvées
+ *    - PUT /api/datasets/<id>/rows pour persister (Ctrl+S)
+ *    - All Data / Model Data : bouton Reconstruire
+ *    - Model Data : en-têtes colorés (id / desc / cible), lignes éval en gras
+ *
+ * 2. **Model Build** — hyperparams XGBoost + nom → POST /api/model/build
+ *    (source = model_data, save dans models/design/<nom>/).
+ *
+ * 3. **Model Explore** — liste design triée, perf, importances, arbres SVG,
+ *    Deploy → models/deploy/model.{pkl,json}.
  *
  * Architecture
  * ------------
- * - state     : état global UI (onglet, page, filtre, dirty, sélection)
- * - api()     : wrapper fetch JSON
- * - fetchPage : charge une page depuis /api/datasets/<id>
- * - renderTable : construit thead/tbody avec inputs WYSIWYG
- * - saveDirty : envoie toutes les lignes modifiées
+ * - state          : état global (onglet, page, dirty, explore…)
+ * - api()          : wrapper fetch JSON
+ * - fetchPage      : GET page dataset
+ * - renderTable    : thead/tbody + inputs
+ * - loadExploreModel : recharge TOUTES les zones explore à chaque modèle
  *
  * IIFE pour ne pas polluer le scope global.
  */

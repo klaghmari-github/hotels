@@ -1,18 +1,27 @@
 """
 Jointure « All Data » — grille parfaite hotel × année × mois.
 
+Produit le fichier ``data/all_data.xlsx`` (feuille ``all_data``).
+
 Règles métier
 -------------
 - **Base** = tous les hôtels de ``hotel_data`` (identité + lat/lon).
 - **Grille** = chaque hôtel × chaque année pertinente × 12 mois.
-- **Ventes** : peuvent rester vides (seul domaine « optionnel »).
-- **Tout le reste** doit être rempli dès que l'on a des coords :
-  - ``hotel_name`` / brand / adresse depuis hotel_data
+- **Ventes** : left join (peuvent être 0 après fill si mois sans CA).
+- **Holidays / weather / brand** : left join sur les clés adaptées.
+- **Fill optionnel** (flags ``fill_weather`` / ``fill_proximity``) :
   - météo via :class:`geo_weather.WeatherFromGeo`
   - proximité via :class:`geo_proximity.ProximityFromGeo`
-  - holidays depuis le fichier (ou laissé si déjà présent)
+- **Null numériques → 0** en fin de pipeline (:func:`fill_numeric_nulls`)
+  pour que l'UI et le ML n'aient pas de trous sur les mesures.
 
-Anti-doublons : une colonne déjà présente n'est jamais ré-ajoutée.
+Anti-doublons
+-------------
+:func:`_merge_new` n'ajoute que les colonnes absentes de la table de gauche
+(une colonne déjà présente n'est jamais ré-ajoutée avec suffixe).
+
+Consommateurs : bouton **Reconstruire** (All Data), ``sync_data_files``,
+et en amont de ``model_data.rebuild_model_data``.
 """
 
 from __future__ import annotations

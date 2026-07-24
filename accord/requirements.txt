@@ -1,8 +1,18 @@
+# Accord · Data & Model Studio — dépendances runtime
+# Installer : pip install -r requirements.txt
+
+# Web
 flask>=3.0
+
+# Données / Excel
 pandas>=2.0
 openpyxl>=3.1
+numpy>=1.24
+
+# Enrichissement géo (rebuild All Data optionnel)
 requests>=2.31
 meteostat>=1.6
+
+# Machine learning (Model Build / Explore)
 scikit-learn>=1.3
 xgboost>=2.0
-numpy>=1.24

@@ -1,8 +1,28 @@
 #!/usr/bin/env python3
 """
-Extrait les coûts ROD (technos, annexes, agencement) depuis
-``archive/sources/raw/ROD - Simulateurs + détail des coûts.xlsx``
-vers ``accord/data/couts.xlsx`` (valeurs calculées, format long propre).
+Extraction one-shot des grilles de coûts ROD → ``data/couts.xlsx``.
+
+Source (hors runtime, lecture seule)
+------------------------------------
+``../archive/sources/raw/ROD - Simulateurs + détail des coûts.xlsx``
+
+Le classeur source contient des **formules** ; on l'ouvre avec
+``openpyxl`` en ``data_only=True`` pour récupérer les **valeurs calculées**
+(nécessite que le fichier ait été ouvert/sauvé une fois dans Excel/LibreOffice
+si les caches de formules sont vides).
+
+Feuilles produites
+------------------
+* ``resume`` — synthèse par solution (simply / liberty / connected)
+* ``couts_technos`` — matériel, licences, frais ad hoc (format long)
+* ``couts_annexes`` — électricité + personnel
+* ``couts_agencement`` — m linéaires × classic/premium/bespoke
+* ``revenus_mix_marges`` / ``revenus_impact_to`` — références revenus
+* ``meta`` — provenance
+
+Usage
+-----
+    python extract_couts.py
 """
 
 from __future__ import annotations

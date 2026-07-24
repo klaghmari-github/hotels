@@ -1,17 +1,25 @@
 #!/usr/bin/env python3
 """
-Accord Data Studio — API HTTP + page unique de saisie.
+Accord · Data & Model Studio — API HTTP + page unique.
 
 Rôle
 ----
-Expose une interface web pour éditer les Excel de ``accord/data/`` en WYSIWYG
-(page par page). Le front (HTML/JS) appelle les routes ``/api/datasets/...`` ;
-la logique métier (lecture/écriture Excel, pagination) vit dans ``store.py``.
+Serveur Flask de l'application :
+
+* **Pages** : shell UI (``templates/index.html`` + static JS/CSS).
+* **API datasets** : CRUD paginé sur les Excel de ``data/`` (via ``store.py``).
+* **API jointure** : rebuild ``all_data.xlsx`` / ``model_data.xlsx``.
+* **API modèles** : build XGBoost (design/), explore, deploy.
+
+La logique métier ne vit **pas** ici : ce module route uniquement vers
+``store``, ``join_data``, ``model_*``.
 
 Lancer
 ------
     python run.py
     # → http://127.0.0.1:5055
+
+Voir ``README.md`` pour le détail des routes et de l'architecture.
 """
 
 from __future__ import annotations
@@ -44,12 +52,17 @@ app.config["JSON_AS_ASCII"] = False
 
 
 # ---------------------------------------------------------------------------
-# Pages
+# Pages HTML
 # ---------------------------------------------------------------------------
 
 @app.get("/")
 def index():
-    """Page principale : shell UI (onglets + table éditable)."""
+    """
+    Page unique de l'application (SPA légère).
+
+    Le HTML charge ``static/js/app.js`` qui pilote les onglets datasets,
+    Model Build et Model Explore via les routes ``/api/...``.
+    """
     return render_template("index.html")
 
 
@@ -60,13 +73,13 @@ def favicon():
 
 
 # ---------------------------------------------------------------------------
-# API — lecture
+# API — lecture des datasets (tables Excel)
 # ---------------------------------------------------------------------------
 
 @app.get("/api/health")
 def health():
     """Sonde simple pour vérifier que le serveur tourne."""
-    return jsonify({"status": "ok", "app": "accord-data-studio"})
+    return jsonify({"status": "ok", "app": "accord-data-model-studio"})
 
 
 @app.get("/api/datasets")
@@ -401,12 +414,12 @@ def main() -> None:
     """Point d'entrée serveur de développement Flask."""
     import argparse
 
-    parser = argparse.ArgumentParser(description="Accord Data Studio")
+    parser = argparse.ArgumentParser(description="Accord · Data & Model Studio")
     parser.add_argument("--host", default="127.0.0.1", help="Adresse d'écoute")
     parser.add_argument("--port", type=int, default=5055, help="Port HTTP")
     parser.add_argument("--debug", action="store_true", help="Mode debug Flask")
     args = parser.parse_args()
-    print(f"Accord Data Studio → http://{args.host}:{args.port}")
+    print(f"Accord · Data & Model Studio → http://{args.host}:{args.port}")
     app.run(host=args.host, port=args.port, debug=args.debug)
 
 
