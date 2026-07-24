@@ -32,16 +32,26 @@ DATA_DIR = Path(__file__).resolve().parent / "data"
 HOLIDAYS_FILENAME = "hotel_holidays_data.xlsx"
 HOLIDAYS_SHEET = "hotel_holidays"
 
+# Colonnes calendrier (listes ISO + compteurs exclusifs)
 HOLIDAY_FEATURE_COLS = [
     "zone_scolaire",
+    "zone_scolaire_a",
+    "zone_scolaire_b",
+    "zone_scolaire_c",
     "departement",
     "commune",
+    "nb_jours_dans_mois",
     "nb_jours_feries",
+    "nb_jours_weekend",
     "nb_jours_vacances_scolaires",
     "nb_jours_vacances_hors_feries",
+    "nb_jours_holidays",  # union exclusive weekend ∪ fériés ∪ vacances scolaires
+    "pct_jours_holidays",  # nb_jours_holidays / nb_jours_dans_mois
     "jours_feries",
+    "jours_weekend",
     "jours_vacances_scolaires",
     "jours_vacances_hors_feries",
+    "jours_holidays",  # liste sans doublons
 ]
 
 
@@ -286,13 +296,29 @@ def _zone_from_lat_lon(lat: Any, lon: Any) -> str:
     return "C"
 
 
+def _weekends_in_month(days: list[date]) -> list[date]:
+    """Samedi (5) + dimanche (6)."""
+    return [d for d in days if d.weekday() >= 5]
+
+
 def rebuild_hotel_holidays_data() -> dict[str, Any]:
     """
     Recalcule ``hotel_holidays_data.xlsx``.
 
     * Hôtels = hotel_data
-    * Années = années de hotel_sales_data
+    * Années = années de hotel_sales_data (ou sales_raw via sales_years)
     * Mois = mois terminés (mois en cours exclu)
+
+    Pour chaque mois on produit les **listes de jours** (ISO) :
+    fériés, weekend, vacances scolaires, puis ``jours_holidays`` =
+    union exclusive (sans doublon) weekend ∪ fériés ∪ vacances scolaires.
+
+    Compteurs :
+    * nb_jours_feries / weekend / vacances_scolaires (bruts)
+    * nb_jours_vacances_hors_feries (vacances hors fériés)
+    * nb_jours_holidays (taille de l'union exclusive)
+    * pct_jours_holidays = nb_jours_holidays / nb_jours_dans_mois
+    * zone_scolaire_a/b/c en 0/1
     """
     from geo_common import load_hotels, sales_years, year_month_pairs
 
@@ -325,10 +351,19 @@ def rebuild_hotel_holidays_data() -> dict[str, Any]:
             if year not in school_cache:
                 school_cache[year] = _school_periods_for_year(year)
             days = _days_in_month(year, month)
-            feries = sorted(d for d in days if d in french_public_holidays(year))
+            n_mois = len(days)
+
+            feries = sorted({d for d in days if d in french_public_holidays(year)})
+            weekends = sorted({d for d in _weekends_in_month(days)})
             vac_ranges = school_cache[year].get(zone, [])
-            vac_all = _days_in_ranges(days, vac_ranges)
-            vac_hors = [d for d in vac_all if d not in set(feries)]
+            vac_all = sorted(set(_days_in_ranges(days, vac_ranges)))
+            # vacances hors fériés (info complémentaire, pas dans l'union brute)
+            vac_hors = sorted(set(vac_all) - set(feries))
+
+            # Union exclusive : un jour compté une seule fois
+            holidays_set = sorted(set(feries) | set(weekends) | set(vac_all))
+            nb_holidays = len(holidays_set)
+            pct_holidays = (nb_holidays / n_mois) if n_mois else 0.0
 
             rows.append(
                 {
@@ -337,19 +372,27 @@ def rebuild_hotel_holidays_data() -> dict[str, Any]:
                     "annee": int(year),
                     "mois": int(month),
                     "zone_scolaire": zone,
+                    "zone_scolaire_a": 1 if zone == "A" else 0,
+                    "zone_scolaire_b": 1 if zone == "B" else 0,
+                    "zone_scolaire_c": 1 if zone == "C" else 0,
                     "departement": dep,
                     "commune": commune,
+                    "nb_jours_dans_mois": n_mois,
                     "nb_jours_feries": len(feries),
+                    "nb_jours_weekend": len(weekends),
                     "nb_jours_vacances_scolaires": len(vac_all),
                     "nb_jours_vacances_hors_feries": len(vac_hors),
+                    "nb_jours_holidays": nb_holidays,
+                    "pct_jours_holidays": round(pct_holidays, 6),
                     "jours_feries": _iso_list(feries),
+                    "jours_weekend": _iso_list(weekends),
                     "jours_vacances_scolaires": _iso_list(vac_all),
                     "jours_vacances_hors_feries": _iso_list(vac_hors),
+                    "jours_holidays": _iso_list(holidays_set),
                 }
             )
 
     frame = pd.DataFrame(rows)
-    # tri
     sort_cols = [c for c in ("hotel_code", "annee", "mois") if c in frame.columns]
     if sort_cols:
         frame = frame.sort_values(sort_cols).reset_index(drop=True)
@@ -362,8 +405,53 @@ def rebuild_hotel_holidays_data() -> dict[str, Any]:
         "columns": list(frame.columns),
         "n_columns": len(frame.columns),
         "years": years,
-        "n_hotels": int(hotels["hotel_code"].nunique()) if "hotel_code" in hotels.columns else len(hotels),
+        "n_hotels": int(hotels["hotel_code"].nunique())
+        if "hotel_code" in hotels.columns
+        else len(hotels),
     }
+
+
+def holidays_day_sets(holidays: pd.DataFrame) -> dict[tuple[str, int, int], set[str]]:
+    """
+    Index (hotel_code, annee, mois) → set de dates ISO « holidays »
+    (union exclusive weekend ∪ fériés ∪ vacances).
+
+    Utilisé par ``sales_prep`` pour tagger chaque ticket raw.
+    """
+    out: dict[tuple[str, int, int], set[str]] = {}
+    if holidays is None or holidays.empty:
+        return out
+    col = "jours_holidays" if "jours_holidays" in holidays.columns else None
+    for _, row in holidays.iterrows():
+        code = str(row.get("hotel_code") or "").strip()
+        try:
+            y, m = int(row["annee"]), int(row["mois"])
+        except Exception:
+            continue
+        days: set[str] = set()
+        if col and pd.notna(row.get(col)):
+            val = row[col]
+            if isinstance(val, str) and val.strip().startswith("["):
+                try:
+                    days = set(json.loads(val.replace("'", '"')))
+                except json.JSONDecodeError:
+                    days = set()
+            elif isinstance(val, (list, tuple)):
+                days = set(str(x) for x in val)
+        else:
+            # fallback union des listes séparées
+            for c in ("jours_feries", "jours_weekend", "jours_vacances_scolaires"):
+                if c not in holidays.columns:
+                    continue
+                val = row.get(c)
+                if isinstance(val, str) and val.strip().startswith("["):
+                    try:
+                        days |= set(json.loads(val.replace("'", '"')))
+                    except json.JSONDecodeError:
+                        pass
+        out[(code, y, m)] = days
+    return out
+
 
 
 def ensure_hotel_holidays_data(

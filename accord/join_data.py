@@ -510,8 +510,10 @@ _NON_NUMERIC_COLS = frozenset(
         "localisation",
         "Marque",
         "jours_feries",
+        "jours_weekend",
         "jours_vacances_scolaires",
         "jours_vacances_hors_feries",
+        "jours_holidays",
         "hotel_geo_source",
     }
 )

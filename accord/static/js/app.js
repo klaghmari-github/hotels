@@ -200,7 +200,7 @@
         proximity:
           "Recalculer proximité Overpass pour chaque hôtel → hotel_proximity_data.xlsx",
         holidays:
-          "Recalculer fériés & vacances (hôtels × années de ventes × mois terminés)",
+          "Recalculer fériés + weekend + vacances (union exclusive) × hôtels × mois terminés",
         model_data: "Reconstruire model_data depuis all_data",
         all_data: "Jointure de tous les onglets → all_data.xlsx",
         data: "Jointure de tous les onglets → all_data.xlsx",
@@ -561,7 +561,7 @@
       holidays: {
         url: "/api/datasets/holidays/rebuild",
         body: {},
-        msg: "Calcul fériés & vacances scolaires…",
+        msg: "Calcul holidays (weekend ∪ fériés ∪ vacances)…",
       },
       model_data: {
         url: "/api/datasets/model_data/rebuild",

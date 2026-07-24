@@ -77,11 +77,13 @@ ID_DETAIL_CANDIDATES = [
     "localisation",
 ]
 
-# Colonnes non exploitables (arrays texte long)
+# Colonnes non exploitables (arrays texte long / listes de jours)
 DROP_ALWAYS = {
     "jours_feries",
+    "jours_weekend",
     "jours_vacances_scolaires",
     "jours_vacances_hors_feries",
+    "jours_holidays",
     "hotel_geo_source",
 }
 

@@ -289,23 +289,44 @@ _SALES_PCT_SOUS_CAT = [
     )
 ]
 
-_SALES_EDITABLE = _SALES_CORE + _SALES_PCT_SOUS_CAT
+# Indicateurs ventes holidays (rebuild sales_prep + jointure holidays)
+_SALES_HOLIDAY_COLS = [
+    "nombre_ventes_holidays",
+    "montant_ventes_holidays",
+    "nombre_ventes_hors_holidays",
+    "montant_ventes_hors_holidays",
+    "pct_nombre_ventes_holidays",
+    "pct_montant_ventes_holidays",
+    "pct_nombre_ventes_hors_holidays",
+    "pct_montant_ventes_hors_holidays",
+]
 
-# --- Holidays : compteurs + listes de jours (feuille resume_annuel non éditée) ---
+_SALES_EDITABLE = _SALES_CORE + _SALES_PCT_SOUS_CAT + _SALES_HOLIDAY_COLS
+
+# --- Holidays : compteurs exclusifs + listes de jours + zone binaire ---
 _HOLIDAYS_EDITABLE = [
     "hotel_code",
     "hotel_name",
     "annee",
     "mois",
     "zone_scolaire",
+    "zone_scolaire_a",
+    "zone_scolaire_b",
+    "zone_scolaire_c",
     "departement",
     "commune",
+    "nb_jours_dans_mois",
     "nb_jours_feries",
+    "nb_jours_weekend",
     "nb_jours_vacances_scolaires",
     "nb_jours_vacances_hors_feries",
+    "nb_jours_holidays",
+    "pct_jours_holidays",
     "jours_feries",
+    "jours_weekend",
     "jours_vacances_scolaires",
     "jours_vacances_hors_feries",
+    "jours_holidays",
 ]
 
 
@@ -315,7 +336,8 @@ _HOLIDAYS_EDITABLE = [
 # Chaque entrée pilote un onglet de la sidebar et le fichier Excel associé.
 # L'id est utilisé dans l'URL API : /api/datasets/<id>
 
-# Ordre sidebar : Brand → Hotel → Sales → Weather → Proximity → Holidays → All → Model
+# Ordre sidebar demandé :
+# Brand → Hotel → Holidays → Sales Raw → Sales → Weather → Proximity → All → Model
 DATASETS: dict[str, DatasetSchema] = {
     "brand": DatasetSchema(
         id="brand",
@@ -339,6 +361,25 @@ DATASETS: dict[str, DatasetSchema] = {
         boolean_columns=_HOTEL_BOOL,
         icon="hotel",
         page_size=15,
+    ),
+    "holidays": DatasetSchema(
+        id="holidays",
+        label="Hotel Holidays Data",
+        description="Fériés, weekend, vacances — listes exclusives + nb_holidays",
+        filename="hotel_holidays_data.xlsx",
+        sheet="hotel_holidays",
+        editable_columns=_HOLIDAYS_EDITABLE,
+        key_columns=["hotel_code", "annee", "mois"],
+        boolean_columns=["zone_scolaire_a", "zone_scolaire_b", "zone_scolaire_c"],
+        array_columns=[
+            "jours_feries",
+            "jours_weekend",
+            "jours_vacances_scolaires",
+            "jours_vacances_hors_feries",
+            "jours_holidays",
+        ],
+        icon="calendar",
+        page_size=25,
     ),
     # Ventes brutes (tickets) — saisie / import ; base du rebuild sales
     "sales_raw": DatasetSchema(
@@ -370,11 +411,11 @@ DATASETS: dict[str, DatasetSchema] = {
         icon="chart",
         page_size=25,
     ),
-    # Ventes agrégées — lecture seule, reconstruites depuis sales_raw
+    # Ventes agrégées — lecture seule, reconstruites depuis sales_raw + holidays
     "sales": DatasetSchema(
         id="sales",
         label="Hotel Sales Data",
-        description="Ventes mensuelles agrégées — Reconstruire depuis Sales Raw",
+        description="Ventes mensuelles + mix % + split holidays — Reconstruire depuis Raw",
         filename="hotel_sales_data.xlsx",
         sheet="hotel_sales",
         editable_columns=_SALES_EDITABLE,
@@ -405,22 +446,6 @@ DATASETS: dict[str, DatasetSchema] = {
         icon="map",
         page_size=15,
     ),
-    "holidays": DatasetSchema(
-        id="holidays",
-        label="Hotel Holidays Data",
-        description="Fériés & vacances scolaires — Reconstruire par hôtel × mois",
-        filename="hotel_holidays_data.xlsx",
-        sheet="hotel_holidays",
-        editable_columns=_HOLIDAYS_EDITABLE,
-        key_columns=["hotel_code", "annee", "mois"],
-        array_columns=[
-            "jours_feries",
-            "jours_vacances_scolaires",
-            "jours_vacances_hors_feries",
-        ],
-        icon="calendar",
-        page_size=25,
-    ),
     # All Data : jointure complète de tous les onglets → all_data.xlsx
     "all_data": DatasetSchema(
         id="all_data",
@@ -432,8 +457,10 @@ DATASETS: dict[str, DatasetSchema] = {
         key_columns=["hotel_code", "annee", "mois"],
         array_columns=[
             "jours_feries",
+            "jours_weekend",
             "jours_vacances_scolaires",
             "jours_vacances_hors_feries",
+            "jours_holidays",
         ],
         icon="table",
         page_size=25,

@@ -109,6 +109,18 @@ SOUS_CAT_SLUGS = (
     "souvenirs",
 )
 
+# Indicateurs ventes sur jours holidays (weekend ∪ férié ∪ scolaire) vs hors holidays
+HOLIDAY_SALES_COLS = (
+    "nombre_ventes_holidays",
+    "montant_ventes_holidays",
+    "nombre_ventes_hors_holidays",
+    "montant_ventes_hors_holidays",
+    "pct_nombre_ventes_holidays",
+    "pct_montant_ventes_holidays",
+    "pct_nombre_ventes_hors_holidays",
+    "pct_montant_ventes_hors_holidays",
+)
+
 
 def _strip_accents(text: str) -> str:
     nfkd = unicodedata.normalize("NFKD", text)
@@ -444,6 +456,121 @@ def build_monthly_sales(lines: pd.DataFrame) -> pd.DataFrame:
     return base
 
 
+def attach_holiday_sales(
+    lines: pd.DataFrame,
+    monthly: pd.DataFrame,
+    holidays: pd.DataFrame | None = None,
+) -> pd.DataFrame:
+    """
+    Joint ``hotel_holidays_data`` (listes de jours) aux tickets raw et
+    ajoute sur chaque ligne mensuelle :
+
+    * nombre/montant des ventes en jours holidays
+      (weekend ∪ férié ∪ vacances scolaires, sans doublon)
+    * idem hors holidays
+    * pourcentages par rapport au total du mois
+    """
+    from geo_holidays import holidays_day_sets, load_holidays_frame
+
+    out = monthly.copy()
+    for c in HOLIDAY_SALES_COLS:
+        out[c] = 0.0
+
+    if lines is None or lines.empty:
+        return out
+
+    if holidays is None:
+        holidays = load_holidays_frame()
+    day_sets = holidays_day_sets(holidays)
+
+    # Tag chaque ligne ticket
+    work = lines.copy()
+    if "date" not in work.columns:
+        return out
+    work["date"] = pd.to_datetime(work["date"], errors="coerce")
+    work = work.dropna(subset=["date"])
+    work["_iso"] = work["date"].dt.strftime("%Y-%m-%d")
+    work["annee"] = work["date"].dt.year.astype(int)
+    work["mois"] = work["date"].dt.month.astype(int)
+
+    def _is_hol(row: pd.Series) -> bool:
+        code = str(row.get("hotel_code") or "").strip()
+        key = (code, int(row["annee"]), int(row["mois"]))
+        days = day_sets.get(key)
+        if not days:
+            return False
+        return str(row["_iso"]) in days
+
+    work["is_holiday_day"] = work.apply(_is_hol, axis=1)
+
+    keys = ["hotel_code", "annee", "mois"]
+    hol = (
+        work.loc[work["is_holiday_day"]]
+        .groupby(keys, dropna=False)
+        .agg(
+            nombre_ventes_holidays=("nombre_ventes", "sum"),
+            montant_ventes_holidays=("montant_ventes", "sum"),
+        )
+        .reset_index()
+    )
+    nhol = (
+        work.loc[~work["is_holiday_day"]]
+        .groupby(keys, dropna=False)
+        .agg(
+            nombre_ventes_hors_holidays=("nombre_ventes", "sum"),
+            montant_ventes_hors_holidays=("montant_ventes", "sum"),
+        )
+        .reset_index()
+    )
+
+    out = out.merge(hol, on=keys, how="left", suffixes=("", "_h"))
+    out = out.merge(nhol, on=keys, how="left", suffixes=("", "_n"))
+
+    # colonnes peuvent arriver en double si déjà créées à 0
+    for c in (
+        "nombre_ventes_holidays",
+        "montant_ventes_holidays",
+        "nombre_ventes_hors_holidays",
+        "montant_ventes_hors_holidays",
+    ):
+        if f"{c}_h" in out.columns:
+            out[c] = out[f"{c}_h"].fillna(out.get(c, 0)).fillna(0)
+            out = out.drop(columns=[f"{c}_h"])
+        if f"{c}_n" in out.columns:
+            out[c] = out[f"{c}_n"].fillna(out.get(c, 0)).fillna(0)
+            out = out.drop(columns=[f"{c}_n"])
+        if c not in out.columns:
+            out[c] = 0.0
+        else:
+            out[c] = pd.to_numeric(out[c], errors="coerce").fillna(0.0)
+
+    # % par rapport au total du mois
+    nv = out["nombre_ventes"].replace(0, pd.NA)
+    mv = out["montant_ventes"].replace(0, pd.NA)
+    out["pct_nombre_ventes_holidays"] = (out["nombre_ventes_holidays"] / nv).fillna(0.0)
+    out["pct_montant_ventes_holidays"] = (out["montant_ventes_holidays"] / mv).fillna(0.0)
+    out["pct_nombre_ventes_hors_holidays"] = (out["nombre_ventes_hors_holidays"] / nv).fillna(0.0)
+    out["pct_montant_ventes_hors_holidays"] = (out["montant_ventes_hors_holidays"] / mv).fillna(0.0)
+
+    # cohérence : si hors_holidays manquant, total - holidays
+    miss_n = out["nombre_ventes_hors_holidays"].eq(0) & out["nombre_ventes"].gt(0)
+    out.loc[miss_n, "nombre_ventes_hors_holidays"] = (
+        out.loc[miss_n, "nombre_ventes"] - out.loc[miss_n, "nombre_ventes_holidays"]
+    ).clip(lower=0)
+    miss_m = out["montant_ventes_hors_holidays"].eq(0) & out["montant_ventes"].gt(0)
+    out.loc[miss_m, "montant_ventes_hors_holidays"] = (
+        out.loc[miss_m, "montant_ventes"] - out.loc[miss_m, "montant_ventes_holidays"]
+    ).clip(lower=0)
+    out["pct_nombre_ventes_hors_holidays"] = (
+        out["nombre_ventes_hors_holidays"] / nv
+    ).fillna(0.0)
+    out["pct_montant_ventes_hors_holidays"] = (
+        out["montant_ventes_hors_holidays"] / mv
+    ).fillna(0.0)
+
+    return out
+
+
 def rebuild_hotel_sales_data(
     *,
     raw: pd.DataFrame | None = None,
@@ -452,11 +579,18 @@ def rebuild_hotel_sales_data(
     """
     Pipeline complet raw → hotel_sales_data.xlsx.
 
+    1. Normalise TYPE / GAMME / boutiques → hotel_code
+    2. Agrège mensuellement + mix %
+    3. Joint ``hotel_holidays_data`` (jours_holidays) pour split
+       ventes holidays / hors holidays (+ %)
+
     Parameters
     ----------
     drop_unmatched :
         Si True, ignore les lignes dont le nom boutique ne matche aucun hôtel.
     """
+    from geo_holidays import load_holidays_frame
+
     lookup = load_hotel_lookup()
     if raw is None:
         raw = load_raw_sales()
@@ -478,6 +612,10 @@ def rebuild_hotel_sales_data(
         )
 
     monthly = build_monthly_sales(lines)
+    # Jointure calendrier holidays (jours précis)
+    holidays = load_holidays_frame()
+    monthly = attach_holiday_sales(lines, monthly, holidays=holidays)
+
     path = sales_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     monthly.to_excel(path, index=False, sheet_name=SALES_SHEET)
@@ -492,6 +630,7 @@ def rebuild_hotel_sales_data(
         "n_unmatched": unmatched,
         "n_hotels": int(monthly["hotel_code"].nunique()) if "hotel_code" in monthly.columns else 0,
         "years": sorted(monthly["annee"].dropna().unique().tolist()) if "annee" in monthly.columns else [],
+        "holidays_joined": not holidays.empty if holidays is not None else False,
     }
 
 
