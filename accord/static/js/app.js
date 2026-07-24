@@ -660,7 +660,6 @@
         pHost.appendChild(field);
       });
     }
-    renderModelList(cfg.models || []);
   }
 
   function getXgbParams() {
@@ -670,63 +669,6 @@
       out[el.dataset.param] = Number.isFinite(n) ? n : el.value;
     });
     return out;
-  }
-
-  function renderModelList(models) {
-    const host = $("#model-list");
-    if (!host) return;
-    if (!models.length) {
-      host.className = "model-list empty";
-      host.textContent = "Aucun modèle design pour l’instant.";
-      return;
-    }
-    host.className = "model-list";
-    host.innerHTML = models
-      .map((m) => {
-        const r2 =
-          m.score_r2 != null
-            ? Number(m.score_r2).toFixed(3)
-            : m.metrics_eval?.mean_r2 != null
-            ? Number(m.metrics_eval.mean_r2).toFixed(3)
-            : "—";
-        return `<div class="model-card">
-          <div class="mc-id">#${m.rank || "—"} · ${escapeHtml(m.name || m.id || "")}</div>
-          <div class="mc-meta">R² ${r2} · ${m.n_features || "?"} feat · ${m.n_targets || "?"} targets</div>
-        </div>`;
-      })
-      .join("");
-  }
-
-  function renderBuildResult(res) {
-    const host = $("#model-result");
-    if (!host) return;
-    host.className = "model-result";
-    const mt = res.metrics_eval || res.metrics_test || {};
-    const r2 = mt.mean_r2 != null ? Number(mt.mean_r2).toFixed(4) : "—";
-    const rmse = mt.mean_rmse != null ? Number(mt.mean_rmse).toFixed(3) : "—";
-    const main = res.main_target || "montant_ventes";
-    const mainM = (mt.per_target || {})[main] || {};
-    host.innerHTML = `
-      <div><strong>Modèle</strong> · <code>${escapeHtml(res.name || res.id)}</code> · sauvegardé design</div>
-      <div class="ci-meta" style="margin-top:0.25rem">
-        train ${res.n_train} / éval ${res.n_eval} · ${res.n_features} feat · ${res.n_targets} targets
-      </div>
-      <div class="metrics-grid">
-        <div class="metric-box good"><span class="m-label">R² éval (moy.)</span><span class="m-value">${r2}</span></div>
-        <div class="metric-box"><span class="m-label">RMSE éval</span><span class="m-value">${rmse}</span></div>
-        <div class="metric-box"><span class="m-label">R² ${escapeHtml(main)}</span><span class="m-value">${
-          mainM.r2 != null ? Number(mainM.r2).toFixed(3) : "—"
-        }</span></div>
-      </div>
-      <div style="margin-top:0.65rem;font-weight:600;font-size:0.8rem;color:var(--text-muted)">Top importances</div>
-      <ul class="imp-list">${(res.top_feature_importance || [])
-        .slice(0, 12)
-        .map(
-          (x) =>
-            `<li><span>${escapeHtml(x.feature)}</span><span>${Number(x.importance).toFixed(4)}</span></li>`
-        )
-        .join("")}</ul>
-    `;
   }
 
   async function buildModel() {
@@ -743,11 +685,16 @@
         method: "POST",
         body: JSON.stringify(body),
       });
-      renderBuildResult(res);
-      toast(`Build OK · ${res.name} · R² ${(res.metrics_eval && res.metrics_eval.mean_r2 != null) ? Number(res.metrics_eval.mean_r2).toFixed(3) : "—"}`);
-      const list = await api("/api/model/list");
-      renderModelList(list.models || []);
-      if (status) status.textContent = `Sauvé · design/${res.name}`;
+      const r2 =
+        res.metrics_eval && res.metrics_eval.mean_r2 != null
+          ? Number(res.metrics_eval.mean_r2).toFixed(3)
+          : "—";
+      toast(`Build OK · ${res.name} · R² éval ${r2} → design/${res.name}`);
+      if (status) {
+        status.textContent = `Sauvé · design/${res.name} · train ${res.n_train}/éval ${res.n_eval} · R² ${r2}`;
+      }
+      // recharger la config (nom + params du dernier modèle)
+      await loadModelConfig();
     } catch (err) {
       toast(err.message, "err");
       if (status) status.textContent = err.message;
@@ -842,32 +789,46 @@
   async function loadExploreModel(modelId) {
     if (!modelId) return;
     const status = $("#explore-status");
-    if (status) status.textContent = "Analyse…";
+    if (status) status.textContent = `Chargement ${modelId}…`;
+    // Reset immédiat de toutes les zones (évite d'afficher l'ancien modèle)
+    clearExploreUI();
+    state.explore.overview = null;
+    state.explore.treeMetrics = null;
     try {
-      const overview = await api(`/api/model/${encodeURIComponent(modelId)}/explore`);
+      const [overview, trees] = await Promise.all([
+        api(`/api/model/${encodeURIComponent(modelId)}/explore`),
+        api(`/api/model/${encodeURIComponent(modelId)}/trees`),
+      ]);
       state.explore.overview = overview;
+      state.explore.treeMetrics = trees;
+      state.explore.currentId = modelId;
+
       updateExploreBanner(overview.last_trained, overview.top_model);
       const chipS = $("#explore-chip-stats");
       if (chipS) {
         chipS.textContent = `${overview.n_features} feat · ${overview.n_trees} arbres · rank #${overview.rank || "—"}`;
       }
+      // 1) perf globale + cible principale
       renderMainMetrics(overview);
+      // 2) feature importance
       renderImportanceBars(overview.global_feature_importance || []);
-      const trees = await api(`/api/model/${encodeURIComponent(modelId)}/trees`);
-      state.explore.treeMetrics = trees;
+      // 3) table des arbres
       renderTreesTable(trees);
+      // 4) slider + visualisation arbre #0 du modèle sélectionné
+      const nTrees = Math.max(1, overview.n_trees || trees.n_trees || 1);
       const slider = $("#explore-tree-slider");
       if (slider) {
-        slider.max = String(Math.max(0, (overview.n_trees || 1) - 1));
+        slider.max = String(Math.max(0, nTrees - 1));
         slider.value = "0";
-        const lab = $("#explore-tree-label");
-        if (lab) lab.textContent = "0";
       }
-      await loadExploreTreeOnly();
+      const lab = $("#explore-tree-label");
+      if (lab) lab.textContent = "0";
+      await loadExploreTreeOnly(modelId, 0);
       if (status) status.textContent = "";
     } catch (err) {
       if (status) status.textContent = err.message;
       toast(err.message, "err");
+      clearExploreUI();
     }
   }
 
@@ -970,38 +931,55 @@
     });
   }
 
-  async function loadExploreTreeOnly() {
-    const modelId = $("#explore-model-select") && $("#explore-model-select").value;
+  async function loadExploreTreeOnly(forceModelId, forceTreeIdx) {
+    const modelId =
+      forceModelId ||
+      (state.explore && state.explore.currentId) ||
+      ($("#explore-model-select") && $("#explore-model-select").value);
     const slider = $("#explore-tree-slider");
     if (!modelId) return;
-    const treeIdx = Number((slider && slider.value) || 0);
+    const treeIdx =
+      forceTreeIdx != null
+        ? Number(forceTreeIdx)
+        : Number((slider && slider.value) || 0);
     const lab = $("#explore-tree-label");
     if (lab) lab.textContent = String(treeIdx);
+    if (slider && String(slider.value) !== String(treeIdx)) {
+      slider.value = String(treeIdx);
+    }
+    const host = $("#explore-tree-view");
+    if (host) {
+      host.className = "tree-view empty";
+      host.textContent = `Chargement arbre #${treeIdx}…`;
+    }
     try {
       const tree = await api(
         `/api/model/${encodeURIComponent(modelId)}/tree?tree=${treeIdx}`
       );
+      // garde-fou : ignorer si l'utilisateur a changé de modèle entre-temps
+      if (state.explore.currentId && state.explore.currentId !== modelId) return;
       renderTreeView(tree);
       const meta = $("#explore-tree-meta");
       if (meta) {
-        // find cumulative metrics for this tree
         const rows = (state.explore.treeMetrics && state.explore.treeMetrics.trees) || [];
-        // nearest row
         let best = null;
         rows.forEach((r) => {
           if (r.tree_index <= treeIdx) best = r;
         });
         meta.textContent = best
-          ? `Profondeur ${tree.depth} · ${tree.n_features} features · R² cumulé ${fmt(
+          ? `Modèle ${modelId} · arbre #${treeIdx} · profondeur ${tree.depth} · ${tree.n_features} features · R² cumulé ${fmt(
               best.r2_cumulative
             )} · RMSE ${fmt(best.rmse_cumulative)} (cible ${tree.target_name})`
-          : `Profondeur ${tree.depth} · ${tree.n_features} features · cible ${tree.target_name}`;
+          : `Modèle ${modelId} · arbre #${treeIdx} · profondeur ${tree.depth} · ${tree.n_features} features · cible ${tree.target_name}`;
       }
-      // highlight table row
       document.querySelectorAll("#explore-trees-table tr[data-tree]").forEach((tr) => {
         tr.classList.toggle("active", Number(tr.dataset.tree) === treeIdx);
       });
     } catch (err) {
+      if (host) {
+        host.className = "tree-view empty";
+        host.textContent = err.message;
+      }
       toast(err.message, "err");
     }
   }
@@ -1135,7 +1113,11 @@
   if (btnExploreDeploy) btnExploreDeploy.addEventListener("click", deployCurrentModel);
   const exploreModelSel = $("#explore-model-select");
   if (exploreModelSel) {
-    exploreModelSel.addEventListener("change", () => loadExploreModel(exploreModelSel.value));
+    exploreModelSel.addEventListener("change", () => {
+      const id = exploreModelSel.value;
+      // forcer le rechargement complet de toutes les zones
+      loadExploreModel(id);
+    });
   }
   const exploreSlider = $("#explore-tree-slider");
   if (exploreSlider) {
@@ -1143,7 +1125,7 @@
       const lab = $("#explore-tree-label");
       if (lab) lab.textContent = exploreSlider.value;
     });
-    exploreSlider.addEventListener("change", loadExploreTreeOnly);
+    exploreSlider.addEventListener("change", () => loadExploreTreeOnly());
   }
 
   // Démarrage

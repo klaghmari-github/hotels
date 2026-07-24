@@ -148,10 +148,10 @@
         </section>
 
         <div class="model-layout model-build-layout">
-          <div class="model-col">
+          <div class="model-col" style="max-width: 720px">
             <section class="card">
               <h2 class="card-title">Nom du modèle</h2>
-              <p class="card-hint">Fichier : <code>models/design/&lt;nom&gt;/</code> (écrasé si même nom).</p>
+              <p class="card-hint">Stockage : <code>models/design/&lt;nom&gt;/model.pkl</code> + <code>config.json</code> (écrasé si même nom).</p>
               <label class="field">
                 <span>Nom</span>
                 <input type="text" id="model-name" value="xgb_sales" maxlength="60" />
@@ -159,19 +159,8 @@
             </section>
             <section class="card">
               <h2 class="card-title">Hyperparamètres XGBoost</h2>
+              <p class="card-hint">Source = model_data · features = descriptives (dont mix % F&amp;B / sous-cat) · éval = dernière année.</p>
               <div id="model-params" class="form-grid form-grid-3"></div>
-            </section>
-          </div>
-          <div class="model-col">
-            <section class="card">
-              <h2 class="card-title">Résultat entraînement</h2>
-              <div id="model-result" class="model-result empty">
-                Cliquez <strong>Build &amp; Save</strong> pour entraîner et enregistrer dans <code>models/design/</code>.
-              </div>
-            </section>
-            <section class="card">
-              <h2 class="card-title">Modèles design</h2>
-              <div id="model-list" class="model-list empty">Aucun modèle pour l’instant.</div>
             </section>
           </div>
         </div>

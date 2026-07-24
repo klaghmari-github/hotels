@@ -74,26 +74,52 @@ def _sales_columns() -> list[str]:
     return list(frame.columns)
 
 
-def _is_excluded_target_pct(col: str) -> bool:
+def _is_mix_descriptive(col: str) -> bool:
     """
-    Pct en *nombre de ventes* pour catégories / sous-catégories :
-    exclus des cibles (restent descriptives si présentes).
+    Variables de mix saisies / fixées par le directeur (features) :
+    - pct F_B / N_F_B (nb catégories ou volumes)
+    - pct de chaque sous-catégorie dans sa catégorie
+    - effectifs de catégories F_B / N_F_B
     """
-    if col in ("pct_categories_mois_f_b", "pct_categories_mois_n_f_b"):
-        return False  # mix nb sous-cat distinctes, pas pct volume ventes
-    if col.startswith("pct_cat_") and col.endswith("_nombre_ventes"):
+    if col in (
+        "nombre_categories_mois_f_b",
+        "nombre_categories_mois_n_f_b",
+        "pct_categories_mois_f_b",
+        "pct_categories_mois_n_f_b",
+    ):
         return True
-    if col.startswith("pct_sous_cat_") and col.endswith("_nombre_ventes"):
+    if col.startswith("pct_cat_") or col.startswith("pct_sous_cat_"):
+        return True
+    if col.startswith("pct_categories_"):
         return True
     return False
 
 
+# Volumes de ventes à prédire (cibles)
+_SALES_TARGET_CORE = {
+    "nombre_ventes",
+    "montant_ventes",
+    "nombre_paniers",
+    "nombre_produits",
+}
+
+
 def _is_sales_numeric_target(col: str, sales_cols: set[str]) -> bool:
+    """
+    Cibles = variables de ventes restantes (volumes),
+    hors mix % catégories / sous-catégories (descriptives).
+    """
     if col not in sales_cols:
         return False
     if col in ("hotel_code", "nom_hotel", "annee", "mois"):
         return False
-    if _is_excluded_target_pct(col):
+    if _is_mix_descriptive(col):
+        return False
+    # volumes principaux + tout autre indicateur vente non-pct
+    if col in _SALES_TARGET_CORE:
+        return True
+    # autres colonnes sales numériques hors mix (ex. futurs agrégats)
+    if col.startswith("pct_"):
         return False
     return True
 
