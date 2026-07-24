@@ -76,10 +76,14 @@ def _sales_columns() -> list[str]:
 
 def _is_mix_descriptive(col: str) -> bool:
     """
-    Variables de mix saisies / fixées par le directeur (features) :
-    - pct F_B / N_F_B (nb catégories ou volumes)
-    - pct de chaque sous-catégorie dans sa catégorie
-    - effectifs de catégories F_B / N_F_B
+    Seuls les % en *nombre* (mix saisi par le directeur) sont descriptifs :
+
+    - ``pct_categories_mois_f_b`` / ``n_f_b`` : part F_B vs N_F_B (nb sous-cat)
+    - ``nombre_categories_mois_*`` : effectifs de sous-cat par type
+    - ``pct_cat_*_nombre_ventes`` : part de la catégorie en nombre de ventes
+    - ``pct_sous_cat_*_nombre_ventes`` : part de la sous-cat en nombre de ventes
+
+    Tout autre pct (montant, paniers, produits…) est une **cible**.
     """
     if col in (
         "nombre_categories_mois_f_b",
@@ -88,38 +92,24 @@ def _is_mix_descriptive(col: str) -> bool:
         "pct_categories_mois_n_f_b",
     ):
         return True
-    if col.startswith("pct_cat_") or col.startswith("pct_sous_cat_"):
+    # uniquement les pct en nombre de ventes pour cat / sous-cat
+    if col.startswith("pct_cat_") and col.endswith("_nombre_ventes"):
         return True
-    if col.startswith("pct_categories_"):
+    if col.startswith("pct_sous_cat_") and col.endswith("_nombre_ventes"):
         return True
     return False
 
 
-# Volumes de ventes à prédire (cibles)
-_SALES_TARGET_CORE = {
-    "nombre_ventes",
-    "montant_ventes",
-    "nombre_paniers",
-    "nombre_produits",
-}
-
-
 def _is_sales_numeric_target(col: str, sales_cols: set[str]) -> bool:
     """
-    Cibles = variables de ventes restantes (volumes),
-    hors mix % catégories / sous-catégories (descriptives).
+    Cibles = toutes les variables de ventes numériques intégrées depuis
+    hotel_sales_data, **sauf** les pct_nombre cat/sous-cat (descriptives).
     """
     if col not in sales_cols:
         return False
     if col in ("hotel_code", "nom_hotel", "annee", "mois"):
         return False
     if _is_mix_descriptive(col):
-        return False
-    # volumes principaux + tout autre indicateur vente non-pct
-    if col in _SALES_TARGET_CORE:
-        return True
-    # autres colonnes sales numériques hors mix (ex. futurs agrégats)
-    if col.startswith("pct_"):
         return False
     return True
 
