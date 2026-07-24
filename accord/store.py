@@ -360,12 +360,13 @@ def page_payload(
                     "hotel_adresse_postale_1",
                     "hotel_adresse_postale_2",
                     "hotel_code_postal",
-                    "zone_scolaire",
                     "departement",
                     "commune",
                     "jours_feries",
+                    "jours_weekend",
                     "jours_vacances_scolaires",
                     "jours_vacances_hors_feries",
+                    "jours_holidays",
                 ):
                     val = "" if not str(c).startswith("jours_") else []
                 else:

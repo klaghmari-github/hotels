@@ -309,7 +309,6 @@ _HOLIDAYS_EDITABLE = [
     "hotel_name",
     "annee",
     "mois",
-    "zone_scolaire",
     "zone_scolaire_a",
     "zone_scolaire_b",
     "zone_scolaire_c",

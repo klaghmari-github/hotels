@@ -12,7 +12,6 @@
     "hotel_lon",
     "annee",
     "mois",
-    "zone_scolaire",
     "departement",
     "commune"
   ],
@@ -203,7 +202,7 @@
     "pct_nombre_ventes_hors_holidays",
     "pct_montant_ventes_hors_holidays"
   ],
-  "n_id_detail": 15,
+  "n_id_detail": 14,
   "n_descriptive": 135,
   "n_target": 48,
   "n_rows": 240,
@@ -295,7 +294,6 @@
     "hotel_lon": "id_detail",
     "annee": "id_detail",
     "mois": "id_detail",
-    "zone_scolaire": "id_detail",
     "departement": "id_detail",
     "commune": "id_detail",
     "nombre_categories_mois_f_b": "descriptive",

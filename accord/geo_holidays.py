@@ -33,8 +33,8 @@ HOLIDAYS_FILENAME = "hotel_holidays_data.xlsx"
 HOLIDAYS_SHEET = "hotel_holidays"
 
 # Colonnes calendrier (listes ISO + compteurs exclusifs)
+# zone_scolaire (A/B/C texte) retirée : les binaires a/b/c suffisent
 HOLIDAY_FEATURE_COLS = [
-    "zone_scolaire",
     "zone_scolaire_a",
     "zone_scolaire_b",
     "zone_scolaire_c",
@@ -267,6 +267,23 @@ def _iso_list(days: list[date]) -> str:
     return json.dumps([d.isoformat() for d in sorted(set(days))], ensure_ascii=False)
 
 
+def _zone_letter_from_row(row: pd.Series | dict[str, Any]) -> str:
+    """Reconstitue A/B/C depuis la colonne texte (legacy) ou les binaires."""
+    z = str(row.get("zone_scolaire") or "").strip().upper()
+    if z in {"A", "B", "C"}:
+        return z
+    try:
+        if int(row.get("zone_scolaire_a") or 0) == 1:
+            return "A"
+        if int(row.get("zone_scolaire_b") or 0) == 1:
+            return "B"
+        if int(row.get("zone_scolaire_c") or 0) == 1:
+            return "C"
+    except (TypeError, ValueError):
+        pass
+    return ""
+
+
 def _hotel_meta_lookup(existing: pd.DataFrame) -> dict[str, dict[str, Any]]:
     """hotel_code → {zone, departement, commune} depuis fichier existant."""
     lookup: dict[str, dict[str, Any]] = {}
@@ -275,7 +292,7 @@ def _hotel_meta_lookup(existing: pd.DataFrame) -> dict[str, dict[str, Any]]:
     for code, group in existing.groupby("hotel_code"):
         row = group.iloc[0]
         lookup[str(code)] = {
-            "zone_scolaire": row.get("zone_scolaire") or "",
+            "zone_scolaire": _zone_letter_from_row(row),
             "departement": row.get("departement") or "",
             "commune": row.get("commune") or "",
         }
@@ -318,7 +335,7 @@ def rebuild_hotel_holidays_data() -> dict[str, Any]:
     * nb_jours_vacances_hors_feries (vacances hors fériés)
     * nb_jours_holidays (taille de l'union exclusive)
     * pct_jours_holidays = nb_jours_holidays / nb_jours_dans_mois
-    * zone_scolaire_a/b/c en 0/1
+    * zone_scolaire_a/b/c en 0/1 (la lettre A/B/C n'est plus exportée)
     """
     from geo_common import load_hotels, sales_years, year_month_pairs
 
@@ -341,6 +358,7 @@ def rebuild_hotel_holidays_data() -> dict[str, Any]:
         code = str(h.get("hotel_code") or "").strip()
         name = h.get("hotel_name")
         info = meta.get(code, {})
+        # zone utilisée en interne pour les périodes scolaires uniquement
         zone = str(info.get("zone_scolaire") or "").strip().upper()
         if zone not in {"A", "B", "C"}:
             zone = _zone_from_lat_lon(h.get("hotel_lat"), h.get("hotel_lon"))
@@ -371,7 +389,6 @@ def rebuild_hotel_holidays_data() -> dict[str, Any]:
                     "hotel_name": name,
                     "annee": int(year),
                     "mois": int(month),
-                    "zone_scolaire": zone,
                     "zone_scolaire_a": 1 if zone == "A" else 0,
                     "zone_scolaire_b": 1 if zone == "B" else 0,
                     "zone_scolaire_c": 1 if zone == "C" else 0,

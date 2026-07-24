@@ -71,7 +71,6 @@ ID_DETAIL_CANDIDATES = [
     "hotel_lon",
     "annee",
     "mois",
-    "zone_scolaire",
     "departement",
     "commune",
     "localisation",

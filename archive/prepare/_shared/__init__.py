@@ -1,1 +1,0 @@
-"""Utilitaires partagés du pipeline prepare."""

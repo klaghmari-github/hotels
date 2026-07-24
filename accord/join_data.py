@@ -504,7 +504,6 @@ _NON_NUMERIC_COLS = frozenset(
         "hotel_adresse_postale_1",
         "hotel_adresse_postale_2",
         "hotel_code_postal",
-        "zone_scolaire",
         "departement",
         "commune",
         "localisation",
