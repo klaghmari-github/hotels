@@ -305,7 +305,9 @@ def page_payload(
     # Index absolus dans le DataFrame d'origine (pas 0..n de la page)
     abs_indices = [int(i) for i in chunk.index.tolist()]
 
-    num_zero = dataset_id in (JOINED_DATASET_ID, "model_data")
+    # Uniquement model_data doit afficher des numériques non vides (déjà imputés
+    # à l'écriture). all_data / sources : laisser les nulls vides.
+    num_zero = dataset_id == "model_data"
     # Rôles de colonnes (model_data)
     column_roles: dict[str, str] = {}
     model_stats: dict[str, Any] = {}

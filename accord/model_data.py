@@ -30,7 +30,12 @@ Règles métier
 5. Tri : année → mois → marque → hôtel.
 6. **Dernière année = évaluation** (``_is_eval=1``, gras dans l'UI) ;
    le reste = apprentissage.
-7. Cible principale pour le ranking des modèles : ``montant_ventes``.
+7. **Imputation des trous** (uniquement ici, pas dans les sources /
+   all_data) via :func:`impute_model.impute_for_model` :
+
+   - counts / ventes / flags → 0
+   - TO, mix clients, météo, lat/lon… → moyenne **marque** puis globale
+8. Cible principale pour le ranking des modèles : ``montant_ventes``.
 
 Sorties
 -------
@@ -49,7 +54,8 @@ from typing import Any
 
 import pandas as pd
 
-from join_data import DATA_DIR, fill_numeric_nulls
+from impute_model import impute_for_model
+from join_data import DATA_DIR
 from schemas import get_schema
 
 MODEL_DATA_FILENAME = "model_data.xlsx"
@@ -205,7 +211,8 @@ def build_model_dataframe(all_data: pd.DataFrame | None = None) -> tuple[pd.Data
         except ValueError:
             all_data = pd.read_excel(path, sheet_name=0)
 
-    frame = fill_numeric_nulls(all_data.copy())
+    # all_data peut contenir des nulls (sources non saisies) — on ne fill pas encore
+    frame = all_data.copy()
 
     # 1. Hôtels avec ventes uniquement
     if "hotel_code" in frame.columns:
@@ -223,7 +230,7 @@ def build_model_dataframe(all_data: pd.DataFrame | None = None) -> tuple[pd.Data
     const = [c for c in const if c not in protect]
     frame = frame.drop(columns=const, errors="ignore")
 
-    # 4. Classification + ordre
+    # 4. Classification + ordre (avant impute pour rôles stables)
     roles = classify_columns(frame)
     ordered = roles["id_detail"] + roles["descriptive"] + roles["target"]
     # colonnes restantes éventuelles
@@ -252,8 +259,10 @@ def build_model_dataframe(all_data: pd.DataFrame | None = None) -> tuple[pd.Data
 
     frame = frame.copy()
     frame["_is_eval"] = is_eval.astype(int)
-    # _is_eval is meta for UI, not a feature — keep at end of id or as flag
-    # Put flag after id block for sorting display but classify separately
+
+    # 7. Imputation **uniquement ici** (moyenne marque / globale, 0 pour counts)
+    #    Les fichiers sources et all_data restent avec des vides.
+    frame, impute_report = impute_for_model(frame)
 
     n_train = int((~is_eval).sum())
     n_eval = int(is_eval.sum())
@@ -271,6 +280,10 @@ def build_model_dataframe(all_data: pd.DataFrame | None = None) -> tuple[pd.Data
         "eval_year": eval_year,
         "dropped_constant": const,
         "dropped_no_sales_hotels": True,
+        "impute": {
+            "n_filled": impute_report.get("n_filled"),
+            "n_columns_touched": len(impute_report.get("columns") or {}),
+        },
         "main_target": MAIN_TARGET if MAIN_TARGET in roles["target"] else (
             roles["target"][0] if roles["target"] else None
         ),

@@ -28,7 +28,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flask import Flask, jsonify, render_template, request, send_from_directory
+from flask import Flask, jsonify, render_template, request, send_file
 
 # Schémas des onglets (colonnes saisissables) et couche Excel
 from schemas import list_datasets
@@ -124,14 +124,52 @@ def _resolve_marque_logo(relpath: str) -> Path | None:
     return target if target.is_file() else None
 
 
+def _logo_mimetype(path: Path) -> str:
+    """
+    Détecte le vrai type des logos Accor.
+
+    Beaucoup de fichiers ``*.png`` du scrape sont en fait du **SVG**
+    (logos monochrome Accor) — un Content-Type image/png fait échouer
+    l'affichage navigateur (→ tiret « — » dans l'UI).
+    """
+    try:
+        head = path.read_bytes()[:512]
+    except OSError:
+        return "application/octet-stream"
+    low = head.lstrip().lower()
+    if low.startswith(b"<svg") or b"<svg" in low or low.startswith(b"<?xml"):
+        return "image/svg+xml"
+    if head.startswith(b"\x89PNG\r\n\x1a\n"):
+        return "image/png"
+    if head[:3] == b"\xff\xd8\xff":
+        return "image/jpeg"
+    if head[:6] in (b"GIF87a", b"GIF89a"):
+        return "image/gif"
+    if head[:4] == b"RIFF" and head[8:12] == b"WEBP":
+        return "image/webp"
+    # fallback extension
+    ext = path.suffix.lower()
+    return {
+        ".svg": "image/svg+xml",
+        ".png": "image/png",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".gif": "image/gif",
+        ".webp": "image/webp",
+    }.get(ext, "application/octet-stream")
+
+
 @app.get("/api/marques/logos/<path:relpath>")
 def api_marque_logo(relpath: str):
     """
-    Sert un logo marque depuis ``accord/data/marques/`` (PNG locaux).
+    Sert un logo marque depuis ``accord/data/marques/``.
 
     URL : ``/api/marques/logos/economy/ibis_budget.png``
     Fichier : ``{ROOT}/data/marques/economy/ibis_budget.png``
     avec ``ROOT`` = répertoire de ``run_admin.py`` / ``app.py``.
+
+    Le Content-Type est déduit du **contenu** (SVG vs PNG réel), pas
+    seulement de l'extension.
     """
     target = _resolve_marque_logo(relpath)
     if target is None:
@@ -140,7 +178,17 @@ def api_marque_logo(relpath: str):
             "path": relpath,
             "expected_under": str((ROOT / "data" / "marques").resolve()),
         }), 404
-    return send_from_directory(str(target.parent), target.name)
+    mime = _logo_mimetype(target)
+    # max-age court pour pouvoir recharger après re-scrape
+    resp = send_file(
+        target,
+        mimetype=mime,
+        conditional=True,
+        download_name=target.name,
+        max_age=300,
+    )
+    resp.headers["Cache-Control"] = "public, max-age=300"
+    return resp
 
 
 # ---------------------------------------------------------------------------

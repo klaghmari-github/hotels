@@ -113,6 +113,21 @@ hotel_data / brand / weather / sales / holidays
 |--------|---------|----------|-------|
 | Hotel Brand Data | `hotel_brand_data.xlsx` | Oui | Marques + logos + `cat_*` (0/1) + effectifs `Nb_*` à saisir |
 
+### Nulls / moyennes
+
+| Fichier | Trous manquants |
+|---------|-----------------|
+| Sources (`hotel_data`, brand, sales, …) | **Laissés vides** (saisie ultérieure) |
+| `all_data.xlsx` | **Laissés vides** après jointure |
+| `model_data.xlsx` | **Imputés** : moyenne marque puis globale (TO, météo…) ; 0 pour counts/ventes |
+
+```bash
+# Retirer d'anciennes moyennes injectées dans hotel_data
+python -m clean_source_fills
+# Puis reconstruire
+# (UI : Reconstruire All Data puis Model Data)
+```
+
 Sync marques → brand data :
 
 ```bash

@@ -122,8 +122,20 @@ def _parse_brands(html: str) -> list[dict[str, Any]]:
     return rows
 
 
+def _is_svg_bytes(data: bytes) -> bool:
+    head = data[:512].lstrip().lower()
+    return head.startswith(b"<svg") or head.startswith(b"<?xml") or b"<svg" in head
+
+
 def _download_logo(logo_url: str, dest: Path) -> bool:
-    """Télécharge le logo ; convertit en PNG si possible (Pillow), sinon raw."""
+    """
+    Télécharge le logo Accor.
+
+    Accor renvoie souvent du **SVG** (même avec ``fmt=png-alpha``).
+    On enregistre :
+    * vrai PNG si décodable par Pillow
+    * sinon le SVG brut (l'API admin sert ``image/svg+xml`` au navigateur)
+    """
     if not logo_url:
         return False
     dest.parent.mkdir(parents=True, exist_ok=True)
@@ -137,6 +149,7 @@ def _download_logo(logo_url: str, dest: Path) -> bool:
     except Exception:
         return False
 
+    # Vrai raster
     try:
         from PIL import Image
 
@@ -146,11 +159,18 @@ def _download_logo(logo_url: str, dest: Path) -> bool:
         img.save(dest, format="PNG")
         return True
     except Exception:
-        try:
+        pass
+
+    # SVG (cas Accor monochrome) — on garde le contenu tel quel sous .png
+    # (chemin stable) ; l'endpoint Flask sniffe le MIME pour le navigateur.
+    try:
+        if _is_svg_bytes(data):
             dest.write_bytes(data)
             return True
-        except Exception:
-            return False
+        dest.write_bytes(data)
+        return True
+    except Exception:
+        return False
 
 
 def extract_brands(*, out_dir: Path | None = None, force: bool = False) -> dict[str, Any]:

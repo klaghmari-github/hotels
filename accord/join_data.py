@@ -12,8 +12,9 @@ Règles métier
 - **Fill optionnel** (flags ``fill_weather`` / ``fill_proximity``) :
   - météo via :class:`geo_weather.WeatherFromGeo`
   - proximité via :class:`geo_proximity.ProximityFromGeo`
-- **Null numériques → 0** en fin de pipeline (:func:`fill_numeric_nulls`)
-  pour que l'UI et le ML n'aient pas de trous sur les mesures.
+- **Null numériques conservés** dans all_data (saisie ultérieure).
+  L'imputation (moyennes marque / globales) se fait dans **model_data**
+  uniquement (:mod:`impute_model`).
 
 Anti-doublons
 -------------
@@ -488,8 +489,8 @@ def build_joined_dataframe(
     # Dedup colonnes au cas où
     result = result.loc[:, ~result.columns.duplicated(keep="first")]
 
-    # Pas de null dans les champs numériques (left join sans match → 0)
-    result = fill_numeric_nulls(result)
+    # Ne plus combler les nulls ici : all_data garde les vides.
+    # L'imputation (moyennes / 0) se fait uniquement dans model_data.
     return result
 
 
@@ -560,97 +561,21 @@ def _looks_like_array_col(series: pd.Series) -> bool:
 
 def fill_numeric_nulls(frame: pd.DataFrame) -> pd.DataFrame:
     """
-    Garantit l'absence de null dans les champs **numériques**.
+    **Déprécié pour all_data** — ne plus combler les trous sources.
 
-    - numériques / booléens → ``fillna(0)``
-    - object quasi numériques (left join) → coerce + ``fillna(0)``
-    - codes texte (ex. ``departement`` en float) → string, null → ``""``
-    - arrays de jours → null → ``[]`` / ``"[]"``
+    Conservé pour compatibilité d'import. Délègue à
+    :func:`impute_model.impute_for_model` (moyennes / 0 selon le type)
+    pour le pipeline **model_data uniquement**.
+
+    Les fichiers sources (hotel_data, brand, …) et ``all_data.xlsx``
+    doivent **garder les NaN** : saisie ultérieure ou imputation au
+    moment model_data.
     """
+    from impute_model import impute_for_model
+
     if frame is None or frame.empty:
         return frame
-    out = frame.copy()
-
-    for col in out.columns:
-        series = out[col]
-
-        # --- Identifiants / zones / adresses / arrays ---
-        if col in _NON_NUMERIC_COLS or _looks_like_array_col(series):
-            if _looks_like_array_col(series) or col.startswith("jours_"):
-                out[col] = [
-                    (
-                        v
-                        if isinstance(v, (list, tuple))
-                        else (
-                            "[]"
-                            if _is_null(v) or (isinstance(v, str) and not v.strip())
-                            else v
-                        )
-                    )
-                    for v in series.tolist()
-                ]
-            else:
-                out[col] = [_as_text_cell(v) for v in series.tolist()]
-            continue
-
-        if pd.api.types.is_bool_dtype(series):
-            out[col] = series.fillna(False)
-            continue
-
-        if pd.api.types.is_numeric_dtype(series):
-            filled = series.fillna(0)
-            if str(filled.dtype) == "Int64":
-                filled = filled.astype("int64")
-            out[col] = filled
-            continue
-
-        # object / string : tenter numérique
-        coerced = pd.to_numeric(series, errors="coerce")
-        non_null = series.notna() & series.map(
-            lambda v: not isinstance(v, (list, tuple))
-        )
-        if non_null.any() and coerced[non_null].notna().mean() >= 0.8:
-            out[col] = coerced.fillna(0)
-        elif not non_null.any():
-            # Colonne entièrement vide : 0 si nom de métrique, sinon texte vide
-            name = str(col).lower()
-            if any(
-                k in name
-                for k in (
-                    "nombre",
-                    "montant",
-                    "pct",
-                    "meteo_",
-                    "nb_",
-                    "hotel_lat",
-                    "hotel_lon",
-                    "hotel_to",
-                    "hotel_nb",
-                    "hotel_metres",
-                    "hotel_affaires",
-                    "hotel_loisirs",
-                    "hotel_international",
-                    "hotel_national",
-                    "hotel_contrat",
-                    "hotel_derniere",
-                    "hotel_lobby",
-                    "hotel_f_b",
-                    "hotel_non_f_b",
-                    "hotel_dispo",
-                    "hotel_corner",
-                    "annee",
-                    "mois",
-                )
-            ):
-                out[col] = 0
-            else:
-                out[col] = ""
-        else:
-            out[col] = [_as_text_cell(v) for v in series.tolist()]
-
-    # Filet final sur tous les dtypes numériques
-    for col in out.select_dtypes(include=["number", "bool"]).columns:
-        out[col] = out[col].fillna(0 if not pd.api.types.is_bool_dtype(out[col]) else False)
+    out, _ = impute_for_model(frame)
     return out
 
 
@@ -659,13 +584,19 @@ def data_xlsx_path() -> Path:
 
 
 def save_joined_excel(frame: pd.DataFrame | None = None, **build_kwargs: Any) -> Path:
-    """Écrit ``accord/data/all_data.xlsx`` (All Data)."""
+    """
+    Écrit ``accord/data/all_data.xlsx`` (All Data).
+
+    **Ne comble plus** les numériques manquants (pas de moyenne, pas de 0 forcé).
+    Les trous restent vides ; l'imputation se fait uniquement dans
+    ``model_data`` (voir ``impute_model.impute_for_model``).
+    """
     if frame is None:
         frame = build_joined_dataframe(**build_kwargs)
     else:
-        frame = fill_numeric_nulls(frame)
+        frame = frame.copy()
 
-    # Séparer texte / numérique pour un Excel propre (pas de NaN numériques)
+    # Textes : "" pour null (affichage) ; numériques : NaN conservé
     text_cols = []
     for col in frame.columns:
         if col in _NON_NUMERIC_COLS or _looks_like_array_col(frame[col]):
@@ -682,14 +613,13 @@ def save_joined_excel(frame: pd.DataFrame | None = None, **build_kwargs: Any) ->
                 )
                 for v in frame[col].tolist()
             ]
-        elif pd.api.types.is_numeric_dtype(frame[col]):
-            frame[col] = frame[col].fillna(0)
+        # numériques : laisser NaN (openpyxl → cellule vide)
 
     path = data_xlsx_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     with pd.ExcelWriter(path, engine="openpyxl") as writer:
         frame.to_excel(writer, index=False, sheet_name=DATA_SHEET)
-        # Forcer type string openpyxl sur colonnes texte (évite float+NaN au rechargement)
+        # Forcer type string openpyxl sur colonnes texte
         try:
             ws = writer.sheets[DATA_SHEET]
             headers = {cell.value: cell.column for cell in ws[1]}
@@ -701,26 +631,12 @@ def save_joined_excel(frame: pd.DataFrame | None = None, **build_kwargs: Any) ->
                     cell = ws.cell(row=row, column=idx)
                     val = cell.value
                     if val is None or (isinstance(val, float) and pd.isna(val)) or val == "":
-                        # Espace insécable : cellule non vide pour Excel/pandas
-                        # (évite colonne float + NaN au rechargement)
                         cell.value = "\u00a0"
                     else:
                         cell.value = str(val)
                     cell.data_type = "s"
                     cell.number_format = "@"
-            # Double filet : cellules numériques None → 0
-            for col in frame.columns:
-                if col in text_cols:
-                    continue
-                idx = headers.get(col)
-                if not idx:
-                    continue
-                for row in range(2, ws.max_row + 1):
-                    cell = ws.cell(row=row, column=idx)
-                    if cell.value is None or (
-                        isinstance(cell.value, float) and pd.isna(cell.value)
-                    ):
-                        cell.value = 0
+            # Ne PAS forcer 0 sur les numériques vides
         except Exception:
             pass
     return path
