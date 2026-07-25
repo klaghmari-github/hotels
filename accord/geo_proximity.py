@@ -57,7 +57,7 @@ BEACH_TAGS: tuple[tuple[str, str], ...] = (
     ("leisure", "swimming_area"),
 )
 
-OVERPASS_URL = "https://overpass-api.de/api/interpreter"
+OVERPASS_URL = "https://overpass.openstreetmap.fr/api/interpreter"
 USER_AGENT = "accord-data-studio/1.0"
 
 
@@ -262,27 +262,45 @@ out center tags;
             dists.append(haversine_m(lat, lon, p_lat, p_lon))
         return dists
 
-    def _overpass(self, query: str, *, retries: int = 2) -> list[dict[str, Any]]:
+    # Fallbacks si le endpoint principal est down / rate-limité
+    OVERPASS_FALLBACKS: tuple[str, ...] = (
+        "https://overpass.openstreetmap.fr/api/interpreter",
+        "https://overpass.osm.ch/api/interpreter",
+        "https://overpass-api.de/api/interpreter",
+        "https://lz4.overpass-api.de/api/interpreter",
+        "https://z.overpass-api.de/api/interpreter",
+        "https://overpass.kumi.systems/api/interpreter",
+    )
+
+    def _overpass(self, query: str, *, retries: int = 1) -> list[dict[str, Any]]:
         last_exc: Exception | None = None
-        for attempt in range(retries + 1):
-            try:
-                resp = requests.post(
-                    self.overpass_url,
-                    data={"data": query},
-                    headers={"User-Agent": self.user_agent},
-                    timeout=50,
-                )
-                if resp.status_code in (429, 502, 504) and attempt < retries:
-                    time.sleep(1.5 * (attempt + 1))
-                    continue
-                resp.raise_for_status()
-                return list(resp.json().get("elements", []))
-            except Exception as exc:
-                last_exc = exc
-                if attempt < retries:
-                    time.sleep(1.5 * (attempt + 1))
-                    continue
-                raise
+        # essayer URL configurée puis fallbacks (dédupliqués)
+        urls: list[str] = []
+        for u in (self.overpass_url, *self.OVERPASS_FALLBACKS):
+            if u and u not in urls:
+                urls.append(u)
+        for url in urls:
+            for attempt in range(retries + 1):
+                try:
+                    resp = requests.post(
+                        url,
+                        data={"data": query},
+                        headers={"User-Agent": self.user_agent},
+                        timeout=35,
+                    )
+                    if resp.status_code in (429, 502, 503, 504) and attempt < retries:
+                        time.sleep(1.2 * (attempt + 1))
+                        continue
+                    resp.raise_for_status()
+                    # mémoriser le miroir qui marche
+                    self.overpass_url = url
+                    return list(resp.json().get("elements", []))
+                except Exception as exc:
+                    last_exc = exc
+                    if attempt < retries:
+                        time.sleep(0.8 * (attempt + 1))
+                        continue
+                    break  # next mirror
         if last_exc:
             raise last_exc
         return []
