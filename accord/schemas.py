@@ -504,11 +504,14 @@ DATASETS: dict[str, DatasetSchema] = {
         page_size=25,
         readonly=True,
     ),
-    # All Data : jointure complète de tous les onglets → all_data.xlsx
+    # All Data : jointure pour hôtels ayant des ventes → all_data.xlsx
     "all_data": DatasetSchema(
         id="all_data",
         label="All Data",
-        description="Jointure de tous les onglets (hotel × année × mois)",
+        description=(
+            "Jointure (hôtels avec ventes) × année × mois — "
+            "sales, holidays, weather, brand, proximity"
+        ),
         filename="all_data.xlsx",
         sheet="all_data",
         editable_columns=[],  # toutes les colonnes du fichier

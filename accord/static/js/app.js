@@ -294,8 +294,10 @@
         model_data: "Reconstruire model_data depuis all_data",
         concept_pilote:
           "Recalculer concept_pilote (hôtel × année : clients, CA moyen, mix produits)",
-        all_data: "Jointure de tous les onglets → all_data.xlsx",
-        data: "Jointure de tous les onglets → all_data.xlsx",
+        all_data:
+          "Jointure hôtels avec ventes (sales) + holidays/weather/brand/proximity → all_data.xlsx",
+        data:
+          "Jointure hôtels avec ventes (sales) + holidays/weather/brand/proximity → all_data.xlsx",
       };
       btnRebuild.title = titles[id] || "Reconstruire";
     }
