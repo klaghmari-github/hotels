@@ -417,3 +417,150 @@ def ensure_concept_pilote() -> Path:
     if not path.exists():
         rebuild_concept_pilote()
     return path
+
+
+def load_concept_pilote() -> pd.DataFrame:
+    """Charge ``concept_pilote.xlsx`` (vide si absent)."""
+    path = concept_pilote_path()
+    if not path.exists():
+        return pd.DataFrame()
+    try:
+        return pd.read_excel(path, sheet_name=SHEET)
+    except ValueError:
+        return pd.read_excel(path, sheet_name=0)
+
+
+# Champs d'exploitation pour l'étape 1 run_user (pas de mix F_B / N_F_B)
+STEP1_AVG_FIELDS = (
+    "nb_chambres",
+    "taux_occupation",
+    "guests_per_chambre",
+    "clients_jour",
+    "clients_mois",
+    "ca_mensuel_moyen",
+    "n_mois_renseignes",
+)
+
+
+def brand_step1_averages(brand: str) -> dict[str, Any]:
+    """
+    Moyennes des indicateurs d'exploitation pour une marque.
+
+    * Lit ``concept_pilote.xlsx``
+    * Filtre les lignes de la marque
+    * **Exclut l'année la plus récente** du fichier (holdout, ex. 2026)
+    * Moyenne arithmétique des champs utiles (étape 1 — sans mix produits)
+
+    Returns
+    -------
+    dict
+        ok, brand, excluded_year, n_rows, n_hotels, years_used, averages, …
+    """
+    brand_clean = str(brand or "").strip()
+    if not brand_clean:
+        return {
+            "ok": False,
+            "error": "Marque non renseignée",
+            "brand": "",
+            "averages": {},
+        }
+
+    frame = load_concept_pilote()
+    if frame.empty:
+        return {
+            "ok": False,
+            "error": "concept_pilote.xlsx vide ou introuvable — reconstruisez-le dans l'admin.",
+            "brand": brand_clean,
+            "averages": {},
+        }
+
+    if "hotel_brand" not in frame.columns or "annee" not in frame.columns:
+        return {
+            "ok": False,
+            "error": "Colonnes hotel_brand / annee manquantes dans concept_pilote.",
+            "brand": brand_clean,
+            "averages": {},
+        }
+
+    work = frame.copy()
+    work["hotel_brand"] = work["hotel_brand"].astype(str).str.strip()
+    work["annee"] = pd.to_numeric(work["annee"], errors="coerce")
+    work = work.dropna(subset=["annee"])
+    work["annee"] = work["annee"].astype(int)
+
+    # Match marque insensible à la casse
+    brand_key = brand_clean.upper().replace("_", " ")
+    mask = work["hotel_brand"].str.upper().str.replace("_", " ", regex=False) == brand_key
+    subset = work.loc[mask].copy()
+    if subset.empty:
+        # partial contains
+        mask2 = work["hotel_brand"].str.upper().str.contains(
+            brand_key, regex=False, na=False
+        )
+        subset = work.loc[mask2].copy()
+    if subset.empty:
+        return {
+            "ok": False,
+            "error": f"Aucune ligne concept_pilote pour la marque « {brand_clean} ».",
+            "brand": brand_clean,
+            "averages": {},
+            "available_brands": sorted(
+                work["hotel_brand"].dropna().astype(str).unique().tolist()
+            ),
+        }
+
+    # Exclure l'année la plus récente **globale** du fichier (pas seulement de la marque)
+    max_year_global = int(work["annee"].max())
+    before = len(subset)
+    subset = subset.loc[subset["annee"] < max_year_global].copy()
+    if subset.empty:
+        return {
+            "ok": False,
+            "error": (
+                f"Aucune année hors holdout ({max_year_global}) pour « {brand_clean} »."
+            ),
+            "brand": brand_clean,
+            "excluded_year": max_year_global,
+            "averages": {},
+            "n_rows_before_exclude": before,
+        }
+
+    averages: dict[str, float] = {}
+    for col in STEP1_AVG_FIELDS:
+        if col not in subset.columns:
+            continue
+        s = pd.to_numeric(subset[col], errors="coerce").dropna()
+        if s.empty:
+            continue
+        averages[col] = float(s.mean())
+
+    # Arrondis d'affichage
+    if "nb_chambres" in averages:
+        averages["nb_chambres"] = round(averages["nb_chambres"], 1)
+    if "taux_occupation" in averages:
+        averages["taux_occupation"] = round(averages["taux_occupation"], 6)
+    if "guests_per_chambre" in averages:
+        averages["guests_per_chambre"] = round(averages["guests_per_chambre"], 3)
+    if "clients_jour" in averages:
+        averages["clients_jour"] = round(averages["clients_jour"], 2)
+    if "clients_mois" in averages:
+        averages["clients_mois"] = round(averages["clients_mois"], 2)
+    if "ca_mensuel_moyen" in averages:
+        averages["ca_mensuel_moyen"] = round(averages["ca_mensuel_moyen"], 2)
+    if "n_mois_renseignes" in averages:
+        averages["n_mois_renseignes"] = round(averages["n_mois_renseignes"], 2)
+
+    years_used = sorted(int(y) for y in subset["annee"].unique())
+    n_hotels = (
+        int(subset["hotel_code"].nunique()) if "hotel_code" in subset.columns else 0
+    )
+
+    return {
+        "ok": True,
+        "brand": brand_clean,
+        "excluded_year": max_year_global,
+        "years_used": years_used,
+        "n_rows": len(subset),
+        "n_hotels": n_hotels,
+        "averages": averages,
+    }

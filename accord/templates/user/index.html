@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/user/css/user.css?v=20260725e" />
+  <link rel="stylesheet" href="/static/user/css/user.css?v=20260725f" />
 </head>
 <body>
   <div class="shell">
@@ -143,15 +143,20 @@
               chambres × taux d’occupation × guests/chambre (par jour),
               puis × 30,5 pour le mois.
             </div>
-            <div id="hist-box" class="hist-box hidden">
-              <h3>Référence model_data (historique)</h3>
+            <div id="brand-pilot-box" class="hist-box hidden">
+              <h3>Moyennes marque <span id="brand-pilot-name"></span></h3>
+              <p class="hint" id="brand-pilot-meta" style="margin:0 0 .65rem"></p>
               <div class="hist-grid">
-                <div><span class="muted">CA mensuel moyen</span><strong id="hist-ca">—</strong></div>
-                <div><span class="muted">Ventes / mois</span><strong id="hist-ventes">—</strong></div>
-                <div><span class="muted">Mix F&amp;B</span><strong id="hist-mix">—</strong></div>
-                <div><span class="muted">Mois observés</span><strong id="hist-n">—</strong></div>
+                <div><span class="muted"># Chambres (moy.)</span><strong id="bp-chambres">—</strong></div>
+                <div><span class="muted">TO annuel (moy.)</span><strong id="bp-to">—</strong></div>
+                <div><span class="muted">Guests / ch (moy.)</span><strong id="bp-guests">—</strong></div>
+                <div><span class="muted">Clients / jour (moy.)</span><strong id="bp-clients-j">—</strong></div>
+                <div><span class="muted">Clients / mois (moy.)</span><strong id="bp-clients-m">—</strong></div>
+                <div><span class="muted">CA mensuel moyen</span><strong id="bp-ca">—</strong></div>
               </div>
-              <p class="hint" id="hist-sources"></p>
+              <p class="hint" id="brand-pilot-hint" style="margin-top:.65rem">
+                Valeurs préremplies dans les champs d’exploitation — vous pouvez les ajuster.
+              </p>
             </div>
           </div>
         </div>
@@ -296,6 +301,6 @@
   </div>
 
   <div id="toast" class="toast hidden"></div>
-  <script src="/static/user/js/user.js?v=20260725e"></script>
+  <script src="/static/user/js/user.js?v=20260725f"></script>
 </body>
 </html>

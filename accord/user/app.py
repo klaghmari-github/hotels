@@ -108,6 +108,20 @@ def brands():
     return jsonify({"brands": _catalog.list_brands()})
 
 
+@app.get("/api/concept_pilote/brand/<path:brand>")
+def concept_pilote_brand_averages(brand: str):
+    """
+    Étape 1 run_user — moyennes d'exploitation pour une marque.
+
+    Lit ``concept_pilote.xlsx``, filtre la marque, exclut l'année la plus
+    récente (ex. 2026), moyenne des champs utiles (sans mix F_B / N_F_B).
+    """
+    from concept_pilote import brand_step1_averages
+
+    result = brand_step1_averages(brand)
+    return jsonify(result), (200 if result.get("ok") else 404)
+
+
 @app.get("/api/hotels")
 def hotels():
     return jsonify({"hotels": _catalog.list_hotels()})

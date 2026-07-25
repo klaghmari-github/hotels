@@ -287,43 +287,121 @@
       .join("");
   }
 
-  function showHist(indicators, sources) {
-    var box = $("#hist-box");
+  /**
+   * Étape 1 — moyennes concept_pilote pour la marque (hors année la plus récente).
+   * Préremplit chambres / TO / guests. Pas de mix F_B (onglet suivant).
+   */
+  function applyBrandPilotAverages(data) {
+    var box = $("#brand-pilot-box");
     if (!box) return;
-    if (!indicators) {
+    if (!data || !data.ok || !data.averages) {
       box.classList.add("hidden");
       return;
     }
+    var a = data.averages;
     box.classList.remove("hidden");
-    var ca = indicators.ca_historique_mensuel;
-    var nv = indicators.ventes_historiques_mensuelles;
-    var histCa = $("#hist-ca");
-    var histV = $("#hist-ventes");
-    var histMix = $("#hist-mix");
-    var histN = $("#hist-n");
-    var histS = $("#hist-sources");
-    if (histCa) {
-      histCa.textContent =
-        ca != null ? euro(ca) : "—";
+
+    var nameEl = $("#brand-pilot-name");
+    if (nameEl) nameEl.textContent = data.brand || "";
+
+    var meta = $("#brand-pilot-meta");
+    if (meta) {
+      meta.textContent =
+        (data.n_hotels || 0) +
+        " hôtel(s) · " +
+        (data.n_rows || 0) +
+        " ligne(s) · années " +
+        ((data.years_used || []).join(", ") || "—") +
+        " · année " +
+        (data.excluded_year || "—") +
+        " exclue";
     }
-    if (histV) {
-      histV.textContent =
-        nv != null ? Math.round(Number(nv)).toLocaleString("fr-FR") : "—";
+
+    function setText(id, text) {
+      var el = $("#" + id);
+      if (el) el.textContent = text;
     }
-    if (histMix) {
-      histMix.textContent =
-        indicators.mix_fb != null ? pctLabel(indicators.mix_fb) : "—";
-    }
-    if (histN) histN.textContent = indicators.n_months_model_data || "—";
-    if (histS && sources) {
-      histS.textContent =
-        "Sources : " +
-        Object.keys(sources)
-          .map(function (k) {
-            return k + "=" + sources[k];
+    setText(
+      "bp-chambres",
+      a.nb_chambres != null ? Math.round(a.nb_chambres) : "—"
+    );
+    setText(
+      "bp-to",
+      a.taux_occupation != null ? pctLabel(a.taux_occupation) : "—"
+    );
+    setText(
+      "bp-guests",
+      a.guests_per_chambre != null
+        ? Number(a.guests_per_chambre).toFixed(2)
+        : "—"
+    );
+    setText(
+      "bp-clients-j",
+      a.clients_jour != null
+        ? Number(a.clients_jour).toLocaleString("fr-FR", {
+            maximumFractionDigits: 1,
           })
-          .join(" · ");
+        : "—"
+    );
+    setText(
+      "bp-clients-m",
+      a.clients_mois != null
+        ? Number(a.clients_mois).toLocaleString("fr-FR", {
+            maximumFractionDigits: 1,
+          })
+        : "—"
+    );
+    setText(
+      "bp-ca",
+      a.ca_mensuel_moyen != null ? euro(a.ca_mensuel_moyen) : "—"
+    );
+
+    // Préremplir les champs d'exploitation (modifiables ensuite)
+    if (a.nb_chambres != null) {
+      var ch = $("#nb_chambres");
+      if (ch) ch.value = Math.round(a.nb_chambres);
     }
+    if (a.taux_occupation != null) {
+      var toEl = $("#taux_occupation");
+      if (toEl) {
+        var toPct = Number(a.taux_occupation);
+        if (toPct <= 1) toPct *= 100;
+        toEl.value = Math.round(toPct * 10) / 10;
+      }
+    }
+    if (a.guests_per_chambre != null) {
+      var gEl = $("#guests_per_chambre");
+      if (gEl) gEl.value = Number(a.guests_per_chambre).toFixed(2);
+    }
+    updateDerived();
+  }
+
+  function loadBrandPilotAverages(brand) {
+    brand = String(brand || "").trim();
+    var box = $("#brand-pilot-box");
+    if (!brand) {
+      if (box) box.classList.add("hidden");
+      return Promise.resolve(null);
+    }
+    return fetch(
+      "/api/concept_pilote/brand/" + encodeURIComponent(brand)
+    )
+      .then(function (res) {
+        return res.json().then(function (data) {
+          if (!data.ok) {
+            if (box) box.classList.add("hidden");
+            console.warn("[ROD] concept_pilote marque:", data.error);
+            return null;
+          }
+          applyBrandPilotAverages(data);
+          return data;
+        });
+      })
+      .catch(function (e) {
+        console.error("[ROD] brand pilot", e);
+        if (box) box.classList.add("hidden");
+        return null;
+      });
   }
 
   function loadHotelContext(code) {
@@ -408,8 +486,11 @@
       if (el) el.checked = !!needs[nid];
     });
 
-    showHist(ctx.indicators, ctx.sources);
     updateDerived();
+    // Après profil hôtel : moyennes marque (concept_pilote, hors dernière année)
+    if (id.hotel_brand) {
+      loadBrandPilotAverages(id.hotel_brand);
+    }
     toast("Profil " + (id.hotel_code || "") + " chargé");
   }
 
@@ -822,11 +903,7 @@
       var codeTimer = null;
       var tryLoadByCode = function () {
         var code = str("hotel_code");
-        if (!code) {
-          var box = $("#hist-box");
-          if (box) box.classList.add("hidden");
-          return;
-        }
+        if (!code) return;
         clearTimeout(codeTimer);
         codeTimer = setTimeout(function () {
           loadHotelContext(code)
@@ -840,6 +917,14 @@
       };
       hotelCodeInput.addEventListener("change", tryLoadByCode);
       hotelCodeInput.addEventListener("blur", tryLoadByCode);
+    }
+
+    // Marque → moyennes concept_pilote (étape 1)
+    var brandSel = $("#hotel_brand");
+    if (brandSel) {
+      brandSel.addEventListener("change", function () {
+        loadBrandPilotAverages(brandSel.value);
+      });
     }
 
     ["nb_chambres", "taux_occupation", "guests_per_chambre"].forEach(
@@ -1006,6 +1091,7 @@
     updateDerived: updateDerived,
     geocode: geocode,
     fillBrands: fillBrands,
+    loadBrandPilotAverages: loadBrandPilotAverages,
     state: state,
   };
 })();
