@@ -134,7 +134,12 @@ Sync marques → brand data :
 cd accord
 python -m sync_brand_data          # enrichit depuis data/marques/marques.xlsx
 ```
-| Hotel Data | `hotel_data.xlsx` | Oui | Fiche hôtel (identité, équipements, corner) |
+| Hotel Data | `hotel_data.xlsx` | Oui | Parc Accor scrape (identité, GPS, flags) + profils saisis |
+
+```bash
+# Remplir hotel_data depuis hotels_all (~tous les hôtels scrapés)
+python -m sync_hotel_data
+```
 | Hotel Weather Data | `hotel_weather_data.xlsx` | Oui | Météo mensuelle |
 | Hotel Proximity Data | `hotel_proximity_data.xlsx` | Oui | Commerces 100–500 m + plage 1–5 km |
 | Hotel Sales Data | `hotel_sales_data.xlsx` | Oui | Ventes + mix % (sans fériés) |

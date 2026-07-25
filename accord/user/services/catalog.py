@@ -100,6 +100,7 @@ class AdminCatalog:
             "hotel_adresse_postale_2",
             "hotel_code_postal",
             "hotel_city",
+            "hotel_country",
             "hotel_nb_chambres",
             "hotel_to_annuel",
             "hotel_affaires_pct",

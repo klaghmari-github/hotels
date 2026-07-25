@@ -247,8 +247,30 @@ def parse_hotel_html(html: str, code: int | str) -> dict[str, Any] | None:
         "has_parking": has("parking"),
         "has_wifi": has("wifi", "wi-fi"),
         "has_clim": has("air conditionné", "climatisation", "clim"),
-        "has_spa": has("spa"),
-        "has_fitness": has("salle de sport", "fitness", "gym"),
+        "has_spa": has("spa", "wellness", "hammam", "sauna"),
+        # Accor FR : « Centre de remise en forme » (pas « fitness »)
+        "has_fitness": has(
+            "salle de sport",
+            "fitness",
+            "gym",
+            "remise en forme",
+            "musculation",
+        ),
+        "has_accessible": has(
+            "fauteuil roulant",
+            "accessible",
+            "pmr",
+            "wheelchair",
+        ),
+        "has_animaux": has("animaux acceptés", "animaux acceptes", "pets allowed"),
+        "has_non_fumeur": has(
+            "non-fumeurs",
+            "non fumeurs",
+            "entièrement non-fumeurs",
+            "non-smoking",
+        ),
+        "has_navette": has("navette", "shuttle"),
+        "has_reunion": has("réunion", "reunion", "meeting"),
         "n_amenities": len(amenities),
         "description_short": description,
     }
