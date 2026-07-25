@@ -5,17 +5,15 @@ Produit le fichier ``data/all_data.xlsx`` (feuille ``all_data``).
 
 Règles métier
 -------------
-- **Base** = hôtels de ``hotel_data`` **qui ont au moins une vente** dans
-  ``hotel_sales_data`` (codes présents dans les ventes).
-- **Grille** = chaque hôtel filtré × chaque année de ventes × 12 mois.
-- **Ventes** : left join (peuvent être 0 après fill si mois sans CA).
-- **Holidays / weather / brand** : left join sur les clés adaptées.
+- **Base (table de gauche)** = ``hotel_sales_data`` : une ligne par
+  (hotel_code, annee, mois) pour lequel il existe une vente.
+- **Left joins** ensuite : holidays, weather (hotel × annee × mois),
+  hotel_data et proximity (hotel_code), brand (hotel_brand).
+- Seuls les hotels presents dans les ventes entrent dans all_data.
 - **Fill optionnel** (flags ``fill_weather`` / ``fill_proximity``) :
-  - météo via :class:`geo_weather.WeatherFromGeo`
-  - proximité via :class:`geo_proximity.ProximityFromGeo`
-- **Null numériques conservés** dans all_data (saisie ultérieure).
-  L'imputation (moyennes marque / globales) se fait dans **model_data**
-  uniquement (:mod:`impute_model`).
+  comble les trous meteo / proximite via lat/lon (desactive par defaut
+  dans le bouton UI Reconstruire).
+- **Nulls conserves** dans all_data. L imputation se fait dans model_data.
 
 Anti-doublons
 -------------
@@ -407,13 +405,16 @@ def build_joined_dataframe(
     fill_proximity: bool = True,
 ) -> pd.DataFrame:
     """
-    Construit la table All Data complète.
+    Construit all_data a partir des ventes, puis left join des autres sources.
 
-    1. Hôtels restreints à ceux qui ont des ventes (``hotel_sales_data``)
-    2. Grille hotel × années de ventes × 12 mois
-    3. Jointure sales / holidays / weather / brand (left)
-    4. Identité forcée depuis hotel_data
-    5. Comblement météo + proximité via lat/lon
+    1. Base = hotel_sales_data (une ligne par hotel_code, annee, mois de vente)
+    2. Left join holidays et weather sur (hotel_code, annee, mois)
+    3. Left join hotel_data et proximity sur hotel_code
+    4. Left join brand sur hotel_brand
+    5. Optionnel: combler meteo / proximite manquantes (flags)
+
+    Le bouton UI Reconstruire appelle cette fonction avec
+    fill_weather=False et fill_proximity=False.
     """
     hotels = _read_source("hotel")
     sales = _read_source("sales")
@@ -421,85 +422,87 @@ def build_joined_dataframe(
     weather = _read_source("weather")
     brand = _read_source("brand")
 
-    # Périmètre All Data = uniquement hôtels avec ventes
-    sales_codes = _sales_hotel_codes(sales)
-    if not sales_codes:
-        # Sans ventes : pas de jointure all_data (évite d'exploser sur tout le parc)
+    # --- Base = ventes uniquement ---
+    if sales is None or sales.empty or "hotel_code" not in sales.columns:
         return pd.DataFrame()
 
+    sales = _normalize_keys(sales, list(JOIN_KEYS_MONTHLY))
+    sales = sales.dropna(subset=["hotel_code", "annee", "mois"])
+    sales["hotel_code"] = sales["hotel_code"].astype(str).str.strip()
+    # Une ligne par hotel x annee x mois (ventes deja mensuelles)
+    sales = sales.drop_duplicates(subset=list(JOIN_KEYS_MONTHLY), keep="last")
+    sales_codes = _sales_hotel_codes(sales)
+    if not sales_codes:
+        return pd.DataFrame()
+
+    # Table de gauche = ventes (left join vers le reste)
+    result = sales.copy()
+
+    # Hotels master restreints aux codes presents dans les ventes
     if not hotels.empty and "hotel_code" in hotels.columns:
         hotels = hotels.copy()
         hotels["hotel_code"] = hotels["hotel_code"].astype(str).str.strip()
         hotels = hotels[hotels["hotel_code"].isin(sales_codes)].reset_index(drop=True)
     else:
-        # Fallback identité minimale depuis les ventes
         hotels = (
             sales.drop_duplicates(subset=["hotel_code"])[
-                [c for c in ("hotel_code", "hotel_name", "nom_hotel", "hotel_brand") if c in sales.columns]
+                [
+                    c
+                    for c in ("hotel_code", "hotel_name", "nom_hotel", "hotel_brand")
+                    if c in sales.columns
+                ]
             ].copy()
         )
         if "hotel_name" not in hotels.columns and "nom_hotel" in hotels.columns:
             hotels["hotel_name"] = hotels["nom_hotel"]
 
-    # Proximity : charger le fichier data/ (ou le construire si absent)
+    # Proximity : fichier existant (pas de recalcul reseau ici si present)
     proximity = _read_source("proximity")
-    if proximity.empty and not hotels.empty:
+    if proximity.empty and not hotels.empty and fill_proximity:
         try:
             from geo_proximity import ensure_hotel_proximity_data
 
-            # force_refresh=False : lit le xlsx s'il existe, sinon calcule Overpass
             proximity = ensure_hotel_proximity_data(
                 force_refresh=False, hotels=hotels, pause_s=1.0
             )
         except Exception:
             proximity = pd.DataFrame()
 
-    # Années = d'abord celles des ventes (périmètre métier)
-    years = _collect_years(sales)
-    if not years:
-        years = _collect_years(sales, holidays, weather)
-    result = _build_grid(hotels, years)
-
-    # Jointures left (ventes peuvent rester vides pour certains mois)
-    if not sales.empty:
-        result = _merge_new(result, sales, on=list(JOIN_KEYS_MONTHLY), how="left")
+    # --- Left joins ---
+    # Holidays et weather : grain mensuel
     if not holidays.empty:
         result = _merge_new(result, holidays, on=list(JOIN_KEYS_MONTHLY), how="left")
     if not weather.empty:
         result = _merge_new(result, weather, on=list(JOIN_KEYS_MONTHLY), how="left")
 
-    # Proximity : grain hôtel (pas mensuel) → jointure sur hotel_code
+    # Proximity : grain hotel
     if not proximity.empty and "hotel_code" in proximity.columns:
-        # Ne pas ré-injecter lat/lon/name si déjà présents
         result = _merge_new(result, proximity, on=["hotel_code"], how="left")
 
-    # Hotel master (toutes colonnes fiche) — déjà filtré sur sales_codes
+    # Fiche hotel (identite + equipements)
     if not hotels.empty:
         result = _merge_new(result, hotels, on=["hotel_code"], how="left")
         result = _fill_identity(result, hotels)
 
-    # Brand
+    # Brand (via hotel_brand)
     if not brand.empty and "Marque" in brand.columns and "hotel_brand" in result.columns:
         brand_r = brand.rename(columns={"Marque": "hotel_brand"})
         result = _merge_new(result, brand_r, on=["hotel_brand"], how="left")
 
-    # Sécurité : retirer toute ligne hors périmètre ventes
-    if "hotel_code" in result.columns:
-        result = result[
-            result["hotel_code"].astype(str).str.strip().isin(sales_codes)
-        ].reset_index(drop=True)
+    # Securite : jamais d hotel hors ventes
+    result = result[
+        result["hotel_code"].astype(str).str.strip().isin(sales_codes)
+    ].reset_index(drop=True)
 
-    years = _collect_years(result) or years
+    years = _collect_years(result) or _collect_years(sales)
 
-    # Comblement auto météo / proximité (si encore des trous et flags activés)
+    # Comblement reseau optionnel (desactive par defaut depuis l UI)
     result = _fill_weather_gaps(result, years=years, fetch=fill_weather)
     result = _fill_proximity_gaps(result, hotels, fetch=fill_proximity)
 
-    # Ré-identité au cas où
     if not hotels.empty:
         result = _fill_identity(result, hotels)
 
-    # Ordre colonnes
     key_order = [
         c
         for c in (
@@ -523,11 +526,7 @@ def build_joined_dataframe(
     else:
         result = result.reset_index(drop=True)
 
-    # Dedup colonnes au cas où
     result = result.loc[:, ~result.columns.duplicated(keep="first")]
-
-    # Ne plus combler les nulls ici : all_data garde les vides.
-    # L'imputation (moyennes / 0) se fait uniquement dans model_data.
     return result
 
 

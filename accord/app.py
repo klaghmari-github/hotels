@@ -313,13 +313,17 @@ def api_reload(dataset_id: str):
 
 
 @app.post("/api/datasets/all_data/rebuild")
-@app.post("/api/datasets/data/rebuild")  # alias rétro-compat
+@app.post("/api/datasets/data/rebuild")  # alias retro-compat
 def api_rebuild_join():
     """
-    **Reconstruire** : jointure de tous les onglets → ``data/all_data.xlsx``,
-    puis le fichier est rechargé en cache pour l'UI.
+    Bouton Reconstruire de l onglet All Data.
 
-    Body optionnel JSON : ``{ "fill_weather": false, "fill_proximity": false }``
+    Construit data/all_data.xlsx :
+      base = hotel_sales_data (hotels avec au moins une vente, mois de vente)
+      left join holidays, weather, hotel_data, proximity, brand
+
+    Body JSON optionnel:
+      fill_weather, fill_proximity (defaut false depuis l UI)
     """
     body = request.get_json(force=True, silent=True) or {}
     try:

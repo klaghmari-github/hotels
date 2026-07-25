@@ -492,13 +492,13 @@ DATASETS: dict[str, DatasetSchema] = {
         page_size=25,
         readonly=True,
     ),
-    # All Data : jointure pour hôtels ayant des ventes → all_data.xlsx
+    # All Data : base sales (hotels/mois avec vente) + left joins
     "all_data": DatasetSchema(
         id="all_data",
         label="All Data",
         description=(
-            "Jointure (hôtels avec ventes) × année × mois — "
-            "sales, holidays, weather, brand, proximity"
+            "Hotels avec ventes (mois de vente) + left join "
+            "holidays, weather, brand, proximity"
         ),
         filename="all_data.xlsx",
         sheet="all_data",

@@ -285,9 +285,9 @@
         concept_pilote:
           "Recalculer concept_pilote (hôtel × année : clients, CA moyen, mix produits)",
         all_data:
-          "Jointure hôtels avec ventes (sales) + holidays/weather/brand/proximity → all_data.xlsx",
+          "Base = mois de vente (sales), left join holidays/weather/hotel/proximity/brand → all_data.xlsx",
         data:
-          "Jointure hôtels avec ventes (sales) + holidays/weather/brand/proximity → all_data.xlsx",
+          "Base = mois de vente (sales), left join holidays/weather/hotel/proximity/brand → all_data.xlsx",
       };
       btnRebuild.title = titles[id] || "Reconstruire";
     }

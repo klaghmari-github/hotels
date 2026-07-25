@@ -200,10 +200,11 @@ def rebuild_joined_data(
     fill_proximity: bool = False,
 ) -> dict[str, Any]:
     """
-    Recalcule la jointure de **tous** les onglets et écrit ``all_data.xlsx``.
+    Recalcule all_data.xlsx pour le bouton Reconstruire.
 
-    Sources : brand, hotel, weather, sales, holidays.
-    Invalide le cache de l'onglet ``all_data`` puis charge le nouveau fichier.
+    Base = hotels/mois presents dans hotel_sales_data.
+    Left join : holidays, weather, hotel_data, proximity, brand.
+    Invalide le cache all_data puis reecrit le fichier.
     """
     from join_data import build_joined_dataframe, save_joined_excel
 
