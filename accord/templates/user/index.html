@@ -60,8 +60,10 @@
                 <input id="hotel_code" type="text" placeholder="H0338" />
               </div>
               <div class="field">
-                <label>Marque</label>
-                <select id="hotel_brand"></select>
+                <label>Marque <span class="muted small">(hotel_brand_data)</span></label>
+                <select id="hotel_brand" name="hotel_brand" required>
+                  <option value="">— Chargement des marques… —</option>
+                </select>
               </div>
             </div>
             <div class="field">
@@ -96,7 +98,16 @@
                 <input id="hotel_lon" type="number" step="any" placeholder="auto" />
               </div>
             </div>
-            <button type="button" class="btn ghost" id="btn-geocode">Localiser depuis l’adresse</button>
+            <button type="button" class="btn ghost" id="btn-geocode">
+              <span class="btn-label">Localiser depuis l’adresse</span>
+            </button>
+            <div id="geocode-status" class="wait-box hidden" role="status" aria-live="polite">
+              <div class="spinner sm"></div>
+              <div>
+                <strong>Veuillez patienter…</strong>
+                <p class="hint" style="margin:0.2rem 0 0">Recherche de la position à partir de l’adresse (OpenStreetMap).</p>
+              </div>
+            </div>
             <p class="hint" id="geocode-hint"></p>
           </div>
 
@@ -247,9 +258,12 @@
           <button type="button" class="btn primary" id="btn-simulate">Lancer la simulation</button>
         </div>
 
-        <div id="sim-loading" class="hidden loading-box">
+        <div id="sim-loading" class="hidden loading-box" role="status" aria-live="polite">
           <div class="spinner"></div>
-          <p>Calcul en cours — enrichissement &amp; règles ROD…</p>
+          <div>
+            <strong>Veuillez patienter…</strong>
+            <p style="margin:0.25rem 0 0">Simulation en cours — analyse des données, règles ROD et coûts.</p>
+          </div>
         </div>
 
         <div id="sim-error" class="hidden error-box"></div>

@@ -110,14 +110,70 @@
     }
   }
 
+  function brandName(b) {
+    if (b == null) return "";
+    if (typeof b === "string") return b.trim();
+    return String(b.brand || b.Marque || b.marque || b.hotel_brand || "").trim();
+  }
+
   function fillBrands(brands) {
     const sel = $("#hotel_brand");
-    const names = brands.map((b) => b.brand).filter(Boolean);
-    const fallback = ["ibis", "ibis Styles", "ibis budget", "Novotel", "Mercure"];
-    const list = names.length ? names : fallback;
+    if (!sel) return;
+    const names = [];
+    const seen = new Set();
+    (brands || []).forEach((b) => {
+      const n = brandName(b);
+      if (!n) return;
+      const key = n.toUpperCase();
+      if (seen.has(key)) return;
+      seen.add(key);
+      names.push(n);
+    });
+    // aussi les marques déjà présentes sur les hôtels admin
+    (state.hotels || []).forEach((h) => {
+      const n = brandName(h.hotel_brand || h);
+      if (!n) return;
+      const key = n.toUpperCase();
+      if (seen.has(key)) return;
+      seen.add(key);
+      names.push(n);
+    });
+    names.sort((a, b) => a.localeCompare(b, "fr", { sensitivity: "base" }));
+    const current = sel.value;
     sel.innerHTML =
-      `<option value="">—</option>` +
-      list.map((n) => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join("");
+      `<option value="">— Choisir une marque —</option>` +
+      names
+        .map(
+          (n) =>
+            `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`
+        )
+        .join("");
+    if (current) setBrandValue(current);
+  }
+
+  /** Sélectionne une marque ; ajoute l'option si absente de hotel_brand_data. */
+  function setBrandValue(name) {
+    const sel = $("#hotel_brand");
+    if (!sel || name == null || name === "") {
+      if (sel) sel.value = "";
+      return;
+    }
+    const target = String(name).trim();
+    const options = [...sel.options];
+    let match = options.find((o) => o.value === target);
+    if (!match) {
+      match = options.find(
+        (o) => o.value.toUpperCase() === target.toUpperCase()
+      );
+    }
+    if (!match && target) {
+      const opt = document.createElement("option");
+      opt.value = target;
+      opt.textContent = target;
+      sel.appendChild(opt);
+      match = opt;
+    }
+    if (match) sel.value = match.value;
   }
 
   function fillHotels(hotels) {
@@ -209,9 +265,11 @@
       hotel_lon: id.hotel_lon,
     };
     Object.entries(map).forEach(([k, v]) => {
+      if (k === "hotel_brand") return;
       const el = $(`#${k}`);
       if (el && v != null && v !== "") el.value = v;
     });
+    if (id.hotel_brand) setBrandValue(id.hotel_brand);
 
     if (op.nb_chambres) $("#nb_chambres").value = op.nb_chambres;
     if (op.taux_occupation != null) {
@@ -290,9 +348,11 @@
       hotel_lon: h.hotel_lon,
     };
     Object.entries(map).forEach(([k, v]) => {
+      if (k === "hotel_brand") return;
       const el = $(`#${k}`);
       if (el && v != null && v !== "") el.value = v;
     });
+    if (h.hotel_brand) setBrandValue(h.hotel_brand);
     if (h.hotel_nb_chambres) $("#nb_chambres").value = h.hotel_nb_chambres;
     if (h.hotel_to_annuel != null) {
       let to = Number(h.hotel_to_annuel);
@@ -498,10 +558,22 @@
   async function runSimulation() {
     const load = $("#sim-loading");
     const err = $("#sim-error");
+    const btnSim = $("#btn-simulate");
+    const btnNext = $("#btn-next");
     load.classList.remove("hidden");
     err.classList.add("hidden");
     $("#sim-reco").classList.add("hidden");
+    $("#sim-calc")?.classList.add("hidden");
     $("#sim-cards").innerHTML = "";
+    if (btnSim) {
+      btnSim.disabled = true;
+      btnSim.classList.add("busy");
+    }
+    if (btnNext) {
+      btnNext.disabled = true;
+      btnNext.classList.add("busy");
+    }
+    toast("Veuillez patienter — simulation en cours…");
     try {
       const payload = collectPayload();
       const res = await fetch("/api/simulate?light=1", {
@@ -518,19 +590,65 @@
       err.textContent = e.message || String(e);
     } finally {
       load.classList.add("hidden");
+      if (btnSim) {
+        btnSim.disabled = false;
+        btnSim.classList.remove("busy");
+      }
+      if (btnNext) {
+        btnNext.disabled = false;
+        btnNext.classList.remove("busy");
+      }
+    }
+  }
+
+  function setGeocodeWaiting(on) {
+    const btn = $("#btn-geocode");
+    const status = $("#geocode-status");
+    const hint = $("#geocode-hint");
+    if (btn) {
+      btn.classList.toggle("busy", !!on);
+      btn.disabled = !!on;
+      const label = btn.querySelector(".btn-label");
+      if (label) {
+        label.textContent = on
+          ? "Localisation en cours…"
+          : "Localiser depuis l’adresse";
+      }
+    }
+    if (status) {
+      status.classList.toggle("hidden", !on);
+      status.classList.remove("ok", "err");
+    }
+    if (on && hint) {
+      hint.textContent = "Veuillez patienter pendant la recherche…";
+      hint.style.color = "";
     }
   }
 
   async function geocode() {
+    const street = str("hotel_adresse_postale_1");
+    const postal = str("hotel_code_postal");
+    const city = str("hotel_city");
+    const hotelName = str("hotel_name");
+    const complement = str("hotel_adresse_postale_2");
+
+    if (!street && !city && !hotelName && !postal) {
+      $("#geocode-hint").textContent =
+        "Renseignez au moins une adresse, une ville ou un nom d’hôtel.";
+      $("#geocode-hint").style.color = "#991b1b";
+      toast("Adresse insuffisante");
+      return;
+    }
+
     const body = {
-      street: str("hotel_adresse_postale_1"),
-      postal_code: str("hotel_code_postal"),
-      city: str("hotel_city"),
-      q: [str("hotel_adresse_postale_1"), str("hotel_code_postal"), str("hotel_city")]
-        .filter(Boolean)
-        .join(", "),
+      street: street || complement,
+      postal_code: postal,
+      city,
+      hotel_name: hotelName,
+      q: [street, complement, postal, city, hotelName].filter(Boolean).join(", "),
     };
-    $("#geocode-hint").textContent = "Recherche…";
+
+    setGeocodeWaiting(true);
     try {
       const res = await fetch("/api/geocode", {
         method: "POST",
@@ -538,13 +656,24 @@
         body: JSON.stringify(body),
       });
       const data = await res.json();
-      if (!data.ok) throw new Error(data.error || "Échec");
-      $("#hotel_lat").value = data.lat;
-      $("#hotel_lon").value = data.lon;
-      $("#geocode-hint").textContent = data.display_name || "OK";
+      if (!data.ok) {
+        throw new Error(data.error || "Aucun résultat pour cette adresse");
+      }
+      $("#hotel_lat").value = Number(data.lat).toFixed(6);
+      $("#hotel_lon").value = Number(data.lon).toFixed(6);
+      const hint = $("#geocode-hint");
+      hint.style.color = "#14532d";
+      hint.textContent =
+        "✓ Position trouvée : " +
+        (data.display_name || `${data.lat}, ${data.lon}`);
       toast("Coordonnées trouvées");
     } catch (e) {
-      $("#geocode-hint").textContent = e.message || String(e);
+      const hint = $("#geocode-hint");
+      hint.style.color = "#991b1b";
+      hint.textContent = "✗ " + (e.message || String(e));
+      toast("Échec de la localisation");
+    } finally {
+      setGeocodeWaiting(false);
     }
   }
 
@@ -558,23 +687,34 @@
     });
     renderToggles("svc-lobby", SERVICES.lobby, {});
 
+    // Chargements indépendants : un échec n'empêche pas la liste des marques
     try {
-      const [meta, brands, hotels] = await Promise.all([
-        fetch("/api/meta").then((r) => r.json()),
-        fetch("/api/brands").then((r) => r.json()),
-        fetch("/api/hotels").then((r) => r.json()),
-      ]);
-      state.meta = meta;
-      state.brands = brands.brands || [];
+      const hotelsRes = await fetch("/api/hotels").then((r) => r.json());
+      fillHotels(hotelsRes.hotels || []);
+    } catch (e) {
+      console.error("hotels", e);
+    }
+    try {
+      const brandsRes = await fetch("/api/brands").then((r) => r.json());
+      state.brands = brandsRes.brands || brandsRes || [];
+      if (!Array.isArray(state.brands)) state.brands = [];
       fillBrands(state.brands);
-      fillHotels(hotels.hotels || []);
-
+      if (!state.brands.length) {
+        toast("Aucune marque dans hotel_brand_data");
+      }
+    } catch (e) {
+      console.error("brands", e);
+      fillBrands([]);
+      toast("Impossible de charger hotel_brand_data");
+    }
+    try {
+      const meta = await fetch("/api/meta").then((r) => r.json());
+      state.meta = meta;
       renderToggles(
         "needs-fb",
         (meta.client_needs_fb || []).map((n) => ({ id: n.id, label: n.label })),
         Object.fromEntries((meta.client_needs_fb || []).map((n) => [n.id, true]))
       );
-      // default nfb: cosmetics/kids/etc on, hygiene off — leave to defaults from server labels
       const nfbDefaults = {};
       (meta.client_needs_nfb || []).forEach((n) => {
         nfbDefaults[n.id] = n.id !== "nfb_hygiene";
@@ -585,7 +725,7 @@
         nfbDefaults
       );
     } catch (e) {
-      console.error(e);
+      console.error("meta", e);
       toast("Chargement partiel des données admin");
     }
 

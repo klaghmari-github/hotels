@@ -308,8 +308,36 @@ body {
   width: 28px; height: 28px; border-radius: 50%;
   border: 3px solid #e5e7eb; border-top-color: var(--accent);
   animation: spin .8s linear infinite;
+  flex-shrink: 0;
 }
+.spinner.sm { width: 22px; height: 22px; border-width: 2.5px; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+.wait-box {
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem;
+  margin-top: .85rem;
+  padding: .85rem 1rem;
+  border-radius: 12px;
+  background: #fff8e8;
+  border: 1px solid rgba(201, 162, 39, .35);
+  color: #5c4a12;
+  font-size: .9rem;
+  line-height: 1.4;
+}
+.wait-box strong { display: block; color: #3d320c; }
+.wait-box.ok {
+  background: #ecfdf5;
+  border-color: rgba(22, 163, 74, .3);
+  color: #14532d;
+}
+.wait-box.err {
+  background: #fef2f2;
+  border-color: rgba(220, 38, 38, .25);
+  color: #991b1b;
+}
+.btn.busy { opacity: .7; cursor: wait; pointer-events: none; }
 
 .reco-banner {
   padding: 1.15rem 1.35rem;

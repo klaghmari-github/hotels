@@ -33,25 +33,57 @@ class AdminCatalog:
     """Accès aux données déjà saisies par l'admin."""
 
     def list_brands(self) -> list[dict[str, Any]]:
+        """
+        Marques depuis ``hotel_brand_data.xlsx`` (colonne ``Marque``).
+
+        Complété par les ``hotel_brand`` distincts de ``hotel_data`` si
+        une marque y figure sans être dans le fichier brand.
+        """
         frame = _read_excel("hotel_brand_data.xlsx")
-        if frame.empty:
-            return []
-        # colonne Marque typique
-        col = "Marque" if "Marque" in frame.columns else frame.columns[0]
-        out = []
-        for _, row in frame.iterrows():
-            name = str(row.get(col) or "").strip()
-            if not name:
-                continue
-            item = {"brand": name}
-            for c in frame.columns:
-                if c == col:
+        out: list[dict[str, Any]] = []
+        seen: set[str] = set()
+
+        if not frame.empty:
+            # colonne Marque (schéma admin) ou variantes
+            col = None
+            for candidate in ("Marque", "marque", "brand", "hotel_brand"):
+                if candidate in frame.columns:
+                    col = candidate
+                    break
+            if col is None:
+                col = frame.columns[0]
+            for _, row in frame.iterrows():
+                name = str(row.get(col) or "").strip()
+                if not name or name.lower() in {"nan", "none"}:
                     continue
-                val = row.get(c)
-                if pd.isna(val):
+                key = name.upper()
+                if key in seen:
                     continue
-                item[str(c)] = val.item() if hasattr(val, "item") else val
-            out.append(item)
+                seen.add(key)
+                item: dict[str, Any] = {"brand": name, "Marque": name}
+                for c in frame.columns:
+                    if c == col:
+                        continue
+                    val = row.get(c)
+                    if pd.isna(val):
+                        continue
+                    item[str(c)] = val.item() if hasattr(val, "item") else val
+                out.append(item)
+
+        # Union avec hotel_data (au cas où)
+        hotels = _read_excel("hotel_data.xlsx")
+        if not hotels.empty and "hotel_brand" in hotels.columns:
+            for raw in hotels["hotel_brand"].dropna().unique():
+                name = str(raw).strip()
+                if not name or name.lower() in {"nan", "none"}:
+                    continue
+                key = name.upper()
+                if key in seen:
+                    continue
+                seen.add(key)
+                out.append({"brand": name, "Marque": name, "source": "hotel_data"})
+
+        out.sort(key=lambda x: str(x.get("brand") or "").upper())
         return out
 
     def list_hotels(self) -> list[dict[str, Any]]:

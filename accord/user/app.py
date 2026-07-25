@@ -130,14 +130,17 @@ def hotel_context(hotel_code: str):
 
 @app.post("/api/geocode")
 def geocode():
+    """Localise lat/lon depuis l'adresse (Nominatim, multi-stratégies)."""
     body = request.get_json(force=True, silent=True) or {}
     result = _geocoder.geocode(
         street=str(body.get("street") or body.get("hotel_adresse_postale_1") or ""),
         postal_code=str(body.get("postal_code") or body.get("hotel_code_postal") or ""),
         city=str(body.get("city") or body.get("hotel_city") or ""),
         free_text=str(body.get("q") or body.get("address") or ""),
+        hotel_name=str(body.get("hotel_name") or ""),
     )
-    return jsonify(result), (200 if result.get("ok") else 422)
+    # 200 même en échec métier (l'UI lit ``ok``) — évite de confondre avec panne réseau
+    return jsonify(result), 200
 
 
 @app.post("/api/enrich")
