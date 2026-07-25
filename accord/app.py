@@ -320,6 +320,26 @@ def api_rebuild_holidays():
         return jsonify({"error": str(exc)}), 400
 
 
+@app.post("/api/datasets/concept_pilote/rebuild")
+def api_rebuild_concept_pilote():
+    """
+    Recalcule ``concept_pilote.xlsx`` (hôtel × année).
+
+    * clients = chambres × TO × guests (hotel_data + défauts marque)
+    * CA mensuel moyen depuis hotel_sales_data
+    * mix F_B / N_F_B = produits distincts (sales_raw prioritaire)
+    """
+    try:
+        from concept_pilote import rebuild_concept_pilote
+        from store import _cache
+
+        result = rebuild_concept_pilote()
+        _cache.pop("concept_pilote", None)
+        return jsonify(result)
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
 # ---------------------------------------------------------------------------
 # API — modèle XGBoost (build design + explore + deploy)
 # ---------------------------------------------------------------------------

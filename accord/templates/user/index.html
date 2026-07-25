@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/user/css/user.css?v=20260725b" />
+  <link rel="stylesheet" href="/static/user/css/user.css?v=20260725e" />
 </head>
 <body>
   <div class="shell">
@@ -28,12 +28,12 @@
 
     <!-- Stepper -->
     <div class="stepper-wrap">
-      <ol class="stepper" id="stepper">
-        <li class="step active" data-step="1"><span class="n">1</span><span class="lbl">Hôtel</span></li>
-        <li class="step" data-step="2"><span class="n">2</span><span class="lbl">Services</span></li>
-        <li class="step" data-step="3"><span class="n">3</span><span class="lbl">Clients</span></li>
-        <li class="step" data-step="4"><span class="n">4</span><span class="lbl">Corner</span></li>
-        <li class="step" data-step="5"><span class="n">5</span><span class="lbl">Simulation</span></li>
+      <ol class="stepper" id="stepper" aria-label="Étapes du parcours">
+        <li class="step active" data-step="1" role="button" tabindex="0" title="Aller à l’étape 1 — Hôtel"><span class="n">1</span><span class="lbl">Hôtel</span></li>
+        <li class="step" data-step="2" role="button" tabindex="0" title="Aller à l’étape 2 — Services"><span class="n">2</span><span class="lbl">Services</span></li>
+        <li class="step" data-step="3" role="button" tabindex="0" title="Aller à l’étape 3 — Clients"><span class="n">3</span><span class="lbl">Clients</span></li>
+        <li class="step" data-step="4" role="button" tabindex="0" title="Aller à l’étape 4 — Corner"><span class="n">4</span><span class="lbl">Corner</span></li>
+        <li class="step" data-step="5" role="button" tabindex="0" title="Aller à l’étape 5 — Simulation"><span class="n">5</span><span class="lbl">Simulation</span></li>
       </ol>
     </div>
 
@@ -134,10 +134,10 @@
                 <strong id="out-clients-mois">—</strong>
               </div>
             </div>
-            <p class="hint" id="clients-formula" style="margin-top:0.5rem"></p>
+            <div class="hint clients-formula" id="clients-formula" style="margin-top:0.5rem"></div>
             <div class="info-box">
               <strong>Règle 1 — scaling par clients hébergés.</strong>
-              Le CA du concept pilote (référence Excel) est multiplié par le ratio
+              Le CA du concept pilote est multiplié par le ratio
               <em>clients de votre hôtel ÷ clients du pilote</em>.
               Les clients se calculent ainsi :
               chambres × taux d’occupation × guests/chambre (par jour),
@@ -296,6 +296,6 @@
   </div>
 
   <div id="toast" class="toast hidden"></div>
-  <script src="/static/user/js/user.js?v=20260725b"></script>
+  <script src="/static/user/js/user.js?v=20260725e"></script>
 </body>
 </html>

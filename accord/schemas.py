@@ -335,8 +335,29 @@ _HOLIDAYS_EDITABLE = [
 # Chaque entrée pilote un onglet de la sidebar et le fichier Excel associé.
 # L'id est utilisé dans l'URL API : /api/datasets/<id>
 
+# Colonnes concept_pilote (hôtel × année)
+_CONCEPT_PILOTE_EDITABLE = [
+    "hotel_code",
+    "hotel_name",
+    "hotel_brand",
+    "annee",
+    "nb_chambres",
+    "taux_occupation",
+    "guests_per_chambre",
+    "clients_jour",
+    "clients_mois",
+    "n_mois_renseignes",
+    "ca_mensuel_moyen",
+    "n_produits_distincts_f_b",
+    "n_produits_distincts_n_f_b",
+    "n_produits_distincts_total",
+    "mix_f_b",
+    "mix_n_f_b",
+]
+
 # Ordre sidebar demandé :
-# Brand → Hotel → Holidays → Sales Raw → Sales → Weather → Proximity → All → Model
+# Brand → Hotel → Holidays → Sales Raw → Sales → Weather → Proximity → All →
+# Concept pilote → Model Data  (puis Model Build / Explore hors datasets)
 DATASETS: dict[str, DatasetSchema] = {
     "brand": DatasetSchema(
         id="brand",
@@ -473,6 +494,19 @@ DATASETS: dict[str, DatasetSchema] = {
         sheet="model_data",
         editable_columns=[],  # toutes les colonnes du fichier
         key_columns=["hotel_code", "annee", "mois"],
+        icon="chart",
+        page_size=25,
+        readonly=True,
+    ),
+    # Concept pilote : agrégats annuels (avant Model Build)
+    "concept_pilote": DatasetSchema(
+        id="concept_pilote",
+        label="Concept Pilote",
+        description="Indicateurs annuels hôtel — clients, CA moyen, mix produits F&B — Reconstruire",
+        filename="concept_pilote.xlsx",
+        sheet="concept_pilote",
+        editable_columns=_CONCEPT_PILOTE_EDITABLE,
+        key_columns=["hotel_code", "annee"],
         icon="chart",
         page_size=25,
         readonly=True,

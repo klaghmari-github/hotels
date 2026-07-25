@@ -141,17 +141,22 @@
     if (outJ) outJ.textContent = fmt(jour);
     if (outM) outM.textContent = fmt(mois);
     if (formula) {
-      formula.textContent =
+      var toPct = Math.round(to * 1000) / 10;
+      formula.innerHTML =
+        "<div>" +
         n +
         " ch × " +
-        Math.round(to * 1000) / 10 +
+        toPct +
         " % TO × " +
         g +
-        " guests = " +
+        " guests/ch = <strong>" +
         fmt(jour) +
-        " clients/jour → " +
+        " clients/jour</strong></div>" +
+        "<div>" +
+        fmt(jour) +
+        " clients/jour × 30,5 = <strong>" +
         fmt(mois) +
-        " clients/mois";
+        " clients/mois</strong></div>";
     }
   }
 
@@ -875,8 +880,15 @@
       btnSim.addEventListener("click", runSimulation);
     }
     $$(".step").forEach(function (s) {
-      s.addEventListener("click", function () {
+      var go = function () {
         setStep(Number(s.dataset.step));
+      };
+      s.addEventListener("click", go);
+      s.addEventListener("keydown", function (ev) {
+        if (ev.key === "Enter" || ev.key === " ") {
+          ev.preventDefault();
+          go();
+        }
       });
     });
   }

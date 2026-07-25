@@ -190,6 +190,7 @@
         "all_data",
         "data",
         "model_data",
+        "concept_pilote",
       ]);
       btnRebuild.classList.toggle("hidden", !rebuildTabs.has(id));
       const titles = {
@@ -202,13 +203,18 @@
         holidays:
           "Recalculer fériés + weekend + vacances (union exclusive) × hôtels × mois terminés",
         model_data: "Reconstruire model_data depuis all_data",
+        concept_pilote:
+          "Recalculer concept_pilote (hôtel × année : clients, CA moyen, mix produits)",
         all_data: "Jointure de tous les onglets → all_data.xlsx",
         data: "Jointure de tous les onglets → all_data.xlsx",
       };
       btnRebuild.title = titles[id] || "Reconstruire";
     }
-    // Lecture seule (sales agrégé, model_data) : masquer add/save/delete
-    const ro = state.datasets.find((d) => d.id === id)?.readonly || id === "sales";
+    // Lecture seule (sales, model_data, concept_pilote) : masquer add/save/delete
+    const ro =
+      state.datasets.find((d) => d.id === id)?.readonly ||
+      id === "sales" ||
+      id === "concept_pilote";
     if ($("#btn-add")) $("#btn-add").classList.toggle("hidden", !!ro);
     if ($("#btn-save")) $("#btn-save").classList.toggle("hidden", !!ro);
     if ($("#btn-delete")) $("#btn-delete").classList.toggle("hidden", !!ro);
@@ -567,6 +573,11 @@
         url: "/api/datasets/model_data/rebuild",
         body: {},
         msg: "Reconstruction model_data…",
+      },
+      concept_pilote: {
+        url: "/api/datasets/concept_pilote/rebuild",
+        body: {},
+        msg: "Calcul concept_pilote (clients, CA, mix produits)…",
       },
       all_data: {
         url: "/api/datasets/all_data/rebuild",
