@@ -111,6 +111,8 @@
     return to;
   }
 
+  var rule1Timer = null;
+
   function updateDerived() {
     var nEl = $("#nb_chambres");
     var toEl = $("#taux_occupation");
@@ -158,6 +160,102 @@
         fmt(mois) +
         " clients/mois</strong></div>";
     }
+
+    // Recalcule le CA Règle 1 (debounce)
+    clearTimeout(rule1Timer);
+    rule1Timer = setTimeout(function () {
+      fetchRule1(n, to, g);
+    }, 200);
+  }
+
+  function renderRule1(data) {
+    var detail = $("#rule1-detail");
+    var meta = $("#rule1-meta");
+    if (!data || !data.ok || !data.by_concept) {
+      ["SIMPLY", "LIBERTY", "CONNECTED"].forEach(function (c) {
+        var caEl = $("#r1-ca-" + c);
+        var subEl = $("#r1-sub-" + c);
+        if (caEl) caEl.textContent = "—";
+        if (subEl) subEl.textContent = "";
+        var card = document.querySelector('.rule1-card[data-concept="' + c + '"]');
+        if (card) card.classList.remove("best");
+      });
+      if (detail) detail.textContent = "";
+      return;
+    }
+
+    if (meta) {
+      meta.textContent =
+        "Vos clients / mois : " +
+        Number(data.clients_mois).toLocaleString("fr-FR", {
+          maximumFractionDigits: 1,
+        }) +
+        " — CA = (CA pilote + impact TO) × (clients hôtel ÷ clients pilote)";
+    }
+
+    var best = null;
+    var bestCa = -Infinity;
+    ["SIMPLY", "LIBERTY", "CONNECTED"].forEach(function (c) {
+      var row = data.by_concept[c] || {};
+      var ca = Number(row.ca_ht_mensuel);
+      if (isFinite(ca) && ca > bestCa) {
+        bestCa = ca;
+        best = c;
+      }
+      var caEl = $("#r1-ca-" + c);
+      var subEl = $("#r1-sub-" + c);
+      if (caEl) caEl.textContent = isFinite(ca) ? euro(ca) : "—";
+      if (subEl) {
+        subEl.innerHTML =
+          "pilote " +
+          euro(row.ca_ht_pilote) +
+          "<br>facteur ×" +
+          (row.client_factor != null
+            ? Number(row.client_factor).toFixed(2)
+            : "—");
+      }
+      var card = document.querySelector('.rule1-card[data-concept="' + c + '"]');
+      if (card) card.classList.toggle("best", c === best);
+    });
+
+    if (detail && best) {
+      var b = data.by_concept[best];
+      detail.textContent =
+        "Meilleur CA Règle 1 : " +
+        best +
+        " (" +
+        euro(b.ca_ht_mensuel) +
+        "/mois) — clients pilote " +
+        Number(b.clients_pilote).toLocaleString("fr-FR", {
+          maximumFractionDigits: 0,
+        }) +
+        ", facteur " +
+        Number(b.client_factor).toFixed(3) +
+        ". (R2 mix, R3 catégories et R4 m lin. viennent ensuite.)";
+    }
+  }
+
+  function fetchRule1(n, to, g) {
+    return fetch("/api/rule1", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        nb_chambres: n,
+        taux_occupation: to,
+        guests_per_chambre: g,
+      }),
+    })
+      .then(function (res) {
+        return res.json();
+      })
+      .then(function (data) {
+        renderRule1(data);
+        return data;
+      })
+      .catch(function (e) {
+        console.error("[ROD] rule1", e);
+        renderRule1(null);
+      });
   }
 
   function setStep(n) {
@@ -388,6 +486,10 @@
       if (gEl) gEl.value = Number(a.guests_per_chambre).toFixed(2);
     }
     updateDerived();
+    // Si le backend a déjà calculé rule1 sur les moyennes, l'afficher tout de suite
+    if (data.rule1 && data.rule1.ok) {
+      renderRule1(data.rule1);
+    }
   }
 
   function loadBrandPilotAverages(brand) {
@@ -846,12 +948,17 @@
     var city = str("hotel_city");
     var hotelName = str("hotel_name");
     var complement = str("hotel_adresse_postale_2");
+    var hotelCode = str("hotel_code");
     var hint = $("#geocode-hint");
 
-    if (!street && !city && !hotelName && !postal) {
+    var hasAccorHint =
+      /all\.accor\.com\/hotel\//i.test(hotelCode) ||
+      /^[Hh]?\d{3,5}$/.test(hotelCode);
+
+    if (!street && !city && !hotelName && !postal && !hasAccorHint) {
       if (hint) {
         hint.textContent =
-          "Renseignez au moins une adresse, une ville ou un nom d’hôtel.";
+          "Renseignez une adresse, une ville, un nom d’hôtel, ou un code Accor (ex. 1545).";
         hint.style.color = "#991b1b";
       }
       toast("Adresse insuffisante pour localiser");
@@ -863,9 +970,11 @@
       postal_code: postal,
       city: city,
       hotel_name: hotelName,
-      q: [street, complement, postal, city, hotelName]
+      hotel_code: hotelCode,
+      q: [street, complement, postal, city, hotelName, hotelCode]
         .filter(Boolean)
         .join(", "),
+      accor_url: /all\.accor\.com/i.test(hotelCode) ? hotelCode : "",
     };
 
     setGeocodeWaiting(true);
@@ -891,10 +1000,23 @@
         var lonEl = $("#hotel_lon");
         if (latEl) latEl.value = Number(data.lat).toFixed(6);
         if (lonEl) lonEl.value = Number(data.lon).toFixed(6);
+        // Préremplir adresse si venue de la fiche Accor
+        if (data.address && !street) {
+          var parts = String(data.address).split(",");
+          if (parts[0] && $("#hotel_adresse_postale_1")) {
+            $("#hotel_adresse_postale_1").value = parts[0].trim();
+          }
+        }
+        if (data.hotel_name && !hotelName && $("#hotel_name")) {
+          $("#hotel_name").value = data.hotel_name;
+        }
         if (hint) {
           hint.style.color = "#14532d";
+          var src = data.source ? " [" + data.source + "]" : "";
           hint.textContent =
-            "✓ Position trouvée : " +
+            "✓ Position trouvée" +
+            src +
+            " : " +
             (data.display_name || data.lat + ", " + data.lon);
         }
         toast("Coordonnées trouvées");

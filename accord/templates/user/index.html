@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/user/css/user.css?v=20260725f" />
+  <link rel="stylesheet" href="/static/user/css/user.css?v=20260725h" />
 </head>
 <body>
   <div class="shell">
@@ -99,7 +99,7 @@
               <div class="spinner sm"></div>
               <div>
                 <strong>Veuillez patienter…</strong>
-                <p class="hint" style="margin:0.2rem 0 0">Recherche de la position à partir de l’adresse.</p>
+                <p class="hint" style="margin:0.2rem 0 0">Recherche via adresse France, code Accor ou fiche all.accor.com…</p>
               </div>
             </div>
             <p class="hint" id="geocode-hint"></p>
@@ -152,11 +152,36 @@
                 <div><span class="muted">Guests / ch (moy.)</span><strong id="bp-guests">—</strong></div>
                 <div><span class="muted">Clients / jour (moy.)</span><strong id="bp-clients-j">—</strong></div>
                 <div><span class="muted">Clients / mois (moy.)</span><strong id="bp-clients-m">—</strong></div>
-                <div><span class="muted">CA mensuel moyen</span><strong id="bp-ca">—</strong></div>
+                <div><span class="muted">CA mensuel historique (moy.)</span><strong id="bp-ca">—</strong></div>
               </div>
               <p class="hint" id="brand-pilot-hint" style="margin-top:.65rem">
                 Valeurs préremplies dans les champs d’exploitation — vous pouvez les ajuster.
               </p>
+            </div>
+
+            <div id="rule1-box" class="rule1-box">
+              <h3>Règle 1 — CA mensuel attendu</h3>
+              <p class="hint" id="rule1-meta" style="margin:0 0 .65rem">
+                CA projeté = (CA pilote + impact TO) × (clients de votre hôtel ÷ clients du pilote).
+              </p>
+              <div class="rule1-grid" id="rule1-cards">
+                <div class="rule1-card" data-concept="SIMPLY">
+                  <div class="rule1-name">SIMPLY</div>
+                  <div class="rule1-ca" id="r1-ca-SIMPLY">—</div>
+                  <div class="rule1-sub" id="r1-sub-SIMPLY"></div>
+                </div>
+                <div class="rule1-card" data-concept="LIBERTY">
+                  <div class="rule1-name">LIBERTY</div>
+                  <div class="rule1-ca" id="r1-ca-LIBERTY">—</div>
+                  <div class="rule1-sub" id="r1-sub-LIBERTY"></div>
+                </div>
+                <div class="rule1-card" data-concept="CONNECTED">
+                  <div class="rule1-name">CONNECTED</div>
+                  <div class="rule1-ca" id="r1-ca-CONNECTED">—</div>
+                  <div class="rule1-sub" id="r1-sub-CONNECTED"></div>
+                </div>
+              </div>
+              <p class="hint" id="rule1-detail" style="margin-top:.65rem"></p>
             </div>
           </div>
         </div>
@@ -301,6 +326,6 @@
   </div>
 
   <div id="toast" class="toast hidden"></div>
-  <script src="/static/user/js/user.js?v=20260725g"></script>
+  <script src="/static/user/js/user.js?v=20260725i"></script>
 </body>
 </html>

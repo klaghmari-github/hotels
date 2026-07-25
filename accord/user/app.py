@@ -115,11 +115,33 @@ def concept_pilote_brand_averages(brand: str):
 
     Lit ``concept_pilote.xlsx``, filtre la marque, exclut l'année la plus
     récente (ex. 2026), moyenne des champs utiles (sans mix F_B / N_F_B).
+    Inclut aussi ``rule1`` : CA mensuel attendu par concept (impact TO + R1).
     """
     from concept_pilote import brand_step1_averages
 
     result = brand_step1_averages(brand)
     return jsonify(result), (200 if result.get("ok") else 404)
+
+
+@app.post("/api/rule1")
+def api_rule1():
+    """
+    Applique impact TO + Règle 1 (scaling clients) pour SIMPLY / LIBERTY / CONNECTED.
+
+    Body JSON : ``nb_chambres``, ``taux_occupation`` (0–1 ou %), ``guests_per_chambre``.
+    """
+    from concept_pilote import rule1_ca_by_concept
+
+    body = request.get_json(force=True, silent=True) or {}
+    try:
+        result = rule1_ca_by_concept(
+            nb_chambres=float(body.get("nb_chambres") or 0),
+            taux_occupation=float(body.get("taux_occupation") or 0),
+            guests_per_chambre=float(body.get("guests_per_chambre") or 1.7),
+        )
+        return jsonify(result)
+    except Exception as exc:  # noqa: BLE001
+        return jsonify({"ok": False, "error": str(exc)}), 400
 
 
 @app.get("/api/hotels")
@@ -153,14 +175,21 @@ def hotel_context(hotel_code: str):
 
 @app.post("/api/geocode")
 def geocode():
-    """Localise lat/lon depuis l'adresse (Nominatim, multi-stratégies)."""
+    """
+    Localise lat/lon : BAN (data.gouv) → fiche Accor (code/URL) → Nominatim.
+
+    Body : street, postal_code, city, hotel_name, hotel_code, q / address / accor_url.
+    Ex. hotel_code ``1545`` ou URL ``https://all.accor.com/hotel/1545/...``.
+    """
     body = request.get_json(force=True, silent=True) or {}
     result = _geocoder.geocode(
         street=str(body.get("street") or body.get("hotel_adresse_postale_1") or ""),
         postal_code=str(body.get("postal_code") or body.get("hotel_code_postal") or ""),
         city=str(body.get("city") or body.get("hotel_city") or ""),
-        free_text=str(body.get("q") or body.get("address") or ""),
+        free_text=str(body.get("q") or body.get("address") or body.get("accor_url") or ""),
         hotel_name=str(body.get("hotel_name") or ""),
+        hotel_code=str(body.get("hotel_code") or ""),
+        accor_url=str(body.get("accor_url") or body.get("url") or ""),
     )
     # 200 même en échec métier (l'UI lit ``ok``) — évite de confondre avec panne réseau
     return jsonify(result), 200

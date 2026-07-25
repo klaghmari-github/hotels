@@ -224,6 +224,63 @@ body {
   font-variant-numeric: tabular-nums;
 }
 .clients-formula strong { color: var(--ink); font-weight: 700; }
+
+.rule1-box {
+  margin-top: 1rem;
+  padding: .9rem 1rem 1.05rem;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #0c1220, #151d2e);
+  color: #eef2f7;
+  border: 1px solid rgba(201, 162, 39, 0.28);
+  box-shadow: 0 12px 28px rgba(12, 18, 32, 0.18);
+}
+.rule1-box h3 {
+  margin: 0 0 .35rem;
+  font-size: .78rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #f0d78c;
+}
+.rule1-box .hint { color: #9aa6b8; }
+.rule1-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .65rem;
+}
+@media (max-width: 700px) {
+  .rule1-grid { grid-template-columns: 1fr; }
+}
+.rule1-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: .75rem .8rem;
+  text-align: center;
+}
+.rule1-card .rule1-name {
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: #9aa6b8;
+  margin-bottom: .35rem;
+}
+.rule1-card .rule1-ca {
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+}
+.rule1-card .rule1-sub {
+  margin-top: .35rem;
+  font-size: .72rem;
+  color: #9aa6b8;
+  line-height: 1.35;
+}
+.rule1-card.best {
+  border-color: rgba(201, 162, 39, 0.55);
+  background: rgba(201, 162, 39, 0.12);
+}
+.rule1-card.best .rule1-ca { color: #f0d78c; }
 .info-box {
   margin-top: 1rem;
   padding: .85rem 1rem;

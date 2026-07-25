@@ -588,6 +588,90 @@ def _mean_fields(subset: pd.DataFrame) -> dict[str, float]:
     return _round_averages(averages)
 
 
+def rule1_ca_by_concept(
+    *,
+    nb_chambres: float,
+    taux_occupation: float,
+    guests_per_chambre: float,
+) -> dict[str, Any]:
+    """
+    Applique **impact TO + Règle 1** (scaling clients) pour chaque concept.
+
+    Formule (alignée ``user.rules.revenue.RevenueRules``) :
+    * clients_hôtel  = n × TO × guests × 30,5
+    * clients_pilote = pivot_n × pivot_to × pivot_guests × 30,5
+    * CA F&B/N-F&B après impact TO (écart TO × ~9,23 €/pt)
+    * CA projeté     = (CA F&B + CA N-F&B) × (clients_hôtel / clients_pilote)
+
+    Ne fait **pas** encore R2 mix / R3 catégories / R4 m_lin (étapes suivantes).
+    """
+    from user.reference import RodReference
+    from user.rules.revenue import RevenueRules
+
+    to = float(taux_occupation)
+    if to > 1.0:
+        to /= 100.0
+    to = min(max(to, 0.0), 1.0)
+    n = max(float(nb_chambres), 0.0)
+    g = max(float(guests_per_chambre), 0.0)
+    clients_hotel = n * to * g * JOURS_MOIS
+
+    ref = RodReference()
+    impact = float(ref.get("impact_to.ht_per_0_01_to", 9.233974) or 9.233974)
+
+    by_concept: dict[str, Any] = {}
+    for concept in ("SIMPLY", "LIBERTY", "CONNECTED"):
+        key = f"concepts.{concept}"
+        pivot_n = float(ref.get(f"{key}.pivot_nb_chambres", 129) or 129)
+        pivot_g = float(ref.get(f"{key}.pivot_guests_per_chambre", 1.7) or 1.7)
+        pivot_to = float(ref.get(f"{key}.pivot_to", 0.75) or 0.75)
+        ca_fb_ref = float(ref.get(f"{key}.base_monthly_ca_fb", 0) or 0)
+        ca_nf_ref = float(ref.get(f"{key}.base_monthly_ca_nf", 0) or 0)
+        ca_ht_ref = ca_fb_ref + ca_nf_ref
+        ventes_ref = float(ref.get(f"{key}.base_monthly_sales", 0) or 0)
+
+        clients_pilote = pivot_n * pivot_to * pivot_g * JOURS_MOIS
+        to_delta = to - pivot_to
+
+        ca_fb, ca_nf = RevenueRules.apply_to_impact(
+            ca_fb_ref, ca_nf_ref, to_delta, impact
+        )
+        ca_fb, ca_nf, factor = RevenueRules.rule1_clients(
+            ca_fb, ca_nf, clients_hotel, clients_pilote
+        )
+        ca_ht = max(ca_fb + ca_nf, 0.0)
+        taux_acheteur = ventes_ref / clients_pilote if clients_pilote else 0.0
+        ventes = taux_acheteur * clients_hotel
+
+        by_concept[concept] = {
+            "ca_ht_mensuel": round(ca_ht, 2),
+            "ca_fb_mensuel": round(ca_fb, 2),
+            "ca_nf_mensuel": round(ca_nf, 2),
+            "ca_ht_pilote": round(ca_ht_ref, 2),
+            "clients_pilote": round(clients_pilote, 2),
+            "client_factor": round(factor, 4),
+            "to_delta": round(to_delta, 4),
+            "nbr_ventes_mensuel": round(ventes, 2),
+            "pivot_nb_chambres": pivot_n,
+            "pivot_to": pivot_to,
+            "pivot_guests": pivot_g,
+        }
+
+    return {
+        "ok": True,
+        "nb_chambres": n,
+        "taux_occupation": to,
+        "guests_per_chambre": g,
+        "clients_jour": round(n * to * g, 2),
+        "clients_mois": round(clients_hotel, 2),
+        "by_concept": by_concept,
+        "formula": (
+            "CA_mensuel = (CA_pilote_F&B + CA_pilote_N-F&B + impact_TO) "
+            "× (clients_hôtel / clients_pilote)"
+        ),
+    }
+
+
 def brand_step1_averages(brand: str) -> dict[str, Any]:
     """
     Moyennes des indicateurs d'exploitation pour une marque.
@@ -722,6 +806,15 @@ def brand_step1_averages(brand: str) -> dict[str, Any]:
         subset["hotel_brand"].dropna().astype(str).str.strip().unique().tolist()
     )
 
+    # Règle 1 : CA mensuel attendu par concept (impact TO + scaling clients)
+    rule1: dict[str, Any] = {}
+    if averages:
+        rule1 = rule1_ca_by_concept(
+            nb_chambres=float(averages.get("nb_chambres") or 0),
+            taux_occupation=float(averages.get("taux_occupation") or 0.7),
+            guests_per_chambre=float(averages.get("guests_per_chambre") or 1.7),
+        )
+
     return {
         "ok": True,
         "brand": brand_clean,
@@ -734,6 +827,7 @@ def brand_step1_averages(brand: str) -> dict[str, Any]:
         "strategy": strategy,
         "source_brands": brands_in_subset if strategy == "direct" else source_brands,
         "ladder": list(BRAND_LADDER),
+        "rule1": rule1,
         "note": (
             None
             if strategy == "direct"
