@@ -35,6 +35,15 @@ app = Flask(
     static_url_path="/static/user",
 )
 app.config["JSON_AS_ASCII"] = False
+# Évite le cache navigateur agressif sur JS/CSS pendant le dev
+app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
+
+
+@app.after_request
+def _no_cache_static(response):
+    if request.path.startswith("/static/"):
+        response.headers["Cache-Control"] = "no-store, max-age=0"
+    return response
 
 # Singletons légers
 _catalog = AdminCatalog()

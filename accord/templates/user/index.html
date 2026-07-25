@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/user/css/user.css" />
+  <link rel="stylesheet" href="/static/user/css/user.css?v=20260725b" />
 </head>
 <body>
   <div class="shell">
@@ -42,27 +42,21 @@
       <section class="panel" data-panel="1">
         <div class="panel-head">
           <h1>Informations générales</h1>
-          <p>Identité de l’hôtel, adresse (géocode auto) et indicateurs d’exploitation. Les marques viennent de l’admin.</p>
+          <p>Identité de l’hôtel, adresse et indicateurs d’exploitation.</p>
         </div>
 
         <div class="grid-2">
           <div class="card">
             <h2 class="card-title">Identité</h2>
-            <div class="field">
-              <label>Hôtel existant (admin)</label>
-              <select id="hotel-select">
-                <option value="">— Nouveau / saisie libre —</option>
-              </select>
-            </div>
             <div class="form-grid-2">
               <div class="field">
                 <label>Code hôtel</label>
                 <input id="hotel_code" type="text" placeholder="H0338" />
               </div>
               <div class="field">
-                <label>Marque <span class="muted small">(hotel_brand_data)</span></label>
-                <select id="hotel_brand" name="hotel_brand" required>
-                  <option value="">— Chargement des marques… —</option>
+                <label>Marque</label>
+                <select id="hotel_brand" name="hotel_brand">
+                  <option value="">— Choisir une marque —</option>
                 </select>
               </div>
             </div>
@@ -105,7 +99,7 @@
               <div class="spinner sm"></div>
               <div>
                 <strong>Veuillez patienter…</strong>
-                <p class="hint" style="margin:0.2rem 0 0">Recherche de la position à partir de l’adresse (OpenStreetMap).</p>
+                <p class="hint" style="margin:0.2rem 0 0">Recherche de la position à partir de l’adresse.</p>
               </div>
             </div>
             <p class="hint" id="geocode-hint"></p>
@@ -121,7 +115,7 @@
               <div class="kpi">
                 <label>TO annuel</label>
                 <div class="input-suffix">
-                  <input id="taux_occupation" type="number" min="1" max="100" value="65" />
+                  <input id="taux_occupation" type="number" min="1" max="100" step="0.1" value="65" />
                   <span>%</span>
                 </div>
               </div>
@@ -131,12 +125,23 @@
               </div>
             </div>
             <div class="derived">
-              <div><span class="muted">Clients / jour</span><strong id="out-clients-jour">—</strong></div>
-              <div><span class="muted">Clients / mois</span><strong id="out-clients-mois">—</strong></div>
+              <div>
+                <span class="muted">Clients / jour</span>
+                <strong id="out-clients-jour">—</strong>
+              </div>
+              <div>
+                <span class="muted">Clients / mois</span>
+                <strong id="out-clients-mois">—</strong>
+              </div>
             </div>
+            <p class="hint" id="clients-formula" style="margin-top:0.5rem"></p>
             <div class="info-box">
-              Les clients hébergés (chambres × TO × guests × 30,5) pilotent la
-              <em>Règle 1</em> : scaling du CA pilote Excel du concept.
+              <strong>Règle 1 — scaling par clients hébergés.</strong>
+              Le CA du concept pilote (référence Excel) est multiplié par le ratio
+              <em>clients de votre hôtel ÷ clients du pilote</em>.
+              Les clients se calculent ainsi :
+              chambres × taux d’occupation × guests/chambre (par jour),
+              puis × 30,5 pour le mois.
             </div>
             <div id="hist-box" class="hist-box hidden">
               <h3>Référence model_data (historique)</h3>
@@ -291,6 +296,6 @@
   </div>
 
   <div id="toast" class="toast hidden"></div>
-  <script src="/static/user/js/user.js"></script>
+  <script src="/static/user/js/user.js?v=20260725b"></script>
 </body>
 </html>
