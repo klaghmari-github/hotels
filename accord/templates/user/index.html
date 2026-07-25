@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ROD · Simulateur Directeur</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/user/css/user.css" />
+</head>
+<body>
+  <div class="shell">
+    <!-- Top bar -->
+    <header class="top">
+      <div class="brand">
+        <span class="brand-mark">A</span>
+        <div>
+          <strong>ROD</strong>
+          <span class="brand-sub">Retail On Demand · Simulateur</span>
+        </div>
+      </div>
+      <nav class="top-nav">
+        <span class="pill">User</span>
+        <span class="muted small">Admin data · port 5055</span>
+      </nav>
+    </header>
+
+    <!-- Stepper -->
+    <div class="stepper-wrap">
+      <ol class="stepper" id="stepper">
+        <li class="step active" data-step="1"><span class="n">1</span><span class="lbl">Hôtel</span></li>
+        <li class="step" data-step="2"><span class="n">2</span><span class="lbl">Services</span></li>
+        <li class="step" data-step="3"><span class="n">3</span><span class="lbl">Clients</span></li>
+        <li class="step" data-step="4"><span class="n">4</span><span class="lbl">Corner</span></li>
+        <li class="step" data-step="5"><span class="n">5</span><span class="lbl">Simulation</span></li>
+      </ol>
+    </div>
+
+    <main class="main">
+      <!-- STEP 1 — Identité -->
+      <section class="panel" data-panel="1">
+        <div class="panel-head">
+          <h1>Informations générales</h1>
+          <p>Identité de l’hôtel, adresse (géocode auto) et indicateurs d’exploitation. Les marques viennent de l’admin.</p>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h2 class="card-title">Identité</h2>
+            <div class="field">
+              <label>Hôtel existant (admin)</label>
+              <select id="hotel-select">
+                <option value="">— Nouveau / saisie libre —</option>
+              </select>
+            </div>
+            <div class="form-grid-2">
+              <div class="field">
+                <label>Code hôtel</label>
+                <input id="hotel_code" type="text" placeholder="H0338" />
+              </div>
+              <div class="field">
+                <label>Marque</label>
+                <select id="hotel_brand"></select>
+              </div>
+            </div>
+            <div class="field">
+              <label>Nom de l’hôtel</label>
+              <input id="hotel_name" type="text" placeholder="ibis Styles Paris…" />
+            </div>
+            <div class="field">
+              <label>Adresse</label>
+              <input id="hotel_adresse_postale_1" type="text" placeholder="12 rue de la Paix" />
+            </div>
+            <div class="field">
+              <label>Complément (optionnel)</label>
+              <input id="hotel_adresse_postale_2" type="text" placeholder="Bâtiment B" />
+            </div>
+            <div class="form-grid-2">
+              <div class="field">
+                <label>Code postal</label>
+                <input id="hotel_code_postal" type="text" placeholder="75001" />
+              </div>
+              <div class="field">
+                <label>Ville</label>
+                <input id="hotel_city" type="text" placeholder="Paris" />
+              </div>
+            </div>
+            <div class="form-grid-2">
+              <div class="field">
+                <label>Latitude</label>
+                <input id="hotel_lat" type="number" step="any" placeholder="auto" />
+              </div>
+              <div class="field">
+                <label>Longitude</label>
+                <input id="hotel_lon" type="number" step="any" placeholder="auto" />
+              </div>
+            </div>
+            <button type="button" class="btn ghost" id="btn-geocode">Localiser depuis l’adresse</button>
+            <p class="hint" id="geocode-hint"></p>
+          </div>
+
+          <div class="card">
+            <h2 class="card-title">Exploitation</h2>
+            <div class="kpi-row">
+              <div class="kpi">
+                <label># Chambres</label>
+                <input id="nb_chambres" type="number" min="1" max="2000" value="80" />
+              </div>
+              <div class="kpi">
+                <label>TO annuel</label>
+                <div class="input-suffix">
+                  <input id="taux_occupation" type="number" min="1" max="100" value="65" />
+                  <span>%</span>
+                </div>
+              </div>
+              <div class="kpi">
+                <label>Guests / chambre</label>
+                <input id="guests_per_chambre" type="number" min="0.5" max="5" step="0.1" value="1.7" />
+              </div>
+            </div>
+            <div class="derived">
+              <div><span class="muted">Clients / jour</span><strong id="out-clients-jour">—</strong></div>
+              <div><span class="muted">Clients / mois</span><strong id="out-clients-mois">—</strong></div>
+            </div>
+            <div class="info-box">
+              Les clients hébergés (chambres × TO × guests × 30,5) pilotent la
+              <em>Règle 1</em> : scaling du CA pilote Excel du concept.
+            </div>
+            <div id="hist-box" class="hist-box hidden">
+              <h3>Référence model_data (historique)</h3>
+              <div class="hist-grid">
+                <div><span class="muted">CA mensuel moyen</span><strong id="hist-ca">—</strong></div>
+                <div><span class="muted">Ventes / mois</span><strong id="hist-ventes">—</strong></div>
+                <div><span class="muted">Mix F&amp;B</span><strong id="hist-mix">—</strong></div>
+                <div><span class="muted">Mois observés</span><strong id="hist-n">—</strong></div>
+              </div>
+              <p class="hint" id="hist-sources"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 2 — Services -->
+      <section class="panel hidden" data-panel="2">
+        <div class="panel-head">
+          <h1>Services &amp; équipements</h1>
+          <p>Présence F&amp;B et non-F&amp;B, équipements lobby. Utilisés pour le profil descriptif (et le futur modèle IA).</p>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <h2 class="card-title accent-fb">F&amp;B</h2>
+            <div class="toggle-list" id="svc-fb"></div>
+          </div>
+          <div class="card">
+            <h2 class="card-title accent-nfb">Non-F&amp;B</h2>
+            <div class="toggle-list" id="svc-nfb"></div>
+          </div>
+          <div class="card span-2">
+            <h2 class="card-title">Équipements lobby</h2>
+            <div class="toggle-grid" id="svc-lobby"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 3 — Clients -->
+      <section class="panel hidden" data-panel="3">
+        <div class="panel-head">
+          <h1>Profil de vos clients</h1>
+          <p>Mix clientèle et besoins produits (Règle 3 — coefficients catégories Excel).</p>
+        </div>
+        <div class="card">
+          <h2 class="card-title">Mix clientèle</h2>
+          <div class="form-grid-4">
+            <div class="field">
+              <label>Loisirs</label>
+              <div class="input-suffix"><input id="loisirs_pct" type="number" min="0" max="100" value="30" /><span>%</span></div>
+            </div>
+            <div class="field">
+              <label>Affaires</label>
+              <div class="input-suffix"><input id="affaires_pct" type="number" min="0" max="100" value="70" /><span>%</span></div>
+            </div>
+            <div class="field">
+              <label>National</label>
+              <div class="input-suffix"><input id="national_pct" type="number" min="0" max="100" value="60" /><span>%</span></div>
+            </div>
+            <div class="field">
+              <label>International</label>
+              <div class="input-suffix"><input id="international_pct" type="number" min="0" max="100" value="40" /><span>%</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <h2 class="card-title accent-fb">Besoins F&amp;B</h2>
+            <div class="toggle-list" id="needs-fb"></div>
+          </div>
+          <div class="card">
+            <h2 class="card-title accent-nfb">Besoins NON-F&amp;B</h2>
+            <div class="toggle-list" id="needs-nfb"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 4 — Corner -->
+      <section class="panel hidden" data-panel="4">
+        <div class="panel-head">
+          <h1>Boutique / corner</h1>
+          <p>Présence d’un corner actuel et paramètres de surface (Règle 4 — mètres linéaires).</p>
+        </div>
+        <div class="card narrow">
+          <div class="toggle-row">
+            <div>
+              <strong>Corner existant ?</strong>
+              <p class="muted small">Boutique, distributeurs, frigos connectés…</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="has_corner" />
+              <span></span>
+            </label>
+          </div>
+          <div class="form-grid-2" style="margin-top:1.25rem">
+            <div class="field">
+              <label>Mètres linéaires</label>
+              <input id="m_lin" type="number" min="1" max="40" step="0.5" placeholder="Défaut pilote concept" />
+              <p class="hint">Laisser vide pour le défaut Excel du concept (6 / 8 / 7 m).</p>
+            </div>
+            <div class="field">
+              <label>Mix F&amp;B souhaité</label>
+              <div class="input-suffix">
+                <input id="mix_fb" type="number" min="0" max="100" step="1" placeholder="Défaut pilote" />
+                <span>%</span>
+              </div>
+              <p class="hint">Optionnel — ajustement Règle 2 (±10 %).</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 5 — Results -->
+      <section class="panel hidden" data-panel="5">
+        <div class="panel-head row">
+          <div>
+            <h1>Simulation de revenu</h1>
+            <p>Revenus ROD + coûts séparés → marge nette → recommandation concept.</p>
+          </div>
+          <button type="button" class="btn primary" id="btn-simulate">Lancer la simulation</button>
+        </div>
+
+        <div id="sim-loading" class="hidden loading-box">
+          <div class="spinner"></div>
+          <p>Calcul en cours — enrichissement &amp; règles ROD…</p>
+        </div>
+
+        <div id="sim-error" class="hidden error-box"></div>
+
+        <div id="sim-reco" class="hidden reco-banner"></div>
+
+        <div id="sim-calc" class="hidden card calc-card"></div>
+
+        <div id="sim-cards" class="concept-grid"></div>
+
+        <div id="sim-enrich" class="hidden card" style="margin-top:1.25rem">
+          <h2 class="card-title">Enrichissement calculé</h2>
+          <div class="enrich-grid" id="enrich-body"></div>
+        </div>
+
+        <div id="sim-warnings" class="hidden" style="margin-top:1rem"></div>
+      </section>
+    </main>
+
+    <footer class="footer-nav">
+      <button type="button" class="btn ghost" id="btn-prev" disabled>Retour</button>
+      <div class="footer-mid muted small" id="step-label">Étape 1 / 5</div>
+      <button type="button" class="btn success" id="btn-next">Valider</button>
+    </footer>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="/static/user/js/user.js"></script>
+</body>
+</html>

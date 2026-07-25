@@ -16,8 +16,10 @@ La logique métier ne vit **pas** ici : ce module route uniquement vers
 
 Lancer
 ------
-    python run.py
+    python run_admin.py
     # → http://127.0.0.1:5055
+
+Interface directeur / simulateur ROD : ``python run_user.py`` (port 5056).
 
 Voir ``README.md`` pour le détail des routes et de l'architecture.
 """

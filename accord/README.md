@@ -24,15 +24,29 @@ cd accord
 
 pip install -r requirements.txt
 
-python run.py
+# Admin — données + model build
+python run_admin.py
 # → http://127.0.0.1:5055
+
+# User — wizard directeur + simulateur ROD
+python run_user.py
+# → http://127.0.0.1:5056
 ```
 
 | Option | Défaut | Description |
 |--------|--------|-------------|
 | `--host` | `127.0.0.1` | Adresse d’écoute |
-| `--port` | `5055` | Port HTTP |
+| `--port` | `5055` admin / `5056` user | Port HTTP |
 | `--debug` | off | Mode debug Flask |
+
+### Deux interfaces
+
+| Entrée | Rôle |
+|--------|------|
+| **`run_admin.py`** | Saisie / rebuild datasets, jointures, Model Build / Explore / Deploy |
+| **`run_user.py`** | Wizard directeur (identité, services, clients, corner) → enrichissement → **revenus ROD** + **coûts** (séparés) → marge → recommandation SIMPLY / LIBERTY / CONNECTED |
+
+Le moteur de **revenus** et le moteur de **coûts** sont volontairement découplés (`user/rules/revenue.py` vs `user/rules/costs.py`) : une future étape IA pourra remplacer uniquement les revenus.
 
 ---
 
@@ -40,8 +54,9 @@ python run.py
 
 ```
 accord/
-├── run.py                 # CLI → app.main()
-├── app.py                 # Routes Flask (pages + API)
+├── run_admin.py           # CLI admin → app.main()
+├── run_user.py            # CLI user  → user.app.main()
+├── app.py                 # Routes Flask admin (pages + API)
 ├── schemas.py             # Schémas des onglets / fichiers Excel
 ├── store.py               # Cache, pagination, lecture/écriture Excel
 ├── join_data.py           # Jointure All Data + fill nulls numériques
@@ -52,16 +67,24 @@ accord/
 ├── model_explore.py       # Analyse arbres, importances, perfs
 ├── extract_couts.py       # Extraction one-shot des grilles de coûts ROD
 ├── sync_data_files.py     # Aligne les Excel data/ sur les schémas UI
+├── user/                  # Simulateur directeur (POO)
+│   ├── app.py             # Flask user API + wizard
+│   ├── models.py          # Request / résultats
+│   ├── reference.py       # rod_reference.json
+│   ├── rules/             # revenue · costs · recommendation
+│   └── services/          # catalog, geocode, enrich, orchestrator
 ├── requirements.txt
-├── data/                  # Excel métier (sources + dérivés)
+├── data/                  # Excel métier + rod_reference.json
 ├── models/
 │   ├── design/<nom>/      # Modèles entraînés (model.pkl + config.json)
 │   ├── deploy/            # Un seul modèle actif (model.pkl + model.json)
 │   └── last_trained.json  # Pointeur dernier entraînement
-├── templates/index.html   # Shell UI
+├── templates/
+│   ├── index.html         # Shell UI admin
+│   └── user/index.html    # Wizard ROD
 └── static/
-    ├── css/app.css
-    └── js/app.js          # Front (tables, Model Build, Model Explore)
+    ├── css/app.css · js/app.js
+    └── user/css · user/js
 ```
 
 ### Flux de données
