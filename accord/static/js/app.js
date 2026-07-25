@@ -315,11 +315,23 @@
 
   function logoUrlFromPath(relpath) {
     if (!relpath) return "";
-    const s = String(relpath).trim();
-    if (!s || s === "nan" || s === "None") return "";
-    // déjà une URL absolue
+    let s = String(relpath).trim().replace(/\\/g, "/");
+    if (!s || s === "nan" || s === "None" || s === "null") return "";
+    // déjà une URL
     if (/^https?:\/\//i.test(s) || s.startsWith("/api/")) return s;
-    return `/api/marques/logos/${s.replace(/^\/+/, "")}`;
+    // normalise préfixes éventuels (Excel / sync)
+    s = s.replace(/^\/+/, "");
+    s = s.replace(/^\.\/+/, "");
+    s = s.replace(/^data\/marques\//i, "");
+    s = s.replace(/^marques\//i, "");
+    // encode chaque segment (espaces, accents) — garde les /
+    const encoded = s
+      .split("/")
+      .filter(Boolean)
+      .map((seg) => encodeURIComponent(seg))
+      .join("/");
+    // relatif à l'origine de run_admin (même host:port)
+    return `/api/marques/logos/${encoded}`;
   }
 
   function renderTable(payload) {
@@ -344,7 +356,11 @@
       if (role === "id_detail") th.classList.add("col-id-detail", "key-col");
       else if (role === "target") th.classList.add("col-target");
       else if (role === "descriptive") th.classList.add("col-descriptive");
-      th.innerHTML = `<span class="col-label" title="${escapeHtml(c)}">${escapeHtml(c)}</span>`;
+      // UI : logo_path → libellé « Logo » (le fichier Excel garde logo_path)
+      const label = images.has(c) && (c === "logo_path" || c.endsWith("_path"))
+        ? "Logo"
+        : c;
+      th.innerHTML = `<span class="col-label" title="${escapeHtml(c)}">${escapeHtml(label)}</span>`;
       hr.appendChild(th);
     });
     thead.appendChild(hr);
@@ -400,24 +416,29 @@
         if (Array.isArray(val)) val = JSON.stringify(val);
         if (val === null || val === undefined) val = "";
 
-        // Colonnes image (ex. logo_path marque)
+        // Colonnes image : afficher uniquement le logo (chemin gardé en data, pas en UI)
         if (images.has(col)) {
           td.className = "cell-logo";
           const wrap = document.createElement("div");
           wrap.className = "logo-cell";
+          wrap.dataset.index = String(row._index);
+          wrap.dataset.col = col;
+          wrap.dataset.logoPath = String(val); // chemin Excel, non affiché
+          const brandName = String(data.Marque || data.marque || "");
           const src = logoUrlFromPath(val);
           if (src) {
             const img = document.createElement("img");
             img.className = "brand-logo-thumb";
             img.src = src;
-            img.alt = String(data.Marque || data.marque || col);
-            img.title = String(val);
+            img.alt = brandName || "logo";
+            img.title = brandName || "Logo";
             img.loading = "lazy";
             img.onerror = () => {
-              img.style.display = "none";
+              img.remove();
               const miss = document.createElement("span");
               miss.className = "logo-missing";
               miss.textContent = "—";
+              miss.title = "Logo introuvable";
               wrap.appendChild(miss);
             };
             wrap.appendChild(img);
@@ -425,17 +446,9 @@
             const miss = document.createElement("span");
             miss.className = "logo-missing";
             miss.textContent = "—";
+            miss.title = "Pas de logo";
             wrap.appendChild(miss);
           }
-          // chemin en lecture seule (petit)
-          const pathInput = document.createElement("input");
-          pathInput.className = "cell-input logo-path-input";
-          pathInput.value = String(val);
-          pathInput.dataset.index = String(row._index);
-          pathInput.dataset.col = col;
-          pathInput.title = col;
-          pathInput.readOnly = true;
-          wrap.appendChild(pathInput);
           td.appendChild(wrap);
           tr.appendChild(td);
           return;

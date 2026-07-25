@@ -74,26 +74,72 @@ def favicon():
     return ("", 204)
 
 
-@app.get("/api/marques/logos/<path:relpath>")
-def api_marque_logo(relpath: str):
+def _resolve_marque_logo(relpath: str) -> Path | None:
     """
-    Sert un logo marque depuis ``data/marques/`` (PNG locaux).
+    Résout un ``logo_path`` Excel vers un fichier sous ``accord/data/marques/``.
 
-    Ex. ``/api/marques/logos/economy/ibis_budget.png``
-    → ``data/marques/economy/ibis_budget.png``
+    Chemin ancré sur ``ROOT`` (= dossier de ``app.py`` / ``run_admin.py``),
+    **indépendant du cwd** au lancement.
+
+    Accepte :
+    * ``economy/ibis.png``  (forme stockée dans hotel_brand_data)
+    * ``marques/economy/ibis.png``
+    * ``data/marques/economy/ibis.png``
+    * chemin absolu déjà sous ``data/marques/``
     """
     base = (ROOT / "data" / "marques").resolve()
-    # normalise, empêche path traversal
-    clean = relpath.replace("\\", "/").lstrip("/")
+    if not relpath:
+        return None
+    raw = str(relpath).strip().replace("\\", "/")
+    if not raw or raw.lower() in {"nan", "none", "null"}:
+        return None
+
+    p = Path(raw)
+    if p.is_absolute():
+        try:
+            target = p.resolve()
+            target.relative_to(base)
+            return target if target.is_file() else None
+        except (ValueError, OSError):
+            return None
+
+    clean = raw.lstrip("/")
+    # strip préfixes redondants
+    for prefix in (
+        "data/marques/",
+        "marques/",
+        "./data/marques/",
+        "./marques/",
+    ):
+        if clean.lower().startswith(prefix):
+            clean = clean[len(prefix) :]
+            break
     if ".." in clean.split("/"):
-        return jsonify({"error": "path invalide"}), 400
+        return None
     target = (base / clean).resolve()
     try:
         target.relative_to(base)
     except ValueError:
-        return jsonify({"error": "path hors marques/"}), 400
-    if not target.is_file():
-        return jsonify({"error": "logo introuvable", "path": clean}), 404
+        return None
+    return target if target.is_file() else None
+
+
+@app.get("/api/marques/logos/<path:relpath>")
+def api_marque_logo(relpath: str):
+    """
+    Sert un logo marque depuis ``accord/data/marques/`` (PNG locaux).
+
+    URL : ``/api/marques/logos/economy/ibis_budget.png``
+    Fichier : ``{ROOT}/data/marques/economy/ibis_budget.png``
+    avec ``ROOT`` = répertoire de ``run_admin.py`` / ``app.py``.
+    """
+    target = _resolve_marque_logo(relpath)
+    if target is None:
+        return jsonify({
+            "error": "logo introuvable",
+            "path": relpath,
+            "expected_under": str((ROOT / "data" / "marques").resolve()),
+        }), 404
     return send_from_directory(str(target.parent), target.name)
 
 

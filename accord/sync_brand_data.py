@@ -129,9 +129,35 @@ def build_brand_frame(
         name = _norm_brand(m.get("Marque") or m.get("marque_nom"))
         if not name:
             continue
-        logo = str(m.get("logo_path") or "").strip()
-        if logo.lower() in {"nan", "none"}:
+        logo = str(m.get("logo_path") or "").strip().replace("\\", "/")
+        if logo.lower() in {"nan", "none", "null"}:
             logo = ""
+        # Toujours relatif à data/marques/ (servi par run_admin via /api/marques/logos/)
+        for prefix in ("data/marques/", "marques/", "./data/marques/", "./marques/"):
+            if logo.lower().startswith(prefix):
+                logo = logo[len(prefix) :]
+                break
+        logo = logo.lstrip("/")
+        # vérifie que le fichier existe bien sous data/marques/
+        if logo:
+            abs_logo = (DATA / "marques" / logo).resolve()
+            try:
+                abs_logo.relative_to((DATA / "marques").resolve())
+            except ValueError:
+                logo = ""
+            else:
+                if not abs_logo.is_file():
+                    # fallback logo_file + categorie_slug
+                    cat = str(m.get("categorie_slug") or "").strip()
+                    fname = str(m.get("logo_file") or "").strip()
+                    if cat and fname:
+                        alt = f"{cat}/{fname}"
+                        if (DATA / "marques" / alt).is_file():
+                            logo = alt
+                        else:
+                            logo = ""
+                    else:
+                        logo = ""
         slug = str(m.get("categorie_slug") or "autres").strip() or "autres"
         rec: dict[str, Any] = {
             "Marque": name,
