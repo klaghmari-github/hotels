@@ -313,9 +313,150 @@ def _zone_from_lat_lon(lat: Any, lon: Any) -> str:
     return "C"
 
 
+# Départements → zone scolaire (académies MEN, repère 2023+)
+_ZONE_A_DEPTS = {
+    "01", "03", "07", "15", "16", "17", "19", "21", "23", "24", "25", "26",
+    "33", "38", "39", "40", "42", "43", "47", "58", "63", "64", "69", "70",
+    "71", "73", "74", "79", "86", "87", "89", "90",
+}
+_ZONE_B_DEPTS = {
+    "02", "04", "05", "06", "08", "10", "13", "14", "18", "22", "27", "28",
+    "29", "35", "36", "37", "41", "44", "45", "49", "50", "51", "52", "53",
+    "54", "55", "56", "57", "59", "60", "61", "62", "67", "68", "72", "76",
+    "80", "84", "85", "88",
+    "2A", "2B",  # Corse rattachée zone B (académies)
+}
+_ZONE_C_DEPTS = {
+    "09", "11", "12", "30", "31", "32", "34", "46", "48", "65", "66", "75",
+    "77", "78", "81", "82", "91", "92", "93", "94", "95",
+}
+
+
+def _dept_from_postal(postal: Any) -> str:
+    """Extrait le code département (2 car. ou 2A/2B) depuis un CP français."""
+    s = str(postal or "").strip().upper().replace(" ", "")
+    if not s:
+        return ""
+    # Corse : 20000–20199 → 2A, 20200–20999 → 2B (approx)
+    if s.startswith("20") and len(s) >= 3:
+        try:
+            n = int(s[:3])
+            return "2A" if n < 202 else "2B"
+        except ValueError:
+            return "20"
+    if s[:2].isdigit():
+        return s[:2]
+    return ""
+
+
+def _zone_from_department(dept: str) -> str:
+    d = str(dept or "").strip().upper()
+    if d in _ZONE_A_DEPTS:
+        return "A"
+    if d in _ZONE_B_DEPTS:
+        return "B"
+    if d in _ZONE_C_DEPTS:
+        return "C"
+    return ""
+
+
+def resolve_hotel_zone(
+    hotel_row: pd.Series | dict[str, Any],
+    *,
+    meta: dict[str, Any] | None = None,
+) -> tuple[str, str, str]:
+    """
+    Détermine (zone A/B/C, departement, commune) pour un hôtel.
+
+    Priorité zone : méta existante → département (CP) → lat/lon.
+    """
+    meta = meta or {}
+    zone = str(meta.get("zone_scolaire") or "").strip().upper()
+    dep = str(meta.get("departement") or "").strip()
+    commune = str(meta.get("commune") or hotel_row.get("hotel_city") or "").strip()
+
+    if not dep:
+        dep = _dept_from_postal(hotel_row.get("hotel_code_postal"))
+    if zone not in {"A", "B", "C"}:
+        zone = _zone_from_department(dep)
+    if zone not in {"A", "B", "C"}:
+        zone = _zone_from_lat_lon(hotel_row.get("hotel_lat"), hotel_row.get("hotel_lon"))
+    if zone not in {"A", "B", "C"}:
+        zone = "C"
+    return zone, dep, commune
+
+
 def _weekends_in_month(days: list[date]) -> list[date]:
     """Samedi (5) + dimanche (6)."""
     return [d for d in days if d.weekday() >= 5]
+
+
+def compute_holidays_rows(
+    hotels: pd.DataFrame,
+    pairs: list[tuple[int, int]],
+    *,
+    meta: dict[str, dict[str, Any]] | None = None,
+    school_cache: dict[int, dict[str, list[tuple[date, date]]]] | None = None,
+) -> list[dict[str, Any]]:
+    """
+    Calcule les lignes holidays (hôtel × année × mois) pour un sous-ensemble d'hôtels.
+
+    Utilisé par :func:`rebuild_hotel_holidays_data` et ``parallel_holidays``.
+    """
+    meta = meta or {}
+    school_cache = school_cache if school_cache is not None else {}
+    rows: list[dict[str, Any]] = []
+
+    for _, h in hotels.iterrows():
+        code = str(h.get("hotel_code") or "").strip()
+        if not code:
+            continue
+        name = h.get("hotel_name")
+        info = meta.get(code, {})
+        zone, dep, commune = resolve_hotel_zone(h, meta=info)
+
+        for year, month in pairs:
+            if year not in school_cache:
+                school_cache[year] = _school_periods_for_year(year)
+            days = _days_in_month(year, month)
+            n_mois = len(days)
+
+            feries = sorted({d for d in days if d in french_public_holidays(year)})
+            weekends = sorted({d for d in _weekends_in_month(days)})
+            vac_ranges = school_cache[year].get(zone, [])
+            vac_all = sorted(set(_days_in_ranges(days, vac_ranges)))
+            vac_hors = sorted(set(vac_all) - set(feries))
+
+            holidays_set = sorted(set(feries) | set(weekends) | set(vac_all))
+            nb_holidays = len(holidays_set)
+            pct_holidays = (nb_holidays / n_mois) if n_mois else 0.0
+
+            rows.append(
+                {
+                    "hotel_code": code,
+                    "hotel_name": name,
+                    "annee": int(year),
+                    "mois": int(month),
+                    "zone_scolaire_a": 1 if zone == "A" else 0,
+                    "zone_scolaire_b": 1 if zone == "B" else 0,
+                    "zone_scolaire_c": 1 if zone == "C" else 0,
+                    "departement": dep,
+                    "commune": commune,
+                    "nb_jours_dans_mois": n_mois,
+                    "nb_jours_feries": len(feries),
+                    "nb_jours_weekend": len(weekends),
+                    "nb_jours_vacances_scolaires": len(vac_all),
+                    "nb_jours_vacances_hors_feries": len(vac_hors),
+                    "nb_jours_holidays": nb_holidays,
+                    "pct_jours_holidays": round(pct_holidays, 6),
+                    "jours_feries": _iso_list(feries),
+                    "jours_weekend": _iso_list(weekends),
+                    "jours_vacances_scolaires": _iso_list(vac_all),
+                    "jours_vacances_hors_feries": _iso_list(vac_hors),
+                    "jours_holidays": _iso_list(holidays_set),
+                }
+            )
+    return rows
 
 
 def rebuild_hotel_holidays_data() -> dict[str, Any]:
@@ -351,64 +492,7 @@ def rebuild_hotel_holidays_data() -> dict[str, Any]:
     existing = load_holidays_frame()
     meta = _hotel_meta_lookup(existing)
 
-    rows: list[dict[str, Any]] = []
-    school_cache: dict[int, dict[str, list[tuple[date, date]]]] = {}
-
-    for _, h in hotels.iterrows():
-        code = str(h.get("hotel_code") or "").strip()
-        name = h.get("hotel_name")
-        info = meta.get(code, {})
-        # zone utilisée en interne pour les périodes scolaires uniquement
-        zone = str(info.get("zone_scolaire") or "").strip().upper()
-        if zone not in {"A", "B", "C"}:
-            zone = _zone_from_lat_lon(h.get("hotel_lat"), h.get("hotel_lon"))
-        dep = info.get("departement") or ""
-        commune = info.get("commune") or ""
-
-        for year, month in pairs:
-            if year not in school_cache:
-                school_cache[year] = _school_periods_for_year(year)
-            days = _days_in_month(year, month)
-            n_mois = len(days)
-
-            feries = sorted({d for d in days if d in french_public_holidays(year)})
-            weekends = sorted({d for d in _weekends_in_month(days)})
-            vac_ranges = school_cache[year].get(zone, [])
-            vac_all = sorted(set(_days_in_ranges(days, vac_ranges)))
-            # vacances hors fériés (info complémentaire, pas dans l'union brute)
-            vac_hors = sorted(set(vac_all) - set(feries))
-
-            # Union exclusive : un jour compté une seule fois
-            holidays_set = sorted(set(feries) | set(weekends) | set(vac_all))
-            nb_holidays = len(holidays_set)
-            pct_holidays = (nb_holidays / n_mois) if n_mois else 0.0
-
-            rows.append(
-                {
-                    "hotel_code": code,
-                    "hotel_name": name,
-                    "annee": int(year),
-                    "mois": int(month),
-                    "zone_scolaire_a": 1 if zone == "A" else 0,
-                    "zone_scolaire_b": 1 if zone == "B" else 0,
-                    "zone_scolaire_c": 1 if zone == "C" else 0,
-                    "departement": dep,
-                    "commune": commune,
-                    "nb_jours_dans_mois": n_mois,
-                    "nb_jours_feries": len(feries),
-                    "nb_jours_weekend": len(weekends),
-                    "nb_jours_vacances_scolaires": len(vac_all),
-                    "nb_jours_vacances_hors_feries": len(vac_hors),
-                    "nb_jours_holidays": nb_holidays,
-                    "pct_jours_holidays": round(pct_holidays, 6),
-                    "jours_feries": _iso_list(feries),
-                    "jours_weekend": _iso_list(weekends),
-                    "jours_vacances_scolaires": _iso_list(vac_all),
-                    "jours_vacances_hors_feries": _iso_list(vac_hors),
-                    "jours_holidays": _iso_list(holidays_set),
-                }
-            )
-
+    rows = compute_holidays_rows(hotels, pairs, meta=meta)
     frame = pd.DataFrame(rows)
     sort_cols = [c for c in ("hotel_code", "annee", "mois") if c in frame.columns]
     if sort_cols:

@@ -30,6 +30,7 @@
 <body>
   <div class="app-shell">
     <aside class="sidebar">
+      <!-- Logo toujours visible (hors zone scroll) -->
       <div class="brand">
         <div class="brand-mark" aria-hidden="true">
           <!-- Logo officiel groupe Accor (group.accor.com / imgix) -->
@@ -46,29 +47,32 @@
           <span class="brand-sub">Data &amp; Model Studio</span>
         </div>
       </div>
-      <!-- Zones All / Pilotes / Modèles : une seule scrollbar (sidebar), séparations conservées -->
-      <div class="nav-section-label" id="nav-all-label">All</div>
-      <nav class="nav-pinned-top" id="nav-pinned-top" aria-label="All"></nav>
 
-      <div class="nav-section-label" id="nav-pilots-label">Pilotes</div>
-      <nav class="nav-tabs" id="nav-tabs" aria-label="Pilotes"></nav>
+      <!-- Une seule scrollbar : All / Pilotes / Modèles (séparations conservées) -->
+      <div class="sidebar-scroll">
+        <div class="nav-section-label" id="nav-all-label">All</div>
+        <nav class="nav-pinned-top" id="nav-pinned-top" aria-label="All"></nav>
 
-      <div class="nav-footer">
-        <div class="nav-section-label">Modèles</div>
-        <button type="button" class="nav-item" id="nav-model-build" data-panel="model-build">
-          <span class="nav-icon">⚡</span>
-          <span>
-            <span class="nav-label">Model Build</span>
-            <span class="nav-desc">Configurer, entraîner, sauvegarder</span>
-          </span>
-        </button>
-        <button type="button" class="nav-item" id="nav-model-explore" data-panel="model-explore">
-          <span class="nav-icon">🌳</span>
-          <span>
-            <span class="nav-label">Model Explore</span>
-            <span class="nav-desc">Arbres, perfs, feature importance</span>
-          </span>
-        </button>
+        <div class="nav-section-label" id="nav-pilots-label">Pilotes</div>
+        <nav class="nav-tabs" id="nav-tabs" aria-label="Pilotes"></nav>
+
+        <div class="nav-footer">
+          <div class="nav-section-label">Modèles</div>
+          <button type="button" class="nav-item" id="nav-model-build" data-panel="model-build">
+            <span class="nav-icon">⚡</span>
+            <span>
+              <span class="nav-label">Model Build</span>
+              <span class="nav-desc">Configurer, entraîner, sauvegarder</span>
+            </span>
+          </button>
+          <button type="button" class="nav-item" id="nav-model-explore" data-panel="model-explore">
+            <span class="nav-icon">🌳</span>
+            <span>
+              <span class="nav-label">Model Explore</span>
+              <span class="nav-desc">Arbres, perfs, feature importance</span>
+            </span>
+          </button>
+        </div>
       </div>
     </aside>
 

@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "path": "/media/laghmari/ssd-data/dev/hotels/accord/data/hotel_weather_data.xlsx",
+  "n_rows": 73374,
+  "n_hotels": 1747,
+  "n_shards_merged": 12,
+  "years": [
+    2023,
+    2024,
+    2025,
+    2026
+  ],
+  "n_ok_hotels": 1697
+}

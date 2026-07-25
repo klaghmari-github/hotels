@@ -68,8 +68,8 @@ body {
 }
 
 /* —— Sidebar —— */
-/* Une seule scrollbar pour toute la barre (zones All / Pilotes / Modèles
-   restent séparées par libellés + bordures, mais ne scrolent plus à part). */
+/* Logo (.brand) fixe en haut ; une seule scrollbar sous le logo pour
+   All / Pilotes / Modèles (séparations par libellés + bordures conservées). */
 .sidebar {
   position: sticky;
   top: 0;
@@ -80,21 +80,32 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  overflow-x: hidden;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(201, 162, 39, 0.35) transparent;
-}
-.sidebar::-webkit-scrollbar {
-  width: 6px;
-}
-.sidebar::-webkit-scrollbar-thumb {
-  background: rgba(201, 162, 39, 0.3);
-  border-radius: 99px;
+  overflow: hidden; /* le scroll est sur .sidebar-scroll, pas ici */
 }
 .sidebar .brand {
   flex-shrink: 0;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.2rem;
+}
+
+/* Zone navigable sous le logo — unique scrollbar de la sidebar */
+.sidebar-scroll {
+  flex: 1 1 auto;
+  min-height: 0; /* obligatoire pour overflow dans un enfant flex */
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 0.15rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 162, 39, 0.35) transparent;
+}
+.sidebar-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background: rgba(201, 162, 39, 0.3);
+  border-radius: 99px;
 }
 
 .brand {
@@ -139,7 +150,7 @@ body {
   margin-top: 0.1rem;
 }
 
-/* Zone All : brand / hotel / proximity (parc global) */
+/* Zone All : brand / hotel / proximity / holidays / weather (parc global) */
 .nav-pinned-top {
   display: flex;
   flex-direction: column;
@@ -164,7 +175,7 @@ body {
   padding-top: 0.2rem;
 }
 
-/* Zone Pilotes : flux normal (scroll = .sidebar, pas de barre dédiée) */
+/* Zone Pilotes : flux normal (scroll = .sidebar-scroll) */
 .nav-tabs {
   display: flex;
   flex-direction: column;
@@ -658,10 +669,10 @@ body {
   to { opacity: 1; transform: none; }
 }
 
-/* —— Zone Modèles (séparée, même scroll que le reste de la sidebar) —— */
+/* —— Zone Modèles (séparée, même scroll que All / Pilotes) —— */
 .nav-footer {
   flex-shrink: 0;
-  /* Colle en bas si le contenu est court ; suit le flux si on scrolle */
+  /* Colle en bas de .sidebar-scroll si contenu court ; suit le flux si scroll */
   margin-top: auto;
   padding-top: 0.5rem;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -1146,6 +1157,11 @@ input[type="range"] {
     border-right: 0;
     border-bottom: 1px solid var(--border);
     overflow: visible;
+  }
+  .sidebar-scroll {
+    overflow: visible;
+    flex: none;
+    min-height: 0;
   }
   .nav-tabs {
     flex-direction: column;

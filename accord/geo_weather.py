@@ -171,24 +171,65 @@ class WeatherFromGeo:
     # Fetch
     # ------------------------------------------------------------------
 
-    def _nearest_station_id(self, lat: float, lon: float) -> str | None:
+    def _nearby_station_ids(
+        self, lat: float, lon: float, *, max_stations: int = 12
+    ) -> list[str]:
+        """
+        Stations ordonnées par distance (plusieurs rayons).
+
+        La 1ʳᵉ station nearby n'a pas toujours de série monthly (ex. Neuhof
+        à Strasbourg) — on renvoie une liste pour essais successifs.
+        """
         key = (round(lat, 3), round(lon, 3))
         if key in self._station_cache:
-            return self._station_cache[key]
-        if not HAS_METEOSTAT or _stations is None:
+            cached = self._station_cache[key]
+            if cached is None:
+                return []
+            # cache peut être un id (legacy) ou une liste
+            if isinstance(cached, list):
+                return cached
+            return [cached]
+
+        if not HAS_METEOSTAT or _stations is None or _Point is None:
             self._station_cache[key] = None
-            return None
-        try:
-            nearby = _stations.nearby(_Point(lat, lon))
+            return []
+
+        ids: list[str] = []
+        # radius None = défaut package ; 100/200 km pour zones clairsemées (Cholet…)
+        for radius in (None, 100_000, 200_000):
+            try:
+                if radius is None:
+                    nearby = _stations.nearby(_Point(lat, lon))
+                else:
+                    nearby = _stations.nearby(_Point(lat, lon), radius=radius)
+            except TypeError:
+                # API sans kwarg radius
+                try:
+                    nearby = _stations.nearby(_Point(lat, lon))
+                except Exception:
+                    nearby = None
+            except Exception:
+                nearby = None
             if nearby is None or getattr(nearby, "empty", True):
-                self._station_cache[key] = None
-                return None
-            sid = str(nearby.index[0])
-            self._station_cache[key] = sid
-            return sid
-        except Exception:
-            self._station_cache[key] = None
-            return None
+                continue
+            for sid in list(nearby.index):
+                s = str(sid)
+                if s not in ids:
+                    ids.append(s)
+                if len(ids) >= max_stations:
+                    break
+            if len(ids) >= max_stations:
+                break
+            # déjà des stations au rayon défaut → pas besoin d'élargir si ≥ 3
+            if radius is None and len(ids) >= 3:
+                break
+
+        self._station_cache[key] = ids if ids else None
+        return ids
+
+    def _nearest_station_id(self, lat: float, lon: float) -> str | None:
+        ids = self._nearby_station_ids(lat, lon)
+        return ids[0] if ids else None
 
     def _fetch_by_year_month(
         self, lat: float, lon: float
@@ -215,9 +256,12 @@ class WeatherFromGeo:
         if _USE_V1:
             by_ym = self._fetch_v1(lat, lon, start, end)
         else:
-            station_id = self._nearest_station_id(lat, lon)
-            if station_id:
-                by_ym = self._fetch_v2_station(station_id, start, end)
+            # Essayer plusieurs stations (1ʳᵉ souvent sans monthly)
+            for station_id in self._nearby_station_ids(lat, lon):
+                cand = self._fetch_v2_station(station_id, start, end)
+                by_ym = self._merge_ym(by_ym, cand)
+                if self._coverage_ratio(by_ym) >= 0.85:
+                    break
             # Point direct (providers géo) en complément
             if self._coverage_ratio(by_ym) < 0.9:
                 extra = self._fetch_v2_point(lat, lon, start, end)
