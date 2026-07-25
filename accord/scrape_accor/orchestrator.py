@@ -41,18 +41,33 @@ def build_ranges(id_min: int, id_max: int, range_size: int) -> list[tuple[int, i
 
 
 def count_hotels_ok() -> int:
-    """Compte les hôtels status=ok dans tous les xlsx de plage."""
+    """
+    Compte les hôtels **uniques** (hotel_code_accor) dans tous les xlsx de plage.
+
+    Évite de double-compter les plages qui se chevauchent (ex. smoke 1140–1155
+    + 1100–1199).
+    """
     import pandas as pd
 
     HOTELS_DIR.mkdir(parents=True, exist_ok=True)
-    total = 0
+    codes: set[str] = set()
     for path in sorted(HOTELS_DIR.glob("hotels_*.xlsx")):
+        if path.name == "hotels_all.xlsx":
+            continue
         try:
             df = pd.read_excel(path, sheet_name="hotels")
-            total += len(df)
         except Exception:
             continue
-    return total
+        if df.empty:
+            continue
+        col = "hotel_code_accor" if "hotel_code_accor" in df.columns else None
+        if col:
+            for v in df[col].dropna().astype(str):
+                codes.add(v.strip())
+        else:
+            # fallback sans clé : ne pas sur-compter
+            codes.update(f"{path.stem}:{i}" for i in range(len(df)))
+    return len(codes)
 
 
 def range_is_done(start: int, end: int) -> bool:
