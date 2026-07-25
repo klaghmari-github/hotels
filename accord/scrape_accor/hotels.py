@@ -254,49 +254,158 @@ def parse_hotel_html(html: str, code: int | str) -> dict[str, Any] | None:
     }
 
 
-def fetch_hotel(code: int, *, pause_s: float = 0.4) -> dict[str, Any]:
+def normalize_hotel_code(code: int | str, *, pad4: bool = False) -> str:
+    """
+    Formate un code pour l'URL Accor.
+
+    Codes souvent sur 4 caractères : ``785`` → ``0785`` si pad4=True.
+    Accepte aussi alphanumériques ``A7L5``, ``B625``.
+    """
+    s = str(code).strip().upper()
+    # pandas/excel peut renvoyer "339.0"
+    if s.endswith(".0") and s[:-2].replace("-", "").isdigit():
+        s = s[:-2]
+    s = s.removeprefix("H") if s.startswith("H") and len(s) > 1 else s
+    if pad4 and s.isdigit():
+        return s.zfill(4)
+    return s
+
+
+def code_for_url(code: int | str) -> str:
+    """
+    Code à utiliser dans l'URL fiche hôtel.
+
+    Règle Accor observée : codes purement numériques < 1000
+    nécessitent les zéros à gauche sur 4 caractères
+    (``785`` / ``339`` → 404 ; ``0785`` / ``0339`` → OK).
+    """
+    s = normalize_hotel_code(code, pad4=False)
+    if s.isdigit() and int(s) < 1000:
+        return s.zfill(4)
+    return s
+
+
+def write_hotels_xlsx(
+    path: Any,
+    ok_rows: list[dict[str, Any]],
+    log_rows: list[dict[str, Any]] | None = None,
+) -> None:
+    """Écrit un xlsx en forçant ``hotel_code_accor`` en texte (garde 0785)."""
+    import pandas as pd
+    from pathlib import Path
+
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    def _prep(rows: list[dict[str, Any]]) -> "pd.DataFrame":
+        df = pd.DataFrame(rows)
+        if df.empty:
+            return df
+        if "hotel_code_accor" in df.columns:
+            df["hotel_code_accor"] = df["hotel_code_accor"].map(
+                lambda x: code_for_url(x) if pd.notna(x) and str(x).strip() != "" else x
+            )
+        return df
+
+    ok_df = _prep(ok_rows)
+    with pd.ExcelWriter(path, engine="openpyxl") as writer:
+        ok_df.to_excel(writer, index=False, sheet_name="hotels")
+        if log_rows is not None:
+            _prep(log_rows).to_excel(writer, index=False, sheet_name="log")
+        # force text format on hotel_code_accor columns
+        for sheet_name in writer.sheets:
+            ws = writer.sheets[sheet_name]
+            headers = [c.value for c in ws[1]]
+            if "hotel_code_accor" not in headers:
+                continue
+            col_idx = headers.index("hotel_code_accor") + 1
+            for row in range(2, ws.max_row + 1):
+                cell = ws.cell(row=row, column=col_idx)
+                if cell.value is None:
+                    continue
+                cell.number_format = "@"
+                cell.value = str(cell.value)
+
+
+def fetch_hotel(
+    code: int | str,
+    *,
+    pause_s: float = 0.4,
+    pad4: bool = False,
+    try_unpadded: bool = False,
+) -> dict[str, Any]:
     """
     Tente d'extraire l'hôtel ``code``.
+
+    Parameters
+    ----------
+    pad4 :
+        Si True et code purement numérique, force 4 chiffres (``785`` → ``0785``).
+    try_unpadded :
+        Si pad4 et 404, retente sans zéros à gauche (rare).
 
     Returns
     -------
     dict with keys status in {ok, missing, error} + fields if ok
     """
-    url = HOTEL_URL.format(code=code)
-    try:
-        status, html = fetch(url, pause_s=pause_s, timeout=30)
-    except Exception as exc:  # noqa: BLE001
-        return {
-            "hotel_code_accor": str(code),
-            "status": "error",
-            "error": str(exc),
-            "url": url,
-        }
+    # Toujours pad4 pour <1000 (sinon Accor renvoie 404 / page vide)
+    if pad4:
+        code_str = normalize_hotel_code(code, pad4=True)
+    else:
+        code_str = code_for_url(code)
+    candidates = [code_str]
+    if try_unpadded and code_str.isdigit() and code_str != str(int(code_str)):
+        candidates.append(str(int(code_str)))
 
-    if status in {404, 410}:
-        return {
-            "hotel_code_accor": str(code),
-            "status": "missing",
-            "http_status": status,
-            "url": url,
-        }
-    if status != 200:
-        return {
-            "hotel_code_accor": str(code),
-            "status": "error",
-            "http_status": status,
-            "url": url,
-        }
+    last: dict[str, Any] = {}
+    for i, c in enumerate(candidates):
+        url = HOTEL_URL.format(code=c)
+        try:
+            # pause seulement sur la 1re tentative
+            status, html = fetch(url, pause_s=pause_s if i == 0 else 0.15, timeout=30)
+        except Exception as exc:  # noqa: BLE001
+            last = {
+                "hotel_code_accor": c,
+                "status": "error",
+                "error": str(exc),
+                "url": url,
+            }
+            continue
 
-    parsed = parse_hotel_html(html, code)
-    if not parsed:
-        return {
-            "hotel_code_accor": str(code),
-            "status": "missing",
-            "http_status": status,
-            "url": url,
-            "note": "page sans données hôtel / fermé",
-        }
-    parsed["status"] = "ok"
-    parsed["http_status"] = status
-    return parsed
+        if status in {404, 410}:
+            last = {
+                "hotel_code_accor": c,
+                "status": "missing",
+                "http_status": status,
+                "url": url,
+            }
+            continue
+        if status != 200:
+            last = {
+                "hotel_code_accor": c,
+                "status": "error",
+                "http_status": status,
+                "url": url,
+            }
+            continue
+
+        parsed = parse_hotel_html(html, c)
+        if not parsed:
+            last = {
+                "hotel_code_accor": c,
+                "status": "missing",
+                "http_status": status,
+                "url": url,
+                "note": "page sans données hôtel / fermé",
+            }
+            continue
+        parsed["status"] = "ok"
+        parsed["http_status"] = status
+        return parsed
+
+    return last or {
+        "hotel_code_accor": code_str,
+        "status": "error",
+        "error": "no attempt",
+        "url": HOTEL_URL.format(code=code_str),
+    }

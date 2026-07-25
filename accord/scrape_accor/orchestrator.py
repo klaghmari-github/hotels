@@ -194,24 +194,36 @@ def merge_all_hotels() -> Path:
     """Concatène tous les hotels_*.xlsx → hotels_all.xlsx (dédup par code)."""
     import pandas as pd
 
+    from scrape_accor.hotels import code_for_url, write_hotels_xlsx
+
     frames = []
     for path in sorted(HOTELS_DIR.glob("hotels_*.xlsx")):
         if path.name == "hotels_all.xlsx":
             continue
         try:
-            df = pd.read_excel(path, sheet_name="hotels")
+            df = pd.read_excel(path, sheet_name="hotels", dtype={"hotel_code_accor": str})
             if not df.empty:
                 frames.append(df)
         except Exception:
-            continue
+            try:
+                df = pd.read_excel(path, sheet_name="hotels")
+                if not df.empty:
+                    frames.append(df)
+            except Exception:
+                continue
     out = HOTELS_DIR / "hotels_all.xlsx"
     if not frames:
         pd.DataFrame().to_excel(out, index=False)
         return out
     all_df = pd.concat(frames, ignore_index=True)
     if "hotel_code_accor" in all_df.columns:
+        # Restaure 0785 si Excel a stocké 785 / 785.0
+        all_df["hotel_code_accor"] = all_df["hotel_code_accor"].map(
+            lambda x: code_for_url(x) if pd.notna(x) and str(x).strip() not in {"", "nan"} else x
+        )
         all_df = all_df.drop_duplicates(subset=["hotel_code_accor"], keep="first")
-    all_df.to_excel(out, index=False, sheet_name="hotels")
+    # write with text format
+    write_hotels_xlsx(out, all_df.to_dict(orient="records"), None)
     print(f"[orchestrator] merge → {out} ({len(all_df)} hôtels)")
     return out
 

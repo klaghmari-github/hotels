@@ -15,7 +15,7 @@ from typing import Any
 
 import pandas as pd
 
-from scrape_accor.hotels import fetch_hotel
+from scrape_accor.hotels import code_for_url, fetch_hotel, write_hotels_xlsx
 
 ROOT = Path(__file__).resolve().parent.parent
 HOTELS_DIR = ROOT / "data" / "marques" / "hotels"
@@ -133,7 +133,8 @@ def process_range(
         for code in range(start, end + 1):
             if code in done_codes:
                 continue
-            rec = fetch_hotel(code, pause_s=pause_s)
+            # <1000 → URL 0785 (pas 785) — sinon page vide
+            rec = fetch_hotel(code_for_url(code), pause_s=pause_s)
             rows.append(rec)
             done_codes.add(code)
             st = rec.get("status")
@@ -162,7 +163,7 @@ def process_range(
                     encoding="utf-8",
                 )
 
-        # Excel final : uniquement status=ok pour le dataset propre + feuille log
+        # Excel final : uniquement status=ok + log (codes en texte → garde 0785)
         ok_rows = [r for r in rows if r.get("status") == "ok"]
         log_rows = [
             {
@@ -174,9 +175,7 @@ def process_range(
             }
             for r in rows
         ]
-        with pd.ExcelWriter(xlsx, engine="openpyxl") as writer:
-            pd.DataFrame(ok_rows).to_excel(writer, index=False, sheet_name="hotels")
-            pd.DataFrame(log_rows).to_excel(writer, index=False, sheet_name="log")
+        write_hotels_xlsx(xlsx, ok_rows, log_rows)
 
         progress.write_text(
             json.dumps(

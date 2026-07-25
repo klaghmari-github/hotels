@@ -60,3 +60,80 @@ python -m scrape_accor.orchestrator --merge-only
 | hotel_lat / hotel_lon | GPS |
 | services_f_b / services_n_f_b | Amenities classées |
 | has_restaurant, has_bar, has_parking, … | Flags 0/1 |
+
+## Liste loyalty opt-in (manquants)
+
+Page : https://all.accor.com/loyalty-program/optin-htl/index.fr.shtml  
+(API catalog `q=france`, ~18 pages × 100)
+
+```bash
+cd accord
+python -m scrape_accor.loyalty_list
+# option: --q france
+```
+
+Sorties dans `data/marques/hotels/` :
+
+* `loyalty_optin_all.xlsx` — liste complète page/API
+* `loyalty_optin_missing.xlsx` / `.csv` — absents de `hotels_all.xlsx`
+* `loyalty_optin_matched.xlsx` — déjà présents
+
+## Hôtels France (destination + manquants)
+
+Page : https://all.accor.com/a/fr/destination/country/hotels-france-pfr.html
+
+* HTML SSR : `?pageIndex=1..50` (~6 hôtels/page, ~300 max)
+* Liste complète : API catalog `q=france` (~1747)
+
+```bash
+cd accord
+python -m scrape_accor.destination_france
+# rapide (API seule) :
+python -m scrape_accor.destination_france --skip-html
+# HTML limité :
+python -m scrape_accor.destination_france --max-html-pages 10
+```
+
+Sorties dans `data/marques/hotels/` :
+
+* `france_destination_all.xlsx` — catalogue France (API + ratings HTML)
+* `france_destination_missing.xlsx` / `.csv` — absents de `hotels_all.xlsx`
+* `france_destination_matched.xlsx` — déjà scrapés
+* `france_destination_summary.json`
+
+## Scrape par liste de codes (alphanum + pad 4)
+
+Les codes Accor sont souvent sur **4 caractères** (`0785`, `A7L5`, `B625`).
+Le scrape par plage entière `785` sans zéro à gauche rate ces fiches.
+
+```bash
+cd accord
+
+# Liste (ex. 748 manquants France)
+python -m scrape_accor.scrape_codes \
+  --from-xlsx data/marques/hotels/france_destination_missing.xlsx \
+  --out hotels_missing_france.xlsx --workers 6
+
+# Plage 0–999 forcée en 4 chiffres (0000..0999)
+python -m scrape_accor.scrape_codes --pad4-range 0 999 \
+  --out hotels_0000_0999.xlsx --workers 6
+
+# Fusion
+python -m scrape_accor.orchestrator --merge-only
+```
+
+Options utiles : `--codes A7L5,0785`, `--force` (ignore progress), `--no-skip-existing`.
+
+### Parallèle multi-process (recommandé pour listes longues)
+
+```bash
+cd accord
+# 8 process agents, shards auto, merge + hotels_all
+python -m scrape_accor.parallel_codes \
+  --from-xlsx data/marques/hotels/france_destination_missing.xlsx \
+  --out hotels_missing_france.xlsx --workers 8 --pause 0.25
+```
+
+Chaque worker écrit `hotels_*_shardNN.xlsx`, le parent fusionne.
+
+Colonnes utiles pour le scrape suivant : `hotel_code_accor`, `url_hotel`.

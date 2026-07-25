@@ -59,11 +59,18 @@ def normalize_brand_name(name: str) -> str:
     return text.upper()
 
 
+def normalize_category(category: str) -> str:
+    """Libellé catégorie en **MAJUSCULES** (jointures / affichage)."""
+    text = unescape(category or "").strip()
+    text = re.sub(r"\s+", " ", text)
+    return text.upper() if text else "AUTRES"
+
+
 def category_dir_name(category: str) -> str:
     """
-    Nom de sous-dossier pour une catégorie (slug stable).
+    Nom de sous-dossier pour une catégorie (slug stable, minuscules).
 
-    Ex. ``Lifestyle by Ennismore`` → ``lifestyle_by_ennismore``
+    Ex. ``LIFESTYLE BY ENNISMORE`` → ``lifestyle_by_ennismore``
     """
     return _slugify(category) or "autres"
 
@@ -82,7 +89,7 @@ def _parse_brands(html: str) -> list[dict[str, Any]]:
     seen: set[str] = set()
     for i, m in enumerate(pattern.finditer(html), start=1):
         raw_name = unescape(m.group(1)).strip()
-        category = unescape(m.group(2)).strip()
+        raw_category = unescape(m.group(2)).strip()
         url = m.group(3).strip()
         logo_url = m.group(4).strip()
         slug_m = re.search(r"/brands/([^/]+)\.html", url, re.I)
@@ -92,6 +99,7 @@ def _parse_brands(html: str) -> list[dict[str, Any]]:
             raw_name = f"marque_{i}"
             slug = f"marque_{i}"
         name = normalize_brand_name(raw_name)
+        category = normalize_category(raw_category)
         key = slug or f"marque_{i}"
         if key in seen:
             key = f"{key}_{i}"
@@ -149,7 +157,7 @@ def extract_brands(*, out_dir: Path | None = None, force: bool = False) -> dict[
     """
     Scrape la page marques + logos → ``marques.xlsx`` + PNG par catégorie.
 
-    * ``marque_nom`` en MAJUSCULES
+    * ``marque_nom`` et ``categorie`` en MAJUSCULES
     * logos dans ``out_dir / {categorie_slug} / {slug}.png``
     """
     out_dir = out_dir or OUT_DIR
@@ -164,6 +172,8 @@ def extract_brands(*, out_dir: Path | None = None, force: bool = False) -> dict[
         raise RuntimeError("Aucune marque extraite — structure HTML changée ?")
 
     for row in brands:
+        row["categorie"] = normalize_category(str(row.get("categorie") or ""))
+        row["categorie_slug"] = category_dir_name(row["categorie"])
         cat_dir = row["categorie_slug"]
         slug_file = _slugify(row["marque_nom"]) or f"marque_{row['marque_id']}"
         if not row["nom_extractable"]:
@@ -186,6 +196,7 @@ def extract_brands(*, out_dir: Path | None = None, force: bool = False) -> dict[
     frame = pd.DataFrame(brands)
     # Garantir uppercase
     frame["marque_nom"] = frame["marque_nom"].map(normalize_brand_name)
+    frame["categorie"] = frame["categorie"].map(normalize_category)
     cols = [
         "marque_id",
         "marque_nom",
@@ -217,7 +228,7 @@ def extract_brands(*, out_dir: Path | None = None, force: bool = False) -> dict[
 def reorganize_existing_marques(*, out_dir: Path | None = None) -> dict[str, Any]:
     """
     Réorganise un scrape déjà fait :
-    * noms en MAJUSCULES dans ``marques.xlsx``
+    * ``marque_nom`` et ``categorie`` en MAJUSCULES dans ``marques.xlsx``
     * logos déplacés vers ``{categorie_slug}/{slug}.png``
     * nettoyage des PNG à la racine de ``marques/``
     """
@@ -236,7 +247,7 @@ def reorganize_existing_marques(*, out_dir: Path | None = None) -> dict[str, Any
 
     for i, row in frame.iterrows():
         nom = normalize_brand_name(str(row.get("marque_nom") or ""))
-        cat = str(row.get("categorie") or "autres").strip()
+        cat = normalize_category(str(row.get("categorie") or "autres"))
         cat_slug = category_dir_name(cat)
         old_file = str(row.get("logo_file") or "").strip()
         slug_file = _slugify(nom) or f"marque_{int(row.get('marque_id') or i) + 1:02d}"
