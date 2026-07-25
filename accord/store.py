@@ -383,6 +383,9 @@ def page_payload(
         "key_columns": [c for c in schema.key_columns if c in display_cols],
         "boolean_columns": [c for c in schema.boolean_columns if c in display_cols],
         "array_columns": [c for c in schema.array_columns if c in display_cols],
+        "image_columns": [
+            c for c in getattr(schema, "image_columns", []) or [] if c in display_cols
+        ],
         "column_roles": column_roles,
         "model_stats": model_stats,
         "readonly": bool(schema.readonly),

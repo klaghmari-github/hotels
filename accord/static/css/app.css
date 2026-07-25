@@ -1095,3 +1095,41 @@ input[type="range"] {
     max-height: 60vh;
   }
 }
+
+/* —— Brand logos (Hotel Brand Data) —— */
+.cell-logo {
+  min-width: 120px;
+  vertical-align: middle;
+}
+.logo-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  padding: 0.25rem 0.15rem;
+}
+.brand-logo-thumb {
+  max-height: 36px;
+  max-width: 110px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 4px;
+  padding: 3px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.logo-path-input {
+  min-width: 140px !important;
+  max-width: 200px;
+  font-size: 0.7rem !important;
+  opacity: 0.75;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.logo-missing {
+  color: var(--text-faint, #888);
+  font-size: 0.85rem;
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+}

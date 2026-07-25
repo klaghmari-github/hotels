@@ -111,7 +111,14 @@ hotel_data / brand / weather / sales / holidays
 
 | Onglet | Fichier | Éditable | Notes |
 |--------|---------|----------|-------|
-| Hotel Brand Data | `hotel_brand_data.xlsx` | Oui | Effectifs `Nb_*` par marque |
+| Hotel Brand Data | `hotel_brand_data.xlsx` | Oui | Marques + logos + `cat_*` (0/1) + effectifs `Nb_*` à saisir |
+
+Sync marques → brand data :
+
+```bash
+cd accord
+python -m sync_brand_data          # enrichit depuis data/marques/marques.xlsx
+```
 | Hotel Data | `hotel_data.xlsx` | Oui | Fiche hôtel (identité, équipements, corner) |
 | Hotel Weather Data | `hotel_weather_data.xlsx` | Oui | Météo mensuelle |
 | Hotel Proximity Data | `hotel_proximity_data.xlsx` | Oui | Commerces 100–500 m + plage 1–5 km |

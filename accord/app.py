@@ -28,7 +28,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, send_from_directory
 
 # Schémas des onglets (colonnes saisissables) et couche Excel
 from schemas import list_datasets
@@ -72,6 +72,29 @@ def index():
 def favicon():
     """Évite un 404 bruyant dans la console navigateur."""
     return ("", 204)
+
+
+@app.get("/api/marques/logos/<path:relpath>")
+def api_marque_logo(relpath: str):
+    """
+    Sert un logo marque depuis ``data/marques/`` (PNG locaux).
+
+    Ex. ``/api/marques/logos/economy/ibis_budget.png``
+    → ``data/marques/economy/ibis_budget.png``
+    """
+    base = (ROOT / "data" / "marques").resolve()
+    # normalise, empêche path traversal
+    clean = relpath.replace("\\", "/").lstrip("/")
+    if ".." in clean.split("/"):
+        return jsonify({"error": "path invalide"}), 400
+    target = (base / clean).resolve()
+    try:
+        target.relative_to(base)
+    except ValueError:
+        return jsonify({"error": "path hors marques/"}), 400
+    if not target.is_file():
+        return jsonify({"error": "logo introuvable", "path": clean}), 404
+    return send_from_directory(str(target.parent), target.name)
 
 
 # ---------------------------------------------------------------------------

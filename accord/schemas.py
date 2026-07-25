@@ -53,6 +53,8 @@ class DatasetSchema:
         Champs 0/1 (saisie numérique bornée côté front).
     array_columns :
         Listes (ex. dates ISO) sérialisées en JSON dans Excel.
+    image_columns :
+        Colonnes chemin image (thumbnail UI, ex. ``logo_path``).
     page_size :
         Taille de page par défaut pour la pagination.
     readonly :
@@ -68,6 +70,7 @@ class DatasetSchema:
     key_columns: list[str] = field(default_factory=list)
     boolean_columns: list[str] = field(default_factory=list)
     array_columns: list[str] = field(default_factory=list)
+    image_columns: list[str] = field(default_factory=list)
     icon: str = "table"
     page_size: int = 25
     readonly: bool = False
@@ -82,9 +85,20 @@ class DatasetSchema:
 # Listes de colonnes éditables par dataset
 # =============================================================================
 
-# --- Brand : effectifs saisis ; les Pct_* du fichier sont calculés ailleurs ---
+# --- Brand : identité marque (marques.xlsx) + effectifs saisis ---
+# cat_* = dummies 0/1 (catégorie) ; logo_path = relatif data/marques/
+_BRAND_CAT_BOOL = [
+    "cat_economy",
+    "cat_midscale",
+    "cat_premium",
+    "cat_luxury",
+    "cat_lifestyle_by_ennismore",
+    "cat_partner_brands",
+]
 _BRAND_EDITABLE = [
     "Marque",
+    "logo_path",
+    *_BRAND_CAT_BOOL,
     "Nb_Hotels",
     "Nb_Ch_0_49",
     "Nb_Ch_50_99",
@@ -362,11 +376,16 @@ DATASETS: dict[str, DatasetSchema] = {
     "brand": DatasetSchema(
         id="brand",
         label="Hotel Brand Data",
-        description="Parc par marque — effectifs par tranche de chambres, restos et bars",
+        description=(
+            "Marques Accor — nom, logo, catégorie (binaires cat_*) "
+            "+ effectifs Nb_* à saisir"
+        ),
         filename="hotel_brand_data.xlsx",
         sheet="Sheet1",
         editable_columns=_BRAND_EDITABLE,
         key_columns=["Marque"],
+        boolean_columns=list(_BRAND_CAT_BOOL),
+        image_columns=["logo_path"],
         icon="building",
         page_size=20,
     ),
@@ -535,6 +554,7 @@ def list_datasets() -> list[dict[str, Any]]:
             "key_columns": d.key_columns,
             "boolean_columns": d.boolean_columns,
             "array_columns": d.array_columns,
+            "image_columns": list(getattr(d, "image_columns", []) or []),
             "readonly": d.readonly,
         }
         for d in DATASETS.values()

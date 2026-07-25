@@ -313,11 +313,21 @@
     `;
   }
 
+  function logoUrlFromPath(relpath) {
+    if (!relpath) return "";
+    const s = String(relpath).trim();
+    if (!s || s === "nan" || s === "None") return "";
+    // déjà une URL absolue
+    if (/^https?:\/\//i.test(s) || s.startsWith("/api/")) return s;
+    return `/api/marques/logos/${s.replace(/^\/+/, "")}`;
+  }
+
   function renderTable(payload) {
     const cols = payload.columns || [];
     const keys = new Set(payload.key_columns || []);
     const bools = new Set(payload.boolean_columns || []);
     const arrays = new Set(payload.array_columns || []);
+    const images = new Set(payload.image_columns || []);
     const roles = payload.column_roles || {};
     const readonly = !!payload.readonly;
 
@@ -386,16 +396,57 @@
       // Une cellule éditable par colonne
       cols.forEach((col) => {
         const td = document.createElement("td");
+        let val = data[col];
+        if (Array.isArray(val)) val = JSON.stringify(val);
+        if (val === null || val === undefined) val = "";
+
+        // Colonnes image (ex. logo_path marque)
+        if (images.has(col)) {
+          td.className = "cell-logo";
+          const wrap = document.createElement("div");
+          wrap.className = "logo-cell";
+          const src = logoUrlFromPath(val);
+          if (src) {
+            const img = document.createElement("img");
+            img.className = "brand-logo-thumb";
+            img.src = src;
+            img.alt = String(data.Marque || data.marque || col);
+            img.title = String(val);
+            img.loading = "lazy";
+            img.onerror = () => {
+              img.style.display = "none";
+              const miss = document.createElement("span");
+              miss.className = "logo-missing";
+              miss.textContent = "—";
+              wrap.appendChild(miss);
+            };
+            wrap.appendChild(img);
+          } else {
+            const miss = document.createElement("span");
+            miss.className = "logo-missing";
+            miss.textContent = "—";
+            wrap.appendChild(miss);
+          }
+          // chemin en lecture seule (petit)
+          const pathInput = document.createElement("input");
+          pathInput.className = "cell-input logo-path-input";
+          pathInput.value = String(val);
+          pathInput.dataset.index = String(row._index);
+          pathInput.dataset.col = col;
+          pathInput.title = col;
+          pathInput.readOnly = true;
+          wrap.appendChild(pathInput);
+          td.appendChild(wrap);
+          tr.appendChild(td);
+          return;
+        }
+
         const input = document.createElement("input");
         input.className = "cell-input";
         if (keys.has(col)) input.classList.add("key");
         if (bools.has(col)) input.classList.add("bool");
         if (arrays.has(col)) input.classList.add("array");
 
-        let val = data[col];
-        // Arrays affichés en JSON pour l'édition libre
-        if (Array.isArray(val)) val = JSON.stringify(val);
-        if (val === null || val === undefined) val = "";
         input.value = String(val);
         input.dataset.index = String(row._index);
         input.dataset.col = col;
