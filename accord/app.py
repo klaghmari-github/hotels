@@ -1,27 +1,19 @@
 #!/usr/bin/env python3
 """
-Accor · Data & Model Studio — API HTTP + page unique.
+Serveur Flask de l interface admin Accor Data and Model Studio.
 
-Rôle
-----
-Serveur Flask de l'application :
+Ce module expose la page unique et les routes API. La logique metier
+est dans store, join_data, geo_*, sales_prep, model_*, concept_pilote.
 
-* **Pages** : shell UI (``templates/index.html`` + static JS/CSS).
-* **API datasets** : CRUD paginé sur les Excel de ``data/`` (via ``store.py``).
-* **API jointure** : rebuild ``all_data.xlsx`` / ``model_data.xlsx``.
-* **API modèles** : build XGBoost (design/), explore, deploy.
+Routes principales:
+  pages HTML via templates/index.html
+  CRUD datasets Excel via store.py
+  rebuild all_data, model_data, sales, weather, proximity, holidays, concept
+  build, list, explore et deploy des modeles XGBoost
 
-La logique métier ne vit **pas** ici : ce module route uniquement vers
-``store``, ``join_data``, ``model_*``.
-
-Lancer
-------
-    python run_admin.py
-    # → http://127.0.0.1:5055
-
-Interface directeur / simulateur ROD : ``python run_user.py`` (port 5056).
-
-Voir ``README.md`` pour le détail des routes et de l'architecture.
+Lancer: python run_admin.py  (http://127.0.0.1:5055)
+Simulateur directeur: python run_user.py (port 5056)
+Documentation: README.md
 """
 
 from __future__ import annotations

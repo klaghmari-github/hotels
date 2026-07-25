@@ -1,30 +1,20 @@
 /**
- * Accor · Data & Model Studio — front-end
- * ========================================
+ * Front-end admin Accor Data and Model Studio (IIFE).
  *
- * Application monolithe navigateur (IIFE) qui pilote :
+ * Vue table:
+ *   onglets datasets, table editable, dirty map, Ctrl+S / Enregistrer
+ *   Recharger = POST reload, Reconstruire = POST rebuild selon l onglet
+ *   pagination et filtre via GET /api/datasets/<id>
  *
- * 1. **Onglets datasets** — tables WYSIWYG paginées sur les Excel `data/`.
- *    - state.dirty : Map<_index, ligne> des modifications non sauvées
- *    - PUT /api/datasets/<id>/rows pour persister (Ctrl+S)
- *    - All Data / Model Data : bouton Reconstruire
- *    - Model Data : en-têtes colorés (id / desc / cible), lignes éval en gras
+ * Model Build:
+ *   hyperparams + nom, POST /api/model/build vers models/design/<nom>/
  *
- * 2. **Model Build** — hyperparams XGBoost + nom → POST /api/model/build
- *    (source = model_data, save dans models/design/<nom>/).
+ * Model Explore:
+ *   liste design, perfs, importances, arbres SVG, Deploy vers models/deploy/
  *
- * 3. **Model Explore** — liste design triée, perf, importances, arbres SVG,
- *    Deploy → models/deploy/model.{pkl,json}.
- *
- * Architecture
- * ------------
- * - state          : état global (onglet, page, dirty, explore…)
- * - api()          : wrapper fetch JSON
- * - fetchPage      : GET page dataset
- * - renderTable    : thead/tbody + inputs
- * - loadExploreModel : recharge TOUTES les zones explore à chaque modèle
- *
- * IIFE pour ne pas polluer le scope global.
+ * Etat principal: state (onglet, page, dirty, explore).
+ * Helpers: api, fetchPage, renderTable, loadExploreModel, showLoading.
+ * Doc detaillee des boutons et routes: README.md.
  */
 (() => {
   // -------------------------------------------------------------------------

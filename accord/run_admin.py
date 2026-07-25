@@ -1,22 +1,16 @@
 #!/usr/bin/env python3
 """
-Point d'entrée CLI d'**Accor · Data & Model Studio** (admin).
+Point d entree de l interface admin Accor Data and Model Studio.
 
-Usage
------
+Usage:
     cd accord
     python run_admin.py
     python run_admin.py --host 0.0.0.0 --port 5055 --debug
 
-Délègue entièrement à :func:`app.main` (serveur Flask de développement).
-
-Chemins logos
--------------
-Les logos sont sous ``accord/data/marques/{categorie}/{slug}.png``.
-``hotel_brand_data.xlsx`` stocke un chemin **relatif** à ce dossier
-(ex. ``economy/ibis.png``), servi par
-``GET /api/marques/logos/<path>`` — résolution ancrée sur le répertoire
-de ``app.py`` (pas sur le cwd du shell).
+Delegue a app.main (serveur Flask de developpement).
+Les logos marques sont sous data/marques et servis par
+GET /api/marques/logos/<chemin relatif>.
+Documentation complete: README.md.
 """
 
 from app import main

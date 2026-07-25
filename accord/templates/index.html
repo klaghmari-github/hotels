@@ -1,21 +1,19 @@
 <!DOCTYPE html>
 <!--
-  Accor · Data & Model Studio — page unique (shell UI)
+  Page unique de l interface admin Accor Data and Model Studio.
 
-  Structure
-  ---------
-  aside.sidebar
-    - nav-tabs        : onglets datasets (brand, hotel, weather, sales,
-                        holidays, all_data, model_data)
-    - nav-footer      : Model Build + Model Explore
+  Sidebar (logo fixe, puis zone scroll All / Pilotes / Modeles):
+    All: brand, hotel, proximity, holidays, weather
+    Pilotes: sales_raw, sales, all_data, concept_pilote, model_data
+    Modeles: Model Build, Model Explore
 
-  main
-    #view-table       : table WYSIWYG paginée + Recharger / Reconstruire
-    #view-model-build : hyperparams XGBoost + Build & Save
-    #view-model-explore : liste modèles, perf, arbres, Deploy
+  Main:
+    view-table: table editable, recherche, pagination, Recharger, Reconstruire
+    view-model-build: nom + hyperparams XGBoost, bouton Build and Save
+    view-model-explore: liste modeles, perfs, importances, arbres, Deploy
 
-  Données via /api/datasets/* et /api/model/* (static/js/app.js).
-  Voir README.md pour l'architecture complète.
+  Logique front: static/js/app.js  Styles: static/css/app.css
+  API: /api/datasets/* et /api/model/*  Doc: README.md
 -->
 <html lang="fr">
 <head>
