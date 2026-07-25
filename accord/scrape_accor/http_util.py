@@ -9,7 +9,7 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 DEFAULT_UA = (
-    "Mozilla/5.0 (compatible; AccordDataStudio/1.0; "
+    "Mozilla/5.0 (compatible; AccorDataStudio/1.0; "
     "+https://local.dev/hotels; research-for-partner-app)"
 )
 

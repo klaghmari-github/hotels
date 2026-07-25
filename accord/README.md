@@ -1,4 +1,4 @@
-# Accord · Data & Model Studio
+# Accor · Data & Model Studio
 
 Application web **self-contained** pour :
 

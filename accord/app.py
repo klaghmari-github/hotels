@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Accord · Data & Model Studio — API HTTP + page unique.
+Accor · Data & Model Studio — API HTTP + page unique.
 
 Rôle
 ----
@@ -629,12 +629,12 @@ def main() -> None:
     """Point d'entrée serveur de développement Flask."""
     import argparse
 
-    parser = argparse.ArgumentParser(description="Accord · Data & Model Studio")
+    parser = argparse.ArgumentParser(description="Accor · Data & Model Studio")
     parser.add_argument("--host", default="127.0.0.1", help="Adresse d'écoute")
     parser.add_argument("--port", type=int, default=5055, help="Port HTTP")
     parser.add_argument("--debug", action="store_true", help="Mode debug Flask")
     args = parser.parse_args()
-    print(f"Accord · Data & Model Studio → http://{args.host}:{args.port}")
+    print(f"Accor · Data & Model Studio → http://{args.host}:{args.port}")
     app.run(host=args.host, port=args.port, debug=args.debug)
 
 

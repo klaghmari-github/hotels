@@ -123,7 +123,7 @@ def _fetch_page(q: str, range_spec: str) -> tuple[list[dict[str, Any]], int]:
     headers = {
         "apiKey": API_KEY,
         "Accept-Language": "fr",
-        "User-Agent": "Mozilla/5.0 (compatible; AccordDataStudio/1.0)",
+        "User-Agent": "Mozilla/5.0 (compatible; AccorDataStudio/1.0)",
         "Accept": "application/json",
         "Accept-Encoding": "gzip",
         "Origin": "https://all.accor.com",

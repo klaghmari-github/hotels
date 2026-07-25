@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Point d'entrée CLI d'**Accord · Data & Model Studio** (admin).
+Point d'entrée CLI d'**Accor · Data & Model Studio** (admin).
 
 Usage
 -----

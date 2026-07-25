@@ -27,7 +27,7 @@ class Geocoder:
     BAN_ENDPOINT = "https://api-adresse.data.gouv.fr/search/"
     NOMINATIM_ENDPOINT = "https://nominatim.openstreetmap.org/search"
     ACCOR_HOTEL_URL = "https://all.accor.com/hotel/{code}/index.fr.shtml"
-    USER_AGENT = "AccordROD-UserSimulator/1.1 (geocode; hotels-sim)"
+    USER_AGENT = "AccorROD-UserSimulator/1.1 (geocode; hotels-sim)"
 
     def __init__(self, *, timeout: float = 15.0) -> None:
         self.timeout = timeout
@@ -47,7 +47,7 @@ class Geocoder:
             url,
             headers={
                 "User-Agent": (
-                    "Mozilla/5.0 (compatible; AccordROD/1.1; +local-geocode)"
+                    "Mozilla/5.0 (compatible; AccorROD/1.1; +local-geocode)"
                 ),
                 "Accept": "text/html,application/xhtml+xml",
                 "Accept-Language": "fr-FR,fr;q=0.9",

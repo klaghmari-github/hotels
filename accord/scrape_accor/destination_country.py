@@ -166,7 +166,7 @@ def _http_get(
     timeout: float = 40.0,
 ) -> tuple[bytes, dict[str, str]]:
     hdrs = {
-        "User-Agent": "Mozilla/5.0 (compatible; AccordDataStudio/1.0)",
+        "User-Agent": "Mozilla/5.0 (compatible; AccorDataStudio/1.0)",
         "Accept-Language": "fr-FR,fr;q=0.9,en;q=0.5",
         "Accept-Encoding": "gzip",
     }

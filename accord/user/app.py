@@ -260,7 +260,7 @@ def simulate():
 
 
 def main(argv: list[str] | None = None) -> None:
-    parser = argparse.ArgumentParser(description="Accord ROD · User Simulator")
+    parser = argparse.ArgumentParser(description="Accor ROD · User Simulator")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=5056)
     parser.add_argument("--debug", action="store_true")

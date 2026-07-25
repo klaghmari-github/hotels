@@ -1,5 +1,5 @@
 /**
- * Accord · Data & Model Studio — front-end
+ * Accor · Data & Model Studio — front-end
  * ========================================
  *
  * Application monolithe navigateur (IIFE) qui pilote :
@@ -54,6 +54,9 @@
   // -------------------------------------------------------------------------
   const $ = (sel) => document.querySelector(sel);
   const nav = $("#nav-tabs");
+  const navPinnedTop = $("#nav-pinned-top");
+  // Sources globales toujours en haut (parc + marques)
+  const PINNED_TOP_IDS = ["brand", "hotel"];
   const title = $("#panel-title");
   const desc = $("#panel-desc");
   const chipFile = $("#chip-file");
@@ -113,6 +116,66 @@
     statusMsg.textContent = msg || "";
   }
 
+  // ---- Overlay de chargement (onglets lourds : sales_raw, all_data, …) ----
+  let _loadingDepth = 0;
+  let _loadingHideTimer = null;
+
+  function showLoading(title, sub) {
+    const overlay = $("#loading-overlay");
+    if (!overlay) return;
+    _loadingDepth += 1;
+    if (_loadingHideTimer) {
+      clearTimeout(_loadingHideTimer);
+      _loadingHideTimer = null;
+    }
+    const t = $("#loading-title");
+    const s = $("#loading-sub");
+    if (t) t.textContent = title || "Chargement…";
+    if (s) s.textContent = sub || "Préparation des données";
+    overlay.classList.remove("hidden", "is-leaving");
+    overlay.setAttribute("aria-busy", "true");
+    document.body.classList.add("is-loading");
+  }
+
+  function hideLoading() {
+    const overlay = $("#loading-overlay");
+    if (!overlay) return;
+    _loadingDepth = Math.max(0, _loadingDepth - 1);
+    if (_loadingDepth > 0) return;
+    overlay.classList.add("is-leaving");
+    overlay.setAttribute("aria-busy", "false");
+    document.body.classList.remove("is-loading");
+    _loadingHideTimer = setTimeout(() => {
+      if (_loadingDepth === 0) {
+        overlay.classList.add("hidden");
+        overlay.classList.remove("is-leaving");
+      }
+      _loadingHideTimer = null;
+    }, 200);
+  }
+
+  /** Libellé lisible pour l'overlay selon l'onglet. */
+  function loadingLabelsFor(datasetId) {
+    const ds = state.datasets.find((d) => d.id === datasetId);
+    const name = (ds && ds.label) || datasetId || "données";
+    const heavy = {
+      sales_raw: "Fichier ventes brutes volumineux — un instant…",
+      sales: "Agrégats ventes — un instant…",
+      all_data: "Table jointure complète — un instant…",
+      model_data: "Jeu d'entraînement — un instant…",
+      hotel: "Parc hôtelier — un instant…",
+      proximity: "Indicateurs de proximité — un instant…",
+      holidays: "Calendriers hôtels — un instant…",
+      weather: "Séries météo — un instant…",
+      brand: "Marques — un instant…",
+      concept_pilote: "Indicateurs pilotes — un instant…",
+    };
+    return {
+      title: `Chargement · ${name}`,
+      sub: heavy[datasetId] || "Récupération de la page…",
+    };
+  }
+
   /**
    * Appel API JSON.
    * @throws Error si HTTP non-2xx (message = body.error si présent)
@@ -141,22 +204,48 @@
     }
   }
 
-  /** Peint la barre latérale (un bouton par dataset). */
+  /** Crée un bouton d'onglet dataset. */
+  function makeNavButton(ds) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "nav-item" + (ds.id === state.currentId ? " active" : "");
+    btn.dataset.id = ds.id;
+    btn.innerHTML = `
+      <span class="nav-icon">${ICONS[ds.icon] || ICONS.table}</span>
+      <span>
+        <span class="nav-label">${escapeHtml(ds.label)}</span>
+        <span class="nav-desc">${escapeHtml(ds.description || "")}</span>
+      </span>`;
+    btn.addEventListener("click", () => selectDataset(ds.id));
+    return btn;
+  }
+
+  /**
+   * Peint la barre latérale :
+   * - haut figé : brand + hotel (sources globales)
+   * - milieu scrollable : pilotes / dérivés
+   * - bas figé : Model Build / Explore (HTML)
+   */
   function renderNav() {
-    nav.innerHTML = "";
+    if (navPinnedTop) navPinnedTop.innerHTML = "";
+    if (nav) nav.innerHTML = "";
+
+    const pinned = [];
+    const middle = [];
     state.datasets.forEach((ds) => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "nav-item" + (ds.id === state.currentId ? " active" : "");
-      btn.dataset.id = ds.id;
-      btn.innerHTML = `
-        <span class="nav-icon">${ICONS[ds.icon] || ICONS.table}</span>
-        <span>
-          <span class="nav-label">${escapeHtml(ds.label)}</span>
-          <span class="nav-desc">${escapeHtml(ds.description || "")}</span>
-        </span>`;
-      btn.addEventListener("click", () => selectDataset(ds.id));
-      nav.appendChild(btn);
+      if (PINNED_TOP_IDS.includes(ds.id)) pinned.push(ds);
+      else middle.push(ds);
+    });
+    // ordre haut : brand puis hotel (même si API renvoie autrement)
+    pinned.sort(
+      (a, b) => PINNED_TOP_IDS.indexOf(a.id) - PINNED_TOP_IDS.indexOf(b.id)
+    );
+
+    pinned.forEach((ds) => {
+      if (navPinnedTop) navPinnedTop.appendChild(makeNavButton(ds));
+    });
+    middle.forEach((ds) => {
+      if (nav) nav.appendChild(makeNavButton(ds));
     });
   }
 
@@ -240,11 +329,18 @@
     if (viewTable) viewTable.classList.remove("hidden");
   }
 
+  /** Retire l'état active de tous les onglets datasets (haut + milieu). */
+  function clearDatasetNavActive() {
+    document
+      .querySelectorAll(".sidebar .nav-item[data-id]")
+      .forEach((el) => el.classList.remove("active"));
+  }
+
   function showModelBuildPanel() {
     state.panel = "model-build";
     hideAllViews();
     if (viewModelBuild) viewModelBuild.classList.remove("hidden");
-    nav.querySelectorAll(".nav-item").forEach((el) => el.classList.remove("active"));
+    clearDatasetNavActive();
     setModelNavActive("build");
   }
 
@@ -252,7 +348,7 @@
     state.panel = "model-explore";
     hideAllViews();
     if (viewModelExplore) viewModelExplore.classList.remove("hidden");
-    nav.querySelectorAll(".nav-item").forEach((el) => el.classList.remove("active"));
+    clearDatasetNavActive();
     setModelNavActive("explore");
   }
 
@@ -261,8 +357,18 @@
   // -------------------------------------------------------------------------
 
   /** GET page courante et met à jour titre, chips, table, pager. */
-  async function fetchPage() {
+  async function fetchPage({ silent = false } = {}) {
     if (!state.currentId) return;
+    const labels = loadingLabelsFor(state.currentId);
+    if (!silent) {
+      showLoading(labels.title, labels.sub);
+      // feedback immédiat dans le tableau
+      if (tbody) {
+        tbody.innerHTML = `<tr><td class="empty-state empty-loading">Chargement de <strong>${escapeHtml(
+          labels.title.replace(/^Chargement · /, "")
+        )}</strong>…</td></tr>`;
+      }
+    }
     setStatus("Chargement…");
     try {
       const qs = new URLSearchParams({
@@ -285,6 +391,8 @@
       tbody.innerHTML = `<tr><td class="empty-state">Erreur : ${escapeHtml(err.message)}</td></tr>`;
       setStatus(err.message);
       toast(err.message, "err");
+    } finally {
+      if (!silent) hideLoading();
     }
   }
 
@@ -593,14 +701,17 @@
   /** Recharge le fichier Excel depuis le disque (invalide le cache serveur). */
   async function reload() {
     if (state.dirty.size && !confirm("Recharger et perdre les modifications ?")) return;
+    showLoading("Rechargement…", "Lecture du fichier Excel depuis le disque");
     try {
       await api(`/api/datasets/${state.currentId}/reload`, { method: "POST" });
       state.dirty.clear();
       state.selected.clear();
       toast("Fichier Excel rechargé");
-      await fetchPage();
+      await fetchPage({ silent: true });
     } catch (err) {
       toast(err.message, "err");
+    } finally {
+      hideLoading();
     }
   }
 
@@ -661,6 +772,7 @@
     }
     setStatus(cfg.msg);
     if (btnRebuild) btnRebuild.disabled = true;
+    showLoading("Reconstruction…", cfg.msg);
     try {
       const res = await api(cfg.url, {
         method: "POST",
@@ -676,12 +788,13 @@
       state.page = 1;
       // Recharge le Excel fraîchement écrit dans l'UI
       await api(`/api/datasets/${id}/reload`, { method: "POST" });
-      await fetchPage();
+      await fetchPage({ silent: true }); // overlay déjà affiché
       setStatus("");
     } catch (err) {
       toast(err.message, "err");
       setStatus(err.message);
     } finally {
+      hideLoading();
       if (btnRebuild) btnRebuild.disabled = false;
     }
   }

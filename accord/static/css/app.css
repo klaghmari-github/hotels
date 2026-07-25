@@ -1,5 +1,5 @@
 /*
- * Accord · Data & Model Studio — styles
+ * Accor · Data & Model Studio — styles
  * =====================================
  * Thème sombre premium (navy + or).
  *
@@ -72,12 +72,17 @@ body {
   position: sticky;
   top: 0;
   height: 100vh;
-  padding: 1.5rem 1rem 1rem;
+  padding: 1.25rem 1rem 1rem;
   background: linear-gradient(180deg, #10151d 0%, #0d1118 100%);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 0.35rem;
+  overflow: hidden; /* seul .nav-tabs scrolle */
+}
+.sidebar .brand {
+  flex-shrink: 0;
+  margin-bottom: 0.35rem;
 }
 
 .brand {
@@ -88,16 +93,24 @@ body {
 }
 
 .brand-mark {
-  width: 42px;
-  height: 42px;
+  width: 48px;
+  height: 48px;
   border-radius: 12px;
   display: grid;
   place-items: center;
-  font-family: var(--serif);
-  font-size: 1.45rem;
-  color: #1a1406;
-  background: linear-gradient(145deg, #f0d56a, #c9a227 55%, #8a6d12);
-  box-shadow: 0 8px 24px rgba(201, 162, 39, 0.25);
+  flex-shrink: 0;
+  background: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  padding: 6px;
+}
+
+.brand-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .brand-name {
@@ -114,12 +127,45 @@ body {
   margin-top: 0.1rem;
 }
 
+/* Haut figé : brand + hotel (parc global) */
+.nav-pinned-top {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nav-section-label {
+  flex-shrink: 0;
+  padding: 0.55rem 0.85rem 0.25rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint, #6b7685);
+}
+
+/* Milieu scrollable : onglets pilotes */
 .nav-tabs {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0; /* indispensable pour overflow dans flex column */
   overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0.25rem 0 0.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 162, 39, 0.35) transparent;
+}
+.nav-tabs::-webkit-scrollbar {
+  width: 6px;
+}
+.nav-tabs::-webkit-scrollbar-thumb {
+  background: rgba(201, 162, 39, 0.3);
+  border-radius: 99px;
 }
 
 .nav-item {
@@ -607,9 +653,16 @@ body {
 
 /* —— Model panel —— */
 .nav-footer {
+  flex-shrink: 0;
   margin-top: auto;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--border);
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.nav-footer .nav-section-label {
+  padding-top: 0.15rem;
 }
 
 .view {
@@ -1094,6 +1147,121 @@ input[type="range"] {
   .table-scroll {
     max-height: 60vh;
   }
+}
+
+/* —— Loading overlay (changement d'onglet / fetch) —— */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(6, 9, 14, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  opacity: 1;
+  transition: opacity 0.22s ease;
+  pointer-events: all;
+}
+.loading-overlay.hidden {
+  display: none !important;
+  opacity: 0;
+  pointer-events: none;
+}
+body.is-loading {
+  cursor: progress;
+}
+.empty-state.empty-loading {
+  color: var(--text-muted, #8b97a8);
+}
+.empty-state.empty-loading strong {
+  color: #f0d56a;
+  font-weight: 600;
+}
+.loading-overlay.is-leaving {
+  opacity: 0;
+}
+.loading-card {
+  min-width: 280px;
+  max-width: min(420px, 92vw);
+  padding: 1.75rem 1.9rem 1.5rem;
+  border-radius: 18px;
+  background: linear-gradient(155deg, rgba(28, 34, 46, 0.96), rgba(14, 18, 26, 0.98));
+  border: 1px solid rgba(240, 213, 106, 0.22);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 24px 64px rgba(0, 0, 0, 0.45),
+    0 0 48px rgba(201, 162, 39, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+  text-align: center;
+}
+.loading-ring {
+  position: relative;
+  width: 56px;
+  height: 56px;
+}
+.loading-ring span {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: #f0d56a;
+  border-right-color: rgba(240, 213, 106, 0.35);
+  animation: loading-spin 0.9s cubic-bezier(0.5, 0.15, 0.5, 0.85) infinite;
+}
+.loading-ring span:nth-child(2) {
+  inset: 7px;
+  border-top-color: rgba(255, 255, 255, 0.55);
+  border-right-color: transparent;
+  animation-duration: 1.25s;
+  animation-direction: reverse;
+}
+.loading-ring span:nth-child(3) {
+  inset: 14px;
+  border-top-color: #c9a227;
+  animation-duration: 0.7s;
+}
+@keyframes loading-spin {
+  to { transform: rotate(360deg); }
+}
+.loading-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.loading-text strong {
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #f5f0e6;
+}
+.loading-text span {
+  font-size: 0.85rem;
+  color: var(--text-muted, #8b97a8);
+  line-height: 1.35;
+}
+.loading-bar {
+  width: 100%;
+  height: 3px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+.loading-bar i {
+  display: block;
+  height: 100%;
+  width: 40%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, transparent, #f0d56a, #c9a227, transparent);
+  animation: loading-bar 1.4s ease-in-out infinite;
+}
+@keyframes loading-bar {
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(320%); }
 }
 
 /* —— Brand logos (Hotel Brand Data) — image seule, pas le chemin —— */

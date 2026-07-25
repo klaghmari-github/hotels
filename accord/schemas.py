@@ -1,5 +1,5 @@
 """
-Schémas des jeux de données — Accord · Data & Model Studio.
+Schémas des jeux de données — Accor · Data & Model Studio.
 
 Principe
 --------

@@ -1,5 +1,5 @@
 """
-Couche données Excel — Accord · Data & Model Studio.
+Couche données Excel — Accor · Data & Model Studio.
 
 Responsabilités
 ---------------
