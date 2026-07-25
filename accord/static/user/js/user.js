@@ -1,6 +1,6 @@
 /**
- * ROD User Simulator — wizard interactif (5 étapes).
- * Cache-bust: v=20260725b
+ * ROD User Simulator — wizard interactif (5 etapes).
+ * Autocomplete hotel_data + services completes presaisis.
  */
 (function () {
   "use strict";
@@ -12,6 +12,7 @@
     hotels: [],
     brands: [],
     ready: false,
+    lastHotelSource: "",
   };
 
   function $(sel, root) {
@@ -21,6 +22,7 @@
     return Array.prototype.slice.call((root || document).querySelectorAll(sel));
   }
 
+  /** Services alignes sur hotel_data (presaisie + validation directeur) */
   var SERVICES = {
     fb: [
       { id: "bar", label: "Bar" },
@@ -29,20 +31,50 @@
       { id: "minibar", label: "Minibar" },
     ],
     nfb: [
-      { id: "meeting_rooms", label: "Salles de réunion" },
+      { id: "meeting_rooms", label: "Salles de reunion" },
       { id: "gym", label: "Salle de sport" },
       { id: "spa", label: "Spa" },
       { id: "pool", label: "Piscine" },
     ],
+    comfort: [
+      { id: "parking", label: "Parking" },
+      { id: "wifi", label: "Wifi" },
+      { id: "clim", label: "Climatisation" },
+      { id: "breakfast", label: "Petit-dejeuner" },
+      { id: "accessible", label: "Accessible PMR" },
+      { id: "pets", label: "Animaux acceptes" },
+      { id: "non_smoking", label: "Non-fumeur" },
+      { id: "shuttle", label: "Navette" },
+    ],
     lobby: [
       { id: "lobby_fridge", label: "Vitrine / frigo" },
       { id: "lobby_microwave", label: "Micro-ondes" },
-      { id: "lobby_water", label: "Fontaine à eau" },
-      { id: "lobby_coffee", label: "Machine à café" },
+      { id: "lobby_water", label: "Fontaine a eau" },
+      { id: "lobby_coffee", label: "Machine a cafe" },
       { id: "lobby_kettle", label: "Bouilloire" },
       { id: "lobby_seating", label: "Assises" },
     ],
+    corner: [
+      { id: "corner_fb_caisse", label: "F&B · caisse code-barres" },
+      { id: "corner_fb_distributeur", label: "F&B · distributeur auto" },
+      { id: "corner_fb_frigo", label: "F&B · frigo connecte" },
+      { id: "corner_fb_reception", label: "F&B · reception" },
+      { id: "corner_fb_snacking", label: "F&B · snacking comptoir" },
+      { id: "corner_nfb_armoire", label: "Non-F&B · armoire connectee" },
+      { id: "corner_nfb_caisse", label: "Non-F&B · caisse code-barres" },
+      { id: "corner_nfb_distributeur", label: "Non-F&B · distributeur auto" },
+      { id: "corner_nfb_reception", label: "Non-F&B · reception" },
+    ],
   };
+
+  function allServiceDefs() {
+    return []
+      .concat(SERVICES.fb)
+      .concat(SERVICES.nfb)
+      .concat(SERVICES.comfort)
+      .concat(SERVICES.lobby)
+      .concat(SERVICES.corner);
+  }
 
   function toast(msg) {
     var el = $("#toast");
@@ -371,7 +403,11 @@
     if (!root) return;
     root.innerHTML = items
       .map(function (it) {
-        var on = defaults[it.id] !== false && defaults[it.id] !== 0;
+        // defaults[id] === true/1 → on ; false/0 → off ; undefined → off pour services hotel
+        var on = defaults[it.id] === true || defaults[it.id] === 1;
+        if (defaults[it.id] === undefined && defaults.__defaultOn) {
+          on = true;
+        }
         return (
           '<label class="toggle-item"><span>' +
           escapeHtml(it.label) +
@@ -383,6 +419,179 @@
         );
       })
       .join("");
+  }
+
+  function renderAllServiceToggles(serviceDefaults) {
+    serviceDefaults = serviceDefaults || {};
+    renderToggles("svc-fb", SERVICES.fb, serviceDefaults);
+    renderToggles("svc-nfb", SERVICES.nfb, serviceDefaults);
+    renderToggles("svc-comfort", SERVICES.comfort, serviceDefaults);
+    renderToggles("svc-lobby", SERVICES.lobby, serviceDefaults);
+    renderToggles("svc-corner", SERVICES.corner, serviceDefaults);
+    var hint = $("#svc-presource-hint");
+    if (hint) {
+      if (state.lastHotelSource) {
+        hint.textContent =
+          "Presaisie chargee pour " +
+          state.lastHotelSource +
+          " — cochez / decochez pour valider.";
+      } else {
+        hint.textContent =
+          "Aucun hotel charge depuis la base : valeurs a saisir manuellement.";
+      }
+    }
+  }
+
+  // ----- Autocomplete hotel_data -----
+  var acTimers = {};
+  var acActive = { code: -1, name: -1 };
+
+  function hideAc(listId) {
+    var list = $("#" + listId);
+    if (list) {
+      list.classList.add("hidden");
+      list.innerHTML = "";
+    }
+  }
+
+  function hideAllAc() {
+    hideAc("ac-hotel-code");
+    hideAc("ac-hotel-name");
+  }
+
+  function renderAcList(listId, items, onPick) {
+    var list = $("#" + listId);
+    if (!list) return;
+    if (!items || !items.length) {
+      hideAc(listId);
+      return;
+    }
+    list.classList.remove("hidden");
+    list.innerHTML = items
+      .map(function (h, i) {
+        var code = h.hotel_code || "";
+        var name = h.hotel_name || "";
+        var meta = [h.hotel_brand, h.hotel_city, h.hotel_code_postal]
+          .filter(Boolean)
+          .join(" · ");
+        return (
+          '<li role="option" data-idx="' +
+          i +
+          '"><span class="ac-code">' +
+          escapeHtml(code) +
+          "</span>" +
+          escapeHtml(name) +
+          (meta
+            ? '<span class="ac-meta">' + escapeHtml(meta) + "</span>"
+            : "") +
+          "</li>"
+        );
+      })
+      .join("");
+    $$("#" + listId + " li").forEach(function (li) {
+      li.addEventListener("mousedown", function (ev) {
+        ev.preventDefault();
+        var idx = Number(li.getAttribute("data-idx"));
+        if (items[idx]) onPick(items[idx]);
+      });
+    });
+  }
+
+  function searchHotels(q) {
+    q = String(q || "").trim();
+    if (q.length < 1) {
+      return Promise.resolve([]);
+    }
+    return fetch(
+      "/api/hotels/search?q=" + encodeURIComponent(q) + "&limit=20"
+    )
+      .then(function (r) {
+        return r.json();
+      })
+      .then(function (data) {
+        return (data && data.hotels) || [];
+      })
+      .catch(function () {
+        return [];
+      });
+  }
+
+  function selectHotelSuggestion(h) {
+    hideAllAc();
+    if (!h || !h.hotel_code) return;
+    var codeEl = $("#hotel_code");
+    var nameEl = $("#hotel_name");
+    if (codeEl) codeEl.value = h.hotel_code;
+    if (nameEl && h.hotel_name) nameEl.value = h.hotel_name;
+    var hint = $("#hotel-lookup-hint");
+    if (hint) {
+      hint.textContent = "Chargement du profil " + h.hotel_code + "…";
+    }
+    loadHotelContext(h.hotel_code)
+      .then(function (ctx) {
+        if (ctx) applyContext(ctx);
+        if (hint) {
+          hint.textContent =
+            "Hotel charge depuis hotel_data : " +
+            (h.hotel_code || "") +
+            (h.hotel_name ? " — " + h.hotel_name : "") +
+            ". Verifiez les services a l etape 2.";
+        }
+      })
+      .catch(function (e) {
+        if (hint) {
+          hint.textContent =
+            "Hotel propose mais contexte incomplet : " + (e.message || e);
+        }
+      });
+  }
+
+  function wireAutocomplete(inputId, listId, key) {
+    var input = $("#" + inputId);
+    if (!input) return;
+    input.addEventListener("input", function () {
+      var q = input.value;
+      clearTimeout(acTimers[key]);
+      if (!String(q || "").trim()) {
+        hideAc(listId);
+        return;
+      }
+      acTimers[key] = setTimeout(function () {
+        searchHotels(q).then(function (items) {
+          acActive[key] = -1;
+          renderAcList(listId, items, selectHotelSuggestion);
+        });
+      }, 220);
+    });
+    input.addEventListener("keydown", function (ev) {
+      var list = $("#" + listId);
+      if (!list || list.classList.contains("hidden")) return;
+      var items = $$("#" + listId + " li");
+      if (!items.length) return;
+      if (ev.key === "ArrowDown") {
+        ev.preventDefault();
+        acActive[key] = Math.min(items.length - 1, (acActive[key] || -1) + 1);
+        items.forEach(function (li, i) {
+          li.classList.toggle("active", i === acActive[key]);
+        });
+      } else if (ev.key === "ArrowUp") {
+        ev.preventDefault();
+        acActive[key] = Math.max(0, (acActive[key] || 0) - 1);
+        items.forEach(function (li, i) {
+          li.classList.toggle("active", i === acActive[key]);
+        });
+      } else if (ev.key === "Enter" && acActive[key] >= 0) {
+        ev.preventDefault();
+        items[acActive[key]].dispatchEvent(new MouseEvent("mousedown"));
+      } else if (ev.key === "Escape") {
+        hideAc(listId);
+      }
+    });
+    input.addEventListener("blur", function () {
+      setTimeout(function () {
+        hideAc(listId);
+      }, 180);
+    });
   }
 
   /**
@@ -570,6 +779,12 @@
       );
     }
 
+    state.lastHotelSource =
+      (id.hotel_code || "") +
+      (id.hotel_name ? " — " + id.hotel_name : "");
+    // Re-render toggles with prefilled services from hotel_data
+    renderAllServiceToggles(services);
+
     Object.keys(services).forEach(function (sid) {
       var el = $("#" + sid);
       if (el) el.checked = !!services[sid];
@@ -612,12 +827,9 @@
 
   function collectPayload() {
     var services = {};
-    SERVICES.fb
-      .concat(SERVICES.nfb)
-      .concat(SERVICES.lobby)
-      .forEach(function (s) {
-        services[s.id] = checked(s.id);
-      });
+    allServiceDefs().forEach(function (s) {
+      services[s.id] = checked(s.id);
+    });
 
     var client_needs = {};
     ((state.meta && state.meta.client_needs_fb) || []).forEach(function (n) {
@@ -1034,12 +1246,15 @@
   }
 
   function wireEvents() {
+    wireAutocomplete("hotel_code", "ac-hotel-code", "code");
+    wireAutocomplete("hotel_name", "ac-hotel-name", "name");
+
     var hotelCodeInput = $("#hotel_code");
     if (hotelCodeInput) {
       var codeTimer = null;
       var tryLoadByCode = function () {
         var code = str("hotel_code");
-        if (!code) return;
+        if (!code || code.length < 3) return;
         clearTimeout(codeTimer);
         codeTimer = setTimeout(function () {
           loadHotelContext(code)
@@ -1049,10 +1264,9 @@
             .catch(function () {
               /* saisie libre */
             });
-        }, 400);
+        }, 450);
       };
       hotelCodeInput.addEventListener("change", tryLoadByCode);
-      hotelCodeInput.addEventListener("blur", tryLoadByCode);
     }
 
     // Marque → moyennes concept_pilote (étape 1)
@@ -1190,14 +1404,8 @@
     state.ready = true;
     console.info("[ROD] init user UI");
 
-    renderToggles("svc-fb", SERVICES.fb, { bar: true, restaurant: true });
-    renderToggles("svc-nfb", SERVICES.nfb, {
-      meeting_rooms: true,
-      gym: true,
-      spa: true,
-      pool: true,
-    });
-    renderToggles("svc-lobby", SERVICES.lobby, {});
+    // Services vides au depart — remplis a la selection d un hotel
+    renderAllServiceToggles({});
 
     wireEvents();
     updateDerived();

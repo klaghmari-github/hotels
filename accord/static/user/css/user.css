@@ -535,3 +535,43 @@ body {
   border-radius: 12px; box-shadow: var(--shadow); max-width: 360px;
   font-size: .9rem;
 }
+
+/* Autocomplete hotels */
+.ac-wrap { position: relative; }
+.ac-list {
+  position: absolute;
+  z-index: 40;
+  left: 0; right: 0;
+  top: calc(100% - 0.15rem);
+  margin: 0;
+  padding: 0.35rem 0;
+  list-style: none;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  max-height: 260px;
+  overflow-y: auto;
+}
+.ac-list li {
+  padding: 0.55rem 0.85rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  border-bottom: 1px solid rgba(15,23,36,0.04);
+}
+.ac-list li:last-child { border-bottom: 0; }
+.ac-list li:hover,
+.ac-list li.active {
+  background: rgba(201, 162, 39, 0.12);
+}
+.ac-list li .ac-code {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin-right: 0.4rem;
+}
+.ac-list li .ac-meta {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 0.15rem;
+}

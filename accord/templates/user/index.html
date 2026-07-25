@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/user/css/user.css?v=20260725h" />
+  <link rel="stylesheet" href="/static/user/css/user.css?v=20260726a" />
 </head>
 <body>
   <div class="shell">
@@ -49,9 +49,10 @@
           <div class="card">
             <h2 class="card-title">Identité</h2>
             <div class="form-grid-2">
-              <div class="field">
+              <div class="field ac-wrap">
                 <label>Code hôtel</label>
-                <input id="hotel_code" type="text" placeholder="H0338" />
+                <input id="hotel_code" type="text" placeholder="H0338 ou 0338" autocomplete="off" />
+                <ul id="ac-hotel-code" class="ac-list hidden" role="listbox"></ul>
               </div>
               <div class="field">
                 <label>Marque</label>
@@ -60,9 +61,11 @@
                 </select>
               </div>
             </div>
-            <div class="field">
+            <div class="field ac-wrap">
               <label>Nom de l’hôtel</label>
-              <input id="hotel_name" type="text" placeholder="ibis Styles Paris…" />
+              <input id="hotel_name" type="text" placeholder="ibis Styles Paris…" autocomplete="off" />
+              <ul id="ac-hotel-name" class="ac-list hidden" role="listbox"></ul>
+              <p class="hint" id="hotel-lookup-hint">Saisissez un code ou un nom — suggestions depuis le parc Accor (hotel_data).</p>
             </div>
             <div class="field">
               <label>Adresse</label>
@@ -191,7 +194,11 @@
       <section class="panel hidden" data-panel="2">
         <div class="panel-head">
           <h1>Services &amp; équipements</h1>
-          <p>Présence F&amp;B et non-F&amp;B, équipements lobby. Utilisés pour le profil descriptif (et le futur modèle IA).</p>
+          <p>
+            Présaisie depuis <strong>hotel_data</strong> (si l’hôtel est connu).
+            Validez ou corrigez chaque point avant de continuer.
+          </p>
+          <p class="hint" id="svc-presource-hint"></p>
         </div>
         <div class="grid-2">
           <div class="card">
@@ -202,9 +209,18 @@
             <h2 class="card-title accent-nfb">Non-F&amp;B</h2>
             <div class="toggle-list" id="svc-nfb"></div>
           </div>
-          <div class="card span-2">
+          <div class="card">
+            <h2 class="card-title">Confort &amp; accès</h2>
+            <div class="toggle-list" id="svc-comfort"></div>
+          </div>
+          <div class="card">
             <h2 class="card-title">Équipements lobby</h2>
-            <div class="toggle-grid" id="svc-lobby"></div>
+            <div class="toggle-list" id="svc-lobby"></div>
+          </div>
+          <div class="card span-2">
+            <h2 class="card-title">Corner actuel (offres)</h2>
+            <p class="hint">Si un corner existe déjà — canaux F&amp;B / non-F&amp;B observés.</p>
+            <div class="toggle-grid" id="svc-corner"></div>
           </div>
         </div>
       </section>
@@ -326,6 +342,6 @@
   </div>
 
   <div id="toast" class="toast hidden"></div>
-  <script src="/static/user/js/user.js?v=20260725i"></script>
+  <script src="/static/user/js/user.js?v=20260726a"></script>
 </body>
 </html>

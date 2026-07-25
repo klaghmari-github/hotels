@@ -130,20 +130,44 @@ class HotelOperating:
 
 @dataclass
 class HotelServices:
+    """Services / equipements (presaisie hotel_data, validable par le directeur)."""
+
+    # F&B
     bar: bool = False
     restaurant: bool = False
     room_service: bool = False
     minibar: bool = False
+    # Non F&B
     meeting_rooms: bool = False
     gym: bool = False
     spa: bool = False
     pool: bool = False
+    # Confort / access
+    parking: bool = False
+    wifi: bool = False
+    clim: bool = False
+    breakfast: bool = False
+    accessible: bool = False
+    pets: bool = False
+    non_smoking: bool = False
+    shuttle: bool = False
+    # Lobby
     lobby_fridge: bool = False
     lobby_microwave: bool = False
     lobby_water: bool = False
     lobby_coffee: bool = False
     lobby_kettle: bool = False
     lobby_seating: bool = False
+    # Corner actuel (offres)
+    corner_fb_caisse: bool = False
+    corner_fb_distributeur: bool = False
+    corner_fb_frigo: bool = False
+    corner_fb_reception: bool = False
+    corner_fb_snacking: bool = False
+    corner_nfb_armoire: bool = False
+    corner_nfb_caisse: bool = False
+    corner_nfb_distributeur: bool = False
+    corner_nfb_reception: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

@@ -296,14 +296,29 @@ class HotelContextBuilder:
 
         # --- Services ---
         services = {
+            # F&B
             "bar": bool(_as_int(row.get("hotel_f_b_bar"), 0)),
             "restaurant": bool(_as_int(row.get("hotel_f_b_restaurant"), 0)),
             "room_service": bool(_as_int(row.get("hotel_f_b_room_service"), 0)),
             "minibar": bool(_as_int(row.get("hotel_f_b_minibar"), 0)),
-            "meeting_rooms": bool(_as_int(row.get("hotel_non_f_b_salles_de_reunion"), 0)),
+            # Non F&B
+            "meeting_rooms": bool(
+                _as_int(row.get("hotel_non_f_b_salles_de_reunion"), 0)
+                or _as_int(row.get("hotel_has_reunion"), 0)
+            ),
             "gym": bool(_as_int(row.get("hotel_non_f_b_salle_de_sport"), 0)),
             "spa": bool(_as_int(row.get("hotel_non_f_b_spa"), 0)),
             "pool": bool(_as_int(row.get("hotel_non_f_b_piscine"), 0)),
+            # Confort / access (hotel_has_*)
+            "parking": bool(_as_int(row.get("hotel_has_parking"), 0)),
+            "wifi": bool(_as_int(row.get("hotel_has_wifi"), 0)),
+            "clim": bool(_as_int(row.get("hotel_has_clim"), 0)),
+            "breakfast": bool(_as_int(row.get("hotel_has_petit_dejeuner"), 0)),
+            "accessible": bool(_as_int(row.get("hotel_has_accessible"), 0)),
+            "pets": bool(_as_int(row.get("hotel_has_animaux"), 0)),
+            "non_smoking": bool(_as_int(row.get("hotel_has_non_fumeur"), 0)),
+            "shuttle": bool(_as_int(row.get("hotel_has_navette"), 0)),
+            # Lobby
             "lobby_fridge": bool(
                 _as_int(row.get("hotel_dispo_dans_lobby_vitrine_refrigeree"), 0)
             ),
@@ -321,6 +336,34 @@ class HotelContextBuilder:
             ),
             "lobby_seating": bool(
                 _as_int(row.get("hotel_dispo_dans_lobby_assises"), 0)
+            ),
+            # Offres corner actuel (pour etape boutique)
+            "corner_fb_caisse": bool(
+                _as_int(row.get("hotel_corner_actuel_offre_f_b_caisse_code_barres"), 0)
+            ),
+            "corner_fb_distributeur": bool(
+                _as_int(row.get("hotel_corner_actuel_offre_f_b_distributeur_auto"), 0)
+            ),
+            "corner_fb_frigo": bool(
+                _as_int(row.get("hotel_corner_actuel_offre_f_b_frigo_connecte"), 0)
+            ),
+            "corner_fb_reception": bool(
+                _as_int(row.get("hotel_corner_actuel_offre_f_b_reception"), 0)
+            ),
+            "corner_fb_snacking": bool(
+                _as_int(row.get("hotel_corner_actuel_offre_f_b_snacking_comptoir"), 0)
+            ),
+            "corner_nfb_armoire": bool(
+                _as_int(row.get("hotel_corner_actuel_offre_non_f_b_armoire_connectee"), 0)
+            ),
+            "corner_nfb_caisse": bool(
+                _as_int(row.get("hotel_corner_actuel_offre_non_f_b_caisse_code_barres"), 0)
+            ),
+            "corner_nfb_distributeur": bool(
+                _as_int(row.get("hotel_corner_actuel_offre_non_f_b_distributeur_auto"), 0)
+            ),
+            "corner_nfb_reception": bool(
+                _as_int(row.get("hotel_corner_actuel_offre_non_f_b_reception"), 0)
             ),
         }
 

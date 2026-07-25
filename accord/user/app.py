@@ -146,14 +146,31 @@ def api_rule1():
 
 @app.get("/api/hotels")
 def hotels():
-    return jsonify({"hotels": _catalog.list_hotels()})
+    """Liste complete (peut etre lourde) — preferer /api/hotels/search pour l UI."""
+    return jsonify({"hotels": _catalog.list_hotels(), "n": len(_catalog.list_hotels())})
+
+
+@app.get("/api/hotels/search")
+def hotels_search():
+    """
+    Autocomplete hotels (hotel_data).
+
+    Query: q (code, nom, ville, marque), limit (defaut 20, max 50).
+    """
+    q = str(request.args.get("q") or request.args.get("query") or "").strip()
+    try:
+        limit = int(request.args.get("limit") or 20)
+    except (TypeError, ValueError):
+        limit = 20
+    results = _catalog.search_hotels(q, limit=limit)
+    return jsonify({"ok": True, "q": q, "n": len(results), "hotels": results})
 
 
 @app.get("/api/hotels/<hotel_code>")
 def hotel_detail(hotel_code: str):
     h = _catalog.get_hotel(hotel_code)
     if not h:
-        return jsonify({"error": "Hôtel introuvable"}), 404
+        return jsonify({"error": "Hotel introuvable"}), 404
     return jsonify({"hotel": h})
 
 
