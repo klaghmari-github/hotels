@@ -45,3 +45,10 @@ data/reference/recomputed_sales_reference.json
 # Local feature-store runtime data
 rod_ia/feature_store/**/simulations/
 rod_ia/feature_store/**/geo/
+# Accor app: huge generated merge (local only; >100MB GitHub limit)
+accord/data/all_data.xlsx
+
+# Accor proximity intermediate shards/state (regenerable; keep final hotel_proximity_data if small)
+# Uncomment if they grow too large:
+# accord/data/proximity_shards/
+# accord/data/proximity_state/

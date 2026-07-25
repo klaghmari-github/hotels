@@ -1,0 +1,10 @@
+{
+  "ok": true,
+  "shard_id": 0,
+  "path": "/media/laghmari/ssd-data/dev/hotels/accord/data/proximity_shards/proximity_fr_shard00.xlsx",
+  "n_rows": 144,
+  "n_ok": 144,
+  "n_err": 0,
+  "elapsed_s": 1558.5,
+  "endpoint": "https://overpass.openstreetmap.fr/api/interpreter"
+}
