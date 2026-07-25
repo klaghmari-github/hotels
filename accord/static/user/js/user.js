@@ -306,6 +306,10 @@
 
     var meta = $("#brand-pilot-meta");
     if (meta) {
+      var src =
+        data.strategy === "neighbors" && data.source_brands
+          ? " · voisins : " + (data.source_brands || []).join(" + ")
+          : "";
       meta.textContent =
         (data.n_hotels || 0) +
         " hôtel(s) · " +
@@ -314,7 +318,17 @@
         ((data.years_used || []).join(", ") || "—") +
         " · année " +
         (data.excluded_year || "—") +
-        " exclue";
+        " exclue" +
+        src;
+    }
+    var hint = $("#brand-pilot-hint");
+    if (hint) {
+      if (data.note) {
+        hint.textContent = data.note;
+      } else {
+        hint.textContent =
+          "Valeurs préremplies dans les champs d’exploitation — vous pouvez les ajuster.";
+      }
     }
 
     function setText(id, text) {

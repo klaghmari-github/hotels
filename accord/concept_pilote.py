@@ -441,20 +441,170 @@ STEP1_AVG_FIELDS = (
     "n_mois_renseignes",
 )
 
+# Échelle de gamme croissante (Accor) :
+# IBIS BUDGET < IBIS STYLES < MERCURE < NOVOTEL
+# Si une marque n'a pas de pilote, on moyenne les voisins immédiats
+# (ex. IBIS STYLES absent → IBIS BUDGET + MERCURE).
+BRAND_LADDER: tuple[str, ...] = (
+    "IBIS BUDGET",
+    "IBIS STYLES",
+    "MERCURE",
+    "NOVOTEL",
+)
+
+# Alias de libellés UI / hotel_data → clé d'échelle
+BRAND_ALIASES: dict[str, str] = {
+    "IBIS BUDGET": "IBIS BUDGET",
+    "IBB": "IBIS BUDGET",
+    "IBIS STYLES": "IBIS STYLES",
+    "IBIS STYLE": "IBIS STYLES",
+    "IBS": "IBIS STYLES",
+    "MERCURE": "MERCURE",
+    "MER": "MERCURE",
+    "NOVOTEL": "NOVOTEL",
+    "NOV": "NOVOTEL",
+    # IBIS « classic » : entre budget et styles (voisinage budget+styles)
+    "IBIS": "IBIS STYLES",
+}
+
+
+def _normalize_brand_key(brand: str) -> str:
+    """Normalise un libellé marque vers une clé d'échelle (ou upper brute)."""
+    raw = str(brand or "").strip().upper().replace("_", " ")
+    raw = " ".join(raw.split())
+    if raw in BRAND_ALIASES:
+        return BRAND_ALIASES[raw]
+    # contains soft match
+    for alias, key in BRAND_ALIASES.items():
+        if alias in raw or raw in alias:
+            return key
+    return raw
+
+
+def _brand_col_key(series: pd.Series) -> pd.Series:
+    return (
+        series.astype(str)
+        .str.strip()
+        .str.upper()
+        .str.replace("_", " ", regex=False)
+        .str.replace(r"\s+", " ", regex=True)
+    )
+
+
+def _filter_brands(work: pd.DataFrame, brand_keys: list[str]) -> pd.DataFrame:
+    """Lignes dont hotel_brand matche une des clés (exact ou contains)."""
+    if work.empty or not brand_keys:
+        return work.iloc[0:0].copy()
+    col = _brand_col_key(work["hotel_brand"])
+    keys_norm = [_normalize_brand_key(k) for k in brand_keys]
+    # aussi les libellés originaux upper
+    keys_all = set(keys_norm) | {k.upper().replace("_", " ") for k in brand_keys}
+
+    def row_match(val: str) -> bool:
+        v = _normalize_brand_key(val)
+        if v in keys_all:
+            return True
+        vu = str(val).upper().replace("_", " ")
+        for k in keys_all:
+            if k in vu or vu in k:
+                return True
+        return False
+
+    mask = col.map(row_match)
+    return work.loc[mask].copy()
+
+
+def _ladder_neighbor_keys(brand_key: str) -> list[str]:
+    """
+    Voisins immédiats sur l'échelle de gamme.
+
+    * milieu : gauche + droite
+    * extrémité : seul voisin disponible
+    * hors échelle : []
+    """
+    if brand_key not in BRAND_LADDER:
+        return []
+    i = BRAND_LADDER.index(brand_key)
+    neighbors: list[str] = []
+    if i > 0:
+        neighbors.append(BRAND_LADDER[i - 1])
+    if i < len(BRAND_LADDER) - 1:
+        neighbors.append(BRAND_LADDER[i + 1])
+    return neighbors
+
+
+def _expand_neighbor_keys(
+    brand_key: str, available_ladder: set[str]
+) -> list[str]:
+    """
+    Étend le voisinage jusqu'à trouver au moins une marque présente dans
+    ``available_ladder`` (clés d'échelle présentes dans les données).
+    """
+    if brand_key not in BRAND_LADDER:
+        return []
+    i = BRAND_LADDER.index(brand_key)
+    found: list[str] = []
+    # gauche
+    for j in range(i - 1, -1, -1):
+        if BRAND_LADDER[j] in available_ladder:
+            found.append(BRAND_LADDER[j])
+            break
+    # droite
+    for j in range(i + 1, len(BRAND_LADDER)):
+        if BRAND_LADDER[j] in available_ladder:
+            found.append(BRAND_LADDER[j])
+            break
+    return found
+
+
+def _round_averages(averages: dict[str, float]) -> dict[str, float]:
+    out = dict(averages)
+    if "nb_chambres" in out:
+        out["nb_chambres"] = round(out["nb_chambres"], 1)
+    if "taux_occupation" in out:
+        out["taux_occupation"] = round(out["taux_occupation"], 6)
+    if "guests_per_chambre" in out:
+        out["guests_per_chambre"] = round(out["guests_per_chambre"], 3)
+    if "clients_jour" in out:
+        out["clients_jour"] = round(out["clients_jour"], 2)
+    if "clients_mois" in out:
+        out["clients_mois"] = round(out["clients_mois"], 2)
+    if "ca_mensuel_moyen" in out:
+        out["ca_mensuel_moyen"] = round(out["ca_mensuel_moyen"], 2)
+    if "n_mois_renseignes" in out:
+        out["n_mois_renseignes"] = round(out["n_mois_renseignes"], 2)
+    return out
+
+
+def _mean_fields(subset: pd.DataFrame) -> dict[str, float]:
+    averages: dict[str, float] = {}
+    for col in STEP1_AVG_FIELDS:
+        if col not in subset.columns:
+            continue
+        s = pd.to_numeric(subset[col], errors="coerce").dropna()
+        if s.empty:
+            continue
+        averages[col] = float(s.mean())
+    return _round_averages(averages)
+
 
 def brand_step1_averages(brand: str) -> dict[str, Any]:
     """
     Moyennes des indicateurs d'exploitation pour une marque.
 
     * Lit ``concept_pilote.xlsx``
-    * Filtre les lignes de la marque
     * **Exclut l'année la plus récente** du fichier (holdout, ex. 2026)
+    * Filtre la marque demandée
+    * Si aucune ligne : **échelle de gamme**
+      ``IBIS BUDGET < IBIS STYLES < MERCURE < NOVOTEL`` —
+      moyenne des **voisins** présents (ex. STYLES → BUDGET + MERCURE)
     * Moyenne arithmétique des champs utiles (étape 1 — sans mix produits)
 
     Returns
     -------
     dict
-        ok, brand, excluded_year, n_rows, n_hotels, years_used, averages, …
+        ok, brand, excluded_year, n_rows, n_hotels, years_used, averages,
+        strategy (``direct`` | ``neighbors``), source_brands, …
     """
     brand_clean = str(brand or "").strip()
     if not brand_clean:
@@ -488,79 +638,110 @@ def brand_step1_averages(brand: str) -> dict[str, Any]:
     work = work.dropna(subset=["annee"])
     work["annee"] = work["annee"].astype(int)
 
-    # Match marque insensible à la casse
-    brand_key = brand_clean.upper().replace("_", " ")
-    mask = work["hotel_brand"].str.upper().str.replace("_", " ", regex=False) == brand_key
-    subset = work.loc[mask].copy()
-    if subset.empty:
-        # partial contains
-        mask2 = work["hotel_brand"].str.upper().str.contains(
-            brand_key, regex=False, na=False
-        )
-        subset = work.loc[mask2].copy()
-    if subset.empty:
-        return {
-            "ok": False,
-            "error": f"Aucune ligne concept_pilote pour la marque « {brand_clean} ».",
-            "brand": brand_clean,
-            "averages": {},
-            "available_brands": sorted(
-                work["hotel_brand"].dropna().astype(str).unique().tolist()
-            ),
-        }
-
-    # Exclure l'année la plus récente **globale** du fichier (pas seulement de la marque)
+    # Exclure l'année la plus récente **globale** du fichier
     max_year_global = int(work["annee"].max())
-    before = len(subset)
-    subset = subset.loc[subset["annee"] < max_year_global].copy()
-    if subset.empty:
+    work_holdout = work.loc[work["annee"] < max_year_global].copy()
+    if work_holdout.empty:
         return {
             "ok": False,
-            "error": (
-                f"Aucune année hors holdout ({max_year_global}) pour « {brand_clean} »."
-            ),
+            "error": f"Aucune année hors holdout ({max_year_global}).",
             "brand": brand_clean,
             "excluded_year": max_year_global,
             "averages": {},
-            "n_rows_before_exclude": before,
         }
 
-    averages: dict[str, float] = {}
-    for col in STEP1_AVG_FIELDS:
-        if col not in subset.columns:
-            continue
-        s = pd.to_numeric(subset[col], errors="coerce").dropna()
-        if s.empty:
-            continue
-        averages[col] = float(s.mean())
+    brand_key = _normalize_brand_key(brand_clean)
 
-    # Arrondis d'affichage
-    if "nb_chambres" in averages:
-        averages["nb_chambres"] = round(averages["nb_chambres"], 1)
-    if "taux_occupation" in averages:
-        averages["taux_occupation"] = round(averages["taux_occupation"], 6)
-    if "guests_per_chambre" in averages:
-        averages["guests_per_chambre"] = round(averages["guests_per_chambre"], 3)
-    if "clients_jour" in averages:
-        averages["clients_jour"] = round(averages["clients_jour"], 2)
-    if "clients_mois" in averages:
-        averages["clients_mois"] = round(averages["clients_mois"], 2)
-    if "ca_mensuel_moyen" in averages:
-        averages["ca_mensuel_moyen"] = round(averages["ca_mensuel_moyen"], 2)
-    if "n_mois_renseignes" in averages:
-        averages["n_mois_renseignes"] = round(averages["n_mois_renseignes"], 2)
+    # --- 1) Direct : lignes de la marque ---
+    subset = _filter_brands(work_holdout, [brand_clean, brand_key])
+    strategy = "direct"
+    source_brands: list[str] = []
 
+    if not subset.empty:
+        source_brands = sorted(
+            subset["hotel_brand"].dropna().astype(str).str.strip().unique().tolist()
+        )
+    else:
+        # --- 2) Voisins sur l'échelle de gamme ---
+        # Marques d'échelle effectivement présentes dans le holdout
+        present_raw = (
+            work_holdout["hotel_brand"].dropna().astype(str).str.strip().unique().tolist()
+        )
+        available_ladder: set[str] = set()
+        for p in present_raw:
+            k = _normalize_brand_key(p)
+            if k in BRAND_LADDER:
+                available_ladder.add(k)
+
+        neighbor_keys = _ladder_neighbor_keys(brand_key)
+        # Ne garder que les voisins qui ont des données ; sinon élargir
+        neighbor_keys = [k for k in neighbor_keys if k in available_ladder]
+        if not neighbor_keys:
+            neighbor_keys = _expand_neighbor_keys(brand_key, available_ladder)
+
+        if not neighbor_keys:
+            return {
+                "ok": False,
+                "error": (
+                    f"Aucune ligne concept_pilote pour « {brand_clean} » "
+                    f"et aucun voisin d'échelle disponible "
+                    f"({' < '.join(BRAND_LADDER)})."
+                ),
+                "brand": brand_clean,
+                "brand_key": brand_key,
+                "excluded_year": max_year_global,
+                "averages": {},
+                "available_brands": sorted(present_raw),
+                "ladder": list(BRAND_LADDER),
+            }
+
+        subset = _filter_brands(work_holdout, neighbor_keys)
+        strategy = "neighbors"
+        source_brands = neighbor_keys
+        if subset.empty:
+            return {
+                "ok": False,
+                "error": (
+                    f"Voisins {neighbor_keys} sans lignes hors {max_year_global}."
+                ),
+                "brand": brand_clean,
+                "brand_key": brand_key,
+                "excluded_year": max_year_global,
+                "source_brands": neighbor_keys,
+                "averages": {},
+            }
+
+    averages = _mean_fields(subset)
     years_used = sorted(int(y) for y in subset["annee"].unique())
     n_hotels = (
         int(subset["hotel_code"].nunique()) if "hotel_code" in subset.columns else 0
     )
 
+    # Libellés réellement présents dans le subset
+    brands_in_subset = sorted(
+        subset["hotel_brand"].dropna().astype(str).str.strip().unique().tolist()
+    )
+
     return {
         "ok": True,
         "brand": brand_clean,
+        "brand_key": brand_key,
         "excluded_year": max_year_global,
         "years_used": years_used,
         "n_rows": len(subset),
         "n_hotels": n_hotels,
         "averages": averages,
+        "strategy": strategy,
+        "source_brands": brands_in_subset if strategy == "direct" else source_brands,
+        "ladder": list(BRAND_LADDER),
+        "note": (
+            None
+            if strategy == "direct"
+            else (
+                f"Marque « {brand_clean} » absente des pilotes : "
+                f"moyenne des voisins d'échelle "
+                f"{' + '.join(source_brands)} "
+                f"(ordre : {' < '.join(BRAND_LADDER)})."
+            )
+        ),
     }
