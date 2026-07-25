@@ -388,15 +388,18 @@ _CONCEPT_PILOTE_EDITABLE = [
     "mix_n_f_b",
 ]
 
-# Ordre sidebar demandé :
-# Brand → Hotel → Holidays → Sales Raw → Sales → Weather → Proximity → All →
-# Concept pilote → Model Data  (puis Model Build / Explore hors datasets)
+# Ordre logique sidebar :
+# All (UI pinned) : Brand → Hotel → Proximity
+# Pilotes (scroll) : Holidays → Sales Raw → Sales → Weather → All Data →
+# Concept pilote → Model Data
+# Modèles (hors datasets) : Model Build / Explore
 DATASETS: dict[str, DatasetSchema] = {
+    # ----- All (parc Accor, pas seulement pilotes) -----
     "brand": DatasetSchema(
         id="brand",
         label="Hotel Brand Data",
         description=(
-            "Marques Accor — nom, logo, catégorie (binaires cat_*) "
+            "All — marques Accor : nom, logo, catégorie (cat_*) "
             "+ effectifs Nb_* à saisir"
         ),
         filename="hotel_brand_data.xlsx",
@@ -412,8 +415,8 @@ DATASETS: dict[str, DatasetSchema] = {
         id="hotel",
         label="Hotel Data",
         description=(
-            "Parc hôtelier Accor (scrape) — identité, adresse, GPS, "
-            "équipements binaires ; profils corner/TO à saisir"
+            "All — parc hôtelier Accor (scrape) : identité, adresse, "
+            "GPS, équipements ; profils corner/TO à saisir"
         ),
         filename="hotel_data.xlsx",
         sheet="Sheet1",
@@ -423,6 +426,21 @@ DATASETS: dict[str, DatasetSchema] = {
         icon="hotel",
         page_size=25,
     ),
+    "proximity": DatasetSchema(
+        id="proximity",
+        label="Hotel Proximity Data",
+        description=(
+            "All — géoloc parc (commerces 100–500 m, plage 1–5 km) "
+            "y compris hors pilotes — Reconstruire via Overpass"
+        ),
+        filename="hotel_proximity_data.xlsx",
+        sheet="hotel_proximity",
+        editable_columns=_PROXIMITY_EDITABLE,
+        key_columns=["hotel_code", "hotel_name"],
+        icon="map",
+        page_size=15,
+    ),
+    # ----- Pilotes / données dérivées -----
     "holidays": DatasetSchema(
         id="holidays",
         label="Hotel Holidays Data",
@@ -495,17 +513,6 @@ DATASETS: dict[str, DatasetSchema] = {
         key_columns=["hotel_code", "annee", "mois"],
         icon="cloud",
         page_size=25,
-    ),
-    "proximity": DatasetSchema(
-        id="proximity",
-        label="Hotel Proximity Data",
-        description="Commerces 100–500 m + plage 1–5 km — Reconstruire via Overpass",
-        filename="hotel_proximity_data.xlsx",
-        sheet="hotel_proximity",
-        editable_columns=_PROXIMITY_EDITABLE,
-        key_columns=["hotel_code", "hotel_name"],
-        icon="map",
-        page_size=15,
     ),
     # All Data : jointure complète de tous les onglets → all_data.xlsx
     "all_data": DatasetSchema(

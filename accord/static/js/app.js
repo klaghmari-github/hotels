@@ -55,8 +55,8 @@
   const $ = (sel) => document.querySelector(sel);
   const nav = $("#nav-tabs");
   const navPinnedTop = $("#nav-pinned-top");
-  // Sources globales toujours en haut (parc + marques)
-  const PINNED_TOP_IDS = ["brand", "hotel"];
+  // Zone All : parc global (marques, hôtels, proximité géo — pas seulement pilotes)
+  const PINNED_TOP_IDS = ["brand", "hotel", "proximity"];
   const title = $("#panel-title");
   const desc = $("#panel-desc");
   const chipFile = $("#chip-file");
@@ -221,10 +221,10 @@
   }
 
   /**
-   * Peint la barre latérale :
-   * - haut figé : brand + hotel (sources globales)
-   * - milieu scrollable : pilotes / dérivés
-   * - bas figé : Model Build / Explore (HTML)
+   * Peint la barre latérale (une scrollbar globale sur .sidebar) :
+   * - All : brand + hotel + proximity (parc global)
+   * - Pilotes : sales, weather, holidays, …
+   * - Modèles : Model Build / Explore (HTML)
    */
   function renderNav() {
     if (navPinnedTop) navPinnedTop.innerHTML = "";
@@ -236,7 +236,7 @@
       if (PINNED_TOP_IDS.includes(ds.id)) pinned.push(ds);
       else middle.push(ds);
     });
-    // ordre haut : brand puis hotel (même si API renvoie autrement)
+    // ordre All : brand → hotel → proximity (même si API renvoie autrement)
     pinned.sort(
       (a, b) => PINNED_TOP_IDS.indexOf(a.id) - PINNED_TOP_IDS.indexOf(b.id)
     );

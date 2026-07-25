@@ -68,6 +68,8 @@ body {
 }
 
 /* —— Sidebar —— */
+/* Une seule scrollbar pour toute la barre (zones All / Pilotes / Modèles
+   restent séparées par libellés + bordures, mais ne scrolent plus à part). */
 .sidebar {
   position: sticky;
   top: 0;
@@ -78,7 +80,17 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  overflow: hidden; /* seul .nav-tabs scrolle */
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 162, 39, 0.35) transparent;
+}
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(201, 162, 39, 0.3);
+  border-radius: 99px;
 }
 .sidebar .brand {
   flex-shrink: 0;
@@ -127,7 +139,7 @@ body {
   margin-top: 0.1rem;
 }
 
-/* Haut figé : brand + hotel (parc global) */
+/* Zone All : brand / hotel / proximity (parc global) */
 .nav-pinned-top {
   display: flex;
   flex-direction: column;
@@ -147,25 +159,20 @@ body {
   color: var(--text-faint, #6b7685);
 }
 
-/* Milieu scrollable : onglets pilotes */
+/* Premier libellé sous le logo (All) : un peu moins d'air au-dessus */
+#nav-all-label {
+  padding-top: 0.2rem;
+}
+
+/* Zone Pilotes : flux normal (scroll = .sidebar, pas de barre dédiée) */
 .nav-tabs {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  flex: 1 1 auto;
-  min-height: 0; /* indispensable pour overflow dans flex column */
-  overflow-y: auto;
-  overflow-x: hidden;
+  flex: 0 0 auto;
+  min-height: 0;
+  overflow: visible;
   padding: 0.25rem 0 0.5rem;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(201, 162, 39, 0.35) transparent;
-}
-.nav-tabs::-webkit-scrollbar {
-  width: 6px;
-}
-.nav-tabs::-webkit-scrollbar-thumb {
-  background: rgba(201, 162, 39, 0.3);
-  border-radius: 99px;
 }
 
 .nav-item {
@@ -651,9 +658,10 @@ body {
   to { opacity: 1; transform: none; }
 }
 
-/* —— Model panel —— */
+/* —— Zone Modèles (séparée, même scroll que le reste de la sidebar) —— */
 .nav-footer {
   flex-shrink: 0;
+  /* Colle en bas si le contenu est court ; suit le flux si on scrolle */
   margin-top: auto;
   padding-top: 0.5rem;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -1134,15 +1142,16 @@ input[type="range"] {
   .sidebar {
     position: relative;
     height: auto;
+    max-height: none;
     border-right: 0;
     border-bottom: 1px solid var(--border);
+    overflow: visible;
   }
   .nav-tabs {
-    flex-direction: row;
-    overflow-x: auto;
+    flex-direction: column;
   }
   .nav-item {
-    min-width: 200px;
+    min-width: 0;
   }
   .table-scroll {
     max-height: 60vh;

@@ -46,17 +46,15 @@
           <span class="brand-sub">Data &amp; Model Studio</span>
         </div>
       </div>
-      <!-- Haut figé : sources globales (parc + marques) -->
-      <nav class="nav-pinned-top" id="nav-pinned-top" aria-label="Sources globales"></nav>
+      <!-- Zones All / Pilotes / Modèles : une seule scrollbar (sidebar), séparations conservées -->
+      <div class="nav-section-label" id="nav-all-label">All</div>
+      <nav class="nav-pinned-top" id="nav-pinned-top" aria-label="All"></nav>
 
-      <div class="nav-section-label" id="nav-pilots-label">Hôtels pilotes</div>
+      <div class="nav-section-label" id="nav-pilots-label">Pilotes</div>
+      <nav class="nav-tabs" id="nav-tabs" aria-label="Pilotes"></nav>
 
-      <!-- Milieu scrollable : données pilotes / dérivées -->
-      <nav class="nav-tabs" id="nav-tabs" aria-label="Données pilotes"></nav>
-
-      <!-- Bas figé : model build / explore -->
       <div class="nav-footer">
-        <div class="nav-section-label">Modèle</div>
+        <div class="nav-section-label">Modèles</div>
         <button type="button" class="nav-item" id="nav-model-build" data-panel="model-build">
           <span class="nav-icon">⚡</span>
           <span>
