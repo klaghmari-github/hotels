@@ -700,6 +700,87 @@ body {
   max-height: calc(100vh - 160px);
 }
 
+.field-inline {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.75rem;
+}
+.field-inline input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+}
+
+.build-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.build-progress-bar {
+  height: 10px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+.build-progress-bar > i {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 99px;
+  transition: width 0.25s ease;
+}
+.build-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.build-results {
+  overflow: auto;
+  max-height: 50vh;
+}
+.build-results.empty {
+  color: var(--text-faint);
+  font-size: 0.9rem;
+  padding: 0.5rem 0;
+}
+.build-results table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+.build-results th,
+.build-results td {
+  text-align: left;
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.build-results th {
+  color: var(--text-muted);
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  background: var(--bg-panel);
+}
+.build-results tr.is-best td {
+  color: var(--success);
+  font-weight: 600;
+}
+.build-results tr.is-err td {
+  color: var(--danger);
+}
+.build-results .kind-tag {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+}
+
 .model-col {
   display: flex;
   flex-direction: column;

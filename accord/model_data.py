@@ -11,8 +11,8 @@ Règles métier
 2. **Supprimer** les colonnes constantes (inutiles au modèle).
 3. **Rôles de colonnes** (couleurs UI) :
 
-   * **id_detail** (jaune) : code, nom, marque, adresse, ville, lat/lon,
-     année, mois, zone scolaire, département…
+   * **id_detail** (jaune) : code, nom, marque, logo_path, adresse, ville,
+     lat/lon, année, mois, département, commune…
    * **descriptive** (neutre) : features d'entrée du modèle —
 
      - météo, équipements, brand stats, holidays counts…
@@ -62,13 +62,14 @@ MODEL_DATA_FILENAME = "model_data.xlsx"
 MODEL_DATA_SHEET = "model_data"
 META_FILENAME = "model_data_meta.json"
 
-# Identifiants / détail (en-têtes jaunes)
+# Identifiants / detail (en-tetes jaunes) — pas des features du modele
 ID_DETAIL_CANDIDATES = [
     "hotel_code",
     "hotel_name",
     "nom_hotel",
     "hotel_brand",
     "Marque",
+    "logo_path",
     "hotel_adresse_postale_1",
     "hotel_adresse_postale_2",
     "hotel_code_postal",

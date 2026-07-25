@@ -490,16 +490,60 @@ def api_model_list():
 @app.post("/api/model/build")
 def api_model_build():
     """
-    Entraîne + sauvegarde dans ``models/design/<name>/``
-    (model.pkl + config.json). Écrase si même nom.
+    Build manuel + grid search (batch asynchrone).
+
+    Body JSON:
+      model_name, xgb_params (manuel),
+      grid_search: { param: [valeurs], ... }  (optionnel),
+      main_target: cible principale pour le ranking (defaut montant_ventes),
+      rank_metric: r2 | rmse | mae,
+      async: true (defaut) lance en arriere-plan et retourne tout de suite
+
+    Suivre l avancement: GET /api/model/build/progress
     """
     body = request.get_json(force=True, silent=True) or {}
     try:
-        from model_train import build_and_save
+        from model_train import (
+            build_and_save,
+            count_grid_jobs,
+            start_build_batch,
+        )
 
+        use_async = body.get("async", True)
+        grid = body.get("grid_search") or body.get("grid") or {}
+        # normaliser listes
+        if isinstance(grid, dict):
+            grid_norm = {
+                k: (v if isinstance(v, list) else [v])
+                for k, v in grid.items()
+                if v is not None and v != ""
+            }
+        else:
+            grid_norm = {}
+
+        if use_async:
+            result = start_build_batch(
+                model_name=body.get("model_name"),
+                xgb_params=body.get("xgb_params"),
+                grid_search=grid_norm or None,
+                main_target=body.get("main_target"),
+                rank_metric=body.get("rank_metric") or "r2",
+            )
+            counts = count_grid_jobs(body.get("xgb_params"), grid_norm or None)
+            result["counts"] = counts
+            return jsonify(result)
+
+        # mode sync simple (un seul modele, sans grid)
+        if grid_norm:
+            return jsonify(
+                {
+                    "error": "Utilisez async=true pour un build avec grid search",
+                }
+            ), 400
         result = build_and_save(
             xgb_params=body.get("xgb_params"),
             model_name=body.get("model_name"),
+            main_target=body.get("main_target"),
         )
         return jsonify(result)
     except ImportError as exc:
@@ -510,6 +554,38 @@ def api_model_build():
         return jsonify({"error": str(exc)}), 400
     except Exception as exc:
         return jsonify({"error": str(exc)}), 500
+
+
+@app.get("/api/model/build/progress")
+def api_model_build_progress():
+    """Progression du build batch (manuel + grid search)."""
+    try:
+        from model_train import get_build_progress
+
+        return jsonify(get_build_progress())
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 500
+
+
+@app.post("/api/model/build/count")
+def api_model_build_count():
+    """Compte le nombre de modeles (manuel + grid) sans lancer l entrainement."""
+    body = request.get_json(force=True, silent=True) or {}
+    try:
+        from model_train import count_grid_jobs
+
+        grid = body.get("grid_search") or body.get("grid") or {}
+        if isinstance(grid, dict):
+            grid_norm = {
+                k: (v if isinstance(v, list) else [v])
+                for k, v in grid.items()
+                if v is not None and v != ""
+            }
+        else:
+            grid_norm = {}
+        return jsonify(count_grid_jobs(body.get("xgb_params"), grid_norm or None))
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
 
 
 @app.post("/api/model/deploy")

@@ -28,10 +28,13 @@ Fichiers annexes
 
 from __future__ import annotations
 
+import itertools
 import json
 import pickle
 import re
 import shutil
+import threading
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -54,6 +57,24 @@ MODELS_DIR = ROOT / "models"
 DESIGN_DIR = MODELS_DIR / "design"
 DEPLOY_DIR = MODELS_DIR / "deploy"
 LAST_TRAINED_FILE = MODELS_DIR / "last_trained.json"
+BUILD_PROGRESS_FILE = MODELS_DIR / "build_progress.json"
+
+# Progression d un build batch (manuel + grid search)
+_build_lock = threading.Lock()
+_build_thread: threading.Thread | None = None
+_build_state: dict[str, Any] = {
+    "status": "idle",  # idle | running | done | error
+    "done": 0,
+    "total": 0,
+    "current_name": "",
+    "message": "",
+    "results": [],
+    "error": None,
+    "rank_metric": "r2",
+    "main_target": MAIN_TARGET,
+    "started_at": None,
+    "finished_at": None,
+}
 
 DEFAULT_XGB_PARAMS: dict[str, Any] = {
     "n_estimators": 200,
@@ -180,6 +201,17 @@ def get_config_payload() -> dict[str, Any]:
         "models": list_design_models(),
         "design_dir": str(DESIGN_DIR),
         "deploy_dir": str(DEPLOY_DIR),
+        "rank_metrics": [
+            {"id": "r2", "label": "R2 (plus eleve = mieux)"},
+            {"id": "rmse", "label": "RMSE (plus bas = mieux)"},
+            {"id": "mae", "label": "MAE (plus bas = mieux)"},
+        ],
+        "default_rank_metric": "r2",
+        "default_grid_search": {
+            "n_estimators": [100, 200],
+            "max_depth": [4, 6],
+            "learning_rate": [0.05, 0.1],
+        },
     }
 
 
@@ -248,17 +280,175 @@ def get_top_model() -> dict[str, Any] | None:
     return models[0] if models else None
 
 
+def _coerce_params(xgb_params: dict[str, Any] | None) -> dict[str, Any]:
+    params = {**DEFAULT_XGB_PARAMS}
+    if not xgb_params:
+        return params
+    for k, v in xgb_params.items():
+        if k not in DEFAULT_XGB_PARAMS:
+            continue
+        if isinstance(DEFAULT_XGB_PARAMS[k], int) and not isinstance(
+            DEFAULT_XGB_PARAMS[k], bool
+        ):
+            params[k] = int(v)
+        elif isinstance(DEFAULT_XGB_PARAMS[k], float):
+            params[k] = float(v)
+        else:
+            params[k] = v
+    return params
+
+
+def expand_grid_search(
+    grid: dict[str, list[Any]] | None,
+    *,
+    base_params: dict[str, Any] | None = None,
+) -> list[dict[str, Any]]:
+    """
+    Produit la liste des jeux de parametres XGBoost pour une grid search.
+
+    grid: { "max_depth": [4, 6], "n_estimators": [100, 200] }
+    Les cles absentes gardent la valeur de base_params / DEFAULT.
+    """
+    base = _coerce_params(base_params)
+    if not grid:
+        return []
+    clean: dict[str, list[Any]] = {}
+    for k, vals in grid.items():
+        if k not in DEFAULT_XGB_PARAMS:
+            continue
+        if vals is None:
+            continue
+        if not isinstance(vals, (list, tuple)):
+            vals = [vals]
+        parsed: list[Any] = []
+        for v in vals:
+            if v is None or v == "":
+                continue
+            try:
+                if isinstance(DEFAULT_XGB_PARAMS[k], int) and not isinstance(
+                    DEFAULT_XGB_PARAMS[k], bool
+                ):
+                    parsed.append(int(v))
+                elif isinstance(DEFAULT_XGB_PARAMS[k], float):
+                    parsed.append(float(v))
+                else:
+                    parsed.append(v)
+            except (TypeError, ValueError):
+                continue
+        # dedupe preserve order
+        seen: set[Any] = set()
+        uniq: list[Any] = []
+        for v in parsed:
+            if v not in seen:
+                seen.add(v)
+                uniq.append(v)
+        if uniq:
+            clean[k] = uniq
+    if not clean:
+        return []
+    keys = sorted(clean.keys())
+    combos: list[dict[str, Any]] = []
+    for values in itertools.product(*(clean[k] for k in keys)):
+        p = dict(base)
+        for k, v in zip(keys, values):
+            p[k] = v
+        combos.append(p)
+    return combos
+
+
+def _score_result(
+    result: dict[str, Any],
+    *,
+    main_target: str,
+    rank_metric: str,
+) -> float:
+    """Score pour trier les modeles (plus grand = mieux pour r2, inverse pour rmse/mae)."""
+    mt = result.get("metrics_eval") or result.get("metrics_test") or {}
+    per = mt.get("per_target") or {}
+    metric = (rank_metric or "r2").lower().strip()
+    if metric not in ("r2", "rmse", "mae"):
+        metric = "r2"
+    val = None
+    if main_target in per and per[main_target].get(metric) is not None:
+        try:
+            val = float(per[main_target][metric])
+        except (TypeError, ValueError):
+            val = None
+    if val is None:
+        key = f"mean_{metric}"
+        try:
+            val = float(mt.get(key))
+        except (TypeError, ValueError):
+            val = float("nan")
+    if not np.isfinite(val):
+        return float("-inf")
+    # r2: higher better; rmse/mae: lower better -> negate
+    if metric in ("rmse", "mae"):
+        return -val
+    return val
+
+
+def _write_build_progress() -> None:
+    try:
+        MODELS_DIR.mkdir(parents=True, exist_ok=True)
+        payload = {
+            k: v
+            for k, v in _build_state.items()
+            if k != "results" or _build_state.get("status") in ("done", "error", "idle")
+        }
+        # results may be large — always include slim results
+        slim = []
+        for r in _build_state.get("results") or []:
+            slim.append(
+                {
+                    "name": r.get("name"),
+                    "id": r.get("id"),
+                    "kind": r.get("kind"),
+                    "rank": r.get("rank"),
+                    "score": r.get("score"),
+                    "main_target": r.get("main_target"),
+                    "rank_metric": r.get("rank_metric"),
+                    "metric_value": r.get("metric_value"),
+                    "xgb_params": r.get("xgb_params"),
+                    "metrics_eval": r.get("metrics_eval"),
+                    "n_train": r.get("n_train"),
+                    "n_eval": r.get("n_eval"),
+                    "error": r.get("error"),
+                    "ok": r.get("ok"),
+                }
+            )
+        payload["results"] = slim
+        BUILD_PROGRESS_FILE.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2, default=str),
+            encoding="utf-8",
+        )
+    except Exception:
+        pass
+
+
+def get_build_progress() -> dict[str, Any]:
+    """Etat du build batch (manuel + grid) pour la barre de progression."""
+    with _build_lock:
+        state = dict(_build_state)
+        state["results"] = list(_build_state.get("results") or [])
+    return state
+
+
 def train_model(
     *,
     xgb_params: dict[str, Any] | None = None,
     model_name: str | None = None,
     save: bool = False,
+    main_target: str | None = None,
+    rebuild_data: bool = True,
+    frame: pd.DataFrame | None = None,
+    meta: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """
     Entraîne sur model_data.
 
     Si ``save=True``, écrit immédiatement dans design/<name>/.
-    Sinon retourne le bundle en mémoire (client doit appeler save_model).
+    ``rebuild_data=False`` + frame/meta : reutilise les donnees (batch grid).
     """
     try:
         from sklearn.multioutput import MultiOutputRegressor
@@ -268,15 +458,19 @@ def train_model(
             "xgboost et scikit-learn sont requis : pip install xgboost scikit-learn"
         ) from exc
 
-    # Toujours rafraîchir model_data
-    rebuild_model_data()
-    frame, meta = _load_model_frame()
+    if rebuild_data or frame is None or meta is None:
+        rebuild_model_data()
+        frame, meta = _load_model_frame()
 
     feature_cols = [c for c in (meta.get("descriptive_columns") or []) if c in frame.columns]
     target_cols = [c for c in (meta.get("target_columns") or []) if c in frame.columns]
-    main_target = meta.get("main_target") or MAIN_TARGET
-    if main_target not in target_cols and MAIN_TARGET in target_cols:
-        main_target = MAIN_TARGET
+    main_t = (main_target or meta.get("main_target") or MAIN_TARGET).strip()
+    if main_t not in target_cols:
+        if MAIN_TARGET in target_cols:
+            main_t = MAIN_TARGET
+        elif target_cols:
+            main_t = target_cols[0]
+    main_target = main_t
 
     if not feature_cols:
         raise ValueError("Aucune feature descriptive dans model_data.")
@@ -310,17 +504,7 @@ def train_model(
     X_eval = eval_df[feature_cols].to_numpy(dtype=float)
     y_eval = eval_df[target_cols].to_numpy(dtype=float)
 
-    params = {**DEFAULT_XGB_PARAMS}
-    if xgb_params:
-        for k, v in xgb_params.items():
-            if k not in DEFAULT_XGB_PARAMS:
-                continue
-            if isinstance(DEFAULT_XGB_PARAMS[k], int) and not isinstance(DEFAULT_XGB_PARAMS[k], bool):
-                params[k] = int(v)
-            elif isinstance(DEFAULT_XGB_PARAMS[k], float):
-                params[k] = float(v)
-            else:
-                params[k] = v
+    params = _coerce_params(xgb_params)
 
     base = XGBRegressor(**params)
     if y_train.shape[1] == 1:
@@ -460,12 +644,236 @@ def build_and_save(
     *,
     xgb_params: dict[str, Any] | None = None,
     model_name: str | None = None,
+    main_target: str | None = None,
 ) -> dict[str, Any]:
-    """Build = entraînement + sauvegarde design."""
-    result = train_model(xgb_params=xgb_params, model_name=model_name, save=True)
-    # ne pas renvoyer le bundle pickle-able énorme dans JSON
+    """Build simple = un seul jeu de parametres + sauvegarde design."""
+    result = train_model(
+        xgb_params=xgb_params,
+        model_name=model_name,
+        save=True,
+        main_target=main_target,
+        rebuild_data=True,
+    )
     result.pop("bundle", None)
     return result
+
+
+def _run_build_batch(
+    *,
+    model_name: str,
+    xgb_params: dict[str, Any],
+    grid_search: dict[str, list[Any]] | None,
+    main_target: str,
+    rank_metric: str,
+) -> None:
+    """Thread worker: modele manuel + toutes les combinaisons grid search."""
+    global _build_state
+    try:
+        base_name = _slug(model_name or "xgb_sales")
+        manual_params = _coerce_params(xgb_params)
+        grid_combos = expand_grid_search(grid_search, base_params=manual_params)
+
+        # Jobs: manual first, then grid (skip grid combo identical to manual)
+        jobs: list[tuple[str, str, dict[str, Any]]] = [
+            (base_name, "manual", manual_params)
+        ]
+        for i, combo in enumerate(grid_combos, start=1):
+            if combo == manual_params:
+                continue
+            jobs.append((f"{base_name}_gs_{i:03d}", "grid", combo))
+
+        with _build_lock:
+            _build_state.update(
+                {
+                    "status": "running",
+                    "done": 0,
+                    "total": len(jobs),
+                    "current_name": "",
+                    "message": "Preparation model_data…",
+                    "results": [],
+                    "error": None,
+                    "rank_metric": rank_metric,
+                    "main_target": main_target,
+                    "started_at": datetime.now(timezone.utc).isoformat(),
+                    "finished_at": None,
+                }
+            )
+            _write_build_progress()
+
+        # Une seule reconstruction des donnees pour tout le batch
+        rebuild_model_data()
+        frame, meta = _load_model_frame()
+        target_cols = meta.get("target_columns") or []
+        main_t = (main_target or meta.get("main_target") or MAIN_TARGET).strip()
+        if main_t not in target_cols:
+            main_t = MAIN_TARGET if MAIN_TARGET in target_cols else (
+                target_cols[0] if target_cols else MAIN_TARGET
+            )
+        metric = (rank_metric or "r2").lower().strip()
+        if metric not in ("r2", "rmse", "mae"):
+            metric = "r2"
+
+        results: list[dict[str, Any]] = []
+        for idx, (name, kind, params) in enumerate(jobs):
+            with _build_lock:
+                _build_state["current_name"] = name
+                _build_state["message"] = f"Entrainement {idx + 1}/{len(jobs)} · {name}"
+                _write_build_progress()
+            try:
+                res = train_model(
+                    xgb_params=params,
+                    model_name=name,
+                    save=True,
+                    main_target=main_t,
+                    rebuild_data=False,
+                    frame=frame,
+                    meta=meta,
+                )
+                res.pop("bundle", None)
+                res["kind"] = kind
+                res["rank_metric"] = metric
+                res["ok"] = True
+                # valeur metrique affichee
+                mt = res.get("metrics_eval") or {}
+                per = (mt.get("per_target") or {}).get(main_t) or {}
+                if metric in per and per[metric] is not None:
+                    res["metric_value"] = float(per[metric])
+                else:
+                    res["metric_value"] = mt.get(f"mean_{metric}")
+                res["score"] = _score_result(
+                    res, main_target=main_t, rank_metric=metric
+                )
+            except Exception as exc:
+                res = {
+                    "ok": False,
+                    "name": name,
+                    "id": name,
+                    "kind": kind,
+                    "error": str(exc),
+                    "xgb_params": params,
+                    "main_target": main_t,
+                    "rank_metric": metric,
+                    "metric_value": None,
+                    "score": float("-inf"),
+                }
+            results.append(res)
+            with _build_lock:
+                _build_state["done"] = idx + 1
+                _build_state["results"] = list(results)
+                _write_build_progress()
+
+        # Ranking (meilleur score en premier)
+        ranked = sorted(
+            results, key=lambda r: float(r.get("score") or float("-inf")), reverse=True
+        )
+        for i, r in enumerate(ranked):
+            r["rank"] = i + 1
+
+        with _build_lock:
+            _build_state.update(
+                {
+                    "status": "done",
+                    "done": len(jobs),
+                    "total": len(jobs),
+                    "current_name": "",
+                    "message": f"Termine · {len(jobs)} modele(s)",
+                    "results": ranked,
+                    "main_target": main_t,
+                    "rank_metric": metric,
+                    "finished_at": datetime.now(timezone.utc).isoformat(),
+                }
+            )
+            _write_build_progress()
+    except Exception as exc:
+        with _build_lock:
+            _build_state.update(
+                {
+                    "status": "error",
+                    "error": str(exc),
+                    "message": str(exc),
+                    "finished_at": datetime.now(timezone.utc).isoformat(),
+                }
+            )
+            _write_build_progress()
+
+
+def start_build_batch(
+    *,
+    model_name: str | None = None,
+    xgb_params: dict[str, Any] | None = None,
+    grid_search: dict[str, list[Any]] | None = None,
+    main_target: str | None = None,
+    rank_metric: str = "r2",
+) -> dict[str, Any]:
+    """
+    Lance en arriere-plan le build manuel + grid search.
+    Suivre via get_build_progress().
+    """
+    global _build_thread
+    with _build_lock:
+        if _build_state.get("status") == "running":
+            return {
+                "ok": False,
+                "error": "Un build est deja en cours",
+                "progress": dict(_build_state),
+            }
+        # estimate total
+        manual = _coerce_params(xgb_params)
+        combos = expand_grid_search(grid_search, base_params=manual)
+        n_grid = sum(1 for c in combos if c != manual)
+        total = 1 + n_grid
+        _build_state.update(
+            {
+                "status": "running",
+                "done": 0,
+                "total": total,
+                "current_name": "",
+                "message": "Demarrage…",
+                "results": [],
+                "error": None,
+                "rank_metric": (rank_metric or "r2").lower(),
+                "main_target": main_target or MAIN_TARGET,
+                "started_at": datetime.now(timezone.utc).isoformat(),
+                "finished_at": None,
+            }
+        )
+        _write_build_progress()
+
+    t = threading.Thread(
+        target=_run_build_batch,
+        kwargs={
+            "model_name": model_name or "xgb_sales",
+            "xgb_params": xgb_params or {},
+            "grid_search": grid_search,
+            "main_target": main_target or MAIN_TARGET,
+            "rank_metric": rank_metric or "r2",
+        },
+        daemon=True,
+    )
+    _build_thread = t
+    t.start()
+    return {
+        "ok": True,
+        "status": "running",
+        "total": total,
+        "message": "Build lance",
+    }
+
+
+def count_grid_jobs(
+    xgb_params: dict[str, Any] | None,
+    grid_search: dict[str, list[Any]] | None,
+) -> dict[str, Any]:
+    """Nombre de modeles qui seront construits (manuel + grid uniques)."""
+    manual = _coerce_params(xgb_params)
+    combos = expand_grid_search(grid_search, base_params=manual)
+    n_grid = sum(1 for c in combos if c != manual)
+    return {
+        "n_manual": 1,
+        "n_grid": n_grid,
+        "n_grid_raw": len(combos),
+        "total": 1 + n_grid,
+    }
 
 
 def deploy_model(model_name: str | None = None) -> dict[str, Any]:

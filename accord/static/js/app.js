@@ -856,8 +856,10 @@
   // -------------------------------------------------------------------------
 
   // -------------------------------------------------------------------------
-  // Panneau Model Build (hyperparams + build&save design)
+  // Panneau Model Build (manuel + grid search + progression + ranking)
   // -------------------------------------------------------------------------
+
+  let _buildPollTimer = null;
 
   async function openModelBuildPanel() {
     if (state.dirty.size) {
@@ -866,6 +868,17 @@
     }
     showModelBuildPanel();
     await loadModelConfig();
+    // reprendre une progression eventuelle
+    try {
+      const prog = await api("/api/model/build/progress");
+      updateBuildProgressUI(prog);
+      if (prog.status === "running") startBuildPolling();
+      if (prog.status === "done" && (prog.results || []).length) {
+        renderBuildResults(prog);
+      }
+    } catch (_) {
+      /* ignore */
+    }
   }
 
   async function loadModelConfig() {
@@ -875,6 +888,7 @@
       const cfg = await api("/api/model/config");
       state.modelConfig = cfg;
       renderModelConfig(cfg);
+      updateJobCountChip();
       if (status) status.textContent = "";
     } catch (err) {
       if (status) status.textContent = err.message;
@@ -892,11 +906,37 @@
     const nameEl = $("#model-name");
     if (nameEl && cfg.model_name) nameEl.value = cfg.model_name;
 
+    // Cible principale
+    const tgtSel = $("#model-main-target");
+    if (tgtSel) {
+      const targets = cfg.target_cols || [];
+      const main = cfg.main_target || "montant_ventes";
+      tgtSel.innerHTML = targets
+        .map(
+          (t) =>
+            `<option value="${escapeHtml(t)}"${t === main ? " selected" : ""}>${escapeHtml(t)}</option>`
+        )
+        .join("");
+      if (!targets.length) {
+        tgtSel.innerHTML = `<option value="montant_ventes">montant_ventes</option>`;
+      }
+    }
+
+    // Metrique
+    const metSel = $("#model-rank-metric");
+    if (metSel && cfg.default_rank_metric) {
+      metSel.value = cfg.default_rank_metric;
+    }
+
+    const params = cfg.xgb_params || {};
+    const schema = cfg.param_schema || [];
+    const defaultGrid = cfg.default_grid_search || {};
+
+    // Params manuels
     const pHost = $("#model-params");
     if (pHost) {
       pHost.innerHTML = "";
-      const params = cfg.xgb_params || {};
-      (cfg.param_schema || []).forEach((spec) => {
+      schema.forEach((spec) => {
         const field = document.createElement("label");
         field.className = "field";
         const val = params[spec.name] != null ? params[spec.name] : "";
@@ -909,6 +949,39 @@
             step="${spec.step != null ? spec.step : "any"}" />`;
         pHost.appendChild(field);
       });
+      pHost.querySelectorAll("input").forEach((el) => {
+        el.addEventListener("input", updateJobCountChip);
+      });
+    }
+
+    // Grid search values (comma-separated)
+    const gHost = $("#model-grid-params");
+    if (gHost) {
+      gHost.innerHTML = "";
+      schema.forEach((spec) => {
+        const field = document.createElement("label");
+        field.className = "field";
+        const def = defaultGrid[spec.name];
+        const defStr = Array.isArray(def) ? def.join(", ") : "";
+        field.innerHTML = `
+          <span>${escapeHtml(spec.label || spec.name)} (grid)</span>
+          <input type="text" data-grid-param="${escapeHtml(spec.name)}"
+            placeholder="ex. ${escapeHtml(String(params[spec.name] ?? ""))}"
+            value="${escapeHtml(defStr)}" />`;
+        gHost.appendChild(field);
+      });
+      gHost.querySelectorAll("input").forEach((el) => {
+        el.addEventListener("input", updateJobCountChip);
+      });
+    }
+
+    const gridEn = $("#model-grid-enabled");
+    if (gridEn) {
+      gridEn.onchange = () => {
+        if (gHost) gHost.style.opacity = gridEn.checked ? "1" : "0.45";
+        updateJobCountChip();
+      };
+      if (gHost) gHost.style.opacity = gridEn.checked ? "1" : "0.45";
     }
   }
 
@@ -921,35 +994,216 @@
     return out;
   }
 
+  function getGridSearch() {
+    const enabled = $("#model-grid-enabled");
+    if (enabled && !enabled.checked) return {};
+    const out = {};
+    document.querySelectorAll("#model-grid-params input[data-grid-param]").forEach((el) => {
+      const raw = (el.value || "").trim();
+      if (!raw) return;
+      const vals = raw
+        .split(/[,;\s]+/)
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .map((s) => {
+          const n = Number(s);
+          return Number.isFinite(n) ? n : s;
+        });
+      if (vals.length) out[el.dataset.gridParam] = vals;
+    });
+    return out;
+  }
+
+  function countLocalJobs() {
+    const grid = getGridSearch();
+    const keys = Object.keys(grid);
+    if (!keys.length) return { total: 1, n_manual: 1, n_grid: 0 };
+    let n = 1;
+    keys.forEach((k) => {
+      n *= Math.max(1, grid[k].length);
+    });
+    // total = 1 manual + grid combos (approx; server dedupes identical)
+    return { total: 1 + n, n_manual: 1, n_grid: n };
+  }
+
+  function updateJobCountChip() {
+    const c = countLocalJobs();
+    const chip = $("#model-chip-jobs");
+    const hint = $("#model-grid-count");
+    const msg =
+      c.n_grid > 0
+        ? `${c.total} modeles (1 manuel + jusqu a ${c.n_grid} grid)`
+        : "1 modele (manuel uniquement)";
+    if (chip) chip.textContent = msg;
+    if (hint) hint.textContent = msg;
+  }
+
+  function updateBuildProgressUI(prog) {
+    const fill = $("#model-build-progress-fill");
+    const text = $("#model-build-progress-text");
+    const count = $("#model-build-progress-count");
+    const done = Number(prog.done || 0);
+    const total = Math.max(1, Number(prog.total || 0));
+    const pct = prog.status === "idle" && done === 0 ? 0 : Math.min(100, Math.round((done / total) * 100));
+    if (fill) fill.style.width = `${pct}%`;
+    if (count) count.textContent = `${done} / ${prog.total || 0}`;
+    if (text) {
+      if (prog.status === "running") {
+        text.textContent = prog.message || prog.current_name || "Entrainement…";
+      } else if (prog.status === "done") {
+        text.textContent = prog.message || "Termine";
+      } else if (prog.status === "error") {
+        text.textContent = prog.error || prog.message || "Erreur";
+      } else {
+        text.textContent = "En attente";
+      }
+    }
+  }
+
+  function renderBuildResults(prog) {
+    const host = $("#model-build-results");
+    const hint = $("#model-results-hint");
+    if (!host) return;
+    const rows = prog.results || [];
+    if (!rows.length) {
+      host.classList.add("empty");
+      host.textContent = "Aucun resultat.";
+      return;
+    }
+    host.classList.remove("empty");
+    const metric = prog.rank_metric || "r2";
+    const main = prog.main_target || "montant_ventes";
+    if (hint) {
+      hint.textContent = `Tries par ${metric} sur ${main} (eval). Meilleur en premier.`;
+    }
+    const head = `
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Modele</th>
+            <th>Type</th>
+            <th>${escapeHtml(metric)} (${escapeHtml(main)})</th>
+            <th>R2 mean</th>
+            <th>RMSE mean</th>
+            <th>Params</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+    const body = rows
+      .map((r, i) => {
+        const cls = !r.ok ? "is-err" : i === 0 ? "is-best" : "";
+        const mt = (r.metrics_eval && r.metrics_eval.per_target && r.metrics_eval.per_target[main]) || {};
+        const metricVal =
+          r.metric_value != null
+            ? Number(r.metric_value).toFixed(4)
+            : mt[metric] != null
+              ? Number(mt[metric]).toFixed(4)
+              : "—";
+        const meanR2 =
+          r.metrics_eval && r.metrics_eval.mean_r2 != null
+            ? Number(r.metrics_eval.mean_r2).toFixed(3)
+            : "—";
+        const meanRmse =
+          r.metrics_eval && r.metrics_eval.mean_rmse != null
+            ? Number(r.metrics_eval.mean_rmse).toFixed(2)
+            : "—";
+        const p = r.xgb_params || {};
+        const pShort = [
+          p.n_estimators != null ? `ne=${p.n_estimators}` : "",
+          p.max_depth != null ? `md=${p.max_depth}` : "",
+          p.learning_rate != null ? `lr=${p.learning_rate}` : "",
+        ]
+          .filter(Boolean)
+          .join(" ");
+        return `<tr class="${cls}">
+          <td>${r.rank || i + 1}</td>
+          <td>${escapeHtml(r.name || r.id || "—")}${r.error ? "<br><small>" + escapeHtml(r.error) + "</small>" : ""}</td>
+          <td><span class="kind-tag">${escapeHtml(r.kind || "—")}</span></td>
+          <td>${metricVal}</td>
+          <td>${meanR2}</td>
+          <td>${meanRmse}</td>
+          <td>${escapeHtml(pShort || "—")}</td>
+        </tr>`;
+      })
+      .join("");
+    host.innerHTML = head + body + "</tbody></table>";
+  }
+
+  function stopBuildPolling() {
+    if (_buildPollTimer) {
+      clearInterval(_buildPollTimer);
+      _buildPollTimer = null;
+    }
+  }
+
+  function startBuildPolling() {
+    stopBuildPolling();
+    _buildPollTimer = setInterval(async () => {
+      try {
+        const prog = await api("/api/model/build/progress");
+        updateBuildProgressUI(prog);
+        if (prog.status === "done" || prog.status === "error") {
+          stopBuildPolling();
+          renderBuildResults(prog);
+          const btn = $("#btn-model-build");
+          if (btn) btn.disabled = false;
+          if (prog.status === "done") {
+            const best = (prog.results || []).find((r) => r.ok);
+            toast(
+              best
+                ? `Build termine · meilleur: ${best.name} (rang 1)`
+                : "Build termine"
+            );
+            const status = $("#model-status");
+            if (status) {
+              status.textContent = prog.message || "Termine";
+            }
+          } else {
+            toast(prog.error || "Erreur de build", "err");
+          }
+        }
+      } catch (err) {
+        /* reseau temporaire */
+      }
+    }, 800);
+  }
+
   async function buildModel() {
     const btn = $("#btn-model-build");
     const status = $("#model-status");
     const body = {
       model_name: ($("#model-name") && $("#model-name").value) || "xgb_sales",
       xgb_params: getXgbParams(),
+      grid_search: getGridSearch(),
+      main_target: ($("#model-main-target") && $("#model-main-target").value) || "montant_ventes",
+      rank_metric: ($("#model-rank-metric") && $("#model-rank-metric").value) || "r2",
+      async: true,
     };
     if (btn) btn.disabled = true;
-    if (status) status.textContent = "Apprentissage + sauvegarde design…";
+    if (status) status.textContent = "Lancement du build…";
+    updateBuildProgressUI({ status: "running", done: 0, total: countLocalJobs().total, message: "Demarrage…" });
     try {
       const res = await api("/api/model/build", {
         method: "POST",
         body: JSON.stringify(body),
       });
-      const r2 =
-        res.metrics_eval && res.metrics_eval.mean_r2 != null
-          ? Number(res.metrics_eval.mean_r2).toFixed(3)
-          : "—";
-      toast(`Build OK · ${res.name} · R² éval ${r2} → design/${res.name}`);
-      if (status) {
-        status.textContent = `Sauvé · design/${res.name} · train ${res.n_train}/éval ${res.n_eval} · R² ${r2}`;
-      }
-      // recharger la config (nom + params du dernier modèle)
-      await loadModelConfig();
+      if (!res.ok && res.error) throw new Error(res.error);
+      const total = (res.counts && res.counts.total) || res.total || countLocalJobs().total;
+      updateBuildProgressUI({
+        status: "running",
+        done: 0,
+        total,
+        message: `Build lance · ${total} modele(s)`,
+      });
+      if (status) status.textContent = `Build en cours · ${total} modele(s)…`;
+      startBuildPolling();
     } catch (err) {
       toast(err.message, "err");
       if (status) status.textContent = err.message;
-    } finally {
       if (btn) btn.disabled = false;
+      stopBuildPolling();
     }
   }
 

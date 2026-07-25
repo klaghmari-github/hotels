@@ -453,7 +453,7 @@ DATASETS: dict[str, DatasetSchema] = {
     "sales_raw": DatasetSchema(
         id="sales_raw",
         label="Hotel Sales Raw Data",
-        description="Tickets bruts — boutique, produit, TYPE, GAMME, prix HT/TTC",
+        description="Extract brut des ventes des hotels pilotes",
         filename="hotel_sales_raw_data.xlsx",
         sheet="sales_raw",
         editable_columns=[
@@ -483,7 +483,7 @@ DATASETS: dict[str, DatasetSchema] = {
     "sales": DatasetSchema(
         id="sales",
         label="Hotel Sales Data",
-        description="Ventes mensuelles + mix % + split holidays — Reconstruire depuis Raw",
+        description="Transformation des donnees de ventes des hotels pilotes",
         filename="hotel_sales_data.xlsx",
         sheet="hotel_sales",
         editable_columns=_SALES_EDITABLE,
@@ -496,10 +496,7 @@ DATASETS: dict[str, DatasetSchema] = {
     "all_data": DatasetSchema(
         id="all_data",
         label="All Data",
-        description=(
-            "Hotels avec ventes (mois de vente) + left join "
-            "holidays, weather, brand, proximity"
-        ),
+        description="Ventes transformees des hotels pilotes enrichies par d autres donnees",
         filename="all_data.xlsx",
         sheet="all_data",
         editable_columns=[],  # toutes les colonnes du fichier
@@ -518,7 +515,7 @@ DATASETS: dict[str, DatasetSchema] = {
     "model_data": DatasetSchema(
         id="model_data",
         label="Model Data",
-        description="Dataset ML — hôtels avec ventes, features / cibles",
+        description="Adaptation de all data au modele ML",
         filename="model_data.xlsx",
         sheet="model_data",
         editable_columns=[],  # toutes les colonnes du fichier
@@ -531,7 +528,7 @@ DATASETS: dict[str, DatasetSchema] = {
     "concept_pilote": DatasetSchema(
         id="concept_pilote",
         label="Concept Pilote",
-        description="Indicateurs annuels hôtel — clients, CA moyen, mix produits F&B — Reconstruire",
+        description="Donnees des ventes transformees agregees par annee",
         filename="concept_pilote.xlsx",
         sheet="concept_pilote",
         editable_columns=_CONCEPT_PILOTE_EDITABLE,

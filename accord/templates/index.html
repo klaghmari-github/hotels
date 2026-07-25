@@ -159,11 +159,12 @@
           <div class="topbar-left">
             <h1>Model Build</h1>
             <p class="subtitle">
-              XGBoost sur <strong>model_data</strong> — features = variables descriptives, split = dernière année (éval).
+              XGBoost sur <strong>model_data</strong> — parametres manuels + grid search,
+              ranking sur la cible principale.
             </p>
           </div>
           <div class="topbar-actions">
-            <button type="button" class="btn btn-primary" id="btn-model-build" title="Entraîner et sauvegarder dans models/design">
+            <button type="button" class="btn btn-primary" id="btn-model-build" title="Entrainer manuel + grid search, sauvegarder dans models/design">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
               Build &amp; Save
             </button>
@@ -173,22 +174,82 @@
         <section class="meta-bar">
           <span class="chip" id="model-chip-source">model_data</span>
           <span class="chip chip-muted" id="model-chip-stats"></span>
+          <span class="chip chip-muted" id="model-chip-jobs">1 modele</span>
           <span class="status" id="model-status"></span>
         </section>
 
         <div class="model-layout model-build-layout">
-          <div class="model-col" style="max-width: 720px">
+          <div class="model-col">
             <section class="card">
-              <h2 class="card-title">Nom du modèle</h2>
-              <p class="card-hint">Stockage : <code>models/design/&lt;nom&gt;/model.pkl</code> + <code>config.json</code> (écrasé si même nom).</p>
-              <label class="field">
-                <span>Nom</span>
-                <input type="text" id="model-name" value="xgb_sales" maxlength="60" />
-              </label>
+              <h2 class="card-title">Nom et ranking</h2>
+              <p class="card-hint">
+                Stockage : <code>models/design/&lt;nom&gt;/</code> (manuel) et
+                <code>&lt;nom&gt;_gs_001</code>… pour le grid. Ecrase si meme nom.
+              </p>
+              <div class="form-grid form-grid-3">
+                <label class="field">
+                  <span>Nom de base</span>
+                  <input type="text" id="model-name" value="xgb_sales" maxlength="60" />
+                </label>
+                <label class="field">
+                  <span>Cible principale</span>
+                  <select id="model-main-target"></select>
+                </label>
+                <label class="field">
+                  <span>Metrique de ranking</span>
+                  <select id="model-rank-metric">
+                    <option value="r2">R2 (plus eleve = mieux)</option>
+                    <option value="rmse">RMSE (plus bas = mieux)</option>
+                    <option value="mae">MAE (plus bas = mieux)</option>
+                  </select>
+                </label>
+              </div>
             </section>
+
             <section class="card">
-              <h2 class="card-title">Hyperparamètres XGBoost</h2>
+              <h2 class="card-title">Parametres manuels XGBoost</h2>
+              <p class="card-hint">Toujours testes et sauvegardes sous le nom de base.</p>
               <div id="model-params" class="form-grid form-grid-3"></div>
+            </section>
+
+            <section class="card">
+              <h2 class="card-title">Grid search</h2>
+              <p class="card-hint">
+                Valeurs separees par des virgules pour chaque parametre a explorer.
+                Laissez vide pour ne pas griller ce parametre.
+                Le produit cartesien des listes + le modele manuel seront compares.
+              </p>
+              <label class="field field-inline">
+                <input type="checkbox" id="model-grid-enabled" checked />
+                <span>Activer le grid search</span>
+              </label>
+              <div id="model-grid-params" class="form-grid form-grid-3"></div>
+              <p class="card-hint" id="model-grid-count">1 modele (manuel uniquement)</p>
+            </section>
+          </div>
+
+          <div class="model-col">
+            <section class="card">
+              <h2 class="card-title">Progression</h2>
+              <div class="build-progress" id="model-build-progress">
+                <div class="build-progress-bar">
+                  <i id="model-build-progress-fill" style="width: 0%"></i>
+                </div>
+                <div class="build-progress-meta">
+                  <span id="model-build-progress-text">En attente</span>
+                  <span id="model-build-progress-count">0 / 0</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="card card-wide">
+              <h2 class="card-title">Resultats (tries par ranking)</h2>
+              <p class="card-hint" id="model-results-hint">
+                Apres Build, les modeles sont ordonnes selon la metrique et la cible choisies.
+              </p>
+              <div id="model-build-results" class="build-results empty">
+                Aucun build pour le moment.
+              </div>
             </section>
           </div>
         </div>
