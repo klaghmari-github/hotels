@@ -11,8 +11,8 @@ Orchestrateur multi-workers pour le scrape hôtels Accor.
 Usage
 -----
     cd accord
-    python -m scrape_accor.orchestrator --max-workers 4 --range-size 100
-    python -m scrape_accor.orchestrator --id-min 1000 --id-max 2000 --max-workers 2
+    python -m scrape_accor.orchestrator --max-workers 12 --range-size 100
+    python -m scrape_accor.orchestrator --id-min 1000 --id-max 2000 --max-workers 8
 """
 
 from __future__ import annotations
@@ -105,7 +105,7 @@ def run_orchestrator(
     id_min: int = 1000,
     id_max: int = 8000,
     range_size: int = 100,
-    max_workers: int = 4,
+    max_workers: int = 12,
     target_hotels: int = 4000,
     pause_s: float = 0.45,
     force: bool = False,
@@ -233,7 +233,12 @@ def main() -> None:
     p.add_argument("--id-min", type=int, default=1000)
     p.add_argument("--id-max", type=int, default=8000)
     p.add_argument("--range-size", type=int, default=100)
-    p.add_argument("--max-workers", type=int, default=4)
+    p.add_argument(
+        "--max-workers",
+        type=int,
+        default=12,
+        help="Agents process en parallèle (max recommandé 12)",
+    )
     p.add_argument("--target-hotels", type=int, default=4000)
     p.add_argument("--pause", type=float, default=0.45)
     p.add_argument("--force", action="store_true")

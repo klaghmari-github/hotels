@@ -1,0 +1,3 @@
+hotel_code_accor,hotel_code_norm,hotel_name,hotel_brand_code,hotel_brand,hotel_city,hotel_country,hotel_adresse,hotel_code_postal,url_hotel,source,source_query,hotel_name_norm,city_norm,country_slug,country_label,region,match_type
+B8M1,B8M1,Ibis Lagos Lekki,IBH,IBIS,LAGOS,Nigéria,"3 THE PROVIDENCE ST, LEKKI PHASE 1 LAGOS, NIGERIA",105101,https://all.accor.com/hotel/B8M1/index.fr.shtml,catalog_api,nigeria,IBIS LAGOS LEKKI,LAGOS,nigeria,Nigeria,africa_me,missing
+C0S0,C0S0,Mövenpick Hotel Ikoyi Lagos,MOV,MÖVENPICK,LAGOS,Nigéria,"47 ALFRED REWANE ROAD, IKOYI",101233,https://all.accor.com/hotel/C0S0/index.fr.shtml,catalog_api,nigeria,MOVENPICK HOTEL IKOYI LAGOS,LAGOS,nigeria,Nigeria,africa_me,missing

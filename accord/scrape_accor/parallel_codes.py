@@ -14,9 +14,9 @@ Usage
     python -m scrape_accor.parallel_codes \\
       --from-xlsx data/marques/hotels/france_destination_missing.xlsx \\
       --out hotels_missing_france.xlsx \\
-      --workers 8
+      --workers 12
 
-    python -m scrape_accor.parallel_codes --pad4-range 0 999 --workers 8 \\
+    python -m scrape_accor.parallel_codes --pad4-range 0 999 --workers 12 \\
       --out hotels_0000_0999.xlsx
 """
 
@@ -179,7 +179,7 @@ def run_parallel(
     codes_csv: str = "",
     pad4_range: tuple[int, int] | None = None,
     out_name: str = "hotels_codes_parallel.xlsx",
-    workers: int = 8,
+    workers: int = 12,
     threads_per_worker: int = 3,
     pause_s: float = 0.25,
     skip_existing: bool = True,
@@ -294,12 +294,17 @@ def main() -> None:
     p.add_argument("--codes", default="")
     p.add_argument("--pad4-range", nargs=2, type=int, metavar=("START", "END"))
     p.add_argument("--out", default="hotels_codes_parallel.xlsx")
-    p.add_argument("--workers", type=int, default=8, help="Nb process agents")
+    p.add_argument(
+        "--workers",
+        type=int,
+        default=12,
+        help="Nb process agents (max recommandé 12)",
+    )
     p.add_argument(
         "--threads",
         type=int,
         default=3,
-        help="Threads I/O par process (défaut 3 → 8×3=24 //)",
+        help="Threads I/O par process (défaut 3 → 12×3=36 //)",
     )
     p.add_argument("--pause", type=float, default=0.25)
     p.add_argument("--no-skip-existing", action="store_true")

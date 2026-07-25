@@ -29,8 +29,8 @@ cd accord
 # Un seul range (test)
 python -m scrape_accor.worker --start 1140 --end 1150 --worker-id test
 
-# Orchestrateur (4 workers, plages de 100, IDs 1000–8000, stop à 4000 hôtels)
-python -m scrape_accor.orchestrator --max-workers 4 --range-size 100 \
+# Orchestrateur (jusqu'à 12 workers, plages de 100, IDs 1000–8000)
+python -m scrape_accor.orchestrator --max-workers 12 --range-size 100 \
   --id-min 1000 --id-max 8000 --target-hotels 4000 --pause 0.45
 
 # Fusion de toutes les plages
@@ -46,7 +46,7 @@ python -m scrape_accor.orchestrator --merge-only
 ### Respect du site
 
 * Pause entre requêtes (`--pause`, défaut 0.45 s)
-* Nombre de workers raisonnable (3–5 recommandé)
+* Jusqu’à **12 agents** en parallèle (défaut actuel)
 * User-Agent identifiable
 
 ## Schéma hôtel (feuille `hotels`)
@@ -77,6 +77,44 @@ Sorties dans `data/marques/hotels/` :
 * `loyalty_optin_all.xlsx` — liste complète page/API
 * `loyalty_optin_missing.xlsx` / `.csv` — absents de `hotels_all.xlsx`
 * `loyalty_optin_matched.xlsx` — déjà présents
+
+## Monde (70 pays — catalog + manquants + scrape)
+
+Liste dans `scrape_accor/countries_config.py` (Europe, Afrique/ME, Asie, Océanie, Amériques).
+
+```bash
+cd accord
+# Catalog seul → world_missing.xlsx
+python -m scrape_accor.world_scrape --catalog-only
+
+# Scrape des manquants (parallèle) + merge hotels_all
+python -m scrape_accor.world_scrape --scrape-missing --workers 12 --threads 3
+
+# Tout-en-un (12 agents max)
+python -m scrape_accor.world_scrape --all --workers 12 --threads 3
+
+# Une région
+python -m scrape_accor.world_scrape --region asia --all
+```
+
+Sorties clés :
+* `world_catalog_all.xlsx` — codes uniques multi-pays
+* `world_missing.xlsx` — absents de `hotels_all` avant scrape
+* `hotels_missing_world.xlsx` — fiches scrapées
+* `{slug}_destination_*.xlsx` — détail par pays
+* `world_catalog_summary.json`
+
+## Destination pays (catalog + manquants)
+
+Pays : config complète dans `countries_config.py` + legacy flags
+
+```bash
+cd accord
+python -m scrape_accor.destination_country --all-targets --skip-html
+python -m scrape_accor.destination_country --country italy
+```
+
+Sorties : `{slug}_destination_{all,missing,matched}.*` + `multi_countries_missing.xlsx`
 
 ## Hôtels France (destination + manquants)
 
@@ -112,11 +150,11 @@ cd accord
 # Liste (ex. 748 manquants France)
 python -m scrape_accor.scrape_codes \
   --from-xlsx data/marques/hotels/france_destination_missing.xlsx \
-  --out hotels_missing_france.xlsx --workers 6
+  --out hotels_missing_france.xlsx --workers 12
 
 # Plage 0–999 forcée en 4 chiffres (0000..0999)
 python -m scrape_accor.scrape_codes --pad4-range 0 999 \
-  --out hotels_0000_0999.xlsx --workers 6
+  --out hotels_0000_0999.xlsx --workers 12
 
 # Fusion
 python -m scrape_accor.orchestrator --merge-only
@@ -128,12 +166,12 @@ Options utiles : `--codes A7L5,0785`, `--force` (ignore progress), `--no-skip-ex
 
 ```bash
 cd accord
-# 8 process agents, shards auto, merge + hotels_all
+# 12 process agents, shards auto, merge + hotels_all
 python -m scrape_accor.parallel_codes \
   --from-xlsx data/marques/hotels/france_destination_missing.xlsx \
-  --out hotels_missing_france.xlsx --workers 8 --pause 0.25
+  --out hotels_missing_france.xlsx --workers 12 --pause 0.25
 ```
 
-Chaque worker écrit `hotels_*_shardNN.xlsx`, le parent fusionne.
+Jusqu’à **12 process agents** en parallèle (défaut). Chaque worker écrit `hotels_*_shardNN.xlsx`, le parent fusionne.
 
 Colonnes utiles pour le scrape suivant : `hotel_code_accor`, `url_hotel`.

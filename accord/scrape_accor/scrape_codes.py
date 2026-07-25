@@ -7,7 +7,7 @@ Usages
 # 748 manquants France
 python -m scrape_accor.scrape_codes \\
   --from-xlsx data/marques/hotels/france_destination_missing.xlsx \\
-  --out hotels_missing_france.xlsx --workers 6
+  --out hotels_missing_france.xlsx --workers 12
 
 # Plage 0–999 avec zéros à gauche (4 caractères)
 python -m scrape_accor.scrape_codes --pad4-range 0 999 --out hotels_0000_0999.xlsx
@@ -89,7 +89,7 @@ def scrape_code_list(
     codes: list[str],
     *,
     out_name: str = "hotels_codes.xlsx",
-    workers: int = 6,
+    workers: int = 12,
     pause_s: float = 0.35,
     pad4: bool = False,
     skip_existing: bool = True,
@@ -253,7 +253,12 @@ def main() -> None:
         help="Génère codes numériques zero-pad 4 (ex: 0 999 → 0000..0999)",
     )
     p.add_argument("--out", type=str, default="hotels_codes.xlsx")
-    p.add_argument("--workers", type=int, default=6)
+    p.add_argument(
+        "--workers",
+        type=int,
+        default=12,
+        help="Threads I/O (ou process via parallel_codes, max 12 agents)",
+    )
     p.add_argument("--pause", type=float, default=0.35)
     p.add_argument("--pad4", action="store_true", help="Force zfill(4) sur codes numériques")
     p.add_argument("--no-skip-existing", action="store_true")
