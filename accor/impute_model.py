@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
-Imputation **uniquement pour model_data**.
+Imputation **uniquement pour model_data** (prediction / entrainement).
 
-Les fichiers sources (hotel_data, brand, sales, weather…) gardent les trous
-vides. Après jointure (all_data peut encore contenir des nulls), model_data
-comble les NaN numériques pour l'apprentissage :
+Regle metier (moyennes numeriques) :
+  1. Moyenne des **hotels pilotes** (hotel_sales_data) de la **meme categorie**
+     de marque (economy, midscale, premium, luxury, …).
+  2. Sinon moyenne des pilotes des categories **directement inferieure
+     et superieure** (combinees).
+  3. Sinon moyenne de tous les pilotes, puis moyenne globale, puis 0.
 
-* **comptages / ventes / flags** → 0
-* **taux, TO, pourcentages, météo, lat/lon, tailles** → moyenne
-  (priorité : moyenne **marque**, sinon moyenne **globale** de la colonne)
-* **textes / id** → inchangés (ou ``""`` si purement textuel manquant)
+Comptages / flags / ventes → 0 (pas de moyenne).
 
-Utilisé par ``model_data.build_model_dataframe``.
+Les fichiers sources (hotel_data, brand, sales…) gardent les trous vides.
 """
 
 from __future__ import annotations
@@ -21,7 +21,13 @@ from typing import Any
 
 import pandas as pd
 
-# Colonnes où 0 est le bon « manque » (pas de moyenne)
+from brand_category import (
+    impute_series_by_brand_category,
+    pilot_mask_for_frame,
+    resolve_category_series,
+)
+
+# Colonnes ou 0 est le bon « manque » (pas de moyenne)
 ZERO_FILL_PATTERNS = (
     r"^nombre_",
     r"^montant_",
@@ -39,9 +45,13 @@ ZERO_FILL_PATTERNS = (
     r"^hotel_loisirs_top_",
     r"^hotel_contrat_type_",
     r"^hotel_corner_actuel_existe",
+    r"^hotel_has_",
+    r"^weather_ok$",
+    r"^proximity_ok$",
+    r"^shard_id$",
 )
 
-# Colonnes où une moyenne a du sens
+# Colonnes ou une moyenne a du sens
 MEAN_FILL_PATTERNS = (
     r"^hotel_to_",
     r"^hotel_nb_chambres$",
@@ -82,12 +92,20 @@ def _is_id_or_text(col: str, series: pd.Series) -> bool:
         "commune",
         "localisation",
         "logo_path",
+        "brand_category",
+        "geo_source",
+        "weather_error",
+        "proximity_error",
     }:
         return True
     if col.startswith("jours_"):
         return True
+    if col.endswith("_error") or col.endswith("_source"):
+        return True
+    if col.startswith("cat_"):
+        # dummies categorie : traite a part (zero-fill)
+        return False
     if pd.api.types.is_object_dtype(series) or pd.api.types.is_string_dtype(series):
-        # object quasi-numérique → pas purement texte
         coerced = pd.to_numeric(series, errors="coerce")
         non_null = series.notna()
         if non_null.any() and coerced[non_null].notna().mean() >= 0.8:
@@ -98,39 +116,60 @@ def _is_id_or_text(col: str, series: pd.Series) -> bool:
 
 def impute_for_model(frame: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, Any]]:
     """
-    Remplit les trous numériques pour l'entraînement.
+    Remplit les trous numeriques pour l'apprentissage / prediction.
 
     Returns
     -------
     (frame_imputed, report)
     """
     if frame is None or frame.empty:
-        return frame, {"n_filled": 0}
+        return frame, {"n_filled": 0, "strategy": "category_pilot"}
 
     out = frame.copy()
-    brand_col = None
-    for c in ("hotel_brand", "Marque"):
-        if c in out.columns:
-            brand_col = c
-            break
+    categories = resolve_category_series(out)
+    # expose pour debug / model (non target)
+    out["brand_category"] = categories
+    pilot_mask = pilot_mask_for_frame(out)
 
-    report: dict[str, Any] = {"columns": {}, "n_filled": 0}
+    report: dict[str, Any] = {
+        "columns": {},
+        "n_filled": 0,
+        "strategy": "pilot_category_then_adjacent",
+        "n_pilots_rows": int(pilot_mask.sum()),
+        "categories_present": sorted(
+            {str(c) for c in categories.dropna().unique()}
+        ),
+    }
 
     for col in list(out.columns):
+        if col in {"brand_category"}:
+            continue
         if col.startswith("_") and col != "_is_eval":
             continue
         series = out[col]
+
+        if col.startswith("cat_"):
+            # dummies : NaN → 0
+            n = int(pd.to_numeric(series, errors="coerce").isna().sum())
+            if n:
+                out[col] = pd.to_numeric(series, errors="coerce").fillna(0)
+                report["columns"][col] = {"strategy": "cat_dummy_zero", "n": n}
+                report["n_filled"] += n
+            continue
 
         if _is_id_or_text(col, series):
             if col.startswith("jours_"):
                 out[col] = series.apply(
                     lambda v: v
                     if isinstance(v, (list, tuple))
-                    else ("[]" if pd.isna(v) or v is None or str(v).strip() == "" else v)
+                    else (
+                        "[]"
+                        if pd.isna(v) or v is None or str(v).strip() == ""
+                        else v
+                    )
                 )
             continue
 
-        # booléens
         if pd.api.types.is_bool_dtype(series):
             n = int(series.isna().sum())
             if n:
@@ -140,7 +179,6 @@ def impute_for_model(frame: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, Any]]
             continue
 
         numeric = pd.to_numeric(series, errors="coerce")
-        # si pas assez numérique, skip
         if series.notna().any() and numeric.notna().sum() == 0:
             continue
         if not pd.api.types.is_numeric_dtype(series) and numeric.notna().mean() < 0.5:
@@ -151,65 +189,119 @@ def impute_for_model(frame: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, Any]]
             out[col] = numeric
             continue
 
-        # stratégie
         if _match_any(col, ZERO_FILL_PATTERNS) or col in {"annee", "mois"}:
-            # annee/mois manquants → 0 est mauvais mais rare ; laisse mean si absents
             if col in {"annee", "mois"}:
-                strategy = "global_mean"
+                # rare : moyenne globale pilote
+                filled, detail = impute_series_by_brand_category(
+                    numeric, categories, pilot_mask
+                )
+                out[col] = filled
+                report["columns"][col] = {
+                    "strategy": "category_pilot_mean",
+                    **detail,
+                }
+                report["n_filled"] += n_miss
             else:
-                strategy = "zero"
-        elif _match_any(col, MEAN_FILL_PATTERNS):
-            strategy = "brand_or_global_mean"
-        else:
-            # défaut : counts-like → 0, sinon mean
-            name = col.lower()
-            if any(k in name for k in ("nombre", "montant", "nb_", "count", "flag", "has_")):
-                strategy = "zero"
-            else:
-                strategy = "brand_or_global_mean"
-
-        if strategy == "zero":
-            filled = numeric.fillna(0)
-            out[col] = filled
-            report["columns"][col] = {"strategy": "zero", "n": n_miss}
-            report["n_filled"] += n_miss
+                out[col] = numeric.fillna(0)
+                report["columns"][col] = {"strategy": "zero", "n": n_miss}
+                report["n_filled"] += n_miss
             continue
 
-        # mean strategies
-        global_mean = float(numeric.mean()) if numeric.notna().any() else 0.0
-        if strategy == "global_mean" or brand_col is None:
-            filled = numeric.fillna(global_mean)
+        if _match_any(col, MEAN_FILL_PATTERNS):
+            use_category = True
+        else:
+            name = col.lower()
+            if any(
+                k in name
+                for k in ("nombre", "montant", "nb_", "count", "flag", "has_")
+            ):
+                out[col] = numeric.fillna(0)
+                report["columns"][col] = {"strategy": "zero", "n": n_miss}
+                report["n_filled"] += n_miss
+                continue
+            use_category = True
+
+        if use_category:
+            filled, detail = impute_series_by_brand_category(
+                numeric, categories, pilot_mask
+            )
             out[col] = filled
             report["columns"][col] = {
-                "strategy": "global_mean",
-                "n": n_miss,
-                "value": global_mean,
+                "strategy": "pilot_category_then_adjacent",
+                **detail,
             }
             report["n_filled"] += n_miss
-            continue
 
-        # brand then global
-        brands = out[brand_col].astype(str)
-        brand_means = numeric.groupby(brands).transform("mean")
-        filled = numeric.copy()
-        miss = filled.isna()
-        filled = filled.where(~miss, brand_means)
-        still = filled.isna()
-        filled = filled.where(~still, global_mean)
-        out[col] = filled
-        report["columns"][col] = {
-            "strategy": "brand_mean_then_global",
-            "n": n_miss,
-            "global_mean": global_mean,
-        }
-        report["n_filled"] += n_miss
-
-    # filet final numériques restants
+    # filet final numeriques restants
     for col in out.select_dtypes(include=["number"]).columns:
         if out[col].isna().any():
             n = int(out[col].isna().sum())
             out[col] = out[col].fillna(0)
-            report["columns"][col] = report["columns"].get(col, {"strategy": "final_zero", "n": n})
+            prev = report["columns"].get(col, {})
+            report["columns"][col] = {
+                **prev,
+                "strategy": prev.get("strategy", "final_zero") + "+final_zero",
+                "n_final_zero": n,
+            }
             report["n_filled"] += n
 
     return out, report
+
+
+def impute_hotel_features(
+    features: dict[str, Any],
+    *,
+    hotel_brand: str | None = None,
+    brand_category: str | None = None,
+    reference_frame: pd.DataFrame | None = None,
+) -> dict[str, Any]:
+    """
+    Impute un dict de features pour **un** hotel (inference).
+
+    Utilise model_data ou all_data comme reference pilote si fourni,
+    sinon recharge model_data.xlsx.
+    """
+    from data_io import DATA_DIR, read_excel
+
+    ref = reference_frame
+    if ref is None or ref.empty:
+        path = DATA_DIR / "model_data.xlsx"
+        ref = read_excel(path, sheet=0)
+        if ref.empty:
+            path = DATA_DIR / "all_data.xlsx"
+            ref = read_excel(path, sheet=0)
+
+    out = dict(features)
+    if not ref.empty:
+        # fake one-row frame to reuse category logic
+        row = {**out}
+        if hotel_brand and "hotel_brand" not in row:
+            row["hotel_brand"] = hotel_brand
+        if brand_category:
+            for c in (
+                "economy",
+                "midscale",
+                "premium",
+                "luxury",
+                "lifestyle_by_ennismore",
+                "partner_brands",
+            ):
+                row[f"cat_{c}"] = 1 if c == brand_category else 0
+
+        # Build combined frame: reference + target row
+        target = pd.DataFrame([row])
+        # align columns
+        for c in ref.columns:
+            if c not in target.columns:
+                target[c] = pd.NA
+        combined = pd.concat([ref, target[ref.columns.intersection(target.columns)]], ignore_index=True)
+        # mark last row as non-pilot if hotel not in sales — still fill from pilots
+        imputed, _ = impute_for_model(combined)
+        last = imputed.iloc[-1]
+        for k in out:
+            if k in last.index:
+                val = last[k]
+                if out.get(k) is None or (isinstance(out.get(k), float) and pd.isna(out.get(k))):
+                    if pd.notna(val):
+                        out[k] = val.item() if hasattr(val, "item") else val
+    return out

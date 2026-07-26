@@ -282,16 +282,28 @@ export class HotelContextLoader {
     allServiceDefs().forEach((s) => {
       services[s.id] = fieldChecked(s.id);
     });
-    const client_needs = {};
+    // Besoins clients : toujours tous les ids ROD (R3), valeur = checkbox ou defaut meta
+    const client_needs = Object.assign({}, meta?.client_needs_defaults || {});
     (meta?.client_needs_fb || []).forEach((n) => {
-      client_needs[n.id] = fieldChecked(n.id);
+      const el = $("#" + n.id);
+      if (el) client_needs[n.id] = !!el.checked;
+      else if (typeof n.default === "boolean") client_needs[n.id] = n.default;
     });
     (meta?.client_needs_nfb || []).forEach((n) => {
-      client_needs[n.id] = fieldChecked(n.id);
+      const el = $("#" + n.id);
+      if (el) client_needs[n.id] = !!el.checked;
+      else if (typeof n.default === "boolean") client_needs[n.id] = n.default;
     });
     const to = Format.toRate(fieldNum("taux_occupation", 65));
     const mLinRaw = $("#m_lin") ? $("#m_lin").value : "";
     const mixFbRaw = $("#mix_fb") ? $("#mix_fb").value : "";
+    // mix UI en % (70) → fraction ; si deja fraction <=1 on garde
+    let mixFb = null;
+    if (mixFbRaw !== "") {
+      let m = fieldNum("mix_fb");
+      if (m > 1) m = m / 100;
+      mixFb = Math.min(Math.max(m, 0), 1);
+    }
 
     return {
       identity: {
@@ -327,7 +339,7 @@ export class HotelContextLoader {
       corner: {
         has_corner: fieldChecked("has_corner"),
         m_lin: mLinRaw === "" ? null : fieldNum("m_lin"),
-        mix_fb: mixFbRaw === "" ? null : fieldNum("mix_fb") / 100,
+        mix_fb: mixFb,
       },
       light_enrich: true,
     };

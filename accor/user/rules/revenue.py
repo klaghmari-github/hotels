@@ -81,10 +81,11 @@ class RevenueRules:
     def rule3_categories(
         ca_fb: float, ca_nf: float, cumul_fb: float, cumul_nf: float
     ) -> Tuple[float, float, float, float]:
+        """Applique le delta de cumuls besoins vs baseline Excel (× CA canal)."""
         delta_fb = cumul_fb - RULE3_BASELINE_FB
         delta_nf = cumul_nf - RULE3_BASELINE_NF
-        ca_fb = ca_fb + ca_fb * delta_fb if ca_fb >= 0 else ca_fb - ca_fb * delta_fb
-        ca_nf = ca_nf + ca_nf * delta_nf if ca_nf >= 0 else ca_nf - ca_nf * delta_nf
+        ca_fb = ca_fb * (1.0 + delta_fb)
+        ca_nf = ca_nf * (1.0 + delta_nf)
         return ca_fb, ca_nf, delta_fb, delta_nf
 
     @staticmethod
@@ -168,10 +169,13 @@ class RevenueRules:
             ca_fb_ref=ca_fb_ref,
             ca_nf_ref=ca_nf_ref,
         )
+        # Plancher par canal apres R2 (evite un mix extreme d annuler tout le CA)
+        ca_fb, ca_nf = max(ca_fb, 0.0), max(ca_nf, 0.0)
         cumul_fb, cumul_nf = self.cumul_rule3(request.client_profile.client_needs)
         ca_fb, ca_nf, delta_fb, delta_nf = self.rule3_categories(
             ca_fb, ca_nf, cumul_fb, cumul_nf
         )
+        ca_fb, ca_nf = max(ca_fb, 0.0), max(ca_nf, 0.0)
         ca_fb, ca_nf, m_lin_diff = self.rule4_m_lin(
             ca_fb,
             ca_nf,
@@ -180,10 +184,11 @@ class RevenueRules:
             ca_fb_ref=ca_fb_ref,
             ca_nf_ref=ca_nf_ref,
         )
+        ca_fb, ca_nf = max(ca_fb, 0.0), max(ca_nf, 0.0)
 
-        ca_ht = max(ca_fb + ca_nf, 0.0)
-        ca_fb_m = ca_fb if ca_ht else 0.0
-        ca_nf_m = ca_nf if ca_ht else 0.0
+        ca_ht = ca_fb + ca_nf
+        ca_fb_m = ca_fb
+        ca_nf_m = ca_nf
         taux_acheteur = ventes_ref / clients_pilote if clients_pilote else 0.0
         nbr_ventes = taux_acheteur * clients_hotel
         marge = self.marge_produit(ca_fb_m, ca_nf_m, margin_fb, margin_nf)

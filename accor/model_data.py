@@ -32,6 +32,7 @@ Règles métier
    le reste = apprentissage.
 7. **Imputation des trous** (uniquement ici, pas dans les sources /
    all_data) via :func:`impute_model.impute_for_model` :
+   moyennes pilotes par **categorie de marque**, sinon categories adjacentes :
 
    - counts / ventes / flags → 0
    - TO, mix clients, météo, lat/lon… → moyenne **marque** puis globale
@@ -68,6 +69,7 @@ ID_DETAIL_CANDIDATES = [
     "hotel_name",
     "nom_hotel",
     "hotel_brand",
+    "brand_category",
     "Marque",
     "logo_path",
     "hotel_adresse_postale_1",

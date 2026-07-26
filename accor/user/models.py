@@ -218,11 +218,22 @@ class ClientProfile:
         raw = data.get("client_needs") or {}
         for k, v in raw.items():
             needs[str(k)] = bool(v)
+
+        def _pct(key: str, default: float) -> float:
+            """Accepte fraction 0–1 ou pourcentage 0–100."""
+            try:
+                v = float(data.get(key, default))
+            except (TypeError, ValueError):
+                return default
+            if v > 1.0:
+                v = v / 100.0
+            return min(max(v, 0.0), 1.0)
+
         return cls(
-            loisirs_pct=float(data.get("loisirs_pct", 0.30)),
-            affaires_pct=float(data.get("affaires_pct", 0.70)),
-            national_pct=float(data.get("national_pct", 0.60)),
-            international_pct=float(data.get("international_pct", 0.40)),
+            loisirs_pct=_pct("loisirs_pct", 0.30),
+            affaires_pct=_pct("affaires_pct", 0.70),
+            national_pct=_pct("national_pct", 0.60),
+            international_pct=_pct("international_pct", 0.40),
             client_needs=needs,
         )
 

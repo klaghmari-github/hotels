@@ -31,6 +31,7 @@ from flask import Flask, jsonify, render_template, request
 
 from user.models import SimulationRequest
 from user.reference import RodReference
+from user.models import DEFAULT_CLIENT_NEEDS
 from user.rules.coeffs import CLIENT_NEED_LABELS, RULE3_FB_COEFFS, RULE3_NFB_COEFFS
 from user.services.catalog import AdminCatalog
 from user.services.enrich import FeatureEnricher
@@ -102,14 +103,43 @@ def meta():
         {
             "concepts": concepts,
             "client_needs_fb": [
-                {"id": k, "label": CLIENT_NEED_LABELS.get(k, k), "group": "F&B"}
+                {
+                    "id": k,
+                    "label": CLIENT_NEED_LABELS.get(k, k),
+                    "group": "F&B",
+                    "default": bool(DEFAULT_CLIENT_NEEDS.get(k, True)),
+                }
                 for k in RULE3_FB_COEFFS
             ],
             "client_needs_nfb": [
-                {"id": k, "label": CLIENT_NEED_LABELS.get(k, k), "group": "NON-F&B"}
+                {
+                    "id": k,
+                    "label": CLIENT_NEED_LABELS.get(k, k),
+                    "group": "NON-F&B",
+                    "default": bool(DEFAULT_CLIENT_NEEDS.get(k, True)),
+                }
                 for k in RULE3_NFB_COEFFS
             ],
+            "client_needs_defaults": dict(DEFAULT_CLIENT_NEEDS),
             "model_defaults": _catalog.model_defaults(),
+            "rules_summary": {
+                "clients_jour": "nb_chambres × TO × guests_per_chambre",
+                "clients_mois": "clients_jour × 30.5",
+                "revenue_chain": [
+                    "impact_TO",
+                    "R1_clients",
+                    "R2_mix",
+                    "R3_categories",
+                    "R4_m_lin",
+                    "marge_produit",
+                ],
+                "reco": [
+                    "n < 50 → SIMPLY only",
+                    "n ≥ 50 → LIBERTY if N-F&B lifestyle, + CONNECTED",
+                    "IBB & n < 200 → SIMPLY also allowed",
+                    "recommend = best marge nette among allowed",
+                ],
+            },
         }
     )
 

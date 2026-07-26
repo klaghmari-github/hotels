@@ -219,8 +219,8 @@
             "label": "Frigo froid",
             "group": "techno",
             "qty_default": 3.0,
-            "capex_unit": 81000.0,
-            "monthly_unit": 1350.0,
+            "capex_unit": 27000.0,
+            "monthly_unit": 450.0,
             "amort_months": 60.0
           },
           {

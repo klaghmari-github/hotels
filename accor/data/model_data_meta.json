@@ -532,6 +532,7 @@
     "pct_montant_ventes_holidays": "target",
     "pct_nombre_ventes_hors_holidays": "target",
     "pct_montant_ventes_hors_holidays": "target",
-    "_is_eval": "meta"
+    "_is_eval": "meta",
+    "brand_category": "meta"
   }
 }

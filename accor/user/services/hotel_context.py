@@ -293,14 +293,63 @@ class HotelContextBuilder:
         brand = str(row.get("hotel_brand") or md_stats.get("hotel_brand") or "").strip()
         brand_key = _norm_brand(brand)
 
+        # Categorie de marque (economy / midscale / …) pour imputation pilotes
+        from brand_category import brand_to_category_map, mean_for_category
+
+        brand_cat = brand_to_category_map().get(brand_key)
+        if brand_cat is None and any(
+            str(row.get(f"cat_{c}") or 0) in {"1", "1.0"} or row.get(f"cat_{c}") == 1
+            for c in (
+                "economy",
+                "midscale",
+                "premium",
+                "luxury",
+                "lifestyle_by_ennismore",
+                "partner_brands",
+            )
+        ):
+            from brand_category import category_from_dummies
+
+            brand_cat = category_from_dummies(row)
+        sources["brand_category"] = brand_cat or ""
+
+        # Series de reference pilotes (hotel_data × ventes) pour moyennes categorie
+        def _pilot_feature_mean(col: str) -> tuple[float | None, str]:
+            try:
+                hotels_df = self._load_hotels()
+                from brand_category import (
+                    pilot_hotel_codes,
+                    resolve_category_series,
+                )
+
+                if hotels_df.empty or col not in hotels_df.columns:
+                    return None, "none"
+                codes = hotels_df["hotel_code"].astype(str).str.strip()
+                pilots = pilot_hotel_codes()
+                pmask = codes.isin(pilots) if pilots else pd.Series(True, index=hotels_df.index)
+                cats = resolve_category_series(hotels_df)
+                return mean_for_category(
+                    hotels_df[col], cats, pmask, brand_cat
+                )
+            except Exception:
+                return None, "none"
+
         # --- Operating (entrées REV-01/02) ---
         nb_chambres = _as_int(
             row.get("hotel_nb_chambres") or md_stats.get("hotel_nb_chambres"), 0
         )
         if nb_chambres <= 0:
-            warnings.append("nb_chambres manquant — imputation 80.")
-            nb_chambres = 80
-            sources["nb_chambres"] = "default"
+            cat_val, cat_src = _pilot_feature_mean("hotel_nb_chambres")
+            if cat_val is not None and cat_val > 0:
+                nb_chambres = int(round(cat_val))
+                sources["nb_chambres"] = cat_src
+                warnings.append(
+                    f"nb_chambres impute par moyenne pilotes ({cat_src}) = {nb_chambres}."
+                )
+            else:
+                warnings.append("nb_chambres manquant — imputation 80.")
+                nb_chambres = 80
+                sources["nb_chambres"] = "default"
         else:
             sources["nb_chambres"] = sources.get("identity", "hotel_data")
 
@@ -311,7 +360,15 @@ class HotelContextBuilder:
             if to_raw is not None:
                 sources["taux_occupation"] = "model_data"
             else:
-                sources["taux_occupation"] = f"brand_default:{brand_key or 'AUTRE'}"
+                cat_val, cat_src = _pilot_feature_mean("hotel_to_annuel")
+                if cat_val is not None:
+                    to_raw = cat_val
+                    sources["taux_occupation"] = cat_src
+                    warnings.append(
+                        f"TO impute par moyenne pilotes ({cat_src})."
+                    )
+                else:
+                    sources["taux_occupation"] = f"brand_default:{brand_key or 'AUTRE'}"
         else:
             sources["taux_occupation"] = "hotel_data"
         taux_occupation = _as_rate(to_raw, to_default)
@@ -319,6 +376,8 @@ class HotelContextBuilder:
         guests_default = BRAND_GUESTS_DEFAULT.get(brand_key, 1.7)
         guests = guests_default
         sources["guests_per_chambre"] = f"brand_default:{brand_key or 'AUTRE'}"
+        # Si concept_pilote a une moyenne marque, priorite deja via brand averages UI ;
+        # pas de colonne guests dans hotel_data standard.
 
         clients_jour = nb_chambres * taux_occupation * guests
         clients_mois = clients_jour * 30.5

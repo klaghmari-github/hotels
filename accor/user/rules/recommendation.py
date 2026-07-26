@@ -33,8 +33,10 @@ class RecommendationRules:
 
     @staticmethod
     def has_liberty_nfb(request: SimulationRequest) -> bool:
-        needs = request.client_profile.client_needs
-        return any(needs.get(k, True) for k in LIBERTY_NFB_NEEDS)
+        """Au moins une categorie N-F&B lifestyle active (Règle reco #2)."""
+        needs = request.client_profile.client_needs or {}
+        # defaut False si cle absente : ne pas ouvrir LIBERTY par omission
+        return any(bool(needs.get(k, False)) for k in LIBERTY_NFB_NEEDS)
 
     def allowed_concepts(
         self, request: SimulationRequest

@@ -157,9 +157,13 @@ export class UserApp {
           })
           .join("");
       };
+      // Defauts alignees DEFAULT_CLIENT_NEEDS backend (Règle 3 ROD)
+      const defaults = meta.client_needs_defaults || {};
       const fbDefs = {};
       (meta.client_needs_fb || []).forEach((n) => {
-        fbDefs[n.id] = true;
+        if (typeof n.default === "boolean") fbDefs[n.id] = n.default;
+        else if (n.id in defaults) fbDefs[n.id] = !!defaults[n.id];
+        else fbDefs[n.id] = true;
       });
       renderNeeds(
         "needs-fb",
@@ -168,7 +172,9 @@ export class UserApp {
       );
       const nfbDefs = {};
       (meta.client_needs_nfb || []).forEach((n) => {
-        nfbDefs[n.id] = n.id !== "nfb_hygiene";
+        if (typeof n.default === "boolean") nfbDefs[n.id] = n.default;
+        else if (n.id in defaults) nfbDefs[n.id] = !!defaults[n.id];
+        else nfbDefs[n.id] = n.id !== "nfb_hygiene";
       });
       renderNeeds(
         "needs-nfb",
