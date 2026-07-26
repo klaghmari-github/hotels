@@ -784,13 +784,12 @@ def api_rod_meta():
         return jsonify({"ok": False, "error": str(exc)}), 400
 
 
-@app.get("/api/rod/hotel/<hotel_code>/trace")
-@app.post("/api/rod/hotel/<hotel_code>/trace")
+@app.route("/api/rod/hotel/<hotel_code>/trace", methods=["GET", "POST"])
 def api_rod_hotel_trace(hotel_code: str):
     """
     Hôtel = nouveau client (directeur corner).
 
-    Body/query optionnels :
+    Body (POST) / query (GET) optionnels :
       year, m_lin, mix_fb (0–1 ou %), client_needs {id: bool},
       nb_chambres, taux_occupation, guests_per_chambre
 

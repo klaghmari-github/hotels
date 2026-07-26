@@ -70,8 +70,6 @@ export class RodSimPanel {
       if (!$("#rod-mix-fb")?.value) {
         this.setMix(Math.round((d.mix_fb ?? 0.7) * 100));
       }
-      const banner = $("#rod-method-banner");
-      if (banner && this.meta.hint) banner.textContent = this.meta.hint;
     } catch (err) {
       console.error(err);
       toast.show(err.message, "err");
@@ -86,9 +84,7 @@ export class RodSimPanel {
         .map(
           (it) => `
         <label class="rod-need-item">
-          <span>${escapeHtml(it.label || it.id)}
-            <small class="muted">coef ${it.coef ?? ""}</small>
-          </span>
+          <span>${escapeHtml(it.label || it.id)}</span>
           <span class="switch">
             <input type="checkbox" data-need="${escapeHtml(it.id)}" ${
               it.default !== false ? "checked" : ""
@@ -177,13 +173,7 @@ export class RodSimPanel {
         chipY.textContent = `Apprend ${train} · éval ${data.eval_year || year}`;
       }
       const chipN = $("#rod-chip-n");
-      if (chipN) {
-        chipN.textContent = `${data.n || 0} pilote(s) (split temporel)`;
-      }
-      if (!this.meta?.hint) {
-        const banner = $("#rod-method-banner");
-        if (banner && data.method) banner.textContent = data.method;
-      }
+      if (chipN) chipN.textContent = `${data.n || 0} pilote(s)`;
       this.fillHotels(data.hotels || []);
       if (status) status.textContent = "";
     } catch (err) {
@@ -411,10 +401,8 @@ export class RodSimPanel {
       <div class="metric-box"><span class="m-label">n hôtels ref</span><span class="m-value">${r.n_hotels ?? "—"}</span></div>
       <div class="metric-box good"><span class="m-label">CA mensuel ref</span><span class="m-value">${euro(r.ca_monthly_ref)}</span></div>
       <div class="metric-box"><span class="m-label">Clients/mois ref</span><span class="m-value">${fmt(r.clients_mois_ref, 1)}</span></div>
-      <div class="metric-box"><span class="m-label">Hold-out exclu</span><span class="m-value">${this.trace.eval_year ?? "—"}</span></div>
+      <div class="metric-box"><span class="m-label">Année éval</span><span class="m-value">${this.trace.eval_year ?? "—"}</span></div>
     `;
-    const hint = $("#rod-category-ref-hint");
-    if (hint && r.method) hint.textContent = r.method;
   }
 
   renderRecoBanner() {
@@ -427,10 +415,8 @@ export class RodSimPanel {
     }
     host.classList.remove("hidden");
     host.innerHTML = `
-      <div class="tag">Solution recommandée</div>
+      <div class="tag">Reco</div>
       <h2>${escapeHtml(rec.recommended_concept)}</h2>
-      <p>${escapeHtml(rec.reason || "")}</p>
-      <p class="muted small">Autorisées : ${(rec.allowed_concepts || []).join(", ")}</p>
     `;
   }
 
@@ -440,18 +426,9 @@ export class RodSimPanel {
     const gaps = this.trace.gaps || {};
     const real = this.trace.real_holdout || {};
     const reco = this.trace.recommendation?.recommended_concept;
-    const params = this.trace.params || {};
     const hasHold = !!(this.trace.has_holdout || real.available);
-    const holdNote = hasHold
-      ? ""
-      : `<p class="card-hint muted">Pas de réel sur l’année d’éval ${real.year || this.trace.eval_year || ""} (split temporel).</p>`;
     host.className = "perf-table-wrap";
     host.innerHTML = `
-      <p class="card-hint">Corner : ${fmt(params.m_lin, 1)} m lin. · mix F&amp;B ${fmt(
-        (params.mix_fb || 0) * 100,
-        0
-      )} % · clients/mois ${fmt(params.clients_mois, 1)}</p>
-      ${holdNote}
       <table>
         <thead>
           <tr>
@@ -615,8 +592,6 @@ export class RodSimPanel {
   }
 
   renderEval(data) {
-    const method = $("#rod-eval-method");
-    if (method && data.method) method.textContent = data.method;
     const m = data.metrics || {};
     const mh = $("#rod-eval-metrics");
     if (mh) {

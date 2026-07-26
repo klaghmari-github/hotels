@@ -747,12 +747,6 @@ def rod_ui_meta() -> dict[str, Any]:
             "m_lin": 6.0,
             "client_needs": all_needs_open(),
         },
-        "hint": (
-            "Le directeur règle le mix F&B/N-F&B du corner, les sous-catégories "
-            "autorisées et les mètres linéaires. La référence CA vient de la "
-            "catégorie de marque (années train). Les règles ROD estiment CA, "
-            "coûts et marge pour SIMPLY / LIBERTY / CONNECTED."
-        ),
     }
 
 
