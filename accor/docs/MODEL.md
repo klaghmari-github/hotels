@@ -56,9 +56,13 @@ Ranking des modèles : souvent R² (ou RMSE/MAE) sur la **cible principale**
 
 ---
 
-## Évaluation année incomplete
+## Évaluation ML année incomplete
 
-`model_eval` — cas 2026 (ou `eval_year` meta) avec mois partiels.
+`model_eval` — **uniquement le modèle XGBoost** (onglet admin
+**Éval. modèle ML**). Ne confondre pas avec l’éval règles ROD
+(`rod_admin` / [ROD_ADMIN.md](ROD_ADMIN.md)).
+
+Cas 2026 (ou `eval_year` meta) avec mois partiels.
 
 Pour chaque hôtel :
 
@@ -79,7 +83,10 @@ Puis :
 Cible sélectionnable (défaut = principale).
 
 API : `/api/model/eval/meta`, `/api/model/eval`  
-UI : onglet Evaluation  
+UI : section **Modèle** → **Éval. modèle ML**
+
+Model Explore n’affiche **pas** les R²/RMSE métier (structure seulement :
+importances, arbres).
 
 ---
 

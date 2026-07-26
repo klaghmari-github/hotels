@@ -23,16 +23,23 @@ Utilisé par admin **et** user.
 
 Entrée : `templates/index.html` → `app.js?v=…`
 
+### Sidebar (ordre)
+
+1. **All** / **Pilotes** — datasets Excel  
+2. **Simulateur ROD** — règles Excel, trace pilotes  
+3. **Modèle** (singulier) — Build / Explore / Éval. ML  
+
 | Fichier | Classe / rôle |
 |---------|----------------|
 | `app.js` | `AdminApp` — compose tout, `window.AccorAdmin` |
 | `state.js` | `AdminState` — dataset courant, page, dirty, panel |
-| `nav-controller.js` | sidebar datasets + Model Build / Explore / Eval |
+| `nav-controller.js` | sidebar datasets + ROD + Model Build / Explore / Eval |
 | `table-renderer.js` | table éditable, sélection, dirty cells |
 | `dataset-controller.js` | fetch page, save, add/delete, rebuilds |
-| `model-build-panel.js` | params XGB, grille, poll progress |
-| `model-explore-panel.js` | liste modèles, métriques, arbres, deploy |
-| `model-eval-panel.js` | eval année incomplete (cible, métriques, tables) |
+| `rod-sim-panel.js` | **Simulateur ROD** : ventes (étapes), marge, éval sim vs réel |
+| `model-build-panel.js` | params XGB, grille, barre progression réelle |
+| `model-explore-panel.js` | structure modèle (importances, arbres) — pas de scores métier |
+| `model-eval-panel.js` | **éval ML** XGBoost (Σ/12) |
 | `tree-svg.js` | layout + SVG arbre XGBoost |
 | `constants.js` | icônes, datasets pinés, map rebuilds |
 
@@ -40,12 +47,14 @@ Entrée : `templates/index.html` → `app.js?v=…`
 
 Ids principaux dans `index.html` :
 
-- `#view-table` — datasets
-- `#view-model-build`
-- `#view-model-explore`
-- `#view-model-eval`
+- `#view-table` — datasets  
+- `#view-rod-sim` — Simulateur ROD (onglets ventes / marge / eval)  
+- `#view-model-build`  
+- `#view-model-explore`  
+- `#view-model-eval` — Éval. modèle ML  
 
-Navigation : boutons `#nav-model-build`, `#nav-model-explore`, `#nav-model-eval`.
+Navigation : `#nav-rod-sim`, `#nav-model-build`, `#nav-model-explore`,
+`#nav-model-eval`.
 
 ### Flux dataset
 
@@ -55,11 +64,20 @@ Navigation : boutons `#nav-model-build`, `#nav-model-explore`, `#nav-model-eval`
 4. Sauvegarder → PUT `/api/datasets/<id>/rows`
 5. Rebuild (si dispo) → POST `/api/datasets/.../rebuild`
 
-### Flux modèles
+### Flux Simulateur ROD
 
-- Build : POST build → poll progress
-- Explore : list + explore + tree/importance
-- Eval : meta → POST eval → rendu métriques / tables
+1. open → GET `/api/rod/pilots?year=`
+2. choisir hôtel → GET `/api/rod/hotel/<code>/trace`
+3. onglet Marge : même payload (coûts / marge nette 3 concepts)
+4. onglet Éval → GET `/api/rod/eval?year=`
+
+Détail métier : [ROD_ADMIN.md](ROD_ADMIN.md).
+
+### Flux modèles ML
+
+- Build : POST build → poll `/api/model/build/progress` (manuel puis grid)
+- Explore : list + explore + tree/importance (structure uniquement)
+- Éval ML : meta → POST `/api/model/eval` → métriques Σ/12
 
 ---
 

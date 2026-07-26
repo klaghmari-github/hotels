@@ -204,7 +204,7 @@ Copie vers `models/deploy/model.pkl` + `model.json`.
 
 ### `GET /api/model/eval/meta`
 
-Prépare l’onglet Evaluation :
+Prépare l’onglet **Éval. modèle ML** (XGBoost, pas le Simulateur ROD) :
 
 ```json
 {
@@ -222,7 +222,7 @@ Prépare l’onglet Evaluation :
 
 ### `GET|POST /api/model/eval`
 
-Évalue un modèle sur l’année incomplete.
+Évalue un **modèle XGBoost** sur l’année incomplete.
 
 Body ou query : `model_id`, `target`, `year`.
 
@@ -231,6 +231,8 @@ puis MAE/RMSE/R²/MAPE/biais + tables détail.
 
 Enregistré **avant** `/api/model/<model_id>` pour ne pas capturer `eval`
 comme id.
+
+Pour l’évaluation **règles ROD** (sim vs réel), voir `/api/rod/eval`.
 
 ### `GET /api/model/<model_id>`
 
@@ -258,6 +260,59 @@ Table des arbres (profondeur, n features, R²/RMSE **cumulés**).
 
 Feature importance (cible principale).
 
+### Progression build
+
+`GET /api/model/build/progress` renvoie notamment :
+
+| Champ | Rôle |
+|-------|------|
+| `status` | idle / running / done / error |
+| `phase` | prepare / manual / grid / done / error |
+| `stage_label` | libellé UI (Config manuelle, Grid search…) |
+| `done` / `total` | modèles terminés / prévus |
+| `job_fraction` | 0–1 dans le job courant (cibles / arbres) |
+| `pct` | pourcentage global |
+| `current_name` / `current_target` / `current_kind` | modèle, cible XGB, manual\|grid |
+| `n_manual` / `n_grid` / `manual_done` / `grid_done` | compteurs étapes |
+| `message` | texte détaillé |
+| `results` | classements une fois done |
+
+---
+
+## Simulateur ROD (admin)
+
+Voir aussi [ROD_ADMIN.md](ROD_ADMIN.md).
+
+### `GET /api/rod/pilots`
+
+Liste des hôtels avec ventes sur `year` (défaut 2026).
+
+| Query | Défaut | Rôle |
+|-------|--------|------|
+| `year` | 2026 | année de vérité terrain |
+
+Chaque hôtel : `hotel_code`, nom, marque, mois présents, `sum_montant_ventes`,
+`avg_monthly_true` = somme / 12.
+
+### `GET /api/rod/hotel/<hotel_code>/trace`
+
+Trace complète pour un pilote.
+
+| Query | Rôle |
+|-------|------|
+| `year` | année réel (défaut 2026) |
+| `concept` | optionnel : un seul concept, sinon SIMPLY+LIBERTY+CONNECTED |
+
+Réponse : `by_concept.<C>.sales.steps[]` (étapes R0–R4 + marge produit),
+`.costs` (lignes techno/annexes/agencement), `.margin` (nette).
+
+### `GET /api/rod/eval`
+
+Batch : pour chaque pilote, CA simulé vs `avg_monthly_true` (Σ/12),
+écarts par concept + reco, métriques globales (MAE, RMSE, biais, MAPE).
+
+Query : `year` (défaut 2026).
+
 ---
 
 ## Exemples curl
@@ -266,7 +321,7 @@ Feature importance (cible principale).
 # page hotels
 curl -s 'http://127.0.0.1:5055/api/datasets/hotel?page=1&page_size=10&q=paris'
 
-# eval
+# eval ML
 curl -s -X POST http://127.0.0.1:5055/api/model/eval \
   -H 'Content-Type: application/json' \
   -d '{"target":"montant_ventes","year":2026}'
@@ -275,4 +330,9 @@ curl -s -X POST http://127.0.0.1:5055/api/model/eval \
 curl -s -X POST http://127.0.0.1:5055/api/model/deploy \
   -H 'Content-Type: application/json' \
   -d '{"model_name":"xgb_sales"}'
+
+# Simulateur ROD
+curl -s 'http://127.0.0.1:5055/api/rod/pilots?year=2026'
+curl -s 'http://127.0.0.1:5055/api/rod/hotel/H0373/trace?year=2026'
+curl -s 'http://127.0.0.1:5055/api/rod/eval?year=2026'
 ```

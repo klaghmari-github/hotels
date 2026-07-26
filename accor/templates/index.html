@@ -59,7 +59,16 @@
         <nav class="nav-tabs" id="nav-tabs" aria-label="Pilotes"></nav>
 
         <div class="nav-footer">
-          <div class="nav-section-label">Modèles</div>
+          <div class="nav-section-label">Simulateur ROD</div>
+          <button type="button" class="nav-item" id="nav-rod-sim" data-panel="rod-sim">
+            <span class="nav-icon">🧮</span>
+            <span>
+              <span class="nav-label">Simulateur ROD</span>
+              <span class="nav-desc">Ventes · marge · écart 2026</span>
+            </span>
+          </button>
+
+          <div class="nav-section-label">Modèle</div>
           <button type="button" class="nav-item" id="nav-model-build" data-panel="model-build">
             <span class="nav-icon">⚡</span>
             <span>
@@ -71,14 +80,14 @@
             <span class="nav-icon">🌳</span>
             <span>
               <span class="nav-label">Model Explore</span>
-              <span class="nav-desc">Arbres, perfs, feature importance</span>
+              <span class="nav-desc">Arbres, importances</span>
             </span>
           </button>
           <button type="button" class="nav-item" id="nav-model-eval" data-panel="model-eval">
             <span class="nav-icon">📊</span>
             <span>
-              <span class="nav-label">Evaluation</span>
-              <span class="nav-desc">Perf 2026 — moyenne mensuelle /12</span>
+              <span class="nav-label">Éval. modèle ML</span>
+              <span class="nav-desc">XGBoost · moyenne /12</span>
             </span>
           </button>
         </div>
@@ -242,6 +251,7 @@
           <div class="model-col">
             <section class="card build-progress-card" id="model-build-progress-card">
               <h2 class="card-title">Progression</h2>
+              <div class="build-stages hidden" id="model-build-stages" aria-label="Étapes du build"></div>
               <div class="build-progress" id="model-build-progress">
                 <div class="build-progress-head">
                   <span class="build-progress-pct" id="model-build-progress-pct">0&nbsp;%</span>
@@ -251,7 +261,7 @@
                   <i id="model-build-progress-fill" style="width: 0%"></i>
                 </div>
                 <div class="build-progress-meta">
-                  <span id="model-build-progress-text">En attente</span>
+                  <span id="model-build-progress-text">En attente d’un build</span>
                   <span id="model-build-progress-count">0 / 0</span>
                 </div>
                 <p class="card-hint" id="model-build-progress-detail"></p>
@@ -302,16 +312,14 @@
             <section class="card">
               <h2 class="card-title">Modèle à explorer</h2>
               <label class="field">
-                <span>Classement par performance</span>
+                <span>Modèle (classement build)</span>
                 <select id="explore-model-select"></select>
               </label>
               <div class="explore-global-metrics" id="explore-global-metrics"></div>
-            </section>
-
-            <section class="card">
-              <h2 class="card-title">Perf. cible principale</h2>
-              <p class="card-hint" id="explore-main-target-label">montant_ventes (évaluation)</p>
-              <div id="explore-main-metrics" class="metrics-grid"></div>
+              <p class="card-hint" id="explore-eval-hint">
+                Pour R² / RMSE / MAE vs réel (année incomplete, moyenne /12) :
+                onglet <strong>Evaluation</strong>.
+              </p>
             </section>
 
             <section class="card">
@@ -342,13 +350,106 @@
         </div>
       </div>
 
-      <!-- ===== Vue Evaluation ===== -->
+      <!-- ===== Vue Simulateur ROD ===== -->
+      <div id="view-rod-sim" class="view hidden">
+        <header class="topbar">
+          <div class="topbar-left">
+            <h1>Simulateur ROD</h1>
+            <p class="subtitle">
+              Règles Excel sur hôtels pilotes (année incomplete) :
+              prédiction CA → coûts / marge → écart vs réel.
+            </p>
+          </div>
+          <div class="topbar-actions">
+            <label class="field field-inline" style="margin:0">
+              <span class="muted small">Année</span>
+              <input type="number" id="rod-year" min="2020" max="2100" value="2026" style="width:5.5rem" />
+            </label>
+            <button type="button" class="btn btn-primary" id="btn-rod-run" title="Lancer pour l'hôtel sélectionné / batch">
+              Calculer
+            </button>
+          </div>
+        </header>
+
+        <section class="meta-bar">
+          <span class="chip" id="rod-chip-year">Année : 2026</span>
+          <span class="chip chip-muted" id="rod-chip-n">—</span>
+          <span class="status" id="rod-status"></span>
+        </section>
+
+        <div class="rod-tabs" id="rod-tabs" role="tablist">
+          <button type="button" class="rod-tab active" data-rod-tab="ventes" role="tab">1 · Prédiction ventes</button>
+          <button type="button" class="rod-tab" data-rod-tab="marge" role="tab">2 · Marge &amp; coûts</button>
+          <button type="button" class="rod-tab" data-rod-tab="eval" role="tab">3 · Évaluation (sim vs réel)</button>
+        </div>
+
+        <div class="model-layout explore-layout rod-layout">
+          <div class="model-col">
+            <section class="card">
+              <h2 class="card-title">Hôtel pilote</h2>
+              <p class="card-hint">Parc avec ventes sur l’année choisie (vérité terrain partielle).</p>
+              <label class="field">
+                <span>Hôtel</span>
+                <select id="rod-hotel-select"></select>
+              </label>
+              <div id="rod-hotel-meta" class="metrics-grid empty">—</div>
+            </section>
+
+            <section class="card" id="rod-concept-card">
+              <h2 class="card-title">Concept affiché</h2>
+              <div class="rod-concept-btns" id="rod-concept-btns">
+                <button type="button" class="rod-concept active" data-concept="SIMPLY">SIMPLY</button>
+                <button type="button" class="rod-concept" data-concept="LIBERTY">LIBERTY</button>
+                <button type="button" class="rod-concept" data-concept="CONNECTED">CONNECTED</button>
+              </div>
+              <div id="rod-concept-kpi" class="metrics-grid empty">—</div>
+            </section>
+          </div>
+
+          <div class="model-col">
+            <!-- Tab 1 : ventes -->
+            <section class="card card-wide rod-panel" data-rod-panel="ventes">
+              <h2 class="card-title">Enchaînement des règles (CA)</h2>
+              <p class="card-hint">
+                Impact TO → R1 clients → R2 mix → R3 catégories → R4 m_lin → marge produit.
+                Chiffres en € HT mensuels.
+              </p>
+              <div id="rod-sales-steps" class="rod-steps empty">Sélectionnez un hôtel et cliquez Calculer.</div>
+            </section>
+
+            <!-- Tab 2 : marge -->
+            <section class="card card-wide rod-panel hidden" data-rod-panel="marge">
+              <h2 class="card-title">Coûts &amp; marge nette — 3 concepts</h2>
+              <p class="card-hint">
+                marge_nette = marge_produit − (techno + annexes + agencement).
+                Détail des lignes de coûts pour le concept sélectionné.
+              </p>
+              <div id="rod-margin-table" class="perf-table-wrap empty">—</div>
+              <h3 class="card-title" style="margin-top:1rem;font-size:1rem">Lignes de coûts</h3>
+              <div id="rod-cost-lines" class="perf-table-wrap empty">—</div>
+            </section>
+
+            <!-- Tab 3 : eval -->
+            <section class="card card-wide rod-panel hidden" data-rod-panel="eval">
+              <h2 class="card-title">Écart CA simulé vs réel</h2>
+              <p class="card-hint" id="rod-eval-method">
+                avg réel = somme(montant_ventes mois dispo) / 12 · écart = simulé − réel
+                (concept recommandé par les règles).
+              </p>
+              <div id="rod-eval-metrics" class="metrics-grid empty">—</div>
+              <div id="rod-eval-table" class="perf-table-wrap empty" style="margin-top:0.75rem">—</div>
+            </section>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Vue Evaluation ML ===== -->
       <div id="view-model-eval" class="view hidden">
         <header class="topbar">
           <div class="topbar-left">
-            <h1>Evaluation</h1>
+            <h1>Évaluation modèle ML</h1>
             <p class="subtitle">
-              Performance du modele sur l annee incomplete :
+              Performance XGBoost sur l annee incomplete :
               moyenne mensuelle = somme(mois disponibles) / 12, pred vs reel.
             </p>
           </div>
@@ -388,7 +489,11 @@
             </section>
 
             <section class="card">
-              <h2 class="card-title">Metriques (moyenne mensuelle / hotel)</h2>
+              <h2 class="card-title">Performance (moyenne mensuelle / hôtel)</h2>
+              <p class="card-hint">
+                R², RMSE, MAE, MAPE, biais — pred vs réel sur la cible choisie.
+                Métrique métier : somme(mois dispo) / 12 par hôtel.
+              </p>
               <div id="eval-metrics" class="metrics-grid empty">Lancez une evaluation…</div>
             </section>
 
@@ -439,6 +544,6 @@
     </div>
   </div>
 
-  <script type="module" src="/static/js/admin/app.js?v=20260726i"></script>
+  <script type="module" src="/static/js/admin/app.js?v=20260726m"></script>
 </body>
 </html>

@@ -714,10 +714,205 @@ body {
   margin: 0;
 }
 
+/* ---- Simulateur ROD admin ---- */
+.rod-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0 0 0.85rem;
+}
+.rod-tab {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+  border-radius: 99px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.rod-tab.active {
+  background: rgba(110, 231, 183, 0.12);
+  border-color: rgba(110, 231, 183, 0.4);
+  color: var(--text);
+  font-weight: 600;
+}
+.rod-concept-btns {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+.rod-concept {
+  flex: 1;
+  min-width: 5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 8px;
+  padding: 0.45rem 0.5rem;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.rod-concept.active {
+  background: rgba(96, 165, 250, 0.15);
+  border-color: rgba(96, 165, 250, 0.45);
+  color: #93c5fd;
+}
+.rod-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 70vh;
+  overflow: auto;
+}
+.rod-steps.empty {
+  color: var(--text-faint);
+  font-size: 0.9rem;
+}
+.rod-step {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.75rem 0.9rem;
+  background: rgba(255, 255, 255, 0.03);
+}
+.rod-step header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+.rod-step h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+.rod-step-n {
+  flex: 0 0 auto;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 99px;
+  display: grid;
+  place-items: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(110, 231, 183, 0.2);
+  color: var(--text);
+}
+.rod-rule {
+  margin: 0.15rem 0 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.rod-formula {
+  margin: 0.45rem 0;
+  font-size: 0.78rem;
+  font-family: ui-monospace, monospace;
+  color: #93c5fd;
+}
+.rod-step-ca {
+  margin-left: auto;
+  text-align: right;
+}
+.rod-step-ca strong {
+  display: block;
+  font-size: 1.05rem;
+}
+.rod-kv-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: 0.35rem 0.75rem;
+  font-size: 0.78rem;
+}
+.rod-kv {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+.rod-kv span {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+}
+.rod-step-split {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+#rod-eval-table td.pos { color: var(--success); }
+#rod-eval-table td.neg { color: var(--danger); }
+
+.build-stages {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+}
+.build-stages.hidden { display: none; }
+.build-stage {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.build-stage strong {
+  display: block;
+  color: var(--text);
+  font-size: 0.82rem;
+  margin-bottom: 0.1rem;
+}
+.build-stage-n {
+  flex: 0 0 auto;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 99px;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 0.75rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+}
+.build-stage.is-active {
+  border-color: rgba(110, 231, 183, 0.45);
+  background: rgba(110, 231, 183, 0.08);
+}
+.build-stage.is-active .build-stage-n {
+  background: var(--accent, #6ee7b7);
+  color: #0b1220;
+}
+.build-stage.is-done {
+  border-color: rgba(110, 231, 183, 0.2);
+  opacity: 0.9;
+}
+.build-stage.is-done .build-stage-n {
+  background: rgba(110, 231, 183, 0.35);
+  color: var(--text);
+}
+.build-stage.is-skip {
+  opacity: 0.45;
+}
+
 .build-progress {
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
+}
+.build-progress-phase[data-phase="manual"] {
+  background: rgba(96, 165, 250, 0.15);
+  color: #93c5fd;
+}
+.build-progress-phase[data-phase="grid"] {
+  background: rgba(167, 139, 250, 0.15);
+  color: #c4b5fd;
+}
+.build-progress-phase[data-phase="prepare"] {
+  background: rgba(251, 191, 36, 0.12);
+  color: #fcd34d;
 }
 .build-progress-head {
   display: flex;

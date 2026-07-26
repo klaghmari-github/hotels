@@ -3,7 +3,7 @@
  *
  * datasets, currentId, page/pageSize/q, payload page courante,
  * dirty (Map index → row patch), selected indices, panel courant
- * (table | model-build | model-explore | model-eval).
+ * (table | rod-sim | model-build | model-explore | model-eval).
  *
  * confirmLeaveDirty() — garde-fou avant de quitter un dataset modifié.
  */
@@ -20,7 +20,7 @@ export class AdminState {
     this.dirty = new Map();
     /** @type {Set<number>} */
     this.selected = new Set();
-    /** @type {"table"|"model-build"|"model-explore"|"model-eval"} */
+    /** @type {"table"|"rod-sim"|"model-build"|"model-explore"|"model-eval"} */
     this.panel = "table";
     this.modelConfig = null;
     this.explore = {

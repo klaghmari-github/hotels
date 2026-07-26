@@ -1,13 +1,13 @@
 /**
- * Onglet Evaluation.
+ * Onglet Evaluation — seul endroit pour les scores métier pred vs réel.
  *
- * Compare le modèle design à la vérité terrain sur une année incomplete
- * (souvent 2026). Pour chaque hôtel :
+ * (Model Explore = structure : importances, arbres ; pas de R²/RMSE ici.)
+ *
+ * Année incomplete (souvent 2026), par hôtel :
  *   moyenne mensuelle = somme(mois disponibles) / 12
- * même formule côté prédit et réel, puis MAE / RMSE / R²…
+ * puis MAE / RMSE / R² / MAPE / biais.
  *
  * API : GET /api/model/eval/meta , POST /api/model/eval
- * Backend : accor.model_eval
  */
 
 import { $, escapeHtml } from "../../shared/js/dom.js";

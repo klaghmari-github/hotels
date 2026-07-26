@@ -4,10 +4,10 @@
  * Modules ES (pas de bundler) :
  *   shared/  → dom, api, toast, loading, format
  *   admin/   → state, nav, table, datasets,
- *              model build / explore / eval
+ *              rod-sim, model build / explore / eval
  *
  * HTML : templates/index.html
- * API  : /api/datasets/* , /api/model/*
+ * API  : /api/datasets/* , /api/model/* , /api/rod/*
  * Doc  : README.md (sections Interface admin + Front)
  *
  * Debug navigateur : window.AccorAdmin
@@ -22,6 +22,7 @@ import { DatasetController } from "./dataset-controller.js";
 import { ModelBuildPanel } from "./model-build-panel.js";
 import { ModelExplorePanel } from "./model-explore-panel.js";
 import { ModelEvalPanel } from "./model-eval-panel.js";
+import { RodSimPanel } from "./rod-sim-panel.js";
 
 export class AdminApp {
   constructor() {
@@ -30,6 +31,7 @@ export class AdminApp {
 
     this.nav = new NavController(this.state, {
       onSelectDataset: (id) => this.datasets.selectDataset(id),
+      onRodSim: () => this.rodSim.open(),
       onModelBuild: () => this.modelBuild.open(),
       onModelExplore: () => this.modelExplore.open(),
       onModelEval: () => this.modelEval.open(),
@@ -47,6 +49,7 @@ export class AdminApp {
       this.table,
       this.els
     );
+    this.rodSim = new RodSimPanel(this.state, this.nav);
     this.modelBuild = new ModelBuildPanel(this.state, this.nav);
     this.modelExplore = new ModelExplorePanel(this.state, this.nav);
     this.modelEval = new ModelEvalPanel(this.state, this.nav);
@@ -127,6 +130,7 @@ export class AdminApp {
     });
 
     this.nav.wire();
+    this.rodSim.wire();
     this.modelBuild.wire();
     this.modelExplore.wire();
     this.modelEval.wire();

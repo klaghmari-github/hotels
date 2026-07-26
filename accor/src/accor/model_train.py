@@ -95,6 +95,13 @@ class BuildProgress:
             "pct": 0.0,
             "current_name": "",
             "current_target": "",
+            "current_kind": "",  # manual | grid
+            "job_index": 0,  # 1-based dans le batch
+            "n_manual": 0,
+            "n_grid": 0,
+            "manual_done": 0,
+            "grid_done": 0,
+            "stage_label": "",  # texte court pour le badge UI
             "message": "",
             "results": [],
             "error": None,
@@ -567,9 +574,98 @@ def _score_result(
     return val
 
 
+def _load_progress_file() -> dict[str, Any] | None:
+    """Lit models/build_progress.json si present."""
+    try:
+        if not BUILD_PROGRESS_FILE.exists():
+            return None
+        data = json.loads(BUILD_PROGRESS_FILE.read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else None
+    except Exception:
+        return None
+
+
 def get_build_progress() -> dict[str, Any]:
-    """Etat du build batch (manuel + grid) pour la barre de progression."""
-    return _BUILD_PROGRESS.snapshot()
+    """
+    Etat du build batch pour la barre de progression.
+
+    Preferer la memoire si un build tourne dans ce process ; sinon relire
+    le JSON disque (utile si le reloader Flask a un 2e process).
+    """
+    snap = _BUILD_PROGRESS.snapshot()
+    if snap.get("status") == "running":
+        return snap
+    disk = _load_progress_file()
+    if not disk:
+        return snap
+    # Memoire idle/done mais fichier plus recent en running → suivre le fichier
+    if disk.get("status") == "running":
+        return disk
+    # Si memoire idle et fichier done avec resultats, exposer le fichier
+    if snap.get("status") == "idle" and disk.get("status") in {"done", "error", "running"}:
+        return disk
+    return snap
+
+
+# ---------------------------------------------------------------------------
+# Progression XGBoost (module-level pour rester picklable)
+# ---------------------------------------------------------------------------
+
+# Hook thread-local : (frac, message, target_name) pendant un fit
+_xgb_progress_tls = threading.local()
+
+
+def _xgb_progress_report(frac: float, msg: str, target: str = "") -> None:
+    hook = getattr(_xgb_progress_tls, "hook", None)
+    if hook is None:
+        return
+    try:
+        hook(min(max(float(frac), 0.0), 1.0), msg, target)
+    except Exception:
+        pass
+
+
+def _strip_xgb_callbacks(estimator: Any) -> None:
+    """Retire les callbacks apres fit (sinon pickle impossible)."""
+    try:
+        if hasattr(estimator, "set_params"):
+            estimator.set_params(callbacks=None)
+    except Exception:
+        pass
+    for attr in ("callbacks", "_callbacks"):
+        if hasattr(estimator, attr):
+            try:
+                setattr(estimator, attr, None)
+            except Exception:
+                pass
+
+
+def _make_xgb_progress_callback(n_estimators: int, *, target_index: int, n_targets: int, target_name: str):
+    """Callback module-level (classe top-level) pour la progression arbres."""
+    try:
+        from xgboost.callback import TrainingCallback
+    except Exception:
+        return None
+
+    class XgbTreeProgressCallback(TrainingCallback):
+        """Compte les arbres et met a jour le hook thread-local."""
+
+        def after_iteration(self, model, epoch, evals_log):  # noqa: ANN001, ARG002
+            try:
+                n_est = max(1, int(n_estimators))
+                tree_frac = (int(epoch) + 1) / n_est
+                overall = (target_index + tree_frac) / max(1, n_targets)
+                _xgb_progress_report(
+                    overall,
+                    f"Cible {target_index + 1}/{n_targets} · {target_name} · "
+                    f"arbre {int(epoch) + 1}/{n_est}",
+                    target_name,
+                )
+            except Exception:
+                pass
+            return False
+
+    return XgbTreeProgressCallback()
 
 
 def _fit_xgb_multioutput(
@@ -584,86 +680,96 @@ def _fit_xgb_multioutput(
     Fit un regresseur multi-cibles avec progression fine.
 
     Enchaîne un XGBRegressor par cible (équivalent MultiOutputRegressor
-    n_jobs=1) et appelle ``progress_hook(frac, message, target_name)``
-    pendant l'entraînement (cibles + arbres).
+    n_jobs=1). Les callbacks sont retires apres fit pour permettre le pickle.
     """
     from sklearn.multioutput import MultiOutputRegressor
     from xgboost import XGBRegressor
 
     n_targets = int(y_train.shape[1]) if y_train.ndim > 1 else 1
     n_estimators = max(1, int(params.get("n_estimators") or 100))
+    prev_hook = getattr(_xgb_progress_tls, "hook", None)
+    _xgb_progress_tls.hook = progress_hook
 
     def _report(frac: float, msg: str, target: str = "") -> None:
-        if progress_hook is None:
-            return
+        _xgb_progress_report(frac, msg, target)
+
+    try:
+        # ---- une seule cible ----
+        if n_targets == 1:
+            y = y_train.ravel() if y_train.ndim > 1 else y_train
+            tname = target_cols[0] if target_cols else "y"
+            est = _make_xgb_regressor(
+                params,
+                n_estimators=n_estimators,
+                target_index=0,
+                n_targets=1,
+                target_name=tname,
+                with_progress=progress_hook is not None,
+            )
+            _report(0.0, f"Entrainement {tname}…", tname)
+            est.fit(X_train, y)
+            _strip_xgb_callbacks(est)
+            _report(1.0, f"{tname} termine", tname)
+            return est
+
+        # ---- multi-output ----
+        base = XGBRegressor(**{k: v for k, v in params.items() if k != "callbacks"})
+        model = MultiOutputRegressor(base, n_jobs=1)
+        estimators = []
+        for i, tname in enumerate(target_cols):
+            tname = str(tname)
+            est = _make_xgb_regressor(
+                params,
+                n_estimators=n_estimators,
+                target_index=i,
+                n_targets=n_targets,
+                target_name=tname,
+                with_progress=progress_hook is not None,
+            )
+            _report(i / n_targets, f"Cible {i + 1}/{n_targets} · {tname}", tname)
+            est.fit(X_train, y_train[:, i])
+            _strip_xgb_callbacks(est)
+            estimators.append(est)
+            _report((i + 1) / n_targets, f"Cible {i + 1}/{n_targets} · {tname} ok", tname)
+
+        model.estimators_ = estimators
         try:
-            progress_hook(min(max(float(frac), 0.0), 1.0), msg, target)
+            model.n_features_in_ = X_train.shape[1]
         except Exception:
             pass
-
-    # ---- une seule cible ----
-    if n_targets == 1:
-        y = y_train.ravel() if y_train.ndim > 1 else y_train
-        tname = target_cols[0] if target_cols else "y"
-
-        def _tree_cb(epoch: int) -> None:
-            # epoch 0-based ; fraction dans [0, 1]
-            _report((epoch + 1) / n_estimators, f"{tname} · arbre {epoch + 1}/{n_estimators}", tname)
-
-        est = _make_xgb_regressor(params, on_iteration=_tree_cb)
-        _report(0.0, f"Entrainement {tname}…", tname)
-        est.fit(X_train, y)
-        _report(1.0, f"{tname} termine", tname)
-        return est
-
-    # ---- multi-output : un estimateur par cible ----
-    base = XGBRegressor(**{k: v for k, v in params.items() if k != "callbacks"})
-    model = MultiOutputRegressor(base, n_jobs=1)
-    estimators = []
-    for i, tname in enumerate(target_cols):
-        tname = str(tname)
-
-        def _tree_cb(epoch: int, _i=i, _t=tname) -> None:
-            frac = (_i + (epoch + 1) / n_estimators) / n_targets
-            _report(frac, f"Cible {_i + 1}/{n_targets} · {_t} · arbre {epoch + 1}/{n_estimators}", _t)
-
-        est = _make_xgb_regressor(params, on_iteration=_tree_cb)
-        _report(i / n_targets, f"Cible {i + 1}/{n_targets} · {tname}", tname)
-        est.fit(X_train, y_train[:, i])
-        estimators.append(est)
-        _report((i + 1) / n_targets, f"Cible {i + 1}/{n_targets} · {tname} ok", tname)
-
-    model.estimators_ = estimators
-    try:
-        model.n_features_in_ = X_train.shape[1]
-    except Exception:
-        pass
-    return model
+        return model
+    finally:
+        _xgb_progress_tls.hook = prev_hook
 
 
-def _make_xgb_regressor(params: dict[str, Any], *, on_iteration: Any | None = None):
-    """XGBRegressor + callback d'iteration optionnel (progression arbres)."""
+def _make_xgb_regressor(
+    params: dict[str, Any],
+    *,
+    n_estimators: int = 100,
+    target_index: int = 0,
+    n_targets: int = 1,
+    target_name: str = "",
+    with_progress: bool = False,
+):
+    """XGBRegressor ; callbacks optionnels (retires apres fit)."""
     from xgboost import XGBRegressor
 
     p = dict(params)
     p.pop("callbacks", None)
-    if on_iteration is None:
+    if not with_progress:
         return XGBRegressor(**p)
 
+    cb = _make_xgb_progress_callback(
+        n_estimators,
+        target_index=target_index,
+        n_targets=n_targets,
+        target_name=target_name,
+    )
+    if cb is None:
+        return XGBRegressor(**p)
     try:
-        from xgboost.callback import TrainingCallback
-
-        class _IterCB(TrainingCallback):
-            def after_iteration(self, model, epoch, evals_log):  # noqa: ANN001
-                try:
-                    on_iteration(int(epoch))
-                except Exception:
-                    pass
-                return False
-
-        return XGBRegressor(**p, callbacks=[_IterCB()])
+        return XGBRegressor(**p, callbacks=[cb])
     except Exception:
-        # versions xgboost sans callbacks sklearn : pas de progression arbres
         return XGBRegressor(**p)
 
 
@@ -918,15 +1024,27 @@ def _run_build_batch(
             grid=grid_search,
         )
         jobs = planner.jobs()
+        counts = planner.counts()
+        n_manual = int(counts.get("n_manual") or 1)
+        n_grid = int(counts.get("n_grid") or 0)
+        n_jobs = len(jobs)
+
         progress.update(
             status="running",
             phase="prepare",
+            stage_label="Préparation",
             done=0,
-            total=len(jobs),
+            total=n_jobs,
             job_fraction=0.0,
             current_name="",
             current_target="",
-            message="Preparation model_data…",
+            current_kind="",
+            job_index=0,
+            n_manual=n_manual,
+            n_grid=n_grid,
+            manual_done=0,
+            grid_done=0,
+            message="Préparation des données (model_data)…",
             results=[],
             error=None,
             rank_metric=rank_metric,
@@ -946,26 +1064,69 @@ def _run_build_batch(
             metric = "r2"
 
         results: list[dict[str, Any]] = []
-        n_jobs = len(jobs)
+        manual_done = 0
+        grid_done = 0
+
         for idx, (name, kind, params) in enumerate(jobs):
+            kind = (kind or "manual").lower()
+            if kind == "manual":
+                phase = "manual"
+                stage_label = "Config manuelle"
+                # index dans l'étape manuelle (souvent 1/1)
+                stage_i = manual_done + 1
+                stage_n = max(1, n_manual)
+                head = (
+                    f"Configuration manuelle · modèle {stage_i}/{stage_n}"
+                    f" (global {idx + 1}/{n_jobs})"
+                )
+            else:
+                phase = "grid"
+                stage_label = "Grid search"
+                stage_i = grid_done + 1
+                stage_n = max(1, n_grid)
+                head = (
+                    f"Grid search · modèle {stage_i}/{stage_n}"
+                    f" (global {idx + 1}/{n_jobs})"
+                )
+
             progress.update(
-                phase="train",
+                phase=phase,
+                stage_label=stage_label,
                 done=idx,
                 total=n_jobs,
                 job_fraction=0.0,
                 current_name=name,
                 current_target="",
-                message=f"Modele {idx + 1}/{n_jobs} · {name}",
+                current_kind=kind,
+                job_index=idx + 1,
+                n_manual=n_manual,
+                n_grid=n_grid,
+                manual_done=manual_done,
+                grid_done=grid_done,
+                message=f"{head} · {name} — démarrage…",
             )
 
-            def _hook(frac: float, msg: str, target: str = "", _idx=idx, _name=name) -> None:
+            def _hook(
+                frac: float,
+                msg: str,
+                target: str = "",
+                _idx=idx,
+                _name=name,
+                _head=head,
+                _phase=phase,
+                _stage=stage_label,
+                _kind=kind,
+            ) -> None:
                 progress.update(
-                    phase="train",
+                    phase=_phase,
+                    stage_label=_stage,
                     done=_idx,
                     job_fraction=float(frac),
                     current_name=_name,
                     current_target=target or "",
-                    message=f"Modele {_idx + 1}/{n_jobs} · {_name} — {msg}",
+                    current_kind=_kind,
+                    job_index=_idx + 1,
+                    message=f"{_head} — {msg}",
                 )
 
             try:
@@ -1005,13 +1166,22 @@ def _run_build_batch(
                     "metric_value": None,
                     "score": float("-inf"),
                 }
+
+            if kind == "manual":
+                manual_done += 1
+            else:
+                grid_done += 1
+
             results.append(res)
             progress.update(
                 done=idx + 1,
                 job_fraction=0.0,
                 current_target="",
+                manual_done=manual_done,
+                grid_done=grid_done,
                 results=list(results),
-                message=f"Modele {idx + 1}/{n_jobs} termine · {name}",
+                message=f"{head} — terminé"
+                + (f" · erreur : {res['error']}" if not res.get("ok") else ""),
             )
 
         ranked = sorted(
@@ -1020,16 +1190,24 @@ def _run_build_batch(
         for i, r in enumerate(ranked):
             r["rank"] = i + 1
 
+        n_ok = sum(1 for r in ranked if r.get("ok"))
         progress.update(
             status="done",
             phase="done",
+            stage_label="Terminé",
             done=len(jobs),
             total=len(jobs),
             job_fraction=0.0,
             pct=100.0,
             current_name="",
             current_target="",
-            message=f"Termine · {len(jobs)} modele(s)",
+            current_kind="",
+            manual_done=manual_done,
+            grid_done=grid_done,
+            message=(
+                f"Terminé · {n_ok}/{len(jobs)} modèle(s) OK"
+                f" (manuel {manual_done}, grid {grid_done})"
+            ),
             results=ranked,
             main_target=main_t,
             rank_metric=metric,
@@ -1039,10 +1217,12 @@ def _run_build_batch(
         progress.update(
             status="error",
             phase="error",
+            stage_label="Erreur",
             error=str(exc),
             message=str(exc),
             finished_at=datetime.now(timezone.utc).isoformat(),
         )
+
 
 
 def start_build_batch(

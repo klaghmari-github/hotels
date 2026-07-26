@@ -8,7 +8,7 @@ voir le dossier [`docs/`](docs/README.md).
 
 | App | Port | Rôle |
 |-----|------|------|
-| **Admin** — Data & Model Studio | 5055 | éditer les Excel, (re)construire les tables dérivées, entraîner / explorer / évaluer / déployer le modèle |
+| **Admin** — Data & Model Studio | 5055 | Excel, Simulateur ROD (trace pilotes), entraîner / explorer / éval ML / déployer |
 | **User** — simulateur directeur | 5056 | parcours ROD : hôtel → concept (SIMPLY / LIBERTY / CONNECTED) → CA, coûts, reco |
 
 Le code vit dans `src/accor/` (package installable). Les données et le front
@@ -157,10 +157,10 @@ accor/
     model_data.py         # all_data → model_data
     impute_model.py       # trous pour le ML uniquement
     brand_category.py     # catégories marque + moyennes pilotes
-    model_train.py        # XGBoost multi-output
-    model_explore.py      # arbres, importance, perfs
-    model_eval.py         # eval année incomplete (moyenne /12)
-    model_explore.py
+    model_train.py        # XGBoost multi-output + progress build
+    model_explore.py      # arbres, importance (structure)
+    model_eval.py         # éval ML année incomplete (moyenne /12)
+    rod_admin.py          # Simulateur ROD admin (trace, marge, éval)
     concept_pilote.py
     geo_common.py
     geo_weather.py
@@ -168,7 +168,7 @@ accor/
     geo_holidays.py
     app.py                # Flask admin
     scrape_accor/         # scrape fiche hôtel unitaire
-    user/                 # simulateur
+    user/                 # simulateur directeur
       app.py
       models.py
       reference.py
@@ -315,30 +315,29 @@ C’est celui que le parcours user / enrichissement peut consommer.
 
 ### Explore (`model_explore.py`)
 
-- Vue d’ensemble, importances, perfs train/eval.
-- Table des arbres : métriques **cumulées** après k arbres (en boosting un
-  arbre seul n’est pas une prédiction de la cible).
-- Dump arbre JSON pour le SVG côté admin.
+- Structure du modèle (pas les scores métier ROD).
+- Importances, table des arbres (métriques **cumulées** boosting), SVG.
 
-### Evaluation année incomplete (`model_eval.py`)
+### Éval. modèle ML (`model_eval.py`)
 
-Cas métier : l’année d’eval (souvent **2026**) n’a que quelques mois.
-
-Pour chaque hôtel :
+Année incomplete (souvent **2026**) : prédiction **XGBoost** vs réel.
 
 ```
-somme_reelle  = Σ y_true  sur les mois présents
-somme_predite = Σ y_pred  sur les mêmes mois
-moyenne_mensuelle = somme / 12
+moyenne_mensuelle = somme(mois présents) / 12   # prédit et réel
 ```
 
-On divise **toujours par 12**, pas par le nombre de mois disponibles : le
-référentiel reste « revenu mensuel moyen = annuel / 12 ».
+API : `GET /api/model/eval/meta`, `POST /api/model/eval`.  
+UI : **Modèle** → **Éval. modèle ML**.
 
-Ensuite MAE, RMSE, R², MAPE, biais sur ces moyennes hôtel, plus le détail
-mois à mois. Cible au choix (défaut = cible principale).
+### Simulateur ROD admin (`rod_admin.py`)
 
-API : `GET /api/model/eval/meta`, `POST /api/model/eval`.
+Même moteurs que le user ; détail des étapes sur pilotes :
+
+1. Prédiction ventes (TO → R1–R4 → marge produit)  
+2. Coûts + marge nette (3 concepts)  
+3. Écart CA sim vs réel (Σ/12)  
+
+API : `/api/rod/*`. Doc : [docs/ROD_ADMIN.md](docs/ROD_ADMIN.md).
 
 ---
 
@@ -348,32 +347,33 @@ Page unique : `templates/index.html` + modules sous `static/js/admin/`.
 
 ### Barre latérale
 
-- Datasets (brand, hotel, sales, all_data, model_data, …) — table paginée,
-  recherche, édition cellulaire si non `readonly`.
-- **Model Build** — lancer un entraînement / grille, suivre la progression.
-- **Model Explore** — perfs, importance, arbres.
-- **Evaluation** — perf sur l’année incomplete, cible sélectionnable.
+```
+All → Pilotes → Simulateur ROD → Modèle
+```
+
+- **Datasets** — table paginée, édition si non readonly  
+- **Simulateur ROD** — règles Excel (ventes / marge / éval sim vs réel)  
+- **Modèle** (singulier) : Build · Explore · Éval. ML  
 
 ### Comportement table
 
-- Pagination + filtre texte.
-- Dirty state : cases modifiées, sauvegarde batch (`PUT …/rows`).
-- Lignes `_is_eval` en évidence sur model_data.
+- Pagination + filtre texte, dirty state, rebuilds selon onglet.
 - Logos marque via `/api/marques/logos/…`.
-- Boutons rebuild : selon l’onglet (sales, weather, all_data, model_data,
-  concept…). En prod, certains rebuilds bulk sont masqués ou déconseillés
-  si les Excel sont figés.
 
-### Evaluation (détail UI)
+### Simulateur ROD (UI)
 
-Paramètres : modèle design, variable cible, année.  
-Métriques sur moyenne mensuelle / hôtel, totaux Σ, tables hôtel et mois.
+Trois onglets : prédiction ventes (étapes), marge & coûts, évaluation batch.
+
+### Éval. modèle ML (UI)
+
+Modèle design, cible, année → métriques Σ/12, tables hôtel / mois.
 
 ---
 
 ## 9. API admin
 
-Base : `http://127.0.0.1:5055`
+Base : `http://127.0.0.1:5055`  
+Détail : [docs/API_ADMIN.md](docs/API_ADMIN.md).
 
 ### Santé / pages
 
@@ -383,54 +383,41 @@ Base : `http://127.0.0.1:5055`
 | GET | `/api/health` | ping |
 | GET | `/api/marques/logos/<path>` | PNG marque |
 
-### Datasets
+### Datasets & rebuilds
+
+CRUD `/api/datasets/*` + rebuilds `all_data`, `model_data`, `sales`,
+`weather`, `proximity`, `holidays`, `concept_pilote`.
+
+### Simulateur ROD
 
 | Méthode | Chemin | Description |
 |---------|--------|-------------|
-| GET | `/api/datasets` | liste des schémas |
-| GET | `/api/datasets/<id>` | page (query: page, page_size, q) |
-| PUT | `/api/datasets/<id>/rows` | maj cellules dirty |
-| POST | `/api/datasets/<id>/rows` | ajout ligne |
-| DELETE | `/api/datasets/<id>/rows` | suppression |
-| POST | `/api/datasets/<id>/reload` | relecture Excel |
+| GET | `/api/rod/pilots` | pilotes (`?year=2026`) |
+| GET | `/api/rod/hotel/<code>/trace` | étapes + coûts + marge |
+| GET | `/api/rod/eval` | batch écart sim vs réel |
 
-### Rebuilds
-
-| Méthode | Chemin |
-|---------|--------|
-| POST | `/api/datasets/all_data/rebuild` |
-| POST | `/api/datasets/model_data/rebuild` |
-| POST | `/api/datasets/sales/rebuild` |
-| POST | `/api/datasets/weather/rebuild` |
-| POST | `/api/datasets/proximity/rebuild` |
-| POST | `/api/datasets/holidays/rebuild` |
-| POST | `/api/datasets/concept_pilote/rebuild` |
-
-### Modèles
+### Modèle ML
 
 | Méthode | Chemin | Description |
 |---------|--------|-------------|
 | GET | `/api/model/config` | config build |
 | GET | `/api/model/list` | modèles design |
-| POST | `/api/model/build` | lance un batch |
-| GET | `/api/model/build/progress` | avancement |
-| POST | `/api/model/build/count` | estime le nb de jobs grille |
-| POST | `/api/model/deploy` | body: model_id |
-| GET | `/api/model/eval/meta` | cibles, modèles, année défaut |
-| GET/POST | `/api/model/eval` | lance l’évaluation |
-| GET | `/api/model/<id>` | détail config |
-| GET | `/api/model/<id>/explore` | overview |
-| GET | `/api/model/<id>/tree` | un arbre (query) |
+| POST | `/api/model/build` | batch async |
+| GET | `/api/model/build/progress` | % manuel/grid |
+| POST | `/api/model/build/count` | nb jobs grille |
+| POST | `/api/model/deploy` | body model_name |
+| GET/POST | `/api/model/eval` | éval **XGBoost** |
+| GET | `/api/model/eval/meta` | meta UI |
+| GET | `/api/model/<id>` | config |
+| GET | `/api/model/<id>/explore` | structure |
+| GET | `/api/model/<id>/tree` | arbre SVG |
 | GET | `/api/model/<id>/trees` | table arbres |
-| GET | `/api/model/<id>/tree-metrics` | perfs cumulées |
 | GET | `/api/model/<id>/importance` | importances |
 
-**Attention** : les routes `/api/model/eval*` sont enregistrées **avant**
-`/api/model/<model_id>` pour que `eval` ne soit pas pris pour un id.
-
-Exemple eval :
+Routes `/api/model/eval*` **avant** `/api/model/<model_id>`.
 
 ```bash
+curl -s 'http://127.0.0.1:5055/api/rod/hotel/H0373/trace?year=2026'
 curl -s -X POST http://127.0.0.1:5055/api/model/eval \
   -H 'Content-Type: application/json' \
   -d '{"target":"montant_ventes","year":2026}'
@@ -577,9 +564,10 @@ rafale inutile depuis le parcours directeur (un hôtel à la fois).
 |---------|------|
 | `app.js` | `AdminApp`, wiring global |
 | `state.js` | datasets, page, dirty, panel courant |
-| `nav-controller.js` | sidebar + bascule des vues |
+| `nav-controller.js` | sidebar All/Pilotes/ROD/Modèle |
 | `table-renderer.js` | rendu table + édition |
 | `dataset-controller.js` | fetch page, save, rebuild |
+| `rod-sim-panel.js` | **Simulateur ROD** (ventes / marge / éval) |
 | `model-build-panel.js` | entraînement |
 | `model-explore-panel.js` | exploration |
 | `model-eval-panel.js` | évaluation 2026 / cible |
@@ -688,15 +676,16 @@ Vérifier `model_data_meta.json` (`eval_year`, `n_eval`).
 | CRUD / cache Excel | `store.py` |
 | Jointure all_data | `join_data.py` |
 | Features ML | `model_data.py`, `impute_model.py` |
-| Train / deploy | `model_train.py` |
-| Arbres UI | `model_explore.py` |
-| Perf année incomplete | `model_eval.py` |
+| Train / deploy / progress | `model_train.py` |
+| Arbres / structure UI | `model_explore.py` |
+| Éval **ML** Σ/12 | `model_eval.py` |
+| **Simulateur ROD admin** | `rod_admin.py` |
 | Routes admin | `app.py` |
 | Routes user | `user/app.py` |
 | CA / règles | `user/rules/revenue.py` |
 | Coûts | `user/rules/costs.py` |
 | Reco concept | `user/rules/recommendation.py` |
-| Simulate | `user/services/orchestrator.py`, `simulator.py` |
+| Simulate user | `user/services/orchestrator.py`, `simulator.py` |
 | Scrape 1 hôtel | `scrape_accor/hotels.py`, `user/services/hotel_fetch.py` |
 | Catégories marque | `brand_category.py` |
 
@@ -711,13 +700,14 @@ le code fait foi — corriger la doc au passage.
 | Fichier | Contenu |
 |---------|---------|
 | [docs/README.md](docs/README.md) | index |
-| [docs/API_ADMIN.md](docs/API_ADMIN.md) | toutes les routes admin + exemples curl |
-| [docs/API_USER.md](docs/API_USER.md) | toutes les routes user + exemples curl |
+| [docs/API_ADMIN.md](docs/API_ADMIN.md) | routes admin (datasets, modèle, **ROD**) |
+| [docs/API_USER.md](docs/API_USER.md) | routes user + exemples curl |
 | [docs/MODULES.md](docs/MODULES.md) | catalogue modules Python |
 | [docs/FRONT.md](docs/FRONT.md) | JS/CSS admin, user, shared |
 | [docs/DATA.md](docs/DATA.md) | Excel/JSON, grains, rôles model_data |
 | [docs/ROD_RULES.md](docs/ROD_RULES.md) | revenus, coûts, reco, validation |
-| [docs/MODEL.md](docs/MODEL.md) | train, explore, eval /12, deploy |
+| [docs/ROD_ADMIN.md](docs/ROD_ADMIN.md) | **Simulateur ROD admin** (trace, marge, éval) |
+| [docs/MODEL.md](docs/MODEL.md) | train, explore, éval ML, deploy |
 
 Les docstrings en tête de module reprennent l’essentiel ; le détail
 des contrats HTTP est dans `docs/API_*.md`.

@@ -18,9 +18,10 @@ Lancer :
 Simulateur directeur (autre process) : python run_user.py → :5056
 
 Doc :
-  README.md          vue d'ensemble
-  docs/API_ADMIN.md  contrat HTTP de chaque route
-  docs/MODULES.md    carte des modules
+  README.md           vue d'ensemble
+  docs/API_ADMIN.md   contrat HTTP (datasets, modèle, /api/rod/*)
+  docs/ROD_ADMIN.md   Simulateur ROD admin (trace pilotes)
+  docs/MODULES.md     carte des modules
 """
 
 from __future__ import annotations
@@ -754,6 +755,58 @@ def api_model_importance(model_id: str):
         return jsonify({"error": str(exc)}), 404
     except Exception as exc:
         return jsonify({"error": str(exc)}), 400
+
+
+# ---------------------------------------------------------------------------
+# API — Simulateur ROD (admin : trace pilotes)
+# ---------------------------------------------------------------------------
+
+@app.get("/api/rod/pilots")
+def api_rod_pilots():
+    """Liste des hôtels pilotes avec ventes sur l'année (défaut 2026)."""
+    try:
+        from accor.rod_admin import list_pilot_hotels
+
+        year = int(request.args.get("year") or 2026)
+        return jsonify(list_pilot_hotels(year))
+    except Exception as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+
+@app.get("/api/rod/hotel/<hotel_code>/trace")
+def api_rod_hotel_trace(hotel_code: str):
+    """
+    Trace détaillée ventes (R1–R4) + coûts + marge pour un hôtel.
+
+    Query : year (2026), concept (optionnel, sinon les 3).
+    """
+    try:
+        from accor.rod_admin import simulate_hotel_trace
+
+        year = int(request.args.get("year") or 2026)
+        concept = request.args.get("concept") or None
+        result = simulate_hotel_trace(hotel_code, year=year, concept=concept)
+        status = 200 if result.get("ok") else 400
+        return jsonify(result), status
+    except Exception as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+
+@app.get("/api/rod/eval")
+def api_rod_eval():
+    """
+    Évaluation ROD sur tous les pilotes de l'année :
+    CA simulé mensuel vs réel (somme mois / 12).
+    """
+    try:
+        from accor.rod_admin import evaluate_pilots_year
+
+        year = int(request.args.get("year") or 2026)
+        result = evaluate_pilots_year(year)
+        status = 200 if result.get("ok") else 400
+        return jsonify(result), status
+    except Exception as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
 
 
 # ---------------------------------------------------------------------------

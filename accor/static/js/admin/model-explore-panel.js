@@ -1,9 +1,10 @@
 /**
  * Panneau Model Explore.
  *
- * Liste models/design, perfs train/eval, importances, table des arbres
- * (métriques cumulées), SVG d'un arbre, bouton Deploy.
- * API : /api/model/list, /explore, /trees, /tree, /importance, /deploy
+ * Structure du modèle (pas l’évaluation métier) :
+ *   liste design, meta (lignes train/éval), importances, arbres (cumul
+ *   boosting), SVG, deploy.
+ * Les R²/RMSE métier vs réel → onglet Evaluation (model_eval).
  */
 
 import { $, escapeHtml } from "../../shared/js/dom.js";
@@ -88,18 +89,19 @@ export class ModelExplorePanel {
   }
 
   clearUI() {
-    [
-      "explore-importance",
-      "explore-tree-view",
-      "explore-trees-table",
-      "explore-main-metrics",
-      "explore-global-metrics",
-    ].forEach((id) => {
-      const el = $("#" + id);
-      if (!el) return;
-      el.innerHTML = "—";
-      el.classList.add("empty");
-    });
+    ["explore-importance", "explore-tree-view", "explore-trees-table"].forEach(
+      (id) => {
+        const el = $("#" + id);
+        if (!el) return;
+        el.innerHTML = "—";
+        el.classList.add("empty");
+      }
+    );
+    const gm = $("#explore-global-metrics");
+    if (gm) {
+      gm.innerHTML = "";
+      gm.classList.add("empty");
+    }
   }
 
   async loadModel(modelId) {
@@ -123,7 +125,7 @@ export class ModelExplorePanel {
       if (chipS) {
         chipS.textContent = `${overview.n_features} feat · ${overview.n_trees} arbres · rank #${overview.rank || "—"}`;
       }
-      this.renderMainMetrics(overview);
+      this.renderModelMeta(overview);
       this.renderImportanceBars(overview.global_feature_importance || []);
       this.renderTreesTable(trees);
       const nTrees = Math.max(1, overview.n_trees || trees.n_trees || 1);
@@ -143,28 +145,21 @@ export class ModelExplorePanel {
     }
   }
 
-  renderMainMetrics(ov) {
-    const host = $("#explore-main-metrics");
-    const label = $("#explore-main-target-label");
-    if (label)
-      label.textContent = `${ov.main_target || "montant_ventes"} (évaluation)`;
-    if (!host) return;
-    const m = ov.main_target_metrics || {};
-    const g = ov.metrics_eval || {};
-    host.innerHTML = `
-      <div class="metric-box good"><span class="m-label">R² ${escapeHtml(ov.main_target || "")}</span><span class="m-value">${Format.fixed(m.r2)}</span></div>
-      <div class="metric-box"><span class="m-label">RMSE</span><span class="m-value">${Format.fixed(m.rmse)}</span></div>
-      <div class="metric-box"><span class="m-label">MAE</span><span class="m-value">${Format.fixed(m.mae)}</span></div>
-      <div class="metric-box"><span class="m-label">R² moy. multi-cibles</span><span class="m-value">${Format.fixed(g.mean_r2)}</span></div>
-    `;
+  /**
+   * Meta structurelle du modèle (pas les scores métier — voir Evaluation).
+   */
+  renderModelMeta(ov) {
     const gm = $("#explore-global-metrics");
-    if (gm) {
-      gm.innerHTML = `
-        <div class="metric-box"><span class="m-label">Train lignes</span><span class="m-value">${ov.n_train ?? "—"}</span></div>
-        <div class="metric-box"><span class="m-label">Éval lignes</span><span class="m-value">${ov.n_eval ?? "—"}</span></div>
-        <div class="metric-box"><span class="m-label">Année éval</span><span class="m-value">${ov.eval_year ?? "—"}</span></div>
-      `;
-    }
+    if (!gm) return;
+    gm.classList.remove("empty");
+    gm.innerHTML = `
+      <div class="metric-box"><span class="m-label">Features</span><span class="m-value">${ov.n_features ?? "—"}</span></div>
+      <div class="metric-box"><span class="m-label">Arbres</span><span class="m-value">${ov.n_trees ?? "—"}</span></div>
+      <div class="metric-box"><span class="m-label">Cibles</span><span class="m-value">${ov.n_targets ?? "—"}</span></div>
+      <div class="metric-box"><span class="m-label">Train / hold-out</span><span class="m-value">${ov.n_train ?? "—"} / ${ov.n_eval ?? "—"}</span></div>
+      <div class="metric-box"><span class="m-label">Année hold-out</span><span class="m-value">${ov.eval_year ?? "—"}</span></div>
+      <div class="metric-box"><span class="m-label">Cible ranking</span><span class="m-value">${escapeHtml(ov.main_target || "—")}</span></div>
+    `;
   }
 
   renderImportanceBars(items) {

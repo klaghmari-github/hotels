@@ -199,18 +199,21 @@ export class ModelBuildPanel {
     const bar = $("#model-build-progress-bar");
     const wrap = $("#model-build-progress");
     const card = $("#model-build-progress-card");
+    const stagesEl = $("#model-build-stages");
 
     const done = Number(prog.done || 0);
     const total = Number(prog.total || 0);
     const totalSafe = Math.max(1, total);
-    // pct backend (fraction dans le job) prioritaire, sinon done/total
+    const status = prog.status || "idle";
+
+    // pct backend (fraction dans le job) prioritaire
     let pct =
       prog.pct != null && Number.isFinite(Number(prog.pct))
         ? Number(prog.pct)
-        : prog.status === "idle" && done === 0
+        : status === "idle" && done === 0
           ? 0
           : Math.min(100, (done / totalSafe) * 100);
-    if (prog.status === "done") pct = 100;
+    if (status === "done") pct = 100;
     pct = Math.min(100, Math.max(0, pct));
     const pctRound = Math.round(pct * 10) / 10;
 
@@ -224,44 +227,104 @@ export class ModelBuildPanel {
 
     const phaseMap = {
       prepare: "Préparation",
+      manual: "Config manuelle",
+      grid: "Grid search",
       train: "Entraînement",
       save: "Sauvegarde",
       done: "Terminé",
       error: "Erreur",
       idle: "En attente",
     };
-    const phase = prog.phase || prog.status || "idle";
-    if (phaseEl) phaseEl.textContent = phaseMap[phase] || phase;
+    const phase = prog.phase || status || "idle";
+    const stageLabel = prog.stage_label || phaseMap[phase] || phase;
+    if (phaseEl) {
+      phaseEl.textContent = stageLabel;
+      phaseEl.dataset.phase = phase;
+    }
 
     if (text) {
-      if (prog.status === "running") {
+      if (status === "running") {
         text.textContent =
           prog.message || prog.current_name || "Entraînement…";
-      } else if (prog.status === "done") {
+      } else if (status === "done") {
         text.textContent = prog.message || "Terminé";
-      } else if (prog.status === "error") {
+      } else if (status === "error") {
         text.textContent = prog.error || prog.message || "Erreur";
       } else {
-        text.textContent = "En attente";
+        text.textContent = "En attente d’un build";
       }
     }
+
+    // Bandeau étapes : Manuel / Grid
+    if (stagesEl) {
+      const nMan = Number(prog.n_manual || 0);
+      const nGrid = Number(prog.n_grid || 0);
+      const manDone = Number(prog.manual_done || 0);
+      const gridDone = Number(prog.grid_done || 0);
+      if (status === "idle" && !total) {
+        stagesEl.innerHTML = "";
+        stagesEl.classList.add("hidden");
+      } else {
+        stagesEl.classList.remove("hidden");
+        const manActive = phase === "manual" || (status === "running" && prog.current_kind === "manual");
+        const gridActive = phase === "grid" || (status === "running" && prog.current_kind === "grid");
+        const manCls =
+          status === "done" || manDone >= nMan
+            ? "is-done"
+            : manActive
+              ? "is-active"
+              : manDone > 0
+                ? "is-done"
+                : "";
+        const gridCls =
+          nGrid <= 0
+            ? "is-skip"
+            : status === "done" || gridDone >= nGrid
+              ? "is-done"
+              : gridActive
+                ? "is-active"
+                : "";
+        stagesEl.innerHTML = `
+          <div class="build-stage ${manCls}">
+            <span class="build-stage-n">1</span>
+            <div>
+              <strong>Config manuelle</strong>
+              <span>${manDone}/${Math.max(nMan, 1)} modèle(s)</span>
+            </div>
+          </div>
+          <div class="build-stage ${gridCls}">
+            <span class="build-stage-n">2</span>
+            <div>
+              <strong>Grid search</strong>
+              <span>${
+                nGrid > 0
+                  ? `${gridDone}/${nGrid} combinaison(s)`
+                  : "désactivé"
+              }</span>
+            </div>
+          </div>`;
+      }
+    }
+
     if (detailEl) {
       const bits = [];
+      if (prog.current_kind === "manual") bits.push("étape · config manuelle");
+      if (prog.current_kind === "grid") bits.push("étape · grid search");
       if (prog.current_name) bits.push(`modèle · ${prog.current_name}`);
       if (prog.current_target) bits.push(`cible · ${prog.current_target}`);
-      if (prog.job_fraction != null && prog.status === "running") {
+      if (prog.job_fraction != null && status === "running") {
         const jf = Math.round(Number(prog.job_fraction) * 100);
-        if (Number.isFinite(jf)) bits.push(`job ${jf} %`);
+        if (Number.isFinite(jf)) bits.push(`dans ce modèle ${jf} %`);
       }
       detailEl.textContent = bits.join("  ·  ");
     }
 
     if (wrap) {
-      wrap.classList.toggle("is-running", prog.status === "running");
-      wrap.classList.toggle("is-done", prog.status === "done");
-      wrap.classList.toggle("is-error", prog.status === "error");
+      wrap.classList.toggle("is-running", status === "running");
+      wrap.classList.toggle("is-done", status === "done");
+      wrap.classList.toggle("is-error", status === "error");
     }
-    if (card) card.classList.toggle("is-active", prog.status === "running");
+    if (card) card.classList.toggle("is-active", status === "running");
   }
 
   renderResults(prog) {

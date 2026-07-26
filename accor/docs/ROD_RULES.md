@@ -95,6 +95,15 @@ accor-validate-rod
 Couvre clients jour/mois, R1 API vs engine, R2–R4 neutres au pivot,
 reco &lt;50 / LIBERTY N-F&B, coûts ∝ m_lin, cohérence simulate.
 
+## Trace admin (pilotes)
+
+L’admin expose le même enchaînement **avec chaque étape chiffrée** sur
+les hôtels qui ont des ventes en 2026 (ou autre année) :
+
+- UI : **Simulateur ROD** (ventes → marge → éval sim vs réel)  
+- Module : `rod_admin.py`  
+- Doc dédiée : [ROD_ADMIN.md](ROD_ADMIN.md)
+
 ---
 
 ## Coefficients (`coeffs.py`)

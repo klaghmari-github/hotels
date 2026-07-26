@@ -1,11 +1,9 @@
 /**
  * Navigation sidebar admin.
  *
- * - Datasets (pinés en haut + liste du milieu)
- * - Model Build / Explore / Evaluation
- *
- * Bascule les vues (#view-table, #view-model-*), active le nav-item,
- * délègue les clics aux handlers fournis par AdminApp.
+ * - Datasets (All / Pilotes)
+ * - Simulateur ROD
+ * - Modèle (Build / Explore / Éval ML)
  */
 
 import { $, $$, escapeHtml } from "../../shared/js/dom.js";
@@ -15,10 +13,6 @@ export class NavController {
   /**
    * @param {import('./state.js').AdminState} state
    * @param {object} handlers
-   * @param {(id: string) => void} handlers.onSelectDataset
-   * @param {() => void} handlers.onModelBuild
-   * @param {() => void} handlers.onModelExplore
-   * @param {() => void} handlers.onModelEval
    */
   constructor(state, handlers) {
     this.state = state;
@@ -26,9 +20,11 @@ export class NavController {
     this.nav = $("#nav-tabs");
     this.navPinnedTop = $("#nav-pinned-top");
     this.viewTable = $("#view-table");
+    this.viewRodSim = $("#view-rod-sim");
     this.viewModelBuild = $("#view-model-build");
     this.viewModelExplore = $("#view-model-explore");
     this.viewModelEval = $("#view-model-eval");
+    this.navRodSim = $("#nav-rod-sim");
     this.navModelBuild = $("#nav-model-build");
     this.navModelExplore = $("#nav-model-explore");
     this.navModelEval = $("#nav-model-eval");
@@ -71,6 +67,8 @@ export class NavController {
   }
 
   setModelNavActive(which) {
+    if (this.navRodSim)
+      this.navRodSim.classList.toggle("active", which === "rod");
     if (this.navModelBuild)
       this.navModelBuild.classList.toggle("active", which === "build");
     if (this.navModelExplore)
@@ -81,6 +79,7 @@ export class NavController {
 
   hideAllViews() {
     if (this.viewTable) this.viewTable.classList.add("hidden");
+    if (this.viewRodSim) this.viewRodSim.classList.add("hidden");
     if (this.viewModelBuild) this.viewModelBuild.classList.add("hidden");
     if (this.viewModelExplore) this.viewModelExplore.classList.add("hidden");
     if (this.viewModelEval) this.viewModelEval.classList.add("hidden");
@@ -96,6 +95,15 @@ export class NavController {
     this.state.panel = "table";
     this.hideAllViews();
     if (this.viewTable) this.viewTable.classList.remove("hidden");
+    this.setModelNavActive(null);
+  }
+
+  showRodSimPanel() {
+    this.state.panel = "rod-sim";
+    this.hideAllViews();
+    if (this.viewRodSim) this.viewRodSim.classList.remove("hidden");
+    this.clearDatasetNavActive();
+    this.setModelNavActive("rod");
   }
 
   showModelBuildPanel() {
@@ -123,6 +131,8 @@ export class NavController {
   }
 
   wire() {
+    if (this.navRodSim)
+      this.navRodSim.addEventListener("click", this.handlers.onRodSim);
     if (this.navModelBuild)
       this.navModelBuild.addEventListener("click", this.handlers.onModelBuild);
     if (this.navModelExplore)
