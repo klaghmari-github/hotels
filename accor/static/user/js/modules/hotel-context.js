@@ -110,12 +110,14 @@ export class HotelContextLoader {
 
   applyContext(ctx) {
     if (!ctx) return;
+    this._lastContext = ctx;
     const id = ctx.identity || {};
     const op = ctx.operating || {};
     const corner = ctx.corner || {};
     const services = ctx.services || {};
     const profile = ctx.client_profile || {};
     const needs = profile.client_needs || {};
+    this._pendingNeeds = needs;
 
     setField("hotel_code", id.hotel_code);
     setField("hotel_name", id.hotel_name);
@@ -127,38 +129,50 @@ export class HotelContextLoader {
     setField("hotel_lon", id.hotel_lon);
     if (id.hotel_brand) this.brands.setValue(id.hotel_brand);
 
-    if (op.nb_chambres) setField("nb_chambres", op.nb_chambres);
-    if (op.taux_occupation != null) {
-      let to = Number(op.taux_occupation);
-      if (to <= 1) to *= 100;
-      setField("taux_occupation", Math.round(to * 10) / 10);
+    // Priorité aux valeurs hôtel (base admin), pas aux moyennes marque
+    if (op.nb_chambres != null && Number(op.nb_chambres) > 0) {
+      setField("nb_chambres", Math.round(Number(op.nb_chambres)));
     }
-    if (op.guests_per_chambre) {
-      setField("guests_per_chambre", Number(op.guests_per_chambre).toFixed(1));
+    if (op.taux_occupation != null && op.taux_occupation !== "") {
+      let to = Number(op.taux_occupation);
+      if (Number.isFinite(to)) {
+        if (to <= 1) to *= 100;
+        setField("taux_occupation", Math.round(to * 10) / 10);
+      }
+    }
+    if (op.guests_per_chambre != null && Number(op.guests_per_chambre) > 0) {
+      setField(
+        "guests_per_chambre",
+        Number(op.guests_per_chambre).toFixed(2)
+      );
     }
 
     this.state.lastHotelSource =
       (id.hotel_code || "") + (id.hotel_name ? " — " + id.hotel_name : "");
     this.services.renderAll(services);
-    Object.keys(services).forEach((sid) => {
-      const el = $("#" + sid);
-      if (el) el.checked = !!services[sid];
-    });
 
     const hasCorner = $("#has_corner");
     if (hasCorner) hasCorner.checked = !!corner.has_corner;
     if (corner.m_lin != null && corner.m_lin !== "") {
       setField("m_lin", corner.m_lin);
+    } else {
+      // laisser vide → défaut pilote concept côté moteur
+      setField("m_lin", "");
     }
     if (corner.mix_fb != null) {
       let m = Number(corner.mix_fb);
-      if (m <= 1) m *= 100;
-      setField("mix_fb", Math.round(m));
+      if (Number.isFinite(m)) {
+        if (m <= 1) m *= 100;
+        setField("mix_fb", Math.round(m));
+      }
+    } else {
+      setField("mix_fb", "");
     }
 
     const pctField = (fieldId, v) => {
       if (v == null) return;
       let p = Number(v);
+      if (!Number.isFinite(p)) return;
       if (p <= 1) p *= 100;
       setField(fieldId, Math.round(p));
     };
@@ -167,17 +181,38 @@ export class HotelContextLoader {
     pctField("national_pct", profile.national_pct);
     pctField("international_pct", profile.international_pct);
 
+    this.applyClientNeeds(needs);
+
+    this.onDerived();
+    // Boîte « moyennes marque » en info seule — ne pas écraser chambres/TO hôtel
+    if (id.hotel_brand) {
+      this.loadBrandPilotAverages(id.hotel_brand, { fillForm: false });
+    }
+    toast.show("Profil " + (id.hotel_code || "") + " chargé");
+  }
+
+  /** Coche les besoins Règle 3 (ids fb_* / nfb_*). */
+  applyClientNeeds(needs) {
+    if (!needs || typeof needs !== "object") return;
     Object.keys(needs).forEach((nid) => {
       const el = $("#" + nid);
       if (el) el.checked = !!needs[nid];
     });
-
-    this.onDerived();
-    if (id.hotel_brand) this.loadBrandPilotAverages(id.hotel_brand);
-    toast.show("Profil " + (id.hotel_code || "") + " chargé");
   }
 
-  applyBrandPilotAverages(data) {
+  /** Réapplique les needs d’un contexte déjà chargé (après render meta). */
+  reapplyPendingNeeds() {
+    if (this._pendingNeeds) this.applyClientNeeds(this._pendingNeeds);
+  }
+
+  /**
+   * Affiche les moyennes marque (concept_pilote).
+   * @param {object} data
+   * @param {{ fillForm?: boolean }} [opts]
+   *   fillForm=true  : écrit aussi chambres / TO / guests (choix marque seule)
+   *   fillForm=false : boîte info seulement — ne pas écraser un hôtel déjà chargé
+   */
+  applyBrandPilotAverages(data, { fillForm = true } = {}) {
     const box = $("#brand-pilot-box");
     if (!box) return;
     if (!data || !data.ok || !data.averages) {
@@ -206,9 +241,10 @@ export class HotelContextLoader {
     }
     const hint = $("#brand-pilot-hint");
     if (hint) {
-      hint.textContent =
-        data.note ||
-        "Valeurs préremplies dans les champs d’exploitation — vous pouvez les ajuster.";
+      hint.textContent = fillForm
+        ? data.note ||
+          "Valeurs préremplies dans les champs d’exploitation — vous pouvez les ajuster."
+        : "Référence marque (info) — les champs d’exploitation viennent de l’hôtel sélectionné.";
     }
 
     setText(
@@ -242,20 +278,26 @@ export class HotelContextLoader {
       a.ca_mensuel_moyen != null ? Format.euro(a.ca_mensuel_moyen) : "—"
     );
 
-    if (a.nb_chambres != null) setField("nb_chambres", Math.round(a.nb_chambres));
-    if (a.taux_occupation != null) {
-      let toPct = Number(a.taux_occupation);
-      if (toPct <= 1) toPct *= 100;
-      setField("taux_occupation", Math.round(toPct * 10) / 10);
+    if (fillForm) {
+      if (a.nb_chambres != null) setField("nb_chambres", Math.round(a.nb_chambres));
+      if (a.taux_occupation != null) {
+        let toPct = Number(a.taux_occupation);
+        if (toPct <= 1) toPct *= 100;
+        setField("taux_occupation", Math.round(toPct * 10) / 10);
+      }
+      if (a.guests_per_chambre != null) {
+        setField("guests_per_chambre", Number(a.guests_per_chambre).toFixed(2));
+      }
+      this.onDerived();
+      if (data.rule1 && data.rule1.ok) this.onRule1(data.rule1);
     }
-    if (a.guests_per_chambre != null) {
-      setField("guests_per_chambre", Number(a.guests_per_chambre).toFixed(2));
-    }
-    this.onDerived();
-    if (data.rule1 && data.rule1.ok) this.onRule1(data.rule1);
   }
 
-  async loadBrandPilotAverages(brand) {
+  /**
+   * @param {string} brand
+   * @param {{ fillForm?: boolean }} [opts]
+   */
+  async loadBrandPilotAverages(brand, { fillForm = true } = {}) {
     brand = String(brand || "").trim();
     const box = $("#brand-pilot-box");
     if (!brand) {
@@ -270,7 +312,7 @@ export class HotelContextLoader {
         if (box) box.classList.add("hidden");
         return null;
       }
-      this.applyBrandPilotAverages(data);
+      this.applyBrandPilotAverages(data, { fillForm });
       return data;
     } catch (e) {
       console.error("[ROD] brand pilot", e);

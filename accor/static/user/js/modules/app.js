@@ -7,7 +7,7 @@
  * Debug : window.RODUser
  */
 
-import { $, $$, escapeHtml } from "../../../shared/js/dom.js";
+import { $, $$, escapeHtml, fieldStr } from "../../../shared/js/dom.js";
 import { api } from "../../../shared/js/api.js";
 import { toast } from "../../../shared/js/toast.js";
 import { ServiceToggles } from "./services-catalog.js";
@@ -202,7 +202,12 @@ export class UserApp {
     const brandSel = $("#hotel_brand");
     if (brandSel) {
       brandSel.addEventListener("change", () => {
-        this.hotel.loadBrandPilotAverages(brandSel.value);
+        // Si un code hôtel est déjà saisi, ne pas écraser chambres/TO
+        // par les moyennes marque (info seule).
+        const hasHotel = !!(fieldStr("hotel_code") || "").trim();
+        this.hotel.loadBrandPilotAverages(brandSel.value, {
+          fillForm: !hasHotel,
+        });
       });
     }
 
@@ -235,14 +240,18 @@ export class UserApp {
     console.info("[ROD] init user UI (modules)");
 
     this.services.renderAll({});
-    this.wireEvents();
     this.rule1.updateDerived();
     this.stepper.setStep(1);
 
+    // Meta (besoins R3) + marques avant les handlers : le préremplissage
+    // hôtel doit trouver les checkboxes déjà rendues.
     await this.loadBrands();
     await this.loadHotels();
     this.brands.fill(this.state.brands);
     await this.loadMeta();
+    this.hotel.reapplyPendingNeeds();
+
+    this.wireEvents();
   }
 }
 

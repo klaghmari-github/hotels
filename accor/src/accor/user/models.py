@@ -126,11 +126,33 @@ class HotelOperating:
             adults = float(data.get("adults_per_room") or 0)
             children = float(data.get("children_per_room") or 0)
             guests = (adults + children) if (adults or children) else 1.7
+
+        # nb_chambres : 0 est invalide métier → défaut 80
+        raw_n = data.get("nb_chambres")
+        if raw_n is None:
+            raw_n = data.get("hotel_nb_chambres")
+        try:
+            n = int(raw_n) if raw_n not in (None, "") else 80
+        except (TypeError, ValueError):
+            n = 80
+        if n <= 0:
+            n = 80
+
+        # TO : ne pas confondre 0 avec « manquant » via `or`
+        raw_to = data.get("taux_occupation")
+        if raw_to is None or raw_to == "":
+            raw_to = data.get("hotel_to_annuel")
+        if raw_to is None or raw_to == "":
+            to = 0.65
+        else:
+            try:
+                to = float(raw_to)
+            except (TypeError, ValueError):
+                to = 0.65
+
         return cls(
-            nb_chambres=int(data.get("nb_chambres") or data.get("hotel_nb_chambres") or 80),
-            taux_occupation=float(
-                data.get("taux_occupation") or data.get("hotel_to_annuel") or 0.65
-            ),
+            nb_chambres=n,
+            taux_occupation=to,
             guests_per_chambre=float(guests),
         )
 

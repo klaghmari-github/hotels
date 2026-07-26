@@ -376,8 +376,18 @@ class HotelContextBuilder:
         guests_default = BRAND_GUESTS_DEFAULT.get(brand_key, 1.7)
         guests = guests_default
         sources["guests_per_chambre"] = f"brand_default:{brand_key or 'AUTRE'}"
-        # Si concept_pilote a une moyenne marque, priorite deja via brand averages UI ;
-        # pas de colonne guests dans hotel_data standard.
+        # hotel_data n'a pas de guests : tenter moyenne marque concept_pilote
+        if brand:
+            try:
+                from accor.concept_pilote import brand_step1_averages
+
+                bp = brand_step1_averages(brand)
+                g_bp = (bp.get("averages") or {}).get("guests_per_chambre")
+                if bp.get("ok") and g_bp is not None and float(g_bp) > 0:
+                    guests = float(g_bp)
+                    sources["guests_per_chambre"] = "concept_pilote_brand"
+            except Exception:
+                pass
 
         clients_jour = nb_chambres * taux_occupation * guests
         clients_mois = clients_jour * 30.5

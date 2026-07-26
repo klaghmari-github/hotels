@@ -60,10 +60,16 @@ export function fieldChecked(id) {
   return !!(el && el.checked);
 }
 
-/** Affecte value si element present. */
+/**
+ * Affecte value si l'élément est présent.
+ * null / undefined → ne touche pas au champ.
+ * "" → vide le champ (ex. m_lin / mix pour défaut pilote).
+ */
 export function setField(id, value) {
   const el = $(id.startsWith("#") ? id : `#${id}`);
-  if (el && value != null && value !== "") el.value = value;
+  if (!el) return el;
+  if (value === undefined || value === null) return el;
+  el.value = value;
   return el;
 }
 
