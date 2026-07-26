@@ -1,0 +1,1452 @@
+{
+  "name": "xgb_sales_1_gs_005",
+  "id": "xgb_sales_1_gs_005",
+  "created_at": "2026-07-26T02:31:56.521039+00:00",
+  "source": "model_data",
+  "eval_year": 2026,
+  "n_rows_used": 126,
+  "n_train": 106,
+  "n_eval": 20,
+  "feature_cols": [
+    "nombre_categories_mois_f_b",
+    "nombre_categories_mois_n_f_b",
+    "pct_categories_mois_f_b",
+    "pct_categories_mois_n_f_b",
+    "pct_cat_f_b_nombre_ventes",
+    "pct_cat_n_f_b_nombre_ventes",
+    "pct_sous_cat_accessoires_nombre_ventes",
+    "pct_sous_cat_alcool_nombre_ventes",
+    "pct_sous_cat_cosmetique_nombre_ventes",
+    "pct_sous_cat_food_salee_nombre_ventes",
+    "pct_sous_cat_food_sucree_nombre_ventes",
+    "pct_sous_cat_jeux_enfants_nombre_ventes",
+    "pct_sous_cat_pap_nombre_ventes",
+    "pct_sous_cat_sans_alcool_nombre_ventes",
+    "pct_sous_cat_sos_nombre_ventes",
+    "pct_sous_cat_souvenirs_nombre_ventes",
+    "zone_scolaire_a",
+    "zone_scolaire_b",
+    "zone_scolaire_c",
+    "nb_jours_dans_mois",
+    "nb_jours_feries",
+    "nb_jours_weekend",
+    "nb_jours_vacances_scolaires",
+    "nb_jours_vacances_hors_feries",
+    "nb_jours_holidays",
+    "pct_jours_holidays",
+    "weather_ok",
+    "weather_error",
+    "shard_id",
+    "meteo_temperature_c_mean",
+    "meteo_temperature_c_min",
+    "meteo_temperature_c_max",
+    "meteo_humidite_pct_mean",
+    "meteo_humidite_pct_min",
+    "meteo_humidite_pct_max",
+    "meteo_precipitations_mm_mean",
+    "meteo_precipitations_mm_min",
+    "meteo_precipitations_mm_max",
+    "meteo_vent_kmh_mean",
+    "meteo_vent_kmh_min",
+    "meteo_vent_kmh_max",
+    "meteo_pression_hpa_mean",
+    "meteo_pression_hpa_min",
+    "meteo_pression_hpa_max",
+    "meteo_ensoleillement_min_mean",
+    "meteo_ensoleillement_min_min",
+    "meteo_ensoleillement_min_max",
+    "commerce_convenience_100m",
+    "commerce_bakery_100m",
+    "commerce_cosmetics_100m",
+    "commerce_gift_100m",
+    "commerce_fb_100m",
+    "commerce_non_fb_100m",
+    "commerce_convenience_200m",
+    "commerce_bakery_200m",
+    "commerce_supermarket_200m",
+    "commerce_grocery_200m",
+    "commerce_cosmetics_200m",
+    "commerce_gift_200m",
+    "commerce_kiosk_200m",
+    "commerce_fb_200m",
+    "commerce_non_fb_200m",
+    "commerce_convenience_300m",
+    "commerce_bakery_300m",
+    "commerce_supermarket_300m",
+    "commerce_alcohol_300m",
+    "commerce_grocery_300m",
+    "commerce_cosmetics_300m",
+    "commerce_gift_300m",
+    "commerce_tobacco_300m",
+    "commerce_kiosk_300m",
+    "commerce_fb_300m",
+    "commerce_non_fb_300m",
+    "commerce_convenience_400m",
+    "commerce_bakery_400m",
+    "commerce_supermarket_400m",
+    "commerce_alcohol_400m",
+    "commerce_grocery_400m",
+    "commerce_cosmetics_400m",
+    "commerce_gift_400m",
+    "commerce_tobacco_400m",
+    "commerce_kiosk_400m",
+    "commerce_fb_400m",
+    "commerce_non_fb_400m",
+    "commerce_convenience_500m",
+    "commerce_bakery_500m",
+    "commerce_supermarket_500m",
+    "commerce_alcohol_500m",
+    "commerce_confectionery_500m",
+    "commerce_grocery_500m",
+    "commerce_cosmetics_500m",
+    "commerce_gift_500m",
+    "commerce_tobacco_500m",
+    "commerce_kiosk_500m",
+    "commerce_fb_500m",
+    "commerce_non_fb_500m",
+    "plage_1km",
+    "plage_2km",
+    "plage_3km",
+    "plage_4km",
+    "plage_5km",
+    "plage_distance_km",
+    "hotel_country",
+    "proximity_ok",
+    "hotel_contrat_signe_annee",
+    "hotel_derniere_reno",
+    "hotel_lobby_derniere_reno",
+    "hotel_nb_chambres",
+    "hotel_to_annuel",
+    "hotel_to_le_plus_bas_taux",
+    "hotel_to_le_plus_haut_taux",
+    "hotel_dispo_dans_lobby_fontaine_a_eau",
+    "hotel_dispo_dans_lobby_machine_a_cafe",
+    "hotel_dispo_dans_lobby_micro_ondes",
+    "hotel_dispo_dans_lobby_vitrine_refrigeree",
+    "hotel_f_b_bar",
+    "hotel_f_b_minibar",
+    "hotel_f_b_restaurant",
+    "hotel_f_b_room_service",
+    "hotel_non_f_b_piscine",
+    "hotel_non_f_b_salle_de_sport",
+    "hotel_non_f_b_salles_de_reunion",
+    "hotel_has_parking",
+    "hotel_has_animaux",
+    "hotel_has_reunion",
+    "hotel_affaires_pct",
+    "hotel_loisirs_pct",
+    "hotel_loisirs_top_1_amis",
+    "hotel_loisirs_top_1_couples",
+    "hotel_loisirs_top_1_familles",
+    "hotel_international_pct",
+    "hotel_national_pct",
+    "hotel_corner_actuel_existe_deja",
+    "hotel_corner_de_vente_actuel_metres_lineaires",
+    "hotel_corner_actuel_offre_f_b_distributeur_auto",
+    "hotel_corner_actuel_offre_f_b_reception",
+    "hotel_corner_actuel_offre_f_b_snacking_comptoir",
+    "hotel_corner_actuel_offre_non_f_b_distributeur_auto",
+    "hotel_corner_actuel_offre_non_f_b_reception",
+    "hotel_metres_lineaires_dedies_corner",
+    "hotel_contrat_type_franchise",
+    "hotel_contrat_type_manage",
+    "cat_economy",
+    "cat_midscale",
+    "Nb_Hotels",
+    "Nb_Ch_0_49",
+    "Nb_Ch_50_99",
+    "Nb_Ch_100_149",
+    "Nb_Ch_150_199",
+    "Nb_Ch_200_249",
+    "Nb_Ch_250_299",
+    "Nb_Ch_300_Plus",
+    "Nb_Resto_0",
+    "Nb_Resto_1",
+    "Nb_Resto_2",
+    "Nb_Resto_3",
+    "Nb_Bar_0",
+    "Nb_Bar_1",
+    "Nb_Bar_2",
+    "Nb_Bar_3"
+  ],
+  "n_features": 160,
+  "target_cols": [
+    "nombre_ventes",
+    "montant_ventes",
+    "nombre_paniers",
+    "nombre_produits",
+    "pct_cat_f_b_montant_ventes",
+    "pct_cat_n_f_b_montant_ventes",
+    "pct_cat_f_b_nombre_paniers",
+    "pct_cat_n_f_b_nombre_paniers",
+    "pct_cat_f_b_nombre_produits",
+    "pct_cat_n_f_b_nombre_produits",
+    "pct_sous_cat_accessoires_montant_ventes",
+    "pct_sous_cat_alcool_montant_ventes",
+    "pct_sous_cat_cosmetique_montant_ventes",
+    "pct_sous_cat_food_salee_montant_ventes",
+    "pct_sous_cat_food_sucree_montant_ventes",
+    "pct_sous_cat_jeux_enfants_montant_ventes",
+    "pct_sous_cat_pap_montant_ventes",
+    "pct_sous_cat_sans_alcool_montant_ventes",
+    "pct_sous_cat_sos_montant_ventes",
+    "pct_sous_cat_souvenirs_montant_ventes",
+    "pct_sous_cat_accessoires_nombre_paniers",
+    "pct_sous_cat_alcool_nombre_paniers",
+    "pct_sous_cat_cosmetique_nombre_paniers",
+    "pct_sous_cat_food_salee_nombre_paniers",
+    "pct_sous_cat_food_sucree_nombre_paniers",
+    "pct_sous_cat_jeux_enfants_nombre_paniers",
+    "pct_sous_cat_pap_nombre_paniers",
+    "pct_sous_cat_sans_alcool_nombre_paniers",
+    "pct_sous_cat_sos_nombre_paniers",
+    "pct_sous_cat_souvenirs_nombre_paniers",
+    "pct_sous_cat_accessoires_nombre_produits",
+    "pct_sous_cat_alcool_nombre_produits",
+    "pct_sous_cat_cosmetique_nombre_produits",
+    "pct_sous_cat_food_salee_nombre_produits",
+    "pct_sous_cat_food_sucree_nombre_produits",
+    "pct_sous_cat_jeux_enfants_nombre_produits",
+    "pct_sous_cat_pap_nombre_produits",
+    "pct_sous_cat_sans_alcool_nombre_produits",
+    "pct_sous_cat_sos_nombre_produits",
+    "pct_sous_cat_souvenirs_nombre_produits",
+    "nombre_ventes_holidays",
+    "montant_ventes_holidays",
+    "nombre_ventes_hors_holidays",
+    "montant_ventes_hors_holidays",
+    "pct_nombre_ventes_holidays",
+    "pct_montant_ventes_holidays",
+    "pct_nombre_ventes_hors_holidays",
+    "pct_montant_ventes_hors_holidays"
+  ],
+  "n_targets": 48,
+  "main_target": "montant_ventes",
+  "xgb_params": {
+    "n_estimators": 100,
+    "max_depth": 4,
+    "learning_rate": 0.1,
+    "subsample": 0.65,
+    "colsample_bytree": 0.6,
+    "min_child_weight": 5,
+    "reg_alpha": 0.0,
+    "reg_lambda": 0.7,
+    "gamma": 0.0,
+    "random_state": 100,
+    "n_jobs": -1,
+    "objective": "reg:squarederror",
+    "tree_method": "hist"
+  },
+  "metrics_train": {
+    "per_target": {
+      "nombre_ventes": {
+        "rmse": 73.98940990180712,
+        "mae": 38.851187350615014,
+        "r2": 0.9946614484846604,
+        "n": 106
+      },
+      "montant_ventes": {
+        "rmse": 435.1436826135214,
+        "mae": 221.11151238999278,
+        "r2": 0.9919806066108456,
+        "n": 106
+      },
+      "nombre_paniers": {
+        "rmse": 42.41943236405514,
+        "mae": 23.287716654111755,
+        "r2": 0.9942045421823364,
+        "n": 106
+      },
+      "nombre_produits": {
+        "rmse": 0.9268907986322771,
+        "mae": 0.6644016619560853,
+        "r2": 0.9976566371187894,
+        "n": 106
+      },
+      "pct_cat_f_b_montant_ventes": {
+        "rmse": 0.00519039983883383,
+        "mae": 0.004006471317681272,
+        "r2": 0.9997534661058214,
+        "n": 106
+      },
+      "pct_cat_n_f_b_montant_ventes": {
+        "rmse": 0.0051904101998280425,
+        "mae": 0.004006482647582825,
+        "r2": 0.9997534651215663,
+        "n": 106
+      },
+      "pct_cat_f_b_nombre_paniers": {
+        "rmse": 0.002112763024466378,
+        "mae": 0.0014086703735165784,
+        "r2": 0.9999440595739839,
+        "n": 106
+      },
+      "pct_cat_n_f_b_nombre_paniers": {
+        "rmse": 0.0020407547496900063,
+        "mae": 0.001506270736287095,
+        "r2": 0.9999492946428155,
+        "n": 106
+      },
+      "pct_cat_f_b_nombre_produits": {
+        "rmse": 0.008994388793416443,
+        "mae": 0.0056956380732175824,
+        "r2": 0.9991066062172206,
+        "n": 106
+      },
+      "pct_cat_n_f_b_nombre_produits": {
+        "rmse": 0.010678270311861422,
+        "mae": 0.006475067806283325,
+        "r2": 0.9991422619952235,
+        "n": 106
+      },
+      "pct_sous_cat_accessoires_montant_ventes": {
+        "rmse": 0.014865781899111138,
+        "mae": 0.008303025601411183,
+        "r2": 0.9969996326661746,
+        "n": 106
+      },
+      "pct_sous_cat_alcool_montant_ventes": {
+        "rmse": 0.005191391696431205,
+        "mae": 0.0023242540222265474,
+        "r2": 0.9982135601035604,
+        "n": 106
+      },
+      "pct_sous_cat_cosmetique_montant_ventes": {
+        "rmse": 0.010531258139905226,
+        "mae": 0.005957245473650076,
+        "r2": 0.9984453103887854,
+        "n": 106
+      },
+      "pct_sous_cat_food_salee_montant_ventes": {
+        "rmse": 0.01161126339630748,
+        "mae": 0.0060761350450868916,
+        "r2": 0.98989509440778,
+        "n": 106
+      },
+      "pct_sous_cat_food_sucree_montant_ventes": {
+        "rmse": 0.004892055938247938,
+        "mae": 0.003488103077190461,
+        "r2": 0.9993272484875588,
+        "n": 106
+      },
+      "pct_sous_cat_jeux_enfants_montant_ventes": {
+        "rmse": 0.00686763159376662,
+        "mae": 0.0029727389389843117,
+        "r2": 0.9932962883813399,
+        "n": 106
+      },
+      "pct_sous_cat_pap_montant_ventes": {
+        "rmse": 0.03580002351015023,
+        "mae": 0.010349611140263951,
+        "r2": 0.9386256434726344,
+        "n": 106
+      },
+      "pct_sous_cat_sans_alcool_montant_ventes": {
+        "rmse": 0.015921147360165904,
+        "mae": 0.008384117926847876,
+        "r2": 0.9965224499663529,
+        "n": 106
+      },
+      "pct_sous_cat_sos_montant_ventes": {
+        "rmse": 0.013261691210440038,
+        "mae": 0.006501337321645905,
+        "r2": 0.998684060152469,
+        "n": 106
+      },
+      "pct_sous_cat_souvenirs_montant_ventes": {
+        "rmse": 0.02678418967087972,
+        "mae": 0.010987008379847873,
+        "r2": 0.964840724574856,
+        "n": 106
+      },
+      "pct_sous_cat_accessoires_nombre_paniers": {
+        "rmse": 0.016588324826775136,
+        "mae": 0.00683664252535158,
+        "r2": 0.9958439265783278,
+        "n": 106
+      },
+      "pct_sous_cat_alcool_nombre_paniers": {
+        "rmse": 0.0072032517105986805,
+        "mae": 0.0023993459350919433,
+        "r2": 0.9890947584937219,
+        "n": 106
+      },
+      "pct_sous_cat_cosmetique_nombre_paniers": {
+        "rmse": 0.012446503716438672,
+        "mae": 0.0055422502180766785,
+        "r2": 0.9976051317535181,
+        "n": 106
+      },
+      "pct_sous_cat_food_salee_nombre_paniers": {
+        "rmse": 0.012083061109821236,
+        "mae": 0.00484296710769167,
+        "r2": 0.9790144135705967,
+        "n": 106
+      },
+      "pct_sous_cat_food_sucree_nombre_paniers": {
+        "rmse": 0.012306724354659961,
+        "mae": 0.005410444535311367,
+        "r2": 0.993540368550296,
+        "n": 106
+      },
+      "pct_sous_cat_jeux_enfants_nombre_paniers": {
+        "rmse": 0.009023264182736414,
+        "mae": 0.0029445064894991096,
+        "r2": 0.9926080557410509,
+        "n": 106
+      },
+      "pct_sous_cat_pap_nombre_paniers": {
+        "rmse": 0.03714713641908682,
+        "mae": 0.011075303802878167,
+        "r2": 0.9305809308430005,
+        "n": 106
+      },
+      "pct_sous_cat_sans_alcool_nombre_paniers": {
+        "rmse": 0.0058428755965235285,
+        "mae": 0.00422379397402351,
+        "r2": 0.9993988789723601,
+        "n": 106
+      },
+      "pct_sous_cat_sos_nombre_paniers": {
+        "rmse": 0.005599091477392164,
+        "mae": 0.003207014880239823,
+        "r2": 0.9997646384682578,
+        "n": 106
+      },
+      "pct_sous_cat_souvenirs_nombre_paniers": {
+        "rmse": 0.008010941106420958,
+        "mae": 0.003236064349886297,
+        "r2": 0.9902624423866954,
+        "n": 106
+      },
+      "pct_sous_cat_accessoires_nombre_produits": {
+        "rmse": 0.019346149327807687,
+        "mae": 0.008163128612299283,
+        "r2": 0.9943788768354652,
+        "n": 106
+      },
+      "pct_sous_cat_alcool_nombre_produits": {
+        "rmse": 0.0053725773480648095,
+        "mae": 0.002602887650589679,
+        "r2": 0.9967758182483982,
+        "n": 106
+      },
+      "pct_sous_cat_cosmetique_nombre_produits": {
+        "rmse": 0.013212003946125676,
+        "mae": 0.008440652552047522,
+        "r2": 0.9975503964134242,
+        "n": 106
+      },
+      "pct_sous_cat_food_salee_nombre_produits": {
+        "rmse": 0.010460587714504139,
+        "mae": 0.007242784623303794,
+        "r2": 0.9893727146503658,
+        "n": 106
+      },
+      "pct_sous_cat_food_sucree_nombre_produits": {
+        "rmse": 0.011597242337067212,
+        "mae": 0.006580701162634743,
+        "r2": 0.9958102275001174,
+        "n": 106
+      },
+      "pct_sous_cat_jeux_enfants_nombre_produits": {
+        "rmse": 0.012549573739419354,
+        "mae": 0.003913860786449823,
+        "r2": 0.9924503959301401,
+        "n": 106
+      },
+      "pct_sous_cat_pap_nombre_produits": {
+        "rmse": 0.03964599255292908,
+        "mae": 0.013583477582554598,
+        "r2": 0.9192765574121371,
+        "n": 106
+      },
+      "pct_sous_cat_sans_alcool_nombre_produits": {
+        "rmse": 0.016080855250038686,
+        "mae": 0.01018587585739028,
+        "r2": 0.9939065302562006,
+        "n": 106
+      },
+      "pct_sous_cat_sos_nombre_produits": {
+        "rmse": 0.017432202881862355,
+        "mae": 0.009787533176745421,
+        "r2": 0.9950138259577966,
+        "n": 106
+      },
+      "pct_sous_cat_souvenirs_nombre_produits": {
+        "rmse": 0.016682512958556238,
+        "mae": 0.006451752296523116,
+        "r2": 0.9758601243784402,
+        "n": 106
+      },
+      "nombre_ventes_holidays": {
+        "rmse": 97.37814250530745,
+        "mae": 40.13937082830465,
+        "r2": 0.9777099219550797,
+        "n": 106
+      },
+      "montant_ventes_holidays": {
+        "rmse": 482.64872939781395,
+        "mae": 209.98798616229368,
+        "r2": 0.9757384461868681,
+        "n": 106
+      },
+      "nombre_ventes_hors_holidays": {
+        "rmse": 55.68905864918402,
+        "mae": 29.865791239266127,
+        "r2": 0.9873249145908449,
+        "n": 106
+      },
+      "montant_ventes_hors_holidays": {
+        "rmse": 263.2750725353782,
+        "mae": 139.59689391334106,
+        "r2": 0.9883456770238818,
+        "n": 106
+      },
+      "pct_nombre_ventes_holidays": {
+        "rmse": 0.029639470842367042,
+        "mae": 0.01651480157704253,
+        "r2": 0.9836429077107451,
+        "n": 106
+      },
+      "pct_montant_ventes_holidays": {
+        "rmse": 0.03133376614116878,
+        "mae": 0.017685444209617443,
+        "r2": 0.9815060522906153,
+        "n": 106
+      },
+      "pct_nombre_ventes_hors_holidays": {
+        "rmse": 0.02963946118652566,
+        "mae": 0.016514806509867235,
+        "r2": 0.9836429183682541,
+        "n": 106
+      },
+      "pct_montant_ventes_hors_holidays": {
+        "rmse": 0.03133376121794503,
+        "mae": 0.017685445125564397,
+        "r2": 0.9815060581022266,
+        "n": 106
+      }
+    },
+    "mean_rmse": 30.251269364978707,
+    "mean_mae": 14.662257788818826,
+    "mean_r2": 0.9880943397879918
+  },
+  "metrics_eval": {
+    "per_target": {
+      "nombre_ventes": {
+        "rmse": 649.5167956166365,
+        "mae": 446.04492530822756,
+        "r2": 0.4317347596660738,
+        "n": 20
+      },
+      "montant_ventes": {
+        "rmse": 3179.5968394401325,
+        "mae": 2048.2214822387696,
+        "r2": 0.29404922113093457,
+        "n": 20
+      },
+      "nombre_paniers": {
+        "rmse": 326.9411725973274,
+        "mae": 242.39444007873536,
+        "r2": 0.446188191979911,
+        "n": 20
+      },
+      "nombre_produits": {
+        "rmse": 12.573332263002763,
+        "mae": 10.852215123176574,
+        "r2": 0.488266068265641,
+        "n": 20
+      },
+      "pct_cat_f_b_montant_ventes": {
+        "rmse": 0.05363161398252879,
+        "mae": 0.03349977729308266,
+        "r2": 0.9664759138506959,
+        "n": 20
+      },
+      "pct_cat_n_f_b_montant_ventes": {
+        "rmse": 0.05363162367853702,
+        "mae": 0.03349975714159043,
+        "r2": 0.9664759017291198,
+        "n": 20
+      },
+      "pct_cat_f_b_nombre_paniers": {
+        "rmse": 0.02830446013462939,
+        "mae": 0.017259306813381652,
+        "r2": 0.9727615363739934,
+        "n": 20
+      },
+      "pct_cat_n_f_b_nombre_paniers": {
+        "rmse": 0.01795789697749624,
+        "mae": 0.010211163031577885,
+        "r2": 0.9917813463074179,
+        "n": 20
+      },
+      "pct_cat_f_b_nombre_produits": {
+        "rmse": 0.10908700899851459,
+        "mae": 0.0656274065429441,
+        "r2": 0.8549384180832789,
+        "n": 20
+      },
+      "pct_cat_n_f_b_nombre_produits": {
+        "rmse": 0.13784277657288468,
+        "mae": 0.09180216731806652,
+        "r2": 0.8739220503985562,
+        "n": 20
+      },
+      "pct_sous_cat_accessoires_montant_ventes": {
+        "rmse": 0.046417588053724944,
+        "mae": 0.027431596838689936,
+        "r2": 0.4407990856583165,
+        "n": 20
+      },
+      "pct_sous_cat_alcool_montant_ventes": {
+        "rmse": 0.023901659605847808,
+        "mae": 0.01267615752147116,
+        "r2": 0.9630184626790393,
+        "n": 20
+      },
+      "pct_sous_cat_cosmetique_montant_ventes": {
+        "rmse": 0.10817408632797215,
+        "mae": 0.058821643411673966,
+        "r2": 0.7086367258992486,
+        "n": 20
+      },
+      "pct_sous_cat_food_salee_montant_ventes": {
+        "rmse": 0.04995758473447075,
+        "mae": 0.03683904346900789,
+        "r2": 0.7188341643993597,
+        "n": 20
+      },
+      "pct_sous_cat_food_sucree_montant_ventes": {
+        "rmse": 0.03193910411068931,
+        "mae": 0.019688425392756687,
+        "r2": 0.9585759781832599,
+        "n": 20
+      },
+      "pct_sous_cat_jeux_enfants_montant_ventes": {
+        "rmse": 0.051219036959287007,
+        "mae": 0.01711196655881336,
+        "r2": 0.4544512754632093,
+        "n": 20
+      },
+      "pct_sous_cat_pap_montant_ventes": {
+        "rmse": 0.051344469474919434,
+        "mae": 0.043596640097498716,
+        "r2": 0.8516027098206878,
+        "n": 20
+      },
+      "pct_sous_cat_sans_alcool_montant_ventes": {
+        "rmse": 0.0805966322778923,
+        "mae": 0.053044928773935095,
+        "r2": 0.7859863381662084,
+        "n": 20
+      },
+      "pct_sous_cat_sos_montant_ventes": {
+        "rmse": 0.1271185792717161,
+        "mae": 0.0893426113662439,
+        "r2": 0.8888591752419197,
+        "n": 20
+      },
+      "pct_sous_cat_souvenirs_montant_ventes": {
+        "rmse": 0.03760975643221515,
+        "mae": 0.0232217343227126,
+        "r2": -1.0463995529500565,
+        "n": 20
+      },
+      "pct_sous_cat_accessoires_nombre_paniers": {
+        "rmse": 0.052971272978053124,
+        "mae": 0.02953633812835126,
+        "r2": -0.14564444172621416,
+        "n": 20
+      },
+      "pct_sous_cat_alcool_nombre_paniers": {
+        "rmse": 0.013040242657195656,
+        "mae": 0.007231026455460499,
+        "r2": 0.9430404172307495,
+        "n": 20
+      },
+      "pct_sous_cat_cosmetique_nombre_paniers": {
+        "rmse": 0.06375005002105766,
+        "mae": 0.03382158870470337,
+        "r2": 0.7858754079946685,
+        "n": 20
+      },
+      "pct_sous_cat_food_salee_nombre_paniers": {
+        "rmse": 0.021590214221622318,
+        "mae": 0.016449937815085608,
+        "r2": 0.8597242115977619,
+        "n": 20
+      },
+      "pct_sous_cat_food_sucree_nombre_paniers": {
+        "rmse": 0.038071306973037046,
+        "mae": 0.028865254223930947,
+        "r2": 0.9329798383716135,
+        "n": 20
+      },
+      "pct_sous_cat_jeux_enfants_nombre_paniers": {
+        "rmse": 0.01911608580513293,
+        "mae": 0.010962793904574074,
+        "r2": 0.8115870739310005,
+        "n": 20
+      },
+      "pct_sous_cat_pap_nombre_paniers": {
+        "rmse": 0.044634691522645716,
+        "mae": 0.03691042055974695,
+        "r2": 0.8391038543264708,
+        "n": 20
+      },
+      "pct_sous_cat_sans_alcool_nombre_paniers": {
+        "rmse": 0.02214607231298455,
+        "mae": 0.016562483080351766,
+        "r2": 0.9799372486115067,
+        "n": 20
+      },
+      "pct_sous_cat_sos_nombre_paniers": {
+        "rmse": 0.08416938926268334,
+        "mae": 0.048907428782529364,
+        "r2": 0.9491013833494394,
+        "n": 20
+      },
+      "pct_sous_cat_souvenirs_nombre_paniers": {
+        "rmse": 0.020152226604573147,
+        "mae": 0.011476655439257815,
+        "r2": -2.1054513202559844,
+        "n": 20
+      },
+      "pct_sous_cat_accessoires_nombre_produits": {
+        "rmse": 0.09071577438362283,
+        "mae": 0.04637664037596527,
+        "r2": -1.6110504056679615,
+        "n": 20
+      },
+      "pct_sous_cat_alcool_nombre_produits": {
+        "rmse": 0.030852905589872123,
+        "mae": 0.014933615541921514,
+        "r2": 0.914373302969893,
+        "n": 20
+      },
+      "pct_sous_cat_cosmetique_nombre_produits": {
+        "rmse": 0.06358904677953393,
+        "mae": 0.0470797710755374,
+        "r2": 0.8825131875193222,
+        "n": 20
+      },
+      "pct_sous_cat_food_salee_nombre_produits": {
+        "rmse": 0.04974141943296669,
+        "mae": 0.040269322727807845,
+        "r2": 0.6571171240992095,
+        "n": 20
+      },
+      "pct_sous_cat_food_sucree_nombre_produits": {
+        "rmse": 0.06017442632371052,
+        "mae": 0.04462989788098547,
+        "r2": 0.8606547686647039,
+        "n": 20
+      },
+      "pct_sous_cat_jeux_enfants_nombre_produits": {
+        "rmse": 0.048075961286653125,
+        "mae": 0.02658074226372647,
+        "r2": 0.5182998205073215,
+        "n": 20
+      },
+      "pct_sous_cat_pap_nombre_produits": {
+        "rmse": 0.05788891219928149,
+        "mae": 0.048721480669702964,
+        "r2": 0.6801441301815404,
+        "n": 20
+      },
+      "pct_sous_cat_sans_alcool_nombre_produits": {
+        "rmse": 0.06977308073612165,
+        "mae": 0.05765586257393279,
+        "r2": 0.8118188799607264,
+        "n": 20
+      },
+      "pct_sous_cat_sos_nombre_produits": {
+        "rmse": 0.09623118067437485,
+        "mae": 0.06389086515548488,
+        "r2": 0.9020621535573856,
+        "n": 20
+      },
+      "pct_sous_cat_souvenirs_nombre_produits": {
+        "rmse": 0.03379088862172687,
+        "mae": 0.02556367176274842,
+        "r2": 0.24982548380781378,
+        "n": 20
+      },
+      "nombre_ventes_holidays": {
+        "rmse": 292.0898673413458,
+        "mae": 219.40260276794433,
+        "r2": 0.26669781005501647,
+        "n": 20
+      },
+      "montant_ventes_holidays": {
+        "rmse": 1454.775733996002,
+        "mae": 983.6180679130555,
+        "r2": 0.06371288642969852,
+        "n": 20
+      },
+      "nombre_ventes_hors_holidays": {
+        "rmse": 385.48193988085137,
+        "mae": 255.5519395828247,
+        "r2": 0.456830794060622,
+        "n": 20
+      },
+      "montant_ventes_hors_holidays": {
+        "rmse": 1611.3357032422498,
+        "mae": 1148.3528953552245,
+        "r2": 0.5125052782935546,
+        "n": 20
+      },
+      "pct_nombre_ventes_holidays": {
+        "rmse": 0.20752521850294411,
+        "mae": 0.1417447872830218,
+        "r2": -0.47494565588763993,
+        "n": 20
+      },
+      "pct_montant_ventes_holidays": {
+        "rmse": 0.22902873882012692,
+        "mae": 0.15741370601886534,
+        "r2": -0.7409519034812144,
+        "n": 20
+      },
+      "pct_nombre_ventes_hors_holidays": {
+        "rmse": 0.2075252395251756,
+        "mae": 0.1417448044193572,
+        "r2": -0.4749459547106052,
+        "n": 20
+      },
+      "pct_montant_ventes_hors_holidays": {
+        "rmse": 0.22902869925189523,
+        "mae": 0.15741366057032372,
+        "r2": -0.7409513019289138,
+        "n": 20
+      }
+    },
+    "mean_rmse": 164.89945211040893,
+    "mean_mae": 111.59014553019303,
+    "mean_r2": 0.44989420504600625
+  },
+  "metrics_test": {
+    "per_target": {
+      "nombre_ventes": {
+        "rmse": 649.5167956166365,
+        "mae": 446.04492530822756,
+        "r2": 0.4317347596660738,
+        "n": 20
+      },
+      "montant_ventes": {
+        "rmse": 3179.5968394401325,
+        "mae": 2048.2214822387696,
+        "r2": 0.29404922113093457,
+        "n": 20
+      },
+      "nombre_paniers": {
+        "rmse": 326.9411725973274,
+        "mae": 242.39444007873536,
+        "r2": 0.446188191979911,
+        "n": 20
+      },
+      "nombre_produits": {
+        "rmse": 12.573332263002763,
+        "mae": 10.852215123176574,
+        "r2": 0.488266068265641,
+        "n": 20
+      },
+      "pct_cat_f_b_montant_ventes": {
+        "rmse": 0.05363161398252879,
+        "mae": 0.03349977729308266,
+        "r2": 0.9664759138506959,
+        "n": 20
+      },
+      "pct_cat_n_f_b_montant_ventes": {
+        "rmse": 0.05363162367853702,
+        "mae": 0.03349975714159043,
+        "r2": 0.9664759017291198,
+        "n": 20
+      },
+      "pct_cat_f_b_nombre_paniers": {
+        "rmse": 0.02830446013462939,
+        "mae": 0.017259306813381652,
+        "r2": 0.9727615363739934,
+        "n": 20
+      },
+      "pct_cat_n_f_b_nombre_paniers": {
+        "rmse": 0.01795789697749624,
+        "mae": 0.010211163031577885,
+        "r2": 0.9917813463074179,
+        "n": 20
+      },
+      "pct_cat_f_b_nombre_produits": {
+        "rmse": 0.10908700899851459,
+        "mae": 0.0656274065429441,
+        "r2": 0.8549384180832789,
+        "n": 20
+      },
+      "pct_cat_n_f_b_nombre_produits": {
+        "rmse": 0.13784277657288468,
+        "mae": 0.09180216731806652,
+        "r2": 0.8739220503985562,
+        "n": 20
+      },
+      "pct_sous_cat_accessoires_montant_ventes": {
+        "rmse": 0.046417588053724944,
+        "mae": 0.027431596838689936,
+        "r2": 0.4407990856583165,
+        "n": 20
+      },
+      "pct_sous_cat_alcool_montant_ventes": {
+        "rmse": 0.023901659605847808,
+        "mae": 0.01267615752147116,
+        "r2": 0.9630184626790393,
+        "n": 20
+      },
+      "pct_sous_cat_cosmetique_montant_ventes": {
+        "rmse": 0.10817408632797215,
+        "mae": 0.058821643411673966,
+        "r2": 0.7086367258992486,
+        "n": 20
+      },
+      "pct_sous_cat_food_salee_montant_ventes": {
+        "rmse": 0.04995758473447075,
+        "mae": 0.03683904346900789,
+        "r2": 0.7188341643993597,
+        "n": 20
+      },
+      "pct_sous_cat_food_sucree_montant_ventes": {
+        "rmse": 0.03193910411068931,
+        "mae": 0.019688425392756687,
+        "r2": 0.9585759781832599,
+        "n": 20
+      },
+      "pct_sous_cat_jeux_enfants_montant_ventes": {
+        "rmse": 0.051219036959287007,
+        "mae": 0.01711196655881336,
+        "r2": 0.4544512754632093,
+        "n": 20
+      },
+      "pct_sous_cat_pap_montant_ventes": {
+        "rmse": 0.051344469474919434,
+        "mae": 0.043596640097498716,
+        "r2": 0.8516027098206878,
+        "n": 20
+      },
+      "pct_sous_cat_sans_alcool_montant_ventes": {
+        "rmse": 0.0805966322778923,
+        "mae": 0.053044928773935095,
+        "r2": 0.7859863381662084,
+        "n": 20
+      },
+      "pct_sous_cat_sos_montant_ventes": {
+        "rmse": 0.1271185792717161,
+        "mae": 0.0893426113662439,
+        "r2": 0.8888591752419197,
+        "n": 20
+      },
+      "pct_sous_cat_souvenirs_montant_ventes": {
+        "rmse": 0.03760975643221515,
+        "mae": 0.0232217343227126,
+        "r2": -1.0463995529500565,
+        "n": 20
+      },
+      "pct_sous_cat_accessoires_nombre_paniers": {
+        "rmse": 0.052971272978053124,
+        "mae": 0.02953633812835126,
+        "r2": -0.14564444172621416,
+        "n": 20
+      },
+      "pct_sous_cat_alcool_nombre_paniers": {
+        "rmse": 0.013040242657195656,
+        "mae": 0.007231026455460499,
+        "r2": 0.9430404172307495,
+        "n": 20
+      },
+      "pct_sous_cat_cosmetique_nombre_paniers": {
+        "rmse": 0.06375005002105766,
+        "mae": 0.03382158870470337,
+        "r2": 0.7858754079946685,
+        "n": 20
+      },
+      "pct_sous_cat_food_salee_nombre_paniers": {
+        "rmse": 0.021590214221622318,
+        "mae": 0.016449937815085608,
+        "r2": 0.8597242115977619,
+        "n": 20
+      },
+      "pct_sous_cat_food_sucree_nombre_paniers": {
+        "rmse": 0.038071306973037046,
+        "mae": 0.028865254223930947,
+        "r2": 0.9329798383716135,
+        "n": 20
+      },
+      "pct_sous_cat_jeux_enfants_nombre_paniers": {
+        "rmse": 0.01911608580513293,
+        "mae": 0.010962793904574074,
+        "r2": 0.8115870739310005,
+        "n": 20
+      },
+      "pct_sous_cat_pap_nombre_paniers": {
+        "rmse": 0.044634691522645716,
+        "mae": 0.03691042055974695,
+        "r2": 0.8391038543264708,
+        "n": 20
+      },
+      "pct_sous_cat_sans_alcool_nombre_paniers": {
+        "rmse": 0.02214607231298455,
+        "mae": 0.016562483080351766,
+        "r2": 0.9799372486115067,
+        "n": 20
+      },
+      "pct_sous_cat_sos_nombre_paniers": {
+        "rmse": 0.08416938926268334,
+        "mae": 0.048907428782529364,
+        "r2": 0.9491013833494394,
+        "n": 20
+      },
+      "pct_sous_cat_souvenirs_nombre_paniers": {
+        "rmse": 0.020152226604573147,
+        "mae": 0.011476655439257815,
+        "r2": -2.1054513202559844,
+        "n": 20
+      },
+      "pct_sous_cat_accessoires_nombre_produits": {
+        "rmse": 0.09071577438362283,
+        "mae": 0.04637664037596527,
+        "r2": -1.6110504056679615,
+        "n": 20
+      },
+      "pct_sous_cat_alcool_nombre_produits": {
+        "rmse": 0.030852905589872123,
+        "mae": 0.014933615541921514,
+        "r2": 0.914373302969893,
+        "n": 20
+      },
+      "pct_sous_cat_cosmetique_nombre_produits": {
+        "rmse": 0.06358904677953393,
+        "mae": 0.0470797710755374,
+        "r2": 0.8825131875193222,
+        "n": 20
+      },
+      "pct_sous_cat_food_salee_nombre_produits": {
+        "rmse": 0.04974141943296669,
+        "mae": 0.040269322727807845,
+        "r2": 0.6571171240992095,
+        "n": 20
+      },
+      "pct_sous_cat_food_sucree_nombre_produits": {
+        "rmse": 0.06017442632371052,
+        "mae": 0.04462989788098547,
+        "r2": 0.8606547686647039,
+        "n": 20
+      },
+      "pct_sous_cat_jeux_enfants_nombre_produits": {
+        "rmse": 0.048075961286653125,
+        "mae": 0.02658074226372647,
+        "r2": 0.5182998205073215,
+        "n": 20
+      },
+      "pct_sous_cat_pap_nombre_produits": {
+        "rmse": 0.05788891219928149,
+        "mae": 0.048721480669702964,
+        "r2": 0.6801441301815404,
+        "n": 20
+      },
+      "pct_sous_cat_sans_alcool_nombre_produits": {
+        "rmse": 0.06977308073612165,
+        "mae": 0.05765586257393279,
+        "r2": 0.8118188799607264,
+        "n": 20
+      },
+      "pct_sous_cat_sos_nombre_produits": {
+        "rmse": 0.09623118067437485,
+        "mae": 0.06389086515548488,
+        "r2": 0.9020621535573856,
+        "n": 20
+      },
+      "pct_sous_cat_souvenirs_nombre_produits": {
+        "rmse": 0.03379088862172687,
+        "mae": 0.02556367176274842,
+        "r2": 0.24982548380781378,
+        "n": 20
+      },
+      "nombre_ventes_holidays": {
+        "rmse": 292.0898673413458,
+        "mae": 219.40260276794433,
+        "r2": 0.26669781005501647,
+        "n": 20
+      },
+      "montant_ventes_holidays": {
+        "rmse": 1454.775733996002,
+        "mae": 983.6180679130555,
+        "r2": 0.06371288642969852,
+        "n": 20
+      },
+      "nombre_ventes_hors_holidays": {
+        "rmse": 385.48193988085137,
+        "mae": 255.5519395828247,
+        "r2": 0.456830794060622,
+        "n": 20
+      },
+      "montant_ventes_hors_holidays": {
+        "rmse": 1611.3357032422498,
+        "mae": 1148.3528953552245,
+        "r2": 0.5125052782935546,
+        "n": 20
+      },
+      "pct_nombre_ventes_holidays": {
+        "rmse": 0.20752521850294411,
+        "mae": 0.1417447872830218,
+        "r2": -0.47494565588763993,
+        "n": 20
+      },
+      "pct_montant_ventes_holidays": {
+        "rmse": 0.22902873882012692,
+        "mae": 0.15741370601886534,
+        "r2": -0.7409519034812144,
+        "n": 20
+      },
+      "pct_nombre_ventes_hors_holidays": {
+        "rmse": 0.2075252395251756,
+        "mae": 0.1417448044193572,
+        "r2": -0.4749459547106052,
+        "n": 20
+      },
+      "pct_montant_ventes_hors_holidays": {
+        "rmse": 0.22902869925189523,
+        "mae": 0.15741366057032372,
+        "r2": -0.7409513019289138,
+        "n": 20
+      }
+    },
+    "mean_rmse": 164.89945211040893,
+    "mean_mae": 111.59014553019303,
+    "mean_r2": 0.44989420504600625
+  },
+  "top_feature_importance": [
+    {
+      "feature": "zone_scolaire_a",
+      "importance": 0.05114532634615898
+    },
+    {
+      "feature": "pct_cat_f_b_nombre_ventes",
+      "importance": 0.042707305401563644
+    },
+    {
+      "feature": "commerce_gift_100m",
+      "importance": 0.03776537626981735
+    },
+    {
+      "feature": "plage_1km",
+      "importance": 0.036773860454559326
+    },
+    {
+      "feature": "commerce_grocery_200m",
+      "importance": 0.03618113324046135
+    },
+    {
+      "feature": "pct_sous_cat_sos_nombre_ventes",
+      "importance": 0.03590763732790947
+    },
+    {
+      "feature": "commerce_bakery_200m",
+      "importance": 0.03397008776664734
+    },
+    {
+      "feature": "pct_cat_n_f_b_nombre_ventes",
+      "importance": 0.030713846907019615
+    },
+    {
+      "feature": "commerce_cosmetics_200m",
+      "importance": 0.030550368130207062
+    },
+    {
+      "feature": "nombre_categories_mois_f_b",
+      "importance": 0.028734778985381126
+    },
+    {
+      "feature": "nb_jours_holidays",
+      "importance": 0.025667794048786163
+    },
+    {
+      "feature": "pct_categories_mois_f_b",
+      "importance": 0.02545679360628128
+    },
+    {
+      "feature": "pct_categories_mois_n_f_b",
+      "importance": 0.02394600212574005
+    },
+    {
+      "feature": "commerce_cosmetics_100m",
+      "importance": 0.02290891669690609
+    },
+    {
+      "feature": "commerce_supermarket_200m",
+      "importance": 0.01986008882522583
+    },
+    {
+      "feature": "pct_sous_cat_pap_nombre_ventes",
+      "importance": 0.01950024999678135
+    },
+    {
+      "feature": "pct_sous_cat_sans_alcool_nombre_ventes",
+      "importance": 0.018850604072213173
+    },
+    {
+      "feature": "commerce_convenience_200m",
+      "importance": 0.018416807055473328
+    },
+    {
+      "feature": "pct_sous_cat_cosmetique_nombre_ventes",
+      "importance": 0.018345506861805916
+    },
+    {
+      "feature": "pct_sous_cat_jeux_enfants_nombre_ventes",
+      "importance": 0.016642646864056587
+    },
+    {
+      "feature": "pct_sous_cat_accessoires_nombre_ventes",
+      "importance": 0.016001028940081596
+    },
+    {
+      "feature": "pct_sous_cat_food_salee_nombre_ventes",
+      "importance": 0.01578286476433277
+    },
+    {
+      "feature": "commerce_fb_200m",
+      "importance": 0.015537630766630173
+    },
+    {
+      "feature": "zone_scolaire_c",
+      "importance": 0.015321229584515095
+    },
+    {
+      "feature": "meteo_humidite_pct_min",
+      "importance": 0.015143230557441711
+    },
+    {
+      "feature": "commerce_convenience_100m",
+      "importance": 0.015031498856842518
+    },
+    {
+      "feature": "shard_id",
+      "importance": 0.014365402050316334
+    },
+    {
+      "feature": "nombre_categories_mois_n_f_b",
+      "importance": 0.014249194413423538
+    },
+    {
+      "feature": "pct_sous_cat_souvenirs_nombre_ventes",
+      "importance": 0.014230150729417801
+    },
+    {
+      "feature": "nb_jours_vacances_scolaires",
+      "importance": 0.014176871627569199
+    },
+    {
+      "feature": "commerce_bakery_300m",
+      "importance": 0.013960756361484528
+    },
+    {
+      "feature": "commerce_bakery_100m",
+      "importance": 0.013695121742784977
+    },
+    {
+      "feature": "hotel_f_b_bar",
+      "importance": 0.0126316137611866
+    },
+    {
+      "feature": "pct_jours_holidays",
+      "importance": 0.012284870259463787
+    },
+    {
+      "feature": "hotel_non_f_b_salles_de_reunion",
+      "importance": 0.012083918787539005
+    },
+    {
+      "feature": "commerce_non_fb_100m",
+      "importance": 0.011689047329127789
+    },
+    {
+      "feature": "meteo_pression_hpa_min",
+      "importance": 0.011421729810535908
+    },
+    {
+      "feature": "meteo_humidite_pct_max",
+      "importance": 0.011224176734685898
+    },
+    {
+      "feature": "pct_sous_cat_food_sucree_nombre_ventes",
+      "importance": 0.010422952473163605
+    },
+    {
+      "feature": "nb_jours_vacances_hors_feries",
+      "importance": 0.010325632058084011
+    }
+  ],
+  "feature_importance": {
+    "nombre_categories_mois_f_b": 0.028734778985381126,
+    "nombre_categories_mois_n_f_b": 0.014249194413423538,
+    "pct_categories_mois_f_b": 0.02545679360628128,
+    "pct_categories_mois_n_f_b": 0.02394600212574005,
+    "pct_cat_f_b_nombre_ventes": 0.042707305401563644,
+    "pct_cat_n_f_b_nombre_ventes": 0.030713846907019615,
+    "pct_sous_cat_accessoires_nombre_ventes": 0.016001028940081596,
+    "pct_sous_cat_alcool_nombre_ventes": 0.009877956472337246,
+    "pct_sous_cat_cosmetique_nombre_ventes": 0.018345506861805916,
+    "pct_sous_cat_food_salee_nombre_ventes": 0.01578286476433277,
+    "pct_sous_cat_food_sucree_nombre_ventes": 0.010422952473163605,
+    "pct_sous_cat_jeux_enfants_nombre_ventes": 0.016642646864056587,
+    "pct_sous_cat_pap_nombre_ventes": 0.01950024999678135,
+    "pct_sous_cat_sans_alcool_nombre_ventes": 0.018850604072213173,
+    "pct_sous_cat_sos_nombre_ventes": 0.03590763732790947,
+    "pct_sous_cat_souvenirs_nombre_ventes": 0.014230150729417801,
+    "zone_scolaire_a": 0.05114532634615898,
+    "zone_scolaire_b": 0.004410297144204378,
+    "zone_scolaire_c": 0.015321229584515095,
+    "nb_jours_dans_mois": 0.0035530177410691977,
+    "nb_jours_feries": 0.0038270223885774612,
+    "nb_jours_weekend": 0.004486077465116978,
+    "nb_jours_vacances_scolaires": 0.014176871627569199,
+    "nb_jours_vacances_hors_feries": 0.010325632058084011,
+    "nb_jours_holidays": 0.025667794048786163,
+    "pct_jours_holidays": 0.012284870259463787,
+    "weather_ok": 0.0,
+    "weather_error": 0.0,
+    "shard_id": 0.014365402050316334,
+    "meteo_temperature_c_mean": 0.0064414325170218945,
+    "meteo_temperature_c_min": 0.007202592212706804,
+    "meteo_temperature_c_max": 0.00580414617434144,
+    "meteo_humidite_pct_mean": 0.008110481314361095,
+    "meteo_humidite_pct_min": 0.015143230557441711,
+    "meteo_humidite_pct_max": 0.011224176734685898,
+    "meteo_precipitations_mm_mean": 0.006078975275158882,
+    "meteo_precipitations_mm_min": 0.0036943003069609404,
+    "meteo_precipitations_mm_max": 0.003691568272188306,
+    "meteo_vent_kmh_mean": 0.005878801923245192,
+    "meteo_vent_kmh_min": 0.005534189287573099,
+    "meteo_vent_kmh_max": 0.005043062847107649,
+    "meteo_pression_hpa_mean": 0.009967626072466373,
+    "meteo_pression_hpa_min": 0.011421729810535908,
+    "meteo_pression_hpa_max": 0.004809219855815172,
+    "meteo_ensoleillement_min_mean": 0.00460846908390522,
+    "meteo_ensoleillement_min_min": 0.0036253577563911676,
+    "meteo_ensoleillement_min_max": 0.001284878235310316,
+    "commerce_convenience_100m": 0.015031498856842518,
+    "commerce_bakery_100m": 0.013695121742784977,
+    "commerce_cosmetics_100m": 0.02290891669690609,
+    "commerce_gift_100m": 0.03776537626981735,
+    "commerce_fb_100m": 0.007227631751447916,
+    "commerce_non_fb_100m": 0.011689047329127789,
+    "commerce_convenience_200m": 0.018416807055473328,
+    "commerce_bakery_200m": 0.03397008776664734,
+    "commerce_supermarket_200m": 0.01986008882522583,
+    "commerce_grocery_200m": 0.03618113324046135,
+    "commerce_cosmetics_200m": 0.030550368130207062,
+    "commerce_gift_200m": 0.009615295566618443,
+    "commerce_kiosk_200m": 0.0,
+    "commerce_fb_200m": 0.015537630766630173,
+    "commerce_non_fb_200m": 0.00017957424279302359,
+    "commerce_convenience_300m": 0.0059893373399972916,
+    "commerce_bakery_300m": 0.013960756361484528,
+    "commerce_supermarket_300m": 0.0,
+    "commerce_alcohol_300m": 0.0,
+    "commerce_grocery_300m": 0.004813827108591795,
+    "commerce_cosmetics_300m": 0.0,
+    "commerce_gift_300m": 0.0,
+    "commerce_tobacco_300m": 0.0,
+    "commerce_kiosk_300m": 0.0,
+    "commerce_fb_300m": 0.0036785651464015245,
+    "commerce_non_fb_300m": 7.408544206555234e-06,
+    "commerce_convenience_400m": 0.0005657062865793705,
+    "commerce_bakery_400m": 0.00019178712682332844,
+    "commerce_supermarket_400m": 0.0,
+    "commerce_alcohol_400m": 0.0,
+    "commerce_grocery_400m": 0.0,
+    "commerce_cosmetics_400m": 0.0,
+    "commerce_gift_400m": 0.0,
+    "commerce_tobacco_400m": 0.0,
+    "commerce_kiosk_400m": 0.0,
+    "commerce_fb_400m": 0.0,
+    "commerce_non_fb_400m": 0.0,
+    "commerce_convenience_500m": 0.0,
+    "commerce_bakery_500m": 0.0,
+    "commerce_supermarket_500m": 0.0,
+    "commerce_alcohol_500m": 0.008161923848092556,
+    "commerce_confectionery_500m": 0.0,
+    "commerce_grocery_500m": 0.0,
+    "commerce_cosmetics_500m": 0.0,
+    "commerce_gift_500m": 0.0,
+    "commerce_tobacco_500m": 0.0,
+    "commerce_kiosk_500m": 0.0,
+    "commerce_fb_500m": 0.0,
+    "commerce_non_fb_500m": 0.0,
+    "plage_1km": 0.036773860454559326,
+    "plage_2km": 0.0,
+    "plage_3km": 0.004220287781208754,
+    "plage_4km": 0.0,
+    "plage_5km": 0.0,
+    "plage_distance_km": 4.297023406252265e-05,
+    "hotel_country": 0.0,
+    "proximity_ok": 0.0022494045551866293,
+    "hotel_contrat_signe_annee": 0.0,
+    "hotel_derniere_reno": 0.0,
+    "hotel_lobby_derniere_reno": 0.0,
+    "hotel_nb_chambres": 0.0011486784787848592,
+    "hotel_to_annuel": 0.0,
+    "hotel_to_le_plus_bas_taux": 0.0,
+    "hotel_to_le_plus_haut_taux": 0.0,
+    "hotel_dispo_dans_lobby_fontaine_a_eau": 2.069160655082669e-05,
+    "hotel_dispo_dans_lobby_machine_a_cafe": 0.0,
+    "hotel_dispo_dans_lobby_micro_ondes": 0.0,
+    "hotel_dispo_dans_lobby_vitrine_refrigeree": 0.0,
+    "hotel_f_b_bar": 0.0126316137611866,
+    "hotel_f_b_minibar": 0.0,
+    "hotel_f_b_restaurant": 0.0,
+    "hotel_f_b_room_service": 0.0,
+    "hotel_non_f_b_piscine": 2.876072539947927e-05,
+    "hotel_non_f_b_salle_de_sport": 0.0,
+    "hotel_non_f_b_salles_de_reunion": 0.012083918787539005,
+    "hotel_has_parking": 0.0,
+    "hotel_has_animaux": 0.0,
+    "hotel_has_reunion": 0.0,
+    "hotel_affaires_pct": 0.0,
+    "hotel_loisirs_pct": 0.0,
+    "hotel_loisirs_top_1_amis": 0.0,
+    "hotel_loisirs_top_1_couples": 0.0,
+    "hotel_loisirs_top_1_familles": 0.0,
+    "hotel_international_pct": 0.0,
+    "hotel_national_pct": 0.0,
+    "hotel_corner_actuel_existe_deja": 0.0,
+    "hotel_corner_de_vente_actuel_metres_lineaires": 0.0,
+    "hotel_corner_actuel_offre_f_b_distributeur_auto": 2.1425485385861975e-07,
+    "hotel_corner_actuel_offre_f_b_reception": 0.0003044350305572152,
+    "hotel_corner_actuel_offre_f_b_snacking_comptoir": 0.0,
+    "hotel_corner_actuel_offre_non_f_b_distributeur_auto": 0.0,
+    "hotel_corner_actuel_offre_non_f_b_reception": 0.0,
+    "hotel_metres_lineaires_dedies_corner": 0.0,
+    "hotel_contrat_type_franchise": 0.0,
+    "hotel_contrat_type_manage": 0.0,
+    "cat_economy": 0.0,
+    "cat_midscale": 0.0,
+    "Nb_Hotels": 0.0,
+    "Nb_Ch_0_49": 0.0,
+    "Nb_Ch_50_99": 0.0,
+    "Nb_Ch_100_149": 0.0,
+    "Nb_Ch_150_199": 0.0,
+    "Nb_Ch_200_249": 0.0,
+    "Nb_Ch_250_299": 0.0,
+    "Nb_Ch_300_Plus": 0.0,
+    "Nb_Resto_0": 0.0,
+    "Nb_Resto_1": 0.0,
+    "Nb_Resto_2": 0.0,
+    "Nb_Resto_3": 0.0,
+    "Nb_Bar_0": 0.0,
+    "Nb_Bar_1": 0.0,
+    "Nb_Bar_2": 0.0,
+    "Nb_Bar_3": 0.0
+  },
+  "model_file": "model.pkl",
+  "config_file": "config.json",
+  "path": "/media/laghmari/ssd-data/dev/hotels/accor/models/design/xgb_sales_1_gs_005"
+}

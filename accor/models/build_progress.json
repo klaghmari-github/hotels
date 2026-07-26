@@ -1,0 +1,17 @@
+{
+  "status": "done",
+  "phase": "done",
+  "done": 2,
+  "total": 2,
+  "job_fraction": 0.0,
+  "pct": 100.0,
+  "current_name": "",
+  "current_target": "",
+  "message": "mid",
+  "results": [],
+  "error": null,
+  "rank_metric": "r2",
+  "main_target": "montant_ventes",
+  "started_at": "2026-07-26T02:39:54.950893+00:00",
+  "finished_at": null
+}

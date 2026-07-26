@@ -193,25 +193,75 @@ export class ModelBuildPanel {
     const fill = $("#model-build-progress-fill");
     const text = $("#model-build-progress-text");
     const count = $("#model-build-progress-count");
+    const pctEl = $("#model-build-progress-pct");
+    const phaseEl = $("#model-build-progress-phase");
+    const detailEl = $("#model-build-progress-detail");
+    const bar = $("#model-build-progress-bar");
+    const wrap = $("#model-build-progress");
+    const card = $("#model-build-progress-card");
+
     const done = Number(prog.done || 0);
-    const total = Math.max(1, Number(prog.total || 0));
-    const pct =
-      prog.status === "idle" && done === 0
-        ? 0
-        : Math.min(100, Math.round((done / total) * 100));
-    if (fill) fill.style.width = `${pct}%`;
-    if (count) count.textContent = `${done} / ${prog.total || 0}`;
+    const total = Number(prog.total || 0);
+    const totalSafe = Math.max(1, total);
+    // pct backend (fraction dans le job) prioritaire, sinon done/total
+    let pct =
+      prog.pct != null && Number.isFinite(Number(prog.pct))
+        ? Number(prog.pct)
+        : prog.status === "idle" && done === 0
+          ? 0
+          : Math.min(100, (done / totalSafe) * 100);
+    if (prog.status === "done") pct = 100;
+    pct = Math.min(100, Math.max(0, pct));
+    const pctRound = Math.round(pct * 10) / 10;
+
+    if (fill) fill.style.width = `${pctRound}%`;
+    if (bar) bar.setAttribute("aria-valuenow", String(Math.round(pctRound)));
+    if (pctEl) pctEl.textContent = `${pctRound.toLocaleString("fr-FR")} %`;
+    if (count) {
+      count.textContent =
+        total > 0 ? `${done} / ${total} modèle(s)` : "— / —";
+    }
+
+    const phaseMap = {
+      prepare: "Préparation",
+      train: "Entraînement",
+      save: "Sauvegarde",
+      done: "Terminé",
+      error: "Erreur",
+      idle: "En attente",
+    };
+    const phase = prog.phase || prog.status || "idle";
+    if (phaseEl) phaseEl.textContent = phaseMap[phase] || phase;
+
     if (text) {
       if (prog.status === "running") {
-        text.textContent = prog.message || prog.current_name || "Entrainement…";
+        text.textContent =
+          prog.message || prog.current_name || "Entraînement…";
       } else if (prog.status === "done") {
-        text.textContent = prog.message || "Termine";
+        text.textContent = prog.message || "Terminé";
       } else if (prog.status === "error") {
         text.textContent = prog.error || prog.message || "Erreur";
       } else {
         text.textContent = "En attente";
       }
     }
+    if (detailEl) {
+      const bits = [];
+      if (prog.current_name) bits.push(`modèle · ${prog.current_name}`);
+      if (prog.current_target) bits.push(`cible · ${prog.current_target}`);
+      if (prog.job_fraction != null && prog.status === "running") {
+        const jf = Math.round(Number(prog.job_fraction) * 100);
+        if (Number.isFinite(jf)) bits.push(`job ${jf} %`);
+      }
+      detailEl.textContent = bits.join("  ·  ");
+    }
+
+    if (wrap) {
+      wrap.classList.toggle("is-running", prog.status === "running");
+      wrap.classList.toggle("is-done", prog.status === "done");
+      wrap.classList.toggle("is-error", prog.status === "error");
+    }
+    if (card) card.classList.toggle("is-active", prog.status === "running");
   }
 
   renderResults(prog) {
@@ -300,6 +350,7 @@ export class ModelBuildPanel {
 
   startPolling() {
     this.stopPolling();
+    // Poll plus serré pendant l'entraînement (arbres / cibles)
     this._pollTimer = setInterval(async () => {
       try {
         const prog = await api.get("/api/model/build/progress");
@@ -313,11 +364,11 @@ export class ModelBuildPanel {
             const best = (prog.results || []).find((r) => r.ok);
             toast.show(
               best
-                ? `Build termine · meilleur: ${best.name} (rang 1)`
-                : "Build termine"
+                ? `Build terminé · meilleur : ${best.name} (rang 1)`
+                : "Build terminé"
             );
             const status = $("#model-status");
-            if (status) status.textContent = prog.message || "Termine";
+            if (status) status.textContent = prog.message || "Terminé";
           } else {
             toast.show(prog.error || "Erreur de build", "err");
           }
@@ -325,7 +376,7 @@ export class ModelBuildPanel {
       } catch {
         /* reseau temporaire */
       }
-    }, 800);
+    }, 400);
   }
 
   async build() {
@@ -344,11 +395,21 @@ export class ModelBuildPanel {
     };
     if (btn) btn.disabled = true;
     if (status) status.textContent = "Lancement du build…";
+
+    // scroller vers la carte progression
+    const card = $("#model-build-progress-card");
+    if (card && typeof card.scrollIntoView === "function") {
+      card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
     this.updateProgressUI({
       status: "running",
+      phase: "prepare",
       done: 0,
       total: this.countLocalJobs().total,
-      message: "Demarrage…",
+      pct: 0,
+      job_fraction: 0,
+      message: "Démarrage…",
     });
     try {
       const res = await api.post("/api/model/build", body);
@@ -359,17 +420,26 @@ export class ModelBuildPanel {
         this.countLocalJobs().total;
       this.updateProgressUI({
         status: "running",
+        phase: "prepare",
         done: 0,
         total,
-        message: `Build lance · ${total} modele(s)`,
+        pct: 0,
+        job_fraction: 0,
+        message: `Build lancé · ${total} modèle(s)`,
       });
-      if (status) status.textContent = `Build en cours · ${total} modele(s)…`;
+      if (status) status.textContent = `Build en cours · ${total} modèle(s)…`;
       this.startPolling();
     } catch (err) {
       toast.show(err.message, "err");
       if (status) status.textContent = err.message;
       if (btn) btn.disabled = false;
       this.stopPolling();
+      this.updateProgressUI({
+        status: "error",
+        phase: "error",
+        message: err.message,
+        error: err.message,
+      });
     }
   }
 

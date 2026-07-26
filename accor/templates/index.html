@@ -240,16 +240,21 @@
           </div>
 
           <div class="model-col">
-            <section class="card">
+            <section class="card build-progress-card" id="model-build-progress-card">
               <h2 class="card-title">Progression</h2>
               <div class="build-progress" id="model-build-progress">
-                <div class="build-progress-bar">
+                <div class="build-progress-head">
+                  <span class="build-progress-pct" id="model-build-progress-pct">0&nbsp;%</span>
+                  <span class="build-progress-phase" id="model-build-progress-phase">—</span>
+                </div>
+                <div class="build-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="model-build-progress-bar">
                   <i id="model-build-progress-fill" style="width: 0%"></i>
                 </div>
                 <div class="build-progress-meta">
                   <span id="model-build-progress-text">En attente</span>
                   <span id="model-build-progress-count">0 / 0</span>
                 </div>
+                <p class="card-hint" id="model-build-progress-detail"></p>
               </div>
             </section>
 
@@ -434,6 +439,6 @@
     </div>
   </div>
 
-  <script type="module" src="/static/js/admin/app.js?v=20260726g"></script>
+  <script type="module" src="/static/js/admin/app.js?v=20260726i"></script>
 </body>
 </html>

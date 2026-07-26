@@ -70,18 +70,31 @@ class BuildProgress:
 
     Thread-safe ; persiste un resume dans models/build_progress.json
     pour le polling UI.
+
+    Champs utiles UI
+    ----------------
+    done / total     modeles termines / prevus
+    job_fraction     0–1 avancement *dans* le job courant (cibles / arbres)
+    pct              pourcentage global (done + fraction) / total
+    phase            prepare | train | save | done | error | idle
+    current_target   nom de la cible en cours (multi-output)
     """
 
     def __init__(self) -> None:
         self._state: dict[str, Any] = self._empty()
+        self._last_persist = 0.0
 
     @staticmethod
     def _empty() -> dict[str, Any]:
         return {
             "status": "idle",
+            "phase": "idle",
             "done": 0,
             "total": 0,
+            "job_fraction": 0.0,
+            "pct": 0.0,
             "current_name": "",
+            "current_target": "",
             "message": "",
             "results": [],
             "error": None,
@@ -91,16 +104,47 @@ class BuildProgress:
             "finished_at": None,
         }
 
+    def _compute_pct_unlocked(self) -> float:
+        status = self._state.get("status")
+        done = float(self._state.get("done") or 0)
+        total = max(1.0, float(self._state.get("total") or 1))
+        frac = float(self._state.get("job_fraction") or 0.0)
+        frac = min(max(frac, 0.0), 1.0)
+        if status == "done":
+            return 100.0
+        if status == "error":
+            return min(99.0, (done / total) * 100.0)
+        if status == "running":
+            # plafonner a 99.5 tant que pas fini (evite barre a 100% trop tot)
+            return min(99.5, ((done + frac) / total) * 100.0)
+        if total and done:
+            return min(100.0, (done / total) * 100.0)
+        return 0.0
+
     def snapshot(self) -> dict[str, Any]:
         with _build_lock:
             out = dict(self._state)
             out["results"] = list(self._state.get("results") or [])
+            out["pct"] = round(self._compute_pct_unlocked(), 1)
+            out["job_fraction"] = float(self._state.get("job_fraction") or 0.0)
             return out
 
     def update(self, **kwargs: Any) -> None:
+        """
+        Met a jour l'etat en memoire (toujours) et persiste sur disque
+        au plus toutes les ~0.35 s (les callbacks arbres sont frequents).
+        Force l'ecriture si status/done/phase changent de facon structurelle.
+        """
+        force = any(
+            k in kwargs for k in ("status", "done", "results", "error", "phase")
+        )
         with _build_lock:
             self._state.update(kwargs)
-            self._persist_unlocked()
+            self._state["pct"] = self._compute_pct_unlocked()
+            now = time.monotonic()
+            if force or (now - self._last_persist) >= 0.35:
+                self._persist_unlocked()
+                self._last_persist = now
 
     def reset_running(
         self,
@@ -114,15 +158,20 @@ class BuildProgress:
             self._state.update(
                 {
                     "status": "running",
+                    "phase": "prepare",
                     "done": 0,
                     "total": total,
+                    "job_fraction": 0.0,
+                    "pct": 0.0,
                     "main_target": main_target,
                     "rank_metric": rank_metric,
                     "started_at": datetime.now(timezone.utc).isoformat(),
                     "message": "Demarrage…",
                 }
             )
+            self._last_persist = 0.0
             self._persist_unlocked()
+            self._last_persist = time.monotonic()
 
     def is_running(self) -> bool:
         with _build_lock:
@@ -151,7 +200,11 @@ class BuildProgress:
                         "ok": r.get("ok"),
                     }
                 )
-            payload = {**self._state, "results": slim}
+            payload = {
+                **self._state,
+                "results": slim,
+                "pct": self._compute_pct_unlocked(),
+            }
             BUILD_PROGRESS_FILE.write_text(
                 json.dumps(payload, ensure_ascii=False, indent=2, default=str),
                 encoding="utf-8",
@@ -519,6 +572,101 @@ def get_build_progress() -> dict[str, Any]:
     return _BUILD_PROGRESS.snapshot()
 
 
+def _fit_xgb_multioutput(
+    X_train: np.ndarray,
+    y_train: np.ndarray,
+    *,
+    params: dict[str, Any],
+    target_cols: list[str],
+    progress_hook: Any | None = None,
+):
+    """
+    Fit un regresseur multi-cibles avec progression fine.
+
+    Enchaîne un XGBRegressor par cible (équivalent MultiOutputRegressor
+    n_jobs=1) et appelle ``progress_hook(frac, message, target_name)``
+    pendant l'entraînement (cibles + arbres).
+    """
+    from sklearn.multioutput import MultiOutputRegressor
+    from xgboost import XGBRegressor
+
+    n_targets = int(y_train.shape[1]) if y_train.ndim > 1 else 1
+    n_estimators = max(1, int(params.get("n_estimators") or 100))
+
+    def _report(frac: float, msg: str, target: str = "") -> None:
+        if progress_hook is None:
+            return
+        try:
+            progress_hook(min(max(float(frac), 0.0), 1.0), msg, target)
+        except Exception:
+            pass
+
+    # ---- une seule cible ----
+    if n_targets == 1:
+        y = y_train.ravel() if y_train.ndim > 1 else y_train
+        tname = target_cols[0] if target_cols else "y"
+
+        def _tree_cb(epoch: int) -> None:
+            # epoch 0-based ; fraction dans [0, 1]
+            _report((epoch + 1) / n_estimators, f"{tname} · arbre {epoch + 1}/{n_estimators}", tname)
+
+        est = _make_xgb_regressor(params, on_iteration=_tree_cb)
+        _report(0.0, f"Entrainement {tname}…", tname)
+        est.fit(X_train, y)
+        _report(1.0, f"{tname} termine", tname)
+        return est
+
+    # ---- multi-output : un estimateur par cible ----
+    base = XGBRegressor(**{k: v for k, v in params.items() if k != "callbacks"})
+    model = MultiOutputRegressor(base, n_jobs=1)
+    estimators = []
+    for i, tname in enumerate(target_cols):
+        tname = str(tname)
+
+        def _tree_cb(epoch: int, _i=i, _t=tname) -> None:
+            frac = (_i + (epoch + 1) / n_estimators) / n_targets
+            _report(frac, f"Cible {_i + 1}/{n_targets} · {_t} · arbre {epoch + 1}/{n_estimators}", _t)
+
+        est = _make_xgb_regressor(params, on_iteration=_tree_cb)
+        _report(i / n_targets, f"Cible {i + 1}/{n_targets} · {tname}", tname)
+        est.fit(X_train, y_train[:, i])
+        estimators.append(est)
+        _report((i + 1) / n_targets, f"Cible {i + 1}/{n_targets} · {tname} ok", tname)
+
+    model.estimators_ = estimators
+    try:
+        model.n_features_in_ = X_train.shape[1]
+    except Exception:
+        pass
+    return model
+
+
+def _make_xgb_regressor(params: dict[str, Any], *, on_iteration: Any | None = None):
+    """XGBRegressor + callback d'iteration optionnel (progression arbres)."""
+    from xgboost import XGBRegressor
+
+    p = dict(params)
+    p.pop("callbacks", None)
+    if on_iteration is None:
+        return XGBRegressor(**p)
+
+    try:
+        from xgboost.callback import TrainingCallback
+
+        class _IterCB(TrainingCallback):
+            def after_iteration(self, model, epoch, evals_log):  # noqa: ANN001
+                try:
+                    on_iteration(int(epoch))
+                except Exception:
+                    pass
+                return False
+
+        return XGBRegressor(**p, callbacks=[_IterCB()])
+    except Exception:
+        # versions xgboost sans callbacks sklearn : pas de progression arbres
+        return XGBRegressor(**p)
+
+
 def train_model(
     *,
     xgb_params: dict[str, Any] | None = None,
@@ -528,12 +676,14 @@ def train_model(
     rebuild_data: bool = True,
     frame: pd.DataFrame | None = None,
     meta: dict[str, Any] | None = None,
+    progress_hook: Any | None = None,
 ) -> dict[str, Any]:
     """
     Entraîne sur model_data.
 
     Si ``save=True``, écrit immédiatement dans design/<name>/.
     ``rebuild_data=False`` + frame/meta : reutilise les donnees (batch grid).
+    ``progress_hook(frac, message, target_name)`` : 0–1 pendant le fit.
     """
     try:
         from sklearn.multioutput import MultiOutputRegressor
@@ -544,6 +694,11 @@ def train_model(
         ) from exc
 
     if rebuild_data or frame is None or meta is None:
+        if progress_hook:
+            try:
+                progress_hook(0.0, "Reconstruction model_data…", "")
+            except Exception:
+                pass
         rebuild_model_data()
         frame, meta = _load_model_frame()
 
@@ -591,19 +746,22 @@ def train_model(
 
     params = _coerce_params(xgb_params)
 
-    base = XGBRegressor(**params)
-    if y_train.shape[1] == 1:
-        model = base
-        model.fit(X_train, y_train.ravel())
-        y_pred_train = model.predict(X_train).reshape(-1, 1)
-        y_pred_eval = model.predict(X_eval).reshape(-1, 1)
-        y_train_m, y_eval_m = y_train, y_eval
-    else:
-        model = MultiOutputRegressor(base, n_jobs=1)
-        model.fit(X_train, y_train)
-        y_pred_train = model.predict(X_train)
-        y_pred_eval = model.predict(X_eval)
-        y_train_m, y_eval_m = y_train, y_eval
+    model = _fit_xgb_multioutput(
+        X_train,
+        y_train,
+        params=params,
+        target_cols=target_cols,
+        progress_hook=progress_hook,
+    )
+    y_pred_train = model.predict(X_train)
+    y_pred_eval = model.predict(X_eval)
+    if y_pred_train.ndim == 1:
+        y_pred_train = y_pred_train.reshape(-1, 1)
+        y_pred_eval = y_pred_eval.reshape(-1, 1)
+    y_train_m, y_eval_m = y_train, y_eval
+    if y_train_m.ndim == 1:
+        y_train_m = y_train_m.reshape(-1, 1)
+        y_eval_m = y_eval_m.reshape(-1, 1)
 
     metrics_train = _metrics(y_train_m, y_pred_train, target_cols)
     metrics_eval = _metrics(y_eval_m, y_pred_eval, target_cols)
@@ -762,9 +920,12 @@ def _run_build_batch(
         jobs = planner.jobs()
         progress.update(
             status="running",
+            phase="prepare",
             done=0,
             total=len(jobs),
+            job_fraction=0.0,
             current_name="",
+            current_target="",
             message="Preparation model_data…",
             results=[],
             error=None,
@@ -785,11 +946,28 @@ def _run_build_batch(
             metric = "r2"
 
         results: list[dict[str, Any]] = []
+        n_jobs = len(jobs)
         for idx, (name, kind, params) in enumerate(jobs):
             progress.update(
+                phase="train",
+                done=idx,
+                total=n_jobs,
+                job_fraction=0.0,
                 current_name=name,
-                message=f"Entrainement {idx + 1}/{len(jobs)} · {name}",
+                current_target="",
+                message=f"Modele {idx + 1}/{n_jobs} · {name}",
             )
+
+            def _hook(frac: float, msg: str, target: str = "", _idx=idx, _name=name) -> None:
+                progress.update(
+                    phase="train",
+                    done=_idx,
+                    job_fraction=float(frac),
+                    current_name=_name,
+                    current_target=target or "",
+                    message=f"Modele {_idx + 1}/{n_jobs} · {_name} — {msg}",
+                )
+
             try:
                 res = train_model(
                     xgb_params=params,
@@ -799,6 +977,7 @@ def _run_build_batch(
                     rebuild_data=False,
                     frame=frame,
                     meta=meta,
+                    progress_hook=_hook,
                 )
                 res.pop("bundle", None)
                 res["kind"] = kind
@@ -827,7 +1006,13 @@ def _run_build_batch(
                     "score": float("-inf"),
                 }
             results.append(res)
-            progress.update(done=idx + 1, results=list(results))
+            progress.update(
+                done=idx + 1,
+                job_fraction=0.0,
+                current_target="",
+                results=list(results),
+                message=f"Modele {idx + 1}/{n_jobs} termine · {name}",
+            )
 
         ranked = sorted(
             results, key=lambda r: float(r.get("score") or float("-inf")), reverse=True
@@ -837,9 +1022,13 @@ def _run_build_batch(
 
         progress.update(
             status="done",
+            phase="done",
             done=len(jobs),
             total=len(jobs),
+            job_fraction=0.0,
+            pct=100.0,
             current_name="",
+            current_target="",
             message=f"Termine · {len(jobs)} modele(s)",
             results=ranked,
             main_target=main_t,
@@ -849,6 +1038,7 @@ def _run_build_batch(
     except Exception as exc:
         progress.update(
             status="error",
+            phase="error",
             error=str(exc),
             message=str(exc),
             finished_at=datetime.now(timezone.utc).isoformat(),
