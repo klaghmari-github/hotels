@@ -773,19 +773,55 @@ def api_rod_pilots():
         return jsonify({"ok": False, "error": str(exc)}), 400
 
 
+@app.get("/api/rod/meta")
+def api_rod_meta():
+    """Labels sous-catégories F&B / N-F&B et défauts corner (mix, m_lin)."""
+    try:
+        from accor.rod_admin import rod_ui_meta
+
+        return jsonify(rod_ui_meta())
+    except Exception as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+
 @app.get("/api/rod/hotel/<hotel_code>/trace")
+@app.post("/api/rod/hotel/<hotel_code>/trace")
 def api_rod_hotel_trace(hotel_code: str):
     """
-    Trace détaillée ventes (R1–R4) + coûts + marge pour un hôtel.
+    Hôtel = nouveau client (directeur corner).
 
-    Query : year (2026), concept (optionnel, sinon les 3).
+    Body/query optionnels :
+      year, m_lin, mix_fb (0–1 ou %), client_needs {id: bool},
+      nb_chambres, taux_occupation, guests_per_chambre
+
+    Défauts : mix 70 % F&B, m_lin hôtel ou 6, toutes sous-catégories autorisées.
     """
     try:
         from accor.rod_admin import simulate_hotel_trace
 
-        year = int(request.args.get("year") or 2026)
-        concept = request.args.get("concept") or None
-        result = simulate_hotel_trace(hotel_code, year=year, concept=concept)
+        body = {}
+        if request.method == "POST":
+            body = request.get_json(force=True, silent=True) or {}
+        year_raw = body.get("year", request.args.get("year") or 2026)
+        year = int(year_raw) if year_raw not in (None, "") else 2026
+
+        def _opt_float(key):
+            v = body.get(key, request.args.get(key))
+            if v is None or v == "":
+                return None
+            return float(v)
+
+        needs = body.get("client_needs")
+        result = simulate_hotel_trace(
+            hotel_code,
+            year=year,
+            m_lin=_opt_float("m_lin"),
+            mix_fb=_opt_float("mix_fb"),
+            client_needs=needs if isinstance(needs, dict) else None,
+            nb_chambres=_opt_float("nb_chambres"),
+            taux_occupation=_opt_float("taux_occupation"),
+            guests_per_chambre=_opt_float("guests_per_chambre"),
+        )
         status = 200 if result.get("ok") else 400
         return jsonify(result), status
     except Exception as exc:

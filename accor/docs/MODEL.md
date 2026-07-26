@@ -112,3 +112,17 @@ Contenu typique du `model.pkl` :
 Unpickle d’un modèle entraîné avec une ancienne sklearn/xgboost peut
 émettre des warnings. En général la prédiction marche ; pour un état
 propre : ré-entraîner + redéployer.
+
+---
+
+## Roadmap — ML vs simulateur ROD (même 2026)
+
+Aujourd’hui :
+
+* **Éval. modèle ML** : pred XGBoost vs réel (Σ/12)
+* **Simulateur ROD** : estimation règles Excel vs réel (Σ/12)
+
+**Plus tard** : pour chaque pilote hold-out, **même hôtel / même 2026** —
+comparer **pred ML** et **sim ROD** face au réel, et entre elles
+(`gap_ml`, `gap_rod`, MAE croisées). Objectif métier : valider si l’IA bat
+les règles fixes. Voir [ROD_ADMIN.md](ROD_ADMIN.md) § roadmap.

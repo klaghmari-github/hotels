@@ -95,14 +95,19 @@ accor-validate-rod
 Couvre clients jour/mois, R1 API vs engine, R2–R4 neutres au pivot,
 reco &lt;50 / LIBERTY N-F&B, coûts ∝ m_lin, cohérence simulate.
 
-## Trace admin (pilotes)
+## Admin (pilotes) vs user (tout hôtel)
 
-L’admin expose le même enchaînement **avec chaque étape chiffrée** sur
-les hôtels qui ont des ventes en 2026 (ou autre année) :
+| | **User** (`run_user`) | **Admin** (`run_admin` → Simulateur ROD) |
+|--|----------------------|------------------------------------------|
+| Cible | N’importe quel hôtel | Pilotes (ventes) — peu d’hôtels, c’est normal |
+| Réf. | Pivots Excel + contexte | + moyennes catégorie sur **train** (ex. 2023–25) |
+| Éval. | Non (souvent pas de réel) | **Temporelle** : éval 2026 (pas d’exclusion d’hôtel) |
 
-- UI : **Simulateur ROD** (ventes → marge → éval sim vs réel)  
-- Module : `rod_admin.py`  
-- Doc dédiée : [ROD_ADMIN.md](ROD_ADMIN.md)
+**Hôtel pilote** = a des ventes sur des années précédentes → sert de modèle
+pour estimer d’autres hôtels, ou le « futur » du même hôtel (quand le futur
+devient disponible, on mesure l’écart).
+
+Doc : [ROD_ADMIN.md](ROD_ADMIN.md).
 
 ---
 

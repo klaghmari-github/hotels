@@ -285,33 +285,24 @@ Voir aussi [ROD_ADMIN.md](ROD_ADMIN.md).
 
 ### `GET /api/rod/pilots`
 
-Liste des hôtels avec ventes sur `year` (défaut 2026).
+Hôtels pilotes (ventes sur années **train** = avant `year`).
+Split **temporel** : ref hors `year`, éval sur `year`. Pas d’exclusion d’hôtel.
 
 | Query | Défaut | Rôle |
 |-------|--------|------|
-| `year` | 2026 | année de vérité terrain |
+| `year` | 2026 | année d’évaluation (exclue de la ref) |
 
-Chaque hôtel : `hotel_code`, nom, marque, mois présents, `sum_montant_ventes`,
-`avg_monthly_true` = somme / 12.
+Réponse : `n`, `train_years`, `eval_year`, `split: "temporal"`.
+Chaque hôtel : identité + `has_holdout` / `avg_monthly_true` si réel `year`.
 
 ### `GET /api/rod/hotel/<hotel_code>/trace`
 
-Trace complète pour un pilote.
-
-| Query | Rôle |
-|-------|------|
-| `year` | année réel (défaut 2026) |
-| `concept` | optionnel : un seul concept, sinon SIMPLY+LIBERTY+CONNECTED |
-
-Réponse : `by_concept.<C>.sales.steps[]` (étapes R0–R4 + marge produit),
-`.costs` (lignes techno/annexes/agencement), `.margin` (nette).
+Simu ROD (ref catégorie **train**, corner, 3 concepts + reco) + écart si réel éval.
 
 ### `GET /api/rod/eval`
 
-Batch : pour chaque pilote, CA simulé vs `avg_monthly_true` (Σ/12),
-écarts par concept + reco, métriques globales (MAE, RMSE, biais, MAPE).
-
-Query : `year` (défaut 2026).
+Batch : ref = train, vérité = année hold-out. MAE / MAPE / biais sur les
+pilotes qui ont du réel cette année. Query : `year` (défaut 2026).
 
 ---
 

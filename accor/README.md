@@ -331,11 +331,13 @@ UI : **Modèle** → **Éval. modèle ML**.
 
 ### Simulateur ROD admin (`rod_admin.py`)
 
-Même moteurs que le user ; détail des étapes sur pilotes :
+Validation métier (≠ ML) :
 
-1. Prédiction ventes (TO → R1–R4 → marge produit)  
-2. Coûts + marge nette (3 concepts)  
-3. Écart CA sim vs réel (Σ/12)  
+* Référence pilote = **catégorie de marque**, années **train** seulement
+  (jamais la dernière année, ex. 2023–2025 si hold-out 2026) :
+  avg mensuelle année = Σ mois / 12, puis moyennes multi-années / multi-hôtels.
+* Hôtel choisi traité comme **nouveau client** → règles ROD → CA estimé.
+* Comparaison au réel hold-out (Σ/12), coûts/marge 3 concepts, reco.
 
 API : `/api/rod/*`. Doc : [docs/ROD_ADMIN.md](docs/ROD_ADMIN.md).
 
@@ -362,7 +364,8 @@ All → Pilotes → Simulateur ROD → Modèle
 
 ### Simulateur ROD (UI)
 
-Trois onglets : prédiction ventes (étapes), marge & coûts, évaluation batch.
+Trois onglets : (1) ref catégorie + étapes ROD + écart hold-out,
+(2) coûts/marge 3 solutions + reco, (3) batch tous pilotes.
 
 ### Éval. modèle ML (UI)
 

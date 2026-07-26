@@ -838,8 +838,54 @@ body {
   font-size: 0.78rem;
   color: var(--text-muted);
 }
-#rod-eval-table td.pos { color: var(--success); }
-#rod-eval-table td.neg { color: var(--danger); }
+#rod-eval-table td.pos,
+#rod-gap-table td.pos { color: var(--success); }
+#rod-eval-table td.neg,
+#rod-gap-table td.neg { color: var(--danger); }
+
+.rod-m-lin-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+.rod-m-lin-row input[type="range"] {
+  flex: 1;
+  min-width: 0;
+}
+.rod-needs-title {
+  font-size: 0.85rem;
+  margin: 0.75rem 0 0.35rem;
+  color: var(--text-muted);
+}
+.rod-needs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 14rem;
+  overflow: auto;
+}
+.rod-need-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+.rod-need-item small {
+  display: block;
+  font-size: 0.7rem;
+}
+.rod-needs-actions {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+.btn-sm {
+  padding: 0.25rem 0.55rem;
+  font-size: 0.75rem;
+}
 
 .build-stages {
   display: grid;

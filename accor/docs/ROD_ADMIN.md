@@ -1,119 +1,149 @@
-# Simulateur ROD (admin)
+# Simulateur ROD — admin vs user
 
-Zone **Simulateur ROD** dans l’admin (`:5055`), entre les datasets (All / Pilotes)
-et la section **Modèle**.
+## Deux applications, deux usages
 
-Objectif : rejouer les **mêmes règles Excel** que le parcours directeur
-(`user.rules.*`), avec le détail des étapes et des chiffres, sur les
-**hôtels pilotes** (ceux qui ont des ventes sur l’année choisie, souvent 2026).
+| App | Entrée | Public | Données de ventes |
+|-----|--------|--------|-------------------|
+| **User** | `run_user.py` / `accor-user` (:5056) | Directeur d’hôtel | Souvent **aucune** → on estime, on ne peut pas juger l’écart |
+| **Admin** | `run_admin.py` / `accor-admin` (:5055) | Data / métier | **Hôtels pilotes** (ventes connues) → on estime **et** on évalue |
 
-Code : `src/accor/rod_admin.py`  
-UI : `static/js/admin/rod-sim-panel.js` + vue `#view-rod-sim`  
-API : `/api/rod/*` (voir [API_ADMIN.md](API_ADMIN.md))
-
----
-
-## Sidebar
-
-```
-All
-Pilotes
-────────────
-Simulateur ROD
-  · Simulateur ROD     (vue unique, 3 onglets internes)
-────────────
-Modèle                 ← singulier
-  · Model Build
-  · Model Explore
-  · Éval. modèle ML    ← XGBoost (pas ROD)
-```
-
-Ne pas confondre :
-
-| Zone | Rôle |
-|------|------|
-| **Simulateur ROD** | Règles déterministes Excel : CA, coûts, marge, écart vs réel |
-| **Éval. modèle ML** | Perf XGBoost (moyenne mensuelle Σ/12 sur hold-out) |
+Le moteur de règles (revenus, coûts, reco) est le **même**. Seul le
+contexte change : validation chiffrée côté admin grâce aux ventes historiques.
 
 ---
 
-## Onglets internes
+## Hôtel pilote
 
-### 1 · Prédiction ventes
+Un **hôtel pilote** est un hôtel pour lequel on a des **ventes sur des
+années précédentes**. Ces séries servent de **modèle** pour :
 
-Pour un hôtel pilote + un concept (SIMPLY / LIBERTY / CONNECTED) :
+1. estimer les ventes d’**autres** hôtels (même logique que le user, avec
+   une référence issue des pilotes de même catégorie de marque) ;
+2. estimer les ventes **futures du même hôtel** et, quand le « futur »
+   devient disponible, **comparer** estimation et réel pour mesurer la
+   fiabilité (écart).
 
-Enchaînement affiché étape par étape (formule + valeurs + CA F&B / N-F&B) :
-
-1. **Entrées hôtel** — n, TO, guests, clients jour/mois, m_lin, mix  
-2. **Référence pilote concept** — pivots `rod_reference.json`  
-3. **Impact TO** — ΔTO × ~9,23 € HT / point  
-4. **R1 clients** — CA × (clients_hôtel / clients_pilote)  
-5. **R2 mix** — pas de 10 % vs mix pilote  
-6. **R3 catégories** — besoins clients vs baseline coefs  
-7. **R4 m_lin** — écart mètres linéaires  
-8. **Marge produit** — CA − CA/coef (F&B et N-F&B)
-
-KPI : CA HT / mois, marge produit, coûts, marge nette.
-
-### 2 · Marge & coûts
-
-Tableau des 3 concepts :
-
-- CA HT mensuel  
-- Marge produit  
-- Techno / annexes / agencement  
-- Coût total mensuel  
-- Marge nette  
-- Capex  
-
-+ détail des **lignes de coûts** du concept sélectionné  
-(`cost_lines` techno / annexes / agencement).
-
-Formule : `marge_nette = marge_produit − coûts_mensuels`.
-
-### 3 · Évaluation (sim vs réel)
-
-Sur **tous** les pilotes de l’année :
-
-- réel : `avg_monthly_true = somme(montant_ventes mois dispo) / 12`  
-- simulé : CA mensuel ROD par concept  
-- écart = simulé − réel (€ et %)  
-- colonnes SIMPLY / LIBERTY / CONNECTED + concept **recommandé**  
-- métriques globales sur le concept reco : MAE, RMSE, biais, MAPE  
+Sans ventes passées, l’hôtel n’est pas un pilote : l’app user peut quand
+même simuler (paramètres corner + défauts / scrape), mais sans score d’écart.
 
 ---
 
-## Pilotes
+## Découpage **temporel** (pas par hôtel)
 
-Hôtels présents dans `hotel_sales_data` pour l’année (ex. 2026, mois 1–4).
+| Période | Années | Rôle |
+|---------|--------|------|
+| **Apprentissage / ref** | 2023, 2024, 2025 | Seules années pour construire la **référence** catégorie |
+| **Évaluation** | 2026 (ex. mois 1–4) | Futur non vu à la modélisation → on estime puis on compare |
 
-Liste via `GET /api/rod/pilots?year=2026`.
+Points clés :
 
-Contexte hôtel : `HotelContextBuilder` (hotel_data + model_data), même
-hydratation que le user.
+* L’**exclusion / inclusion est temporelle** : on exclut l’année 2026 de la
+  ref, **pas** un sous-ensemble d’hôtels.
+* **Tous** les hôtels avec ventes train entrent dans la moyenne de leur
+  catégorie (pas de leave-one-out).
+* On a **peu d’hôtels** en apprentissage : c’est normal avec les données
+  actuelles ; le hold-out reste l’année 2026.
+* Réel 2026 : `avg_true = somme(montant_ventes mois) / 12` → écart, MAE, etc.
+
+Même esprit que le split ML (`_is_eval` / dernière année) ; ici le moteur
+est **déterministe** (règles Excel), pas XGBoost.
 
 ---
 
-## API (résumé)
+## Flux admin (onglet Simulateur ROD)
+
+1. Lister les pilotes (ventes sur les années **train**).
+2. Catégorie de marque de l’hôtel.
+3. **Référence** = moyennes de **tous** les pilotes de la catégorie sur
+   2023–2025 (**pas 2026** ; **pas d’exclusion d’hôtel**) :
+   - par année : avg mensuelle = Σ mois / 12 ;
+   - moyenne multi-années par hôtel ;
+   - moyenne entre hôtels de la catégorie.
+4. Traiter l’hôtel comme **client corner** (m_lin, mix, sous-cat., chambres…).
+5. Règles ROD → CA, coûts, marge (SIMPLY / LIBERTY / CONNECTED) + reco.
+6. **Évaluer sur 2026** : écart vs réel (Σ/12). Batch → MAE / MAPE / biais.
+
+---
+
+## Flux user (`run_user`)
+
+* N’importe quel code hôtel (scrape si besoin).
+* Pas d’exigence de ventes historiques.
+* Même règles + corner (mix, m_lin, besoins).
+* Pas de panneau d’écart (pas de réel futur sous la main).
+
+---
+
+## API admin
 
 | Méthode | Chemin | Rôle |
 |---------|--------|------|
-| GET | `/api/rod/pilots?year=` | liste pilotes + Σ ventes /12 |
-| GET | `/api/rod/hotel/<code>/trace?year=` | étapes ventes + coûts + marge (3 concepts) |
-| GET | `/api/rod/eval?year=` | batch écart sim vs réel |
+| GET | `/api/rod/meta` | labels sous-cat., défauts corner |
+| GET | `/api/rod/pilots?year=` | **tous** les pilotes train + flag `has_holdout` |
+| GET/POST | `/api/rod/hotel/<code>/trace` | pred + ref catégorie + reco (+ gaps si réel) |
+| GET | `/api/rod/eval?year=` | batch pred tous ; métriques si hold-out |
+
+Module : `src/accor/rod_admin.py`  
+UI : `static/js/admin/rod-sim-panel.js`
 
 ---
 
-## Moteurs réutilisés
+## Formules
 
-- `user.rules.revenue.RevenueRules`  
-- `user.rules.costs.CostRules`  
-- `user.services.orchestrator.SimulationOrchestrator`  
-- `user.services.hotel_context.HotelContextBuilder`  
-- `user.reference.RodReference` (`data/rod_reference.json`)
+```
+# référence (train uniquement, ex. 2023–2025)
+avg_year(h, y) = sum(montant_ventes mois de y) / 12
+ref_hotel(h)   = mean_y avg_year(h, y)
+ref_cat(c)     = mean_h ref_hotel(h)   # tous les pilotes catégorie c (pas d'exclusion)
 
-Le traçage des étapes ventes rejoue la chaîne dans `rod_admin._sales_steps`
-pour exposer chaque intermédiaire (pas seulement le résultat final).
+# réel hold-out (ex. 2026)
+avg_true = sum(montant_ventes mois hold-out) / 12
 
-Voir aussi [ROD_RULES.md](ROD_RULES.md) pour le détail métier des formules.
+# écart règles ROD
+gap_rod = CA_sim_ROD_mensuel − avg_true
+```
+
+---
+
+## Roadmap — comparer règles ROD et modèle ML (même hold-out)
+
+**Objectif plus tard** : pour le **même hôtel pilote** et la **même année 2026**
+(mois disponibles) :
+
+| Source | Sortie |
+|--------|--------|
+| **Simulateur ROD** (règles fixes Excel) | CA estimé mensuel (déjà en place) |
+| **Modèle ML** (XGBoost, entraîné hors 2026) | CA prédit mensuel (`model_eval` / Σ mois pred / 12) |
+| **Réel 2026** | `avg_true` = Σ mois / 12 |
+
+Puis afficher côte à côte :
+
+```
+gap_rod = sim_ROD − réel
+gap_ml  = pred_ML − réel
+```
+
+et des métriques globales (MAE, MAPE, biais) **ROD vs ML** sur les pilotes
+hold-out. L’hypothèse métier : le modèle IA devrait faire mieux (ou au moins
+être comparé objectivement aux règles fixes).
+
+### Points d’accroche déjà dans le code
+
+| Brique | Rôle aujourd’hui |
+|--------|------------------|
+| `rod_admin.simulate_hotel_trace` | sim ROD + gap vs réel 2026 |
+| `model_eval.evaluate_model` | pred ML + gap vs réel (Σ/12, cible au choix) |
+| Années train / eval | même esprit : 2023–25 train, 2026 hold-out |
+
+### À brancher (futur)
+
+1. Pour chaque pilote hold-out : appeler **les deux** moteurs avec les mêmes
+   features d’entrée quand c’est possible (hôtel, mois 2026).
+2. UI admin : onglet ou colonne **« ROD vs ML vs réel »** (pas seulement
+   ROD vs réel ou ML vs réel séparément).
+3. Garder les paramètres corner (mix, m_lin, sous-cat.) pour le bras ROD ;
+   le bras ML utilise les features `model_data` (dont mix directeur si
+   renseigné).
+
+Jusque-là, les deux évaluations restent **séparées** (Simulateur ROD vs
+Éval. modèle ML) — la fusion est le prochain jalon de validation.

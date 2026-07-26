@@ -356,47 +356,109 @@
           <div class="topbar-left">
             <h1>Simulateur ROD</h1>
             <p class="subtitle">
-              Règles Excel sur hôtels pilotes (année incomplete) :
-              prédiction CA → coûts / marge → écart vs réel.
+              <strong>Split temporel</strong> : on apprend / construit la ref sur
+              2023–2025 (tous les pilotes, pas d’exclusion d’hôtel) ; on évalue sur 2026.
+              Peu d’hôtels en apprentissage = normal. Corner : m lin., mix, sous-catégories.
             </p>
           </div>
           <div class="topbar-actions">
             <label class="field field-inline" style="margin:0">
-              <span class="muted small">Année</span>
-              <input type="number" id="rod-year" min="2020" max="2100" value="2026" style="width:5.5rem" />
+              <span class="muted small">Année éval</span>
+              <input type="number" id="rod-year" min="2020" max="2100" value="2026" style="width:5.5rem" title="Année hold-out (exclue de la référence ; écart si réel présent)" />
             </label>
-            <button type="button" class="btn btn-primary" id="btn-rod-run" title="Lancer pour l'hôtel sélectionné / batch">
-              Calculer
+            <button type="button" class="btn btn-primary" id="btn-rod-run" title="Lancer la simulation">
+              Simuler
             </button>
           </div>
         </header>
 
         <section class="meta-bar">
-          <span class="chip" id="rod-chip-year">Année : 2026</span>
+          <span class="chip" id="rod-chip-year">Hold-out —</span>
           <span class="chip chip-muted" id="rod-chip-n">—</span>
           <span class="status" id="rod-status"></span>
         </section>
+        <p class="card-hint" id="rod-method-banner" style="margin:0 0 0.75rem;padding:0 0.25rem"></p>
 
         <div class="rod-tabs" id="rod-tabs" role="tablist">
-          <button type="button" class="rod-tab active" data-rod-tab="ventes" role="tab">1 · Prédiction ventes</button>
+          <button type="button" class="rod-tab active" data-rod-tab="ventes" role="tab">1 · Ventes (règles)</button>
           <button type="button" class="rod-tab" data-rod-tab="marge" role="tab">2 · Marge &amp; coûts</button>
-          <button type="button" class="rod-tab" data-rod-tab="eval" role="tab">3 · Évaluation (sim vs réel)</button>
+          <button type="button" class="rod-tab" data-rod-tab="eval" role="tab">3 · Éval 2026 (batch)</button>
         </div>
+
+        <div id="rod-reco-banner" class="reco-banner hidden" style="margin-bottom:0.85rem"></div>
 
         <div class="model-layout explore-layout rod-layout">
           <div class="model-col">
             <section class="card">
-              <h2 class="card-title">Hôtel pilote</h2>
-              <p class="card-hint">Parc avec ventes sur l’année choisie (vérité terrain partielle).</p>
+              <h2 class="card-title">1. Hôtel (nouveau client)</h2>
               <label class="field">
-                <span>Hôtel</span>
+                <span>Hôtel pilote</span>
                 <select id="rod-hotel-select"></select>
               </label>
               <div id="rod-hotel-meta" class="metrics-grid empty">—</div>
             </section>
 
+            <section class="card">
+              <h2 class="card-title">2. Référence pilote (catégorie)</h2>
+              <p class="card-hint" id="rod-category-ref-hint">
+                Calculée auto à la sélection : moyennes train, même catégorie de marque.
+              </p>
+              <div id="rod-category-ref" class="metrics-grid empty">—</div>
+            </section>
+
+            <section class="card">
+              <h2 class="card-title">3. Corner — paramètres directeur</h2>
+              <p class="card-hint">
+                Ces réglages pilotent R2 (mix), R3 (sous-catégories) et R4 (m linéaires).
+              </p>
+              <label class="field">
+                <span>Mètres linéaires corner</span>
+                <div class="rod-m-lin-row">
+                  <input type="range" id="rod-m-lin-slider" min="1" max="40" step="0.5" value="6" />
+                  <input type="number" id="rod-m-lin" min="1" max="40" step="0.5" value="6" style="width:4.5rem" />
+                </div>
+              </label>
+              <label class="field">
+                <span>Mix F&amp;B du corner (%)</span>
+                <div class="rod-m-lin-row">
+                  <input type="range" id="rod-mix-slider" min="0" max="100" step="1" value="70" />
+                  <input type="number" id="rod-mix-fb" min="0" max="100" step="1" value="70" style="width:4.5rem" />
+                </div>
+                <span class="muted small" id="rod-mix-nf-label">N-F&amp;B = 30 %</span>
+              </label>
+              <div class="form-grid form-grid-3" style="margin-top:0.5rem">
+                <label class="field">
+                  <span># Chambres</span>
+                  <input type="number" id="rod-nb-chambres" min="1" step="1" />
+                </label>
+                <label class="field">
+                  <span>TO (%)</span>
+                  <input type="number" id="rod-to" min="1" max="100" step="0.1" />
+                </label>
+                <label class="field">
+                  <span>Guests / ch</span>
+                  <input type="number" id="rod-guests" min="0.5" max="5" step="0.1" />
+                </label>
+              </div>
+            </section>
+
+            <section class="card">
+              <h2 class="card-title">4. Sous-catégories autorisées</h2>
+              <p class="card-hint">
+                Coché = autorisé dans le corner (R3). Défaut : tout ouvert (pas de filtre).
+              </p>
+              <div class="rod-needs-actions">
+                <button type="button" class="btn btn-ghost btn-sm" id="rod-needs-all-on">Tout autoriser</button>
+                <button type="button" class="btn btn-ghost btn-sm" id="rod-needs-all-off">Tout interdire</button>
+              </div>
+              <h3 class="rod-needs-title">F&amp;B</h3>
+              <div id="rod-needs-fb" class="rod-needs-list"></div>
+              <h3 class="rod-needs-title">N-F&amp;B</h3>
+              <div id="rod-needs-nfb" class="rod-needs-list"></div>
+            </section>
+
             <section class="card" id="rod-concept-card">
-              <h2 class="card-title">Concept affiché</h2>
+              <h2 class="card-title">Solution affichée (détail)</h2>
               <div class="rod-concept-btns" id="rod-concept-btns">
                 <button type="button" class="rod-concept active" data-concept="SIMPLY">SIMPLY</button>
                 <button type="button" class="rod-concept" data-concept="LIBERTY">LIBERTY</button>
@@ -407,34 +469,29 @@
           </div>
 
           <div class="model-col">
-            <!-- Tab 1 : ventes -->
             <section class="card card-wide rod-panel" data-rod-panel="ventes">
-              <h2 class="card-title">Enchaînement des règles (CA)</h2>
+              <h2 class="card-title">Estimation CA (règles ROD)</h2>
               <p class="card-hint">
-                Impact TO → R1 clients → R2 mix → R3 catégories → R4 m_lin → marge produit.
-                Chiffres en € HT mensuels.
+                Réf. catégorie → impact TO → R1 clients → R2 mix → R3 sous-cat. → R4 m_lin → marge produit.
               </p>
-              <div id="rod-sales-steps" class="rod-steps empty">Sélectionnez un hôtel et cliquez Calculer.</div>
+              <div id="rod-sales-steps" class="rod-steps empty">Choisissez un hôtel : la simu se lance (ou cliquez Simuler).</div>
+              <h3 class="card-title" style="margin-top:1rem;font-size:1rem">Synthèse 3 solutions vs réel hold-out</h3>
+              <div id="rod-gap-table" class="perf-table-wrap empty">—</div>
             </section>
 
-            <!-- Tab 2 : marge -->
             <section class="card card-wide rod-panel hidden" data-rod-panel="marge">
-              <h2 class="card-title">Coûts &amp; marge nette — 3 concepts</h2>
-              <p class="card-hint">
-                marge_nette = marge_produit − (techno + annexes + agencement).
-                Détail des lignes de coûts pour le concept sélectionné.
-              </p>
+              <h2 class="card-title">Coûts &amp; marge nette</h2>
+              <p class="card-hint">marge_nette = marge_produit − coûts. ★ = recommandé.</p>
               <div id="rod-margin-table" class="perf-table-wrap empty">—</div>
-              <h3 class="card-title" style="margin-top:1rem;font-size:1rem">Lignes de coûts</h3>
+              <h3 class="card-title" style="margin-top:1rem;font-size:1rem">Lignes de coûts (solution affichée)</h3>
               <div id="rod-cost-lines" class="perf-table-wrap empty">—</div>
             </section>
 
-            <!-- Tab 3 : eval -->
             <section class="card card-wide rod-panel hidden" data-rod-panel="eval">
-              <h2 class="card-title">Écart CA simulé vs réel</h2>
+              <h2 class="card-title">Batch — évaluer sur l’année hold-out</h2>
               <p class="card-hint" id="rod-eval-method">
-                avg réel = somme(montant_ventes mois dispo) / 12 · écart = simulé − réel
-                (concept recommandé par les règles).
+                Ref = années train (tous les pilotes de la catégorie). Éval = année hold-out.
+                Split temporel, pas par hôtel.
               </p>
               <div id="rod-eval-metrics" class="metrics-grid empty">—</div>
               <div id="rod-eval-table" class="perf-table-wrap empty" style="margin-top:0.75rem">—</div>
@@ -544,6 +601,6 @@
     </div>
   </div>
 
-  <script type="module" src="/static/js/admin/app.js?v=20260726m"></script>
+  <script type="module" src="/static/js/admin/app.js?v=20260726q"></script>
 </body>
 </html>
