@@ -506,6 +506,12 @@ body {
   gap: 0.65rem;
 }
 
+/* Evaluation tables */
+#eval-hotels-table td.pos,
+#eval-months-table td.pos { color: var(--success); }
+#eval-hotels-table td.neg,
+#eval-months-table td.neg { color: var(--danger); }
+
 .model-build-layout {
   max-height: calc(100vh - 150px);
 }

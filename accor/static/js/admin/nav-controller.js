@@ -12,6 +12,7 @@ export class NavController {
    * @param {(id: string) => void} handlers.onSelectDataset
    * @param {() => void} handlers.onModelBuild
    * @param {() => void} handlers.onModelExplore
+   * @param {() => void} handlers.onModelEval
    */
   constructor(state, handlers) {
     this.state = state;
@@ -21,8 +22,10 @@ export class NavController {
     this.viewTable = $("#view-table");
     this.viewModelBuild = $("#view-model-build");
     this.viewModelExplore = $("#view-model-explore");
+    this.viewModelEval = $("#view-model-eval");
     this.navModelBuild = $("#nav-model-build");
     this.navModelExplore = $("#nav-model-explore");
+    this.navModelEval = $("#nav-model-eval");
   }
 
   makeNavButton(ds) {
@@ -66,12 +69,15 @@ export class NavController {
       this.navModelBuild.classList.toggle("active", which === "build");
     if (this.navModelExplore)
       this.navModelExplore.classList.toggle("active", which === "explore");
+    if (this.navModelEval)
+      this.navModelEval.classList.toggle("active", which === "eval");
   }
 
   hideAllViews() {
     if (this.viewTable) this.viewTable.classList.add("hidden");
     if (this.viewModelBuild) this.viewModelBuild.classList.add("hidden");
     if (this.viewModelExplore) this.viewModelExplore.classList.add("hidden");
+    if (this.viewModelEval) this.viewModelEval.classList.add("hidden");
   }
 
   clearDatasetNavActive() {
@@ -102,10 +108,20 @@ export class NavController {
     this.setModelNavActive("explore");
   }
 
+  showModelEvalPanel() {
+    this.state.panel = "model-eval";
+    this.hideAllViews();
+    if (this.viewModelEval) this.viewModelEval.classList.remove("hidden");
+    this.clearDatasetNavActive();
+    this.setModelNavActive("eval");
+  }
+
   wire() {
     if (this.navModelBuild)
       this.navModelBuild.addEventListener("click", this.handlers.onModelBuild);
     if (this.navModelExplore)
       this.navModelExplore.addEventListener("click", this.handlers.onModelExplore);
+    if (this.navModelEval)
+      this.navModelEval.addEventListener("click", this.handlers.onModelEval);
   }
 }

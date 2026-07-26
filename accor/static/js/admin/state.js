@@ -14,7 +14,7 @@ export class AdminState {
     this.dirty = new Map();
     /** @type {Set<number>} */
     this.selected = new Set();
-    /** @type {"table"|"model-build"|"model-explore"} */
+    /** @type {"table"|"model-build"|"model-explore"|"model-eval"} */
     this.panel = "table";
     this.modelConfig = null;
     this.explore = {

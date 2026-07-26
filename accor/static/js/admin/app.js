@@ -20,6 +20,7 @@ import { TableRenderer } from "./table-renderer.js";
 import { DatasetController } from "./dataset-controller.js";
 import { ModelBuildPanel } from "./model-build-panel.js";
 import { ModelExplorePanel } from "./model-explore-panel.js";
+import { ModelEvalPanel } from "./model-eval-panel.js";
 
 export class AdminApp {
   constructor() {
@@ -30,6 +31,7 @@ export class AdminApp {
       onSelectDataset: (id) => this.datasets.selectDataset(id),
       onModelBuild: () => this.modelBuild.open(),
       onModelExplore: () => this.modelExplore.open(),
+      onModelEval: () => this.modelEval.open(),
     });
 
     this.table = new TableRenderer(this.state, this.els, {
@@ -46,6 +48,7 @@ export class AdminApp {
     );
     this.modelBuild = new ModelBuildPanel(this.state, this.nav);
     this.modelExplore = new ModelExplorePanel(this.state, this.nav);
+    this.modelEval = new ModelEvalPanel(this.state, this.nav);
   }
 
   _bindDom() {
@@ -125,6 +128,7 @@ export class AdminApp {
     this.nav.wire();
     this.modelBuild.wire();
     this.modelExplore.wire();
+    this.modelEval.wire();
   }
 
   async boot() {

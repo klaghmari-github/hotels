@@ -1,26 +1,18 @@
 #!/usr/bin/env python3
 """
-Point d'entrée **User** — Simulateur ROD (interface directeur).
+Point d'entree user — Simulateur ROD (directeur).
 
-Usage
------
-    cd accord
+Usage (depuis la racine du projet, avec le venv active) :
+
+    source .venv/bin/activate
     python run_user.py
     python run_user.py --host 0.0.0.0 --port 5056 --debug
 
-Parcours
---------
-1. Saisie interactive (identité, services, profil clients, corner)
-2. Enrichissement auto (géocode, weather, proximity, holidays)
-3. Simulation revenus (règles Excel ROD — moteur déterministe)
-4. Coûts (technos / annexes / agencement — séparés des revenus)
-5. Marge nette + recommandation concept (SIMPLY / LIBERTY / CONNECTED)
-
-Le moteur IA pourra plus tard remplacer uniquement l'étape revenus
-en réutilisant le même calcul de coûts.
+    # ou entry point installé
+    accor-user
 """
 
-from user.app import main
+from accor.user.app import main
 
 if __name__ == "__main__":
     main()

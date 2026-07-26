@@ -1,161 +1,101 @@
-# Accor ROD — package production (`accor/`)
+# Accor ROD — package Python
 
-Application web prete pour la prod : **donnees propres deja construites** + interfaces admin / user.
+Application **prod** : Data & Model Studio (admin) + simulateur directeur (user).
 
-L historique complet (rebuilds massifs France, shards, scrapes bulk) est archive dans
-`../accor_1_0_0/`. Ce dossier ne garde que l essentiel pour faire tourner le produit.
+Le code est un **package installable** `accor` (layout `src/`).  
+Les donnees et assets restent a la racine du projet.
 
----
+## Structure
 
-## Demarrage
+```
+accor/                          # racine projet
+  pyproject.toml                # metadata + dependances
+  requirements.txt              # miroir pour pip -r
+  .venv/                        # environnement virtuel (local)
+  run_admin.py                  # entrees fines
+  run_user.py
+  data/                         # Excel + rod_reference (runtime)
+  models/                       # design + deploy
+  static/                       # JS/CSS admin + user
+  templates/                    # HTML
+  src/
+    accor/                      # PACKAGE Python
+      __init__.py               # PROJECT_ROOT, DATA_DIR, MODELS_DIR
+      app.py                    # Flask admin
+      data_io.py, store.py, schemas.py, …
+      brand_category.py, impute_model.py, …
+      user/                     # simulateur ROD
+      scrape_accor/             # scrape fiche hotel unitaire
+```
+
+Imports : `from accor.store import get_frame`, `from accor.user.app import app`, etc.
+
+Chemins runtime (independants de l endroit d ou on lance) :
+
+| Constante | Emplacement |
+|-----------|-------------|
+| `accor.PROJECT_ROOT` | racine projet (`…/hotels/accor`) |
+| `accor.DATA_DIR` | `PROJECT_ROOT/data` |
+| `accor.MODELS_DIR` | `PROJECT_ROOT/models` |
+| `accor.STATIC_DIR` | `PROJECT_ROOT/static` |
+| `accor.TEMPLATES_DIR` | `PROJECT_ROOT/templates` |
+
+## Environnement virtuel
 
 ```bash
 cd accor
-pip install -r requirements.txt
 
-python run_admin.py   # http://127.0.0.1:5055
-python run_user.py    # http://127.0.0.1:5056
+# creer le venv (une fois)
+python3 -m venv .venv
+source .venv/bin/activate
 
-# Verifie regles ROD (revenus R1–R4, couts, reco)
-python -m user.validate_rod
+# installer le package en editable + dependances
+pip install -U pip setuptools wheel
+pip install -e .
+
+# verifier
+python -c "import accor; print(accor.__version__, accor.DATA_DIR)"
+accor-validate-rod
 ```
 
-### Imputation prediction (categorie de marque)
+Desactiver : `deactivate`.
 
-Quand une feature numerique manque pour le modele (`impute_model`) :
+## Lancer les apps
 
-1. moyenne des **hotels pilotes** (ventes) de la **meme categorie** de marque  
-   (`economy` / `midscale` / `premium` / `luxury` / …) ;
-2. sinon moyenne des pilotes des categories **directement inferieure et superieure**  
-   (ex. luxury sans pilote → premium ; economy → midscale ; lifestyle → midscale+premium) ;
-3. sinon moyenne de tous les pilotes, puis moyenne globale.
+```bash
+source .venv/bin/activate
 
-Pilotes = codes presents dans `hotel_sales_data.xlsx`.  
-Module : `brand_category.py` + `impute_model.py`.  
-Colonne audit : `brand_category` (id_detail, pas une feature).
+# Admin  :5055
+python run_admin.py
+# ou
+accor-admin
 
-Meme logique pour `nb_chambres` / TO manquants dans le wizard user (`hotel_context`).
-
-### Simulateur ROD (run_user) — chaine de calcul
-
-1. **Clients** : `nb_chambres × TO × guests × 30.5`
-2. **Impact TO** puis **R1** (scaling clients vs pilote concept)
-3. **R2 mix** F&B / non-F&B (si mix corner saisi ; sinon mix pilote du concept)
-4. **R3 categories** (besoins clients vs baseline Excel)
-5. **R4 m_lin** (ecart vs pivot concept)
-6. **Marge produit** : `CA − CA/coef` par canal
-7. **Couts** techno + annexes + agencement × m_lin
-8. **Reco** : filtres taille/marque/N-F&B lifestyle, puis meilleure marge nette
-
-Les cartes etape 1 (rule1) n affichent que impact TO + R1 ; l etape 5 applique R2–R4 + couts.
-
----
-
-## Ce qui est en prod
-
-| Domaine | Contenu |
-|---------|---------|
-| Donnees Excel | brand, hotel, proximity, holidays, weather, sales raw/agregees, all_data, model_data, concept_pilote, couts, rod_reference, logos marques |
-| Admin UI | Consultation / edition des tables, Model Build, Model Explore |
-| User UI | Wizard 5 etapes + simulation ROD |
-| Ventes | Raw + pipeline `sales_prep` (transformation) |
-| ML | model_data, model_train, model_explore, models/design + deploy |
-| Scrape hotel | **A la demande** si le code n existe pas dans hotel_data |
-| Enrichissement simu | geo_* pour un point (meteo / proximite / holidays) si besoin |
-
-## Ce qui est retire (ou masque)
-
-| Element | Statut |
-|---------|--------|
-| Rebuilds massifs France (`parallel_*`) | Absents (reste dans accor_1_0_0) |
-| Sync bulk marque / hotel / alignement | Absents |
-| Scrape catalogue pays / world / workers | Absents |
-| Shards / state weather-holidays-proximity | Non copies |
-| Boutons **Reconstruire** dans l admin | **Masques** (API et modules Python conserves) |
-
-Pour reafficher un rebuild avance : renseigner `REBUILD_TABS` dans
-`static/js/admin/constants.js` (ids `sales`, `weather`, …).
-
----
-
-## Scrape hotel a la demande
-
-URL Accor : `https://all.accor.com/hotel/{code}/index.fr.shtml`
-
-Flux user :
-
-1. Saisie d un code hotel (autocomplete ou champ libre).
-2. `GET /api/hotels/<code>/context`
-3. Si present dans `hotel_data` → profil local.
-4. Sinon `user.services.hotel_fetch.fetch_and_upsert_hotel` :
-   - `scrape_accor.hotels.fetch_hotel`
-   - map vers colonnes hotel_data
-   - upsert Excel + invalidation cache
-5. UI : toast « Hotel recupere depuis Accor ».
-
-Module : `user/services/hotel_fetch.py`  
-Scrape : `scrape_accor/hotels.py` + `http_util.py`
-
----
-
-## Arborescence essentielle
-
-```
-accor/
-  run_admin.py / run_user.py
-  app.py, store.py, schemas.py, data_io.py
-  sales_prep.py          # raw → sales (garde)
-  join_data.py           # all_data (rebuild API masquee)
-  model_data.py / model_train.py / model_explore.py
-  concept_pilote.py
-  geo_*.py               # enrichissement ponctuel simu
-  impute_model.py        # utilise par model_data
-  scrape_accor/hotels.py # fiche unitaire
-  user/                  # wizard + regles + hotel_fetch
-  static/                # front OOP admin + user
-  data/                  # Excel propres (sans shards)
-  models/                # design + deploy
+# User   :5056
+python run_user.py
+# ou
+accor-user
 ```
 
----
+## Commandes utiles
 
-## API utiles
+| Commande | Role |
+|----------|------|
+| `pip install -e .` | (re)installe le package en dev |
+| `accor-admin` | Flask admin |
+| `accor-user` | Flask user / simulateur |
+| `accor-validate-rod` | tests regles revenus / couts / reco |
+| `python -m accor.user.validate_rod` | idem |
 
-### Admin (port 5055)
+## Contenu prod (rappel)
 
-- Datasets : `GET/PUT/POST/DELETE /api/datasets/...`
-- Rebuilds (conserves, non exposes UI) : `POST /api/datasets/<id>/rebuild`
-- Modeles : `/api/model/*`
+- Donnees preconstruites sous `data/` (pas de rebuilds massifs UI)
+- Ventes raw + `sales_prep`
+- Scrape hotel a la demande (`scrape_accor` + `user.services.hotel_fetch`)
+- Imputation prediction par categorie de marque (`brand_category` + `impute_model`)
+- Simulateur ROD (`user.rules.*`)
+- Admin **Evaluation** : perf modele sur l annee incomplete (defaut 2026) ;
+  cible selectionnable (defaut principale) ;
+  metrique = moyenne mensuelle hotel = somme(mois disponibles) / 12, pred vs reel
+  (`model_eval.py`, API `/api/model/eval`, onglet Evaluation)
 
-### User (port 5056)
-
-| Route | Role |
-|-------|------|
-| `GET /api/hotels/search` | Autocomplete |
-| `GET /api/hotels/<code>/context` | Profil (+ scrape si absent) |
-| `POST /api/simulate` | Simulation ROD |
-| `POST /api/geocode` | Lat/lon |
-| `POST /api/rule1` | CA regle 1 |
-| `GET /api/concept_pilote/brand/<marque>` | Moyennes marque |
-
----
-
-## Front
-
-- Admin : `static/js/admin/app.js` (ES modules)
-- User : `static/user/js/modules/app.js`
-- Shared : `static/shared/js/*`
-
-Bouton rebuild : `id="btn-rebuild"` reste en `hidden` ; `REBUILD_TABS = empty`.
-
----
-
-## Archive
-
-| Dossier | Role |
-|---------|------|
-| `accor/` | **Prod** (ce package) |
-| `accor_1_0_0/` | Version complete avec pipelines de construction de donnees |
-| `archive/` | Anciens pipelines / sources brutes |
-
-Ne pas reintroduire les rebuilds massifs dans ce package sans besoin operationnel.
+Archive complete (pipelines bulk) : `../accor_1_0_0/`.
