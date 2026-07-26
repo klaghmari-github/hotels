@@ -1,5 +1,6 @@
 /**
- * Simulation ROD + rendu resultats.
+ * Lance POST /api/simulate et rend les tableaux par concept + reco.
+ * collectPayload() fourni par UserApp (agrège les champs du wizard).
  */
 
 import { $, escapeHtml } from "../../../shared/js/dom.js";

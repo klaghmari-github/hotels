@@ -22,7 +22,12 @@ API principales
   /api/concept_pilote/brand/…   indicateurs pilotes marque
 
 La simulation passe par SimulationOrchestrator (services/orchestrator).
-Doc : README.md sections Interface user / Règles ROD.
+
+Doc :
+  README.md          vue d'ensemble
+  docs/API_USER.md   contrat HTTP de chaque route
+  docs/ROD_RULES.md  revenus / coûts / reco
+  docs/FRONT.md      wizard JS
 """
 
 from __future__ import annotations
@@ -74,11 +79,13 @@ _context = HotelContextBuilder()
 
 @app.get("/")
 def index():
+    """Page wizard directeur (templates/user/index.html)."""
     return render_template("index.html")
 
 
 @app.get("/api/health")
 def health():
+    """Sonde + concepts chargés depuis rod_reference.json."""
     return jsonify(
         {
             "status": "ok",
@@ -152,6 +159,7 @@ def meta():
 
 @app.get("/api/brands")
 def brands():
+    """Liste des marques (hotel_brand_data) pour listes déroulantes UI."""
     return jsonify({"brands": _catalog.list_brands()})
 
 
@@ -215,6 +223,11 @@ def hotels_search():
 
 @app.get("/api/hotels/<hotel_code>")
 def hotel_detail(hotel_code: str):
+    """
+    Fiche hotel_data pour un code.
+
+    Ne scrape pas : utiliser /context?fetch=1 si le code peut être absent.
+    """
     h = _catalog.get_hotel(hotel_code)
     if not h:
         return jsonify({"error": "Hotel introuvable"}), 404
@@ -275,6 +288,12 @@ def geocode():
 
 @app.post("/api/enrich")
 def enrich():
+    """
+    Complète un SimulationRequest (coords, proximity, weather, holidays).
+
+    Body = champs SimulationRequest (identity, operating, …).
+    ``light: true`` saute Overpass et Meteostat (holidays restent calculés).
+    """
     body = request.get_json(force=True, silent=True) or {}
     light = bool(body.get("light", False))
     try:

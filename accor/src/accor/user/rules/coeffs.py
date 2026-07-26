@@ -1,4 +1,15 @@
-"""Coefficients Règle 3 Excel + mapping marques (ROD Paramètres & règles)."""
+"""
+Coefficients et tables de référence pour les règles ROD.
+
+  RULE3_FB_COEFFS / RULE3_NFB_COEFFS  poids catégories (Excel simu)
+  RULE3_BASELINE_*                    sommes de référence règle 3
+  LIBERTY_NFB_NEEDS                   besoins qui ouvrent le chemin LIBERTY
+  CLIENT_NEED_LABELS                  libellés UI
+  BRAND_TO_CODE                       marque texte → code court
+  BRANDS_REQUIRING_LIBERTY_PATH       marques avec contrainte reco
+
+Utilisé par revenue, recommendation et /api/meta.
+"""
 
 from __future__ import annotations
 

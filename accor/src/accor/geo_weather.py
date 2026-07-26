@@ -1,22 +1,22 @@
 """
-WeatherFromGeo — météo mensuelle à partir de (lat, lon).
+Météo mensuelle à partir de (lat, lon) — hotel_weather_data.xlsx.
 
-Utilisé optionnellement lors du rebuild All Data
-(``join_data.build_joined_dataframe(fill_weather=True)``) pour combler
-les trous de ``hotel_weather_data``.
+Points d'entrée
+---------------
+  rebuild_hotel_weather_data()   grille hotels × années sales × mois terminés
+  WeatherFromGeo                 fetch pour un point (fill all_data optionnel)
 
-Compatible **Meteostat 2.x** (``stations.nearby`` + monthly/daily/hourly).
+Compatible Meteostat 2.x (stations.nearby + monthly/daily/hourly).
 
-Stratégie
----------
-1. Station météo la plus proche (``stations.nearby(Point)``).
-2. Série **monthly** (historique long, rapide).
-3. Fallback daily / hourly si couverture insuffisante.
-4. **Imputation** mois manquant ← même mois N-1, N-2, … (jamais fill 0
-   ici — le fill 0 global se fait ailleurs pour les mesures sales).
+Stratégie par hôtel
+-------------------
+1. station la plus proche
+2. série monthly (historique long)
+3. fallback daily / hourly si couverture faible
+4. mois manquant ← même mois N-1, N-2… (pas de fill 0 ici)
 
-Si Meteostat n'est pas installé, ``HAS_METEOSTAT`` est False et les appels
-retournent des frames vides sans lever d'exception bloquante.
+Si meteostat n'est pas installé : HAS_METEOSTAT=False, frames vides,
+pas d'exception bloquante. Doc : docs/DATA.md, docs/MODULES.md.
 """
 
 from __future__ import annotations

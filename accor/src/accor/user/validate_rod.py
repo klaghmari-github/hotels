@@ -1,17 +1,20 @@
 #!/usr/bin/env python3
 """
-Validation des regles ROD du simulateur user.
+Validation des règles ROD du simulateur user.
 
-Usage:
-    cd accor && python -m user.validate_rod
+Usage (venv activé) :
+  accor-validate-rod
+  python -m accor.user.validate_rod
 
-Verifie :
-  * clients jour/mois
-  * impact TO + R1 (API rule1 == RevenueRules)
-  * R2–R4 neutres au mix/m_lin pilote + besoins complets
-  * reco <50 ch, LIBERTY N-F&B, IBB
-  * couts agencement proportionnels a m_lin
-  * POST /api/simulate coherent
+Vérifie sans serveur HTTP (logique pure) :
+  - clients jour/mois (nb × TO × guests × 30.5)
+  - impact TO + R1 (rule1_ca_by_concept == RevenueRules)
+  - R2–R4 neutres au mix/m_lin pilote + besoins complets
+  - reco <50 chambres, ouverture LIBERTY N-F&B, cas IBB
+  - coûts agencement proportionnels à m_lin
+  - enchaînement SimulationOrchestrator cohérent
+
+Exit code 0 si tout passe, 1 sinon (messages sur stderr/stdout).
 """
 
 from __future__ import annotations

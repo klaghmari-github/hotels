@@ -1,5 +1,8 @@
 /**
- * CRUD datasets + pagination + rebuild.
+ * Contrôleur datasets : fetch page, dirty save, add/delete, reload, rebuild.
+ *
+ * API : /api/datasets/*  (voir docs/API_ADMIN.md)
+ * Rebuilds mappés via constants.REBUILD_MAP (sales, weather, all_data…).
  */
 
 import { $, escapeHtml } from "../../shared/js/dom.js";

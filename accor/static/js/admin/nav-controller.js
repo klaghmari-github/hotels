@@ -1,5 +1,11 @@
 /**
- * Navigation sidebar : All / Pilotes / Modeles.
+ * Navigation sidebar admin.
+ *
+ * - Datasets (pinés en haut + liste du milieu)
+ * - Model Build / Explore / Evaluation
+ *
+ * Bascule les vues (#view-table, #view-model-*), active le nav-item,
+ * délègue les clics aux handlers fournis par AdminApp.
  */
 
 import { $, $$, escapeHtml } from "../../shared/js/dom.js";

@@ -1,15 +1,10 @@
 /**
- * Point d'entree User — ROD Simulateur directeur.
+ * Point d'entrée user — simulateur ROD directeur.
  *
- * Modules :
- *   shared/               dom, api, toast, format
- *   user/js/modules/      stepper, autocomplete, hotel, rule1, sim, geocode
- *
- * HTML : templates/user/index.html
- * API  : /api/hotels/*, /api/simulate, /api/geocode, /api/rule1, …
- * Doc  : README.md (Architecture front + Interface user)
- *
- * Debug console : window.RODUser
+ * Compose stepper, autocomplete, hotel-context, rule1, geocode,
+ * simulation. HTML : templates/user/index.html
+ * API : docs/API_USER.md  |  Front : docs/FRONT.md
+ * Debug : window.RODUser
  */
 
 import { $, $$, escapeHtml } from "../../../shared/js/dom.js";

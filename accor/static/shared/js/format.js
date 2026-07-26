@@ -1,5 +1,7 @@
 /**
- * Formatage nombres / monnaies / pourcentages (FR).
+ * Formatage nombres / monnaies / pourcentages (locale fr-FR).
+ *
+ * Format.euro, Format.pct, Format.num — tolère null/NaN → "—".
  */
 
 export class Format {

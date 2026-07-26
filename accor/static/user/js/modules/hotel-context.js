@@ -1,5 +1,7 @@
 /**
- * Chargement profil hotel + moyennes marque (concept_pilote).
+ * Charge le contexte hôtel (GET /api/hotels/<code>/context) et les
+ * moyennes marque (concept_pilote). Préremplit les champs exploitation
+ * du wizard ; gère le flag scraped après fetch Accor.
  */
 
 import {

@@ -85,7 +85,12 @@ def _metrics_1d(y_true: np.ndarray, y_pred: np.ndarray) -> dict[str, float]:
 
 
 def eval_meta() -> dict[str, Any]:
-    """Payload UI : cibles, modeles, annee d eval par defaut."""
+    """
+    Payload pour l'onglet Evaluation / GET /api/model/eval/meta.
+
+    target_cols, main_target, eval_year, models, top_model, n_eval_rows,
+    divisor_months=12, texte method.
+    """
     try:
         _, meta = _load_model_frame()
     except Exception as exc:
@@ -121,7 +126,13 @@ def evaluate_model(
     year: int | None = None,
 ) -> dict[str, Any]:
     """
-    Evalue un modele design sur l annee ``year`` (defaut meta.eval_year / 2026).
+    Évalue un modèle design sur l'année ``year`` (défaut meta.eval_year).
+
+    model_id None → top_model puis premier design.
+    target None → main_target (montant_ventes).
+
+    Retourne ok, metrics_hotel_avg, metrics_month_level, hotels[],
+    months_detail[], totals (sum et avg /12). Voir docs/MODEL.md.
     """
     models = list_design_models()
     if not model_id:

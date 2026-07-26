@@ -1,8 +1,16 @@
 """
 Référentiel constantes ROD (pilotes Excel).
 
-Source de vérité runtime : ``accord/data/rod_reference.json``
-(extrait de *ROD - Simulateurs + détail des coûts.xlsx*).
+Source runtime : data/rod_reference.json
+(extrait de l'Excel simulateur + détail des coûts).
+
+RodReference expose :
+  concept(name)       pivots, mix, base CA, cost_lines
+  concept_names()     SIMPLY / LIBERTY / CONNECTED
+  get('a.b.c')        accès pointé
+  impact_to / raw     constantes transverses
+
+Rechargé via reload() si le JSON est régénéré sans redémarrer.
 """
 
 from __future__ import annotations

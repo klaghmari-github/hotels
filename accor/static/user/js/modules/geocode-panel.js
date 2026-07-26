@@ -1,5 +1,6 @@
 /**
- * Localisation adresse / code Accor.
+ * Bouton géocode : POST /api/geocode (BAN → Accor → Nominatim).
+ * Remplit lat/lon dans le formulaire si ok.
  */
 
 import { $, fieldStr } from "../../../shared/js/dom.js";

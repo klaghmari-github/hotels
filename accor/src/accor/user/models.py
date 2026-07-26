@@ -1,7 +1,19 @@
 """
-Modèles métier de la saisie directeur et des résultats de simulation.
+Structures métier du parcours user (saisie + résultats de simulation).
 
-Les structures sont volontairement plates / sérialisables JSON pour l'API.
+Dataclasses plates, sérialisables JSON pour l'API Flask.
+
+Principales classes
+-------------------
+  HotelIdentity       code, nom, marque, adresse, lat/lon
+  HotelOperating      chambres, TO, guests → clients jour/mois
+  ClientProfile       mix, besoins catégories (règle 3)
+  StoreConfig         mètres linéaires, options corner
+  SimulationRequest   agrège le tout (from_dict / to_dict)
+  RevenueResult / CostResult / ConceptSimulation
+  FullSimulation      by_concept + reco + warnings
+
+Voir docs/ROD_RULES.md et docs/API_USER.md.
 """
 
 from __future__ import annotations

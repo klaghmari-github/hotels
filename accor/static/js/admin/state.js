@@ -1,5 +1,11 @@
 /**
- * Etat central de l'admin (mutable, une instance).
+ * État central de l'admin (une instance mutable par session page).
+ *
+ * datasets, currentId, page/pageSize/q, payload page courante,
+ * dirty (Map index → row patch), selected indices, panel courant
+ * (table | model-build | model-explore | model-eval).
+ *
+ * confirmLeaveDirty() — garde-fou avant de quitter un dataset modifié.
  */
 
 export class AdminState {

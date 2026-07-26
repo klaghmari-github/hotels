@@ -1,9 +1,12 @@
 """
-Catalogue lecture seule depuis les datasets admin (``accor/data/*.xlsx``).
+Catalogue lecture seule depuis les Excel admin (data/*.xlsx).
 
-* Marques → ``hotel_brand_data.xlsx`` (pas de saisie user)
-* Hôtels  → ``hotel_data.xlsx`` (préremplissage du wizard)
-* Stats model_data → valeurs par défaut / moyennes de référence
+  Marques     hotel_brand_data.xlsx  (list_brands)
+  Hôtels      hotel_data.xlsx        (list / search / get)
+  model_data  défauts / moyennes     (model_defaults)
+
+Cache hotels invalidable (invalidate_hotels) après un scrape upsert.
+Pas d'écriture ici — le wizard ne saisit pas les marques.
 """
 
 from __future__ import annotations

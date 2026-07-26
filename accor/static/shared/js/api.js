@@ -1,9 +1,9 @@
 /**
- * Client HTTP JSON partage (admin + user).
+ * Client HTTP JSON partagé (admin + user).
  *
- * Instance par defaut : export const api = new ApiClient()
- * Leve Error avec message body.error si HTTP non 2xx.
- * Doc : README.md section Architecture front.
+ * Instance : export const api = new ApiClient()
+ * get / post / put / delete — parse JSON, lève Error(body.error) si non 2xx.
+ * Doc : docs/FRONT.md
  */
 
 export class ApiClient {

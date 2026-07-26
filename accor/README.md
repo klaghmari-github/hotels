@@ -3,6 +3,9 @@
 Deux applications Flask qui partagent le même package Python `accor` et les
 mêmes fichiers sous `data/` / `models/` :
 
+**Documentation détaillée** (API, modules, front, données, règles, ML) :
+voir le dossier [`docs/`](docs/README.md).
+
 | App | Port | Rôle |
 |-----|------|------|
 | **Admin** — Data & Model Studio | 5055 | éditer les Excel, (re)construire les tables dérivées, entraîner / explorer / évaluer / déployer le modèle |
@@ -39,6 +42,7 @@ code n’est pas encore en base.
 17. [Commandes utiles](#17-commandes-utiles)
 18. [Dépannage](#18-dépannage)
 19. [Où trouver quoi dans le code](#19-où-trouver-quoi-dans-le-code)
+20. [Documentation étendue (`docs/`)](#20-documentation-étendue-docs)
 
 ---
 
@@ -699,6 +703,24 @@ Vérifier `model_data_meta.json` (`eval_year`, `n_eval`).
 Les docstrings en tête de module détaillent les règles métier locales
 (imputation, split eval, métrique /12, etc.). En cas d’écart doc / code,
 le code fait foi — corriger la doc au passage.
+
+---
+
+## 20. Documentation étendue (`docs/`)
+
+| Fichier | Contenu |
+|---------|---------|
+| [docs/README.md](docs/README.md) | index |
+| [docs/API_ADMIN.md](docs/API_ADMIN.md) | toutes les routes admin + exemples curl |
+| [docs/API_USER.md](docs/API_USER.md) | toutes les routes user + exemples curl |
+| [docs/MODULES.md](docs/MODULES.md) | catalogue modules Python |
+| [docs/FRONT.md](docs/FRONT.md) | JS/CSS admin, user, shared |
+| [docs/DATA.md](docs/DATA.md) | Excel/JSON, grains, rôles model_data |
+| [docs/ROD_RULES.md](docs/ROD_RULES.md) | revenus, coûts, reco, validation |
+| [docs/MODEL.md](docs/MODEL.md) | train, explore, eval /12, deploy |
+
+Les docstrings en tête de module reprennent l’essentiel ; le détail
+des contrats HTTP est dans `docs/API_*.md`.
 
 ---
 

@@ -1,5 +1,9 @@
 /**
- * Panneau Model Build : params manuels + grid search + progression.
+ * Panneau Model Build.
+ *
+ * Params XGBoost manuels + grilles (listes de valeurs) + poll progress.
+ * POST /api/model/build  →  GET /api/model/build/progress
+ * POST /api/model/build/count pour prévisualiser le nombre de jobs.
  */
 
 import { $, escapeHtml } from "../../shared/js/dom.js";

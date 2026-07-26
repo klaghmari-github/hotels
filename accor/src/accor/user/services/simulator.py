@@ -1,10 +1,11 @@
 """
-Simulateur unitaire : revenus + coûts → marge pour **un** concept.
+Simulateur unitaire : revenus + coûts → marge pour un concept.
 
-Séparation claire :
-* ``RevenueRules.compute`` → CA / ventes / marge produit
-* ``CostRules.compute``    → techno / annexes / agencement
-* agrégation ici          → marge nette, ROI
+  RevenueRules.compute  → CA, ventes, marge produit
+  CostRules.compute     → techno, annexes, agencement
+  ici                   → marge nette, ROI, ConceptSimulation
+
+Le multi-concepts + reco est dans orchestrator.SimulationOrchestrator.
 """
 
 from __future__ import annotations

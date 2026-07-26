@@ -1,4 +1,7 @@
-/** Constantes UI admin. */
+/**
+ * Constantes UI admin : datasets pinés en haut de sidebar, icônes,
+ * mapping dataset_id → endpoint rebuild, titres overlay.
+ */
 
 export const PINNED_TOP_IDS = ["brand", "hotel", "proximity", "holidays", "weather"];
 

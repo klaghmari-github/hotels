@@ -1,21 +1,18 @@
 #!/usr/bin/env python3
 """
-Geo / Holidays — ``hotel_holidays_data.xlsx``.
+Calendrier FR par hôtel × mois — hotel_holidays_data.xlsx.
 
-Pattern load-or-build (comme weather / proximity)
-------------------------------------------------
-* ``ensure_hotel_holidays_data`` : charge le fichier s'il existe, sinon
-  archive ou grille minimale.
-* ``rebuild_hotel_holidays_data`` : recalcule pour chaque hôtel de
-  ``hotel_data``, années de ``hotel_sales_data``, mois terminés uniquement.
+  ensure_hotel_holidays_data   charge si présent, sinon grille minimale
+  rebuild_hotel_holidays_data  hotels × années sales × mois terminés
 
 Calcul
 ------
-* **Jours fériés** français (calendrier fixe + Pâques).
-* **Vacances scolaires** : conservation des zones déjà connues par hôtel
-  (fichier existant) + périodes zones A/B/C approximatives pour les années
-  courantes, ou compteurs 0 si inconnus.
-* Département / commune : repris du fichier existant si disponible.
+  jours fériés FR (fixe + Pâques)
+  vacances scolaires zones A/B/C (binaires + compteurs)
+  weekends, nb jours mois, % holidays
+  département / commune repris du fichier existant si dispo
+
+Pas d'appel réseau. Doc : docs/DATA.md.
 """
 
 from __future__ import annotations

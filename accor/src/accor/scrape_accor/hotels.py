@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
 """
-Extraction d'une fiche hôtel Accor : ``/hotel/{id}/index.fr.shtml``.
+Extraction d'une fiche hôtel Accor : /hotel/{code}/index.fr.shtml.
 
-Champs :
-* code Accor, nom, marque
-* adresse / complément / CP / ville / pays
-* lat / lon
-* amenities brutes + flags F_B / N_F_B
+API publique principale
+-----------------------
+  fetch_hotel(code)       GET + parse → dict
+  parse_hotel_html(html)  parse hors réseau
+  normalize_hotel_code / code_for_url
+  write_hotels_xlsx       écriture batch (usage archive / plages)
+
+Champs extraits : code, nom, marque, adresse, CP, ville, pays, lat/lon,
+amenities brutes + classification F&B / non-F&B (mots-clés).
+
+En prod le parcours user passe par user.services.hotel_fetch
+(fetch_and_upsert_hotel) qui mappe vers le schéma hotel_data.
 """
 
 from __future__ import annotations

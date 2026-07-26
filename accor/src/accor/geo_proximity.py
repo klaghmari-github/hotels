@@ -1,18 +1,18 @@
 """
-ProximityFromGeo — commerces / plage à partir de (lat, lon).
+Proximité commerces / plage à partir de (lat, lon) — hotel_proximity_data.
 
-Utilisé optionnellement lors du rebuild All Data
-(``fill_proximity=True``) pour enrichir la jointure.
+  rebuild_hotel_proximity_data()   un hôtel = une requête Overpass (lente)
+  ProximityFromGeo                 fill ponctuel (all_data / enrich user)
 
-Source : **Overpass API** (OpenStreetMap) — indépendant du domaine hôtel.
+Source : Overpass API (OpenStreetMap).
 
-Features produites
-------------------
-* Commerces par catégorie OSM : rayons 100 → 500 m (pas de 100 m).
-* Présence de plage : 0/1 aux distances 1 → 5 km + distance km min.
+Features
+--------
+  commerces par catégorie OSM, rayons 100→500 m (pas 100)
+  plage 0/1 aux distances 1→5 km + distance min
 
-Les requêtes réseau peuvent être lentes / rate-limitées ; le rebuild
-All Data désactive souvent ce fill par défaut pour rester réactif.
+Rate-limit OSM : pause entre hôtels (rebuild). Le fill dans all_data
+est off par défaut côté UI. Doc : docs/DATA.md.
 """
 
 from __future__ import annotations

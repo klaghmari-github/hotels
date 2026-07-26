@@ -1,5 +1,7 @@
 /**
- * Layout + rendu SVG d'un arbre XGBoost.
+ * Layout récursif + rendu SVG d'un arbre XGBoost (JSON model_explore).
+ *
+ * Nœuds internes : feature / seuil ; feuilles : valeur. Zoom basique via CSS.
  */
 
 import { escapeHtml } from "../../shared/js/dom.js";

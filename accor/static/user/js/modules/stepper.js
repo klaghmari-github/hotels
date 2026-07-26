@@ -1,5 +1,8 @@
 /**
- * Wizard 5 etapes.
+ * Wizard multi-étapes (défaut 5).
+ *
+ * show(step), next/prev, callbacks onEnter(step). Met à jour les
+ * panels .step et l'indicateur de progression dans le HTML.
  */
 
 import { $, $$ } from "../../../shared/js/dom.js";

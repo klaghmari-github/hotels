@@ -1,5 +1,7 @@
 /**
- * Autocomplete hotels (code / nom).
+ * Autocomplete hôtels (code / nom / ville) via GET /api/hotels/search.
+ *
+ * onPick(hotel) quand l'utilisateur choisit une suggestion.
  */
 
 import { $, $$, escapeHtml, debounce } from "../../../shared/js/dom.js";

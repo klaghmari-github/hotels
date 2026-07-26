@@ -1,5 +1,8 @@
 /**
- * Rendu table editable + dirty tracking.
+ * Rendu table éditable + sélection lignes + marquage dirty.
+ *
+ * Colonnes image (logo), booléens 0/1, clés métier en style fort.
+ * onEdit(row, col, value, payload) notifie DatasetController.
  */
 
 import { $, escapeHtml } from "../../shared/js/dom.js";

@@ -1,5 +1,9 @@
 /**
- * Panneau Model Explore : liste, metriques, importances, arbres, deploy.
+ * Panneau Model Explore.
+ *
+ * Liste models/design, perfs train/eval, importances, table des arbres
+ * (métriques cumulées), SVG d'un arbre, bouton Deploy.
+ * API : /api/model/list, /explore, /trees, /tree, /importance, /deploy
  */
 
 import { $, escapeHtml } from "../../shared/js/dom.js";

@@ -1,5 +1,6 @@
 /**
- * Derive clients + CA Regle 1.
+ * Dérive clients jour/mois et aperçu CA règle 1 (POST /api/rule1).
+ * Debounce sur nb_chambres / TO / guests.
  */
 
 import { $, debounce } from "../../../shared/js/dom.js";

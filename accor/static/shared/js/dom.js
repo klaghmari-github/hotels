@@ -1,5 +1,7 @@
 /**
- * Helpers DOM partages (admin + user).
+ * Helpers DOM partagés (admin + user).
+ *
+ * $, $$, on, escapeHtml, debounce, fieldStr/Num/Checked, setField, setText…
  */
 
 export function $(sel, root = document) {

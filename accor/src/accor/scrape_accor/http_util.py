@@ -1,4 +1,10 @@
-"""HTTP utilitaires — User-Agent, retries, throttle."""
+"""
+HTTP utilitaires pour scrape Accor.
+
+  fetch(url) → (status, body)
+  User-Agent identifiable, retries, petite pause anti-rafale.
+  404/410 renvoyés sans exception (body peut être vide).
+"""
 
 from __future__ import annotations
 

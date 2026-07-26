@@ -16,7 +16,11 @@ Lancer :
   accor-admin
 
 Simulateur directeur (autre process) : python run_user.py → :5056
-Doc d'ensemble : README.md à la racine du projet.
+
+Doc :
+  README.md          vue d'ensemble
+  docs/API_ADMIN.md  contrat HTTP de chaque route
+  docs/MODULES.md    carte des modules
 """
 
 from __future__ import annotations
@@ -349,7 +353,11 @@ def api_rebuild_join():
 
 @app.post("/api/datasets/model_data/rebuild")
 def api_rebuild_model_data():
-    """Reconstruit model_data.xlsx depuis all_data."""
+    """
+    Reconstruit model_data.xlsx (+ meta JSON) depuis all_data.
+
+    Filtre hôtels sans ventes, rôles colonnes, _is_eval, imputation ML.
+    """
     try:
         from accor.model_data import rebuild_model_data
         from accor.store import _cache
@@ -463,7 +471,10 @@ def api_rebuild_concept_pilote():
 
 @app.get("/api/model/config")
 def api_model_config():
-    """Config Model Build : hyperparams + dernier modèle (source = model_data)."""
+    """
+    Config Model Build : hyperparams par défaut, grilles, cible principale,
+    dernier modèle. Features issues de model_data.
+    """
     try:
         from accor.model_train import get_config_payload
 
@@ -476,7 +487,7 @@ def api_model_config():
 
 @app.get("/api/model/list")
 def api_model_list():
-    """Liste des modèles design, triés par performance."""
+    """Liste models/design, last_trained et top_model (ranking cible principale)."""
     try:
         from accor.model_train import get_last_trained, get_top_model, list_design_models
 
@@ -493,7 +504,12 @@ def api_model_list():
 
 @app.get("/api/model/eval/meta")
 def api_model_eval_meta():
-    """Cibles, modeles et annee d evaluation pour l onglet Evaluation."""
+    """
+    Prépare l'onglet Evaluation.
+
+    Retourne target_cols, main_target, eval_year, models, top_model,
+    n_eval_rows, méthode (somme mois / 12). Voir model_eval.eval_meta.
+    """
     try:
         from accor.model_eval import eval_meta
 
@@ -506,10 +522,11 @@ def api_model_eval_meta():
 @app.post("/api/model/eval")
 def api_model_eval():
     """
-    Evalue un modele sur l annee incomplete (defaut 2026).
+    Évalue un modèle design sur l'année incomplete (défaut meta.eval_year).
 
-    Query/body : model_id, target (cible), year.
-    Metrique : avg_monthly = sum(mois dispo) / 12, compare pred vs reel par hotel.
+    Body JSON ou query : model_id, target, year.
+    Métrique métier : par hôtel avg = sum(mois dispo) / 12 (pred vs réel),
+    puis MAE/RMSE/R²/MAPE + détail mois. Voir docs/MODEL.md.
     """
     try:
         from accor.model_eval import evaluate_model

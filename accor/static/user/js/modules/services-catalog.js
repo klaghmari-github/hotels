@@ -1,5 +1,6 @@
 /**
- * Catalogue des services hotel (alignes hotel_data).
+ * Catalogue des services hôtel (flags alignés hotel_data).
+ * Groupes F&B et non-F&B pour cases à cocher du wizard.
  */
 
 export const SERVICES = {
