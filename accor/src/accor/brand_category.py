@@ -1,15 +1,20 @@
 """
-Categories de marque Accor et moyennes pilotes pour imputation prediction.
+Catégories de marque Accor et moyennes « pilotes » pour l'imputation ML.
 
-Categories (dummies hotel_brand_data / jointure) :
-  economy, midscale, premium, luxury, lifestyle_by_ennismore, partner_brands
+Catégories (dummies cat_* dans hotel_brand_data / jointure) :
+  economy, midscale, premium, luxury,
+  lifestyle_by_ennismore, partner_brands
 
-Echelle "luxe" pour voisins directs :
+Échelle de gamme pour voisins directs :
   economy < midscale < premium < luxury
-  lifestyle_by_ennismore → voisins midscale + premium
-  partner_brands         → voisins economy + midscale
+  lifestyle_by_ennismore  →  midscale + premium
+  partner_brands          →  economy + midscale
 
-Pilotes = hotels presents dans hotel_sales_data (ventes).
+Un hôtel **pilote** = présent dans hotel_sales_data (a déjà des ventes).
+Les moyennes d'imputation se calculent d'abord sur ce sous-ensemble,
+pour coller au parc qui a réellement un corner / un historique.
+
+Utilisé par impute_model ; pas d'écriture fichier ici.
 """
 
 from __future__ import annotations

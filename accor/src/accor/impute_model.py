@@ -1,17 +1,23 @@
 #!/usr/bin/env python3
 """
-Imputation **uniquement pour model_data** (prediction / entrainement).
+Imputation réservée à model_data (entraînement / prédiction).
 
-Regle metier (moyennes numeriques) :
-  1. Moyenne des **hotels pilotes** (hotel_sales_data) de la **meme categorie**
-     de marque (economy, midscale, premium, luxury, …).
-  2. Sinon moyenne des pilotes des categories **directement inferieure
-     et superieure** (combinees).
-  3. Sinon moyenne de tous les pilotes, puis moyenne globale, puis 0.
+Important : on ne remplit pas hotel_data, sales ni all_data. Les sources
+gardent les trous ; seule la table ML est complétée.
 
-Comptages / flags / ventes → 0 (pas de moyenne).
+Règle pour une moyenne numérique manquante
+------------------------------------------
+1. Moyenne des hôtels **pilotes** (présents dans hotel_sales_data) de la
+   **même** catégorie de marque.
+2. Sinon moyenne des pilotes des catégories **directement** inférieure
+   et supérieure (échelle economy → luxury ; lifestyle / partner ont
+   leurs voisins dédiés — voir brand_category).
+3. Sinon moyenne tous pilotes, puis moyenne globale, puis 0.
 
-Les fichiers sources (hotel_data, brand, sales…) gardent les trous vides.
+Comptages, flags, montants de vente, dummies → 0 (pas de moyenne).
+
+Point d'entrée : impute_for_model(frame). Appelé par model_data lors
+du rebuild.
 """
 
 from __future__ import annotations

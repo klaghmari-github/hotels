@@ -1,31 +1,23 @@
 #!/usr/bin/env python3
 """
-Construction de ``concept_pilote.xlsx`` — indicateurs annuels par hôtel.
+Construction de concept_pilote.xlsx — indicateurs annuels par hôtel.
 
-Grain
------
-``hotel_code`` × ``annee``
+Grain : hotel_code × annee
 
-Colonnes
---------
-* Identité : hotel_code, hotel_name, hotel_brand
-* Exploitation (hotel_data + défauts marque) :
-  nb_chambres, taux_occupation, guests_per_chambre,
-  clients_jour, clients_mois
-* CA : ca_mensuel_moyen = moyenne des ``montant_ventes`` mensuels
-  (hotel_sales_data) sur les mois renseignés de l'année
-* Mix produits distincts (detail raw prioritaire) :
-  n_produits_distincts_f_b / n_f_b / total,
-  mix_f_b, mix_n_f_b = parts en nombre de produits distincts
+Colonnes principales
+--------------------
+  Identité     hotel_code, hotel_name, hotel_brand
+  Exploitation nb_chambres, TO, guests_per_chambre, clients_jour/mois
+               (hotel_data + défauts marque si besoin)
+  CA           ca_mensuel_moyen = moyenne des montant_ventes mensuels
+               sur les mois renseignés de l'année
+  Mix          produits distincts F&B / non-F&B (raw prioritaire)
 
-Sources
--------
-* hotel_data.xlsx — chambres, TO, marque
-* hotel_sales_data.xlsx — CA mensuel
-* hotel_sales_raw_data.xlsx — TYPE produit (F&B / NON-F&B) + code EAN
-  (via ``sales_prep.prepare_lines``)
+Sources : hotel_data, hotel_sales_data, hotel_sales_raw_data
+  (prepare_lines pour le TYPE produit).
 
-UI admin : onglet ``concept_pilote`` (rebuild + reload).
+UI admin : onglet concept_pilote (rebuild). Côté user : référence
+marque via /api/concept_pilote/brand/<marque> et règles de simu.
 """
 
 from __future__ import annotations

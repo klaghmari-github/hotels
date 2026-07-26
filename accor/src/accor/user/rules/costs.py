@@ -1,12 +1,17 @@
 """
-Règles de **coûts** ROD — indépendantes des revenus.
+Règles de coûts ROD — indépendantes des revenus.
 
 Sources
 -------
-* ``rod_reference.json`` → ``concepts.{C}.cost_lines`` (techno, annexes, agencement)
-* fallback agrégés : techno_monthly, annexes_monthly, agencement_per_m
+  data/rod_reference.json → concepts.{C}.cost_lines
+    (techno, annexes, agencement : qty, monthly_unit, capex, amort…)
+  fallbacks agrégés : techno_monthly, annexes_monthly, agencement_per_m
 
-Ce module reste stable lorsque le moteur de revenus est remplacé par l'IA.
+Chaque ligne : opex mensuel = monthly_unit × qty, ou capex/amort si pas
+de monthly_unit. Attention aux quantités déjà incluses dans un forfait
+(ex. CONNECTED) pour ne pas double-compter.
+
+Module volontairement stable si le moteur de revenus change.
 """
 
 from __future__ import annotations

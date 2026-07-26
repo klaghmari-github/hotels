@@ -1,7 +1,13 @@
 """
-Orchestrateur multi-concepts : contexte hôtel → store → simulation → reco.
+Orchestrateur multi-concepts.
 
-Point d'entrée principal de l'API ``POST /api/simulate``.
+Enchaînement pour POST /api/simulate :
+  1. prepare_request — hydrate depuis hotel_data / model_data si code connu
+  2. enrichissement optionnel des features manquantes
+  3. simulation SIMPLY / LIBERTY / CONNECTED (RodSimulator)
+  4. RecommendationRules — filtre + meilleure marge nette
+
+Retourne un FullSimulation (détail par concept + reco + warnings).
 """
 
 from __future__ import annotations

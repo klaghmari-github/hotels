@@ -1,27 +1,23 @@
 """
-Jointure « All Data » — grille parfaite hotel × année × mois.
+Jointure All Data — grain hotel × année × mois.
 
-Produit le fichier ``data/all_data.xlsx`` (feuille ``all_data``).
+Produit data/all_data.xlsx (feuille all_data).
 
-Règles métier
--------------
-- **Base (table de gauche)** = ``hotel_sales_data`` : une ligne par
-  (hotel_code, annee, mois) pour lequel il existe une vente.
-- **Left joins** ensuite : holidays, weather (hotel × annee × mois),
-  hotel_data et proximity (hotel_code), brand (hotel_brand).
-- Seuls les hotels presents dans les ventes entrent dans all_data.
-- **Fill optionnel** (flags ``fill_weather`` / ``fill_proximity``) :
-  comble les trous meteo / proximite via lat/lon (desactive par defaut
-  dans le bouton UI Reconstruire).
-- **Nulls conserves** dans all_data. L imputation se fait dans model_data.
+Règles
+------
+- Table de gauche = hotel_sales_data : une ligne par
+  (hotel_code, annee, mois) où il y a eu de l'activité.
+- Left joins : holidays, weather (même clé mois), hotel_data + proximity
+  (hotel_code), brand (hotel_brand).
+- Seuls les hôtels présents dans les ventes entrent dans all_data.
+- fill_weather / fill_proximity (optionnels) : comble via lat/lon
+  (désactivés par défaut dans l'UI pour rester réactif).
+- Les nulls sont **conservés** ici. L'imputation ML se fait dans model_data.
 
-Anti-doublons
--------------
-:func:`_merge_new` n'ajoute que les colonnes absentes de la table de gauche
-(une colonne déjà présente n'est jamais ré-ajoutée avec suffixe).
+Anti-doublons : _merge_new n'ajoute que les colonnes encore absentes
+(pas de suffixes _x / _y).
 
-Consommateurs : bouton **Reconstruire** (All Data), ``sync_data_files``,
-et en amont de ``model_data.rebuild_model_data``.
+Appelé depuis le rebuild admin all_data et en amont de model_data.
 """
 
 from __future__ import annotations

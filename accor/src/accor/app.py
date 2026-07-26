@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
 """
-Serveur Flask de l interface admin Accor Data and Model Studio.
+Serveur Flask — interface admin Accor Data & Model Studio.
 
-Ce module expose la page unique et les routes API. La logique metier
-est dans store, join_data, geo_*, sales_prep, model_*, concept_pilote.
+Page unique (templates/index.html) + API JSON. La logique métier est
+ailleurs : store (Excel), join_data / sales_prep / geo_* / model_* /
+concept_pilote.
 
-Routes principales:
-  pages HTML via templates/index.html
-  CRUD datasets Excel via store.py
-  rebuild all_data, model_data, sales, weather, proximity, holidays, concept
-  build, list, explore et deploy des modeles XGBoost
+Routes regroupées :
+  /api/datasets/*     CRUD + pagination + rebuilds
+  /api/model/*        build, list, explore, deploy, eval
+  /api/marques/logos  logos PNG sous data/marques/
 
-Lancer: python run_admin.py  (http://127.0.0.1:5055)
-Simulateur directeur: python run_user.py (port 5056)
-Documentation: README.md
+Lancer :
+  python run_admin.py          → http://127.0.0.1:5055
+  accor-admin
+
+Simulateur directeur (autre process) : python run_user.py → :5056
+Doc d'ensemble : README.md à la racine du projet.
 """
 
 from __future__ import annotations
@@ -53,10 +56,10 @@ app.config["JSON_AS_ASCII"] = False
 @app.get("/")
 def index():
     """
-    Page unique de l'application (SPA légère).
+    Page unique admin (SPA légère).
 
-    Le HTML charge ``static/js/app.js`` qui pilote les onglets datasets,
-    Model Build et Model Explore via les routes ``/api/...``.
+    Le HTML charge ``static/js/admin/app.js`` (modules ES) : datasets,
+    Model Build, Model Explore, Evaluation — le tout via ``/api/...``.
     """
     return render_template("index.html")
 

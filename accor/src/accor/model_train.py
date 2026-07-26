@@ -1,32 +1,31 @@
 """
-Entrainement XGBoost a partir de model_data.
+Entraînement XGBoost à partir de model_data.
 
 Pipeline
 --------
-1. (Re)construit model_data via model_data.rebuild_model_data.
+1. Charge (ou reconstruit) model_data.
 2. Features = colonnes descriptives (meta).
-3. Targets = colonnes cibles (volumes + pct non-mix).
-4. Split temporel : _is_eval=0 train, _is_eval=1 eval (derniere annee).
-5. Multi-output : un XGBRegressor par cible (MultiOutputRegressor).
-6. Sauvegarde design : models/design/<nom>/model.pkl + config.json.
-7. Deploy : copie vers models/deploy/model.pkl + model.json.
+3. Targets = volumes + pct cibles (multi-output).
+4. Split temporel : _is_eval=0 train, _is_eval=1 eval (dernière année).
+5. Un XGBRegressor par cible (sklearn MultiOutputRegressor).
+6. Sauvegarde design : models/design/<slug>/model.pkl + config.json.
+7. Deploy : copie vers models/deploy/ (modèle « en production » simu).
 
-Classes
+Côté UI
 -------
-* BuildProgress — etat d un batch (manuel + grid), JSON pour le poll UI.
-* GridSearchPlanner — 1 job manuel + produit cartesien des grilles (dedup).
+POST /api/model/build       lance un batch (manuel + grille hyperparams)
+GET  /api/model/build/progress   état JSON pour le poll
+list_design_models / get_top_model   ranking (souvent sur montant_ventes)
+deploy_model                écrit models/deploy/
 
-UI (front ModelBuildPanel / ModelExplorePanel)
-----------------------------------------------
-* POST /api/model/build (async) planifie les jobs via GridSearchPlanner.
-* GET /api/model/build/progress lit BuildProgress.
-* Model Explore liste list_design_models (tri par metrique / cible).
-* Deploy appelle deploy_model.
-
-Fichiers annexes
+Classes internes
 ----------------
-* models/last_trained.json — pointeur du dernier build.
-* models/build_progress.json — resume du batch pour le front.
+BuildProgress     état d'un batch (thread d'entraînement)
+GridSearchPlanner produit cartésien des grilles, dédupliqué
+
+Fichiers annexes : models/last_trained.json, models/build_progress.json.
+Exploration détaillée des arbres : model_explore.py.
+Eval année incomplete (moyenne /12) : model_eval.py.
 """
 
 from __future__ import annotations

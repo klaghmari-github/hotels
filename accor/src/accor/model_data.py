@@ -1,50 +1,32 @@
 """
-Construction de ``model_data.xlsx`` pour l'apprentissage XGBoost.
+Construction de model_data.xlsx pour l'apprentissage XGBoost.
 
-Entrée
+Entrée : all_data.xlsx (jointure hotel × année × mois).
+
+Règles
 ------
-``all_data.xlsx`` (jointure complète hotel × année × mois).
-
-Règles métier
--------------
-1. **Filtrer** les hôtels sans aucune vente (> 0) — lignes éliminées.
-2. **Supprimer** les colonnes constantes (inutiles au modèle).
-3. **Rôles de colonnes** (couleurs UI) :
-
-   * **id_detail** (jaune) : code, nom, marque, logo_path, adresse, ville,
-     lat/lon, année, mois, département, commune…
-   * **descriptive** (neutre) : features d'entrée du modèle —
-
-     - météo, équipements, brand stats, holidays counts…
-     - **mix saisi par le directeur** uniquement en *nombre de ventes* :
-       ``pct_categories_mois_*``, ``nombre_categories_mois_*``,
-       ``pct_cat_*_nombre_ventes``, ``pct_sous_cat_*_nombre_ventes``
-
-   * **target** (vert) : variables de ventes à prédire —
-
-     - volumes : ``nombre_ventes``, ``montant_ventes``, ``nombre_paniers``,
-       ``nombre_produits``
-     - **tous les autres pct** ventes (montant, paniers, produits…)
-
+1. Filtrer les hôtels sans aucune vente > 0.
+2. Supprimer les colonnes constantes (inutiles au modèle).
+3. Rôles de colonnes (couleurs UI) :
+   - id_detail (jaune) : code, nom, marque, adresse, lat/lon, annee, mois…
+   - descriptive : météo, équipements, brand, holidays, et le mix
+     « saisi directeur » en *nombre de ventes* seulement
+     (pct_categories_mois_*, pct_cat_*_nombre_ventes, …)
+   - target (vert) : nombre_ventes, montant_ventes, nombre_paniers,
+     nombre_produits + les autres pct ventes (montant, paniers, …)
 4. Ordre des colonnes : id_detail | descriptive | target.
 5. Tri : année → mois → marque → hôtel.
-6. **Dernière année = évaluation** (``_is_eval=1``, gras dans l'UI) ;
-   le reste = apprentissage.
-7. **Imputation des trous** (uniquement ici, pas dans les sources /
-   all_data) via :func:`impute_model.impute_for_model` :
-   moyennes pilotes par **categorie de marque**, sinon categories adjacentes :
-
-   - counts / ventes / flags → 0
-   - TO, mix clients, météo, lat/lon… → moyenne **marque** puis globale
-8. Cible principale pour le ranking des modèles : ``montant_ventes``.
+6. Dernière année calendaire → _is_eval=1 (hold-out) ; le reste = train.
+7. Imputation uniquement ici (impute_model) : moyennes pilotes par
+   catégorie de marque, sinon catégories adjacentes ; counts/flags → 0.
+8. Cible principale de ranking des modèles : montant_ventes (MAIN_TARGET).
 
 Sorties
 -------
-* ``data/model_data.xlsx`` — feuille ``model_data``
-* ``data/model_data_meta.json`` — rôles, n_train / n_eval, listes de colonnes
+  data/model_data.xlsx
+  data/model_data_meta.json   rôles, n_train / n_eval, listes de colonnes
 
-Consommateurs : ``model_train`` (features/targets), ``store.page_payload``
-(couleurs + stats), UI onglet Model Data.
+Consommateurs : model_train, model_eval, model_explore, store (couleurs UI).
 """
 
 from __future__ import annotations

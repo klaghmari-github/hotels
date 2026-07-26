@@ -1,16 +1,15 @@
 """
-Package **User** — simulateur ROD pour directeurs d'hôtel.
+Package user — simulateur ROD pour directeurs d'hôtel.
 
-Architecture
-------------
-* ``models``        — structures d'entrée / sortie (POO, dataclasses)
-* ``reference``     — constantes Excel (``data/rod_reference.json``)
-* ``rules``         — revenus · coûts · recommandation (séparés)
-* ``services``      — catalogue admin, géocode, enrichissement, orchestrateur
-* ``app``           — Flask API + UI wizard
+  models.py      dataclasses d'entrée / sortie (SimulationRequest, …)
+  reference.py   constantes lues depuis data/rod_reference.json
+  rules/         revenus, coûts, recommandation (modules séparés)
+  services/      catalogue, géocode, enrich, contexte hôtel, orchestrateur
+  app.py         Flask API + page wizard
+  validate_rod.py  checks de non-régression sur les règles
 
-Séparation volontaire revenus / coûts : l'étape IA future remplacera
-uniquement le moteur de revenus, en réutilisant ``rules.costs``.
+Revenus et coûts sont séparés exprès : un futur moteur (ex. modèle) peut
+remplacer RevenueRules sans retoucher CostRules.
 """
 
 __all__ = ["__version__"]

@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 """
-Point d'entree admin — Accor Data & Model Studio.
+Point d'entrée admin — Accor Data & Model Studio.
 
-Usage (depuis la racine du projet, avec le venv active) :
+Depuis la racine du projet, venv activé :
 
-    source .venv/bin/activate
-    python run_admin.py
-    python run_admin.py --host 0.0.0.0 --port 5055 --debug
+  python run_admin.py
+  python run_admin.py --host 0.0.0.0 --port 5055 --debug
+  accor-admin
 
-    # ou entry point installé
-    accor-admin
+Délègue à accor.app:main. Doc : README.md.
 """
 
 from accor.app import main

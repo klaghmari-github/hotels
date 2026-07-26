@@ -1,10 +1,16 @@
 """
-Recuperation a la demande d un hotel Accor absent de hotel_data.
+Récupération à la demande d'un hôtel Accor absent de hotel_data.
 
-Source : https://all.accor.com/hotel/{code}/index.fr.shtml
-(scrape_accor.hotels.fetch_hotel)
+Quand le directeur saisit un code inconnu, on tente un scrape unitaire :
 
-En cas de succes : upsert dans data/hotel_data.xlsx + invalidation caches.
+  https://all.accor.com/hotel/{code}/index.fr.shtml
+  → scrape_accor.hotels
+  → upsert data/hotel_data.xlsx
+  → invalidation des caches store / catalogue
+
+normalize_lookup_code / code_variants gèrent H0338, 0338, 338, pad 4, etc.
+Échec réseau ou 404 : on remonte une erreur propre à l'API, sans casser
+le wizard.
 """
 
 from __future__ import annotations

@@ -1,8 +1,20 @@
 """
-Lecture / ecriture Excel et normalisations partagees.
+Lecture / écriture Excel et normalisations partagées.
 
-Utilise par geo_*, join_data, store, catalog, parallel_*.
-Fonctions pures : pas d etat global hors DATA_DIR.
+Résout aussi les chemins runtime du projet (indépendants du cwd) :
+
+  PACKAGE_DIR   → src/accor/
+  PROJECT_ROOT  → racine (data/, models/, static/, templates/)
+  DATA_DIR, MODELS_DIR, STATIC_DIR, TEMPLATES_DIR
+
+Fonctions pures autant que possible : pas d'état global hors ces chemins.
+Consommateurs : store, join_data, geo_*, model_*, user.services, scripts.
+
+Helpers :
+  read_excel                  charge une feuille (vide si fichier absent)
+  normalize_hotel_code_*      aligne H0338 / 0338 / formes vides
+  filter_france_hotels        parc France + dédup code
+  cell_to_python / row_to_dict  sérialisation JSON-safe pour l'API
 """
 
 from __future__ import annotations

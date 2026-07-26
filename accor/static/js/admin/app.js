@@ -1,15 +1,16 @@
 /**
- * Point d'entree admin — Accor Data & Model Studio.
+ * Point d'entrée admin — Accor Data & Model Studio.
  *
- * Architecture (ES modules + classes) :
+ * Modules ES (pas de bundler) :
  *   shared/  → dom, api, toast, loading, format
- *   admin/   → state, nav, table, datasets, model build/explore
+ *   admin/   → state, nav, table, datasets,
+ *              model build / explore / eval
  *
  * HTML : templates/index.html
  * API  : /api/datasets/* , /api/model/*
- * Doc  : README.md (Architecture front + Interface graphique admin)
+ * Doc  : README.md (sections Interface admin + Front)
  *
- * Debug console : window.AccorAdmin
+ * Debug navigateur : window.AccorAdmin
  */
 
 import { $, debounce } from "../../shared/js/dom.js";

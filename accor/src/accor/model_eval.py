@@ -1,19 +1,24 @@
 """
-Evaluation modele sur l annee incomplete (ex. 2026).
+Évaluation d'un modèle design sur une année incomplete (souvent 2026).
 
-Metrique metier
----------------
-Sur les mois **disponibles** pour chaque hotel :
+Pourquoi /12 et pas /n_mois ?
+  L'année n'a que quelques mois de vérité terrain, mais le référentiel
+  métier reste le « revenu mensuel moyen » = total annuel / 12. On prend
+  donc la somme sur les mois disponibles et on divise toujours par 12,
+  côté réel comme côté prédit (mêmes mois pour les deux).
 
-* somme_reelle  = Σ y_true (mois presents)
-* somme_predite = Σ y_pred (memes mois)
-* revenu_mensuel_moyen = somme / 12
+Par hôtel :
+  avg_monthly_true = sum(y_true) / 12
+  avg_monthly_pred = sum(y_pred) / 12
 
-(On divise par 12 et non par le nombre de mois, car l annee est incomplete
-mais le referentiel metier reste le « revenu mensuel moyen » = annuel/12.)
+Puis métriques globales sur ces moyennes (MAE, RMSE, R², MAPE, biais),
+plus un détail mois à mois.
 
-On compare ensuite ces moyennes par hotel (MAE, RMSE, R2, MAPE, biais)
-et on fournit le detail hotel + les metriques mois a mois.
+API admin : GET /api/model/eval/meta , GET|POST /api/model/eval
+UI : onglet Evaluation (static/js/admin/model-eval-panel.js)
+
+Cible par défaut = MAIN_TARGET (montant_ventes) ; n'importe quelle
+colonne cible du multi-output est sélectionnable.
 """
 
 from __future__ import annotations

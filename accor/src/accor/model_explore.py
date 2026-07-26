@@ -1,22 +1,23 @@
 """
-Exploration des modèles design (XGBoost) pour l'onglet Model Explore.
+Exploration des modèles design pour l'onglet Model Explore.
 
-Fonctions exposées à l'API
---------------------------
-* :func:`explore_overview` — méta, importances, perfs train/éval, n arbres.
-* :func:`trees_table` — une ligne par arbre (profondeur, n features,
-  R²/RMSE **cumulés** sur le jeu d'évaluation).
-* :func:`get_tree` — dump XGBoost parsé en arbre JSON pour le SVG UI.
-* :func:`feature_importance_payload` — barre d'importances.
+Fonctions API
+-------------
+  explore_overview              méta, importances, perfs train/eval, n arbres
+  trees_table                   une ligne par arbre (profondeur, n features,
+                                R²/RMSE *cumulés* sur le jeu d'eval)
+  get_tree                      dump XGBoost parsé en JSON pour le SVG
+  feature_importance_payload    barres d'importance
 
-Note sur la « perf par arbre »
------------------------------
-En boosting, l'arbre *k* prédit un **correctif** (résidu), pas la cible.
-On évalue donc la prédiction **cumulative** après les *k+1* premiers arbres
-(``booster.predict(..., iteration_range=(0, k+1))``) — seule métrique
-interprétable côté métier.
+Perf « par arbre »
+-----------------
+En boosting, l'arbre k prédit un correctif, pas la cible brute. On évalue
+donc la prédiction cumulative après les k+1 premiers arbres
+(booster.predict(..., iteration_range=(0, k+1))). C'est la seule métrique
+lisible métier.
 
-Les modèles sont lus depuis ``models/design/<id>/`` via ``model_train``.
+Lecture des modèles : models/design/<id>/ via model_train.load_design_model.
+Pour l'eval année incomplete (moyenne /12), voir model_eval.
 """
 
 from __future__ import annotations

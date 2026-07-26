@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 """
-Point d'entree user — Simulateur ROD (directeur).
+Point d'entrée user — simulateur ROD (directeur).
 
-Usage (depuis la racine du projet, avec le venv active) :
+Depuis la racine du projet, venv activé :
 
-    source .venv/bin/activate
-    python run_user.py
-    python run_user.py --host 0.0.0.0 --port 5056 --debug
+  python run_user.py
+  python run_user.py --host 0.0.0.0 --port 5056 --debug
+  accor-user
 
-    # ou entry point installé
-    accor-user
+Délègue à accor.user.app:main. Doc : README.md.
 """
 
 from accor.user.app import main

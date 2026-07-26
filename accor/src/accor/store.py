@@ -1,10 +1,20 @@
 """
-Couche donnees Excel admin (cache, pagination, mutations).
+Couche données Excel de l'admin : cache mémoire, pagination, CRUD.
 
-API publique inchangee pour app.py / sync_data_files :
+Chaque onglet (schemas.DATASETS) pointe vers un fichier sous data/.
+Une instance module-level sert toutes les routes Flask (thread-safe
+via RLock).
+
+API publique (app.py et scripts) :
   get_frame, page_payload, update_rows, add_row, delete_rows,
-  reload_dataset, rebuild_joined_data, JOINED_DATASET_ID,
-  _cache, _project_to_schema, _save_excel (usage interne / scripts)
+  reload_dataset, rebuild_joined_data, JOINED_DATASET_ID
+
+Cas particuliers :
+  all_data / model_data — colonnes colorées (rôles), lignes eval en gras
+  image_columns (logo_path) — chemins relatifs data/marques/
+  array_columns — listes sérialisées JSON dans la cellule Excel
+
+L'UI n'écrit jamais model_data à la main (readonly) : rebuild seulement.
 """
 
 from __future__ import annotations

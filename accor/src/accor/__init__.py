@@ -1,8 +1,12 @@
 """
-Package Accor ROD — data studio admin + simulateur user.
+Package Accor ROD.
 
-Donnees runtime : <project>/data, <project>/models
-Assets web     : <project>/static, <project>/templates
+Contient :
+  - le studio admin (Flask, datasets Excel, modèles XGBoost)
+  - le simulateur directeur (parcours ROD SIMPLY / LIBERTY / CONNECTED)
+
+Les chemins data / models / static / templates sont résolus depuis l’emplacement
+du package, pas depuis le répertoire de lancement. Voir data_io pour le détail.
 """
 
 from __future__ import annotations

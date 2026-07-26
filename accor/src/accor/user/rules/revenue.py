@@ -1,12 +1,16 @@
 """
-Règles de **revenus** ROD (sans coûts).
+Règles de revenus ROD (sans coûts).
 
-Enchaînement Excel SIMULATEUR * :
-  impact TO → Règle 1 (clients) → Règle 2 (mix) → Règle 3 (catégories) → Règle 4 (m_lin)
-  puis marge produit (coefs J9/J10).
+Enchaînement calqué sur l'Excel simulateur :
+  impact TO
+  → règle 1 (ratio clients hôtel / pilote)
+  → règle 2 (mix)
+  → règle 3 (coefficients catégories F&B / N-F&B)
+  → règle 4 (mètres linéaires)
+  → marge produit (coefs type J9/J10)
 
-Isolé volontairement de ``CostRules`` pour permettre un swap IA sur les seuls
-revenus tout en réutilisant le même moteur de coûts.
+Séparé de CostRules : on peut remplacer ce moteur plus tard sans
+retoucher les barèmes de coûts.
 """
 
 from __future__ import annotations

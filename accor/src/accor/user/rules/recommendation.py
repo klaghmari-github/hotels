@@ -1,9 +1,14 @@
 """
-Règles de **recommandation** de concept (Excel REGLES POUR RECO).
+Recommandation de concept (logique type Excel « règles pour reco »).
 
-* #1 taille : < 50 ch → SIMPLY ; ≥ 50 → LIBERTY / CONNECTED
-* #2 catégories N-F&B lifestyle → ouvre LIBERTY
-* Choix final : meilleure marge nette parmi les concepts autorisés
+1. Taille : moins de 50 chambres → plutôt SIMPLY ;
+   50 et plus → chemin LIBERTY / CONNECTED.
+2. Certaines catégories N-F&B « lifestyle » ouvrent LIBERTY.
+3. Parmi les concepts encore autorisés : on garde celui qui maximise
+   la marge nette (après coûts).
+
+Ne calcule pas le CA : s'appuie sur les ConceptSimulation déjà produites
+par le simulateur.
 """
 
 from __future__ import annotations

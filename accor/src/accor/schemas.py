@@ -1,13 +1,20 @@
 """
-Schemas des jeux de donnees de l interface admin.
+Schémas des jeux de données de l'interface admin.
 
-Chaque entree de DATASETS decrit un onglet et le fichier Excel sous data/.
-editable_columns fixe l ordre et le sous-ensemble editable (sauf all_data
-et model_data qui exposent toutes les colonnes).
-readonly=True masque ajout, sauvegarde et suppression dans l UI.
+Chaque entrée de DATASETS = un onglet latéral + un fichier sous data/.
+  editable_columns  ordre / sous-ensemble affiché (sauf all_data et
+                    model_data qui exposent toutes les colonnes du fichier)
+  key_columns       mise en avant visuelle (style clé métier)
+  boolean_columns   saisie 0/1 bornée côté front
+  image_columns     chemins image (thumbnail logo)
+  readonly          masque ajout / sauvegarde / suppression
 
-Pour ajouter un onglet: fichier dans data/, entree dans DATASETS, colonnes
-editables si besoin. Persistance: store.py. Documentation: README.md.
+Pour ajouter un onglet :
+  1. placer le xlsx dans data/
+  2. ajouter une DatasetSchema dans DATASETS
+  3. redémarrer l'admin — store.py gère la persistance
+
+Voir README.md (section Données / API admin).
 """
 
 from __future__ import annotations

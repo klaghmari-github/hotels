@@ -1,19 +1,28 @@
 """
-Flask — interface User ROD (wizard directeur).
+Flask — interface user ROD (wizard directeur d'hôtel).
 
 Lancer
 ------
-    python run_user.py          # → http://127.0.0.1:5056
+  python run_user.py     → http://127.0.0.1:5056
+  accor-user
 
 Static
 ------
-Serve tout accord/static (url /static) pour :
-  * /static/user/js/modules/app.js  (front OOP UserApp)
-  * /static/shared/js/*             (dom, api, toast, format)
+Sert tout PROJECT_ROOT/static sous /static :
+  user/js/modules/*   front OOP (UserApp, panels)
+  shared/js/*         dom, api, toast, format
 
-API principales : /api/hotels/*, /api/simulate, /api/geocode,
-/api/rule1, /api/concept_pilote/brand/<marque>, /api/meta, /api/brands.
-Doc UI + routes : README.md section Interface user.
+API principales
+---------------
+  /api/hotels/*                 recherche, fiche, contexte (scrape si besoin)
+  /api/simulate                 multi-concepts + reco
+  /api/geocode, /api/enrich     adresse et features manquantes
+  /api/rule1                    aperçu règle clients
+  /api/meta, /api/brands        labels UI
+  /api/concept_pilote/brand/…   indicateurs pilotes marque
+
+La simulation passe par SimulationOrchestrator (services/orchestrator).
+Doc : README.md sections Interface user / Règles ROD.
 """
 
 from __future__ import annotations

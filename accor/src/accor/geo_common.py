@@ -1,10 +1,13 @@
 """
-Utilitaires partages pour les rebuilds geo (weather / proximity / holidays).
+Utilitaires partagés pour les rebuilds geo (weather / proximity / holidays).
 
-Regles communes:
-  hotels = hotel_data.xlsx
-  annees = hotel_sales_data.xlsx
-  mois termines seulement (mois courant exclu)
+Règles communes :
+  hotels  = hotel_data.xlsx
+  années  = dérivées de hotel_sales_data
+  mois    = mois terminés seulement (le mois en cours est exclu)
+
+Helpers : load_hotels, load_sales, sales_years, months_for_year,
+year_month_pairs, filter_frame_to_pairs.
 """
 
 from __future__ import annotations

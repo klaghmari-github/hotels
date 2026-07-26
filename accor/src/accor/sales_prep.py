@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """
-Pipeline Sales — hotel_sales_raw_data → hotel_sales_data.
+Pipeline ventes : hotel_sales_raw_data → hotel_sales_data.
 
-Etapes nommees (SalesPrepPipeline):
-  1. load raw
-  2. prepare_lines (TYPE/GAMME/boutique → hotel_code)
-  3. build_monthly_sales (agregats + mix %)
-  4. attach_holiday_sales
-  5. write Excel
+Étapes (SalesPrepPipeline) :
+  1. charge le raw (lignes de ticket / caisse)
+  2. prepare_lines — normalise TYPE, GAMME, boutique → hotel_code
+  3. build_monthly_sales — agrégats mensuels + mix % catégories
+  4. attach_holiday_sales — jointure éventuelle calendrier
+  5. écrit hotel_sales_data.xlsx
 
-API publique inchangee : rebuild_hotel_sales_data, prepare_lines, etc.
+API publique : rebuild_hotel_sales_data, prepare_lines, et helpers.
+Utilisé par l'onglet sales (rebuild) et en amont de all_data / concept_pilote.
 """
 
 from __future__ import annotations
