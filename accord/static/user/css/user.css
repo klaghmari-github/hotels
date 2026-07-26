@@ -1,4 +1,8 @@
-/* ROD User Simulator — design system */
+/*
+ * ROD User Simulator — theme clair.
+ * JS : /static/user/js/modules/app.js (wizard OOP)
+ * Shared : /static/shared/js/* + tokens.css
+ */
 :root {
   --bg: #f3f5f8;
   --bg-card: #ffffff;
@@ -7,7 +11,7 @@
   --line: rgba(15, 23, 36, 0.08);
   --navy: #0c1220;
   --navy-2: #151d2e;
-  --accent: #c9a227;
+  --accent: var(--accor-gold, #c9a227);
   --fb: #3d8b7a;
   --nfb: #2f6fed;
   --success: #16a34a;
@@ -16,8 +20,8 @@
   --radius: 18px;
   --radius-sm: 12px;
   --shadow: 0 18px 50px rgba(15, 23, 36, 0.08);
-  --font: "DM Sans", system-ui, sans-serif;
-  --serif: "Instrument Serif", Georgia, serif;
+  --font: var(--accor-font, "DM Sans", system-ui, sans-serif);
+  --serif: var(--accor-serif, "Instrument Serif", Georgia, serif);
 }
 
 *, *::before, *::after { box-sizing: border-box; }

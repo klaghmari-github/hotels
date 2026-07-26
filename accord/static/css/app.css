@@ -1,17 +1,13 @@
 /*
- * Styles de l interface admin Accor Data and Model Studio.
- * Theme sombre (fond navy, accent or, primaire bleu).
+ * Styles admin Accor Data and Model Studio (theme sombre).
  *
- * Organisation:
- *   :root variables de couleur et layout
- *   .app-shell grille sidebar + main
- *   .sidebar logo fixe, .sidebar-scroll zone unique de scroll
- *   .nav-section-label libelles All / Pilotes / Modeles
- *   .data-table table editable, roles Model Data (id / descriptive / target)
- *   .model-* cartes Build et Explore
- *   .tree-* visualisation SVG des arbres
- *   .loading-overlay chargement onglet / rebuild
- *   .toast-* notifications bas droite
+ * JS associe (ES modules OOP) :
+ *   /static/js/admin/app.js + dataset / model-build / model-explore
+ *   /static/shared/js/* (dom, api, toast, loading, format)
+ *
+ * Sections CSS :
+ *   :root theme  .app-shell  .sidebar  .data-table
+ *   .model-* Build/Explore  .tree-*  .loading-overlay  .toast
  */
 
 :root {
@@ -24,20 +20,20 @@
   --text: #eef2f7;
   --text-muted: #8b97a8;
   --text-faint: #5c6778;
-  --accent: #c9a227;
+  --accent: var(--accor-gold, #c9a227);
   --accent-soft: rgba(201, 162, 39, 0.14);
-  --accent-hover: #dbb43a;
-  --primary: #3d7eff;
+  --accent-hover: var(--accor-gold-hover, #dbb43a);
+  --primary: var(--accor-primary, #3d7eff);
   --primary-soft: rgba(61, 126, 255, 0.15);
   --danger: #ff5c7a;
   --danger-soft: rgba(255, 92, 122, 0.12);
   --success: #3ecf8e;
   --warn: #f0b429;
-  --radius: 14px;
-  --radius-sm: 8px;
+  --radius: var(--accor-radius, 14px);
+  --radius-sm: var(--accor-radius-sm, 8px);
   --shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
-  --font: "DM Sans", system-ui, sans-serif;
-  --serif: "Instrument Serif", Georgia, serif;
+  --font: var(--accor-font, "DM Sans", system-ui, sans-serif);
+  --serif: var(--accor-serif, "Instrument Serif", Georgia, serif);
   --sidebar-w: 280px;
 }
 

@@ -1,56 +1,50 @@
 """
-Utilitaires partagés pour les rebuilds geo (weather / proximity / holidays).
+Utilitaires partages pour les rebuilds geo (weather / proximity / holidays).
 
-Règles communes
----------------
-* Liste des hôtels = ``hotel_data.xlsx``
-* Années à couvrir = années présentes dans ``hotel_sales_data.xlsx``
-* Mois = 1..12 pour les années passées ; pour l'année en cours, 1..(mois-1)
-  (le mois courant est exclu car incomplet).
+Regles communes:
+  hotels = hotel_data.xlsx
+  annees = hotel_sales_data.xlsx
+  mois termines seulement (mois courant exclu)
 """
 
 from __future__ import annotations
 
 from datetime import date
-from pathlib import Path
 from typing import Any
 
 import pandas as pd
 
-DATA_DIR = Path(__file__).resolve().parent / "data"
+from data_io import DATA_DIR, filter_france_hotels, read_excel
+
+# re-export pour compatibilite
+__all__ = [
+    "DATA_DIR",
+    "load_hotels",
+    "load_sales",
+    "sales_years",
+    "months_for_year",
+    "year_month_pairs",
+    "filter_frame_to_pairs",
+    "filter_france_hotels",
+]
 
 
 def load_hotels() -> pd.DataFrame:
-    """Charge la fiche hôtels (coords + codes)."""
-    path = DATA_DIR / "hotel_data.xlsx"
-    if not path.exists():
-        return pd.DataFrame()
-    try:
-        return pd.read_excel(path, sheet_name=0)
-    except Exception:
-        return pd.DataFrame()
+    """Charge hotel_data.xlsx."""
+    return read_excel(DATA_DIR / "hotel_data.xlsx", sheet=0)
 
 
 def load_sales() -> pd.DataFrame:
-    """Charge les ventes mensuelles."""
+    """Charge les ventes mensuelles hotel_sales_data."""
     path = DATA_DIR / "hotel_sales_data.xlsx"
-    if not path.exists():
-        return pd.DataFrame()
-    try:
-        return pd.read_excel(path, sheet_name="hotel_sales")
-    except ValueError:
-        try:
-            return pd.read_excel(path, sheet_name=0)
-        except Exception:
-            return pd.DataFrame()
+    return read_excel(path, sheet="hotel_sales")
 
 
 def sales_years(sales: pd.DataFrame | None = None) -> list[int]:
-    """Années pour lesquelles on dispose d'info de ventes."""
+    """Annees presentes dans les ventes (fallback: 2 dernieres annees)."""
     if sales is None:
         sales = load_sales()
     if sales is None or sales.empty or "annee" not in sales.columns:
-        # fallback : 3 dernières années calendaires (hors année en cours si besoin)
         today = date.today()
         return [today.year - 2, today.year - 1]
     years = sorted(
@@ -64,11 +58,11 @@ def sales_years(sales: pd.DataFrame | None = None) -> list[int]:
 
 def months_for_year(year: int, *, today: date | None = None) -> list[int]:
     """
-    Mois à générer pour une année.
+    Mois a generer pour une annee.
 
-    * année < année courante → 1..12
-    * année == année courante → 1..(mois_courant - 1)  [mois en cours exclu]
-    * année > année courante → []
+    annee passee → 1..12
+    annee courante → 1..(mois-1)
+    annee future → []
     """
     today = today or date.today()
     y = int(year)
@@ -80,8 +74,10 @@ def months_for_year(year: int, *, today: date | None = None) -> list[int]:
     return []
 
 
-def year_month_pairs(years: list[int] | None = None, *, today: date | None = None) -> list[tuple[int, int]]:
-    """Liste (année, mois) à produire pour weather / holidays."""
+def year_month_pairs(
+    years: list[int] | None = None, *, today: date | None = None
+) -> list[tuple[int, int]]:
+    """Liste (annee, mois) pour weather / holidays."""
     today = today or date.today()
     if years is None:
         years = sales_years()
@@ -96,7 +92,7 @@ def filter_frame_to_pairs(
     frame: pd.DataFrame,
     pairs: list[tuple[int, int]],
 ) -> pd.DataFrame:
-    """Ne garde que les lignes (annee, mois) ∈ pairs."""
+    """Ne garde que les lignes (annee, mois) dans pairs."""
     if frame is None or frame.empty:
         return frame
     if not pairs or "annee" not in frame.columns or "mois" not in frame.columns:
@@ -105,9 +101,7 @@ def filter_frame_to_pairs(
     an = pd.to_numeric(frame["annee"], errors="coerce")
     mo = pd.to_numeric(frame["mois"], errors="coerce")
     mask = [
-        (int(a), int(m)) in allowed
-        if pd.notna(a) and pd.notna(m)
-        else False
+        (int(a), int(m)) in allowed if pd.notna(a) and pd.notna(m) else False
         for a, m in zip(an, mo)
     ]
     return frame.loc[mask].reset_index(drop=True)

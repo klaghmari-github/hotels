@@ -399,135 +399,177 @@ def _sales_hotel_codes(sales: pd.DataFrame) -> set[str]:
     }
 
 
+class AllDataBuilder:
+    """
+    Construit all_data : base ventes + left joins.
+
+    Utilisation:
+        frame = AllDataBuilder(fill_weather=False).build()
+
+    Ou via la facade build_joined_dataframe(...) pour l API existante.
+    """
+
+    KEY_ORDER = (
+        "hotel_code",
+        "hotel_name",
+        "nom_hotel",
+        "hotel_brand",
+        "annee",
+        "mois",
+        "hotel_lat",
+        "hotel_lon",
+    )
+
+    def __init__(
+        self,
+        *,
+        fill_weather: bool = True,
+        fill_proximity: bool = True,
+    ) -> None:
+        self.fill_weather = fill_weather
+        self.fill_proximity = fill_proximity
+        self.sales = pd.DataFrame()
+        self.hotels = pd.DataFrame()
+        self.holidays = pd.DataFrame()
+        self.weather = pd.DataFrame()
+        self.brand = pd.DataFrame()
+        self.proximity = pd.DataFrame()
+        self.sales_codes: set[str] = set()
+
+    def load_sources(self) -> "AllDataBuilder":
+        self.hotels = _read_source("hotel")
+        self.sales = _read_source("sales")
+        self.holidays = _read_source("holidays")
+        self.weather = _read_source("weather")
+        self.brand = _read_source("brand")
+        self.proximity = _read_source("proximity")
+        return self
+
+    def prepare_sales_spine(self) -> pd.DataFrame | None:
+        """Base = mois de vente uniques. None si rien a joindre."""
+        sales = self.sales
+        if sales is None or sales.empty or "hotel_code" not in sales.columns:
+            return None
+        sales = _normalize_keys(sales, list(JOIN_KEYS_MONTHLY))
+        sales = sales.dropna(subset=["hotel_code", "annee", "mois"])
+        sales["hotel_code"] = sales["hotel_code"].astype(str).str.strip()
+        sales = sales.drop_duplicates(subset=list(JOIN_KEYS_MONTHLY), keep="last")
+        self.sales = sales
+        self.sales_codes = _sales_hotel_codes(sales)
+        if not self.sales_codes:
+            return None
+        return sales.copy()
+
+    def restrict_hotels_to_sales(self) -> None:
+        """Hotels master = uniquement codes presents dans les ventes."""
+        hotels = self.hotels
+        sales = self.sales
+        codes = self.sales_codes
+        if not hotels.empty and "hotel_code" in hotels.columns:
+            hotels = hotels.copy()
+            hotels["hotel_code"] = hotels["hotel_code"].astype(str).str.strip()
+            hotels = hotels[hotels["hotel_code"].isin(codes)].reset_index(drop=True)
+        else:
+            hotels = (
+                sales.drop_duplicates(subset=["hotel_code"])[
+                    [
+                        c
+                        for c in (
+                            "hotel_code",
+                            "hotel_name",
+                            "nom_hotel",
+                            "hotel_brand",
+                        )
+                        if c in sales.columns
+                    ]
+                ].copy()
+            )
+            if "hotel_name" not in hotels.columns and "nom_hotel" in hotels.columns:
+                hotels["hotel_name"] = hotels["nom_hotel"]
+        self.hotels = hotels
+
+    def ensure_proximity(self) -> None:
+        if not self.proximity.empty or self.hotels.empty or not self.fill_proximity:
+            return
+        try:
+            from geo_proximity import ensure_hotel_proximity_data
+
+            self.proximity = ensure_hotel_proximity_data(
+                force_refresh=False, hotels=self.hotels, pause_s=1.0
+            )
+        except Exception:
+            self.proximity = pd.DataFrame()
+
+    def left_join_all(self, result: pd.DataFrame) -> pd.DataFrame:
+        monthly = list(JOIN_KEYS_MONTHLY)
+        if not self.holidays.empty:
+            result = _merge_new(result, self.holidays, on=monthly, how="left")
+        if not self.weather.empty:
+            result = _merge_new(result, self.weather, on=monthly, how="left")
+        if not self.proximity.empty and "hotel_code" in self.proximity.columns:
+            result = _merge_new(result, self.proximity, on=["hotel_code"], how="left")
+        if not self.hotels.empty:
+            result = _merge_new(result, self.hotels, on=["hotel_code"], how="left")
+            result = _fill_identity(result, self.hotels)
+        if (
+            not self.brand.empty
+            and "Marque" in self.brand.columns
+            and "hotel_brand" in result.columns
+        ):
+            brand_r = self.brand.rename(columns={"Marque": "hotel_brand"})
+            result = _merge_new(result, brand_r, on=["hotel_brand"], how="left")
+        return result
+
+    def finalize(self, result: pd.DataFrame) -> pd.DataFrame:
+        result = result[
+            result["hotel_code"].astype(str).str.strip().isin(self.sales_codes)
+        ].reset_index(drop=True)
+        years = _collect_years(result) or _collect_years(self.sales)
+        result = _fill_weather_gaps(
+            result, years=years, fetch=self.fill_weather
+        )
+        result = _fill_proximity_gaps(
+            result, self.hotels, fetch=self.fill_proximity
+        )
+        if not self.hotels.empty:
+            result = _fill_identity(result, self.hotels)
+        key_order = [c for c in self.KEY_ORDER if c in result.columns]
+        other = [c for c in result.columns if c not in key_order]
+        result = result[key_order + other]
+        sort_cols = [c for c in ("hotel_code", "annee", "mois") if c in result.columns]
+        if sort_cols:
+            result = result.sort_values(sort_cols, kind="mergesort").reset_index(
+                drop=True
+            )
+        else:
+            result = result.reset_index(drop=True)
+        return result.loc[:, ~result.columns.duplicated(keep="first")]
+
+    def build(self) -> pd.DataFrame:
+        self.load_sources()
+        spine = self.prepare_sales_spine()
+        if spine is None:
+            return pd.DataFrame()
+        self.restrict_hotels_to_sales()
+        self.ensure_proximity()
+        result = self.left_join_all(spine)
+        return self.finalize(result)
+
+
 def build_joined_dataframe(
     *,
     fill_weather: bool = True,
     fill_proximity: bool = True,
 ) -> pd.DataFrame:
     """
-    Construit all_data a partir des ventes, puis left join des autres sources.
+    Facade stable pour l API / UI.
 
-    1. Base = hotel_sales_data (une ligne par hotel_code, annee, mois de vente)
-    2. Left join holidays et weather sur (hotel_code, annee, mois)
-    3. Left join hotel_data et proximity sur hotel_code
-    4. Left join brand sur hotel_brand
-    5. Optionnel: combler meteo / proximite manquantes (flags)
-
-    Le bouton UI Reconstruire appelle cette fonction avec
-    fill_weather=False et fill_proximity=False.
+    Base = ventes pilotes, left joins holidays / weather / hotel / proximity / brand.
     """
-    hotels = _read_source("hotel")
-    sales = _read_source("sales")
-    holidays = _read_source("holidays")
-    weather = _read_source("weather")
-    brand = _read_source("brand")
-
-    # --- Base = ventes uniquement ---
-    if sales is None or sales.empty or "hotel_code" not in sales.columns:
-        return pd.DataFrame()
-
-    sales = _normalize_keys(sales, list(JOIN_KEYS_MONTHLY))
-    sales = sales.dropna(subset=["hotel_code", "annee", "mois"])
-    sales["hotel_code"] = sales["hotel_code"].astype(str).str.strip()
-    # Une ligne par hotel x annee x mois (ventes deja mensuelles)
-    sales = sales.drop_duplicates(subset=list(JOIN_KEYS_MONTHLY), keep="last")
-    sales_codes = _sales_hotel_codes(sales)
-    if not sales_codes:
-        return pd.DataFrame()
-
-    # Table de gauche = ventes (left join vers le reste)
-    result = sales.copy()
-
-    # Hotels master restreints aux codes presents dans les ventes
-    if not hotels.empty and "hotel_code" in hotels.columns:
-        hotels = hotels.copy()
-        hotels["hotel_code"] = hotels["hotel_code"].astype(str).str.strip()
-        hotels = hotels[hotels["hotel_code"].isin(sales_codes)].reset_index(drop=True)
-    else:
-        hotels = (
-            sales.drop_duplicates(subset=["hotel_code"])[
-                [
-                    c
-                    for c in ("hotel_code", "hotel_name", "nom_hotel", "hotel_brand")
-                    if c in sales.columns
-                ]
-            ].copy()
-        )
-        if "hotel_name" not in hotels.columns and "nom_hotel" in hotels.columns:
-            hotels["hotel_name"] = hotels["nom_hotel"]
-
-    # Proximity : fichier existant (pas de recalcul reseau ici si present)
-    proximity = _read_source("proximity")
-    if proximity.empty and not hotels.empty and fill_proximity:
-        try:
-            from geo_proximity import ensure_hotel_proximity_data
-
-            proximity = ensure_hotel_proximity_data(
-                force_refresh=False, hotels=hotels, pause_s=1.0
-            )
-        except Exception:
-            proximity = pd.DataFrame()
-
-    # --- Left joins ---
-    # Holidays et weather : grain mensuel
-    if not holidays.empty:
-        result = _merge_new(result, holidays, on=list(JOIN_KEYS_MONTHLY), how="left")
-    if not weather.empty:
-        result = _merge_new(result, weather, on=list(JOIN_KEYS_MONTHLY), how="left")
-
-    # Proximity : grain hotel
-    if not proximity.empty and "hotel_code" in proximity.columns:
-        result = _merge_new(result, proximity, on=["hotel_code"], how="left")
-
-    # Fiche hotel (identite + equipements)
-    if not hotels.empty:
-        result = _merge_new(result, hotels, on=["hotel_code"], how="left")
-        result = _fill_identity(result, hotels)
-
-    # Brand (via hotel_brand)
-    if not brand.empty and "Marque" in brand.columns and "hotel_brand" in result.columns:
-        brand_r = brand.rename(columns={"Marque": "hotel_brand"})
-        result = _merge_new(result, brand_r, on=["hotel_brand"], how="left")
-
-    # Securite : jamais d hotel hors ventes
-    result = result[
-        result["hotel_code"].astype(str).str.strip().isin(sales_codes)
-    ].reset_index(drop=True)
-
-    years = _collect_years(result) or _collect_years(sales)
-
-    # Comblement reseau optionnel (desactive par defaut depuis l UI)
-    result = _fill_weather_gaps(result, years=years, fetch=fill_weather)
-    result = _fill_proximity_gaps(result, hotels, fetch=fill_proximity)
-
-    if not hotels.empty:
-        result = _fill_identity(result, hotels)
-
-    key_order = [
-        c
-        for c in (
-            "hotel_code",
-            "hotel_name",
-            "nom_hotel",
-            "hotel_brand",
-            "annee",
-            "mois",
-            "hotel_lat",
-            "hotel_lon",
-        )
-        if c in result.columns
-    ]
-    other = [c for c in result.columns if c not in key_order]
-    result = result[key_order + other]
-
-    sort_cols = [c for c in ("hotel_code", "annee", "mois") if c in result.columns]
-    if sort_cols:
-        result = result.sort_values(sort_cols, kind="mergesort").reset_index(drop=True)
-    else:
-        result = result.reset_index(drop=True)
-
-    result = result.loc[:, ~result.columns.duplicated(keep="first")]
-    return result
+    return AllDataBuilder(
+        fill_weather=fill_weather,
+        fill_proximity=fill_proximity,
+    ).build()
 
 
 # Colonnes textuelles / listes : ne jamais les forcer en 0

@@ -1,26 +1,15 @@
 #!/usr/bin/env python3
 """
-Pipeline Sales — reconstruit ``hotel_sales_data.xlsx`` depuis les ventes brutes.
+Pipeline Sales — hotel_sales_raw_data → hotel_sales_data.
 
-Indépendant de l'archive : s'inspire de l'ancien SalesPrep (agrégats mensuels,
-mix F_B / N_F_B, % sous-catégories) mais vit entièrement sous ``accord/``.
+Etapes nommees (SalesPrepPipeline):
+  1. load raw
+  2. prepare_lines (TYPE/GAMME/boutique → hotel_code)
+  3. build_monthly_sales (agregats + mix %)
+  4. attach_holiday_sales
+  5. write Excel
 
-Entrées
--------
-* ``data/hotel_sales_raw_data.xlsx`` — tickets bruts (ou import CSV historique)
-* ``data/hotel_data.xlsx`` — référentiel hôtels (``hotel_code``, ``hotel_name``)
-
-Sortie
-------
-* ``data/hotel_sales_data.xlsx`` — grain hôtel × année × mois + indicateurs
-
-Normalisations critiques
-------------------------
-1. **Hôtels** : ``NOM BOUTIQUE`` → ``hotel_code`` via matching flou sur
-   ``hotel_name`` (référentiel hotel_data).
-2. **Catégories** : TYPE ``F&B`` / ``NON-F&B`` → ``f_b`` / ``n_f_b``.
-3. **Sous-catégories** : GAMME (ex. ``FOOD SALEE``, ``SANS ALCOOL``) → slug
-   stable (``food_salee``, ``sans_alcool``…).
+API publique inchangee : rebuild_hotel_sales_data, prepare_lines, etc.
 """
 
 from __future__ import annotations
@@ -32,13 +21,13 @@ from typing import Any
 
 import pandas as pd
 
-DATA_DIR = Path(__file__).resolve().parent / "data"
+from data_io import DATA_DIR, read_excel
+
 RAW_FILENAME = "hotel_sales_raw_data.xlsx"
 RAW_SHEET = "sales_raw"
 SALES_FILENAME = "hotel_sales_data.xlsx"
 SALES_SHEET = "hotel_sales"
 
-# Colonnes brutes attendues (noms source ou normalisés)
 RAW_COLUMN_MAP = {
     "nom boutique": "nom_boutique",
     "nom_boutique": "nom_boutique",
@@ -61,7 +50,6 @@ RAW_COLUMN_MAP = {
     "order_id": "order_id",
 }
 
-# TYPE → catégorie modèle
 TYPE_MAP = {
     "f&b": "f_b",
     "f_b": "f_b",
@@ -75,7 +63,6 @@ TYPE_MAP = {
     "non_fb": "n_f_b",
 }
 
-# GAMME → slug sous-catégorie (clés normalisées)
 GAMME_MAP = {
     "sans alcool": "sans_alcool",
     "food sucree": "food_sucree",
@@ -109,7 +96,6 @@ SOUS_CAT_SLUGS = (
     "souvenirs",
 )
 
-# Indicateurs ventes sur jours holidays (weekend ∪ férié ∪ scolaire) vs hors holidays
 HOLIDAY_SALES_COLS = (
     "nombre_ventes_holidays",
     "montant_ventes_holidays",
@@ -122,13 +108,17 @@ HOLIDAY_SALES_COLS = (
 )
 
 
+# ---------------------------------------------------------------------------
+# Normalisations de libelles (reutilisees hors pipeline)
+# ---------------------------------------------------------------------------
+
+
 def _strip_accents(text: str) -> str:
     nfkd = unicodedata.normalize("NFKD", text)
     return "".join(c for c in nfkd if not unicodedata.combining(c))
 
 
 def normalize_label(value: Any) -> str:
-    """Normalise un libellé libre → minuscules sans accents, espaces simples."""
     if value is None or (isinstance(value, float) and pd.isna(value)):
         return ""
     text = str(value).strip()
@@ -149,7 +139,6 @@ def slugify(value: str) -> str:
 
 def normalize_type(value: Any) -> str:
     key = normalize_label(value).replace(" ", "_")
-    # variantes
     key2 = normalize_label(value)
     if key in TYPE_MAP:
         return TYPE_MAP[key]
@@ -159,14 +148,13 @@ def normalize_type(value: Any) -> str:
         return "n_f_b"
     if "f&b" in key2 or key2 in {"fb", "f_b"}:
         return "f_b"
-    return "n_f_b" if key2 else "n_f_b"
+    return "n_f_b"
 
 
 def normalize_gamme(value: Any) -> str:
     key = normalize_label(value)
     if key in GAMME_MAP:
         return GAMME_MAP[key]
-    # fallback slug
     return slugify(value) if key else "autre"
 
 
@@ -179,46 +167,46 @@ def sales_path() -> Path:
 
 
 def load_hotel_lookup() -> pd.DataFrame:
-    """Référentiel hotel_data → colonnes nom_hotel, hotel_code, hotel_name."""
     path = DATA_DIR / "hotel_data.xlsx"
-    if not path.exists():
-        return pd.DataFrame(columns=["hotel_code", "hotel_name", "nom_key"])
-    hotels = pd.read_excel(path, sheet_name=0)
-    if "hotel_code" not in hotels.columns or "hotel_name" not in hotels.columns:
+    hotels = read_excel(path, sheet=0)
+    if hotels.empty or "hotel_code" not in hotels.columns or "hotel_name" not in hotels.columns:
         return pd.DataFrame(columns=["hotel_code", "hotel_name", "nom_key"])
     out = hotels[["hotel_code", "hotel_name"]].drop_duplicates().copy()
     out["nom_key"] = out["hotel_name"].map(normalize_label)
     return out
 
 
-def match_hotel_code(nom_boutique: str, lookup: pd.DataFrame) -> tuple[str | None, str | None]:
-    """
-    Lie un nom de boutique brut au code Accor.
+class HotelBoutiqueMatcher:
+    """Associe NOM BOUTIQUE → hotel_code (exact, containment, tokens)."""
 
-    Stratégie :
-    1. égalité exacte sur clé normalisée
-    2. containment (boutique ⊂ name ou name ⊂ boutique)
-    3. score de tokens en commun (meilleur score ≥ 2 tokens)
-    """
+    def __init__(self, lookup: pd.DataFrame | None = None) -> None:
+        self.lookup = lookup if lookup is not None else load_hotel_lookup()
+        self._cache: dict[str, tuple[str | None, str | None]] = {}
+
+    def match(self, nom_boutique: str) -> tuple[str | None, str | None]:
+        if nom_boutique in self._cache:
+            return self._cache[nom_boutique]
+        result = match_hotel_code(nom_boutique, self.lookup)
+        self._cache[nom_boutique] = result
+        return result
+
+
+def match_hotel_code(
+    nom_boutique: str, lookup: pd.DataFrame
+) -> tuple[str | None, str | None]:
     key = normalize_label(nom_boutique)
     if not key or lookup.empty:
         return None, None
-
-    # exact
     hit = lookup.loc[lookup["nom_key"] == key]
     if len(hit):
         row = hit.iloc[0]
         return str(row["hotel_code"]), str(row["hotel_name"])
-
-    # containment
     for _, row in lookup.iterrows():
         nk = row["nom_key"]
         if not nk:
             continue
         if key in nk or nk in key:
             return str(row["hotel_code"]), str(row["hotel_name"])
-
-    # token overlap
     tokens = set(key.split())
     best_score, best = 0, None
     for _, row in lookup.iterrows():
@@ -226,7 +214,6 @@ def match_hotel_code(nom_boutique: str, lookup: pd.DataFrame) -> tuple[str | Non
         if not nk:
             continue
         score = len(tokens & set(nk.split()))
-        # bonus si premier token (marque) match
         if tokens and nk.split() and list(tokens)[0] == nk.split()[0]:
             score += 0.5
         if score > best_score:
@@ -244,19 +231,15 @@ def _normalize_raw_columns(frame: pd.DataFrame) -> pd.DataFrame:
         if key in RAW_COLUMN_MAP:
             rename[c] = RAW_COLUMN_MAP[key]
         else:
-            # already normalized?
             slug = slugify(c)
             if slug in RAW_COLUMN_MAP.values():
                 rename[c] = slug
-    out = frame.rename(columns=rename)
-    return out
+    return frame.rename(columns=rename)
 
 
 def load_raw_sales(path: Path | None = None) -> pd.DataFrame:
-    """Charge le fichier raw (xlsx ou legacy csv copié)."""
     path = path or raw_path()
     if not path.exists():
-        # tentative CSV historique monorepo
         legacy = (
             Path(__file__).resolve().parent.parent
             / "archive"
@@ -268,15 +251,13 @@ def load_raw_sales(path: Path | None = None) -> pd.DataFrame:
             frame = pd.read_csv(legacy, dtype=str, low_memory=False)
             return _normalize_raw_columns(frame)
         return pd.DataFrame()
-    try:
-        frame = pd.read_excel(path, sheet_name=RAW_SHEET, dtype=str)
-    except ValueError:
-        frame = pd.read_excel(path, sheet_name=0, dtype=str)
+    frame = read_excel(path, sheet=RAW_SHEET, dtype=str)
+    if frame.empty:
+        frame = read_excel(path, sheet=0, dtype=str)
     return _normalize_raw_columns(frame)
 
 
 def import_raw_from_csv(csv_path: Path, dest: Path | None = None) -> Path:
-    """Importe le CSV brut vers hotel_sales_raw_data.xlsx."""
     dest = dest or raw_path()
     frame = pd.read_csv(csv_path, low_memory=False)
     frame = _normalize_raw_columns(frame)
@@ -285,20 +266,24 @@ def import_raw_from_csv(csv_path: Path, dest: Path | None = None) -> Path:
     return dest
 
 
-def prepare_lines(raw: pd.DataFrame, lookup: pd.DataFrame) -> pd.DataFrame:
+def prepare_lines(
+    raw: pd.DataFrame,
+    lookup: pd.DataFrame,
+    *,
+    matcher: HotelBoutiqueMatcher | None = None,
+) -> pd.DataFrame:
     """Normalise les lignes brutes + attache hotel_code."""
     if raw is None or raw.empty:
         return pd.DataFrame()
-
     df = raw.copy()
-    # statut DONE uniquement si la colonne existe
     if "statut" in df.columns:
         st = df["statut"].astype(str).str.strip().str.upper()
-        # garder DONE + valeurs vides/NA (exports partiels)
-        keep = st.eq("DONE") | st.isin(["", "NAN", "NONE", "NAT"]) | df["statut"].isna()
+        keep = (
+            st.eq("DONE")
+            | st.isin(["", "NAN", "NONE", "NAT"])
+            | df["statut"].isna()
+        )
         df = df.loc[keep].copy()
-
-    # dates
     if "date" not in df.columns:
         raise ValueError("Colonne DATE / date manquante dans les ventes brutes.")
     df["date"] = pd.to_datetime(df["date"], errors="coerce")
@@ -306,10 +291,21 @@ def prepare_lines(raw: pd.DataFrame, lookup: pd.DataFrame) -> pd.DataFrame:
     df["annee"] = df["date"].dt.year.astype(int)
     df["mois"] = df["date"].dt.month.astype(int)
 
-    # quantités / montants ligne = prix unitaire × quantité (HT prioritaire, sinon TTC)
-    q = pd.to_numeric(df["quantite"] if "quantite" in df.columns else 1, errors="coerce").fillna(1.0).clip(lower=0)
-    ht = pd.to_numeric(df["prix_ht"], errors="coerce") if "prix_ht" in df.columns else pd.Series(pd.NA, index=df.index)
-    ttc = pd.to_numeric(df["prix_ttc"], errors="coerce") if "prix_ttc" in df.columns else pd.Series(pd.NA, index=df.index)
+    q = (
+        pd.to_numeric(df["quantite"] if "quantite" in df.columns else 1, errors="coerce")
+        .fillna(1.0)
+        .clip(lower=0)
+    )
+    ht = (
+        pd.to_numeric(df["prix_ht"], errors="coerce")
+        if "prix_ht" in df.columns
+        else pd.Series(pd.NA, index=df.index)
+    )
+    ttc = (
+        pd.to_numeric(df["prix_ttc"], errors="coerce")
+        if "prix_ttc" in df.columns
+        else pd.Series(pd.NA, index=df.index)
+    )
     unit = ht.fillna(ttc).fillna(0.0)
     df["nombre_ventes"] = q
     df["montant_ventes"] = (unit * q).astype(float)
@@ -320,46 +316,33 @@ def prepare_lines(raw: pd.DataFrame, lookup: pd.DataFrame) -> pd.DataFrame:
     if "code_ean" in df.columns:
         df["code_ean"] = df["code_ean"].astype(str)
     else:
-        df["code_ean"] = df["nom_produit"].astype(str) if "nom_produit" in df.columns else ""
+        df["code_ean"] = (
+            df["nom_produit"].astype(str) if "nom_produit" in df.columns else ""
+        )
     type_src = df["type_raw"] if "type_raw" in df.columns else pd.Series("", index=df.index)
-    gamme_src = df["gamme_raw"] if "gamme_raw" in df.columns else pd.Series("", index=df.index)
+    gamme_src = (
+        df["gamme_raw"] if "gamme_raw" in df.columns else pd.Series("", index=df.index)
+    )
     df["categorie"] = type_src.map(normalize_type)
     df["sous_categorie"] = gamme_src.map(normalize_gamme)
 
-    # mapping hôtel
     if "nom_boutique" not in df.columns:
         raise ValueError("Colonne NOM BOUTIQUE / nom_boutique manquante.")
+    matcher = matcher or HotelBoutiqueMatcher(lookup)
     codes = []
     names = []
-    cache: dict[str, tuple[str | None, str | None]] = {}
     for nom in df["nom_boutique"].astype(str):
-        if nom not in cache:
-            cache[nom] = match_hotel_code(nom, lookup)
-        code, hname = cache[nom]
+        code, hname = matcher.match(nom)
         codes.append(code)
         names.append(hname or nom)
     df["hotel_code"] = codes
     df["nom_hotel"] = df["nom_boutique"].astype(str)
     df["hotel_name_ref"] = names
-
-    # drop lines without hotel match? keep with NA code for audit
     return df
 
 
-def _agg_group(g: pd.DataFrame) -> pd.Series:
-    return pd.Series(
-        {
-            "nombre_ventes": g["nombre_ventes"].sum(),
-            "montant_ventes": g["montant_ventes"].sum(),
-            "nombre_paniers": g["order_id"].nunique(),
-            "nombre_produits": g["code_ean"].nunique(),
-        }
-    )
-
-
-
 def build_monthly_sales(lines: pd.DataFrame) -> pd.DataFrame:
-    """Agrège hotel × année × mois + mix cat / sous-cat (pct)."""
+    """Agrege hotel x annee x mois + mix cat / sous-cat (pct)."""
     if lines is None or lines.empty:
         return pd.DataFrame()
 
@@ -461,29 +444,18 @@ def attach_holiday_sales(
     monthly: pd.DataFrame,
     holidays: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
-    """
-    Joint ``hotel_holidays_data`` (listes de jours) aux tickets raw et
-    ajoute sur chaque ligne mensuelle :
-
-    * nombre/montant des ventes en jours holidays
-      (weekend ∪ férié ∪ vacances scolaires, sans doublon)
-    * idem hors holidays
-    * pourcentages par rapport au total du mois
-    """
+    """Split ventes holidays / hors holidays sur le grain mensuel."""
     from geo_holidays import holidays_day_sets, load_holidays_frame
 
     out = monthly.copy()
     for c in HOLIDAY_SALES_COLS:
         out[c] = 0.0
-
     if lines is None or lines.empty:
         return out
-
     if holidays is None:
         holidays = load_holidays_frame()
     day_sets = holidays_day_sets(holidays)
 
-    # Tag chaque ligne ticket
     work = lines.copy()
     if "date" not in work.columns:
         return out
@@ -502,7 +474,6 @@ def attach_holiday_sales(
         return str(row["_iso"]) in days
 
     work["is_holiday_day"] = work.apply(_is_hol, axis=1)
-
     keys = ["hotel_code", "annee", "mois"]
     hol = (
         work.loc[work["is_holiday_day"]]
@@ -522,11 +493,8 @@ def attach_holiday_sales(
         )
         .reset_index()
     )
-
     out = out.merge(hol, on=keys, how="left", suffixes=("", "_h"))
     out = out.merge(nhol, on=keys, how="left", suffixes=("", "_n"))
-
-    # colonnes peuvent arriver en double si déjà créées à 0
     for c in (
         "nombre_ventes_holidays",
         "montant_ventes_holidays",
@@ -544,15 +512,17 @@ def attach_holiday_sales(
         else:
             out[c] = pd.to_numeric(out[c], errors="coerce").fillna(0.0)
 
-    # % par rapport au total du mois
     nv = out["nombre_ventes"].replace(0, pd.NA)
     mv = out["montant_ventes"].replace(0, pd.NA)
     out["pct_nombre_ventes_holidays"] = (out["nombre_ventes_holidays"] / nv).fillna(0.0)
     out["pct_montant_ventes_holidays"] = (out["montant_ventes_holidays"] / mv).fillna(0.0)
-    out["pct_nombre_ventes_hors_holidays"] = (out["nombre_ventes_hors_holidays"] / nv).fillna(0.0)
-    out["pct_montant_ventes_hors_holidays"] = (out["montant_ventes_hors_holidays"] / mv).fillna(0.0)
+    out["pct_nombre_ventes_hors_holidays"] = (
+        out["nombre_ventes_hors_holidays"] / nv
+    ).fillna(0.0)
+    out["pct_montant_ventes_hors_holidays"] = (
+        out["montant_ventes_hors_holidays"] / mv
+    ).fillna(0.0)
 
-    # cohérence : si hors_holidays manquant, total - holidays
     miss_n = out["nombre_ventes_hors_holidays"].eq(0) & out["nombre_ventes"].gt(0)
     out.loc[miss_n, "nombre_ventes_hors_holidays"] = (
         out.loc[miss_n, "nombre_ventes"] - out.loc[miss_n, "nombre_ventes_holidays"]
@@ -567,8 +537,101 @@ def attach_holiday_sales(
     out["pct_montant_ventes_hors_holidays"] = (
         out["montant_ventes_hors_holidays"] / mv
     ).fillna(0.0)
-
     return out
+
+
+class SalesPrepPipeline:
+    """
+    Pipeline raw → hotel_sales_data (etapes reutilisables).
+
+        SalesPrepPipeline().run()
+        SalesPrepPipeline(raw=df, drop_unmatched=False).run()
+    """
+
+    def __init__(
+        self,
+        *,
+        raw: pd.DataFrame | None = None,
+        drop_unmatched: bool = True,
+        lookup: pd.DataFrame | None = None,
+    ) -> None:
+        self.raw = raw
+        self.drop_unmatched = drop_unmatched
+        self.lookup = lookup if lookup is not None else load_hotel_lookup()
+        self.lines = pd.DataFrame()
+        self.monthly = pd.DataFrame()
+        self.n_raw = 0
+        self.n_unmatched = 0
+        self.holidays_joined = False
+
+    def load_raw(self) -> "SalesPrepPipeline":
+        if self.raw is None:
+            self.raw = load_raw_sales()
+        if self.raw is None or self.raw.empty:
+            raise ValueError(
+                "Ventes brutes introuvables. Placez hotel_sales_raw_data.xlsx "
+                "ou importez archive/sources/raw/001.queryVentes.csv."
+            )
+        return self
+
+    def prepare(self) -> "SalesPrepPipeline":
+        matcher = HotelBoutiqueMatcher(self.lookup)
+        self.lines = prepare_lines(self.raw, self.lookup, matcher=matcher)
+        self.n_raw = len(self.lines)
+        self.n_unmatched = (
+            int(self.lines["hotel_code"].isna().sum())
+            if "hotel_code" in self.lines.columns
+            else self.n_raw
+        )
+        if self.drop_unmatched and "hotel_code" in self.lines.columns:
+            self.lines = self.lines.loc[self.lines["hotel_code"].notna()].copy()
+        if self.lines.empty:
+            raise ValueError(
+                f"Aucune ligne matchee sur hotel_data "
+                f"({self.n_unmatched}/{self.n_raw} non liees)."
+            )
+        return self
+
+    def aggregate(self) -> "SalesPrepPipeline":
+        self.monthly = build_monthly_sales(self.lines)
+        return self
+
+    def join_holidays(self) -> "SalesPrepPipeline":
+        from geo_holidays import load_holidays_frame
+
+        holidays = load_holidays_frame()
+        self.monthly = attach_holiday_sales(
+            self.lines, self.monthly, holidays=holidays
+        )
+        self.holidays_joined = not holidays.empty if holidays is not None else False
+        return self
+
+    def write(self, path: Path | None = None) -> Path:
+        path = path or sales_path()
+        path.parent.mkdir(parents=True, exist_ok=True)
+        self.monthly.to_excel(path, index=False, sheet_name=SALES_SHEET)
+        return path
+
+    def run(self) -> dict[str, Any]:
+        self.load_raw().prepare().aggregate().join_holidays()
+        path = self.write()
+        monthly = self.monthly
+        return {
+            "ok": True,
+            "path": str(path),
+            "rows": len(monthly),
+            "columns": list(monthly.columns),
+            "n_columns": len(monthly.columns),
+            "n_raw_lines": self.n_raw,
+            "n_unmatched": self.n_unmatched,
+            "n_hotels": int(monthly["hotel_code"].nunique())
+            if "hotel_code" in monthly.columns
+            else 0,
+            "years": sorted(monthly["annee"].dropna().unique().tolist())
+            if "annee" in monthly.columns
+            else [],
+            "holidays_joined": self.holidays_joined,
+        }
 
 
 def rebuild_hotel_sales_data(
@@ -576,66 +639,11 @@ def rebuild_hotel_sales_data(
     raw: pd.DataFrame | None = None,
     drop_unmatched: bool = True,
 ) -> dict[str, Any]:
-    """
-    Pipeline complet raw → hotel_sales_data.xlsx.
-
-    1. Normalise TYPE / GAMME / boutiques → hotel_code
-    2. Agrège mensuellement + mix %
-    3. Joint ``hotel_holidays_data`` (jours_holidays) pour split
-       ventes holidays / hors holidays (+ %)
-
-    Parameters
-    ----------
-    drop_unmatched :
-        Si True, ignore les lignes dont le nom boutique ne matche aucun hôtel.
-    """
-    from geo_holidays import load_holidays_frame
-
-    lookup = load_hotel_lookup()
-    if raw is None:
-        raw = load_raw_sales()
-    if raw is None or raw.empty:
-        raise ValueError(
-            "Ventes brutes introuvables. Placez hotel_sales_raw_data.xlsx "
-            "ou importez archive/sources/raw/001.queryVentes.csv."
-        )
-
-    lines = prepare_lines(raw, lookup)
-    n_raw = len(lines)
-    unmatched = int(lines["hotel_code"].isna().sum()) if "hotel_code" in lines.columns else n_raw
-    if drop_unmatched and "hotel_code" in lines.columns:
-        lines = lines.loc[lines["hotel_code"].notna()].copy()
-
-    if lines.empty:
-        raise ValueError(
-            f"Aucune ligne matchée sur hotel_data ({unmatched}/{n_raw} non liées)."
-        )
-
-    monthly = build_monthly_sales(lines)
-    # Jointure calendrier holidays (jours précis)
-    holidays = load_holidays_frame()
-    monthly = attach_holiday_sales(lines, monthly, holidays=holidays)
-
-    path = sales_path()
-    path.parent.mkdir(parents=True, exist_ok=True)
-    monthly.to_excel(path, index=False, sheet_name=SALES_SHEET)
-
-    return {
-        "ok": True,
-        "path": str(path),
-        "rows": len(monthly),
-        "columns": list(monthly.columns),
-        "n_columns": len(monthly.columns),
-        "n_raw_lines": n_raw,
-        "n_unmatched": unmatched,
-        "n_hotels": int(monthly["hotel_code"].nunique()) if "hotel_code" in monthly.columns else 0,
-        "years": sorted(monthly["annee"].dropna().unique().tolist()) if "annee" in monthly.columns else [],
-        "holidays_joined": not holidays.empty if holidays is not None else False,
-    }
+    """Facade stable : pipeline complet raw → hotel_sales_data.xlsx."""
+    return SalesPrepPipeline(raw=raw, drop_unmatched=drop_unmatched).run()
 
 
 def ensure_raw_sales_from_archive() -> Path | None:
-    """Copie le CSV archive vers hotel_sales_raw_data.xlsx s'il manque."""
     dest = raw_path()
     if dest.exists():
         return dest

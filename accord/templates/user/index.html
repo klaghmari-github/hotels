@@ -1,4 +1,14 @@
 <!DOCTYPE html>
+<!--
+  Wizard user ROD (simulateur directeur).
+
+  Etapes : 1 Hotel, 2 Services, 3 Clients, 4 Corner, 5 Simulation.
+  Front ES modules : static/user/js/modules/app.js (UserApp)
+    + static/shared/js/* (dom, api, toast, format).
+  Styles : static/user/css/user.css + static/shared/css/tokens.css.
+  API : /api/hotels/*, /api/simulate, /api/geocode, /api/rule1, …
+  Doc complete : README.md (section Interface user).
+-->
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
@@ -7,7 +17,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/user/css/user.css?v=20260726a" />
+  <link rel="stylesheet" href="/static/shared/css/tokens.css?v=20260726f" />
+  <link rel="stylesheet" href="/static/user/css/user.css?v=20260726f" />
 </head>
 <body>
   <div class="shell">
@@ -342,6 +353,6 @@
   </div>
 
   <div id="toast" class="toast hidden"></div>
-  <script src="/static/user/js/user.js?v=20260726a"></script>
+  <script type="module" src="/static/user/js/modules/app.js?v=20260726f"></script>
 </body>
 </html>

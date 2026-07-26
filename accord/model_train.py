@@ -1,29 +1,32 @@
 """
-Entraînement XGBoost à partir de ``model_data``.
+Entrainement XGBoost a partir de model_data.
 
 Pipeline
 --------
-1. (Re)construit ``model_data`` via :func:`model_data.rebuild_model_data`.
-2. Features = colonnes **descriptives** (méta).
-3. Targets = colonnes **cibles** (volumes + pct non-mix).
-4. Split temporel : lignes ``_is_eval=0`` → train, ``_is_eval=1`` → éval
-   (dernière année calendaire présente dans les données).
-5. Multi-output : un ``XGBRegressor`` par cible
-   (``sklearn.multioutput.MultiOutputRegressor``).
-6. Sauvegarde **design** : ``models/design/<nom>/model.pkl`` + ``config.json``
-   (écrase le dossier si le nom existe déjà).
-7. **Deploy** : copie vers ``models/deploy/model.pkl`` + ``model.json``
-   (un seul modèle déployé à la fois).
+1. (Re)construit model_data via model_data.rebuild_model_data.
+2. Features = colonnes descriptives (meta).
+3. Targets = colonnes cibles (volumes + pct non-mix).
+4. Split temporel : _is_eval=0 train, _is_eval=1 eval (derniere annee).
+5. Multi-output : un XGBRegressor par cible (MultiOutputRegressor).
+6. Sauvegarde design : models/design/<nom>/model.pkl + config.json.
+7. Deploy : copie vers models/deploy/model.pkl + model.json.
 
-UI
---
-* Model Build appelle :func:`build_and_save` (train + save design).
-* Model Explore liste :func:`list_design_models` (tri R² montant_ventes éval).
-* Deploy appelle :func:`deploy_model`.
+Classes
+-------
+* BuildProgress — etat d un batch (manuel + grid), JSON pour le poll UI.
+* GridSearchPlanner — 1 job manuel + produit cartesien des grilles (dedup).
+
+UI (front ModelBuildPanel / ModelExplorePanel)
+----------------------------------------------
+* POST /api/model/build (async) planifie les jobs via GridSearchPlanner.
+* GET /api/model/build/progress lit BuildProgress.
+* Model Explore liste list_design_models (tri par metrique / cible).
+* Deploy appelle deploy_model.
 
 Fichiers annexes
 ----------------
-* ``models/last_trained.json`` — pointeur du dernier build.
+* models/last_trained.json — pointeur du dernier build.
+* models/build_progress.json — resume du batch pour le front.
 """
 
 from __future__ import annotations
@@ -59,22 +62,147 @@ DEPLOY_DIR = MODELS_DIR / "deploy"
 LAST_TRAINED_FILE = MODELS_DIR / "last_trained.json"
 BUILD_PROGRESS_FILE = MODELS_DIR / "build_progress.json"
 
-# Progression d un build batch (manuel + grid search)
 _build_lock = threading.Lock()
 _build_thread: threading.Thread | None = None
-_build_state: dict[str, Any] = {
-    "status": "idle",  # idle | running | done | error
-    "done": 0,
-    "total": 0,
-    "current_name": "",
-    "message": "",
-    "results": [],
-    "error": None,
-    "rank_metric": "r2",
-    "main_target": MAIN_TARGET,
-    "started_at": None,
-    "finished_at": None,
-}
+
+
+class BuildProgress:
+    """
+    Etat partage d un build batch (manuel + grid).
+
+    Thread-safe ; persiste un resume dans models/build_progress.json
+    pour le polling UI.
+    """
+
+    def __init__(self) -> None:
+        self._state: dict[str, Any] = self._empty()
+
+    @staticmethod
+    def _empty() -> dict[str, Any]:
+        return {
+            "status": "idle",
+            "done": 0,
+            "total": 0,
+            "current_name": "",
+            "message": "",
+            "results": [],
+            "error": None,
+            "rank_metric": "r2",
+            "main_target": MAIN_TARGET,
+            "started_at": None,
+            "finished_at": None,
+        }
+
+    def snapshot(self) -> dict[str, Any]:
+        with _build_lock:
+            out = dict(self._state)
+            out["results"] = list(self._state.get("results") or [])
+            return out
+
+    def update(self, **kwargs: Any) -> None:
+        with _build_lock:
+            self._state.update(kwargs)
+            self._persist_unlocked()
+
+    def reset_running(
+        self,
+        *,
+        total: int,
+        main_target: str,
+        rank_metric: str,
+    ) -> None:
+        with _build_lock:
+            self._state = self._empty()
+            self._state.update(
+                {
+                    "status": "running",
+                    "done": 0,
+                    "total": total,
+                    "main_target": main_target,
+                    "rank_metric": rank_metric,
+                    "started_at": datetime.now(timezone.utc).isoformat(),
+                    "message": "Demarrage…",
+                }
+            )
+            self._persist_unlocked()
+
+    def is_running(self) -> bool:
+        with _build_lock:
+            return self._state.get("status") == "running"
+
+    def _persist_unlocked(self) -> None:
+        try:
+            MODELS_DIR.mkdir(parents=True, exist_ok=True)
+            slim = []
+            for r in self._state.get("results") or []:
+                slim.append(
+                    {
+                        "name": r.get("name"),
+                        "id": r.get("id"),
+                        "kind": r.get("kind"),
+                        "rank": r.get("rank"),
+                        "score": r.get("score"),
+                        "main_target": r.get("main_target"),
+                        "rank_metric": r.get("rank_metric"),
+                        "metric_value": r.get("metric_value"),
+                        "xgb_params": r.get("xgb_params"),
+                        "metrics_eval": r.get("metrics_eval"),
+                        "n_train": r.get("n_train"),
+                        "n_eval": r.get("n_eval"),
+                        "error": r.get("error"),
+                        "ok": r.get("ok"),
+                    }
+                )
+            payload = {**self._state, "results": slim}
+            BUILD_PROGRESS_FILE.write_text(
+                json.dumps(payload, ensure_ascii=False, indent=2, default=str),
+                encoding="utf-8",
+            )
+        except Exception:
+            pass
+
+
+class GridSearchPlanner:
+    """Planifie les jobs d entrainement : 1 manuel + N combinaisons grid."""
+
+    def __init__(
+        self,
+        *,
+        base_name: str,
+        manual_params: dict[str, Any],
+        grid: dict[str, list[Any]] | None = None,
+    ) -> None:
+        self.base_name = _slug(base_name or "xgb_sales")
+        self.manual_params = _coerce_params(manual_params)
+        self.grid = grid or {}
+
+    def jobs(self) -> list[tuple[str, str, dict[str, Any]]]:
+        """Liste (name, kind, params) a entrainer."""
+        out: list[tuple[str, str, dict[str, Any]]] = [
+            (self.base_name, "manual", self.manual_params)
+        ]
+        combos = expand_grid_search(self.grid, base_params=self.manual_params)
+        for i, combo in enumerate(combos, start=1):
+            if combo == self.manual_params:
+                continue
+            out.append((f"{self.base_name}_gs_{i:03d}", "grid", combo))
+        return out
+
+    def counts(self) -> dict[str, Any]:
+        jobs = self.jobs()
+        n_grid = sum(1 for _, k, _ in jobs if k == "grid")
+        return {
+            "n_manual": 1,
+            "n_grid": n_grid,
+            "n_grid_raw": len(
+                expand_grid_search(self.grid, base_params=self.manual_params)
+            ),
+            "total": len(jobs),
+        }
+
+
+# Instance module-level pour le polling Flask
+_BUILD_PROGRESS = BuildProgress()
 
 DEFAULT_XGB_PARAMS: dict[str, Any] = {
     "n_estimators": 200,
@@ -388,50 +516,9 @@ def _score_result(
     return val
 
 
-def _write_build_progress() -> None:
-    try:
-        MODELS_DIR.mkdir(parents=True, exist_ok=True)
-        payload = {
-            k: v
-            for k, v in _build_state.items()
-            if k != "results" or _build_state.get("status") in ("done", "error", "idle")
-        }
-        # results may be large — always include slim results
-        slim = []
-        for r in _build_state.get("results") or []:
-            slim.append(
-                {
-                    "name": r.get("name"),
-                    "id": r.get("id"),
-                    "kind": r.get("kind"),
-                    "rank": r.get("rank"),
-                    "score": r.get("score"),
-                    "main_target": r.get("main_target"),
-                    "rank_metric": r.get("rank_metric"),
-                    "metric_value": r.get("metric_value"),
-                    "xgb_params": r.get("xgb_params"),
-                    "metrics_eval": r.get("metrics_eval"),
-                    "n_train": r.get("n_train"),
-                    "n_eval": r.get("n_eval"),
-                    "error": r.get("error"),
-                    "ok": r.get("ok"),
-                }
-            )
-        payload["results"] = slim
-        BUILD_PROGRESS_FILE.write_text(
-            json.dumps(payload, ensure_ascii=False, indent=2, default=str),
-            encoding="utf-8",
-        )
-    except Exception:
-        pass
-
-
 def get_build_progress() -> dict[str, Any]:
     """Etat du build batch (manuel + grid) pour la barre de progression."""
-    with _build_lock:
-        state = dict(_build_state)
-        state["results"] = list(_build_state.get("results") or [])
-    return state
+    return _BUILD_PROGRESS.snapshot()
 
 
 def train_model(
@@ -667,40 +754,26 @@ def _run_build_batch(
     rank_metric: str,
 ) -> None:
     """Thread worker: modele manuel + toutes les combinaisons grid search."""
-    global _build_state
+    progress = _BUILD_PROGRESS
     try:
-        base_name = _slug(model_name or "xgb_sales")
-        manual_params = _coerce_params(xgb_params)
-        grid_combos = expand_grid_search(grid_search, base_params=manual_params)
+        planner = GridSearchPlanner(
+            base_name=model_name or "xgb_sales",
+            manual_params=xgb_params or {},
+            grid=grid_search,
+        )
+        jobs = planner.jobs()
+        progress.update(
+            status="running",
+            done=0,
+            total=len(jobs),
+            current_name="",
+            message="Preparation model_data…",
+            results=[],
+            error=None,
+            rank_metric=rank_metric,
+            main_target=main_target,
+        )
 
-        # Jobs: manual first, then grid (skip grid combo identical to manual)
-        jobs: list[tuple[str, str, dict[str, Any]]] = [
-            (base_name, "manual", manual_params)
-        ]
-        for i, combo in enumerate(grid_combos, start=1):
-            if combo == manual_params:
-                continue
-            jobs.append((f"{base_name}_gs_{i:03d}", "grid", combo))
-
-        with _build_lock:
-            _build_state.update(
-                {
-                    "status": "running",
-                    "done": 0,
-                    "total": len(jobs),
-                    "current_name": "",
-                    "message": "Preparation model_data…",
-                    "results": [],
-                    "error": None,
-                    "rank_metric": rank_metric,
-                    "main_target": main_target,
-                    "started_at": datetime.now(timezone.utc).isoformat(),
-                    "finished_at": None,
-                }
-            )
-            _write_build_progress()
-
-        # Une seule reconstruction des donnees pour tout le batch
         rebuild_model_data()
         frame, meta = _load_model_frame()
         target_cols = meta.get("target_columns") or []
@@ -715,10 +788,10 @@ def _run_build_batch(
 
         results: list[dict[str, Any]] = []
         for idx, (name, kind, params) in enumerate(jobs):
-            with _build_lock:
-                _build_state["current_name"] = name
-                _build_state["message"] = f"Entrainement {idx + 1}/{len(jobs)} · {name}"
-                _write_build_progress()
+            progress.update(
+                current_name=name,
+                message=f"Entrainement {idx + 1}/{len(jobs)} · {name}",
+            )
             try:
                 res = train_model(
                     xgb_params=params,
@@ -733,7 +806,6 @@ def _run_build_batch(
                 res["kind"] = kind
                 res["rank_metric"] = metric
                 res["ok"] = True
-                # valeur metrique affichee
                 mt = res.get("metrics_eval") or {}
                 per = (mt.get("per_target") or {}).get(main_t) or {}
                 if metric in per and per[metric] is not None:
@@ -757,44 +829,32 @@ def _run_build_batch(
                     "score": float("-inf"),
                 }
             results.append(res)
-            with _build_lock:
-                _build_state["done"] = idx + 1
-                _build_state["results"] = list(results)
-                _write_build_progress()
+            progress.update(done=idx + 1, results=list(results))
 
-        # Ranking (meilleur score en premier)
         ranked = sorted(
             results, key=lambda r: float(r.get("score") or float("-inf")), reverse=True
         )
         for i, r in enumerate(ranked):
             r["rank"] = i + 1
 
-        with _build_lock:
-            _build_state.update(
-                {
-                    "status": "done",
-                    "done": len(jobs),
-                    "total": len(jobs),
-                    "current_name": "",
-                    "message": f"Termine · {len(jobs)} modele(s)",
-                    "results": ranked,
-                    "main_target": main_t,
-                    "rank_metric": metric,
-                    "finished_at": datetime.now(timezone.utc).isoformat(),
-                }
-            )
-            _write_build_progress()
+        progress.update(
+            status="done",
+            done=len(jobs),
+            total=len(jobs),
+            current_name="",
+            message=f"Termine · {len(jobs)} modele(s)",
+            results=ranked,
+            main_target=main_t,
+            rank_metric=metric,
+            finished_at=datetime.now(timezone.utc).isoformat(),
+        )
     except Exception as exc:
-        with _build_lock:
-            _build_state.update(
-                {
-                    "status": "error",
-                    "error": str(exc),
-                    "message": str(exc),
-                    "finished_at": datetime.now(timezone.utc).isoformat(),
-                }
-            )
-            _write_build_progress()
+        progress.update(
+            status="error",
+            error=str(exc),
+            message=str(exc),
+            finished_at=datetime.now(timezone.utc).isoformat(),
+        )
 
 
 def start_build_batch(
@@ -810,34 +870,26 @@ def start_build_batch(
     Suivre via get_build_progress().
     """
     global _build_thread
-    with _build_lock:
-        if _build_state.get("status") == "running":
-            return {
-                "ok": False,
-                "error": "Un build est deja en cours",
-                "progress": dict(_build_state),
-            }
-        # estimate total
-        manual = _coerce_params(xgb_params)
-        combos = expand_grid_search(grid_search, base_params=manual)
-        n_grid = sum(1 for c in combos if c != manual)
-        total = 1 + n_grid
-        _build_state.update(
-            {
-                "status": "running",
-                "done": 0,
-                "total": total,
-                "current_name": "",
-                "message": "Demarrage…",
-                "results": [],
-                "error": None,
-                "rank_metric": (rank_metric or "r2").lower(),
-                "main_target": main_target or MAIN_TARGET,
-                "started_at": datetime.now(timezone.utc).isoformat(),
-                "finished_at": None,
-            }
-        )
-        _write_build_progress()
+    if _BUILD_PROGRESS.is_running():
+        return {
+            "ok": False,
+            "error": "Un build est deja en cours",
+            "progress": _BUILD_PROGRESS.snapshot(),
+        }
+
+    planner = GridSearchPlanner(
+        base_name=model_name or "xgb_sales",
+        manual_params=xgb_params or {},
+        grid=grid_search,
+    )
+    counts = planner.counts()
+    main_t = main_target or MAIN_TARGET
+    metric = (rank_metric or "r2").lower()
+    _BUILD_PROGRESS.reset_running(
+        total=counts["total"],
+        main_target=main_t,
+        rank_metric=metric,
+    )
 
     t = threading.Thread(
         target=_run_build_batch,
@@ -845,8 +897,8 @@ def start_build_batch(
             "model_name": model_name or "xgb_sales",
             "xgb_params": xgb_params or {},
             "grid_search": grid_search,
-            "main_target": main_target or MAIN_TARGET,
-            "rank_metric": rank_metric or "r2",
+            "main_target": main_t,
+            "rank_metric": metric,
         },
         daemon=True,
     )
@@ -855,7 +907,7 @@ def start_build_batch(
     return {
         "ok": True,
         "status": "running",
-        "total": total,
+        "total": counts["total"],
         "message": "Build lance",
     }
 
@@ -865,15 +917,11 @@ def count_grid_jobs(
     grid_search: dict[str, list[Any]] | None,
 ) -> dict[str, Any]:
     """Nombre de modeles qui seront construits (manuel + grid uniques)."""
-    manual = _coerce_params(xgb_params)
-    combos = expand_grid_search(grid_search, base_params=manual)
-    n_grid = sum(1 for c in combos if c != manual)
-    return {
-        "n_manual": 1,
-        "n_grid": n_grid,
-        "n_grid_raw": len(combos),
-        "total": 1 + n_grid,
-    }
+    return GridSearchPlanner(
+        base_name="xgb",
+        manual_params=xgb_params or {},
+        grid=grid_search,
+    ).counts()
 
 
 def deploy_model(model_name: str | None = None) -> dict[str, Any]:

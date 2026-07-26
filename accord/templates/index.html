@@ -12,7 +12,9 @@
     view-model-build: nom + hyperparams XGBoost, bouton Build and Save
     view-model-explore: liste modeles, perfs, importances, arbres, Deploy
 
-  Logique front: static/js/app.js  Styles: static/css/app.css
+  Logique front (ES modules OOP):
+    static/js/admin/app.js + static/shared/js/*
+  Styles: static/css/app.css + static/shared/css/tokens.css
   API: /api/datasets/* et /api/model/*  Doc: README.md
 -->
 <html lang="fr">
@@ -23,6 +25,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/shared/css/tokens.css" />
   <link rel="stylesheet" href="/static/css/app.css" />
 </head>
 <body>
@@ -350,6 +353,6 @@
     </div>
   </div>
 
-  <script src="/static/js/app.js"></script>
+  <script type="module" src="/static/js/admin/app.js?v=20260726f"></script>
 </body>
 </html>

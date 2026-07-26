@@ -1,9 +1,19 @@
 """
-Flask — interface **User** ROD (wizard directeur).
+Flask — interface User ROD (wizard directeur).
 
 Lancer
 ------
     python run_user.py          # → http://127.0.0.1:5056
+
+Static
+------
+Serve tout accord/static (url /static) pour :
+  * /static/user/js/modules/app.js  (front OOP UserApp)
+  * /static/shared/js/*             (dom, api, toast, format)
+
+API principales : /api/hotels/*, /api/simulate, /api/geocode,
+/api/rule1, /api/concept_pilote/brand/<marque>, /api/meta, /api/brands.
+Doc UI + routes : README.md section Interface user.
 """
 
 from __future__ import annotations
@@ -28,11 +38,12 @@ from user.services.geocode import Geocoder
 from user.services.hotel_context import HotelContextBuilder
 from user.services.orchestrator import SimulationOrchestrator
 
+# static/ entier pour servir user/ + shared/ (modules ES communs)
 app = Flask(
     __name__,
     template_folder=str(ROOT / "templates" / "user"),
-    static_folder=str(ROOT / "static" / "user"),
-    static_url_path="/static/user",
+    static_folder=str(ROOT / "static"),
+    static_url_path="/static",
 )
 app.config["JSON_AS_ASCII"] = False
 # Évite le cache navigateur agressif sur JS/CSS pendant le dev

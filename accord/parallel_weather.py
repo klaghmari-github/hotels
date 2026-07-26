@@ -20,13 +20,14 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
+
+from parallel_common import chunk_list, load_france_hotels as _load_fr
 
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data"
@@ -37,36 +38,9 @@ STATE_DIR = DATA / "weather_state"
 WEATHER_SHEET = "Sheet1"
 
 
-def _chunk_list(items: list[Any], n: int) -> list[list[Any]]:
-    if n <= 1 or len(items) <= 1:
-        return [items] if items else []
-    n = min(n, len(items))
-    size = math.ceil(len(items) / n)
-    return [items[i : i + size] for i in range(0, len(items), size)]
-
-
 def load_france_hotels(path: Path | None = None) -> pd.DataFrame:
-    """Hôtels France avec lat/lon valides (requis pour Meteostat)."""
-    path = path or HOTEL_XLSX
-    df = pd.read_excel(path, dtype={"hotel_code": str})
-    if df.empty:
-        return df
-    country = (
-        df.get("hotel_country", pd.Series([""] * len(df)))
-        .astype(str)
-        .str.upper()
-        .str.strip()
-    )
-    fr = df[country.isin(["FR", "FRA", "FRANCE"])].copy()
-    lat = pd.to_numeric(fr.get("hotel_lat"), errors="coerce")
-    lon = pd.to_numeric(fr.get("hotel_lon"), errors="coerce")
-    fr = fr[lat.notna() & lon.notna()].copy()
-    fr["hotel_lat"] = lat.loc[fr.index]
-    fr["hotel_lon"] = lon.loc[fr.index]
-    fr["hotel_code"] = fr["hotel_code"].astype(str).str.strip()
-    fr = fr[fr["hotel_code"].ne("") & fr["hotel_code"].ne("nan")]
-    fr = fr.drop_duplicates(subset=["hotel_code"], keep="first")
-    return fr.reset_index(drop=True)
+    """Hotels France avec lat/lon valides (Meteostat)."""
+    return _load_fr(path or HOTEL_XLSX, require_coords=True)
 
 
 def _normalize_frame(frame: pd.DataFrame) -> pd.DataFrame:
@@ -451,7 +425,7 @@ def run_parallel(
         print("[wx] rien à calculer — merge")
         return merge_shards()
 
-    shards = _chunk_list(records, workers)
+    shards = chunk_list(records, workers)
     print(
         f"[wx] {len(records)} hotels → {len(shards)} shards "
         f"sizes={[len(s) for s in shards]} pause={pause_s}s"

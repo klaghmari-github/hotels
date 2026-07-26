@@ -19,13 +19,14 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
+
+from parallel_common import chunk_list, load_france_hotels as _load_fr
 
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data"
@@ -34,7 +35,7 @@ OUT_XLSX = DATA / "hotel_proximity_data.xlsx"
 SHARD_DIR = DATA / "proximity_shards"
 STATE_DIR = DATA / "proximity_state"
 
-# Mirrors Overpass (FR en tête — souvent le plus fiable depuis la France)
+# Mirrors Overpass (FR en tete — souvent le plus fiable depuis la France)
 OVERPASS_ENDPOINTS = [
     "https://overpass.openstreetmap.fr/api/interpreter",
     "https://overpass.osm.ch/api/interpreter",
@@ -45,30 +46,9 @@ OVERPASS_ENDPOINTS = [
 ]
 
 
-def _chunk_list(items: list[Any], n: int) -> list[list[Any]]:
-    if n <= 1 or len(items) <= 1:
-        return [items] if items else []
-    n = min(n, len(items))
-    size = math.ceil(len(items) / n)
-    return [items[i : i + size] for i in range(0, len(items), size)]
-
-
 def load_france_hotels(path: Path | None = None) -> pd.DataFrame:
-    path = path or HOTEL_XLSX
-    df = pd.read_excel(path, dtype={"hotel_code": str})
-    if df.empty:
-        return df
-    country = df.get("hotel_country", pd.Series([""] * len(df))).astype(str).str.upper().str.strip()
-    fr = df[country.isin(["FR", "FRA", "FRANCE"])].copy()
-    lat = pd.to_numeric(fr.get("hotel_lat"), errors="coerce")
-    lon = pd.to_numeric(fr.get("hotel_lon"), errors="coerce")
-    fr = fr[lat.notna() & lon.notna()].copy()
-    fr["hotel_lat"] = lat
-    fr["hotel_lon"] = lon
-    # dédup code
-    fr["hotel_code"] = fr["hotel_code"].astype(str).str.strip()
-    fr = fr.drop_duplicates(subset=["hotel_code"], keep="first")
-    return fr.reset_index(drop=True)
+    """Hotels France avec coords valides (Overpass)."""
+    return _load_fr(path or HOTEL_XLSX, require_coords=True)
 
 
 def _worker_shard(
@@ -324,7 +304,7 @@ def run_parallel(
         print("[prox] rien à calculer — merge")
         return merge_shards()
 
-    shards = _chunk_list(records, workers)
+    shards = chunk_list(records, workers)
     print(
         f"[prox] {len(records)} hotels → {len(shards)} shards "
         f"sizes={[len(s) for s in shards]} pause={pause_s}s"

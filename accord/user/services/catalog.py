@@ -13,20 +13,11 @@ from typing import Any
 
 import pandas as pd
 
-DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
+from data_io import DATA_DIR, cell_to_python, read_excel as _read_excel_path
 
 
 def _read_excel(name: str, sheet: str | int = 0) -> pd.DataFrame:
-    path = DATA_DIR / name
-    if not path.exists():
-        return pd.DataFrame()
-    try:
-        return pd.read_excel(path, sheet_name=sheet)
-    except Exception:
-        try:
-            return pd.read_excel(path, sheet_name=0)
-        except Exception:
-            return pd.DataFrame()
+    return _read_excel_path(DATA_DIR / name, sheet=sheet)
 
 
 class AdminCatalog:
@@ -188,18 +179,9 @@ class AdminCatalog:
 
         out: list[dict[str, Any]] = []
         for _, row in frame.iterrows():
-            item: dict[str, Any] = {}
-            for c in present:
-                val = row.get(c)
-                if pd.isna(val):
-                    item[c] = None
-                elif hasattr(val, "item"):
-                    try:
-                        item[c] = val.item()
-                    except Exception:
-                        item[c] = val
-                else:
-                    item[c] = val
+            item: dict[str, Any] = {
+                str(c): cell_to_python(row.get(c)) for c in present
+            }
             code = str(item.get("hotel_code") or "").strip()
             name = str(item.get("hotel_name") or "").strip()
             if code or name:

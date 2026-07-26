@@ -22,13 +22,14 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
+
+from parallel_common import chunk_list, load_france_hotels as _load_fr
 
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data"
@@ -38,31 +39,13 @@ SHARD_DIR = DATA / "holidays_shards"
 STATE_DIR = DATA / "holidays_state"
 
 
-def _chunk_list(items: list[Any], n: int) -> list[list[Any]]:
-    if n <= 1 or len(items) <= 1:
-        return [items] if items else []
-    n = min(n, len(items))
-    size = math.ceil(len(items) / n)
-    return [items[i : i + size] for i in range(0, len(items), size)]
-
-
 def load_france_hotels(path: Path | None = None) -> pd.DataFrame:
-    """Tous les hôtels France (coords optionnelles — zone via CP)."""
-    path = path or HOTEL_XLSX
-    df = pd.read_excel(path, dtype={"hotel_code": str, "hotel_code_postal": str})
-    if df.empty:
-        return df
-    country = (
-        df.get("hotel_country", pd.Series([""] * len(df)))
-        .astype(str)
-        .str.upper()
-        .str.strip()
+    """Hotels France (coords optionnelles — zone via CP)."""
+    return _load_fr(
+        path or HOTEL_XLSX,
+        require_coords=False,
+        extra_dtypes={"hotel_code_postal": str},
     )
-    fr = df[country.isin(["FR", "FRA", "FRANCE"])].copy()
-    fr["hotel_code"] = fr["hotel_code"].astype(str).str.strip()
-    fr = fr[fr["hotel_code"].ne("") & fr["hotel_code"].ne("nan")]
-    fr = fr.drop_duplicates(subset=["hotel_code"], keep="first")
-    return fr.reset_index(drop=True)
 
 
 def _worker_shard(
@@ -316,7 +299,7 @@ def run_parallel(*, workers: int = 12, skip_existing: bool = True) -> dict[str, 
         print("[hol] rien à calculer — merge")
         return merge_shards()
 
-    shards = _chunk_list(records, workers)
+    shards = chunk_list(records, workers)
     print(
         f"[hol] {len(records)} hotels → {len(shards)} shards "
         f"sizes={[len(s) for s in shards]}"
