@@ -364,15 +364,89 @@ export class RodSimPanel {
       host.textContent = "—";
       return;
     }
-    const monthsVal = h.has_holdout
-      ? (h.months || []).join(", ") || "—"
-      : "—";
     host.className = "metrics-grid";
     host.innerHTML = `
       <div class="metric-box"><span class="m-label">Marque</span><span class="m-value">${escapeHtml(h.hotel_brand || "—")}</span></div>
       <div class="metric-box"><span class="m-label">Catégorie</span><span class="m-value">${escapeHtml(h.category || "—")}</span></div>
-      <div class="metric-box"><span class="m-label">Mois réel</span><span class="m-value">${escapeHtml(monthsVal)}</span></div>
-      <div class="metric-box ${h.has_holdout ? "good" : ""}"><span class="m-label">Réel éval Σ/12</span><span class="m-value">${h.has_holdout ? euro(h.avg_monthly_true) : "—"}</span></div>
+      <div class="metric-box"><span class="m-label">Nom</span><span class="m-value">${escapeHtml(h.hotel_name || "—")}</span></div>
+    `;
+  }
+
+  /**
+   * Zone 2 — hôtels pilotes même catégorie de marque (années de modélisation).
+   * CA réel = avg mensuelle multi-années train ; TO réel = hotel_to_annuel.
+   */
+  renderPilots() {
+    const sumHost = $("#rod-pilots-summary");
+    const tableHost = $("#rod-pilots-table");
+    if (!sumHost || !tableHost) return;
+
+    if (!this.trace) {
+      sumHost.className = "metrics-grid empty";
+      sumHost.textContent = "—";
+      tableHost.className = "perf-table-wrap empty";
+      tableHost.textContent = "—";
+      return;
+    }
+
+    const r = this.trace.category_reference || {};
+    const train = (this.trace.train_years || r.train_years || []).join(", ");
+    const pilots =
+      this.trace.category_pilots ||
+      this.trace.category_reference_hotels ||
+      [];
+
+    sumHost.className = "metrics-grid";
+    sumHost.innerHTML = `
+      <div class="metric-box"><span class="m-label">Années de modélisation</span><span class="m-value">${escapeHtml(train || "—")}</span></div>
+      <div class="metric-box"><span class="m-label">Catégorie</span><span class="m-value">${escapeHtml(r.category || this.trace.category || "—")}</span></div>
+      <div class="metric-box"><span class="m-label">n pilotes</span><span class="m-value">${pilots.length || r.n_hotels || 0}</span></div>
+      <div class="metric-box good"><span class="m-label">CA réel moyen / mois</span><span class="m-value">${euro(r.ca_monthly_ref)}</span></div>
+      <div class="metric-box"><span class="m-label">TO réel moyen</span><span class="m-value">${r.taux_occupation_ref != null ? fmt(Number(r.taux_occupation_ref) * 100, 1) + " %" : "—"}</span></div>
+    `;
+
+    if (!pilots.length) {
+      tableHost.className = "perf-table-wrap empty";
+      tableHost.textContent = "Aucun pilote pour cette catégorie";
+      return;
+    }
+
+    const target = this.trace.hotel_code;
+    tableHost.className = "perf-table-wrap";
+    tableHost.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Hôtel</th>
+            <th>Années</th>
+            <th>CA réel / mois</th>
+            <th>TO réel</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${pilots
+            .map((p) => {
+              const years = (p.train_years || Object.keys(p.by_year || {}))
+                .map(String)
+                .join(", ");
+              const ca = p.ca_monthly_ref ?? p.reference_monthly;
+              const to =
+                p.taux_occupation != null
+                  ? fmt(Number(p.taux_occupation) * 100, 1) + " %"
+                  : "—";
+              const isTarget = p.hotel_code === target;
+              return `<tr${isTarget ? ' class="is-target"' : ""}>
+                <td>${escapeHtml(p.hotel_code || "")}${isTarget ? " ·" : ""}</td>
+                <td>${escapeHtml(p.hotel_name || "—")}</td>
+                <td>${escapeHtml(years || "—")}</td>
+                <td>${euro(ca)}</td>
+                <td>${to}</td>
+              </tr>`;
+            })
+            .join("")}
+        </tbody>
+      </table>
     `;
   }
 
@@ -507,6 +581,7 @@ export class RodSimPanel {
 
   renderTrace() {
     if (!this.trace) return;
+    this.renderPilots();
     this.renderCategoryRef();
     this.renderRecoBanner();
     this.renderConceptKpi();

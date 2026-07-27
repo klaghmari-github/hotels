@@ -26,8 +26,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/shared/css/tokens.css" />
-  <link rel="stylesheet" href="/static/css/app.css" />
+  <link rel="stylesheet" href="{{ asset('shared/css/tokens.css') }}" />
+  <link rel="stylesheet" href="{{ asset('css/app.css') }}" />
 </head>
 <body>
   <div class="app-shell">
@@ -37,7 +37,7 @@
         <div class="brand-mark" aria-hidden="true">
           <!-- Logo officiel groupe Accor (group.accor.com / imgix) -->
           <img
-            src="/static/img/accor-logo.svg"
+            src="{{ asset('img/accor-logo.svg') }}"
             alt="Accor"
             class="brand-logo"
             width="48"
@@ -580,12 +580,18 @@
             </section>
 
             <section class="card">
-              <h2 class="card-title">2. Référence catégorie</h2>
+              <h2 class="card-title">2. Hôtels pilotes</h2>
+              <div id="rod-pilots-summary" class="metrics-grid empty">—</div>
+              <div id="rod-pilots-table" class="perf-table-wrap empty" style="margin-top:0.75rem">—</div>
+            </section>
+
+            <section class="card">
+              <h2 class="card-title">3. Référence catégorie</h2>
               <div id="rod-category-ref" class="metrics-grid empty">—</div>
             </section>
 
             <section class="card">
-              <h2 class="card-title">3. Corner</h2>
+              <h2 class="card-title">4. Corner</h2>
               <label class="field">
                 <span>Mètres linéaires</span>
                 <div class="rod-m-lin-row">
@@ -618,7 +624,7 @@
             </section>
 
             <section class="card">
-              <h2 class="card-title">4. Sous-catégories</h2>
+              <h2 class="card-title">5. Sous-catégories</h2>
               <div class="rod-needs-actions">
                 <button type="button" class="btn btn-ghost btn-sm" id="rod-needs-all-on">Tout autoriser</button>
                 <button type="button" class="btn btn-ghost btn-sm" id="rod-needs-all-off">Tout interdire</button>
@@ -822,6 +828,6 @@
     </div>
   </div>
 
-  <script type="module" src="/static/js/admin/app.js?v=20260726q"></script>
+  <script type="module" src="{{ asset('js/admin/app.js') }}"></script>
 </body>
 </html>

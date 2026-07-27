@@ -871,6 +871,12 @@ body {
 #rod-gap-table td.neg,
 #rod-gap-table-inner td.neg { color: var(--danger); }
 
+/* Pilotes : ligne de l'hôtel désigné pour simulation */
+#rod-pilots-table tr.is-target td {
+  background: rgba(56, 189, 248, 0.08);
+  font-weight: 500;
+}
+
 /* Onglet écart réel / sim : bloc distinct */
 .rod-gap-kpi {
   margin-bottom: 0.25rem;

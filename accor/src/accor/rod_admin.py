@@ -214,7 +214,6 @@ def build_category_reference(
         href = hotel_reference_over_years(sales, code, train_years)
         if href["reference_monthly"] is None:
             continue
-        hotel_refs.append(href)
         ca_list.append(float(href["reference_monthly"]))
 
         row = None
@@ -222,7 +221,14 @@ def build_category_reference(
             m = hotels[hotels["hotel_code"] == code]
             if not m.empty:
                 row = m.iloc[0]
+
+        name = ""
+        brand = ""
+        n = 0
+        to = None
+        g = None
         if row is not None:
+            name = str(row.get("hotel_name") or "")
             brand = str(row.get("hotel_brand") or "")
             bk = _norm_brand(brand)
             n = _as_int(row.get("hotel_nb_chambres"), 0)
@@ -233,6 +239,27 @@ def build_category_reference(
                 to_list.append(float(to))
                 guests_list.append(float(g))
                 clients_list.append(float(n) * float(to) * float(g) * JOURS_MOIS)
+
+        # nom depuis ventes train si fiche absente
+        if not name and not sales.empty and "nom_hotel" in sales.columns:
+            sub_n = sales[
+                (sales["hotel_code"] == code) & (sales["annee"].isin(train_years))
+            ]
+            nn = sub_n["nom_hotel"].dropna()
+            if len(nn):
+                name = str(nn.iloc[0] or "")
+
+        hotel_refs.append(
+            {
+                **href,
+                "hotel_name": name,
+                "hotel_brand": brand,
+                "nb_chambres": n or None,
+                "taux_occupation": _round(to, 4) if to is not None else None,
+                "ca_monthly_ref": _round(float(href["reference_monthly"]), 2),
+                "train_years": sorted(int(y) for y in (href.get("by_year") or {}).keys()),
+            }
+        )
 
     if not ca_list:
         return {
@@ -1025,6 +1052,8 @@ def simulate_hotel_trace(
             for k, v in cat_ref.items()
             if k != "hotel_refs"
         },
+        # Pilotes même catégorie (années de modélisation) — toujours exposés
+        "category_pilots": cat_ref.get("hotel_refs") or [],
         "identity": req.identity.to_dict(),
         "operating": req.operating.to_dict(),
         "client_needs": dict(req.client_profile.client_needs or {}),
@@ -1042,7 +1071,8 @@ def simulate_hotel_trace(
     }
     if include_gaps:
         out["has_holdout"] = has_holdout
-        out["category_reference_hotels"] = cat_ref.get("hotel_refs")
+        # alias rétrocompat
+        out["category_reference_hotels"] = out["category_pilots"]
         out["real_holdout"] = {
             "year": eval_year,
             "available": has_holdout,
