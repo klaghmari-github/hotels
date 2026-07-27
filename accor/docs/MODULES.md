@@ -20,11 +20,11 @@ Imports : `from accor.store import get_frame`, `from accor.user.app import app`,
 | `model_data.py` | all_data → model_data (rôles, eval, impute) |
 | `impute_model.py` | imputation ML par catégorie marque |
 | `brand_category.py` | catégories, pilotes, voisins de gamme |
-| `model_train.py` | XGBoost multi-output, design, deploy, batch UI + progress |
-| `model_explore.py` | arbres, importance (structure modèle) |
-| `model_eval.py` | **éval ML** année incomplete (somme/12) |
-| `rod_admin.py` | **Simulateur ROD admin** : ref catégorie train, simu corner, éval temporelle 2026 |
-| `model_final.py` | **Modèle final** : stacking descriptives + pred_* → montant_ventes |
+| `model_train.py` | **Intermédiaires** multi-output XGB, design, deploy, batch + progress |
+| `model_final.py` | **Final** stacking descriptives + pred_* → montant_ventes |
+| `model_explore.py` | arbres, importance (`tier` intermediate \| final) |
+| `model_eval.py` | **éval ML** année incomplete (Σ/12), `tier` intermediate \| final |
+| `rod_admin.py` | **Simulateur ROD** : hôtel cible, ref catégorie train, éval temporelle |
 | `concept_pilote.py` | indicateurs annuels hôtel × année |
 | `geo_common.py` | hotels/sales/années/mois pour rebuilds geo |
 | `geo_weather.py` | Meteostat → hotel_weather_data |

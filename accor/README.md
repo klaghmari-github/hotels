@@ -318,7 +318,7 @@ C’est celui que le parcours user / enrichissement peut consommer.
 - Structure du modèle (pas les scores métier ROD).
 - Importances, table des arbres (métriques **cumulées** boosting), SVG.
 
-### Éval. modèle ML (`model_eval.py`)
+### Éval. ML intermédiaire / final (`model_eval.py`)
 
 Année incomplete (souvent **2026**) : prédiction **XGBoost** vs réel.
 
@@ -326,19 +326,18 @@ Année incomplete (souvent **2026**) : prédiction **XGBoost** vs réel.
 moyenne_mensuelle = somme(mois présents) / 12   # prédit et réel
 ```
 
-API : `GET /api/model/eval/meta`, `POST /api/model/eval`.  
-UI : **Modèle** → **Éval. modèle ML**.
+API : `GET /api/model/eval/meta?tier=…`, `POST /api/model/eval` (`tier`).  
+UI : **Intermédiaires → Évaluation** et **Final → Évaluation** (vues séparées).
 
 ### Simulateur ROD admin (`rod_admin.py`)
 
 Validation métier (≠ ML) — **split temporel**, pas par hôtel :
 
 * **Apprentissage / ref** = années hors 2026 (ex. 2023–2025) : tous les
-  pilotes de la **catégorie de marque** (pas de leave-one-out).
-  avg mensuelle année = Σ mois / 12, puis moyennes multi-années / multi-hôtels.
+  **pilotes** de la catégorie (pas de leave-one-out).
+* **Hôtel cible** = hôtel pour lequel on simule (pas « client »).
 * **Évaluation** = 2026 vs réel (Σ/12). Peu d’hôtels en apprentissage = normal.
-* Corner éditable (m_lin, mix F&B, sous-cat.) → règles ROD → CA / coûts /
-  marge 3 concepts + reco.
+* Corner (m_lin, mix, sous-cat.) → ROD → CA / coûts / marge + reco.
 
 API : `/api/rod/*` (UI : **POST** sur `/trace`). Doc : [docs/ROD_ADMIN.md](docs/ROD_ADMIN.md).
 
@@ -351,27 +350,26 @@ Page unique : `templates/index.html` + modules sous `static/js/admin/`.
 ### Barre latérale
 
 ```
-All → Pilotes → Simulateur ROD → Modèle
+All → Pilotes
+  → Simulateur ROD
+  → Modèles intermédiaires  (Build · Explore · Évaluation)
+  → Modèle final            (Build · Explore · Évaluation)
 ```
 
-- **Datasets** — table paginée, édition si non readonly  
-- **Simulateur ROD** — règles Excel (ventes / marge / éval sim vs réel)  
-- **Modèle** (singulier) : Build · Explore · Éval. ML  
-
-### Comportement table
-
-- Pagination + filtre texte, dirty state, rebuilds selon onglet.
-- Logos marque via `/api/marques/logos/…`.
+- **Datasets** — table paginée  
+- **Simulateur ROD** — hôtel cible, corner, CA / marge / écart / batch  
+- **Intermédiaires** — multi-cibles XGB  
+- **Final** — stacking descriptives + pred_*  
 
 ### Simulateur ROD (UI)
 
-Recalcul **auto** (pas de bouton Simuler). Quatre onglets séparés :
-(1) CA règles, (2) coûts & marge, (3) **écart réel / sim**, (4) batch.
-Corner : m_lin, mix, sous-catégories, chambres/TO/guests.
+Recalcul **auto** + **barre de progression**. Onglets :
+(1) CA règles, (2) coûts & marge, (3) écart réel/sim, (4) batch.
+Vocabulaire : **hôtel cible** / **à cibler**.
 
-### Éval. modèle ML (UI)
+### Éval. ML (UI)
 
-Modèle design, cible, année → métriques Σ/12, tables hôtel / mois.
+Deux écrans : listes / résultats **indépendants** pour intermédiaire et final.
 
 ---
 
@@ -398,29 +396,33 @@ CRUD `/api/datasets/*` + rebuilds `all_data`, `model_data`, `sales`,
 | Méthode | Chemin | Description |
 |---------|--------|-------------|
 | GET | `/api/rod/meta` | sous-cat. + défauts corner |
-| GET | `/api/rod/pilots` | pilotes train (`?year=2026` = année d’éval) |
-| GET\|POST | `/api/rod/hotel/<code>/trace` | simu (UI = POST) + écart si réel |
-| GET | `/api/rod/eval` | batch éval temporelle (MAE si réel) |
+| GET | `/api/rod/pilots` | pilotes train (`?year=` = année d’éval) |
+| GET\|POST | `/api/rod/hotel/<code>/trace` | simu **hôtel cible** (UI = POST) |
+| GET | `/api/rod/eval` | batch éval temporelle |
 
-### Modèle ML
+### Modèles intermédiaires
 
 | Méthode | Chemin | Description |
 |---------|--------|-------------|
 | GET | `/api/model/config` | config build |
-| GET | `/api/model/list` | modèles design |
+| GET | `/api/model/list` | `models/design` |
 | POST | `/api/model/build` | batch async |
-| GET | `/api/model/build/progress` | % manuel/grid |
-| POST | `/api/model/build/count` | nb jobs grille |
-| POST | `/api/model/deploy` | body model_name |
-| GET/POST | `/api/model/eval` | éval **XGBoost** |
-| GET | `/api/model/eval/meta` | meta UI |
-| GET | `/api/model/<id>` | config |
-| GET | `/api/model/<id>/explore` | structure |
-| GET | `/api/model/<id>/tree` | arbre SVG |
-| GET | `/api/model/<id>/trees` | table arbres |
-| GET | `/api/model/<id>/importance` | importances |
+| GET | `/api/model/build/progress` | progression |
+| POST | `/api/model/deploy` | → `models/deploy/` |
+| GET/POST | `/api/model/eval` | `tier=intermediate` |
+| GET | `/api/model/<id>/explore`… | structure / arbres |
 
-Routes `/api/model/eval*` **avant** `/api/model/<model_id>`.
+### Modèle final
+
+| Méthode | Chemin | Description |
+|---------|--------|-------------|
+| GET | `/api/model/final/config` | + intermédiaires dispo |
+| GET | `/api/model/final/list` | `models/final/design` |
+| POST | `/api/model/final/build` | stacking async |
+| GET | `/api/model/final/build/progress` | progression |
+| POST | `/api/model/final/deploy` | → `models/final/deploy/` |
+| GET | `/api/model/final/<id>/explore`… | structure |
+| GET/POST | `/api/model/eval` | `tier=final` |
 
 ```bash
 curl -s -X POST 'http://127.0.0.1:5055/api/rod/hotel/H0373/trace' \

@@ -75,7 +75,7 @@ Source : `hotel_brand_data.xlsx` via `AdminCatalog`.
 
 ### `GET /api/concept_pilote/brand/<path:brand>`
 
-Moyennes d’exploitation pour une marque (étape 1 du wizard).
+Moyennes d’exploitation pour une marque (contexte / prefill).
 
 - Lit `concept_pilote.xlsx`
 - Filtre la marque
@@ -112,7 +112,7 @@ Fiche brute. 404 si inconnu.
 
 ### `GET /api/hotels/<hotel_code>/context`
 
-Contexte complet pour le wizard + payload simulation.
+Contexte complet pour la simu directeur + payload simulation.
 
 | Query | Défaut | Rôle |
 |-------|--------|------|

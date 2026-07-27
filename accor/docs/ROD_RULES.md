@@ -13,7 +13,7 @@ Séparation volontaire :
 
 ## Indicateurs d’entrée
 
-Produits par `HotelContextBuilder` / saisie wizard :
+Produits par `HotelContextBuilder` / saisie UI directeur :
 
 | Indicateur | Formule / source |
 |------------|------------------|
@@ -99,13 +99,12 @@ reco &lt;50 / LIBERTY N-F&B, coûts ∝ m_lin, cohérence simulate.
 
 | | **User** (`run_user`) | **Admin** (`run_admin` → Simulateur ROD) |
 |--|----------------------|------------------------------------------|
-| Cible | N’importe quel hôtel | Pilotes (ventes) — peu d’hôtels, c’est normal |
+| Hôtel simulé | N’importe quel code (**hôtel cible**) | **Hôtel cible** (souvent un pilote) |
 | Réf. | Pivots Excel + contexte | + moyennes catégorie sur **train** (ex. 2023–25) |
 | Éval. | Non (souvent pas de réel) | **Temporelle** : éval 2026 (pas d’exclusion d’hôtel) |
 
-**Hôtel pilote** = a des ventes sur des années précédentes → sert de modèle
-pour estimer d’autres hôtels, ou le « futur » du même hôtel (quand le futur
-devient disponible, on mesure l’écart).
+**Hôtel pilote** = ventes train → entre dans la **référence** catégorie.  
+**Hôtel cible** = hôtel pour lequel on **simule** le corner (plus « client »).
 
 Doc : [ROD_ADMIN.md](ROD_ADMIN.md).
 

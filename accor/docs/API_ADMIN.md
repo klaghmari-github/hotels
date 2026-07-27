@@ -204,17 +204,21 @@ Copie vers `models/deploy/model.pkl` + `model.json`.
 
 ### `GET /api/model/eval/meta`
 
-Prépare l’onglet **Éval. modèle ML** (XGBoost, pas le Simulateur ROD) :
+Prépare l’**Évaluation ML** (XGBoost, pas le Simulateur ROD).
+
+| Query | Défaut | Rôle |
+|-------|--------|------|
+| `tier` | `intermediate` | `intermediate` → `models/design` ; `final` → `models/final/design` |
 
 ```json
 {
   "ok": true,
-  "target_cols": ["nombre_ventes", "montant_ventes", …],
+  "tier": "intermediate",
+  "target_cols": ["nombre_ventes", "montant_ventes", "…"],
   "main_target": "montant_ventes",
   "eval_year": 2026,
-  "n_eval_rows": 20,
-  "models": [ … ],
-  "top_model": { … },
+  "models": [ "…" ],
+  "top_model": { },
   "divisor_months": 12,
   "method": "…"
 }
@@ -222,17 +226,33 @@ Prépare l’onglet **Éval. modèle ML** (XGBoost, pas le Simulateur ROD) :
 
 ### `GET|POST /api/model/eval`
 
-Évalue un **modèle XGBoost** sur l’année incomplete.
+Évalue un **modèle XGBoost** (intermédiaire multi-output ou final stacking)
+sur l’année incomplete.
 
-Body ou query : `model_id`, `target`, `year`.
+Body ou query : `model_id`, `target`, `year`, **`tier`** (`intermediate`|`final`).
 
 Métrique : par hôtel, `avg = sum(mois dispo) / 12` (prédit vs réel),
 puis MAE/RMSE/R²/MAPE/biais + tables détail.
 
-Enregistré **avant** `/api/model/<model_id>` pour ne pas capturer `eval`
-comme id.
-
 Pour l’évaluation **règles ROD** (sim vs réel), voir `/api/rod/eval`.
+
+---
+
+## Modèle final (stacking)
+
+Voir aussi [MODEL.md](MODEL.md).
+
+| Méthode | Chemin | Rôle |
+|---------|--------|------|
+| GET | `/api/model/final/config` | config + liste intermédiaires |
+| GET | `/api/model/final/list` | modèles `models/final/design` |
+| POST | `/api/model/final/build` | build async stacking |
+| GET | `/api/model/final/build/progress` | progression |
+| POST | `/api/model/final/deploy` | copie vers `models/final/deploy/` |
+| GET | `/api/model/final/<id>/explore` | overview |
+| GET | `/api/model/final/<id>/trees` | arbres cumulés |
+| GET | `/api/model/final/<id>/tree` | dump arbre |
+| GET | `/api/model/final/<id>/importance` | importances |
 
 ### `GET /api/model/<model_id>`
 
@@ -283,73 +303,65 @@ Feature importance (cible principale).
 
 Voir aussi [ROD_ADMIN.md](ROD_ADMIN.md).
 
-**Contrat métier** : split **temporel** uniquement — ref / apprentissage =
-années `< year` (ex. 2023–2025) ; éval = `year` (ex. 2026). Aucune exclusion
-d’hôtel dans la ref catégorie. Peu de pilotes en apprentissage = normal.
+**Contrat métier** : split **temporel** — ref = années `< year` (ex. 2023–2025) ;
+éval = `year` (ex. 2026). Aucune exclusion d’hôtel dans la ref.  
+Vocabulaire : **hôtel cible** (simulé) vs **hôtels pilotes** (référence).
 
 ### `GET /api/rod/meta`
 
-Labels sous-catégories F&B / N-F&B, coefs, défauts corner (`mix_fb`, `m_lin`,
-`client_needs` tous ouverts).
+Sous-cat. F&B / N-F&B, défauts corner (`mix_fb`, `m_lin`, `client_needs`).
 
 ### `GET /api/rod/pilots`
 
-Hôtels pilotes = codes avec ventes sur les années **train** (avant `year`).
+Hôtels pilotes = codes avec ventes **train** (avant `year`).
 
 | Query | Défaut | Rôle |
 |-------|--------|------|
 | `year` | 2026 | année d’évaluation (exclue de la ref) |
 
 Réponse : `n`, `n_with_holdout`, `train_years`, `eval_year`, `split: "temporal"`.
-Chaque hôtel : identité, catégorie, `train_years`, `has_holdout` ;
-si réel `year` : `months`, `avg_monthly_true` = Σ / 12.
 
 ### `GET|POST /api/rod/hotel/<hotel_code>/trace`
 
-Simu ROD : ref catégorie **train**, corner, 3 concepts (SIMPLY / LIBERTY /
-CONNECTED) + reco + écart si réel éval.
+Simu d’un **hôtel cible** : ref catégorie train, corner, 3 concepts + reco ;
+écart si réel hold-out. UI admin = **POST**.
 
-L’UI admin utilise **POST** (paramètres corner en JSON). GET reste OK pour
-un smoke test (`?year=2026`).
-
-| Body (POST) / query (GET) | Rôle |
-|---------------------------|------|
-| `year` | année d’éval (défaut 2026) |
-| `m_lin` | mètres linéaires corner |
-| `mix_fb` | mix F&B (0–1 ou %) |
-| `client_needs` | `{ id: bool }` sous-cat. autorisées |
+| Body / query | Rôle |
+|--------------|------|
+| `year` | année d’éval |
+| `m_lin`, `mix_fb`, `client_needs` | corner |
 | `nb_chambres`, `taux_occupation`, `guests_per_chambre` | exploitation |
 
 Réponse : `category_reference`, `by_concept`, `recommendation`,
-`has_holdout`, `real_holdout`, `gaps` (null si pas de réel).
+`has_holdout`, `real_holdout`, `gaps` ; flag `as_target_hotel`.
+
+Étapes CA : titre **« Hôtel cible »** (plus « hôtel client »).
 
 ### `GET /api/rod/eval`
 
-Batch sur tous les pilotes train. Ref = train ; vérité = hold-out.
-Métriques MAE / RMSE / biais / MAPE sur ceux qui ont du réel `year`.
-
-Query : `year` (défaut 2026).
+Batch pilotes train. Métriques MAE / RMSE / biais / MAPE si réel `year`.
 
 ---
 
 ## Exemples curl
 
 ```bash
-# page hotels
-curl -s 'http://127.0.0.1:5055/api/datasets/hotel?page=1&page_size=10&q=paris'
-
-# eval ML
+# eval ML intermédiaire
 curl -s -X POST http://127.0.0.1:5055/api/model/eval \
   -H 'Content-Type: application/json' \
-  -d '{"target":"montant_ventes","year":2026}'
+  -d '{"target":"montant_ventes","year":2026,"tier":"intermediate"}'
 
-# deploy
-curl -s -X POST http://127.0.0.1:5055/api/model/deploy \
+# eval ML final
+curl -s -X POST http://127.0.0.1:5055/api/model/eval \
   -H 'Content-Type: application/json' \
-  -d '{"model_name":"xgb_sales"}'
+  -d '{"target":"montant_ventes","year":2026,"tier":"final"}'
 
-# Simulateur ROD
-curl -s 'http://127.0.0.1:5055/api/rod/meta'
+# modèle final build
+curl -s -X POST http://127.0.0.1:5055/api/model/final/build \
+  -H 'Content-Type: application/json' \
+  -d '{"model_name":"xgb_final","intermediate_model_id":"xgb_sales"}'
+
+# Simulateur ROD (hôtel cible)
 curl -s 'http://127.0.0.1:5055/api/rod/pilots?year=2026'
 curl -s -X POST 'http://127.0.0.1:5055/api/rod/hotel/H0373/trace' \
   -H 'Content-Type: application/json' \
