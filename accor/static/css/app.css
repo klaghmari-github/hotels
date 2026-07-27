@@ -508,9 +508,13 @@ body {
 
 /* Evaluation tables */
 #eval-hotels-table td.pos,
-#eval-months-table td.pos { color: var(--success); }
+#eval-months-table td.pos,
+#final-eval-hotels-table td.pos,
+#final-eval-months-table td.pos { color: var(--success); }
 #eval-hotels-table td.neg,
-#eval-months-table td.neg { color: var(--danger); }
+#eval-months-table td.neg,
+#final-eval-hotels-table td.neg,
+#final-eval-months-table td.neg { color: var(--danger); }
 
 .model-build-layout {
   max-height: calc(100vh - 150px);

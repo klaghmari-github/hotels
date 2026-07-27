@@ -656,35 +656,33 @@
         </div>
       </div>
 
-      <!-- ===== Vue Evaluation ML (intermédiaire ou final selon nav) ===== -->
+      <!-- ===== Évaluation · modèles intermédiaires ===== -->
       <div id="view-model-eval" class="view hidden">
         <header class="topbar">
           <div class="topbar-left">
             <h1 id="eval-page-title">Évaluation · modèles intermédiaires</h1>
             <p class="subtitle" id="eval-page-subtitle">
-              Pred vs réel · moyenne mensuelle = somme(mois) / 12.
+              Multi-cibles (models/design) · pred vs réel · Σ mois / 12.
             </p>
           </div>
           <div class="topbar-actions">
-            <button type="button" class="btn btn-primary" id="btn-eval-run" title="Lancer l evaluation">
+            <button type="button" class="btn btn-primary" id="btn-eval-run">
               Evaluer
             </button>
           </div>
         </header>
-
         <section class="meta-bar">
           <span class="chip" id="eval-chip-year">Annee : —</span>
           <span class="chip chip-muted" id="eval-chip-months">Mois : —</span>
           <span class="chip chip-muted" id="eval-chip-n">—</span>
           <span class="status" id="eval-status"></span>
         </section>
-
         <div class="model-layout explore-layout">
           <div class="model-col">
             <section class="card">
-              <h2 class="card-title">Parametres</h2>
+              <h2 class="card-title">Parametres (intermediaires)</h2>
               <label class="field">
-                <span>Modele</span>
+                <span>Modele design multi-cibles</span>
                 <select id="eval-model-select"></select>
               </label>
               <label class="field">
@@ -696,37 +694,89 @@
                 <input type="number" id="eval-year" min="2020" max="2100" step="1" value="2026" />
               </label>
               <p class="card-hint" id="eval-method-hint">
-                Defaut cible = principale (montant_ventes). Diviseur fixe = 12 mois.
+                Liste = models/design uniquement. Diviseur = 12 mois.
               </p>
             </section>
-
             <section class="card">
               <h2 class="card-title">Performance (moyenne mensuelle / hôtel)</h2>
-              <p class="card-hint">
-                R², RMSE, MAE, MAPE, biais — pred vs réel sur la cible choisie.
-                Métrique métier : somme(mois dispo) / 12 par hôtel.
-              </p>
               <div id="eval-metrics" class="metrics-grid empty">Lancez une evaluation…</div>
             </section>
-
             <section class="card">
               <h2 class="card-title">Totaux annee</h2>
               <div id="eval-totals" class="metrics-grid empty">—</div>
             </section>
           </div>
-
           <div class="model-col">
             <section class="card card-wide">
               <h2 class="card-title">Detail par hotel</h2>
-              <p class="card-hint">
-                avg = somme(mois disponibles) / 12 — compare predit vs reel.
-              </p>
               <div id="eval-hotels-table" class="perf-table-wrap empty">—</div>
             </section>
-
             <section class="card card-wide">
               <h2 class="card-title">Detail mois</h2>
               <div id="eval-months-table" class="perf-table-wrap empty">—</div>
+            </section>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Évaluation · modèle final (séparée) ===== -->
+      <div id="view-final-eval" class="view hidden">
+        <header class="topbar">
+          <div class="topbar-left">
+            <h1 id="final-eval-page-title">Évaluation · modèle final</h1>
+            <p class="subtitle" id="final-eval-page-subtitle">
+              Stacking (descriptives + pred_*) · models/final/design · pred vs réel · Σ/12.
+            </p>
+          </div>
+          <div class="topbar-actions">
+            <button type="button" class="btn btn-primary" id="btn-final-eval-run">
+              Evaluer final
+            </button>
+          </div>
+        </header>
+        <section class="meta-bar">
+          <span class="chip" id="final-eval-chip-year">Annee : —</span>
+          <span class="chip chip-muted" id="final-eval-chip-months">Mois : —</span>
+          <span class="chip chip-muted" id="final-eval-chip-n">—</span>
+          <span class="status" id="final-eval-status"></span>
+        </section>
+        <div class="model-layout explore-layout">
+          <div class="model-col">
+            <section class="card">
+              <h2 class="card-title">Parametres (modele final)</h2>
+              <label class="field">
+                <span>Modele final (stacking)</span>
+                <select id="final-eval-model-select"></select>
+              </label>
+              <label class="field">
+                <span>Variable cible</span>
+                <select id="final-eval-target-select"></select>
+              </label>
+              <label class="field">
+                <span>Annee d evaluation</span>
+                <input type="number" id="final-eval-year" min="2020" max="2100" step="1" value="2026" />
+              </label>
+              <p class="card-hint" id="final-eval-method-hint">
+                Liste = models/final/design uniquement. Pred = X_descriptives + pred_*.
+              </p>
+            </section>
+            <section class="card">
+              <h2 class="card-title">Performance (moyenne mensuelle / hôtel)</h2>
+              <div id="final-eval-metrics" class="metrics-grid empty">Lancez une evaluation…</div>
+            </section>
+            <section class="card">
+              <h2 class="card-title">Totaux annee</h2>
+              <div id="final-eval-totals" class="metrics-grid empty">—</div>
+            </section>
+          </div>
+          <div class="model-col">
+            <section class="card card-wide">
+              <h2 class="card-title">Detail par hotel</h2>
+              <div id="final-eval-hotels-table" class="perf-table-wrap empty">—</div>
+            </section>
+            <section class="card card-wide">
+              <h2 class="card-title">Detail mois</h2>
+              <div id="final-eval-months-table" class="perf-table-wrap empty">—</div>
             </section>
           </div>
         </div>

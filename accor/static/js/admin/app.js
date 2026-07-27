@@ -36,10 +36,10 @@ export class AdminApp {
       onRodSim: () => this.rodSim.open(),
       onModelBuild: () => this.modelBuild.open(),
       onModelExplore: () => this.modelExplore.open(),
-      onModelEval: () => this.modelEval.open("intermediate"),
+      onModelEval: () => this.modelEval.open(),
       onFinalBuild: () => this.finalBuild.open(),
       onFinalExplore: () => this.finalExplore.open(),
-      onFinalEval: () => this.modelEval.open("final"),
+      onFinalEval: () => this.finalEval.open(),
     });
 
     this.table = new TableRenderer(this.state, this.els, {
@@ -59,7 +59,8 @@ export class AdminApp {
     this.modelExplore = new ModelExplorePanel(this.state, this.nav);
     this.finalBuild = new FinalModelBuildPanel(this.state, this.nav);
     this.finalExplore = new FinalModelExplorePanel(this.state, this.nav);
-    this.modelEval = new ModelEvalPanel(this.state, this.nav);
+    this.modelEval = new ModelEvalPanel(this.state, this.nav, "intermediate");
+    this.finalEval = new ModelEvalPanel(this.state, this.nav, "final");
   }
 
   _bindDom() {
@@ -143,6 +144,7 @@ export class AdminApp {
     this.finalBuild.wire();
     this.finalExplore.wire();
     this.modelEval.wire();
+    this.finalEval.wire();
   }
 
   async boot() {

@@ -1,74 +1,119 @@
 /**
- * Onglet Evaluation — seul endroit pour les scores métier pred vs réel.
+ * Onglet Evaluation — scores métier pred vs réel (Σ mois / 12).
  *
- * (Model Explore = structure : importances, arbres ; pas de R²/RMSE ici.)
+ * Deux instances indépendantes :
+ *   - intermediate → models/design (multi-cibles)
+ *   - final        → models/final/design (stacking)
  *
- * Année incomplete (souvent 2026), par hôtel :
- *   moyenne mensuelle = somme(mois disponibles) / 12
- * puis MAE / RMSE / R² / MAPE / biais.
- *
- * API : GET /api/model/eval/meta , POST /api/model/eval
+ * API : GET /api/model/eval/meta?tier=… , POST /api/model/eval { tier }
  */
 
 import { $, escapeHtml } from "../../shared/js/dom.js";
 import { api } from "../../shared/js/api.js";
 import { toast } from "../../shared/js/toast.js";
-import { Format } from "../../shared/js/format.js";
+
+/**
+ * @typedef {object} EvalUiIds
+ * @property {string} view
+ * @property {string} title
+ * @property {string} subtitle
+ * @property {string} btnRun
+ * @property {string} status
+ * @property {string} chipYear
+ * @property {string} chipMonths
+ * @property {string} chipN
+ * @property {string} modelSelect
+ * @property {string} targetSelect
+ * @property {string} year
+ * @property {string} methodHint
+ * @property {string} metrics
+ * @property {string} totals
+ * @property {string} hotelsTable
+ * @property {string} monthsTable
+ */
+
+const INTER_IDS = {
+  view: "view-model-eval",
+  title: "eval-page-title",
+  subtitle: "eval-page-subtitle",
+  btnRun: "btn-eval-run",
+  status: "eval-status",
+  chipYear: "eval-chip-year",
+  chipMonths: "eval-chip-months",
+  chipN: "eval-chip-n",
+  modelSelect: "eval-model-select",
+  targetSelect: "eval-target-select",
+  year: "eval-year",
+  methodHint: "eval-method-hint",
+  metrics: "eval-metrics",
+  totals: "eval-totals",
+  hotelsTable: "eval-hotels-table",
+  monthsTable: "eval-months-table",
+};
+
+const FINAL_IDS = {
+  view: "view-final-eval",
+  title: "final-eval-page-title",
+  subtitle: "final-eval-page-subtitle",
+  btnRun: "btn-final-eval-run",
+  status: "final-eval-status",
+  chipYear: "final-eval-chip-year",
+  chipMonths: "final-eval-chip-months",
+  chipN: "final-eval-chip-n",
+  modelSelect: "final-eval-model-select",
+  targetSelect: "final-eval-target-select",
+  year: "final-eval-year",
+  methodHint: "final-eval-method-hint",
+  metrics: "final-eval-metrics",
+  totals: "final-eval-totals",
+  hotelsTable: "final-eval-hotels-table",
+  monthsTable: "final-eval-months-table",
+};
 
 export class ModelEvalPanel {
   /**
    * @param {import('./state.js').AdminState} state
    * @param {import('./nav-controller.js').NavController} nav
+   * @param {"intermediate"|"final"} tier
    */
-  constructor(state, nav) {
+  constructor(state, nav, tier = "intermediate") {
     this.state = state;
     this.nav = nav;
+    /** @type {"intermediate"|"final"} */
+    this.tier = tier === "final" ? "final" : "intermediate";
+    /** @type {EvalUiIds} */
+    this.ids = this.tier === "final" ? FINAL_IDS : INTER_IDS;
     this.meta = null;
     this.lastResult = null;
-    /** @type {"intermediate"|"final"} */
-    this.tier = "intermediate";
   }
 
-  /**
-   * @param {"intermediate"|"final"} [tier]
-   */
-  async open(tier = "intermediate") {
+  el(key) {
+    const id = this.ids[key];
+    return id ? document.getElementById(id) : null;
+  }
+
+  async open() {
     if (!this.state.confirmLeaveDirty()) return;
-    this.tier = tier === "final" ? "final" : "intermediate";
-    this.nav.showModelEvalPanel(this.tier);
-    this.applyTitles();
+    if (this.tier === "final") this.nav.showFinalEvalPanel();
+    else this.nav.showModelEvalPanel();
     await this.loadMeta();
-  }
-
-  applyTitles() {
-    const title = $("#eval-page-title");
-    const sub = $("#eval-page-subtitle");
-    if (this.tier === "final") {
-      if (title) title.textContent = "Évaluation · modèle final";
-      if (sub)
-        sub.textContent =
-          "Stacking final (descriptives + pred_*) · pred vs réel · Σ mois / 12.";
-    } else {
-      if (title) title.textContent = "Évaluation · modèles intermédiaires";
-      if (sub)
-        sub.textContent =
-          "Multi-cibles · pred vs réel · moyenne mensuelle = somme(mois) / 12.";
-    }
+    // Réafficher le dernier résultat propre à ce tier (s'il existe)
+    if (this.lastResult) this.render(this.lastResult);
   }
 
   async loadMeta() {
-    const status = $("#eval-status");
+    const status = this.el("status");
     if (status) status.textContent = "Chargement…";
     try {
       const meta = await api.get("/api/model/eval/meta", { tier: this.tier });
       this.meta = meta;
       this.fillModels(meta.models || [], meta.top_model);
       this.fillTargets(meta.target_cols || [], meta.main_target);
-      const yearEl = $("#eval-year");
+      const yearEl = this.el("year");
       if (yearEl && meta.eval_year) yearEl.value = String(meta.eval_year);
-      const chipY = $("#eval-chip-year");
+      const chipY = this.el("chipYear");
       if (chipY) chipY.textContent = `Annee : ${meta.eval_year || "—"}`;
-      const hint = $("#eval-method-hint");
+      const hint = this.el("methodHint");
       if (hint && meta.method) hint.textContent = meta.method;
       if (status) status.textContent = "";
     } catch (err) {
@@ -78,7 +123,7 @@ export class ModelEvalPanel {
   }
 
   fillModels(models, top) {
-    const sel = $("#eval-model-select");
+    const sel = this.el("modelSelect");
     if (!sel) return;
     sel.innerHTML = "";
     if (!models.length) {
@@ -88,13 +133,17 @@ export class ModelEvalPanel {
     models.forEach((m) => {
       const opt = document.createElement("option");
       opt.value = m.id || m.name;
-      const r2 =
-        m.score_r2 != null
-          ? Number(m.score_r2).toFixed(3)
-          : m.metrics_eval?.mean_r2 != null
-            ? Number(m.metrics_eval.mean_r2).toFixed(3)
-            : "—";
-      opt.textContent = `${m.name || m.id} · R² ${r2}`;
+      let r2 = "—";
+      if (m.score_r2 != null) r2 = Number(m.score_r2).toFixed(3);
+      else if (m.metrics_eval?.mean_r2 != null)
+        r2 = Number(m.metrics_eval.mean_r2).toFixed(3);
+      else {
+        const main = m.main_target || "montant_ventes";
+        const per = m.metrics_eval?.per_target?.[main];
+        if (per?.r2 != null) r2 = Number(per.r2).toFixed(3);
+      }
+      const tag = this.tier === "final" ? "final" : "inter";
+      opt.textContent = `[${tag}] ${m.name || m.id} · R² ${r2}`;
       sel.appendChild(opt);
     });
     if (top && (top.id || top.name)) {
@@ -103,7 +152,7 @@ export class ModelEvalPanel {
   }
 
   fillTargets(targets, main) {
-    const sel = $("#eval-target-select");
+    const sel = this.el("targetSelect");
     if (!sel) return;
     sel.innerHTML = "";
     const list = targets.length ? targets : [main || "montant_ventes"];
@@ -118,11 +167,11 @@ export class ModelEvalPanel {
   }
 
   async run() {
-    const status = $("#eval-status");
-    const btn = $("#btn-eval-run");
-    const modelId = $("#eval-model-select")?.value;
-    const target = $("#eval-target-select")?.value;
-    const year = Number($("#eval-year")?.value || 2026);
+    const status = this.el("status");
+    const btn = this.el("btnRun");
+    const modelId = this.el("modelSelect")?.value;
+    const target = this.el("targetSelect")?.value;
+    const year = Number(this.el("year")?.value || 2026);
     if (!modelId) {
       toast.show("Choisissez un modele", "err");
       return;
@@ -140,8 +189,9 @@ export class ModelEvalPanel {
       this.lastResult = res;
       this.render(res);
       if (status) status.textContent = "OK";
+      const label = this.tier === "final" ? "final" : "intermédiaire";
       toast.show(
-        `Eval ${res.eval_year} · ${res.n_hotels} hotels · ${res.n_month_rows} mois`
+        `Eval ${label} ${res.eval_year} · ${res.n_hotels} hotels · ${res.n_month_rows} mois`
       );
     } catch (err) {
       if (status) status.textContent = err.message;
@@ -152,20 +202,21 @@ export class ModelEvalPanel {
   }
 
   render(res) {
-    const chipY = $("#eval-chip-year");
-    const chipM = $("#eval-chip-months");
-    const chipN = $("#eval-chip-n");
+    const chipY = this.el("chipYear");
+    const chipM = this.el("chipMonths");
+    const chipN = this.el("chipN");
     if (chipY) chipY.textContent = `Annee : ${res.eval_year}`;
     if (chipM) {
       chipM.textContent = `Mois : ${(res.months_present || []).join(", ") || "—"}`;
     }
     if (chipN) {
-      chipN.textContent = `${res.n_hotels} hotels · ${res.n_month_rows} lignes · cible ${res.target}`;
+      const tierLab = res.tier === "final" ? "final" : "inter";
+      chipN.textContent = `${tierLab} · ${res.n_hotels} hotels · ${res.n_month_rows} lignes · ${res.target}`;
     }
 
-    this.renderMetrics($("#eval-metrics"), res.metrics_hotel_avg, "hotel /12");
+    this.renderMetrics(this.el("metrics"), res.metrics_hotel_avg, "hotel /12");
     const tot = res.totals || {};
-    const totHost = $("#eval-totals");
+    const totHost = this.el("totals");
     if (totHost) {
       totHost.classList.remove("empty");
       totHost.innerHTML = `
@@ -201,7 +252,7 @@ export class ModelEvalPanel {
   }
 
   renderHotelsTable(rows) {
-    const host = $("#eval-hotels-table");
+    const host = this.el("hotelsTable");
     if (!host) return;
     if (!rows.length) {
       host.className = "perf-table-wrap empty";
@@ -240,7 +291,7 @@ export class ModelEvalPanel {
   }
 
   renderMonthsTable(rows) {
-    const host = $("#eval-months-table");
+    const host = this.el("monthsTable");
     if (!host) return;
     if (!rows.length) {
       host.className = "perf-table-wrap empty";
@@ -248,7 +299,6 @@ export class ModelEvalPanel {
       return;
     }
     host.className = "perf-table-wrap";
-    // cap display for large tables
     const shown = rows.slice(0, 200);
     host.innerHTML = `
       <table>
@@ -279,7 +329,7 @@ export class ModelEvalPanel {
   }
 
   wire() {
-    $("#btn-eval-run")?.addEventListener("click", () => this.run());
+    this.el("btnRun")?.addEventListener("click", () => this.run());
   }
 }
 

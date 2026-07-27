@@ -27,6 +27,7 @@ export class NavController {
     this.viewModelExplore = $("#view-model-explore");
     this.viewFinalBuild = $("#view-final-build");
     this.viewFinalExplore = $("#view-final-explore");
+    this.viewFinalEval = $("#view-final-eval");
     this.viewModelEval = $("#view-model-eval");
     this.navRodSim = $("#nav-rod-sim");
     this.navModelBuild = $("#nav-model-build");
@@ -94,9 +95,10 @@ export class NavController {
       this.viewRodSim,
       this.viewModelBuild,
       this.viewModelExplore,
+      this.viewModelEval,
       this.viewFinalBuild,
       this.viewFinalExplore,
-      this.viewModelEval,
+      this.viewFinalEval,
     ].forEach((v) => v && v.classList.add("hidden"));
   }
 
@@ -153,12 +155,20 @@ export class NavController {
     this.setModelNavActive("final-explore");
   }
 
-  showModelEvalPanel(tier = "intermediate") {
-    this.state.panel = tier === "final" ? "final-eval" : "model-eval";
+  showModelEvalPanel() {
+    this.state.panel = "model-eval";
     this.hideAllViews();
     if (this.viewModelEval) this.viewModelEval.classList.remove("hidden");
     this.clearDatasetNavActive();
-    this.setModelNavActive(tier === "final" ? "final-eval" : "eval");
+    this.setModelNavActive("eval");
+  }
+
+  showFinalEvalPanel() {
+    this.state.panel = "final-eval";
+    this.hideAllViews();
+    if (this.viewFinalEval) this.viewFinalEval.classList.remove("hidden");
+    this.clearDatasetNavActive();
+    this.setModelNavActive("final-eval");
   }
 
   wire() {
