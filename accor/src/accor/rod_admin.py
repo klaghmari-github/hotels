@@ -486,8 +486,8 @@ def _sales_steps_category_pilot(
     steps.append(
         {
             "id": "hotel_cible",
-            "title": "Hôtel cible",
-            "rule": "Caractéristiques de l'hôtel à cibler (hotel_data) — pas ses ventes train",
+            "title": "Hôtel désigné pour simulation",
+            "rule": "Caractéristiques de l'hôtel désigné (hotel_data) — pas ses ventes train",
             "formula": "clients_mois = n × TO × guests × 30,5",
             "values": {
                 "nb_chambres": op.nb_chambres,
@@ -563,7 +563,7 @@ def _sales_steps_category_pilot(
         {
             "id": "r1_clients",
             "title": "Règle 1 — scaling clients",
-            "rule": "CA × (clients hôtel cible / clients référence catégorie)",
+            "rule": "CA × (clients hôtel désigné / clients référence catégorie)",
             "formula": "facteur = clients_mois_cible / clients_mois_catégorie",
             "values": {
                 "clients_hotel_cible": _round(clients_hotel, 2),
@@ -1004,7 +1004,7 @@ def simulate_hotel_trace(
     method = (
         f"Ref catégorie {category} sur {train_years} "
         f"(année {eval_year} exclue — split temporel, pas d'exclusion d'hôtel). "
-        f"Hôtel cible {code}. Règles ROD → CA / coûts / marge + reco."
+        f"Hôtel désigné pour simulation {code}. Règles ROD → CA / coûts / marge + reco."
     )
     if include_gaps and has_holdout:
         method += f" Éval admin : écart vs réel {eval_year} (Σ/12)."

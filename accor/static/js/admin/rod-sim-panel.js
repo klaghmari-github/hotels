@@ -117,7 +117,7 @@ export class RodSimPanel {
               { until: 90, label: "Prêt", text: "Finalisation…" },
             ]
           : [
-              { until: 12, label: "Prépare", text: "Lecture contexte hôtel cible…" },
+              { until: 12, label: "Prépare", text: "Lecture contexte hôtel désigné…" },
               { until: 28, label: "Référence", text: "Moyenne catégorie (années train)…" },
               { until: 55, label: "CA", text: "Règles ROD · CA HT…" },
               { until: 78, label: "Coûts", text: "Coûts · marges · 3 solutions…" },
@@ -387,7 +387,7 @@ export class RodSimPanel {
   async runSim() {
     const code = $("#rod-hotel-select")?.value;
     if (!code) {
-      this.setStatus("Choisissez un hôtel à cibler");
+      this.setStatus("Choisissez un hôtel pour la simulation");
       return;
     }
 
@@ -439,9 +439,8 @@ export class RodSimPanel {
         el.classList.toggle("active", el.dataset.concept === this.concept);
       });
       this.renderTrace();
-      const summary = `${code} · reco ${reco || "—"} · ${fmt(p.m_lin ?? params.m_lin, 1)} m · mix ${Math.round(
-        (p.mix_fb ?? params.mix_fb) * 100
-      )} %`;
+      const mixFb = Math.round((p.mix_fb ?? params.mix_fb) * 100);
+      const summary = `${code} · solution ${reco || "—"} · ${fmt(p.m_lin ?? params.m_lin, 1)} m lin. · mix F&B ${mixFb} %`;
       this.finishProgress("done", "Simulation terminée", summary);
       this.setStatus(summary);
     } catch (err) {
