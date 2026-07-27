@@ -1,9 +1,14 @@
 # Simulateur ROD — admin vs user
 
-> **Voir aussi** : [Simulateur Excel](ROD_EXCEL_SIM.md) — UI calquée sur
-> le fichier Excel, référence par **solution** (pas par catégorie),
-> 3 onglets SIMPLY / LIBERTY / CONNECTED. Le présent document décrit le
-> simulateur ROD « validation » (catégorie + écart 2026).
+> **Voir aussi** : [Simulateur Excel ROD](ROD_EXCEL_SIM.md) — UI dual-colonne
+> calquée sur l’Excel (`ROD - Simulateurs + détail des coûts.xlsx` + audit
+> `ROD_Audit_Complet_Regles_Simulateurs.html`), référence par **solution**
+> (pilotes SIMPLY / LIBERTY / CONNECTED), 4 règles de revenus + coûts +
+> marge nette, arbre de reco (ordre d’affichage ≠ max CA). API :
+> `/api/rod/excel/*`.  
+> Le présent document décrit le simulateur ROD « validation » (référence
+> par **catégorie de marque** + écart temporel 2026). Les deux coexistent
+> dans l’admin.
 
 ## Deux applications, deux usages
 

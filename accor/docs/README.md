@@ -12,7 +12,7 @@ Index des docs détaillées. Le point d’entrée reste le
 | [DATA.md](DATA.md) | Fichiers Excel/JSON, grains, rôles colonnes |
 | [ROD_RULES.md](ROD_RULES.md) | Revenus, coûts, recommandation concept |
 | [ROD_ADMIN.md](ROD_ADMIN.md) | **Simulateur ROD** admin/user (hôtel cible, éval temporelle) |
-| [ROD_EXCEL_SIM.md](ROD_EXCEL_SIM.md) | **Simulateur Excel** — 3 onglets SIMPLY/LIBERTY/CONNECTED, 2 colonnes |
+| [ROD_EXCEL_SIM.md](ROD_EXCEL_SIM.md) | **Simulateur Excel** — réf. par solution, dual-colonne, R1–R4, reco |
 | [MODEL.md](MODEL.md) | Intermédiaires, final (stacking), explore, éval ML |
 
 Les docstrings en tête de chaque module Python / fichier JS reprennent
@@ -22,7 +22,8 @@ l’essentiel ; en cas d’écart, le code fait foi.
 
 ```
 All → Pilotes
-  → Simulateur ROD
+  → Simulateur ROD          (réf. catégorie + écart 2026)
+  → Simulateur Excel        (réf. solution · dual-colonne · voir ROD_EXCEL_SIM.md)
   → Modèles intermédiaires  (Build · Explore · Évaluation)
   → Modèle final            (Build · Explore · Évaluation)
 ```

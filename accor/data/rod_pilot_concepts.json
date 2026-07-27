@@ -1,9 +1,10 @@
 {
-  "_source": "archive/sources/raw/ROD - Simulateurs + détail des coûts.xlsx (REVENUS - MIX & MARGES, REVENUS - IMPACT TO)",
+  "_source": "archive/sources/raw/ROD - Simulateurs + détail des coûts.xlsx (REVENUS - MIX & MARGES, REVENUS - IMPACT TO) + ROD_Audit_Complet_Regles_Simulateurs.html",
   "_note": "Pilotes regroupés par solution déployée (pas par catégorie de marque). Si plusieurs hôtels pour une solution → moyenne.",
   "concepts": {
     "SIMPLY": [
-      { "hotel_code": "H2075", "label": "IBB NICE" }
+      { "hotel_code": "H2075", "label": "IBB NICE" },
+      { "hotel_code": "HB6A3", "label": "IBB STRA" }
     ],
     "LIBERTY": [
       { "hotel_code": "H6188", "label": "MER BOUL" },

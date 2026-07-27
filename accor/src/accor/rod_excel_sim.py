@@ -36,6 +36,7 @@ from accor.user.models import (
 from accor.user.reference import RodReference
 from accor.user.rules.coeffs import (
     CLIENT_NEED_LABELS,
+    LIBERTY_NFB_NEEDS,
     RULE3_BASELINE_FB,
     RULE3_BASELINE_NF,
     RULE3_FB_COEFFS,
@@ -47,6 +48,18 @@ from accor.user.services.hotel_context import HotelContextBuilder
 
 CONCEPTS = ("SIMPLY", "LIBERTY", "CONNECTED")
 PILOT_MAP_PATH = DATA_DIR / "rod_pilot_concepts.json"
+NOT_PROFITABLE = "Not profitable"
+
+# Alias courts audit HTML → clés client_needs
+_LIFESTYLE_NFB_ALIASES: dict[str, str] = {
+    "cosmetics": "nfb_cosmetics",
+    "kids": "nfb_kids",
+    "kids items": "nfb_kids",
+    "apparel": "nfb_apparel",
+    "ready-to-wear": "nfb_apparel",
+    "accessories": "nfb_accessories",
+    "souvenirs": "nfb_souvenirs",
+}
 
 # Commentaires métier extraits de l'Excel (SIMULATEUR *)
 EXCEL_COMMENTS: dict[str, str] = {
@@ -111,8 +124,16 @@ def _r(x: Any, nd: int = 2) -> float | None:
     return _round(x, nd)
 
 
-@lru_cache(maxsize=1)
-def load_pilot_concept_map() -> dict[str, list[dict[str, str]]]:
+def _pilot_map_mtime() -> float:
+    try:
+        return float(PILOT_MAP_PATH.stat().st_mtime) if PILOT_MAP_PATH.exists() else 0.0
+    except OSError:
+        return 0.0
+
+
+@lru_cache(maxsize=4)
+def _load_pilot_concept_map_cached(mtime: float) -> dict[str, list[dict[str, str]]]:
+    del mtime  # key only — invalide le cache si le fichier change
     if not PILOT_MAP_PATH.exists():
         return {c: [] for c in CONCEPTS}
     raw = json.loads(PILOT_MAP_PATH.read_text(encoding="utf-8"))
@@ -130,8 +151,227 @@ def load_pilot_concept_map() -> dict[str, list[dict[str, str]]]:
     return out
 
 
+def load_pilot_concept_map() -> dict[str, list[dict[str, str]]]:
+    """Mapping solution → pilotes. Cache invalidé sur mtime du JSON."""
+    return _load_pilot_concept_map_cached(_pilot_map_mtime())
+
+
+def clear_pilot_concept_map_cache() -> None:
+    _load_pilot_concept_map_cached.cache_clear()
+
+
 def all_needs_open() -> dict[str, bool]:
     return {**{k: True for k in RULE3_FB_COEFFS}, **{k: True for k in RULE3_NFB_COEFFS}}
+
+
+def _has_lifestyle_nfb(client_needs: dict[str, bool] | None) -> bool:
+    """Au moins un besoin lifestyle N-F&B ON (audit : cosmetics, kids, apparel…)."""
+    needs = client_needs or {}
+    if any(bool(needs.get(k, False)) for k in LIBERTY_NFB_NEEDS):
+        return True
+    return any(bool(needs.get(alias, False)) for alias in _LIFESTYLE_NFB_ALIASES)
+
+
+def recommend_display_order(
+    nb_chambres: float | int,
+    mix_fb: float,
+    m_lin: float,
+    client_needs: dict[str, bool] | None,
+    has_vitrine: bool,
+    to: float,
+    nb_frigos: float | int | None = None,
+) -> tuple[str, list[str], list[str]]:
+    """
+    Arbre de reco audit HTML (ordre d'affichage, pas d'exclusion).
+
+    IF rooms <= 49 → SIMPLY first
+    ELIF any lifestyle NFB need ON → LIBERTY first
+    ELIF m_lin > 4 → LIBERTY first
+    ELIF has_vitrine → LIBERTY first
+    ELIF TO < 0.70 → LIBERTY first
+    ELSE → CONNECTED first
+
+    Returns
+    -------
+    (recommended, ordered_list_of_3, reasons)
+    """
+    del mix_fb, nb_frigos  # signature stable / futurs critères audit
+    rooms = float(nb_chambres or 0)
+    ml = float(m_lin or 0)
+    to_rate = float(to or 0)
+    if to_rate > 1.0:
+        to_rate /= 100.0
+    needs = client_needs or {}
+    reasons: list[str] = []
+
+    if rooms <= 49:
+        recommended = "SIMPLY"
+        reasons.append(
+            f"Nb. chambres ≤ 49 ({int(round(rooms))}) → SIMPLY en premier."
+        )
+    elif _has_lifestyle_nfb(needs):
+        recommended = "LIBERTY"
+        active = [
+            CLIENT_NEED_LABELS.get(k, k)
+            for k in LIBERTY_NFB_NEEDS
+            if bool(needs.get(k, False))
+        ]
+        reasons.append(
+            "Catégorie(s) lifestyle N-F&B active(s) "
+            f"({', '.join(active) or '—'}) → LIBERTY en premier."
+        )
+    elif ml > 4:
+        recommended = "LIBERTY"
+        reasons.append(f"Mètres linéaires > 4 ({_r(ml, 2)}) → LIBERTY en premier.")
+    elif bool(has_vitrine):
+        recommended = "LIBERTY"
+        reasons.append("Vitrine réfrigérée déjà présente → LIBERTY en premier.")
+    elif to_rate < 0.70:
+        recommended = "LIBERTY"
+        reasons.append(
+            f"TO moyen < 70 % ({_r(to_rate * 100, 1)} %) → LIBERTY en premier."
+        )
+    else:
+        recommended = "CONNECTED"
+        reasons.append(
+            "Hôtel ≥ 50 ch., sans lifestyle N-F&B, ML ≤ 4, sans vitrine, "
+            f"TO ≥ 70 % ({_r(to_rate * 100, 1)} %) → CONNECTED en premier."
+        )
+
+    ordered = [recommended] + [c for c in CONCEPTS if c != recommended]
+    return recommended, ordered, reasons
+
+
+def _merge_dual_rows(
+    left_rows: list[dict[str, Any]] | None,
+    right_rows: list[dict[str, Any]] | None,
+) -> list[dict[str, Any]]:
+    """Fusionne left_rows / right_rows → rows[{label, left, right, hint?, fmt?}].
+
+    Préserve les doublons de label (ex. deux lignes « Amortissement ») via un
+    index d'occurrence (label, n).
+    """
+    left_rows = left_rows or []
+    right_rows = right_rows or []
+
+    def _index(rows: list[dict[str, Any]]) -> dict[tuple[str, int], dict[str, Any]]:
+        counts: dict[str, int] = {}
+        out: dict[tuple[str, int], dict[str, Any]] = {}
+        for r in rows:
+            lab = str(r.get("label") or "")
+            n = counts.get(lab, 0)
+            counts[lab] = n + 1
+            out[(lab, n)] = r
+        return out
+
+    left_by = _index(left_rows)
+    right_by = _index(right_rows)
+    # Clés ordonnées : gauche d'abord, puis lignes droite absentes à gauche
+    keys: list[tuple[str, int]] = []
+    seen: set[tuple[str, int]] = set()
+    lcounts: dict[str, int] = {}
+    for r in left_rows:
+        lab = str(r.get("label") or "")
+        n = lcounts.get(lab, 0)
+        lcounts[lab] = n + 1
+        k = (lab, n)
+        if k not in seen:
+            keys.append(k)
+            seen.add(k)
+    rcounts: dict[str, int] = {}
+    for r in right_rows:
+        lab = str(r.get("label") or "")
+        n = rcounts.get(lab, 0)
+        rcounts[lab] = n + 1
+        k = (lab, n)
+        if k not in seen:
+            keys.append(k)
+            seen.add(k)
+
+    out: list[dict[str, Any]] = []
+    for k in keys:
+        lab, _n = k
+        lr = left_by.get(k) or {}
+        rr = right_by.get(k) or {}
+        row: dict[str, Any] = {
+            "label": lab,
+            "left": lr.get("value") if lr else None,
+            "right": rr.get("value") if rr else None,
+        }
+        hint = None
+        if rr.get("hint") is not None:
+            hint = rr.get("hint")
+        elif lr.get("hint") is not None:
+            hint = lr.get("hint")
+        if hint is not None:
+            row["hint"] = hint
+        fmt = None
+        if rr.get("fmt") is not None:
+            fmt = rr.get("fmt")
+        elif lr.get("fmt") is not None:
+            fmt = lr.get("fmt")
+        if fmt is not None:
+            row["fmt"] = fmt
+        # conserver numériques si affichage « Not profitable »
+        if rr.get("value_num") is not None:
+            row["right_num"] = rr.get("value_num")
+        if lr.get("value_num") is not None:
+            row["left_num"] = lr.get("value_num")
+        out.append(row)
+    return out
+
+
+def _apply_not_profitable_to_steps(
+    steps: list[dict[str, Any]],
+    *,
+    not_profitable: bool,
+) -> list[dict[str, Any]]:
+    """Remplace CA TOTAL / Marge nette affichés par « Not profitable » si besoin."""
+    if not not_profitable:
+        return steps
+    kpi_labels = {
+        "CA HT TOTAL",
+        "Marge nette HT / mois",
+        "Marge nette",
+        "CA TOTAL",
+    }
+    out: list[dict[str, Any]] = []
+    for st in steps:
+        st2 = dict(st)
+        rows = []
+        for r in st.get("rows") or []:
+            r2 = dict(r)
+            lab = str(r2.get("label") or "")
+            if lab in kpi_labels or (
+                "CA HT TOTAL" in lab or lab.startswith("Marge nette")
+            ):
+                if r2.get("value") is not None and not isinstance(r2.get("value"), str):
+                    r2["value_num"] = r2.get("value")
+                r2["value"] = NOT_PROFITABLE
+            rows.append(r2)
+        st2["rows"] = rows
+        out.append(st2)
+    return out
+
+
+def collect_validation_warnings(
+    *,
+    m_lin: float,
+    client_needs: dict[str, bool] | None,
+) -> list[str]:
+    """Avertissements audit (m_lin < 2, toutes catégories OFF)."""
+    warnings: list[str] = []
+    if float(m_lin or 0) < 2:
+        warnings.append(
+            "Minimum 2 mètres linéaires requis (m_lin < 2)."
+        )
+    needs = client_needs or {}
+    known = list(RULE3_FB_COEFFS) + list(RULE3_NFB_COEFFS)
+    if known and not any(bool(needs.get(k, False)) for k in known):
+        warnings.append(
+            "Toutes les catégories de produits sont désactivées."
+        )
+    return warnings
 
 
 def excel_ui_meta() -> dict[str, Any]:
@@ -728,6 +968,17 @@ def _right_snapshot(
         bd=bd,
         is_left=False,
     )
+
+    ca_ht_num = _r(ca_ht, 2)
+    marge_nette_num = _r(marge_nette, 2)
+    # Audit : CA ou marge nette négatifs → affichage « Not profitable »
+    not_profitable = bool(
+        (ca_ht is not None and ca_ht < 0)
+        or (marge_nette is not None and marge_nette < 0)
+    )
+    if not_profitable:
+        steps = _apply_not_profitable_to_steps(steps, not_profitable=True)
+
     return {
         "is_pilot_avg": False,
         "params": {
@@ -752,11 +1003,14 @@ def _right_snapshot(
         },
         "ca_fb": _r(ca_fb, 2),
         "ca_nf": _r(ca_nf, 2),
-        "ca_ht": _r(ca_ht, 2),
+        "ca_ht": NOT_PROFITABLE if not_profitable else ca_ht_num,
+        "ca_ht_num": ca_ht_num,
         "nbr_ventes": _r(rev_res.nbr_ventes_mensuel, 1),
         "marge_produit": _r(marge_prod, 2),
         "cout_mensuel": _r(cout, 2),
-        "marge_nette": _r(marge_nette, 2),
+        "marge_nette": NOT_PROFITABLE if not_profitable else marge_nette_num,
+        "marge_nette_num": marge_nette_num,
+        "not_profitable": not_profitable,
         "capex": _r(capex, 2),
         "amort_mois": _r(amort_mois, 1),
         "amort_ans": _r((amort_mois / 12.0) if amort_mois else None, 2),
@@ -776,10 +1030,15 @@ def simulate_excel_dual(
     taux_occupation: float | None = None,
     guests_per_chambre: float | None = None,
     year: int | None = None,
+    has_vitrine: bool | None = None,
+    nb_frigos: float | int | None = None,
 ) -> dict[str, Any]:
     """
     Pour l'hôtel désigné : produit les 3 onglets SIMPLY / LIBERTY / CONNECTED
     avec colonne gauche (moyenne pilotes solution) et droite (projection).
+
+    Colonne gauche = CA base pilote (sans R2–R4, fidélité Excel).
+    Recommandation = arbre audit (ordre d'affichage, 3 solutions toujours calculées).
     """
     code = str(hotel_code or "").strip()
     if not code:
@@ -821,6 +1080,31 @@ def simulate_excel_dual(
     for k in list(RULE3_FB_COEFFS) + list(RULE3_NFB_COEFFS):
         needs.setdefault(k, True)
 
+    # Vitrine / frigos : param explicite ou fiche hôtel (lobby fridge)
+    if has_vitrine is None:
+        services = getattr(ctx, "services", None) or {}
+        has_vitrine = bool(
+            isinstance(services, dict)
+            and (
+                services.get("lobby_fridge")
+                or services.get("has_vitrine")
+                or services.get("vitrine_refrigeree")
+            )
+        )
+    else:
+        has_vitrine = bool(has_vitrine)
+
+    validation_warnings = collect_validation_warnings(m_lin=ml, client_needs=needs)
+    recommended, concept_order, reco_reasons = recommend_display_order(
+        n,
+        mx,
+        ml,
+        needs,
+        has_vitrine,
+        to,
+        nb_frigos=nb_frigos,
+    )
+
     ref = RodReference()
     rev = RevenueRules(ref)
     cost = CostRules(ref)
@@ -847,7 +1131,6 @@ def simulate_excel_dual(
         excel_nf = float((concept_ref.get("left") or {}).get("ca_nf") or 0)
         excel_ventes = float((concept_ref.get("left") or {}).get("nb_ventes") or 0)
         excel_mix_fb = float(left_p.get("mix_fb") or 0.7)
-        excel_mix_nf = float(left_p.get("mix_nf") or 0.3)
         excel_ml = float(left_p.get("m_lin") or 6)
         excel_n = float(left_p.get("nb_chambres") or 100)
         excel_to = float(left_p.get("taux_occupation") or 0.75)
@@ -910,17 +1193,23 @@ def simulate_excel_dual(
         for sid in order:
             ls = left_by_id.get(sid) or {}
             rs = right_by_id.get(sid) or {}
+            left_rows = ls.get("rows") or []
+            right_rows = rs.get("rows") or []
             dual_steps.append(
                 {
                     "id": sid,
                     "title": rs.get("title") or ls.get("title") or sid,
                     "comment": rs.get("comment") or ls.get("comment") or "",
                     "highlight": bool(rs.get("highlight") or ls.get("highlight")),
-                    "left_rows": ls.get("rows") or [],
-                    "right_rows": rs.get("rows") or [],
+                    "left_rows": left_rows,
+                    "right_rows": right_rows,
+                    # Frontend unifié : label + left/right
+                    "rows": _merge_dual_rows(left_rows, right_rows),
                 }
             )
 
+        right_ca_display = right.get("ca_ht")
+        right_marge_display = right.get("marge_nette")
         by_concept[concept] = {
             "concept": concept,
             "label": f"{concept} STORE",
@@ -933,9 +1222,14 @@ def simulate_excel_dual(
             "steps": dual_steps,
             "kpi": {
                 "left_ca_ht": left.get("ca_ht"),
-                "right_ca_ht": right.get("ca_ht"),
+                "right_ca_ht": right_ca_display,
+                "right_ca_ht_num": right.get("ca_ht_num", right.get("ca_ht")),
                 "left_marge_nette": left.get("marge_nette"),
-                "right_marge_nette": right.get("marge_nette"),
+                "right_marge_nette": right_marge_display,
+                "right_marge_nette_num": right.get(
+                    "marge_nette_num", right.get("marge_nette")
+                ),
+                "right_not_profitable": bool(right.get("not_profitable")),
                 "left_amort_mois": left.get("amort_mois"),
                 "right_amort_mois": right.get("amort_mois"),
             },
@@ -964,11 +1258,17 @@ def simulate_excel_dual(
             "mix_fb": _r(mx, 4),
             "mix_nf": _r(1.0 - mx, 4),
             "client_needs": needs,
+            "has_vitrine": bool(has_vitrine),
+            "nb_frigos": nb_frigos,
         },
         "concepts": by_concept,
-        "concept_order": list(CONCEPTS),
+        "recommended_concept": recommended,
+        "concept_order": concept_order,
+        "recommendation_reasons": reco_reasons,
+        "validation_warnings": validation_warnings,
         "comments": EXCEL_COMMENTS,
     }
+
 
 
 def list_excel_pilots(year: int | None = None) -> dict[str, Any]:

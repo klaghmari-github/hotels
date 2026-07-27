@@ -897,125 +897,147 @@ body {
   font-size: 0.95rem;
   color: var(--text);
 }
-.rx-dual-head {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
-  position: sticky;
-  top: 0;
-  z-index: 5;
-  background: var(--bg);
-  padding: 0.35rem 0;
-}
-.rx-col-head {
-  border-radius: 12px;
-  padding: 0.65rem 0.9rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-.rx-col-head.left {
-  background: rgba(201, 162, 39, 0.1);
-  border-color: rgba(201, 162, 39, 0.28);
-}
-.rx-col-head.right {
+.rx-kpi-item.rx-kpi-reco {
+  border-color: rgba(110, 231, 183, 0.4);
   background: rgba(110, 231, 183, 0.1);
-  border-color: rgba(110, 231, 183, 0.28);
 }
-.rx-col-title {
-  font-weight: 700;
-  font-size: 0.78rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+.rx-kpi-item.rx-kpi-reco strong {
+  color: var(--success, #6ee7b7);
 }
-.rx-col-sub {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin-top: 0.15rem;
+
+/* Dual-column Excel sheet (table.rx-sheet)
+   Horizontal + vertical scroll lives on .rod-excel-scroll so sticky thead works. */
+.rx-panels {
+  min-width: 0;
 }
-.rx-step {
-  margin-bottom: 0.85rem;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 14px;
-  overflow: hidden;
+.rx-sheet-wrap {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.02);
 }
-.rx-step.is-highlight {
-  border-color: rgba(110, 231, 183, 0.35);
-  box-shadow: 0 0 0 1px rgba(110, 231, 183, 0.08);
-}
-.rx-step-head {
-  padding: 0.55rem 0.9rem;
-  background: rgba(255, 255, 255, 0.04);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-.rx-step-head h3 {
-  margin: 0;
-  font-size: 0.88rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-}
-.rx-comment {
-  padding: 0.65rem 0.9rem;
-  font-size: 0.8rem;
-  line-height: 1.45;
-  color: var(--text-muted);
-  background: rgba(110, 231, 183, 0.06);
-  border-bottom: 1px dashed rgba(110, 231, 183, 0.2);
-  white-space: normal;
-}
-.rx-dual-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
-}
-.rx-col {
-  padding: 0.45rem 0.75rem 0.65rem;
-}
-.rx-col.left {
-  border-right: 1px solid rgba(255, 255, 255, 0.07);
-  background: rgba(201, 162, 39, 0.03);
-}
-.rx-col.right {
-  background: rgba(110, 231, 183, 0.03);
-}
-.rx-row {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 0.25rem 0.75rem;
-  padding: 0.28rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+table.rx-sheet {
+  width: max(100%, 720px);
+  min-width: 720px;
+  border-collapse: collapse;
+  table-layout: fixed;
   font-size: 0.84rem;
 }
-.rx-row:last-child {
-  border-bottom: 0;
+table.rx-sheet col.rx-col-ind,
+table.rx-sheet th.rx-th-ind,
+table.rx-sheet th.rx-ind,
+table.rx-sheet .rx-ind {
+  width: 32%;
 }
-.rx-label {
-  color: var(--text-muted);
-}
-.rx-value {
-  font-weight: 600;
-  color: var(--text);
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-.rx-hint {
-  grid-column: 1 / -1;
+table.rx-sheet thead th {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  padding: 0.65rem 0.85rem;
   font-size: 0.72rem;
-  color: var(--text-faint);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+table.rx-sheet thead th.rx-th-ind {
+  background: #1a1d24;
+  color: var(--text-muted);
+  width: 32%;
+}
+table.rx-sheet thead th.rx-th-left {
+  /* solid gold-tint so sticky header stays opaque while scrolling */
+  background: #2c2818;
+  color: #f0d78c;
+  border-left: 1px solid rgba(201, 162, 39, 0.45);
+  width: 34%;
+}
+table.rx-sheet thead th.rx-th-right {
+  /* solid green-tint so sticky header stays opaque while scrolling */
+  background: #1a2b24;
+  color: #9ef0c9;
+  border-left: 1px solid rgba(110, 231, 183, 0.45);
+  width: 34%;
+}
+table.rx-sheet tbody th,
+table.rx-sheet tbody td {
+  padding: 0.32rem 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+  vertical-align: top;
+}
+table.rx-sheet tbody th.rx-ind {
+  font-weight: 500;
+  color: var(--text-muted);
+  text-align: left;
+  background: rgba(255, 255, 255, 0.02);
+  border-left: 0;
+}
+table.rx-sheet tbody td.rx-left {
+  background: rgba(201, 162, 39, 0.04);
+  text-align: right;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+table.rx-sheet tbody td.rx-right {
+  background: rgba(110, 231, 183, 0.04);
+  text-align: right;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+table.rx-sheet tr.rx-banner th {
+  padding: 0.55rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 0;
+}
+table.rx-sheet tr.rx-banner.is-highlight th {
+  background: rgba(110, 231, 183, 0.14);
+  border-color: rgba(110, 231, 183, 0.35);
+  color: #b6f5d6;
+  box-shadow: inset 3px 0 0 rgba(110, 231, 183, 0.7);
+}
+table.rx-sheet tr.rx-comment-row td {
+  padding: 0.55rem 0.9rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+  background: rgba(110, 231, 183, 0.05);
+  border-bottom: 1px dashed rgba(110, 231, 183, 0.22);
+  border-left: 0;
+  white-space: normal;
+}
+table.rx-sheet tr.rx-metric-row.is-total th,
+table.rx-sheet tr.rx-metric-row.is-total td {
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.04);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+table.rx-sheet tr.rx-metric-row.is-total td.rx-left {
+  background: rgba(201, 162, 39, 0.1);
+}
+table.rx-sheet tr.rx-metric-row.is-total td.rx-right {
+  background: rgba(110, 231, 183, 0.1);
+}
+table.rx-sheet .is-not-profitable {
+  color: #dc2c3e !important;
+  font-weight: 700;
 }
 .rx-method {
   margin: 0.75rem 0 0;
   padding: 0 0.25rem;
-}
-@media (max-width: 900px) {
-  .rx-dual-head,
-  .rx-dual-grid {
-    grid-template-columns: 1fr;
-  }
-  .rx-col.left {
-    border-right: 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-  }
 }
 
 /* Bandeau reco (toujours dans .rod-sticky-head) */

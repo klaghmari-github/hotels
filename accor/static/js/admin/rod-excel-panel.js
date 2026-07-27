@@ -1,9 +1,8 @@
 /**
  * Simulateur Excel ROD — 3 onglets SIMPLY / LIBERTY / CONNECTED.
  *
- * Layout Excel :
- *   gauche = moyenne pilotes de la solution
- *   droite = projection hôtel désigné
+ * Layout Excel (table.rx-sheet) :
+ *   Indicateur | MOYENNE RESULTATS PILOTES | SIMULATEUR · hôtel
  * Commentaires métier Excel affichés à chaque étape.
  *
  * API : /api/rod/excel/*
@@ -31,7 +30,26 @@ function euro(v) {
   );
 }
 
+function pct(v, d = 1) {
+  if (v == null || Number.isNaN(Number(v))) return "—";
+  return (
+    (Number(v) * 100).toLocaleString("fr-FR", {
+      maximumFractionDigits: d,
+      minimumFractionDigits: 0,
+    }) + " %"
+  );
+}
+
 const CONCEPTS = ["SIMPLY", "LIBERTY", "CONNECTED"];
+
+/** Money-like row labels (CA, Marge, coûts, Capex, TOTAL…). */
+const MONEY_RE = /CA|Marge|co[uû]t|Cout|Capex|TOTAL/i;
+/** TO (taux d'occupation) labels. */
+const TO_RE = /\bTO\b|taux\s*d['']?occupation|taux_occupation/i;
+/** Mix F&B / N-F&B labels. */
+const MIX_RE = /mix/i;
+/** Generic rate labels (0–1 → %). */
+const RATE_RE = /^Taux\b/i;
 
 export class RodExcelPanel {
   constructor(state, nav) {
@@ -43,6 +61,8 @@ export class RodExcelPanel {
     this.concept = "SIMPLY";
     this._openBusy = false;
     this._simBusy = false;
+    this._pending = false;
+    this._didAutoReco = false;
     this._progressTimer = null;
     this._progressPct = 0;
   }
@@ -111,9 +131,9 @@ export class RodExcelPanel {
   }
 
   _syncMixLabel() {
-    const pct = Number($("#rx-mix-fb")?.value || 70);
+    const pctVal = Number($("#rx-mix-fb")?.value || 70);
     const el = $("#rx-mix-nf-label");
-    if (el) el.textContent = `N-F&B = ${100 - pct} %`;
+    if (el) el.textContent = `N-F&B = ${100 - pctVal} %`;
   }
 
   _setAllNeeds(on) {
@@ -330,8 +350,13 @@ export class RodExcelPanel {
       this.setStatus("Choisissez un hôtel désigné");
       return;
     }
-    if (this._simBusy) return;
+    // Coalesce concurrent requests: re-run once when the in-flight call finishes.
+    if (this._simBusy) {
+      this._pending = true;
+      return;
+    }
     this._simBusy = true;
+    this._pending = false;
     this.startProgress(p.hotel_code);
     this.setStatus("Calcul…");
     try {
@@ -356,7 +381,7 @@ export class RodExcelPanel {
           this.result.hotel_name || ""
         }`.trim();
       }
-      this._activateConceptTab();
+      this._syncConceptTabs();
       this.renderConcept();
       this.finishProgress(true, "3 solutions calculées");
       this.setStatus("");
@@ -367,13 +392,150 @@ export class RodExcelPanel {
       toast.show(err.message, "err");
     } finally {
       this._simBusy = false;
+      if (this._pending) {
+        this._pending = false;
+        this.simulate();
+      }
     }
+  }
+
+  /**
+   * Reorder / relabel concept tabs from result.concept_order.
+   * Auto-select recommended_concept only on first successful load.
+   */
+  _syncConceptTabs() {
+    const tabs = $("#rx-concept-tabs");
+    if (!tabs || !this.result?.ok) return;
+
+    const order =
+      Array.isArray(this.result.concept_order) && this.result.concept_order.length
+        ? this.result.concept_order.map((c) => String(c).toUpperCase())
+        : CONCEPTS.slice();
+
+    const byConcept = new Map();
+    tabs.querySelectorAll(".rod-tab[data-rx-concept]").forEach((btn) => {
+      byConcept.set(btn.dataset.rxConcept, btn);
+    });
+    order.forEach((c) => {
+      const btn = byConcept.get(c);
+      if (btn) {
+        btn.textContent = `SIMULATEUR ${c}`;
+        tabs.appendChild(btn);
+      }
+    });
+    // Any leftover tabs (unknown concepts) keep order after known ones
+    byConcept.forEach((btn, c) => {
+      if (!order.includes(c)) {
+        btn.textContent = `SIMULATEUR ${c}`;
+        tabs.appendChild(btn);
+      }
+    });
+
+    const reco = this.result.recommended_concept
+      ? String(this.result.recommended_concept).toUpperCase()
+      : null;
+    if (!this._didAutoReco && reco && byConcept.has(reco)) {
+      this.concept = reco;
+      this._didAutoReco = true;
+    } else if (!byConcept.has(this.concept) && order.length) {
+      this.concept = order[0];
+    }
+
+    this._activateConceptTab();
   }
 
   _activateConceptTab() {
     $$("#rx-concept-tabs .rod-tab").forEach((btn) => {
       btn.classList.toggle("active", btn.dataset.rxConcept === this.concept);
     });
+  }
+
+  /**
+   * Align left_rows / right_rows by label (union, left-first then right-only).
+   * Duplicate labels keep parallel slots (e.g. Amortissement mois / ans).
+   */
+  _alignRows(leftRows, rightRows) {
+    const left = leftRows || [];
+    const right = rightRows || [];
+    const leftBuckets = new Map();
+    const rightBuckets = new Map();
+    for (const r of left) {
+      const k = r.label || "";
+      if (!leftBuckets.has(k)) leftBuckets.set(k, []);
+      leftBuckets.get(k).push(r);
+    }
+    for (const r of right) {
+      const k = r.label || "";
+      if (!rightBuckets.has(k)) rightBuckets.set(k, []);
+      rightBuckets.get(k).push(r);
+    }
+    const seen = new Set();
+    const out = [];
+    for (const r of left) {
+      const k = r.label || "";
+      if (seen.has(k)) continue;
+      seen.add(k);
+      const L = leftBuckets.get(k) || [];
+      const R = rightBuckets.get(k) || [];
+      const n = Math.max(L.length, R.length);
+      for (let i = 0; i < n; i++) {
+        out.push({ label: k, left: L[i] || null, right: R[i] || null });
+      }
+    }
+    for (const r of right) {
+      const k = r.label || "";
+      if (seen.has(k)) continue;
+      seen.add(k);
+      for (const item of rightBuckets.get(k) || []) {
+        out.push({ label: k, left: null, right: item });
+      }
+    }
+    return out;
+  }
+
+  /**
+   * Format a single cell value according to its label.
+   * @returns {{ text: string, cls: string }}
+   */
+  _formatValue(row, label) {
+    if (row == null || row.value == null || row.value === "—") {
+      return { text: "—", cls: "" };
+    }
+    const v = row.value;
+    if (v === "Not profitable") {
+      return { text: "Not profitable", cls: "is-not-profitable" };
+    }
+    if (typeof v === "string") {
+      return { text: v, cls: "" };
+    }
+    if (typeof v === "number") {
+      const lab = label || row.label || "";
+      if (MONEY_RE.test(lab)) {
+        return { text: euro(v), cls: /TOTAL/i.test(lab) ? "is-total" : "" };
+      }
+      if (TO_RE.test(lab) && v >= 0 && v <= 1) {
+        return { text: pct(v), cls: "" };
+      }
+      if (MIX_RE.test(lab) && v >= 0 && v <= 1) {
+        return { text: pct(v), cls: "" };
+      }
+      if (RATE_RE.test(lab) && v >= 0 && v <= 1) {
+        return { text: pct(v), cls: "" };
+      }
+      return { text: fmt(v, 4), cls: "" };
+    }
+    return { text: String(v), cls: "" };
+  }
+
+  _displayLabel(pair) {
+    const base = pair.label || "";
+    const hint =
+      (pair.left && pair.left.hint) || (pair.right && pair.right.hint) || "";
+    // Disambiguate duplicate labels (Amortissement mois / ans)
+    if (hint && /amort/i.test(base)) {
+      return `${base} (${hint})`;
+    }
+    return base;
   }
 
   renderConcept() {
@@ -393,7 +555,16 @@ export class RodExcelPanel {
       const pilots = (block.pilots || [])
         .map((p) => p.label || p.hotel_code)
         .join(", ");
+      const reco = this.result.recommended_concept
+        ? String(this.result.recommended_concept).toUpperCase()
+        : "";
+      const recoHtml = reco
+        ? `<div class="rx-kpi-item rx-kpi-reco"><span>Recommandé</span><strong>${escapeHtml(
+            reco
+          )}</strong></div>`
+        : "";
       kpiBar.innerHTML = `
+        ${recoHtml}
         <div class="rx-kpi-item"><span>Solution</span><strong>${escapeHtml(
           block.label || this.concept
         )}</strong></div>
@@ -415,74 +586,78 @@ export class RodExcelPanel {
       `;
     }
 
-    const steps = block.steps || [];
-    host.innerHTML = `
-      <div class="rx-dual-head">
-        <div class="rx-col-head left">
-          <div class="rx-col-title">MOYENNE RESULTATS PILOTES</div>
-          <div class="rx-col-sub">${escapeHtml(block.label || this.concept)}</div>
-        </div>
-        <div class="rx-col-head right">
-          <div class="rx-col-title">SIMULATEUR</div>
-          <div class="rx-col-sub">${escapeHtml(
-            this.result.hotel_code || ""
-          )} · hôtel désigné</div>
-        </div>
-      </div>
-      ${steps
-        .map((st) => {
-          const hl = st.highlight ? " is-highlight" : "";
-          return `
-        <section class="rx-step${hl}" data-step="${escapeHtml(st.id)}">
-          <header class="rx-step-head">
-            <h3>${escapeHtml(st.title || st.id)}</h3>
-          </header>
-          ${
-            st.comment
-              ? `<div class="rx-comment">${escapeHtml(st.comment).replace(
-                  /\n/g,
-                  "<br>"
-                )}</div>`
-              : ""
-          }
-          <div class="rx-dual-grid">
-            <div class="rx-col left">${this._rowsHtml(st.left_rows)}</div>
-            <div class="rx-col right">${this._rowsHtml(st.right_rows)}</div>
-          </div>
-        </section>`;
-        })
-        .join("")}
-      <p class="muted small rx-method">${escapeHtml(block.method || "")}</p>
-    `;
-  }
+    const hotelLabel = [
+      this.result.hotel_code || "",
+      this.result.hotel_name || "",
+    ]
+      .filter(Boolean)
+      .join(" · ");
+    const rightHead = hotelLabel
+      ? `SIMULATEUR · ${hotelLabel}`
+      : "SIMULATEUR · hôtel désigné";
 
-  _rowsHtml(rows) {
-    if (!rows || !rows.length) return `<div class="rx-row empty">—</div>`;
-    return rows
-      .map((r) => {
-        const v = r.value;
-        let display;
-        if (v == null || v === "—") display = "—";
-        else if (typeof v === "number") display = fmt(v, 4);
-        else display = String(v);
-        // euro-ish labels
-        if (
-          typeof v === "number" &&
-          /CA|Marge|coût|Cout|Capex|TOTAL/i.test(r.label || "")
-        ) {
-          display = euro(v);
-        }
-        return `
-        <div class="rx-row">
-          <span class="rx-label">${escapeHtml(r.label || "")}</span>
-          <span class="rx-value">${escapeHtml(display)}</span>
-          ${
-            r.hint
-              ? `<span class="rx-hint">${escapeHtml(r.hint)}</span>`
-              : ""
-          }
-        </div>`;
+    const steps = block.steps || [];
+    const bodyRows = steps
+      .map((st) => {
+        const hl = st.highlight ? " is-highlight" : "";
+        const banner = `
+        <tr class="rx-banner${hl}" data-step="${escapeHtml(st.id || "")}">
+          <th colspan="3">${escapeHtml(st.title || st.id || "")}</th>
+        </tr>`;
+        const comment = st.comment
+          ? `
+        <tr class="rx-comment-row">
+          <td colspan="3">${escapeHtml(st.comment).replace(/\n/g, "<br>")}</td>
+        </tr>`
+          : "";
+        const aligned = this._alignRows(st.left_rows, st.right_rows);
+        const metrics =
+          aligned.length === 0
+            ? `
+        <tr class="rx-metric-row">
+          <th class="rx-ind">—</th>
+          <td class="rx-left">—</td>
+          <td class="rx-right">—</td>
+        </tr>`
+            : aligned
+                .map((pair) => {
+                  const lab = this._displayLabel(pair);
+                  const L = this._formatValue(pair.left, pair.label);
+                  const R = this._formatValue(pair.right, pair.label);
+                  const isTotal = /TOTAL/i.test(pair.label || "");
+                  const rowCls = ["rx-metric-row", isTotal ? "is-total" : ""]
+                    .filter(Boolean)
+                    .join(" ");
+                  const lCls = ["rx-left", L.cls].filter(Boolean).join(" ");
+                  const rCls = ["rx-right", R.cls].filter(Boolean).join(" ");
+                  return `
+        <tr class="${rowCls}">
+          <th class="rx-ind" scope="row">${escapeHtml(lab)}</th>
+          <td class="${lCls}">${escapeHtml(L.text)}</td>
+          <td class="${rCls}">${escapeHtml(R.text)}</td>
+        </tr>`;
+                })
+                .join("");
+        return banner + comment + metrics;
       })
       .join("");
+
+    host.innerHTML = `
+      <div class="rx-sheet-wrap">
+        <table class="rx-sheet">
+          <thead>
+            <tr>
+              <th class="rx-th-ind">Indicateur</th>
+              <th class="rx-th-left">MOYENNE RESULTATS PILOTES</th>
+              <th class="rx-th-right">${escapeHtml(rightHead)}</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${bodyRows}
+          </tbody>
+        </table>
+      </div>
+      <p class="muted small rx-method">${escapeHtml(block.method || "")}</p>
+    `;
   }
 }
