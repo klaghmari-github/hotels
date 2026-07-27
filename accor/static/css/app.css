@@ -719,6 +719,28 @@ body {
 }
 
 /* ---- Simulateur ROD admin ---- */
+.rod-progress-card {
+  margin: 0 0 0.85rem;
+  padding: 0.9rem 1.1rem;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--bg-panel, rgba(20, 24, 32, 0.96));
+  border: 1px solid rgba(110, 231, 183, 0.28);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+}
+.rod-progress-card.hidden {
+  display: none !important;
+}
+.rod-progress-card.is-active {
+  outline: 1px solid rgba(110, 231, 183, 0.4);
+}
+.rod-layout.is-calculating {
+  opacity: 0.45;
+  pointer-events: none;
+  filter: grayscale(0.15);
+  transition: opacity 0.2s ease;
+}
 .rod-tabs {
   display: flex;
   flex-wrap: wrap;
@@ -976,6 +998,14 @@ body {
 .build-progress-phase[data-phase="prepare"] {
   background: rgba(251, 191, 36, 0.12);
   color: #fcd34d;
+}
+.build-progress-phase[data-phase="done"] {
+  background: rgba(52, 211, 153, 0.15);
+  color: #6ee7b7;
+}
+.build-progress-phase[data-phase="error"] {
+  background: rgba(248, 113, 113, 0.15);
+  color: #fca5a5;
 }
 .build-progress-head {
   display: flex;

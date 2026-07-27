@@ -485,9 +485,9 @@ def _sales_steps_category_pilot(
 
     steps.append(
         {
-            "id": "client_hotel",
-            "title": "Hôtel client (traité comme nouveau)",
-            "rule": "Caractéristiques de l'hôtel choisi (hotel_data) — pas ses ventes train",
+            "id": "hotel_cible",
+            "title": "Hôtel cible",
+            "rule": "Caractéristiques de l'hôtel à cibler (hotel_data) — pas ses ventes train",
             "formula": "clients_mois = n × TO × guests × 30,5",
             "values": {
                 "nb_chambres": op.nb_chambres,
@@ -563,10 +563,10 @@ def _sales_steps_category_pilot(
         {
             "id": "r1_clients",
             "title": "Règle 1 — scaling clients",
-            "rule": "CA × (clients_hôtel / clients_référence_catégorie)",
-            "formula": "facteur = clients_mois_client / clients_mois_catégorie",
+            "rule": "CA × (clients hôtel cible / clients référence catégorie)",
+            "formula": "facteur = clients_mois_cible / clients_mois_catégorie",
             "values": {
-                "clients_hotel": _round(clients_hotel, 2),
+                "clients_hotel_cible": _round(clients_hotel, 2),
                 "clients_categorie": _round(clients_pilote, 2),
                 "client_factor": _round(client_factor, 4),
             },
@@ -764,7 +764,7 @@ def simulate_hotel_trace(
     include_gaps: bool = True,
 ) -> dict[str, Any]:
     """
-    Traite l'hôtel comme nouveau client (directeur de corner) :
+    Simule un **hôtel cible** (estimation corner) :
 
     * référence CA / clients = catégorie de marque (années train) ;
     * paramètres corner éditables : m_lin, mix_fb, sous-catégories (besoins) ;
@@ -1004,7 +1004,7 @@ def simulate_hotel_trace(
     method = (
         f"Ref catégorie {category} sur {train_years} "
         f"(année {eval_year} exclue — split temporel, pas d'exclusion d'hôtel). "
-        f"Hôtel {code} = client corner. Règles ROD → CA / coûts / marge + reco."
+        f"Hôtel cible {code}. Règles ROD → CA / coûts / marge + reco."
     )
     if include_gaps and has_holdout:
         method += f" Éval admin : écart vs réel {eval_year} (Σ/12)."
@@ -1018,7 +1018,7 @@ def simulate_hotel_trace(
         "eval_year": eval_year,
         "train_years": train_years,
         "divisor_months": int(DIVISOR_MONTHS),
-        "as_new_client": True,
+        "as_target_hotel": True,
         "params": params_used,
         "category_reference": {
             k: v

@@ -48,6 +48,8 @@ export class RodSimPanel {
     this._evalBusy = false;
     this._paramsTouched = false;
     this._simSeq = 0;
+    this._progressTimer = null;
+    this._progressPct = 0;
   }
 
   async open() {
@@ -64,6 +66,143 @@ export class RodSimPanel {
   setStatus(msg) {
     const status = $("#rod-status");
     if (status) status.textContent = msg || "";
+  }
+
+  /**
+   * Barre de progression type Model Build (visible, animée).
+   * Indéterminée côté API → on simule l'avancement par phases.
+   */
+  _stopProgressTick() {
+    if (this._progressTimer) {
+      clearInterval(this._progressTimer);
+      this._progressTimer = null;
+    }
+  }
+
+  /**
+   * @param {"sim"|"batch"|"load"} mode
+   * @param {string} [detail]
+   */
+  startProgress(mode = "sim", detail = "") {
+    const card = $("#rod-progress-card");
+    const wrap = $("#rod-progress");
+    const fill = $("#rod-progress-fill");
+    const pctEl = $("#rod-progress-pct");
+    const phaseEl = $("#rod-progress-phase");
+    const textEl = $("#rod-progress-text");
+    const detailEl = $("#rod-progress-detail");
+    const bar = $("#rod-progress-bar");
+    const layout = document.querySelector(".rod-layout");
+
+    if (card) card.classList.remove("hidden");
+    if (card) card.classList.add("is-active");
+    if (wrap) {
+      wrap.classList.remove("is-done", "is-error");
+      wrap.classList.add("is-running");
+    }
+    if (layout) layout.classList.add("is-calculating");
+
+    const phases =
+      mode === "batch"
+        ? [
+            { until: 15, label: "Pilotes", text: "Chargement des hôtels pilotes…" },
+            { until: 40, label: "Ref catégorie", text: "Moyennes catégorie (train)…" },
+            { until: 75, label: "Simulation", text: "Règles ROD · tous les pilotes…" },
+            { until: 92, label: "Métriques", text: "MAE · écarts · reco…" },
+          ]
+        : mode === "load"
+          ? [
+              { until: 30, label: "Données", text: "Chargement pilotes…" },
+              { until: 70, label: "Liste", text: "Préparation de la liste…" },
+              { until: 90, label: "Prêt", text: "Finalisation…" },
+            ]
+          : [
+              { until: 12, label: "Prépare", text: "Lecture contexte hôtel cible…" },
+              { until: 28, label: "Référence", text: "Moyenne catégorie (années train)…" },
+              { until: 55, label: "CA", text: "Règles ROD · CA HT…" },
+              { until: 78, label: "Coûts", text: "Coûts · marges · 3 solutions…" },
+              { until: 92, label: "Reco", text: "Recommandation concept…" },
+            ];
+
+    this._progressPct = 0;
+    this._progressPhases = phases;
+    if (phaseEl) {
+      phaseEl.textContent = phases[0].label;
+      phaseEl.dataset.phase = "prepare";
+    }
+    if (textEl) textEl.textContent = phases[0].text;
+    if (detailEl) detailEl.textContent = detail || "";
+    if (pctEl) pctEl.innerHTML = "0&nbsp;%";
+    if (fill) fill.style.width = "0%";
+    if (bar) bar.setAttribute("aria-valuenow", "0");
+    this.setStatus(mode === "batch" ? "Batch en cours…" : "Calcul en cours…");
+
+    this._stopProgressTick();
+    this._progressTimer = setInterval(() => {
+      // asymptote vers 92 % tant que la requête n'est pas finie
+      const cap = 92;
+      const step = this._progressPct < 40 ? 2.2 : this._progressPct < 70 ? 1.1 : 0.45;
+      this._progressPct = Math.min(cap, this._progressPct + step);
+      const pct = Math.round(this._progressPct);
+      if (pctEl) pctEl.innerHTML = `${pct}&nbsp;%`;
+      if (fill) fill.style.width = `${this._progressPct}%`;
+      if (bar) bar.setAttribute("aria-valuenow", String(pct));
+      const ph = (this._progressPhases || []).find((p) => this._progressPct <= p.until)
+        || (this._progressPhases || []).slice(-1)[0];
+      if (ph) {
+        if (phaseEl) phaseEl.textContent = ph.label;
+        if (textEl) textEl.textContent = ph.text;
+      }
+    }, 180);
+  }
+
+  /**
+   * @param {"done"|"error"} state
+   * @param {string} [message]
+   * @param {string} [detail]
+   */
+  finishProgress(state = "done", message = "", detail = "") {
+    this._stopProgressTick();
+    const card = $("#rod-progress-card");
+    const wrap = $("#rod-progress");
+    const fill = $("#rod-progress-fill");
+    const pctEl = $("#rod-progress-pct");
+    const phaseEl = $("#rod-progress-phase");
+    const textEl = $("#rod-progress-text");
+    const detailEl = $("#rod-progress-detail");
+    const bar = $("#rod-progress-bar");
+    const layout = document.querySelector(".rod-layout");
+
+    if (layout) layout.classList.remove("is-calculating");
+    if (wrap) {
+      wrap.classList.remove("is-running");
+      wrap.classList.toggle("is-done", state === "done");
+      wrap.classList.toggle("is-error", state === "error");
+    }
+    if (fill) fill.style.width = "100%";
+    if (pctEl) pctEl.innerHTML = state === "done" ? "100&nbsp;%" : "—";
+    if (bar) bar.setAttribute("aria-valuenow", state === "done" ? "100" : "0");
+    if (phaseEl) {
+      phaseEl.textContent = state === "done" ? "Terminé" : "Erreur";
+      phaseEl.dataset.phase = state === "done" ? "done" : "error";
+    }
+    if (textEl) textEl.textContent = message || (state === "done" ? "Simulation terminée" : "Échec");
+    if (detailEl) detailEl.textContent = detail || "";
+
+    // masquer la barre après un court délai si succès
+    if (state === "done") {
+      setTimeout(() => {
+        if (this._simBusy || this._evalBusy) return;
+        if (card) {
+          card.classList.add("hidden");
+          card.classList.remove("is-active");
+        }
+        if (wrap) wrap.classList.remove("is-done", "is-error");
+      }, 900);
+    } else {
+      // garder visible en erreur jusqu'au prochain calcul
+      if (card) card.classList.add("is-active");
+    }
   }
 
   async loadMeta() {
@@ -168,7 +307,7 @@ export class RodSimPanel {
   }
 
   async loadPilots() {
-    this.setStatus("Chargement…");
+    this.startProgress("load", `Année éval ${this.year()}`);
     try {
       const year = this.year();
       const data = await api.get("/api/rod/pilots", { year });
@@ -181,8 +320,10 @@ export class RodSimPanel {
       const chipN = $("#rod-chip-n");
       if (chipN) chipN.textContent = `${data.n || 0} pilote(s)`;
       this.fillHotels(data.hotels || []);
+      this.finishProgress("done", `${data.n || 0} pilote(s) chargés`);
       this.setStatus("");
     } catch (err) {
+      this.finishProgress("error", err.message);
       this.setStatus(err.message);
       toast.show(err.message, "err");
     }
@@ -246,7 +387,7 @@ export class RodSimPanel {
   async runSim() {
     const code = $("#rod-hotel-select")?.value;
     if (!code) {
-      this.setStatus("Choisissez un hôtel");
+      this.setStatus("Choisissez un hôtel à cibler");
       return;
     }
 
@@ -256,7 +397,7 @@ export class RodSimPanel {
     }
     this._simBusy = true;
     const seq = ++this._simSeq;
-    this.setStatus("Calcul…");
+    this.startProgress("sim", code);
 
     try {
       const params = this.collectParams();
@@ -266,6 +407,7 @@ export class RodSimPanel {
       );
       // réponse obsolète (nouvelle demande en file) → ignorer
       if (seq !== this._simSeq && this._simQueued) {
+        // ne pas finishProgress : le run suivant reprend la barre
         return;
       }
       if (!data.ok) throw new Error(data.error || "Simulation échouée");
@@ -297,12 +439,13 @@ export class RodSimPanel {
         el.classList.toggle("active", el.dataset.concept === this.concept);
       });
       this.renderTrace();
-      this.setStatus(
-        `${code} · reco ${reco || "—"} · ${fmt(p.m_lin ?? params.m_lin, 1)} m · mix ${Math.round(
-          (p.mix_fb ?? params.mix_fb) * 100
-        )} %`
-      );
+      const summary = `${code} · reco ${reco || "—"} · ${fmt(p.m_lin ?? params.m_lin, 1)} m · mix ${Math.round(
+        (p.mix_fb ?? params.mix_fb) * 100
+      )} %`;
+      this.finishProgress("done", "Simulation terminée", summary);
+      this.setStatus(summary);
     } catch (err) {
+      this.finishProgress("error", err.message);
       this.setStatus(err.message);
       toast.show(err.message, "err");
     } finally {
@@ -317,7 +460,7 @@ export class RodSimPanel {
   async runEvalBatch() {
     if (this._evalBusy) return;
     this._evalBusy = true;
-    this.setStatus("Batch…");
+    this.startProgress("batch", `Année ${this.year()}`);
     try {
       const year = this.year();
       const data = await api.get("/api/rod/eval", { year });
@@ -325,10 +468,11 @@ export class RodSimPanel {
       this.evalResult = data;
       this.renderEval(data);
       const nScored = data.metrics?.n ?? "—";
-      this.setStatus(
-        `Batch ${data.eval_year} · ${data.n_hotels} pilote(s) · MAE n=${nScored}`
-      );
+      const summary = `Batch ${data.eval_year} · ${data.n_hotels} pilote(s) · MAE n=${nScored}`;
+      this.finishProgress("done", "Batch terminé", summary);
+      this.setStatus(summary);
     } catch (err) {
+      this.finishProgress("error", err.message);
       this.setStatus(err.message);
       toast.show(err.message, "err");
     } finally {
