@@ -401,17 +401,15 @@ def tunnel_process_alive(name: str) -> bool:
         return False
 
 
-def public_health(name: str) -> bool:
+def public_health(name: str, *, timeout: float = 6.0) -> bool:
     url = read_tunnel_url(name)
     if not url:
         return False
-    # try root then health
-    if http_ok(url + "/", timeout=12):
-        return True
     cfg = SERVICES.get(name)
-    if cfg:
-        return http_ok(url + cfg["health"], timeout=12)
-    return False
+    path = (cfg or {}).get("health") or "/"
+    if http_ok(url + path, timeout=timeout):
+        return True
+    return http_ok(url + "/", timeout=timeout)
 
 
 def _parse_tunnel_url_from_log(log_path: Path) -> str | None:
@@ -464,21 +462,20 @@ def start_tunnel(name: str, port: int) -> str | None:
     return None
 
 
-def ensure_tunnel(name: str) -> str | None:
+def ensure_tunnel(name: str, *, check_public: bool = True) -> str | None:
     port = _service_ports.get(name, SERVICES[name]["port"])
     if not health_ok(name, port):
         return read_tunnel_url(name)
-    # alive + public health
-    if tunnel_process_alive(name) and public_health(name):
-        return read_tunnel_url(name)
-    # process alive but no public? re-parse log
+    # process cloudflared vivant + URL connue → OK (check public optionnel)
     if tunnel_process_alive(name):
-        url = _parse_tunnel_url_from_log(tunnel_log_file(name))
+        url = read_tunnel_url(name) or _parse_tunnel_url_from_log(tunnel_log_file(name))
         if url:
             tunnel_url_file(name).write_text(url + "\n", encoding="utf-8")
-            if public_health(name):
+            if not check_public or public_health(name):
                 return url
-        _log(f"tunnel {name} process up mais URL morte → restart")
+            _log(f"tunnel {name} process up mais URL morte → restart")
+        else:
+            _log(f"tunnel {name} process up sans URL dans le log → restart")
     else:
         _log(f"tunnel {name} absent/mort → start")
     return start_tunnel(name, port)
@@ -725,17 +722,17 @@ def git_push_readme(message: str | None = None) -> None:
 
 def git_fetch_remote_readme() -> str | None:
     """Fetch et lit le README distant sans merger (pour consignes)."""
-    remotes = []
-    for r in ("github", "origin"):
-        remotes.append(r)
-    for remote in remotes:
-        f = _run_git(["fetch", remote, "--quiet"], timeout=90)
+    for remote in ("github", "origin"):
+        try:
+            f = _run_git(["fetch", remote, "--quiet"], timeout=45)
+        except subprocess.TimeoutExpired:
+            _log(f"git fetch {remote}: timeout")
+            continue
         if f.returncode != 0:
             _log(f"git fetch {remote}: {(f.stderr or '')[:200]}")
             continue
-        # try main then master
         for ref in (f"{remote}/main", f"{remote}/master", f"{remote}/HEAD"):
-            s = _run_git(["show", f"{ref}:{_git_readme_path()}"], timeout=30)
+            s = _run_git(["show", f"{ref}:{_git_readme_path()}"], timeout=15)
             if s.returncode == 0 and s.stdout:
                 return s.stdout
     return None
@@ -853,7 +850,20 @@ def process_remote_consignes() -> list[str]:
 # ── cycle principal ──────────────────────────────────────────────────────────
 
 
+_cycle_n = 0
+
+
 def cycle() -> None:
+    global _cycle_n
+    _cycle_n += 1
+    # check HTTP public every 5th cycle (plus rapide sinon)
+    check_public = (_cycle_n % 5 == 1)
+    _log(
+        f"cycle #{_cycle_n} · "
+        f"dev={health_ok('dev')} admin={health_ok('admin')} user={health_ok('user')} · "
+        f"pub_check={check_public}"
+    )
+
     # 1) services
     for name in ("dev", "admin", "user"):
         try:
@@ -863,12 +873,12 @@ def cycle() -> None:
         except Exception as exc:
             _log(f"ensure_service {name}: {exc}")
 
-    # 2) tunnels (dev + admin obligatoires)
+    # 2) tunnels (dev + admin obligatoires, user aussi)
     for name in ("dev", "admin", "user"):
         try:
             if name == "user" and not health_ok(name):
                 continue
-            ensure_tunnel(name)
+            ensure_tunnel(name, check_public=check_public or SERVICES[name].get("public_required", False) and not read_tunnel_url(name))
         except Exception as exc:
             _log(f"ensure_tunnel {name}: {exc}")
 
@@ -878,12 +888,20 @@ def cycle() -> None:
         if changed:
             git_pull_rebase()
             git_push_readme()
+        else:
+            _log(
+                f"urls ok · dev={public_url_for('dev')} · admin={public_url_for('admin')}"
+            )
     except Exception as exc:
         _log(f"update_readme: {exc}")
 
     # 4) consignes distantes
     try:
-        process_remote_consignes()
+        n = process_remote_consignes()
+        if n:
+            _log(f"{len(n)} consigne(s) exécutée(s)")
+        else:
+            _log("aucune consigne distante")
     except Exception as exc:
         _log(f"consignes: {exc}")
 
