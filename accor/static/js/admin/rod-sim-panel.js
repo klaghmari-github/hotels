@@ -400,7 +400,7 @@ export class RodSimPanel {
 
   /**
    * Zone 2 — hôtels pilotes même catégorie de marque (années de modélisation).
-   * CA réel = avg mensuelle multi-années train ; TO réel = hotel_to_annuel.
+   * CA réel = avg mensuelle multi-années train ; TO / clients = fiche hôtel.
    */
   renderPilots() {
     const sumHost = $("#rod-pilots-summary");
@@ -428,6 +428,7 @@ export class RodSimPanel {
       <div class="metric-box"><span class="m-label">Catégorie</span><span class="m-value">${escapeHtml(r.category || this.trace.category || "—")}</span></div>
       <div class="metric-box"><span class="m-label">n pilotes</span><span class="m-value">${pilots.length || r.n_hotels || 0}</span></div>
       <div class="metric-box good"><span class="m-label">CA réel moyen / mois</span><span class="m-value">${euro(r.ca_monthly_ref)}</span></div>
+      <div class="metric-box"><span class="m-label">Clients / mois (moy.)</span><span class="m-value">${fmt(r.clients_mois_ref, 1)}</span></div>
       <div class="metric-box"><span class="m-label">TO réel moyen</span><span class="m-value">${r.taux_occupation_ref != null ? fmt(Number(r.taux_occupation_ref) * 100, 1) + " %" : "—"}</span></div>
     `;
 
@@ -447,6 +448,7 @@ export class RodSimPanel {
             <th>Hôtel</th>
             <th>Années</th>
             <th>CA réel / mois</th>
+            <th>Clients / mois</th>
             <th>TO réel</th>
           </tr>
         </thead>
@@ -467,6 +469,7 @@ export class RodSimPanel {
                 <td>${escapeHtml(p.hotel_name || "—")}</td>
                 <td>${escapeHtml(years || "—")}</td>
                 <td>${euro(ca)}</td>
+                <td>${fmt(p.clients_mois, 1)}</td>
                 <td>${to}</td>
               </tr>`;
             })
@@ -619,7 +622,6 @@ export class RodSimPanel {
   renderTrace() {
     if (!this.trace) return;
     this.renderPilots();
-    this.renderCategoryRef();
     this.renderRecoBanner();
     this.renderConceptKpi();
     this.renderSalesSteps(
@@ -651,22 +653,6 @@ export class RodSimPanel {
       <div class="metric-box"><span class="m-label">Marge produit</span><span class="m-value">${euro(margin.marge_produit_mensuelle)}</span></div>
       <div class="metric-box good"><span class="m-label">Marge nette</span><span class="m-value">${euro(margin.marge_nette_mensuelle)}</span></div>
       <div class="metric-box"><span class="m-label">Coût / mois</span><span class="m-value">${euro(margin.cout_mensuel)}</span></div>
-    `;
-  }
-
-  renderCategoryRef() {
-    const host = $("#rod-category-ref");
-    if (!host || !this.trace) return;
-    const r = this.trace.category_reference || {};
-    const train = (this.trace.train_years || r.train_years || []).join(", ");
-    host.className = "metrics-grid";
-    host.innerHTML = `
-      <div class="metric-box"><span class="m-label">Catégorie</span><span class="m-value">${escapeHtml(r.category || "—")}</span></div>
-      <div class="metric-box"><span class="m-label">Années train</span><span class="m-value">${escapeHtml(train || "—")}</span></div>
-      <div class="metric-box"><span class="m-label">n hôtels ref</span><span class="m-value">${r.n_hotels ?? "—"}</span></div>
-      <div class="metric-box good"><span class="m-label">CA mensuel ref</span><span class="m-value">${euro(r.ca_monthly_ref)}</span></div>
-      <div class="metric-box"><span class="m-label">Clients/mois ref</span><span class="m-value">${fmt(r.clients_mois_ref, 1)}</span></div>
-      <div class="metric-box"><span class="m-label">Année éval</span><span class="m-value">${this.trace.eval_year ?? "—"}</span></div>
     `;
   }
 

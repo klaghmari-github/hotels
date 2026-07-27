@@ -227,6 +227,7 @@ def build_category_reference(
         n = 0
         to = None
         g = None
+        clients_mois = None
         if row is not None:
             name = str(row.get("hotel_name") or "")
             brand = str(row.get("hotel_brand") or "")
@@ -234,11 +235,12 @@ def build_category_reference(
             n = _as_int(row.get("hotel_nb_chambres"), 0)
             to = _as_rate(row.get("hotel_to_annuel"), BRAND_TO_DEFAULT.get(bk, 0.70))
             g = BRAND_GUESTS_DEFAULT.get(bk, 1.7)
-            if n > 0:
+            if n > 0 and to is not None and g is not None:
+                clients_mois = float(n) * float(to) * float(g) * JOURS_MOIS
                 rooms_list.append(float(n))
                 to_list.append(float(to))
                 guests_list.append(float(g))
-                clients_list.append(float(n) * float(to) * float(g) * JOURS_MOIS)
+                clients_list.append(clients_mois)
 
         # nom depuis ventes train si fiche absente
         if not name and not sales.empty and "nom_hotel" in sales.columns:
@@ -256,6 +258,7 @@ def build_category_reference(
                 "hotel_brand": brand,
                 "nb_chambres": n or None,
                 "taux_occupation": _round(to, 4) if to is not None else None,
+                "clients_mois": _round(clients_mois, 1) if clients_mois is not None else None,
                 "ca_monthly_ref": _round(float(href["reference_monthly"]), 2),
                 "train_years": sorted(int(y) for y in (href.get("by_year") or {}).keys()),
             }
