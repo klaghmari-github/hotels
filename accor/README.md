@@ -1,4 +1,7 @@
-run_dev url : http://192.168.1.80:5500
+run_dev url : https://thru-handhelds-east-instructors.trycloudflare.com
+run_admin url : https://est-peer-logical-recorded.trycloudflare.com
+run_user url : https://adipex-longer-fusion-guidance.trycloudflare.com
+watchdog status : UP · interval=60s · ports dev=5500 admin=5055 user=5056
 
 # Accor ROD
 
@@ -105,9 +108,19 @@ python scripts/dev_watchdog.py
 # nohup python scripts/dev_watchdog.py >> /tmp/accor-dev-watchdog.log 2>&1 &
 ```
 
-La ligne **`run_dev url : …`** en tête de ce README est maintenue par le
-watchdog (IP LAN + port, défaut **5500**).  
-Désactiver le push : `ACCOR_DEV_NO_PUSH=1`.
+Les lignes en tête de ce README (`run_dev url`, `run_admin url`,
+`run_user url`, `watchdog status`) sont maintenues par le **watchdog permanent**
+(`scripts/dev_watchdog.py`) : services UP, tunnels Cloudflare, push git des
+URL publiques, lecture des consignes `watchdog>` (inbox locale **et** README
+distant, toutes les 60 s).
+
+```bash
+# Démarrage permanent (ne pas arrêter sauf demande explicite)
+nohup python scripts/dev_watchdog.py >> /tmp/accor-dev-watchdog.log 2>&1 &
+```
+
+Désactiver le push : `ACCOR_DEV_NO_PUSH=1`.  
+Arrêt volontaire uniquement : consignes `watchdog> STOP_WATCHDOG_NOW` ou kill du process.
 
 
 Au démarrage, la console affiche les URL **local** et **réseau** (IP LAN).
@@ -792,3 +805,16 @@ des contrats HTTP est dans `docs/API_*.md`.
 
 Propriétaire (voir `pyproject.toml`). Usage interne projet ROD.
 )
+
+## Watchdog inbox
+
+<!-- Une consigne par ligne. Le watchdog distant (git) les lit chaque minute. -->
+<!-- Exemples : -->
+<!-- watchdog> status -->
+<!-- watchdog> restart admin -->
+<!-- watchdog> reexpose all -->
+<!-- watchdog> note: message pour l'agent -->
+
+## Watchdog outbox
+
+_(vide)_
