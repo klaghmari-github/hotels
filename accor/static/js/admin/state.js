@@ -20,10 +20,17 @@ export class AdminState {
     this.dirty = new Map();
     /** @type {Set<number>} */
     this.selected = new Set();
-    /** @type {"table"|"rod-sim"|"model-build"|"model-explore"|"model-eval"} */
+    /** @type {string} */
     this.panel = "table";
     this.modelConfig = null;
     this.explore = {
+      models: [],
+      overview: null,
+      treeMetrics: null,
+      impScope: "global",
+      currentId: null,
+    };
+    this.finalExplore = {
       models: [],
       overview: null,
       treeMetrics: null,

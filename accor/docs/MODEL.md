@@ -1,6 +1,14 @@
 # Modèles ML
 
-Code : `model_data.py`, `model_train.py`, `model_explore.py`, `model_eval.py`.
+Code : `model_data.py`, `model_train.py`, `model_final.py`, `model_explore.py`,
+`model_eval.py`.
+
+Deux étages dans l’admin :
+
+| Zone UI | Rôle | Stockage |
+|---------|------|----------|
+| **Modèles intermédiaires** | Multi-output XGB (toutes cibles) | `models/design/` |
+| **Modèle final** | Stacking enrichi → `montant_ventes` | `models/final/design/` |
 
 ---
 
@@ -19,7 +27,7 @@ counts/flags. Voir `impute_model` + `brand_category`.
 
 ---
 
-## Entraînement
+## Étape 1 — Modèles intermédiaires
 
 `model_train` :
 
@@ -29,19 +37,30 @@ counts/flags. Voir `impute_model` + `brand_category`.
 4. Métriques train + eval (par cible + agrégat)  
 5. Sauve `models/design/<slug>/model.pkl` + `config.json`  
 
-UI batch :
+UI : **Modèles intermédiaires → Build / Explore**.
 
-- job manuel (params saisis)  
-- + grille (produit cartésien dédupliqué)  
-- progression : `BuildProgress` / `GET /api/model/build/progress`  
+Ranking : R² / RMSE / MAE sur la **cible principale** `montant_ventes`.
 
-Ranking des modèles : souvent R² (ou RMSE/MAE) sur la **cible principale**
-`montant_ventes`.
+---
+
+## Étape 2 — Modèle final (stacking enrichi)
+
+`model_final` :
+
+1. Charger un intermédiaire multi-output (top ou choisi)  
+2. Prédire **toutes** les cibles sur model_data → colonnes `pred_<cible>`  
+3. Features finales = **descriptives d’origine + toutes les pred_***  
+   (pas un meta-model sur preds seules)  
+4. Fit un XGB **mono-cible** sur `montant_ventes`  
+5. Sauve `models/final/design/<slug>/`  
+
+UI : **Modèle final → Build / Explore**.  
+API : `/api/model/final/*`.
 
 ### Deploy
 
-`deploy_model(id)` → copie vers `models/deploy/` (un seul modèle déployé
-à la fois).
+- Intermédiaire : `deploy_model` → `models/deploy/`  
+- Final : `deploy_final_model` → `models/final/deploy/`
 
 ---
 

@@ -24,6 +24,7 @@ Imports : `from accor.store import get_frame`, `from accor.user.app import app`,
 | `model_explore.py` | arbres, importance (structure modèle) |
 | `model_eval.py` | **éval ML** année incomplete (somme/12) |
 | `rod_admin.py` | **Simulateur ROD admin** : ref catégorie train, simu corner, éval temporelle 2026 |
+| `model_final.py` | **Modèle final** : stacking descriptives + pred_* → montant_ventes |
 | `concept_pilote.py` | indicateurs annuels hôtel × année |
 | `geo_common.py` | hotels/sales/années/mois pour rebuilds geo |
 | `geo_weather.py` | Meteostat → hotel_weather_data |

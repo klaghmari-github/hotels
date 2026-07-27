@@ -758,6 +758,150 @@ def api_model_importance(model_id: str):
 
 
 # ---------------------------------------------------------------------------
+# API — modèle FINAL (stacking enrichi : descriptives + pred_*)
+# ---------------------------------------------------------------------------
+
+@app.get("/api/model/final/config")
+def api_final_config():
+    """Config build final + liste des intermédiaires disponibles."""
+    try:
+        from accor.model_final import get_final_config_payload
+
+        return jsonify(get_final_config_payload())
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
+@app.get("/api/model/final/list")
+def api_final_list():
+    try:
+        from accor.model_final import (
+            get_final_last_trained,
+            get_final_top_model,
+            list_final_models,
+        )
+
+        return jsonify(
+            {
+                "models": list_final_models(),
+                "last_trained": get_final_last_trained(),
+                "top_model": get_final_top_model(),
+                "tier": "final",
+            }
+        )
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
+@app.post("/api/model/final/build")
+def api_final_build():
+    """
+    Build modèle final : preds intermédiaires + descriptives → XGB montant_ventes.
+
+    Body : intermediate_model_id, model_name, xgb_params, grid_search, main_target.
+    """
+    body = request.get_json(force=True, silent=True) or {}
+    try:
+        from accor.model_final import start_final_build
+        from accor.model_train import count_grid_jobs
+
+        grid = body.get("grid_search") or body.get("grid") or {}
+        if isinstance(grid, dict):
+            grid_norm = {
+                k: (v if isinstance(v, list) else [v])
+                for k, v in grid.items()
+                if v is not None and v != ""
+            }
+        else:
+            grid_norm = {}
+        result = start_final_build(
+            intermediate_model_id=body.get("intermediate_model_id"),
+            model_name=body.get("model_name") or "xgb_final",
+            xgb_params=body.get("xgb_params"),
+            main_target=body.get("main_target"),
+            grid_search=grid_norm or None,
+        )
+        result["counts"] = count_grid_jobs(body.get("xgb_params"), grid_norm or None)
+        return jsonify(result)
+    except FileNotFoundError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 404
+    except Exception as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+
+@app.get("/api/model/final/build/progress")
+def api_final_build_progress():
+    try:
+        from accor.model_final import get_final_build_progress
+
+        return jsonify(get_final_build_progress())
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 500
+
+
+@app.post("/api/model/final/deploy")
+def api_final_deploy():
+    body = request.get_json(force=True, silent=True) or {}
+    try:
+        from accor.model_final import deploy_final_model
+
+        return jsonify(deploy_final_model(body.get("model_name") or body.get("id")))
+    except FileNotFoundError as exc:
+        return jsonify({"error": str(exc)}), 404
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
+@app.get("/api/model/final/<model_id>/explore")
+def api_final_explore(model_id: str):
+    try:
+        from accor.model_explore import explore_overview
+
+        return jsonify(explore_overview(model_id, tier="final"))
+    except FileNotFoundError as exc:
+        return jsonify({"error": str(exc)}), 404
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
+@app.get("/api/model/final/<model_id>/trees")
+def api_final_trees(model_id: str):
+    try:
+        from accor.model_explore import trees_table
+
+        return jsonify(trees_table(model_id, tier="final"))
+    except FileNotFoundError as exc:
+        return jsonify({"error": str(exc)}), 404
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
+@app.get("/api/model/final/<model_id>/tree")
+def api_final_tree(model_id: str):
+    try:
+        from accor.model_explore import get_tree
+
+        tree = int(request.args.get("tree", 0))
+        return jsonify(get_tree(model_id, tree_index=tree, tier="final"))
+    except FileNotFoundError as exc:
+        return jsonify({"error": str(exc)}), 404
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
+@app.get("/api/model/final/<model_id>/importance")
+def api_final_importance(model_id: str):
+    try:
+        from accor.model_explore import feature_importance_payload
+
+        return jsonify(feature_importance_payload(model_id, tier="final"))
+    except FileNotFoundError as exc:
+        return jsonify({"error": str(exc)}), 404
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
+# ---------------------------------------------------------------------------
 # API — Simulateur ROD (admin : trace pilotes)
 # ---------------------------------------------------------------------------
 

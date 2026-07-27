@@ -39,6 +39,15 @@ from accor.model_train import (
     _load_model_frame,
 )
 
+
+def _load_model_bundle(model_id: str, *, tier: str = "intermediate") -> dict[str, Any]:
+    """Charge un modèle intermédiaire (design/) ou final (final/design/)."""
+    if tier == "final":
+        from accor.model_final import load_final_model
+
+        return load_final_model(model_id)
+    return load_design_model(model_id)
+
 _SPLIT_RE = re.compile(
     r"^(\d+):\[(f\d+|[^<\]]+)<([^\]]+)\]\s+yes=(\d+),no=(\d+),missing=(\d+)"
     r"(?:,gain=([^,]+))?(?:,cover=([^,\s]+))?"
@@ -159,8 +168,8 @@ def _estimator_for_main(bundle: dict[str, Any], meta: dict[str, Any]) -> tuple[A
     return estimators[idx], idx, main
 
 
-def explore_overview(model_id: str) -> dict[str, Any]:
-    loaded = load_design_model(model_id)
+def explore_overview(model_id: str, *, tier: str = "intermediate") -> dict[str, Any]:
+    loaded = _load_model_bundle(model_id, tier=tier)
     bundle = loaded["bundle"]
     meta = loaded["meta"]
     feature_cols = list(bundle.get("feature_cols") or meta.get("feature_cols") or [])
@@ -185,17 +194,38 @@ def explore_overview(model_id: str) -> dict[str, Any]:
     metrics_eval = meta.get("metrics_eval") or meta.get("metrics_test") or {}
     main_metrics = (metrics_eval.get("per_target") or {}).get(main) or {}
 
-    models = list_design_models()
-    rank = next((m["rank"] for m in models if m.get("id") == model_id or m.get("name") == model_id), None)
+    if tier == "final":
+        from accor.model_final import (
+            get_final_last_trained,
+            get_final_top_model,
+            list_final_models,
+        )
+
+        models = list_final_models()
+        last = get_final_last_trained()
+        top = get_final_top_model()
+    else:
+        models = list_design_models()
+        last = get_last_trained()
+        top = get_top_model()
+    rank = next(
+        (m["rank"] for m in models if m.get("id") == model_id or m.get("name") == model_id),
+        None,
+    )
 
     return {
         "id": model_id,
         "name": meta.get("name") or model_id,
+        "tier": tier,
         "rank": rank,
         "created_at": meta.get("created_at"),
         "n_features": len(feature_cols),
         "n_targets": len(target_cols),
         "feature_cols": feature_cols,
+        "base_feature_cols": meta.get("base_feature_cols") or bundle.get("base_feature_cols"),
+        "pred_feature_cols": meta.get("pred_feature_cols") or bundle.get("pred_feature_cols"),
+        "intermediate_model_id": meta.get("intermediate_model_id")
+        or bundle.get("intermediate_model_id"),
         "target_cols": target_cols,
         "main_target": main,
         "main_target_index": t_idx,
@@ -208,14 +238,20 @@ def explore_overview(model_id: str) -> dict[str, Any]:
         "n_train": meta.get("n_train"),
         "n_eval": meta.get("n_eval"),
         "eval_year": meta.get("eval_year"),
-        "last_trained": get_last_trained(),
-        "top_model": get_top_model(),
+        "last_trained": last,
+        "top_model": top,
         "models": models,
     }
 
 
-def get_tree(model_id: str, *, target_index: int | None = None, tree_index: int = 0) -> dict[str, Any]:
-    loaded = load_design_model(model_id)
+def get_tree(
+    model_id: str,
+    *,
+    target_index: int | None = None,
+    tree_index: int = 0,
+    tier: str = "intermediate",
+) -> dict[str, Any]:
+    loaded = _load_model_bundle(model_id, tier=tier)
     bundle = loaded["bundle"]
     meta = loaded["meta"]
     feature_cols = list(bundle.get("feature_cols") or [])
@@ -247,7 +283,7 @@ def get_tree(model_id: str, *, target_index: int | None = None, tree_index: int 
     }
 
 
-def trees_table(model_id: str) -> dict[str, Any]:
+def trees_table(model_id: str, *, tier: str = "intermediate") -> dict[str, Any]:
     """
     Table des arbres pour la cible principale.
 
@@ -261,16 +297,33 @@ def trees_table(model_id: str) -> dict[str, Any]:
     from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
     from xgboost import DMatrix
 
-    loaded = load_design_model(model_id)
+    loaded = _load_model_bundle(model_id, tier=tier)
     bundle = loaded["bundle"]
     meta = loaded["meta"]
     feature_cols = list(bundle.get("feature_cols") or [])
     est, t_idx, main = _estimator_for_main(bundle, meta)
 
     frame, md_meta = _load_model_frame()
-    for c in feature_cols:
-        if c in frame.columns:
-            frame[c] = pd.to_numeric(frame[c], errors="coerce").fillna(0.0)
+    # Modèle final : reconstruire X = descriptives + pred_* via intermédiaire
+    if tier == "final":
+        from accor.model_final import build_stacked_features
+        from accor.model_train import load_design_model
+
+        mid = meta.get("intermediate_model_id") or bundle.get("intermediate_model_id")
+        if not mid:
+            return {
+                "model_id": model_id,
+                "main_target": main,
+                "trees": [],
+                "note": "intermediate_model_id manquant sur le modèle final",
+            }
+        inter = load_design_model(str(mid))["bundle"]
+        frame, feature_cols, _, _ = build_stacked_features(frame, md_meta, inter)
+    else:
+        for c in feature_cols:
+            if c in frame.columns:
+                frame[c] = pd.to_numeric(frame[c], errors="coerce").fillna(0.0)
+
     if main in frame.columns:
         y = pd.to_numeric(frame[main], errors="coerce").fillna(0.0).to_numpy(dtype=float)
     else:
@@ -288,6 +341,14 @@ def trees_table(model_id: str) -> dict[str, Any]:
     else:
         mask = pd.Series(True, index=frame.index)
 
+    missing = [c for c in feature_cols if c not in frame.columns]
+    if missing:
+        return {
+            "model_id": model_id,
+            "main_target": main,
+            "trees": [],
+            "note": f"Features manquantes : {missing[:5]}",
+        }
     X = frame.loc[mask, feature_cols].to_numpy(dtype=float)
     y_eval = y[mask.to_numpy()]
     if len(X) < 2:
@@ -354,10 +415,16 @@ def trees_table(model_id: str) -> dict[str, Any]:
     }
 
 
-def feature_importance_payload(model_id: str, *, target_index: int | None = None) -> dict[str, Any]:
-    ov = explore_overview(model_id)
+def feature_importance_payload(
+    model_id: str,
+    *,
+    target_index: int | None = None,
+    tier: str = "intermediate",
+) -> dict[str, Any]:
+    ov = explore_overview(model_id, tier=tier)
     return {
         "model_id": model_id,
+        "tier": tier,
         "scope": "main_target",
         "target_name": ov["main_target"],
         "importance": ov["global_feature_importance"],

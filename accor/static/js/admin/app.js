@@ -21,6 +21,8 @@ import { TableRenderer } from "./table-renderer.js";
 import { DatasetController } from "./dataset-controller.js";
 import { ModelBuildPanel } from "./model-build-panel.js";
 import { ModelExplorePanel } from "./model-explore-panel.js";
+import { FinalModelBuildPanel } from "./final-model-build-panel.js";
+import { FinalModelExplorePanel } from "./final-model-explore-panel.js";
 import { ModelEvalPanel } from "./model-eval-panel.js";
 import { RodSimPanel } from "./rod-sim-panel.js";
 
@@ -34,6 +36,8 @@ export class AdminApp {
       onRodSim: () => this.rodSim.open(),
       onModelBuild: () => this.modelBuild.open(),
       onModelExplore: () => this.modelExplore.open(),
+      onFinalBuild: () => this.finalBuild.open(),
+      onFinalExplore: () => this.finalExplore.open(),
       onModelEval: () => this.modelEval.open(),
     });
 
@@ -52,6 +56,8 @@ export class AdminApp {
     this.rodSim = new RodSimPanel(this.state, this.nav);
     this.modelBuild = new ModelBuildPanel(this.state, this.nav);
     this.modelExplore = new ModelExplorePanel(this.state, this.nav);
+    this.finalBuild = new FinalModelBuildPanel(this.state, this.nav);
+    this.finalExplore = new FinalModelExplorePanel(this.state, this.nav);
     this.modelEval = new ModelEvalPanel(this.state, this.nav);
   }
 
@@ -133,6 +139,8 @@ export class AdminApp {
     this.rodSim.wire();
     this.modelBuild.wire();
     this.modelExplore.wire();
+    this.finalBuild.wire();
+    this.finalExplore.wire();
     this.modelEval.wire();
   }
 

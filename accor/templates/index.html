@@ -68,21 +68,39 @@
             </span>
           </button>
 
-          <div class="nav-section-label">Modèle</div>
+          <div class="nav-section-label">Modèles intermédiaires</div>
           <button type="button" class="nav-item" id="nav-model-build" data-panel="model-build">
             <span class="nav-icon">⚡</span>
             <span>
-              <span class="nav-label">Model Build</span>
-              <span class="nav-desc">Configurer, entraîner, sauvegarder</span>
+              <span class="nav-label">Build</span>
+              <span class="nav-desc">Multi-cibles · model_data</span>
             </span>
           </button>
           <button type="button" class="nav-item" id="nav-model-explore" data-panel="model-explore">
             <span class="nav-icon">🌳</span>
             <span>
-              <span class="nav-label">Model Explore</span>
-              <span class="nav-desc">Arbres, importances</span>
+              <span class="nav-label">Explore</span>
+              <span class="nav-desc">Arbres · importances</span>
             </span>
           </button>
+
+          <div class="nav-section-label">Modèle final</div>
+          <button type="button" class="nav-item" id="nav-final-build" data-panel="final-build">
+            <span class="nav-icon">🏁</span>
+            <span>
+              <span class="nav-label">Build</span>
+              <span class="nav-desc">Stacking descriptives + pred_*</span>
+            </span>
+          </button>
+          <button type="button" class="nav-item" id="nav-final-explore" data-panel="final-explore">
+            <span class="nav-icon">🔍</span>
+            <span>
+              <span class="nav-label">Explore</span>
+              <span class="nav-desc">Super-modèle montant_ventes</span>
+            </span>
+          </button>
+
+          <div class="nav-section-label">Évaluation</div>
           <button type="button" class="nav-item" id="nav-model-eval" data-panel="model-eval">
             <span class="nav-icon">📊</span>
             <span>
@@ -173,14 +191,14 @@
         </footer>
       </div>
 
-      <!-- ===== Vue Model Build ===== -->
+      <!-- ===== Vue Model Build (intermédiaires multi-cibles) ===== -->
       <div id="view-model-build" class="view hidden">
         <header class="topbar">
           <div class="topbar-left">
-            <h1>Model Build</h1>
+            <h1>Modèles intermédiaires · Build</h1>
             <p class="subtitle">
-              XGBoost sur <strong>model_data</strong> — parametres manuels + grid search,
-              ranking sur la cible principale.
+              XGBoost multi-cibles sur <strong>model_data</strong> (manuel + grid).
+              Produit les pred_* pour le modèle final.
             </p>
           </div>
           <div class="topbar-actions">
@@ -281,13 +299,13 @@
         </div>
       </div>
 
-      <!-- ===== Vue Model Explore ===== -->
+      <!-- ===== Vue Model Explore (intermédiaires) ===== -->
       <div id="view-model-explore" class="view hidden">
         <header class="topbar">
           <div class="topbar-left">
-            <h1>Model Explore</h1>
+            <h1>Modèles intermédiaires · Explore</h1>
             <p class="subtitle">
-              Explorer les modèles de <code>models/design</code> — perf, importances, arbres.
+              <code>models/design</code> — multi-cibles, importances, arbres.
             </p>
           </div>
           <div class="topbar-actions">
@@ -345,6 +363,156 @@
               </label>
               <div id="explore-tree-meta" class="ci-meta" style="margin:0.5rem 0"></div>
               <div id="explore-tree-view" class="tree-view empty">Sélectionnez un arbre…</div>
+            </section>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Vue Modèle FINAL Build (stacking) ===== -->
+      <div id="view-final-build" class="view hidden">
+        <header class="topbar">
+          <div class="topbar-left">
+            <h1>Modèle final · Build</h1>
+            <p class="subtitle">
+              Stacking enrichi : features descriptives + <strong>pred_*</strong>
+              (toutes cibles du modèle intermédiaire) → XGB sur
+              <strong>montant_ventes</strong>.
+            </p>
+          </div>
+          <div class="topbar-actions">
+            <button type="button" class="btn btn-primary" id="btn-final-build">
+              Build final &amp; Save
+            </button>
+          </div>
+        </header>
+        <section class="meta-bar">
+          <span class="chip" id="final-chip-source">stacking</span>
+          <span class="chip chip-muted" id="final-chip-stats"></span>
+          <span class="chip chip-muted" id="final-chip-jobs">1 modele</span>
+          <span class="status" id="final-status"></span>
+        </section>
+        <div class="model-layout model-build-layout">
+          <div class="model-col">
+            <section class="card">
+              <h2 class="card-title">Intermédiaire source</h2>
+              <label class="field">
+                <span>Modèle intermédiaire (multi-cibles)</span>
+                <select id="final-intermediate-select"></select>
+              </label>
+              <p class="card-hint" id="final-pipeline-hint">
+                1) pred toutes cibles sur model_data · 2) X = descriptives + pred_* ·
+                3) fit XGB mono-cible montant_ventes
+              </p>
+            </section>
+            <section class="card">
+              <h2 class="card-title">Nom et ranking</h2>
+              <div class="form-grid form-grid-3">
+                <label class="field">
+                  <span>Nom de base</span>
+                  <input type="text" id="final-model-name" value="xgb_final" maxlength="60" />
+                </label>
+                <label class="field">
+                  <span>Cible finale</span>
+                  <select id="final-main-target"></select>
+                </label>
+                <label class="field">
+                  <span>Metrique</span>
+                  <select id="final-rank-metric">
+                    <option value="r2">R2</option>
+                    <option value="rmse">RMSE</option>
+                    <option value="mae">MAE</option>
+                  </select>
+                </label>
+              </div>
+            </section>
+            <section class="card">
+              <h2 class="card-title">Parametres manuels XGBoost</h2>
+              <div id="final-model-params" class="form-grid form-grid-3"></div>
+            </section>
+            <section class="card">
+              <h2 class="card-title">Grid search</h2>
+              <label class="field field-inline">
+                <input type="checkbox" id="final-grid-enabled" checked />
+                <span>Activer le grid search</span>
+              </label>
+              <div id="final-grid-params" class="form-grid form-grid-3"></div>
+              <p class="card-hint" id="final-grid-count">1 modele</p>
+            </section>
+          </div>
+          <div class="model-col">
+            <section class="card build-progress-card" id="final-build-progress-card">
+              <h2 class="card-title">Progression</h2>
+              <div class="build-progress" id="final-build-progress">
+                <div class="build-progress-head">
+                  <span class="build-progress-pct" id="final-build-progress-pct">0&nbsp;%</span>
+                  <span class="build-progress-phase" id="final-build-progress-phase">—</span>
+                </div>
+                <div class="build-progress-bar" id="final-build-progress-bar">
+                  <i id="final-build-progress-fill" style="width:0%"></i>
+                </div>
+                <div class="build-progress-meta">
+                  <span id="final-build-progress-text">En attente</span>
+                  <span id="final-build-progress-count">0 / 0</span>
+                </div>
+                <p class="card-hint" id="final-build-progress-detail"></p>
+              </div>
+            </section>
+            <section class="card card-wide">
+              <h2 class="card-title">Resultats</h2>
+              <div id="final-build-results" class="build-results empty">Aucun build final.</div>
+            </section>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Vue Modèle FINAL Explore ===== -->
+      <div id="view-final-explore" class="view hidden">
+        <header class="topbar">
+          <div class="topbar-left">
+            <h1>Modèle final · Explore</h1>
+            <p class="subtitle">
+              <code>models/final/design</code> — stacking, importances (dont pred_*), arbres.
+            </p>
+          </div>
+          <div class="topbar-actions">
+            <button type="button" class="btn btn-ghost" id="btn-final-explore-refresh">Recharger</button>
+            <button type="button" class="btn btn-primary" id="btn-final-explore-deploy">Deploy final</button>
+          </div>
+        </header>
+        <section class="meta-bar explore-banner">
+          <span class="chip" id="final-explore-chip-last">Dernier : —</span>
+          <span class="chip chip-accent" id="final-explore-chip-top">Top final : —</span>
+          <span class="chip chip-muted" id="final-explore-chip-stats"></span>
+          <span class="status" id="final-explore-status"></span>
+        </section>
+        <div class="model-layout explore-layout">
+          <div class="model-col">
+            <section class="card">
+              <h2 class="card-title">Modèle final</h2>
+              <label class="field">
+                <span>Sélection</span>
+                <select id="final-explore-model-select"></select>
+              </label>
+              <div class="explore-global-metrics" id="final-explore-global-metrics"></div>
+            </section>
+            <section class="card">
+              <h2 class="card-title">Feature importance</h2>
+              <div id="final-explore-importance" class="imp-bars empty">—</div>
+            </section>
+          </div>
+          <div class="model-col">
+            <section class="card card-wide">
+              <h2 class="card-title">Arbres</h2>
+              <div id="final-explore-trees-table" class="perf-table-wrap"></div>
+            </section>
+            <section class="card card-wide">
+              <h2 class="card-title">Visualiser un arbre</h2>
+              <label class="field">
+                <span>Arbre # <span id="final-explore-tree-label">0</span></span>
+                <input type="range" id="final-explore-tree-slider" min="0" max="0" value="0" step="1" />
+              </label>
+              <div id="final-explore-tree-meta" class="ci-meta" style="margin:0.5rem 0"></div>
+              <div id="final-explore-tree-view" class="tree-view empty">—</div>
             </section>
           </div>
         </div>

@@ -3,7 +3,9 @@
  *
  * - Datasets (All / Pilotes)
  * - Simulateur ROD
- * - Modèle (Build / Explore / Éval ML)
+ * - Modèles intermédiaires (Build / Explore)
+ * - Modèle final (Build / Explore)
+ * - Éval ML
  */
 
 import { $, $$, escapeHtml } from "../../shared/js/dom.js";
@@ -23,10 +25,14 @@ export class NavController {
     this.viewRodSim = $("#view-rod-sim");
     this.viewModelBuild = $("#view-model-build");
     this.viewModelExplore = $("#view-model-explore");
+    this.viewFinalBuild = $("#view-final-build");
+    this.viewFinalExplore = $("#view-final-explore");
     this.viewModelEval = $("#view-model-eval");
     this.navRodSim = $("#nav-rod-sim");
     this.navModelBuild = $("#nav-model-build");
     this.navModelExplore = $("#nav-model-explore");
+    this.navFinalBuild = $("#nav-final-build");
+    this.navFinalExplore = $("#nav-final-explore");
     this.navModelEval = $("#nav-model-eval");
   }
 
@@ -67,22 +73,29 @@ export class NavController {
   }
 
   setModelNavActive(which) {
-    if (this.navRodSim)
-      this.navRodSim.classList.toggle("active", which === "rod");
-    if (this.navModelBuild)
-      this.navModelBuild.classList.toggle("active", which === "build");
-    if (this.navModelExplore)
-      this.navModelExplore.classList.toggle("active", which === "explore");
-    if (this.navModelEval)
-      this.navModelEval.classList.toggle("active", which === "eval");
+    const map = {
+      rod: this.navRodSim,
+      build: this.navModelBuild,
+      explore: this.navModelExplore,
+      "final-build": this.navFinalBuild,
+      "final-explore": this.navFinalExplore,
+      eval: this.navModelEval,
+    };
+    Object.entries(map).forEach(([key, el]) => {
+      if (el) el.classList.toggle("active", which === key);
+    });
   }
 
   hideAllViews() {
-    if (this.viewTable) this.viewTable.classList.add("hidden");
-    if (this.viewRodSim) this.viewRodSim.classList.add("hidden");
-    if (this.viewModelBuild) this.viewModelBuild.classList.add("hidden");
-    if (this.viewModelExplore) this.viewModelExplore.classList.add("hidden");
-    if (this.viewModelEval) this.viewModelEval.classList.add("hidden");
+    [
+      this.viewTable,
+      this.viewRodSim,
+      this.viewModelBuild,
+      this.viewModelExplore,
+      this.viewFinalBuild,
+      this.viewFinalExplore,
+      this.viewModelEval,
+    ].forEach((v) => v && v.classList.add("hidden"));
   }
 
   clearDatasetNavActive() {
@@ -122,6 +135,22 @@ export class NavController {
     this.setModelNavActive("explore");
   }
 
+  showFinalBuildPanel() {
+    this.state.panel = "final-build";
+    this.hideAllViews();
+    if (this.viewFinalBuild) this.viewFinalBuild.classList.remove("hidden");
+    this.clearDatasetNavActive();
+    this.setModelNavActive("final-build");
+  }
+
+  showFinalExplorePanel() {
+    this.state.panel = "final-explore";
+    this.hideAllViews();
+    if (this.viewFinalExplore) this.viewFinalExplore.classList.remove("hidden");
+    this.clearDatasetNavActive();
+    this.setModelNavActive("final-explore");
+  }
+
   showModelEvalPanel() {
     this.state.panel = "model-eval";
     this.hideAllViews();
@@ -137,6 +166,10 @@ export class NavController {
       this.navModelBuild.addEventListener("click", this.handlers.onModelBuild);
     if (this.navModelExplore)
       this.navModelExplore.addEventListener("click", this.handlers.onModelExplore);
+    if (this.navFinalBuild)
+      this.navFinalBuild.addEventListener("click", this.handlers.onFinalBuild);
+    if (this.navFinalExplore)
+      this.navFinalExplore.addEventListener("click", this.handlers.onFinalExplore);
     if (this.navModelEval)
       this.navModelEval.addEventListener("click", this.handlers.onModelEval);
   }
