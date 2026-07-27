@@ -35,7 +35,7 @@ export class AdminApp {
     this.nav = new NavController(this.state, {
       onSelectDataset: (id) => this.datasets.selectDataset(id),
       onRodSim: () => this.rodSim.open(),
-      onRodExcel: () => this.rodExcel.open(),
+      onRodExcel: (concept) => this.rodExcel.open(concept),
       onModelBuild: () => this.modelBuild.open(),
       onModelExplore: () => this.modelExplore.open(),
       onModelEval: () => this.modelEval.open(),

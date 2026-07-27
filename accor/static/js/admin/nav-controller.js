@@ -31,7 +31,9 @@ export class NavController {
     this.viewFinalEval = $("#view-final-eval");
     this.viewModelEval = $("#view-model-eval");
     this.navRodSim = $("#nav-rod-sim");
-    this.navRodExcel = $("#nav-rod-excel");
+    this.navRodExcelSimply = $("#nav-rod-excel-simply");
+    this.navRodExcelLiberty = $("#nav-rod-excel-liberty");
+    this.navRodExcelConnected = $("#nav-rod-excel-connected");
     this.navModelBuild = $("#nav-model-build");
     this.navModelExplore = $("#nav-model-explore");
     this.navFinalBuild = $("#nav-final-build");
@@ -79,7 +81,9 @@ export class NavController {
   _navButtonMap() {
     return {
       rod: this.navRodSim,
-      excel: this.navRodExcel,
+      "excel-simply": this.navRodExcelSimply,
+      "excel-liberty": this.navRodExcelLiberty,
+      "excel-connected": this.navRodExcelConnected,
       build: this.navModelBuild,
       explore: this.navModelExplore,
       eval: this.navModelEval,
@@ -161,12 +165,19 @@ export class NavController {
     this.setModelNavActive("rod");
   }
 
-  showRodExcelPanel() {
-    this.state.panel = "rod-excel";
+  showRodExcelPanel(concept = "SIMPLY") {
+    const c = String(concept || "SIMPLY").toUpperCase();
+    const key =
+      c === "LIBERTY"
+        ? "excel-liberty"
+        : c === "CONNECTED"
+          ? "excel-connected"
+          : "excel-simply";
+    this.state.panel = `rod-excel-${c.toLowerCase()}`;
     this.hideAllViews();
     if (this.viewRodExcel) this.viewRodExcel.classList.remove("hidden");
     this.clearDatasetNavActive();
-    this.setModelNavActive("excel");
+    this.setModelNavActive(key);
   }
 
   showModelBuildPanel() {
@@ -220,8 +231,18 @@ export class NavController {
   wire() {
     if (this.navRodSim)
       this.navRodSim.addEventListener("click", this.handlers.onRodSim);
-    if (this.navRodExcel)
-      this.navRodExcel.addEventListener("click", this.handlers.onRodExcel);
+    if (this.navRodExcelSimply)
+      this.navRodExcelSimply.addEventListener("click", () =>
+        this.handlers.onRodExcel?.("SIMPLY")
+      );
+    if (this.navRodExcelLiberty)
+      this.navRodExcelLiberty.addEventListener("click", () =>
+        this.handlers.onRodExcel?.("LIBERTY")
+      );
+    if (this.navRodExcelConnected)
+      this.navRodExcelConnected.addEventListener("click", () =>
+        this.handlers.onRodExcel?.("CONNECTED")
+      );
     if (this.navModelBuild)
       this.navModelBuild.addEventListener("click", this.handlers.onModelBuild);
     if (this.navModelExplore)

@@ -67,11 +67,26 @@
               <span class="nav-desc">Ventes · marge · écart 2026</span>
             </span>
           </button>
-          <button type="button" class="nav-item" id="nav-rod-excel" data-panel="rod-excel">
-            <span class="nav-icon">📑</span>
+          <div class="nav-section-label">Simulateurs Excel</div>
+          <button type="button" class="nav-item" id="nav-rod-excel-simply" data-panel="rod-excel-simply" data-rx-concept="SIMPLY">
+            <span class="nav-icon">🟦</span>
             <span>
-              <span class="nav-label">Simulateur Excel</span>
-              <span class="nav-desc">SIMPLY · LIBERTY · CONNECTED</span>
+              <span class="nav-label">Simulateur Simply</span>
+              <span class="nav-desc">Excel · dual-colonne Simply</span>
+            </span>
+          </button>
+          <button type="button" class="nav-item" id="nav-rod-excel-liberty" data-panel="rod-excel-liberty" data-rx-concept="LIBERTY">
+            <span class="nav-icon">🟩</span>
+            <span>
+              <span class="nav-label">Simulateur Liberty</span>
+              <span class="nav-desc">Excel · dual-colonne Liberty</span>
+            </span>
+          </button>
+          <button type="button" class="nav-item" id="nav-rod-excel-connected" data-panel="rod-excel-connected" data-rx-concept="CONNECTED">
+            <span class="nav-icon">🟧</span>
+            <span>
+              <span class="nav-label">Simulateur Connected</span>
+              <span class="nav-desc">Excel · dual-colonne Connected</span>
             </span>
           </button>
 
@@ -686,17 +701,22 @@
         </div>
       </div>
 
-      <!-- ===== Vue Simulateur Excel (3 solutions) ===== -->
+      <!-- ===== Vue Simulateur Excel (3 solutions via sidebar) ===== -->
       <div id="view-rod-excel" class="view view-rod-excel hidden">
+        <!-- Barre compacte : ne doit PAS manger toute la hauteur -->
         <div class="rod-excel-sticky">
-          <header class="topbar">
+          <header class="topbar rx-topbar">
             <div class="topbar-left">
-              <h1>Simulateur Excel</h1>
+              <h1 id="rx-page-title">Simulateur Simply</h1>
               <p class="subtitle">
-                Layout Excel · 2 colonnes (moyenne pilotes solution | projection hôtel désigné)
+                Colonne gauche = moyenne pilotes · Colonne droite = hôtel désigné · comme l’Excel
               </p>
             </div>
-            <div class="topbar-actions">
+            <div class="topbar-actions rx-top-actions">
+              <div class="rx-concept-pill" id="rx-concept-pill" aria-live="polite">
+                <span class="rx-concept-pill-label">Solution</span>
+                <strong id="rx-concept-name">SIMPLY</strong>
+              </div>
               <label class="field field-inline" style="margin:0">
                 <span class="muted small">Hôtel désigné</span>
                 <select id="rx-hotel-select" style="min-width:16rem"></select>
@@ -724,52 +744,53 @@
             </div>
           </section>
 
-          <div class="rx-controls card">
-            <div class="form-grid form-grid-3">
+          <!-- Params compacts (1 ligne) -->
+          <div class="rx-controls card rx-controls-compact">
+            <div class="rx-params-row">
               <label class="field">
                 <span>M. lin.</span>
                 <div class="rod-m-lin-row">
                   <input type="range" id="rx-m-lin-slider" min="1" max="40" step="0.5" value="6" />
-                  <input type="number" id="rx-m-lin" min="1" max="40" step="0.5" value="6" style="width:4.5rem" />
+                  <input type="number" id="rx-m-lin" min="1" max="40" step="0.5" value="6" style="width:4rem" />
                 </div>
               </label>
               <label class="field">
-                <span>Mix F&amp;B (%)</span>
+                <span>Mix F&amp;B %</span>
                 <div class="rod-m-lin-row">
                   <input type="range" id="rx-mix-slider" min="0" max="100" step="1" value="70" />
-                  <input type="number" id="rx-mix-fb" min="0" max="100" step="1" value="70" style="width:4.5rem" />
+                  <input type="number" id="rx-mix-fb" min="0" max="100" step="1" value="70" style="width:4rem" />
                 </div>
                 <span class="muted small" id="rx-mix-nf-label">N-F&amp;B = 30 %</span>
               </label>
-              <div class="form-grid form-grid-3" style="grid-column:1/-1">
-                <label class="field"><span># Chambres</span><input type="number" id="rx-nb-chambres" min="1" step="1" /></label>
-                <label class="field"><span>TO (%)</span><input type="number" id="rx-to" min="1" max="100" step="0.1" /></label>
-                <label class="field"><span>Guests / ch</span><input type="number" id="rx-guests" min="0.5" max="5" step="0.1" /></label>
-              </div>
+              <label class="field"><span># Chambres</span><input type="number" id="rx-nb-chambres" min="1" step="1" /></label>
+              <label class="field"><span>TO %</span><input type="number" id="rx-to" min="1" max="100" step="0.1" /></label>
+              <label class="field"><span>Guests/ch</span><input type="number" id="rx-guests" min="0.5" max="5" step="0.1" /></label>
             </div>
-            <div class="rx-needs-wrap">
-              <div class="rod-needs-actions">
-                <button type="button" class="btn btn-ghost btn-sm" id="rx-needs-all-on">Tout autoriser</button>
-                <button type="button" class="btn btn-ghost btn-sm" id="rx-needs-all-off">Tout interdire</button>
+            <!-- Sous-catégories REPLIÉES par défaut (sinon masquent la feuille) -->
+            <details class="rx-needs-details">
+              <summary>Sous-catégories F&amp;B / N-F&amp;B (règle 3) — cliquer pour ouvrir</summary>
+              <div class="rx-needs-wrap">
+                <div class="rod-needs-actions">
+                  <button type="button" class="btn btn-ghost btn-sm" id="rx-needs-all-on">Tout autoriser</button>
+                  <button type="button" class="btn btn-ghost btn-sm" id="rx-needs-all-off">Tout interdire</button>
+                </div>
+                <h3 class="rod-needs-title">F&amp;B</h3>
+                <div id="rx-needs-fb" class="rod-needs-list"></div>
+                <h3 class="rod-needs-title">N-F&amp;B</h3>
+                <div id="rx-needs-nfb" class="rod-needs-list"></div>
               </div>
-              <h3 class="rod-needs-title">Sous-catégories F&amp;B</h3>
-              <div id="rx-needs-fb" class="rod-needs-list"></div>
-              <h3 class="rod-needs-title">Sous-catégories N-F&amp;B</h3>
-              <div id="rx-needs-nfb" class="rod-needs-list"></div>
-            </div>
-          </div>
-
-          <div class="rod-tabs rx-concept-tabs" id="rx-concept-tabs" role="tablist">
-            <button type="button" class="rod-tab active" data-rx-concept="SIMPLY" role="tab">SIMPLY</button>
-            <button type="button" class="rod-tab" data-rx-concept="LIBERTY" role="tab">LIBERTY</button>
-            <button type="button" class="rod-tab" data-rx-concept="CONNECTED" role="tab">CONNECTED</button>
+            </details>
           </div>
           <div id="rx-kpi-bar" class="rx-kpi-bar"></div>
         </div>
 
+        <!-- FEUILLE EXCEL : zone principale (toujours visible / scrollable) -->
         <div class="rod-excel-scroll" id="rx-scroll-body">
           <div id="rx-panels" class="rx-panels">
-            <!-- panels filled by JS for SIMPLY / LIBERTY / CONNECTED -->
+            <div class="xl-placeholder" id="rx-placeholder">
+              <p><strong>Chargement du simulateur…</strong></p>
+              <p class="muted">La feuille Excel (pilotes | hôtel désigné · règles 1→4 · coûts · marge) s’affiche ici.</p>
+            </div>
           </div>
         </div>
       </div>

@@ -22,6 +22,22 @@ de marque** + écart temporel 2026). Les deux coexistent dans la sidebar admin.
 Runtime : `src/accor/rod_excel_sim.py` + moteur commun
 `user/rules/{revenue,costs,recommendation,coeffs}.py`.
 
+### Colonne pilote éditable (cascade)
+
+Les 3 simulateurs Excel (Simply / Liberty / Connected) exposent la **colonne
+gauche** (moyenne pilotes) en **saisie** :
+
+| Champ | Impact |
+|-------|--------|
+| Nb. chambres, TO, guests | Clients pilote / mois → facteur R1 |
+| M. lin. | Réf. R4 (CA / m) |
+| Mix F&B, marges F&B / N-F&B | Réf. R2 + marge produit |
+| CA HT F&B / N-F&B, nb. ventes | Base R1 et revenus pilote |
+
+Toute modification est renvoyée en `pilot_overrides` dans
+`POST /api/rod/excel/simulate` et recalcule **gauche + droite** (R1→R4,
+coûts, marge nette, amortissement). Bouton **Réinitialiser** = pivots Excel.
+
 ---
 
 ## Différence clé vs Simulateur ROD (catégorie)
@@ -79,9 +95,41 @@ Dans le code : `_years_split(sales)` → `eval_year = max(années)` (ex. 2026),
 
 ---
 
+## Feuilles annexe Excel (MIX PRODUITS + IMPACT TO)
+
+Fichier runtime : `data/rod_excel_sheets.json`  
+Affichées en tête de chaque onglet (sections repliables).
+
+### REVENUS ► MIX PRODUITS
+
+| Solution | Pilotes (mix F&B/N-F&B · marges) | Marge moyenne |
+|----------|----------------------------------|---------------|
+| SIMPLY | IBB NICE 70/30 · 2,60/1,45 | **2,26** |
+| LIBERTY | MER BOUL 100/0 · 2,60 + NOV MEG 30/70 · 2,60/2,00 | **2,39** |
+| CONNECTED | MER MONT 90/10 · 2,60/1,80 | **2,52** |
+
+> Mix **Règle 2** du SIMULATEUR peut différer (SIMPLY **40/60** dans la
+> feuille SIMULATEUR vs **70/30** dans MIX PRODUITS).
+
+### REVENUS ► TAUX D'OCCUPATION (IMPACT TO)
+
+| Solution | TO moyen | CA HT total | Impact +1 % TO (HT) |
+|----------|----------|-------------|---------------------|
+| SIMPLY | 78 % | 720 € | **9 €** (F&B 7 + N-F&B 2) |
+| LIBERTY | 68 % | 1 479 € | **22 €** |
+| CONNECTED | 75 % | 3 634 € | **48 €** |
+
+---
+
 ## Layout UI dual-colonne (type Excel)
 
-Chaque onglet **SIMPLY / LIBERTY / CONNECTED** affiche la même grille :
+Dans la **sidebar admin**, 3 entrées séparées (même design, chiffres différents) :
+
+* **Simulateur Simply**
+* **Simulateur Liberty**
+* **Simulateur Connected**
+
+Chaque entrée ouvre la même vue dual-colonne, pré-positionnée sur la solution :
 
 ```
 ┌────────────────────────────────┬────────────────────────────────┐

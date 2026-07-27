@@ -1026,7 +1026,8 @@ def api_rod_excel_simulate():
 
     Body / query :
       hotel_code (requis), year, m_lin, mix_fb, client_needs,
-      nb_chambres, taux_occupation, guests_per_chambre
+      nb_chambres, taux_occupation, guests_per_chambre,
+      pilot_overrides (dict par concept ou plat — colonne pilote éditable)
     """
     try:
         from accor.rod_excel_sim import simulate_excel_dual
@@ -1050,6 +1051,9 @@ def api_rod_excel_simulate():
         needs = body.get("client_needs")
         year_raw = body.get("year", request.args.get("year"))
         year = int(year_raw) if year_raw not in (None, "") else None
+        pilot_ov = body.get("pilot_overrides")
+        if pilot_ov is not None and not isinstance(pilot_ov, dict):
+            pilot_ov = None
 
         result = simulate_excel_dual(
             str(hotel_code),
@@ -1060,6 +1064,7 @@ def api_rod_excel_simulate():
             nb_chambres=_opt_float("nb_chambres"),
             taux_occupation=_opt_float("taux_occupation"),
             guests_per_chambre=_opt_float("guests_per_chambre"),
+            pilot_overrides=pilot_ov,
         )
         status = 200 if result.get("ok") else 400
         return jsonify(result), status

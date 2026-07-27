@@ -48,6 +48,7 @@ from accor.user.services.hotel_context import HotelContextBuilder
 
 CONCEPTS = ("SIMPLY", "LIBERTY", "CONNECTED")
 PILOT_MAP_PATH = DATA_DIR / "rod_pilot_concepts.json"
+SHEETS_PATH = DATA_DIR / "rod_excel_sheets.json"
 NOT_PROFITABLE = "Not profitable"
 
 # Alias courts audit HTML → clés client_needs
@@ -374,14 +375,30 @@ def collect_validation_warnings(
     return warnings
 
 
+def load_excel_sheets() -> dict[str, Any]:
+    """Feuilles REVENUS - MIX & MARGES + IMPACT TO (captures Excel)."""
+    if not SHEETS_PATH.exists():
+        return {}
+    try:
+        return json.loads(SHEETS_PATH.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
 def excel_ui_meta() -> dict[str, Any]:
-    """Meta UI : besoins, défauts, mapping, commentaires."""
+    """Meta UI : besoins, défauts, mapping, commentaires, feuilles MIX/TO."""
     mapping = load_pilot_concept_map()
+    sheets = load_excel_sheets()
     return {
         "ok": True,
         "concepts": list(CONCEPTS),
         "comments": EXCEL_COMMENTS,
         "pilot_map": mapping,
+        "sheets": {
+            "mix_products": sheets.get("mix_products") or {},
+            "impact_to": sheets.get("impact_to") or {},
+            "simulator_r2_mix_ref": sheets.get("simulator_r2_mix_ref") or {},
+        },
         "client_needs_fb": [
             {"id": k, "label": CLIENT_NEED_LABELS.get(k, k), "coef": v, "default": True}
             for k, v in RULE3_FB_COEFFS.items()
@@ -932,10 +949,12 @@ def _right_snapshot(
     cost: CostRules,
     request: SimulationRequest,
     concept: str,
+    *,
+    pilot_overrides: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Colonne droite = projection hôtel désigné (toutes les règles)."""
     concept = concept.upper()
-    rev_res = rev.compute(request, concept)
+    rev_res = rev.compute(request, concept, pilot_overrides=pilot_overrides)
     cost_res = cost.compute(request, concept)
     bd = rev_res.breakdown or {}
     op = request.operating
@@ -1020,6 +1039,67 @@ def _right_snapshot(
     }
 
 
+def _normalize_pilot_overrides(raw: Any) -> dict[str, dict[str, float]]:
+    """
+    Normalise ``pilot_overrides`` : par concept ou dict plat (appliqué à tous).
+
+    Clés reconnues : nb_chambres, guests_per_chambre, taux_occupation,
+    m_lin, mix_fb, mix_nf, ca_fb, ca_nf, nb_ventes, margin_fb, margin_nf.
+    """
+    if not isinstance(raw, dict) or not raw:
+        return {}
+    # Structure par concept ?
+    if any(k.upper() in CONCEPTS for k in raw.keys()):
+        out: dict[str, dict[str, float]] = {}
+        for k, v in raw.items():
+            ck = str(k).upper()
+            if ck not in CONCEPTS or not isinstance(v, dict):
+                continue
+            out[ck] = _coerce_override_values(v)
+        return out
+    # Dict plat → appliqué à chaque concept
+    flat = _coerce_override_values(raw)
+    if not flat:
+        return {}
+    return {c: dict(flat) for c in CONCEPTS}
+
+
+def _coerce_override_values(d: dict[str, Any]) -> dict[str, float]:
+    """Filtre et convertit les overrides numériques valides."""
+    allowed = {
+        "nb_chambres",
+        "guests_per_chambre",
+        "taux_occupation",
+        "m_lin",
+        "mix_fb",
+        "mix_nf",
+        "ca_fb",
+        "ca_nf",
+        "nb_ventes",
+        "margin_fb",
+        "margin_nf",
+    }
+    out: dict[str, float] = {}
+    for k, v in d.items():
+        key = str(k)
+        if key not in allowed or v is None or v == "":
+            continue
+        try:
+            fv = float(v)
+        except (TypeError, ValueError):
+            continue
+        if key == "taux_occupation" and fv > 1.0:
+            fv /= 100.0
+        if key in ("mix_fb", "mix_nf") and fv > 1.0:
+            fv /= 100.0
+        out[key] = fv
+    if "mix_fb" in out and "mix_nf" not in out:
+        out["mix_nf"] = max(0.0, 1.0 - out["mix_fb"])
+    elif "mix_nf" in out and "mix_fb" not in out:
+        out["mix_fb"] = max(0.0, 1.0 - out["mix_nf"])
+    return out
+
+
 def simulate_excel_dual(
     hotel_code: str,
     *,
@@ -1032,6 +1112,7 @@ def simulate_excel_dual(
     year: int | None = None,
     has_vitrine: bool | None = None,
     nb_frigos: float | int | None = None,
+    pilot_overrides: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """
     Pour l'hôtel désigné : produit les 3 onglets SIMPLY / LIBERTY / CONNECTED
@@ -1039,6 +1120,9 @@ def simulate_excel_dual(
 
     Colonne gauche = CA base pilote (sans R2–R4, fidélité Excel).
     Recommandation = arbre audit (ordre d'affichage, 3 solutions toujours calculées).
+
+    ``pilot_overrides`` : valeurs pilote éditables (par concept ou plat).
+    Toute modification cascade sur R1→R4 et la colonne hôtel.
     """
     code = str(hotel_code or "").strip()
     if not code:
@@ -1121,22 +1205,76 @@ def simulate_excel_dual(
                 if int(y) < eval_year
             ]
 
+    ov_by_concept = _normalize_pilot_overrides(pilot_overrides)
+
     by_concept: dict[str, Any] = {}
     for concept in CONCEPTS:
         concept_ref = build_concept_reference(
             concept, eval_year=eval_year, train_years=train_years
         )
         left_p = (concept_ref.get("left") or {}).get("params") or {}
-        excel_fb = float((concept_ref.get("left") or {}).get("ca_fb") or 0)
-        excel_nf = float((concept_ref.get("left") or {}).get("ca_nf") or 0)
-        excel_ventes = float((concept_ref.get("left") or {}).get("nb_ventes") or 0)
-        excel_mix_fb = float(left_p.get("mix_fb") or 0.7)
-        excel_ml = float(left_p.get("m_lin") or 6)
-        excel_n = float(left_p.get("nb_chambres") or 100)
-        excel_to = float(left_p.get("taux_occupation") or 0.75)
-        excel_g = float(left_p.get("guests_per_chambre") or 1.7)
+        # Pivots Excel (feuille SIMULATEUR *) — modifiables via pilot_overrides
+        xf = concept_ref.get("excel_fallback") or {}
+        excel_fb = float(
+            (concept_ref.get("left") or {}).get("ca_fb")
+            or xf.get("ca_fb")
+            or 0
+        )
+        excel_nf = float(
+            (concept_ref.get("left") or {}).get("ca_nf")
+            or xf.get("ca_nf")
+            or 0
+        )
+        excel_ventes = float(
+            (concept_ref.get("left") or {}).get("nb_ventes")
+            or xf.get("nb_ventes")
+            or 0
+        )
+        excel_mix_fb = float(xf.get("mix_fb") or left_p.get("mix_fb") or 0.7)
+        excel_ml = float(xf.get("m_lin") or left_p.get("m_lin") or 6)
+        excel_n = float(xf.get("nb_chambres") or left_p.get("nb_chambres") or 100)
+        excel_to = float(
+            xf.get("taux_occupation") or left_p.get("taux_occupation") or 0.75
+        )
+        excel_g = float(
+            xf.get("guests_per_chambre") or left_p.get("guests_per_chambre") or 1.7
+        )
+        excel_fb_m = float(
+            (concept_ref.get("excel_fallback") or {}).get("margin_fb")
+            or left_p.get("margin_fb")
+            or 2.6
+        )
+        excel_nf_m = float(
+            (concept_ref.get("excel_fallback") or {}).get("margin_nf")
+            or left_p.get("margin_nf")
+            or 1.45
+        )
 
-        # Colonne gauche = moyenne pilotes solution (CA base Excel, sans R2–R4)
+        # Overrides utilisateur (colonne pilote éditable)
+        cov = ov_by_concept.get(concept) or {}
+        if cov:
+            if "nb_chambres" in cov:
+                excel_n = cov["nb_chambres"]
+            if "guests_per_chambre" in cov:
+                excel_g = cov["guests_per_chambre"]
+            if "taux_occupation" in cov:
+                excel_to = cov["taux_occupation"]
+            if "m_lin" in cov:
+                excel_ml = cov["m_lin"]
+            if "mix_fb" in cov:
+                excel_mix_fb = cov["mix_fb"]
+            if "ca_fb" in cov:
+                excel_fb = cov["ca_fb"]
+            if "ca_nf" in cov:
+                excel_nf = cov["ca_nf"]
+            if "nb_ventes" in cov:
+                excel_ventes = cov["nb_ventes"]
+            if "margin_fb" in cov:
+                excel_fb_m = cov["margin_fb"]
+            if "margin_nf" in cov:
+                excel_nf_m = cov["margin_nf"]
+
+        # Colonne gauche = moyenne pilotes solution (CA base, sans R2–R4)
         left_req = _build_request(
             hotel_code=f"PILOT_AVG_{concept}",
             hotel_name=f"Moyenne pilotes {concept}",
@@ -1149,16 +1287,6 @@ def simulate_excel_dual(
             client_needs=all_needs_open(),
             concept=concept,
         )
-        excel_fb_m = float(
-            (concept_ref.get("excel_fallback") or {}).get("margin_fb")
-            or left_p.get("margin_fb")
-            or 2.6
-        )
-        excel_nf_m = float(
-            (concept_ref.get("excel_fallback") or {}).get("margin_nf")
-            or left_p.get("margin_nf")
-            or 1.45
-        )
         left = _left_snapshot(
             cost,
             left_req,
@@ -1170,7 +1298,7 @@ def simulate_excel_dual(
             margin_nf=excel_nf_m,
         )
 
-        # Colonne droite = hôtel désigné projeté avec référence de CETTE solution
+        # Colonne droite = hôtel désigné projeté avec réf. pilote (évent. overridée)
         right_req = _build_request(
             hotel_code=code,
             hotel_name=hotel_name,
@@ -1183,7 +1311,9 @@ def simulate_excel_dual(
             client_needs=needs,
             concept=concept,
         )
-        right = _right_snapshot(rev, cost, right_req, concept)
+        right = _right_snapshot(
+            rev, cost, right_req, concept, pilot_overrides=cov or None
+        )
 
         # Fusionner steps left/right pour l'UI (même id)
         dual_steps: list[dict[str, Any]] = []
@@ -1235,14 +1365,29 @@ def simulate_excel_dual(
             },
             # contexte Excel brut (debug / chips)
             "excel_base": {
+                # Pivots feuille Excel (colonne gauche — éditables via pilot_overrides)
+                "nb_chambres": _r(excel_n, 1),
+                "guests_per_chambre": _r(excel_g, 3),
+                "taux_occupation": _r(excel_to, 4),
+                "m_lin": _r(excel_ml, 2),
+                "mix_fb": _r(excel_mix_fb, 4),
+                "mix_nf": _r(1.0 - excel_mix_fb, 4),
+                "margin_fb": _r(excel_fb_m, 2),
+                "margin_nf": _r(excel_nf_m, 2),
                 "ca_fb": _r(excel_fb, 2),
                 "ca_nf": _r(excel_nf, 2),
                 "nb_ventes": _r(excel_ventes, 1),
-                "m_lin": _r(excel_ml, 2),
-                "mix_fb": _r(excel_mix_fb, 4),
+                "clients_jour": _r(excel_n * excel_to * excel_g, 2),
+                "clients_mois": _r(excel_n * excel_to * excel_g * JOURS_MOIS, 1),
+                "overridden": bool(cov),
+                "overrides_applied": list(cov.keys()) if cov else [],
             },
+            # Feuilles annexe Excel (MIX PRODUITS + IMPACT TO) pour ce concept
+            "sheet_mix": (load_excel_sheets().get("mix_products") or {}).get(concept),
+            "sheet_impact_to": (load_excel_sheets().get("impact_to") or {}).get(concept),
         }
 
+    sheets_all = load_excel_sheets()
     return {
         "ok": True,
         "hotel_code": code,
@@ -1250,6 +1395,11 @@ def simulate_excel_dual(
         "hotel_brand": hotel_brand,
         "eval_year": eval_year,
         "train_years": train_years,
+        "sheets": {
+            "mix_products": sheets_all.get("mix_products") or {},
+            "impact_to": sheets_all.get("impact_to") or {},
+            "simulator_r2_mix_ref": sheets_all.get("simulator_r2_mix_ref") or {},
+        },
         "params": {
             "nb_chambres": int(round(n)),
             "taux_occupation": _r(to, 4),
@@ -1260,6 +1410,7 @@ def simulate_excel_dual(
             "client_needs": needs,
             "has_vitrine": bool(has_vitrine),
             "nb_frigos": nb_frigos,
+            "pilot_overrides": ov_by_concept,
         },
         "concepts": by_concept,
         "recommended_concept": recommended,

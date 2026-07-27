@@ -121,23 +121,58 @@ class RevenueRules:
         return cumul_fb, cumul_nf
 
     # ------------------------------------------------------------------ main
-    def compute(self, request: SimulationRequest, concept: str) -> RevenueResult:
+    def compute(
+        self,
+        request: SimulationRequest,
+        concept: str,
+        *,
+        pilot_overrides: dict | None = None,
+    ) -> RevenueResult:
+        """
+        Calcule le CA projeté pour un hôtel.
+
+        ``pilot_overrides`` (optionnel) remplace temporairement les pivots
+        pilote de la solution (nb chambres, TO, CA base, mix, marges…).
+        Utilisé par le simulateur Excel pour montrer l'impact d'une
+        modification de la colonne gauche (réf. pilotes).
+        """
         concept = concept.upper()
         if request.store is None:
             raise ValueError("store requis (fourni par l'orchestrateur)")
 
         key = f"concepts.{concept}"
-        pivot_nb = float(self._ref.get(f"{key}.pivot_nb_chambres", 129) or 129)
-        pivot_guests = float(self._ref.get(f"{key}.pivot_guests_per_chambre", 1.7) or 1.7)
-        pivot_m_lin = float(self._ref.get(f"{key}.pivot_m_lin", 6) or 6)
-        pivot_to = float(self._ref.get(f"{key}.pivot_to", 0.75) or 0.75)
-        ca_fb_ref = float(self._ref.get(f"{key}.base_monthly_ca_fb", 0) or 0)
-        ca_nf_ref = float(self._ref.get(f"{key}.base_monthly_ca_nf", 0) or 0)
-        ventes_ref = float(self._ref.get(f"{key}.base_monthly_sales", 0) or 0)
-        margin_fb = float(self._ref.get(f"{key}.margin_fb_pct", 2.6) or 2.6)
-        margin_nf = float(self._ref.get(f"{key}.margin_nf_pct", 1.45) or 1.45)
-        ref_mix_fb = float(self._ref.get(f"{key}.mix_fb", 0.7) or 0.7)
-        ref_mix_nf = float(self._ref.get(f"{key}.mix_nf", 0.3) or 0.3)
+        ov = pilot_overrides if isinstance(pilot_overrides, dict) else {}
+
+        def _ov(name: str, ref_key: str, default: float) -> float:
+            if name in ov and ov[name] is not None and ov[name] != "":
+                return float(ov[name])
+            return float(self._ref.get(ref_key, default) or default)
+
+        pivot_nb = _ov("nb_chambres", f"{key}.pivot_nb_chambres", 129)
+        pivot_guests = _ov(
+            "guests_per_chambre", f"{key}.pivot_guests_per_chambre", 1.7
+        )
+        pivot_m_lin = _ov("m_lin", f"{key}.pivot_m_lin", 6)
+        pivot_to = _ov("taux_occupation", f"{key}.pivot_to", 0.75)
+        if pivot_to > 1.0:
+            pivot_to /= 100.0
+        ca_fb_ref = _ov("ca_fb", f"{key}.base_monthly_ca_fb", 0)
+        ca_nf_ref = _ov("ca_nf", f"{key}.base_monthly_ca_nf", 0)
+        ventes_ref = _ov("nb_ventes", f"{key}.base_monthly_sales", 0)
+        margin_fb = _ov("margin_fb", f"{key}.margin_fb_pct", 2.6)
+        margin_nf = _ov("margin_nf", f"{key}.margin_nf_pct", 1.45)
+        ref_mix_fb = _ov("mix_fb", f"{key}.mix_fb", 0.7)
+        if ref_mix_fb > 1.0:
+            ref_mix_fb /= 100.0
+        if "mix_nf" in ov and ov["mix_nf"] is not None and ov["mix_nf"] != "":
+            ref_mix_nf = float(ov["mix_nf"])
+            if ref_mix_nf > 1.0:
+                ref_mix_nf /= 100.0
+        else:
+            ref_mix_nf = float(self._ref.get(f"{key}.mix_nf", 1.0 - ref_mix_fb) or (1.0 - ref_mix_fb))
+            # Si mix_fb a été overridé sans mix_nf, compléter
+            if "mix_fb" in ov:
+                ref_mix_nf = 1.0 - ref_mix_fb
         impact_to = float(self._ref.get("impact_to.ht_per_0_01_to", 9.233974) or 9.233974)
 
         store = request.store
