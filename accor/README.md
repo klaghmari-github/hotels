@@ -139,40 +139,44 @@ Par défaut les serveurs écoutent sur **toutes les interfaces** (`0.0.0.0`).
 
 | Accès | Comment |
 |-------|---------|
-| **Même PC** | `http://127.0.0.1:5055` (admin) · `http://127.0.0.1:5056` (user) |
-| **LAN** (téléphone, autre machine) | `http://<IP-LAN-du-PC>:5055` / `:5056` (affichée au démarrage) |
-| **Internet** | Ouvrir les ports sur la box **ou** tunnel (recommandé) |
+| **Même PC** | `http://127.0.0.1:5055` (admin) · `http://127.0.0.1:5056` (user) · `http://127.0.0.1:5500` (run_dev) |
+| **LAN** | `http://192.168.x.x:…` — **uniquement** le réseau local (pas Internet) |
+| **Internet** | tunnel Cloudflare / ngrok → URL `https://….trycloudflare.com` |
 
-**Firewall** (si ufw) :
+> **192.168.1.80 n’est jamais routable depuis un autre réseau Internet.**
+> Pour un accès externe, il faut un **tunnel** (recommandé) ou une
+> redirection de ports sur la box.
 
-```bash
-sudo ufw allow 5055/tcp
-sudo ufw allow 5056/tcp
-sudo ufw reload
-```
+### Tunnel (recommandé — déjà branché)
 
-**Box / routeur** (exposition directe) : redirection de port WAN → IP du PC,
-ports 5055 et 5056. Attention : l’admin n’a **pas** d’auth HTTP — toute
-personne qui connaît l’URL peut y accéder.
-
-**Tunnel (recommandé, sans ouvrir la box)** — les apps tournent en local,
-le tunnel donne une URL `https://…` publique :
+`bin/cloudflared` est fourni dans le projet. Les apps restent en local ;
+le tunnel publie une URL HTTPS accessible depuis n’importe quel réseau :
 
 ```bash
-# 1) Lancer les apps
-python run_admin.py &
-python run_user.py &
-
-# 2) Exposer (cloudflared ou ngrok)
-chmod +x scripts/expose_public.sh
-./scripts/expose_public.sh admin   # URL publique admin
-./scripts/expose_public.sh user    # URL publique user
-# ou les deux (cloudflared) :
-./scripts/expose_public.sh both
+# Apps déjà lancées (admin / user / run_dev), puis :
+./scripts/expose_public.sh all      # admin + user + run_dev
+./scripts/expose_public.sh admin    # admin seulement
+./scripts/expose_public.sh user
+./scripts/expose_public.sh dev      # console Grok :5500
+./scripts/expose_public.sh status   # affiche les URL en cours
 ```
 
-Prérequis tunnel : [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/installation/)
-ou [ngrok](https://ngrok.com/download).
+Les URL sont enregistrées dans `data/dev_console/tunnel_*.url`.
+Le watchdog (`scripts/dev_watchdog.py`) préfère l’URL tunnel `dev` pour la
+ligne `run_dev url` en tête de ce README (sinon l’IP LAN).
+
+**URLs publiques actives** (quick tunnel — changent si on relance cloudflared) :
+
+| Service | Port local | URL publique |
+|---------|------------|--------------|
+| **run_dev** (console) | 5500 | https://thru-handhelds-east-instructors.trycloudflare.com |
+| **Admin** | 5055 | https://est-peer-logical-recorded.trycloudflare.com |
+| **User** | 5056 | https://adipex-longer-fusion-guidance.trycloudflare.com |
+
+*(Si une URL ne répond plus : `./scripts/expose_public.sh all` pour en obtenir de nouvelles.)*
+
+**Alternative box / routeur** : DNAT WAN → PC ports 5055/5056/5500 + ufw.
+Attention : l’admin n’a **pas** d’auth HTTP.
 
 > Serveur Flask de **développement** (Werkzeug) : OK pour démo / usage
 > interne. Pour une prod internet durable, préférer gunicorn/uvicorn derrière
