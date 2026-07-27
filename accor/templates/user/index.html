@@ -15,8 +15,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/shared/css/tokens.css?v=20260727a" />
-  <link rel="stylesheet" href="/static/user/css/user.css?v=20260727a" />
+  <link rel="stylesheet" href="{{ asset('shared/css/tokens.css') }}" />
+  <link rel="stylesheet" href="{{ asset('user/css/user.css') }}" />
 </head>
 <body>
   <div class="dir-shell">
@@ -160,6 +160,6 @@
   </div>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="/static/user/js/modules/app.js?v=20260727a"></script>
+  <script type="module" src="{{ asset('user/js/modules/app.js') }}"></script>
 </body>
 </html>

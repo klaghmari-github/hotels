@@ -27,6 +27,7 @@ dev = ["pytest>=7.0"]
 [project.scripts]
 accor-admin = "accor.app:main"
 accor-user = "accor.user.app:main"
+accor-dev = "accor.dev_app:main"
 accor-validate-rod = "accor.user.validate_rod:main"
 
 [tool.setuptools.packages.find]

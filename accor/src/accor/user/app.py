@@ -24,6 +24,7 @@ from pathlib import Path
 
 from flask import Flask, jsonify, render_template, request
 
+from accor.cache_bust import register_cache_bust
 from accor.data_io import PROJECT_ROOT, STATIC_DIR, TEMPLATES_DIR
 
 from accor.user.models import SimulationRequest
@@ -39,19 +40,11 @@ ROOT = PROJECT_ROOT
 app = Flask(
     __name__,
     template_folder=str(TEMPLATES_DIR / "user"),
-    static_folder=str(STATIC_DIR),
+    static_folder=None,  # servi via cache_bust (?dt=mtime)
     static_url_path="/static",
 )
 app.config["JSON_AS_ASCII"] = False
-# Évite le cache navigateur agressif sur JS/CSS pendant le dev
-app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
-
-
-@app.after_request
-def _no_cache_static(response):
-    if request.path.startswith("/static/"):
-        response.headers["Cache-Control"] = "no-store, max-age=0"
-    return response
+register_cache_bust(app, STATIC_DIR)
 
 # Singletons légers
 _catalog = AdminCatalog()

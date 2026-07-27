@@ -41,6 +41,7 @@ from accor.store import (
     update_rows,
 )
 
+from accor.cache_bust import register_cache_bust
 from accor.data_io import PROJECT_ROOT, STATIC_DIR, TEMPLATES_DIR
 
 ROOT = PROJECT_ROOT
@@ -48,10 +49,11 @@ ROOT = PROJECT_ROOT
 app = Flask(
     __name__,
     template_folder=str(TEMPLATES_DIR),
-    static_folder=str(STATIC_DIR),
+    static_folder=None,  # servi via cache_bust (?dt=mtime)
 )
 # Garde les accents / unicode dans les réponses JSON (noms d'hôtels, etc.)
 app.config["JSON_AS_ASCII"] = False
+register_cache_bust(app, STATIC_DIR)
 
 
 # ---------------------------------------------------------------------------
