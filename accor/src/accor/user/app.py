@@ -355,13 +355,35 @@ def simulate():
 
 
 def main(argv: list[str] | None = None) -> None:
+    """
+    Point d'entrée serveur Flask user.
+
+    Par défaut ``0.0.0.0`` (LAN + exposable publiquement).
+    Override : ``--host 127.0.0.1`` ou env ``ACCOR_HOST`` / ``ACCOR_PORT``.
+    """
+    from accor.serve_utils import (
+        default_host,
+        default_port,
+        print_listen_banner,
+        run_flask_app,
+    )
+
     parser = argparse.ArgumentParser(description="Accor ROD · User Simulator")
-    parser.add_argument("--host", default="127.0.0.1")
-    parser.add_argument("--port", type=int, default=5056)
+    parser.add_argument(
+        "--host",
+        default=default_host(),
+        help="Adresse d'écoute (défaut 0.0.0.0 = toutes interfaces / réseau)",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=default_port(5056),
+        help="Port HTTP (défaut 5056, ou ACCOR_PORT)",
+    )
     parser.add_argument("--debug", action="store_true")
     args = parser.parse_args(argv)
-    print(f"→ User ROD simulator  http://{args.host}:{args.port}")
-    app.run(host=args.host, port=args.port, debug=args.debug)
+    print_listen_banner("Accor ROD · Simulateur directeur (user)", args.host, args.port)
+    run_flask_app(app, host=args.host, port=args.port, debug=args.debug)
 
 
 if __name__ == "__main__":

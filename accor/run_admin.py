@@ -4,9 +4,13 @@ Point d'entrée admin — Accor Data & Model Studio.
 
 Depuis la racine du projet, venv activé :
 
-  python run_admin.py
-  python run_admin.py --host 0.0.0.0 --port 5055 --debug
+  python run_admin.py                    # écoute 0.0.0.0:5055 (LAN + public)
+  python run_admin.py --host 127.0.0.1   # local uniquement
+  python run_admin.py --port 5055 --debug
   accor-admin
+
+Exposition publique : ouvrir le port routeur/firewall, ou tunnel
+(cloudflared / ngrok). Voir README § Accès réseau.
 
 Délègue à accor.app:main. Doc : README.md.
 """

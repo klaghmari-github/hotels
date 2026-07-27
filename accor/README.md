@@ -81,27 +81,84 @@ Flask, pandas, openpyxl, numpy, scikit-learn, xgboost, requests, meteostat.
 ```bash
 source .venv/bin/activate
 
-# Admin → http://127.0.0.1:5055
+# Admin → écoute 0.0.0.0:5055 (local + LAN + exposable)
 python run_admin.py
 # ou
 accor-admin
 
-# User → http://127.0.0.1:5056
+# User → écoute 0.0.0.0:5056
 python run_user.py
 # ou
 accor-user
 ```
 
-Options courantes :
+Au démarrage, la console affiche les URL **local** et **réseau** (IP LAN).
+
+Options :
 
 ```bash
-python run_admin.py --host 0.0.0.0 --port 5055 --debug
-python run_user.py  --host 0.0.0.0 --port 5056
+# Local uniquement
+python run_admin.py --host 127.0.0.1
+python run_user.py  --host 127.0.0.1
+
+# Port / debug
+python run_admin.py --port 5055 --debug
+python run_user.py  --port 5056
+
+# Via variables d'environnement
+export ACCOR_HOST=0.0.0.0
+export ACCOR_PORT=5055   # pour un seul process
+python run_admin.py
 ```
 
 Les deux apps peuvent tourner en même temps. Elles lisent les mêmes Excel ;
 en écriture, évite de rebuild admin pendant qu’un directeur simule (cache
 mémoire côté store).
+
+### Accès réseau / public (PC local exposé)
+
+Par défaut les serveurs écoutent sur **toutes les interfaces** (`0.0.0.0`).
+
+| Accès | Comment |
+|-------|---------|
+| **Même PC** | `http://127.0.0.1:5055` (admin) · `http://127.0.0.1:5056` (user) |
+| **LAN** (téléphone, autre machine) | `http://<IP-LAN-du-PC>:5055` / `:5056` (affichée au démarrage) |
+| **Internet** | Ouvrir les ports sur la box **ou** tunnel (recommandé) |
+
+**Firewall** (si ufw) :
+
+```bash
+sudo ufw allow 5055/tcp
+sudo ufw allow 5056/tcp
+sudo ufw reload
+```
+
+**Box / routeur** (exposition directe) : redirection de port WAN → IP du PC,
+ports 5055 et 5056. Attention : l’admin n’a **pas** d’auth HTTP — toute
+personne qui connaît l’URL peut y accéder.
+
+**Tunnel (recommandé, sans ouvrir la box)** — les apps tournent en local,
+le tunnel donne une URL `https://…` publique :
+
+```bash
+# 1) Lancer les apps
+python run_admin.py &
+python run_user.py &
+
+# 2) Exposer (cloudflared ou ngrok)
+chmod +x scripts/expose_public.sh
+./scripts/expose_public.sh admin   # URL publique admin
+./scripts/expose_public.sh user    # URL publique user
+# ou les deux (cloudflared) :
+./scripts/expose_public.sh both
+```
+
+Prérequis tunnel : [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/installation/)
+ou [ngrok](https://ngrok.com/download).
+
+> Serveur Flask de **développement** (Werkzeug) : OK pour démo / usage
+> interne. Pour une prod internet durable, préférer gunicorn/uvicorn derrière
+> un reverse-proxy + HTTPS + authentification.
 
 ---
 
