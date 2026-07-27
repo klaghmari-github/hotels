@@ -1,14 +1,14 @@
 /**
  * Simulateur ROD — admin (pilotes + éval temporelle).
  *
- * Split **temporel** (pas par hôtel) :
- *   - apprentissage / ref catégorie = années hors 2026 (ex. 2023–2025) ;
- *   - évaluation = 2026 vs réel (Σ/12).
- * Tous les pilotes de la catégorie entrent dans la ref (pas d'exclusion d'hôtel).
- * Peu d'hôtels en apprentissage = normal avec les données actuelles.
+ * Recalcul auto dès qu'un paramètre change (pas de bouton Simuler).
+ * Split temporel : ref hors 2026, éval 2026. Pas d'exclusion d'hôtel.
  *
- * Corner éditable : m_lin, mix F&B, sous-catégories F&B / N-F&B.
- * API : /api/rod/meta, /api/rod/pilots, POST /api/rod/hotel/<code>/trace
+ * Onglets :
+ *   - CA (règles)     : étapes ROD
+ *   - Coûts & marge   : étude économique
+ *   - Écart réel/sim  : validation vs ventes réelles (séparé)
+ *   - Batch           : MAE sur tous les pilotes
  */
 
 import { $, $$, escapeHtml, debounce } from "../../shared/js/dom.js";
@@ -42,10 +42,12 @@ export class RodSimPanel {
     this.trace = null;
     this.evalResult = null;
     this.concept = "SIMPLY";
-    this.tab = "ventes";
+    this.tab = "ca";
     this._simBusy = false;
     this._simQueued = false;
+    this._evalBusy = false;
     this._paramsTouched = false;
+    this._simSeq = 0;
   }
 
   async open() {
@@ -57,6 +59,11 @@ export class RodSimPanel {
 
   year() {
     return Number($("#rod-year")?.value || 2026);
+  }
+
+  setStatus(msg) {
+    const status = $("#rod-status");
+    if (status) status.textContent = msg || "";
   }
 
   async loadMeta() {
@@ -161,8 +168,7 @@ export class RodSimPanel {
   }
 
   async loadPilots() {
-    const status = $("#rod-status");
-    if (status) status.textContent = "Chargement pilotes…";
+    this.setStatus("Chargement…");
     try {
       const year = this.year();
       const data = await api.get("/api/rod/pilots", { year });
@@ -175,9 +181,9 @@ export class RodSimPanel {
       const chipN = $("#rod-chip-n");
       if (chipN) chipN.textContent = `${data.n || 0} pilote(s)`;
       this.fillHotels(data.hotels || []);
-      if (status) status.textContent = "";
+      this.setStatus("");
     } catch (err) {
-      if (status) status.textContent = err.message;
+      this.setStatus(err.message);
       toast.show(err.message, "err");
     }
   }
@@ -196,7 +202,7 @@ export class RodSimPanel {
       opt.value = h.hotel_code;
       const realPart = h.has_holdout
         ? `réel ${fmt(h.avg_monthly_true, 0)} €/mois`
-        : "pas encore de réel éval";
+        : "pas de réel éval";
       opt.textContent = `${h.hotel_code} · ${h.hotel_name || "—"} · ${
         h.category || "?"
       } · ${realPart}`;
@@ -204,7 +210,6 @@ export class RodSimPanel {
     });
     if (prev && hotels.some((h) => h.hotel_code === prev)) sel.value = prev;
     this.renderHotelMeta();
-    // auto-sim au premier chargement
     if (sel.value) this.scheduleSim();
   }
 
@@ -218,8 +223,6 @@ export class RodSimPanel {
       host.textContent = "—";
       return;
     }
-    const realLabel = "Réel éval Σ/12";
-    const realVal = h.has_holdout ? euro(h.avg_monthly_true) : "—";
     const monthsVal = h.has_holdout
       ? (h.months || []).join(", ") || "—"
       : "—";
@@ -228,7 +231,7 @@ export class RodSimPanel {
       <div class="metric-box"><span class="m-label">Marque</span><span class="m-value">${escapeHtml(h.hotel_brand || "—")}</span></div>
       <div class="metric-box"><span class="m-label">Catégorie</span><span class="m-value">${escapeHtml(h.category || "—")}</span></div>
       <div class="metric-box"><span class="m-label">Mois réel</span><span class="m-value">${escapeHtml(monthsVal)}</span></div>
-      <div class="metric-box ${h.has_holdout ? "good" : ""}"><span class="m-label">${realLabel}</span><span class="m-value">${realVal}</span></div>
+      <div class="metric-box ${h.has_holdout ? "good" : ""}"><span class="m-label">Réel éval Σ/12</span><span class="m-value">${h.has_holdout ? euro(h.avg_monthly_true) : "—"}</span></div>
     `;
   }
 
@@ -236,36 +239,14 @@ export class RodSimPanel {
     if (this._simDebounced) this._simDebounced();
   }
 
-  async run() {
-    const status = $("#rod-status");
-    const btn = $("#btn-rod-run");
+  /**
+   * Recalcule la simu hôtel courant (auto à chaque changement).
+   * Ne lance PAS le batch — le batch est sur l'onglet dédié.
+   */
+  async runSim() {
     const code = $("#rod-hotel-select")?.value;
-    const year = this.year();
-
-    if (this.tab === "eval") {
-      if (btn) btn.disabled = true;
-      if (status) status.textContent = "Éval batch…";
-      try {
-        await this.loadPilots();
-        const data = await api.get("/api/rod/eval", { year });
-        if (!data.ok) throw new Error(data.error || "Éval échouée");
-        this.evalResult = data;
-        this.renderEval(data);
-        const nScored = data.metrics?.n ?? "—";
-        if (status)
-          status.textContent = `Éval ${data.eval_year} · ${data.n_hotels} pilote(s) · MAE n=${nScored}`;
-        toast.show(`Éval ROD ${data.eval_year} · ${data.n_hotels} hôtels`);
-      } catch (err) {
-        if (status) status.textContent = err.message;
-        toast.show(err.message, "err");
-      } finally {
-        if (btn) btn.disabled = false;
-      }
-      return;
-    }
-
     if (!code) {
-      toast.show("Choisissez un hôtel", "err");
+      this.setStatus("Choisissez un hôtel");
       return;
     }
 
@@ -274,8 +255,8 @@ export class RodSimPanel {
       return;
     }
     this._simBusy = true;
-    if (btn) btn.disabled = true;
-    if (status) status.textContent = "Simulation…";
+    const seq = ++this._simSeq;
+    this.setStatus("Calcul…");
 
     try {
       const params = this.collectParams();
@@ -283,10 +264,13 @@ export class RodSimPanel {
         `/api/rod/hotel/${encodeURIComponent(code)}/trace`,
         params
       );
+      // réponse obsolète (nouvelle demande en file) → ignorer
+      if (seq !== this._simSeq && this._simQueued) {
+        return;
+      }
       if (!data.ok) throw new Error(data.error || "Simulation échouée");
       this.trace = data;
 
-      // sync champs depuis réponse (première fois ou si non touchés)
       const p = data.params || {};
       if (!this._paramsTouched) {
         if (p.m_lin != null) this.setMLin(p.m_lin);
@@ -300,7 +284,6 @@ export class RodSimPanel {
         }
         if (p.guests_per_chambre != null && $("#rod-guests"))
           $("#rod-guests").value = String(Number(p.guests_per_chambre).toFixed(1));
-        // needs
         const needs = p.client_needs || data.client_needs || {};
         Object.keys(needs).forEach((id) => {
           const el = document.querySelector(`input[data-need="${id}"]`);
@@ -314,21 +297,42 @@ export class RodSimPanel {
         el.classList.toggle("active", el.dataset.concept === this.concept);
       });
       this.renderTrace();
-      if (status) {
-        status.textContent = `OK · ${code} · reco ${reco || "—"} · mix ${Math.round(
+      this.setStatus(
+        `${code} · reco ${reco || "—"} · ${fmt(p.m_lin ?? params.m_lin, 1)} m · mix ${Math.round(
           (p.mix_fb ?? params.mix_fb) * 100
-        )} % · ${p.m_lin ?? params.m_lin} m`;
-      }
+        )} %`
+      );
     } catch (err) {
-      if (status) status.textContent = err.message;
+      this.setStatus(err.message);
       toast.show(err.message, "err");
     } finally {
       this._simBusy = false;
-      if (btn) btn.disabled = false;
       if (this._simQueued) {
         this._simQueued = false;
         this.scheduleSim();
       }
+    }
+  }
+
+  async runEvalBatch() {
+    if (this._evalBusy) return;
+    this._evalBusy = true;
+    this.setStatus("Batch…");
+    try {
+      const year = this.year();
+      const data = await api.get("/api/rod/eval", { year });
+      if (!data.ok) throw new Error(data.error || "Éval échouée");
+      this.evalResult = data;
+      this.renderEval(data);
+      const nScored = data.metrics?.n ?? "—";
+      this.setStatus(
+        `Batch ${data.eval_year} · ${data.n_hotels} pilote(s) · MAE n=${nScored}`
+      );
+    } catch (err) {
+      this.setStatus(err.message);
+      toast.show(err.message, "err");
+    } finally {
+      this._evalBusy = false;
     }
   }
 
@@ -340,6 +344,14 @@ export class RodSimPanel {
     $$(".rod-panel").forEach((el) => {
       el.classList.toggle("hidden", el.dataset.rodPanel !== tab);
     });
+    // Batch : lancer à l'entrée de l'onglet
+    if (tab === "eval" && !this.evalResult) {
+      this.runEvalBatch();
+    }
+    // Re-render panneaux si trace déjà là
+    if (this.trace && tab !== "eval") {
+      this.renderTrace();
+    }
   }
 
   setConcept(c) {
@@ -354,39 +366,37 @@ export class RodSimPanel {
     if (!this.trace) return;
     this.renderCategoryRef();
     this.renderRecoBanner();
+    this.renderConceptKpi();
+    this.renderSalesSteps(
+      (this.trace.by_concept?.[this.concept] || {}).sales?.steps || []
+    );
+    this.renderMarginAll();
+    this.renderCostLines(
+      (this.trace.by_concept?.[this.concept] || {}).costs?.cost_lines || []
+    );
+    this.renderGapKpi();
+    this.renderGapDetail();
+  }
 
-    const c = this.concept;
-    const block = this.trace.by_concept?.[c];
+  /** KPI solution : CA / marges seulement (pas d'écart ici). */
+  renderConceptKpi() {
     const kpi = $("#rod-concept-kpi");
-
+    if (!kpi) return;
+    const block = this.trace?.by_concept?.[this.concept];
     if (!block || block.ok === false || block.error) {
-      if (kpi) {
-        kpi.className = "metrics-grid empty";
-        kpi.textContent = block?.error || "—";
-      }
+      kpi.className = "metrics-grid empty";
+      kpi.textContent = block?.error || "—";
       return;
     }
-
     const sales = block.sales || {};
     const margin = block.margin || {};
-    const gap = (this.trace.gaps || {})[c] || {};
-    const real = this.trace.real_holdout || {};
-    const hasHold = !!(this.trace.has_holdout || real.available);
-
-    if (kpi) {
-      kpi.className = "metrics-grid";
-      kpi.innerHTML = `
-        <div class="metric-box good"><span class="m-label">CA sim / mois</span><span class="m-value">${euro(sales.ca_ht_mensuel)}</span></div>
-        <div class="metric-box"><span class="m-label">Réel (Σ/12)</span><span class="m-value">${hasHold ? euro(real.avg_monthly_true) : "—"}</span></div>
-        <div class="metric-box"><span class="m-label">Écart</span><span class="m-value">${hasHold && gap.gap != null ? euro(gap.gap) + (gap.gap_pct != null ? " (" + fmt(gap.gap_pct, 1) + "%)" : "") : "—"}</span></div>
-        <div class="metric-box good"><span class="m-label">Marge nette</span><span class="m-value">${euro(margin.marge_nette_mensuelle)}</span></div>
-      `;
-    }
-
-    this.renderSalesSteps(sales.steps || []);
-    this.renderMarginAll();
-    this.renderCostLines((block.costs || {}).cost_lines || []);
-    this.renderGapDetail();
+    kpi.className = "metrics-grid";
+    kpi.innerHTML = `
+      <div class="metric-box good"><span class="m-label">CA sim / mois</span><span class="m-value">${euro(sales.ca_ht_mensuel)}</span></div>
+      <div class="metric-box"><span class="m-label">Marge produit</span><span class="m-value">${euro(margin.marge_produit_mensuelle)}</span></div>
+      <div class="metric-box good"><span class="m-label">Marge nette</span><span class="m-value">${euro(margin.marge_nette_mensuelle)}</span></div>
+      <div class="metric-box"><span class="m-label">Coût / mois</span><span class="m-value">${euro(margin.cout_mensuel)}</span></div>
+    `;
   }
 
   renderCategoryRef() {
@@ -420,6 +430,43 @@ export class RodSimPanel {
     `;
   }
 
+  /** KPI dédiés écart réel vs sim (solution affichée). */
+  renderGapKpi() {
+    const host = $("#rod-gap-kpi");
+    if (!host || !this.trace) return;
+    const c = this.concept;
+    const gap = (this.trace.gaps || {})[c] || {};
+    const real = this.trace.real_holdout || {};
+    const hasHold = !!(this.trace.has_holdout || real.available);
+    const ca =
+      gap.ca_sim_mensuel ??
+      this.trace.by_concept?.[c]?.sales?.ca_ht_mensuel;
+    const avgTrue = gap.avg_monthly_true ?? real.avg_monthly_true;
+    const gapCls =
+      hasHold && gap.gap != null
+        ? (gap.gap || 0) >= 0
+          ? "good"
+          : "warn"
+        : "";
+
+    host.className = "metrics-grid rod-gap-kpi";
+    if (!hasHold) {
+      host.innerHTML = `
+        <div class="metric-box"><span class="m-label">Solution</span><span class="m-value">${escapeHtml(c)}</span></div>
+        <div class="metric-box good"><span class="m-label">CA simulé / mois</span><span class="m-value">${euro(ca)}</span></div>
+        <div class="metric-box"><span class="m-label">Réel éval</span><span class="m-value">—</span></div>
+        <div class="metric-box"><span class="m-label">Écart</span><span class="m-value">—</span></div>
+      `;
+      return;
+    }
+    host.innerHTML = `
+      <div class="metric-box"><span class="m-label">Solution</span><span class="m-value">${escapeHtml(c)}</span></div>
+      <div class="metric-box good"><span class="m-label">CA simulé / mois</span><span class="m-value">${euro(ca)}</span></div>
+      <div class="metric-box"><span class="m-label">Réel ${real.year || ""} Σ/12</span><span class="m-value">${euro(avgTrue)}</span></div>
+      <div class="metric-box ${gapCls}"><span class="m-label">Écart (sim − réel)</span><span class="m-value">${euro(gap.gap)}${gap.gap_pct != null ? " · " + fmt(gap.gap_pct, 1) + " %" : ""}</span></div>
+    `;
+  }
+
   renderGapDetail() {
     const host = $("#rod-gap-table");
     if (!host || !this.trace) return;
@@ -429,34 +476,31 @@ export class RodSimPanel {
     const hasHold = !!(this.trace.has_holdout || real.available);
     host.className = "perf-table-wrap";
     host.innerHTML = `
-      <table>
+      <table id="rod-gap-table-inner">
         <thead>
           <tr>
             <th>Solution</th>
-            <th>CA sim / mois</th>
+            <th>CA simulé / mois</th>
             <th>Réel ${real.year || ""} Σ/12</th>
-            <th>Écart</th>
+            <th>Écart (sim − réel)</th>
             <th>%</th>
-            <th>Marge nette</th>
           </tr>
         </thead>
         <tbody>
           ${["SIMPLY", "LIBERTY", "CONNECTED"]
             .map((c) => {
               const g = gaps[c] || {};
-              const m = this.trace.by_concept?.[c]?.margin || {};
               const ca =
                 g.ca_sim_mensuel ??
                 this.trace.by_concept?.[c]?.sales?.ca_ht_mensuel;
               const cls =
                 g.gap != null ? ((g.gap || 0) >= 0 ? "pos" : "neg") : "";
-              return `<tr class="${c === reco ? "is-best" : ""}">
+              return `<tr class="${c === reco || c === this.concept ? "is-best" : ""}">
                 <td><strong>${c}</strong>${c === reco ? " ★" : ""}</td>
                 <td>${euro(ca)}</td>
                 <td>${hasHold ? euro(g.avg_monthly_true ?? real.avg_monthly_true) : "—"}</td>
                 <td class="${cls}">${hasHold ? euro(g.gap) : "—"}</td>
-                <td>${hasHold && g.gap_pct != null ? fmt(g.gap_pct, 1) + " %" : "—"}</td>
-                <td>${euro(m.marge_nette_mensuelle)}</td>
+                <td class="${cls}">${hasHold && g.gap_pct != null ? fmt(g.gap_pct, 1) + " %" : "—"}</td>
               </tr>`;
             })
             .join("")}
@@ -630,7 +674,7 @@ export class RodSimPanel {
               const gapCls =
                 r.gap_reco != null ? ((r.gap_reco || 0) >= 0 ? "pos" : "neg") : "";
               return `<tr>
-                <td>${escapeHtml(r.hotel_code)}${hasH ? "" : ' <small class="muted">pred</small>'}<br><small>${escapeHtml(
+                <td>${escapeHtml(r.hotel_code)}<br><small>${escapeHtml(
                   r.hotel_name || ""
                 )}</small></td>
                 <td>${escapeHtml(r.category || "—")}</td>
@@ -639,7 +683,7 @@ export class RodSimPanel {
                 <td><strong>${escapeHtml(r.recommended_concept || "—")}</strong></td>
                 <td>${euro(r.ca_sim_reco)}</td>
                 <td class="${gapCls}">${hasH ? euro(r.gap_reco) : "—"}</td>
-                <td>${hasH && r.gap_pct_reco != null ? fmt(r.gap_pct_reco, 1) + " %" : "—"}</td>
+                <td class="${gapCls}">${hasH && r.gap_pct_reco != null ? fmt(r.gap_pct_reco, 1) + " %" : "—"}</td>
               </tr>`;
             })
             .join("")}
@@ -648,17 +692,20 @@ export class RodSimPanel {
   }
 
   wire() {
-    this._simDebounced = debounce(() => this.run(), 350);
+    // Auto-recalc (pas de bouton Simuler)
+    this._simDebounced = debounce(() => this.runSim(), 400);
 
-    $("#btn-rod-run")?.addEventListener("click", () => this.run());
     $("#rod-hotel-select")?.addEventListener("change", () => {
       this._paramsTouched = false;
+      this.evalResult = null;
       this.renderHotelMeta();
       this.scheduleSim();
     });
-    $("#rod-year")?.addEventListener("change", () => {
+    $("#rod-year")?.addEventListener("change", async () => {
       this._paramsTouched = false;
-      this.loadPilots();
+      this.evalResult = null;
+      await this.loadPilots();
+      if (this.tab === "eval") this.runEvalBatch();
     });
 
     const linkM = (sliderId, inputId) => {
@@ -677,13 +724,23 @@ export class RodSimPanel {
           this._paramsTouched = true;
           this.scheduleSim();
         });
+        i.addEventListener("input", () => {
+          this._paramsTouched = true;
+          this.scheduleSim();
+        });
       }
     };
     linkM("rod-m-lin-slider", "rod-m-lin");
     linkM("rod-mix-slider", "rod-mix-fb");
 
     ["rod-nb-chambres", "rod-to", "rod-guests"].forEach((id) => {
-      $("#" + id)?.addEventListener("change", () => {
+      const el = $("#" + id);
+      if (!el) return;
+      el.addEventListener("change", () => {
+        this._paramsTouched = true;
+        this.scheduleSim();
+      });
+      el.addEventListener("input", () => {
         this._paramsTouched = true;
         this.scheduleSim();
       });

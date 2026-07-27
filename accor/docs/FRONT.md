@@ -36,7 +36,7 @@ Entrée : `templates/index.html` → `app.js?v=…`
 | `nav-controller.js` | sidebar datasets + ROD + Model Build / Explore / Eval |
 | `table-renderer.js` | table éditable, sélection, dirty cells |
 | `dataset-controller.js` | fetch page, save, add/delete, rebuilds |
-| `rod-sim-panel.js` | **Simulateur ROD** : ventes (étapes), marge, éval sim vs réel |
+| `rod-sim-panel.js` | **Simulateur ROD** : corner, ventes, marge, batch éval temporelle |
 | `model-build-panel.js` | params XGB, grille, barre progression réelle |
 | `model-explore-panel.js` | structure modèle (importances, arbres) — pas de scores métier |
 | `model-eval-panel.js` | **éval ML** XGBoost (Σ/12) |
@@ -66,10 +66,16 @@ Navigation : `#nav-rod-sim`, `#nav-model-build`, `#nav-model-explore`,
 
 ### Flux Simulateur ROD
 
-1. open → GET `/api/rod/pilots?year=`
-2. choisir hôtel → GET `/api/rod/hotel/<code>/trace`
-3. onglet Marge : même payload (coûts / marge nette 3 concepts)
-4. onglet Éval → GET `/api/rod/eval?year=`
+Split **temporel** (apprend hors 2026, évalue 2026) — pas d’exclusion d’hôtel.
+**Pas de bouton Simuler** : recalcul auto (debounce) dès qu’un paramètre change.
+
+1. open → GET `/api/rod/meta` puis GET `/api/rod/pilots?year=`
+2. hôtel / corner / sous-cat. → **POST** `/api/rod/hotel/<code>/trace` (auto)
+3. Onglets séparés :
+   - **CA (règles)** — étapes ROD uniquement
+   - **Coûts & marge** — étude économique (sans écart)
+   - **Écart réel / sim** — validation vs ventes réelles (Σ/12)
+   - **Batch** — GET `/api/rod/eval` au premier affichage de l’onglet
 
 Détail métier : [ROD_ADMIN.md](ROD_ADMIN.md).
 
@@ -81,30 +87,23 @@ Détail métier : [ROD_ADMIN.md](ROD_ADMIN.md).
 
 ---
 
-## User (`static/user/`)
+## User (`static/user/`) — directeur
 
-Entrée : `templates/user/index.html` → `modules/app.js`
+Entrée : `templates/user/index.html` → `modules/app.js` (`DirectorApp`).
 
-| Fichier | Rôle |
-|---------|------|
-| `js/modules/app.js` | `UserApp` / orchestration wizard, `window.RODUser` |
-| `js/modules/stepper.js` | 5 étapes du parcours |
-| `js/modules/autocomplete.js` | recherche hôtels (code/nom) |
-| `js/modules/hotel-context.js` | charge context + moyennes marque |
-| `js/modules/geocode-panel.js` | bouton géocode adresse |
-| `js/modules/rule1-panel.js` | clients dérivés + aperçu CA R1 |
-| `js/modules/services-catalog.js` | listes services F&B / N-F&B (flags) |
-| `js/modules/simulation-panel.js` | POST simulate + rendu tableaux |
-| `js/user.js` | legacy warning (ne plus utiliser) |
-| `css/user.css` | styles wizard |
+**Même moteur** que l’admin (`POST /api/rod/simulate` → `simulate_hotel_trace`,
+`include_gaps=False`, scrape si besoin). UX orientée **résultat** :
 
-### Étapes wizard (ordre typique)
+| Zone | Contenu |
+|------|---------|
+| Sidebar | hôtel (search), exploitation, corner (m_lin / mix), sous-cat. |
+| Hero | solution recommandée (très grand) |
+| Big metrics | CA / marge nette / coûts / marge produit |
+| Onglets | **Résultat** (3 cartes) · **Détail CA** · **Coûts & marge** |
 
-1. Choix / saisie hôtel  
-2. Exploitation (chambres, TO, guests) + rule1  
-3. Profil clients / besoins catégories  
-4. Corner / m linéaires / options  
-5. Simulation + reco  
+Recalcul **auto** (debounce) — pas de bouton Simuler.  
+Legacy wizard modules (`stepper.js`, `simulation-panel.js`…) plus utilisés par
+l’entrée principale.
 
 ---
 

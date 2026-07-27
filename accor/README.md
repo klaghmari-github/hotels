@@ -9,7 +9,7 @@ voir le dossier [`docs/`](docs/README.md).
 | App | Port | Rôle |
 |-----|------|------|
 | **Admin** — Data & Model Studio | 5055 | Excel, Simulateur ROD (trace pilotes), entraîner / explorer / éval ML / déployer |
-| **User** — simulateur directeur | 5056 | parcours ROD : hôtel → concept (SIMPLY / LIBERTY / CONNECTED) → CA, coûts, reco |
+| **User** — simulateur directeur | 5056 | même moteur ROD que l’admin ; UI résultat (CA, marge, reco) |
 
 Le code vit dans `src/accor/` (package installable). Les données et le front
 restent à la racine du projet (`data/`, `models/`, `static/`, `templates/`).
@@ -145,7 +145,7 @@ accor/
 
   templates/
     index.html            # admin SPA
-    user/index.html       # wizard directeur
+    user/index.html       # UI directeur (résultats ROD)
 
   src/accor/              # PACKAGE Python
     __init__.py           # version + chemins réexportés
@@ -331,15 +331,16 @@ UI : **Modèle** → **Éval. modèle ML**.
 
 ### Simulateur ROD admin (`rod_admin.py`)
 
-Validation métier (≠ ML) :
+Validation métier (≠ ML) — **split temporel**, pas par hôtel :
 
-* Référence pilote = **catégorie de marque**, années **train** seulement
-  (jamais la dernière année, ex. 2023–2025 si hold-out 2026) :
+* **Apprentissage / ref** = années hors 2026 (ex. 2023–2025) : tous les
+  pilotes de la **catégorie de marque** (pas de leave-one-out).
   avg mensuelle année = Σ mois / 12, puis moyennes multi-années / multi-hôtels.
-* Hôtel choisi traité comme **nouveau client** → règles ROD → CA estimé.
-* Comparaison au réel hold-out (Σ/12), coûts/marge 3 concepts, reco.
+* **Évaluation** = 2026 vs réel (Σ/12). Peu d’hôtels en apprentissage = normal.
+* Corner éditable (m_lin, mix F&B, sous-cat.) → règles ROD → CA / coûts /
+  marge 3 concepts + reco.
 
-API : `/api/rod/*`. Doc : [docs/ROD_ADMIN.md](docs/ROD_ADMIN.md).
+API : `/api/rod/*` (UI : **POST** sur `/trace`). Doc : [docs/ROD_ADMIN.md](docs/ROD_ADMIN.md).
 
 ---
 
@@ -364,8 +365,9 @@ All → Pilotes → Simulateur ROD → Modèle
 
 ### Simulateur ROD (UI)
 
-Trois onglets : (1) ref catégorie + étapes ROD + écart hold-out,
-(2) coûts/marge 3 solutions + reco, (3) batch tous pilotes.
+Recalcul **auto** (pas de bouton Simuler). Quatre onglets séparés :
+(1) CA règles, (2) coûts & marge, (3) **écart réel / sim**, (4) batch.
+Corner : m_lin, mix, sous-catégories, chambres/TO/guests.
 
 ### Éval. modèle ML (UI)
 
@@ -395,9 +397,10 @@ CRUD `/api/datasets/*` + rebuilds `all_data`, `model_data`, `sales`,
 
 | Méthode | Chemin | Description |
 |---------|--------|-------------|
-| GET | `/api/rod/pilots` | pilotes (`?year=2026`) |
-| GET | `/api/rod/hotel/<code>/trace` | étapes + coûts + marge |
-| GET | `/api/rod/eval` | batch écart sim vs réel |
+| GET | `/api/rod/meta` | sous-cat. + défauts corner |
+| GET | `/api/rod/pilots` | pilotes train (`?year=2026` = année d’éval) |
+| GET\|POST | `/api/rod/hotel/<code>/trace` | simu (UI = POST) + écart si réel |
+| GET | `/api/rod/eval` | batch éval temporelle (MAE si réel) |
 
 ### Modèle ML
 
@@ -420,7 +423,8 @@ CRUD `/api/datasets/*` + rebuilds `all_data`, `model_data`, `sales`,
 Routes `/api/model/eval*` **avant** `/api/model/<model_id>`.
 
 ```bash
-curl -s 'http://127.0.0.1:5055/api/rod/hotel/H0373/trace?year=2026'
+curl -s -X POST 'http://127.0.0.1:5055/api/rod/hotel/H0373/trace' \
+  -H 'Content-Type: application/json' -d '{"year":2026,"m_lin":6,"mix_fb":0.7}'
 curl -s -X POST http://127.0.0.1:5055/api/model/eval \
   -H 'Content-Type: application/json' \
   -d '{"target":"montant_ventes","year":2026}'
@@ -430,44 +434,30 @@ curl -s -X POST http://127.0.0.1:5055/api/model/eval \
 
 ## 10. Interface user (simulateur)
 
-Wizard directeur : `templates/user/index.html` + `static/user/js/modules/`.
+UI directeur : `templates/user/index.html` + `static/user/js/modules/app.js`
+(`DirectorApp`). **Même moteur** que l’admin (`simulate_hotel_trace`), sans
+écart hold-out — focus **résultat** (grands chiffres, onglets).
 
-Parcours typique :
-
-1. Recherche / saisie code hôtel (si absent de `hotel_data` → scrape
-   unitaire possible via `hotel_fetch`).
-2. Contexte : fiche, concept pilote marque, géocode si besoin.
-3. Profil clients / besoins, mètres linéaires, options store.
-4. Simulation multi-concepts → tableaux CA, coûts, marge.
-5. Recommandation (règles taille / lifestyle / meilleure marge nette).
-
-Front OOP : `UserApp`, panels (stepper, hotel-context, simulation, …),
-helpers partagés (`shared/js`).
+1. Recherche hôtel (scrape Accor si fiche absente).
+2. Corner : m_lin, mix F&B, sous-catégories, exploitation.
+3. Recalcul **auto** → reco + CA / marge nette / coûts (très lisible).
+4. Onglets : Résultat (3 solutions) · Détail CA · Coûts & marge.
 
 ---
 
 ## 11. API user
 
-Base : `http://127.0.0.1:5056`
+Base : `http://127.0.0.1:5056` — détail [docs/API_USER.md](docs/API_USER.md).
 
 | Méthode | Chemin | Description |
 |---------|--------|-------------|
-| GET | `/` | wizard |
+| GET | `/` | UI directeur |
 | GET | `/api/health` | ping |
-| GET | `/api/meta` | labels, besoins clients, meta UI |
-| GET | `/api/brands` | marques connues |
-| GET | `/api/concept_pilote/brand/<marque>` | indicateurs pilotes |
-| GET | `/api/hotels` | liste courte |
+| GET | `/api/rod/meta` | sous-cat. + défauts corner (alias `/api/meta`) |
+| POST | `/api/rod/simulate` | **simu directeur** (ref cat. train, sans gaps) |
 | GET | `/api/hotels/search` | recherche (q) |
-| GET | `/api/hotels/<code>` | fiche |
-| GET | `/api/hotels/<code>/context` | contexte simu (peut scraper) |
-| POST | `/api/geocode` | adresse → lat/lon |
-| POST | `/api/enrich` | features manquantes |
-| POST | `/api/rule1` | preview règle clients |
-| POST | `/api/simulate` | simulation complète multi-concepts |
-
-Le corps de `/api/simulate` suit `user.models.SimulationRequest` (identité,
-exploitation, profil client, store, options).
+| GET | `/api/hotels/<code>/context` | contexte (peut scraper) |
+| POST | `/api/simulate` | legacy orchestrator (encore dispo) |
 
 ---
 

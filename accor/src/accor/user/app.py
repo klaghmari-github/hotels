@@ -1,33 +1,20 @@
 """
-Flask — interface user ROD (wizard directeur d'hôtel).
+Flask — interface **user** ROD (directeur d'hôtel).
 
-Lancer
-------
-  python run_user.py     → http://127.0.0.1:5056
-  accor-user
+Même moteur que l'admin (``rod_admin.simulate_hotel_trace``) :
+ref catégorie sur années **train**, corner (m_lin, mix, sous-cat.),
+3 concepts + reco. **Pas** d'écart hold-out (réservé admin).
 
-Static
-------
-Sert tout PROJECT_ROOT/static sous /static :
-  user/js/modules/*   front OOP (UserApp, panels)
-  shared/js/*         dom, api, toast, format
+Lancer : ``python run_user.py`` → http://127.0.0.1:5056
 
-API principales
----------------
-  /api/hotels/*                 recherche, fiche, contexte (scrape si besoin)
-  /api/simulate                 multi-concepts + reco
-  /api/geocode, /api/enrich     adresse et features manquantes
-  /api/rule1                    aperçu règle clients
-  /api/meta, /api/brands        labels UI
-  /api/concept_pilote/brand/…   indicateurs pilotes marque
+API clés
+--------
+  GET  /api/rod/meta
+  POST /api/rod/simulate     → simu directeur (fetch Accor si besoin)
+  GET  /api/hotels/search    → autocomplete
+  GET  /api/hotels/<code>/context
 
-La simulation passe par SimulationOrchestrator (services/orchestrator).
-
-Doc :
-  README.md          vue d'ensemble
-  docs/API_USER.md   contrat HTTP de chaque route
-  docs/ROD_RULES.md  revenus / coûts / reco
-  docs/FRONT.md      wizard JS
+Legacy : POST /api/simulate (orchestrator) encore dispo.
 """
 
 from __future__ import annotations
@@ -41,8 +28,6 @@ from accor.data_io import PROJECT_ROOT, STATIC_DIR, TEMPLATES_DIR
 
 from accor.user.models import SimulationRequest
 from accor.user.reference import RodReference
-from accor.user.models import DEFAULT_CLIENT_NEEDS
-from accor.user.rules.coeffs import CLIENT_NEED_LABELS, RULE3_FB_COEFFS, RULE3_NFB_COEFFS
 from accor.user.services.catalog import AdminCatalog
 from accor.user.services.enrich import FeatureEnricher
 from accor.user.services.geocode import Geocoder
@@ -79,7 +64,7 @@ _context = HotelContextBuilder()
 
 @app.get("/")
 def index():
-    """Page wizard directeur (templates/user/index.html)."""
+    """Page directeur (templates/user/index.html)."""
     return render_template("index.html")
 
 
@@ -96,9 +81,13 @@ def health():
     )
 
 
+@app.get("/api/rod/meta")
 @app.get("/api/meta")
 def meta():
-    """Métadonnées UI : concepts, besoins clients, défauts pilotes."""
+    """Métadonnées UI : sous-cat., défauts corner (aligné admin)."""
+    from accor.rod_admin import rod_ui_meta
+
+    base = rod_ui_meta()
     concepts = {}
     for name in _reference.concept_names():
         c = _reference.concept(name)
@@ -109,52 +98,61 @@ def meta():
             "pivot_guests_per_chambre": c.get("pivot_guests_per_chambre"),
             "mix_fb": c.get("mix_fb"),
             "mix_nf": c.get("mix_nf"),
-            "base_monthly_ca": c.get("base_monthly_ca"),
-            "monthly_cost_total": c.get("monthly_cost_total"),
         }
-    return jsonify(
-        {
-            "concepts": concepts,
-            "client_needs_fb": [
-                {
-                    "id": k,
-                    "label": CLIENT_NEED_LABELS.get(k, k),
-                    "group": "F&B",
-                    "default": bool(DEFAULT_CLIENT_NEEDS.get(k, True)),
-                }
-                for k in RULE3_FB_COEFFS
-            ],
-            "client_needs_nfb": [
-                {
-                    "id": k,
-                    "label": CLIENT_NEED_LABELS.get(k, k),
-                    "group": "NON-F&B",
-                    "default": bool(DEFAULT_CLIENT_NEEDS.get(k, True)),
-                }
-                for k in RULE3_NFB_COEFFS
-            ],
-            "client_needs_defaults": dict(DEFAULT_CLIENT_NEEDS),
-            "model_defaults": _catalog.model_defaults(),
-            "rules_summary": {
-                "clients_jour": "nb_chambres × TO × guests_per_chambre",
-                "clients_mois": "clients_jour × 30.5",
-                "revenue_chain": [
-                    "impact_TO",
-                    "R1_clients",
-                    "R2_mix",
-                    "R3_categories",
-                    "R4_m_lin",
-                    "marge_produit",
-                ],
-                "reco": [
-                    "n < 50 → SIMPLY only",
-                    "n ≥ 50 → LIBERTY if N-F&B lifestyle, + CONNECTED",
-                    "IBB & n < 200 → SIMPLY also allowed",
-                    "recommend = best marge nette among allowed",
-                ],
-            },
-        }
-    )
+    base["concepts"] = concepts
+    base["model_defaults"] = _catalog.model_defaults()
+    return jsonify(base)
+
+
+@app.post("/api/rod/simulate")
+def api_rod_simulate():
+    """
+    Simulation directeur — **même moteur** que l'admin.
+
+    Body : hotel_code (requis), m_lin, mix_fb, client_needs,
+    nb_chambres, taux_occupation, guests_per_chambre.
+    Scrape Accor si fiche absente. Pas d'écart hold-out.
+    """
+    from accor.rod_admin import simulate_hotel_trace
+
+    body = request.get_json(force=True, silent=True) or {}
+    code = str(body.get("hotel_code") or request.args.get("hotel_code") or "").strip()
+    if not code:
+        return jsonify({"ok": False, "error": "hotel_code requis"}), 400
+
+    def _opt_float(key):
+        v = body.get(key)
+        if v is None or v == "":
+            return None
+        try:
+            return float(v)
+        except (TypeError, ValueError):
+            return None
+
+    needs = body.get("client_needs")
+    year = None
+    if body.get("year") not in (None, ""):
+        try:
+            year = int(body.get("year"))
+        except (TypeError, ValueError):
+            year = None
+    try:
+        result = simulate_hotel_trace(
+            code,
+            year=year,
+            m_lin=_opt_float("m_lin"),
+            mix_fb=_opt_float("mix_fb"),
+            client_needs=needs if isinstance(needs, dict) else None,
+            nb_chambres=_opt_float("nb_chambres"),
+            taux_occupation=_opt_float("taux_occupation"),
+            guests_per_chambre=_opt_float("guests_per_chambre"),
+            fetch_if_missing=True,
+            include_gaps=False,
+        )
+        status = 200 if result.get("ok") else 400
+        return jsonify(result), status
+    except Exception as exc:  # noqa: BLE001
+        return jsonify({"ok": False, "error": str(exc)}), 400
 
 
 @app.get("/api/brands")

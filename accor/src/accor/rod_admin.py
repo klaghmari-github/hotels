@@ -760,6 +760,8 @@ def simulate_hotel_trace(
     nb_chambres: float | None = None,
     taux_occupation: float | None = None,
     guests_per_chambre: float | None = None,
+    fetch_if_missing: bool = False,
+    include_gaps: bool = True,
 ) -> dict[str, Any]:
     """
     Traite l'hôtel comme nouveau client (directeur de corner) :
@@ -769,6 +771,9 @@ def simulate_hotel_trace(
     * règles ROD → CA, coûts, marge pour les 3 concepts + reco.
 
     Défauts corner : m_lin hôtel ou 6, mix_fb 70 %, toutes sous-catégories ON.
+
+    ``fetch_if_missing`` : scrape Accor si fiche absente (parcours user).
+    ``include_gaps`` : écart vs réel hold-out (admin) ; False côté directeur.
     """
     code = str(hotel_code or "").strip()
     if not code:
@@ -790,7 +795,7 @@ def simulate_hotel_trace(
     # Contexte hôtel (identité / exploitation) — sans se baser sur ses ventes train
     builder = HotelContextBuilder()
     try:
-        ctx = builder.build(code, fetch_if_missing=False)
+        ctx = builder.build(code, fetch_if_missing=bool(fetch_if_missing))
     except Exception as exc:
         return {"ok": False, "error": f"Contexte : {exc}", "hotel_code": code}
 
@@ -960,71 +965,66 @@ def simulate_hotel_trace(
     else:
         recommended, best_margin, reason = "SIMPLY", "SIMPLY", "Aucun concept simulé."
 
-    # Réel hold-out (optionnel) — écart seulement s'il y a des ventes
-    hold = sales[(sales["hotel_code"] == code) & (sales["annee"] == eval_year)]
-    has_holdout = not hold.empty
-    if has_holdout:
-        sum_true = float(hold["montant_ventes"].fillna(0).sum())
-        months = sorted(int(m) for m in hold["mois"].dropna().unique().tolist())
-        avg_true = sum_true / DIVISOR_MONTHS
-    else:
-        sum_true = None
-        months = []
-        avg_true = None
-
-    # Écarts par concept (null si pas de réel)
+    # Réel hold-out / écarts — réservé à l'admin (include_gaps=True)
     gaps: dict[str, Any] = {}
-    for c, block in by_concept.items():
-        if not block.get("sales"):
-            continue
-        ca = float(block["sales"].get("ca_ht_mensuel") or 0)
-        if has_holdout and avg_true is not None:
-            gap = ca - avg_true
-            pct = (100.0 * gap / avg_true) if abs(avg_true) > 1e-9 else None
-            gaps[c] = {
-                "ca_sim_mensuel": _round(ca, 2),
-                "avg_monthly_true": _round(avg_true, 2),
-                "gap": _round(gap, 2),
-                "gap_pct": _round(pct, 1) if pct is not None else None,
-                "has_holdout": True,
-            }
-        else:
-            gaps[c] = {
-                "ca_sim_mensuel": _round(ca, 2),
-                "avg_monthly_true": None,
-                "gap": None,
-                "gap_pct": None,
-                "has_holdout": False,
-            }
+    has_holdout = False
+    months: list[int] = []
+    sum_true = None
+    avg_true = None
+    if include_gaps:
+        hold = sales[(sales["hotel_code"] == code) & (sales["annee"] == eval_year)]
+        has_holdout = not hold.empty
+        if has_holdout:
+            sum_true = float(hold["montant_ventes"].fillna(0).sum())
+            months = sorted(int(m) for m in hold["mois"].dropna().unique().tolist())
+            avg_true = sum_true / DIVISOR_MONTHS
+        for c, block in by_concept.items():
+            if not block.get("sales"):
+                continue
+            ca = float(block["sales"].get("ca_ht_mensuel") or 0)
+            if has_holdout and avg_true is not None:
+                gap = ca - avg_true
+                pct = (100.0 * gap / avg_true) if abs(avg_true) > 1e-9 else None
+                gaps[c] = {
+                    "ca_sim_mensuel": _round(ca, 2),
+                    "avg_monthly_true": _round(avg_true, 2),
+                    "gap": _round(gap, 2),
+                    "gap_pct": _round(pct, 1) if pct is not None else None,
+                    "has_holdout": True,
+                }
+            else:
+                gaps[c] = {
+                    "ca_sim_mensuel": _round(ca, 2),
+                    "avg_monthly_true": None,
+                    "gap": None,
+                    "gap_pct": None,
+                    "has_holdout": False,
+                }
 
     method = (
-        f"Split temporel : ref catégorie {category} sur {train_years} "
-        f"(année {eval_year} exclue — pas d'exclusion d'hôtel). "
-        f"Hôtel {code} traité comme nouveau client. "
-        "Règles ROD → CA / coûts / marge + reco."
+        f"Ref catégorie {category} sur {train_years} "
+        f"(année {eval_year} exclue — split temporel, pas d'exclusion d'hôtel). "
+        f"Hôtel {code} = client corner. Règles ROD → CA / coûts / marge + reco."
     )
-    if has_holdout:
-        method += f" Éval : écart vs réel {eval_year} (Σ/12)."
-    else:
-        method += f" Pas encore de réel {eval_year} pour cet hôtel."
+    if include_gaps and has_holdout:
+        method += f" Éval admin : écart vs réel {eval_year} (Σ/12)."
 
-    return {
+    out: dict[str, Any] = {
         "ok": True,
         "hotel_code": code,
         "hotel_brand": brand,
+        "hotel_name": (ctx.identity or {}).get("hotel_name") or "",
         "category": category,
         "eval_year": eval_year,
         "train_years": train_years,
         "divisor_months": int(DIVISOR_MONTHS),
         "as_new_client": True,
-        "has_holdout": has_holdout,
         "params": params_used,
         "category_reference": {
             k: v
             for k, v in cat_ref.items()
-            if k != "hotel_refs"  # allégé pour l'API ; détail dispo si besoin
+            if k != "hotel_refs"
         },
-        "category_reference_hotels": cat_ref.get("hotel_refs"),
         "identity": req.identity.to_dict(),
         "operating": req.operating.to_dict(),
         "client_needs": dict(req.client_profile.client_needs or {}),
@@ -1037,7 +1037,13 @@ def simulate_hotel_trace(
             "reason": reason,
             "warnings": reco_warnings,
         },
-        "real_holdout": {
+        "method": method,
+        "scraped": bool((ctx.sources or {}).get("scrape")),
+    }
+    if include_gaps:
+        out["has_holdout"] = has_holdout
+        out["category_reference_hotels"] = cat_ref.get("hotel_refs")
+        out["real_holdout"] = {
             "year": eval_year,
             "available": has_holdout,
             "months": months,
@@ -1045,10 +1051,9 @@ def simulate_hotel_trace(
             "sum_montant_ventes": _round(sum_true, 2) if sum_true is not None else None,
             "avg_monthly_true": _round(avg_true, 2) if avg_true is not None else None,
             "formula": f"avg_monthly_true = somme(mois {eval_year}) / {int(DIVISOR_MONTHS)}",
-        },
-        "gaps": gaps,
-        "method": method,
-    }
+        }
+        out["gaps"] = gaps
+    return out
 
 
 def evaluate_pilots_year(year: int | None = None) -> dict[str, Any]:

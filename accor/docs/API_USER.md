@@ -4,7 +4,10 @@ Serveur : `accor.user.app` — `python run_user.py` ou `accor-user`.
 
 Base URL : `http://127.0.0.1:5056`
 
-Static servi depuis `PROJECT_ROOT/static` (user + shared).
+Même moteur ROD que l’admin (`rod_admin.simulate_hotel_trace`) : ref catégorie
+sur années train, corner, 3 concepts + reco. **Sans** écart hold-out.
+
+Static : `PROJECT_ROOT/static` (user + shared).
 
 ---
 
@@ -12,7 +15,7 @@ Static servi depuis `PROJECT_ROOT/static` (user + shared).
 
 ### `GET /`
 
-Wizard directeur (`templates/user/index.html`).
+UI directeur (`templates/user/index.html`) — grands résultats, onglets.
 
 ### `GET /api/health`
 
@@ -27,12 +30,40 @@ Wizard directeur (`templates/user/index.html`).
 
 ---
 
-## Méta UI
+## Simulateur ROD (directeur)
+
+### `GET /api/rod/meta` (alias `GET /api/meta`)
+
+Sous-catégories F&B / N-F&B, défauts corner (`mix_fb` 70 %, `m_lin` 6),
+pivots concepts.
+
+### `POST /api/rod/simulate`
+
+Body JSON :
+
+| Champ | Rôle |
+|-------|------|
+| `hotel_code` | **requis** — scrape Accor si fiche absente |
+| `m_lin`, `mix_fb` | corner (mix 0–1 ou %) |
+| `client_needs` | `{ id: bool }` |
+| `nb_chambres`, `taux_occupation`, `guests_per_chambre` | exploitation |
+
+Réponse : même structure que l’admin **sans** `gaps` / `real_holdout`
+(`by_concept`, `recommendation`, `category_reference`, `params`…).
+
+```bash
+curl -s -X POST http://127.0.0.1:5056/api/rod/simulate \
+  -H 'Content-Type: application/json' \
+  -d '{"hotel_code":"H0373","m_lin":6,"mix_fb":0.7}'
+```
+
+---
+
+## Méta UI (legacy)
 
 ### `GET /api/meta`
 
-Alimente le front : pivots par concept, besoins clients F&B / N-F&B
-(labels + défauts), résumé des règles, défauts modèle.
+Alias de `/api/rod/meta`.
 
 ### `GET /api/brands`
 

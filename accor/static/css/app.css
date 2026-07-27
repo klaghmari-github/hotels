@@ -839,9 +839,22 @@ body {
   color: var(--text-muted);
 }
 #rod-eval-table td.pos,
-#rod-gap-table td.pos { color: var(--success); }
+#rod-gap-table td.pos,
+#rod-gap-table-inner td.pos { color: var(--success); }
 #rod-eval-table td.neg,
-#rod-gap-table td.neg { color: var(--danger); }
+#rod-gap-table td.neg,
+#rod-gap-table-inner td.neg { color: var(--danger); }
+
+/* Onglet écart réel / sim : bloc distinct */
+.rod-gap-kpi {
+  margin-bottom: 0.25rem;
+}
+.rod-panel[data-rod-panel="ecart"] {
+  border-color: rgba(251, 191, 36, 0.25);
+}
+.rod-panel[data-rod-panel="ecart"] > .card-title {
+  color: #fbbf24;
+}
 
 .rod-m-lin-row {
   display: flex;

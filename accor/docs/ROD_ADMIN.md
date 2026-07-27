@@ -67,10 +67,14 @@ est **déterministe** (règles Excel), pas XGBoost.
 
 ## Flux user (`run_user`)
 
-* N’importe quel code hôtel (scrape si besoin).
-* Pas d’exigence de ventes historiques.
-* Même règles + corner (mix, m_lin, besoins).
-* Pas de panneau d’écart (pas de réel futur sous la main).
+* **Même moteur** que l’admin : `simulate_hotel_trace` (ref catégorie train,
+  corner, 3 concepts + reco).
+* N’importe quel code hôtel (scrape Accor si fiche absente).
+* **Pas d’écart** hold-out (`include_gaps=False`) — le directeur regarde le
+  **résultat** (CA, marge, reco), pas la validation data.
+* UI : grands chiffres, onglets Résultat / Détail CA / Coûts & marge,
+  recalcul auto (pas de bouton Simuler).
+* API : `POST /api/rod/simulate` (port 5056).
 
 ---
 
@@ -79,12 +83,15 @@ est **déterministe** (règles Excel), pas XGBoost.
 | Méthode | Chemin | Rôle |
 |---------|--------|------|
 | GET | `/api/rod/meta` | labels sous-cat., défauts corner |
-| GET | `/api/rod/pilots?year=` | **tous** les pilotes train + flag `has_holdout` |
-| GET/POST | `/api/rod/hotel/<code>/trace` | pred + ref catégorie + reco (+ gaps si réel) |
-| GET | `/api/rod/eval?year=` | batch pred tous ; métriques si hold-out |
+| GET | `/api/rod/pilots?year=` | pilotes train + `has_holdout` / réel éval |
+| **GET\|POST** | `/api/rod/hotel/<code>/trace` | simu (UI = **POST** JSON corner) + gaps si réel |
+| GET | `/api/rod/eval?year=` | batch ; MAE / MAPE si réel hold-out |
 
 Module : `src/accor/rod_admin.py`  
-UI : `static/js/admin/rod-sim-panel.js`
+UI : `static/js/admin/rod-sim-panel.js` — recalcul auto, onglets  
+**CA** / **Coûts & marge** / **Écart réel·sim** / **Batch** (séparés).
+
+Détail HTTP : [API_ADMIN.md](API_ADMIN.md) § Simulateur ROD.
 
 ---
 

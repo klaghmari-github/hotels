@@ -283,26 +283,52 @@ Feature importance (cible principale).
 
 Voir aussi [ROD_ADMIN.md](ROD_ADMIN.md).
 
+**Contrat métier** : split **temporel** uniquement — ref / apprentissage =
+années `< year` (ex. 2023–2025) ; éval = `year` (ex. 2026). Aucune exclusion
+d’hôtel dans la ref catégorie. Peu de pilotes en apprentissage = normal.
+
+### `GET /api/rod/meta`
+
+Labels sous-catégories F&B / N-F&B, coefs, défauts corner (`mix_fb`, `m_lin`,
+`client_needs` tous ouverts).
+
 ### `GET /api/rod/pilots`
 
-Hôtels pilotes (ventes sur années **train** = avant `year`).
-Split **temporel** : ref hors `year`, éval sur `year`. Pas d’exclusion d’hôtel.
+Hôtels pilotes = codes avec ventes sur les années **train** (avant `year`).
 
 | Query | Défaut | Rôle |
 |-------|--------|------|
 | `year` | 2026 | année d’évaluation (exclue de la ref) |
 
-Réponse : `n`, `train_years`, `eval_year`, `split: "temporal"`.
-Chaque hôtel : identité + `has_holdout` / `avg_monthly_true` si réel `year`.
+Réponse : `n`, `n_with_holdout`, `train_years`, `eval_year`, `split: "temporal"`.
+Chaque hôtel : identité, catégorie, `train_years`, `has_holdout` ;
+si réel `year` : `months`, `avg_monthly_true` = Σ / 12.
 
-### `GET /api/rod/hotel/<hotel_code>/trace`
+### `GET|POST /api/rod/hotel/<hotel_code>/trace`
 
-Simu ROD (ref catégorie **train**, corner, 3 concepts + reco) + écart si réel éval.
+Simu ROD : ref catégorie **train**, corner, 3 concepts (SIMPLY / LIBERTY /
+CONNECTED) + reco + écart si réel éval.
+
+L’UI admin utilise **POST** (paramètres corner en JSON). GET reste OK pour
+un smoke test (`?year=2026`).
+
+| Body (POST) / query (GET) | Rôle |
+|---------------------------|------|
+| `year` | année d’éval (défaut 2026) |
+| `m_lin` | mètres linéaires corner |
+| `mix_fb` | mix F&B (0–1 ou %) |
+| `client_needs` | `{ id: bool }` sous-cat. autorisées |
+| `nb_chambres`, `taux_occupation`, `guests_per_chambre` | exploitation |
+
+Réponse : `category_reference`, `by_concept`, `recommendation`,
+`has_holdout`, `real_holdout`, `gaps` (null si pas de réel).
 
 ### `GET /api/rod/eval`
 
-Batch : ref = train, vérité = année hold-out. MAE / MAPE / biais sur les
-pilotes qui ont du réel cette année. Query : `year` (défaut 2026).
+Batch sur tous les pilotes train. Ref = train ; vérité = hold-out.
+Métriques MAE / RMSE / biais / MAPE sur ceux qui ont du réel `year`.
+
+Query : `year` (défaut 2026).
 
 ---
 
@@ -323,7 +349,10 @@ curl -s -X POST http://127.0.0.1:5055/api/model/deploy \
   -d '{"model_name":"xgb_sales"}'
 
 # Simulateur ROD
+curl -s 'http://127.0.0.1:5055/api/rod/meta'
 curl -s 'http://127.0.0.1:5055/api/rod/pilots?year=2026'
-curl -s 'http://127.0.0.1:5055/api/rod/hotel/H0373/trace?year=2026'
+curl -s -X POST 'http://127.0.0.1:5055/api/rod/hotel/H0373/trace' \
+  -H 'Content-Type: application/json' \
+  -d '{"year":2026,"m_lin":6,"mix_fb":0.7}'
 curl -s 'http://127.0.0.1:5055/api/rod/eval?year=2026'
 ```

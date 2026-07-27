@@ -122,7 +122,7 @@ Aujourd’hui :
 * **Éval. modèle ML** : pred XGBoost vs réel (Σ/12)
 * **Simulateur ROD** : estimation règles Excel vs réel (Σ/12)
 
-**Plus tard** : pour chaque pilote hold-out, **même hôtel / même 2026** —
-comparer **pred ML** et **sim ROD** face au réel, et entre elles
-(`gap_ml`, `gap_rod`, MAE croisées). Objectif métier : valider si l’IA bat
-les règles fixes. Voir [ROD_ADMIN.md](ROD_ADMIN.md) § roadmap.
+**Plus tard** : pour chaque pilote, **même hôtel / même 2026** (split
+temporel, pas d’exclusion d’hôtel) — comparer **pred ML** et **sim ROD**
+face au réel (`gap_ml`, `gap_rod`, MAE croisées). Objectif métier : valider
+si l’IA bat les règles fixes. Voir [ROD_ADMIN.md](ROD_ADMIN.md) § roadmap.

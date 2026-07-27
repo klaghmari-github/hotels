@@ -763,7 +763,10 @@ def api_model_importance(model_id: str):
 
 @app.get("/api/rod/pilots")
 def api_rod_pilots():
-    """Liste des hôtels pilotes avec ventes sur l'année (défaut 2026)."""
+    """
+    Pilotes = ventes sur années **train** (avant ``year``).
+    ``year`` = année d'éval (hold-out temporel, exclue de la ref).
+    """
     try:
         from accor.rod_admin import list_pilot_hotels
 
@@ -787,13 +790,12 @@ def api_rod_meta():
 @app.route("/api/rod/hotel/<hotel_code>/trace", methods=["GET", "POST"])
 def api_rod_hotel_trace(hotel_code: str):
     """
-    Hôtel = nouveau client (directeur corner).
+    Simu ROD : ref catégorie train (hors year), corner, 3 concepts + reco.
+    Écart vs réel hold-out si dispo. UI admin = POST JSON.
 
-    Body (POST) / query (GET) optionnels :
+    Body (POST) / query (GET) :
       year, m_lin, mix_fb (0–1 ou %), client_needs {id: bool},
       nb_chambres, taux_occupation, guests_per_chambre
-
-    Défauts : mix 70 % F&B, m_lin hôtel ou 6, toutes sous-catégories autorisées.
     """
     try:
         from accor.rod_admin import simulate_hotel_trace
@@ -830,8 +832,8 @@ def api_rod_hotel_trace(hotel_code: str):
 @app.get("/api/rod/eval")
 def api_rod_eval():
     """
-    Évaluation ROD sur tous les pilotes de l'année :
-    CA simulé mensuel vs réel (somme mois / 12).
+    Batch éval **temporelle** : ref train, vérité = year (ex. 2026).
+    MAE / MAPE sur les pilotes qui ont du réel cette année.
     """
     try:
         from accor.rod_admin import evaluate_pilots_year

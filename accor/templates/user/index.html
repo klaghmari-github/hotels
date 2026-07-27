@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <!--
-  Wizard user ROD (simulateur directeur).
+  ROD · Simulateur directeur (user :5056)
 
-  Etapes : 1 Hotel, 2 Services, 3 Clients, 4 Corner, 5 Simulation.
-  Front ES modules : static/user/js/modules/app.js (UserApp)
-    + static/shared/js/* (dom, api, toast, format).
-  Styles : static/user/css/user.css + static/shared/css/tokens.css.
-  API : /api/hotels/*, /api/simulate, /api/geocode, /api/rule1, …
-  Doc complete : README.md (section Interface user).
+  Même moteur que l'admin (ref catégorie train, corner, 3 concepts + reco).
+  UX : résultats grands / lisibles, onglets, recalcul auto (pas de bouton Simuler).
+  Front : static/user/js/modules/app.js
+  API  : POST /api/rod/simulate, GET /api/rod/meta, /api/hotels/*
 -->
 <html lang="fr">
 <head>
@@ -17,342 +15,151 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/shared/css/tokens.css?v=20260726f" />
-  <link rel="stylesheet" href="/static/user/css/user.css?v=20260726f" />
+  <link rel="stylesheet" href="/static/shared/css/tokens.css?v=20260727a" />
+  <link rel="stylesheet" href="/static/user/css/user.css?v=20260727a" />
 </head>
 <body>
-  <div class="shell">
-    <!-- Top bar -->
-    <header class="top">
+  <div class="dir-shell">
+    <header class="dir-top">
       <div class="brand">
         <span class="brand-mark">A</span>
         <div>
           <strong>ROD</strong>
-          <span class="brand-sub">Retail On Demand · Simulateur</span>
+          <span class="brand-sub">Retail On Demand · Directeur</span>
         </div>
       </div>
-      <nav class="top-nav">
+      <div class="dir-top-right">
+        <span class="status" id="dir-status"></span>
         <span class="pill">User</span>
-        <span class="muted small">Admin data · port 5055</span>
-      </nav>
+      </div>
     </header>
 
-    <!-- Stepper -->
-    <div class="stepper-wrap">
-      <ol class="stepper" id="stepper" aria-label="Étapes du parcours">
-        <li class="step active" data-step="1" role="button" tabindex="0" title="Aller à l’étape 1 — Hôtel"><span class="n">1</span><span class="lbl">Hôtel</span></li>
-        <li class="step" data-step="2" role="button" tabindex="0" title="Aller à l’étape 2 — Services"><span class="n">2</span><span class="lbl">Services</span></li>
-        <li class="step" data-step="3" role="button" tabindex="0" title="Aller à l’étape 3 — Clients"><span class="n">3</span><span class="lbl">Clients</span></li>
-        <li class="step" data-step="4" role="button" tabindex="0" title="Aller à l’étape 4 — Corner"><span class="n">4</span><span class="lbl">Corner</span></li>
-        <li class="step" data-step="5" role="button" tabindex="0" title="Aller à l’étape 5 — Simulation"><span class="n">5</span><span class="lbl">Simulation</span></li>
-      </ol>
-    </div>
+    <div class="dir-layout">
+      <!-- ===== Contrôles (gauche) ===== -->
+      <aside class="dir-side">
+        <section class="dir-card">
+          <h2 class="dir-card-title">Votre hôtel</h2>
+          <label class="field ac-wrap">
+            <span>Code ou nom</span>
+            <input id="hotel_search" type="text" placeholder="H0373, ibis Paris…" autocomplete="off" />
+            <ul id="ac-hotels" class="ac-list hidden" role="listbox"></ul>
+          </label>
+          <input type="hidden" id="hotel_code" />
+          <div id="hotel-summary" class="hotel-summary empty">Choisissez un hôtel</div>
+        </section>
 
-    <main class="main">
-      <!-- STEP 1 — Identité -->
-      <section class="panel" data-panel="1">
-        <div class="panel-head">
-          <h1>Informations générales</h1>
-          <p>Identité de l’hôtel, adresse et indicateurs d’exploitation.</p>
-        </div>
-
-        <div class="grid-2">
-          <div class="card">
-            <h2 class="card-title">Identité</h2>
-            <div class="form-grid-2">
-              <div class="field ac-wrap">
-                <label>Code hôtel</label>
-                <input id="hotel_code" type="text" placeholder="H0338 ou 0338" autocomplete="off" />
-                <ul id="ac-hotel-code" class="ac-list hidden" role="listbox"></ul>
-              </div>
-              <div class="field">
-                <label>Marque</label>
-                <select id="hotel_brand" name="hotel_brand">
-                  <option value="">— Choisir une marque —</option>
-                </select>
-              </div>
-            </div>
-            <div class="field ac-wrap">
-              <label>Nom de l’hôtel</label>
-              <input id="hotel_name" type="text" placeholder="ibis Styles Paris…" autocomplete="off" />
-              <ul id="ac-hotel-name" class="ac-list hidden" role="listbox"></ul>
-              <p class="hint" id="hotel-lookup-hint">Saisissez un code ou un nom — suggestions depuis le parc Accor (hotel_data).</p>
-            </div>
-            <div class="field">
-              <label>Adresse</label>
-              <input id="hotel_adresse_postale_1" type="text" placeholder="12 rue de la Paix" />
-            </div>
-            <div class="field">
-              <label>Complément (optionnel)</label>
-              <input id="hotel_adresse_postale_2" type="text" placeholder="Bâtiment B" />
-            </div>
-            <div class="form-grid-2">
-              <div class="field">
-                <label>Code postal</label>
-                <input id="hotel_code_postal" type="text" placeholder="75001" />
-              </div>
-              <div class="field">
-                <label>Ville</label>
-                <input id="hotel_city" type="text" placeholder="Paris" />
-              </div>
-            </div>
-            <div class="form-grid-2">
-              <div class="field">
-                <label>Latitude</label>
-                <input id="hotel_lat" type="number" step="any" placeholder="auto" />
-              </div>
-              <div class="field">
-                <label>Longitude</label>
-                <input id="hotel_lon" type="number" step="any" placeholder="auto" />
-              </div>
-            </div>
-            <button type="button" class="btn ghost" id="btn-geocode">
-              <span class="btn-label">Localiser depuis l’adresse</span>
-            </button>
-            <div id="geocode-status" class="wait-box hidden" role="status" aria-live="polite">
-              <div class="spinner sm"></div>
-              <div>
-                <strong>Veuillez patienter…</strong>
-                <p class="hint" style="margin:0.2rem 0 0">Recherche via adresse France, code Accor ou fiche all.accor.com…</p>
-              </div>
-            </div>
-            <p class="hint" id="geocode-hint"></p>
-          </div>
-
-          <div class="card">
-            <h2 class="card-title">Exploitation</h2>
-            <div class="kpi-row">
-              <div class="kpi">
-                <label># Chambres</label>
-                <input id="nb_chambres" type="number" min="1" max="2000" value="80" />
-              </div>
-              <div class="kpi">
-                <label>TO annuel</label>
-                <div class="input-suffix">
-                  <input id="taux_occupation" type="number" min="1" max="100" step="0.1" value="65" />
-                  <span>%</span>
-                </div>
-              </div>
-              <div class="kpi">
-                <label>Guests / chambre</label>
-                <input id="guests_per_chambre" type="number" min="0.5" max="5" step="0.1" value="1.7" />
-              </div>
-            </div>
-            <div class="derived">
-              <div>
-                <span class="muted">Clients / jour</span>
-                <strong id="out-clients-jour">—</strong>
-              </div>
-              <div>
-                <span class="muted">Clients / mois</span>
-                <strong id="out-clients-mois">—</strong>
-              </div>
-            </div>
-            <div class="hint clients-formula" id="clients-formula" style="margin-top:0.5rem"></div>
-            <div class="info-box">
-              <strong>Règle 1 — scaling par clients hébergés.</strong>
-              Le CA du concept pilote est multiplié par le ratio
-              <em>clients de votre hôtel ÷ clients du pilote</em>.
-              Les clients se calculent ainsi :
-              chambres × taux d’occupation × guests/chambre (par jour),
-              puis × 30,5 pour le mois.
-            </div>
-            <div id="brand-pilot-box" class="hist-box hidden">
-              <h3>Moyennes marque <span id="brand-pilot-name"></span></h3>
-              <p class="hint" id="brand-pilot-meta" style="margin:0 0 .65rem"></p>
-              <div class="hist-grid">
-                <div><span class="muted"># Chambres (moy.)</span><strong id="bp-chambres">—</strong></div>
-                <div><span class="muted">TO annuel (moy.)</span><strong id="bp-to">—</strong></div>
-                <div><span class="muted">Guests / ch (moy.)</span><strong id="bp-guests">—</strong></div>
-                <div><span class="muted">Clients / jour (moy.)</span><strong id="bp-clients-j">—</strong></div>
-                <div><span class="muted">Clients / mois (moy.)</span><strong id="bp-clients-m">—</strong></div>
-                <div><span class="muted">CA mensuel historique (moy.)</span><strong id="bp-ca">—</strong></div>
-              </div>
-              <p class="hint" id="brand-pilot-hint" style="margin-top:.65rem">
-                Valeurs préremplies dans les champs d’exploitation — vous pouvez les ajuster.
-              </p>
-            </div>
-
-            <div id="rule1-box" class="rule1-box">
-              <h3>Règle 1 — CA mensuel attendu</h3>
-              <p class="hint" id="rule1-meta" style="margin:0 0 .65rem">
-                CA projeté = (CA pilote + impact TO) × (clients de votre hôtel ÷ clients du pilote).
-              </p>
-              <div class="rule1-grid" id="rule1-cards">
-                <div class="rule1-card" data-concept="SIMPLY">
-                  <div class="rule1-name">SIMPLY</div>
-                  <div class="rule1-ca" id="r1-ca-SIMPLY">—</div>
-                  <div class="rule1-sub" id="r1-sub-SIMPLY"></div>
-                </div>
-                <div class="rule1-card" data-concept="LIBERTY">
-                  <div class="rule1-name">LIBERTY</div>
-                  <div class="rule1-ca" id="r1-ca-LIBERTY">—</div>
-                  <div class="rule1-sub" id="r1-sub-LIBERTY"></div>
-                </div>
-                <div class="rule1-card" data-concept="CONNECTED">
-                  <div class="rule1-name">CONNECTED</div>
-                  <div class="rule1-ca" id="r1-ca-CONNECTED">—</div>
-                  <div class="rule1-sub" id="r1-sub-CONNECTED"></div>
-                </div>
-              </div>
-              <p class="hint" id="rule1-detail" style="margin-top:.65rem"></p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- STEP 2 — Services -->
-      <section class="panel hidden" data-panel="2">
-        <div class="panel-head">
-          <h1>Services &amp; équipements</h1>
-          <p>
-            Présaisie depuis <strong>hotel_data</strong> (si l’hôtel est connu).
-            Validez ou corrigez chaque point avant de continuer.
-          </p>
-          <p class="hint" id="svc-presource-hint"></p>
-        </div>
-        <div class="grid-2">
-          <div class="card">
-            <h2 class="card-title accent-fb">F&amp;B</h2>
-            <div class="toggle-list" id="svc-fb"></div>
-          </div>
-          <div class="card">
-            <h2 class="card-title accent-nfb">Non-F&amp;B</h2>
-            <div class="toggle-list" id="svc-nfb"></div>
-          </div>
-          <div class="card">
-            <h2 class="card-title">Confort &amp; accès</h2>
-            <div class="toggle-list" id="svc-comfort"></div>
-          </div>
-          <div class="card">
-            <h2 class="card-title">Équipements lobby</h2>
-            <div class="toggle-list" id="svc-lobby"></div>
-          </div>
-          <div class="card span-2">
-            <h2 class="card-title">Corner actuel (offres)</h2>
-            <p class="hint">Si un corner existe déjà — canaux F&amp;B / non-F&amp;B observés.</p>
-            <div class="toggle-grid" id="svc-corner"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- STEP 3 — Clients -->
-      <section class="panel hidden" data-panel="3">
-        <div class="panel-head">
-          <h1>Profil de vos clients</h1>
-          <p>Mix clientèle et besoins produits (Règle 3 — coefficients catégories Excel).</p>
-        </div>
-        <div class="card">
-          <h2 class="card-title">Mix clientèle</h2>
-          <div class="form-grid-4">
-            <div class="field">
-              <label>Loisirs</label>
-              <div class="input-suffix"><input id="loisirs_pct" type="number" min="0" max="100" value="30" /><span>%</span></div>
-            </div>
-            <div class="field">
-              <label>Affaires</label>
-              <div class="input-suffix"><input id="affaires_pct" type="number" min="0" max="100" value="70" /><span>%</span></div>
-            </div>
-            <div class="field">
-              <label>National</label>
-              <div class="input-suffix"><input id="national_pct" type="number" min="0" max="100" value="60" /><span>%</span></div>
-            </div>
-            <div class="field">
-              <label>International</label>
-              <div class="input-suffix"><input id="international_pct" type="number" min="0" max="100" value="40" /><span>%</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="grid-2">
-          <div class="card">
-            <h2 class="card-title accent-fb">Besoins F&amp;B</h2>
-            <div class="toggle-list" id="needs-fb"></div>
-          </div>
-          <div class="card">
-            <h2 class="card-title accent-nfb">Besoins NON-F&amp;B</h2>
-            <div class="toggle-list" id="needs-nfb"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- STEP 4 — Corner -->
-      <section class="panel hidden" data-panel="4">
-        <div class="panel-head">
-          <h1>Boutique / corner</h1>
-          <p>Présence d’un corner actuel et paramètres de surface (Règle 4 — mètres linéaires).</p>
-        </div>
-        <div class="card narrow">
-          <div class="toggle-row">
-            <div>
-              <strong>Corner existant ?</strong>
-              <p class="muted small">Boutique, distributeurs, frigos connectés…</p>
-            </div>
-            <label class="switch">
-              <input type="checkbox" id="has_corner" />
-              <span></span>
+        <section class="dir-card">
+          <h2 class="dir-card-title">Exploitation</h2>
+          <div class="dir-kpi-inputs">
+            <label class="field">
+              <span>Chambres</span>
+              <input id="nb_chambres" type="number" min="1" max="2000" step="1" />
+            </label>
+            <label class="field">
+              <span>TO %</span>
+              <input id="taux_occupation" type="number" min="1" max="100" step="0.1" />
+            </label>
+            <label class="field">
+              <span>Guests / ch</span>
+              <input id="guests_per_chambre" type="number" min="0.5" max="5" step="0.1" />
             </label>
           </div>
-          <div class="form-grid-2" style="margin-top:1.25rem">
-            <div class="field">
-              <label>Mètres linéaires</label>
-              <input id="m_lin" type="number" min="1" max="40" step="0.5" placeholder="Défaut pilote concept" />
-              <p class="hint">Laisser vide pour le défaut Excel du concept (6 / 8 / 7 m).</p>
+        </section>
+
+        <section class="dir-card">
+          <h2 class="dir-card-title">Corner</h2>
+          <label class="field">
+            <span>Mètres linéaires <strong id="m-lin-val">6</strong></span>
+            <div class="slider-row">
+              <input type="range" id="m_lin_slider" min="1" max="40" step="0.5" value="6" />
+              <input type="number" id="m_lin" min="1" max="40" step="0.5" value="6" />
             </div>
-            <div class="field">
-              <label>Mix F&amp;B souhaité</label>
-              <div class="input-suffix">
-                <input id="mix_fb" type="number" min="0" max="100" step="1" placeholder="Défaut pilote" />
-                <span>%</span>
-              </div>
-              <p class="hint">Optionnel — ajustement Règle 2 (±10 %).</p>
+          </label>
+          <label class="field">
+            <span>Mix F&amp;B <strong id="mix-val">70</strong> % · N-F&amp;B <strong id="mix-nf-val">30</strong> %</span>
+            <div class="slider-row">
+              <input type="range" id="mix_slider" min="0" max="100" step="1" value="70" />
+              <input type="number" id="mix_fb" min="0" max="100" step="1" value="70" />
+            </div>
+          </label>
+        </section>
+
+        <section class="dir-card dir-card-needs">
+          <div class="dir-card-head">
+            <h2 class="dir-card-title">Sous-catégories</h2>
+            <div class="needs-actions">
+              <button type="button" class="btn-text" id="needs-all-on">Tout</button>
+              <button type="button" class="btn-text" id="needs-all-off">Rien</button>
             </div>
           </div>
-        </div>
-      </section>
-
-      <!-- STEP 5 — Results -->
-      <section class="panel hidden" data-panel="5">
-        <div class="panel-head row">
-          <div>
-            <h1>Simulation de revenu</h1>
-            <p>Revenus ROD + coûts séparés → marge nette → recommandation concept.</p>
+          <div class="needs-cols">
+            <div>
+              <h3 class="needs-h">F&amp;B</h3>
+              <div id="needs-fb" class="needs-list"></div>
+            </div>
+            <div>
+              <h3 class="needs-h">N-F&amp;B</h3>
+              <div id="needs-nfb" class="needs-list"></div>
+            </div>
           </div>
-          <button type="button" class="btn primary" id="btn-simulate">Lancer la simulation</button>
+        </section>
+      </aside>
+
+      <!-- ===== Résultats (droite) ===== -->
+      <main class="dir-main">
+        <div id="dir-empty" class="dir-empty">
+          <p class="dir-empty-title">Simulation corner</p>
+          <p class="dir-empty-sub">Sélectionnez un hôtel pour estimer CA, coûts et solution recommandée.</p>
         </div>
 
-        <div id="sim-loading" class="hidden loading-box" role="status" aria-live="polite">
-          <div class="spinner"></div>
-          <div>
-            <strong>Veuillez patienter…</strong>
-            <p style="margin:0.25rem 0 0">Simulation en cours — analyse des données, règles ROD et coûts.</p>
+        <div id="dir-results" class="dir-results hidden">
+          <!-- Hero reco -->
+          <section id="dir-hero" class="dir-hero">
+            <div class="dir-hero-tag">Solution recommandée</div>
+            <h1 id="dir-reco-name">—</h1>
+            <p id="dir-hotel-line" class="dir-hotel-line"></p>
+          </section>
+
+          <!-- Gros chiffres solution reco -->
+          <section class="dir-big-metrics" id="dir-big-metrics"></section>
+
+          <!-- Sélecteur concept + onglets -->
+          <div class="dir-toolbar">
+            <div class="concept-pills" id="concept-pills">
+              <button type="button" class="concept-pill" data-concept="SIMPLY">SIMPLY</button>
+              <button type="button" class="concept-pill" data-concept="LIBERTY">LIBERTY</button>
+              <button type="button" class="concept-pill" data-concept="CONNECTED">CONNECTED</button>
+            </div>
+            <div class="dir-tabs" role="tablist">
+              <button type="button" class="dir-tab active" data-tab="resultat">Résultat</button>
+              <button type="button" class="dir-tab" data-tab="ca">Détail CA</button>
+              <button type="button" class="dir-tab" data-tab="marge">Coûts &amp; marge</button>
+            </div>
           </div>
+
+          <!-- Tab Résultat : 3 cartes concept -->
+          <section class="dir-panel" data-panel="resultat">
+            <div id="dir-concept-cards" class="dir-concept-cards"></div>
+          </section>
+
+          <!-- Tab CA -->
+          <section class="dir-panel hidden" data-panel="ca">
+            <div id="dir-ca-kpi" class="dir-panel-kpi"></div>
+            <div id="dir-sales-steps" class="dir-steps"></div>
+          </section>
+
+          <!-- Tab Marge -->
+          <section class="dir-panel hidden" data-panel="marge">
+            <div id="dir-margin-table" class="dir-table-wrap"></div>
+            <h3 class="dir-subh">Lignes de coûts — solution affichée</h3>
+            <div id="dir-cost-lines" class="dir-table-wrap"></div>
+          </section>
         </div>
-
-        <div id="sim-error" class="hidden error-box"></div>
-
-        <div id="sim-reco" class="hidden reco-banner"></div>
-
-        <div id="sim-calc" class="hidden card calc-card"></div>
-
-        <div id="sim-cards" class="concept-grid"></div>
-
-        <div id="sim-enrich" class="hidden card" style="margin-top:1.25rem">
-          <h2 class="card-title">Enrichissement calculé</h2>
-          <div class="enrich-grid" id="enrich-body"></div>
-        </div>
-
-        <div id="sim-warnings" class="hidden" style="margin-top:1rem"></div>
-      </section>
-    </main>
-
-    <footer class="footer-nav">
-      <button type="button" class="btn ghost" id="btn-prev" disabled>Retour</button>
-      <div class="footer-mid muted small" id="step-label">Étape 1 / 5</div>
-      <button type="button" class="btn success" id="btn-next">Valider</button>
-    </footer>
+      </main>
+    </div>
   </div>
 
   <div id="toast" class="toast hidden"></div>
-  <script type="module" src="/static/user/js/modules/app.js?v=20260726h"></script>
+  <script type="module" src="/static/user/js/modules/app.js?v=20260727a"></script>
 </body>
 </html>
