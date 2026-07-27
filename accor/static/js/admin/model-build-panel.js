@@ -22,18 +22,31 @@ export class ModelBuildPanel {
   }
 
   async open() {
+    if (this._openBusy) return;
+    if (this.state.panel === "model-build" && this._openedOnce) {
+      this.nav.showModelBuildPanel();
+      return;
+    }
     if (!this.state.confirmLeaveDirty()) return;
-    this.nav.showModelBuildPanel();
-    await this.loadConfig();
+    this._openBusy = true;
+    this.nav.setNavBusy("build", true);
     try {
-      const prog = await api.get("/api/model/build/progress");
-      this.updateProgressUI(prog);
-      if (prog.status === "running") this.startPolling();
-      if (prog.status === "done" && (prog.results || []).length) {
-        this.renderResults(prog);
+      this.nav.showModelBuildPanel();
+      await this.loadConfig();
+      try {
+        const prog = await api.get("/api/model/build/progress");
+        this.updateProgressUI(prog);
+        if (prog.status === "running") this.startPolling();
+        if (prog.status === "done" && (prog.results || []).length) {
+          this.renderResults(prog);
+        }
+      } catch {
+        /* ignore */
       }
-    } catch {
-      /* ignore */
+      this._openedOnce = true;
+    } finally {
+      this._openBusy = false;
+      this.nav.setNavBusy("build", false);
     }
   }
 

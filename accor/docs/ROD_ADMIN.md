@@ -1,5 +1,10 @@
 # Simulateur ROD — admin vs user
 
+> **Voir aussi** : [Simulateur Excel](ROD_EXCEL_SIM.md) — UI calquée sur
+> le fichier Excel, référence par **solution** (pas par catégorie),
+> 3 onglets SIMPLY / LIBERTY / CONNECTED. Le présent document décrit le
+> simulateur ROD « validation » (catégorie + écart 2026).
+
 ## Deux applications, deux usages
 
 | App | Entrée | Public | Données de ventes |

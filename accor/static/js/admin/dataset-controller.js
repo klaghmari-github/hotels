@@ -90,35 +90,62 @@ export class DatasetController {
   }
 
   async selectDataset(id, { keepPage = false } = {}) {
+    // Même dataset en cours de chargement → ignore re-clics
+    if (this._selectBusy) {
+      if (this._selectBusyId === id) return;
+      // autre onglet pendant un load : on laisse finir le premier
+      return;
+    }
+    // Déjà affiché sur ce dataset → juste remontrer le panneau table
+    if (
+      this.state.panel === "table" &&
+      this.state.currentId === id &&
+      this.state.payload
+    ) {
+      this.nav.showTablePanel();
+      return;
+    }
     if (this.state.currentId && this.state.currentId !== id) {
       if (!this.state.confirmLeaveDirty()) return;
     }
-    this.nav.showTablePanel();
-    if (this.state.currentId !== id) {
-      this.state.clearEdits();
-      if (!keepPage) this.state.page = 1;
-      this.state.q = "";
-      if (this.els.searchInput) this.els.searchInput.value = "";
+
+    this._selectBusy = true;
+    this._selectBusyId = id;
+    this.nav.setDatasetNavBusy(id, true);
+    try {
+      this.nav.showTablePanel();
+      if (this.state.currentId !== id) {
+        this.state.clearEdits();
+        if (!keepPage) this.state.page = 1;
+        this.state.q = "";
+        if (this.els.searchInput) this.els.searchInput.value = "";
+      }
+      this.state.currentId = id;
+
+      const { btnRebuild } = this.els;
+      if (btnRebuild) {
+        btnRebuild.classList.toggle("hidden", !REBUILD_TABS.has(id));
+        btnRebuild.title = REBUILD_TITLES[id] || "Reconstruire";
+      }
+
+      const ro =
+        this.state.datasets.find((d) => d.id === id)?.readonly ||
+        id === "sales" ||
+        id === "concept_pilote";
+      if ($("#btn-add")) $("#btn-add").classList.toggle("hidden", !!ro);
+      if ($("#btn-save")) $("#btn-save").classList.toggle("hidden", !!ro);
+      if ($("#btn-delete")) $("#btn-delete").classList.toggle("hidden", !!ro);
+
+      this.nav.render();
+      // re-appliquer busy après re-render des boutons dataset
+      this.nav.setDatasetNavBusy(id, true);
+      this.nav.setModelNavActive(null);
+      await this.fetchPage();
+    } finally {
+      this._selectBusy = false;
+      this._selectBusyId = null;
+      this.nav.setDatasetNavBusy(id, false);
     }
-    this.state.currentId = id;
-
-    const { btnRebuild } = this.els;
-    if (btnRebuild) {
-      btnRebuild.classList.toggle("hidden", !REBUILD_TABS.has(id));
-      btnRebuild.title = REBUILD_TITLES[id] || "Reconstruire";
-    }
-
-    const ro =
-      this.state.datasets.find((d) => d.id === id)?.readonly ||
-      id === "sales" ||
-      id === "concept_pilote";
-    if ($("#btn-add")) $("#btn-add").classList.toggle("hidden", !!ro);
-    if ($("#btn-save")) $("#btn-save").classList.toggle("hidden", !!ro);
-    if ($("#btn-delete")) $("#btn-delete").classList.toggle("hidden", !!ro);
-
-    this.nav.render();
-    this.nav.setModelNavActive(null);
-    await this.fetchPage();
   }
 
   async fetchPage({ silent = false } = {}) {

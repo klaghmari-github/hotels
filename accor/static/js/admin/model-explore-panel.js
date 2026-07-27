@@ -25,9 +25,24 @@ export class ModelExplorePanel {
   }
 
   async open() {
+    if (this._openBusy) return;
+    if (
+      this.state.panel === "model-explore" &&
+      this.state.explore?.models?.length
+    ) {
+      this.nav.showModelExplorePanel();
+      return;
+    }
     if (!this.state.confirmLeaveDirty()) return;
-    this.nav.showModelExplorePanel();
-    await this.loadModels();
+    this._openBusy = true;
+    this.nav.setNavBusy("explore", true);
+    try {
+      this.nav.showModelExplorePanel();
+      await this.loadModels();
+    } finally {
+      this._openBusy = false;
+      this.nav.setNavBusy("explore", false);
+    }
   }
 
   async loadModels() {

@@ -93,12 +93,28 @@ export class ModelEvalPanel {
   }
 
   async open() {
+    if (this._openBusy) return;
+    const navKey = this.tier === "final" ? "final-eval" : "eval";
+    const panelKey = this.tier === "final" ? "final-eval" : "model-eval";
+    // Déjà ouvert + meta chargée → pas de rechargement
+    if (this.state.panel === panelKey && this.meta) {
+      if (this.tier === "final") this.nav.showFinalEvalPanel();
+      else this.nav.showModelEvalPanel();
+      if (this.lastResult) this.render(this.lastResult);
+      return;
+    }
     if (!this.state.confirmLeaveDirty()) return;
-    if (this.tier === "final") this.nav.showFinalEvalPanel();
-    else this.nav.showModelEvalPanel();
-    await this.loadMeta();
-    // Réafficher le dernier résultat propre à ce tier (s'il existe)
-    if (this.lastResult) this.render(this.lastResult);
+    this._openBusy = true;
+    this.nav.setNavBusy(navKey, true);
+    try {
+      if (this.tier === "final") this.nav.showFinalEvalPanel();
+      else this.nav.showModelEvalPanel();
+      await this.loadMeta();
+      if (this.lastResult) this.render(this.lastResult);
+    } finally {
+      this._openBusy = false;
+      this.nav.setNavBusy(navKey, false);
+    }
   }
 
   async loadMeta() {

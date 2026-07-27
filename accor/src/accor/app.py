@@ -992,6 +992,82 @@ def api_rod_eval():
 
 
 # ---------------------------------------------------------------------------
+# API — Simulateur Excel (réf. par solution SIMPLY/LIBERTY/CONNECTED)
+# ---------------------------------------------------------------------------
+
+@app.get("/api/rod/excel/meta")
+def api_rod_excel_meta():
+    """Meta UI Excel : commentaires, mapping pilotes, besoins, défauts."""
+    try:
+        from accor.rod_excel_sim import excel_ui_meta
+
+        return jsonify(excel_ui_meta())
+    except Exception as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+
+@app.get("/api/rod/excel/pilots")
+def api_rod_excel_pilots():
+    """Pilotes par solution + moyennes (live train + pivots Excel)."""
+    try:
+        from accor.rod_excel_sim import list_excel_pilots
+
+        year_raw = request.args.get("year")
+        year = int(year_raw) if year_raw not in (None, "") else None
+        return jsonify(list_excel_pilots(year))
+    except Exception as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+
+@app.route("/api/rod/excel/simulate", methods=["GET", "POST"])
+def api_rod_excel_simulate():
+    """
+    Dual-colonne Excel pour les 3 solutions.
+
+    Body / query :
+      hotel_code (requis), year, m_lin, mix_fb, client_needs,
+      nb_chambres, taux_occupation, guests_per_chambre
+    """
+    try:
+        from accor.rod_excel_sim import simulate_excel_dual
+
+        body = {}
+        if request.method == "POST":
+            body = request.get_json(force=True, silent=True) or {}
+
+        hotel_code = (
+            body.get("hotel_code")
+            or request.args.get("hotel_code")
+            or ""
+        )
+
+        def _opt_float(key):
+            v = body.get(key, request.args.get(key))
+            if v is None or v == "":
+                return None
+            return float(v)
+
+        needs = body.get("client_needs")
+        year_raw = body.get("year", request.args.get("year"))
+        year = int(year_raw) if year_raw not in (None, "") else None
+
+        result = simulate_excel_dual(
+            str(hotel_code),
+            year=year,
+            m_lin=_opt_float("m_lin"),
+            mix_fb=_opt_float("mix_fb"),
+            client_needs=needs if isinstance(needs, dict) else None,
+            nb_chambres=_opt_float("nb_chambres"),
+            taux_occupation=_opt_float("taux_occupation"),
+            guests_per_chambre=_opt_float("guests_per_chambre"),
+        )
+        status = 200 if result.get("ok") else 400
+        return jsonify(result), status
+    except Exception as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+
+# ---------------------------------------------------------------------------
 # Entrée CLI
 # ---------------------------------------------------------------------------
 

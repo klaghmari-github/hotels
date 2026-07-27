@@ -23,6 +23,7 @@ export class NavController {
     this.navPinnedTop = $("#nav-pinned-top");
     this.viewTable = $("#view-table");
     this.viewRodSim = $("#view-rod-sim");
+    this.viewRodExcel = $("#view-rod-excel");
     this.viewModelBuild = $("#view-model-build");
     this.viewModelExplore = $("#view-model-explore");
     this.viewFinalBuild = $("#view-final-build");
@@ -30,6 +31,7 @@ export class NavController {
     this.viewFinalEval = $("#view-final-eval");
     this.viewModelEval = $("#view-model-eval");
     this.navRodSim = $("#nav-rod-sim");
+    this.navRodExcel = $("#nav-rod-excel");
     this.navModelBuild = $("#nav-model-build");
     this.navModelExplore = $("#nav-model-explore");
     this.navFinalBuild = $("#nav-final-build");
@@ -74,9 +76,10 @@ export class NavController {
     });
   }
 
-  setModelNavActive(which) {
-    const map = {
+  _navButtonMap() {
+    return {
       rod: this.navRodSim,
+      excel: this.navRodExcel,
       build: this.navModelBuild,
       explore: this.navModelExplore,
       eval: this.navModelEval,
@@ -84,8 +87,42 @@ export class NavController {
       "final-explore": this.navFinalExplore,
       "final-eval": this.navFinalEval,
     };
-    Object.entries(map).forEach(([key, el]) => {
+  }
+
+  setModelNavActive(which) {
+    Object.entries(this._navButtonMap()).forEach(([key, el]) => {
       if (el) el.classList.toggle("active", which === key);
+    });
+  }
+
+  /**
+   * Désactive un bouton de nav pendant le chargement d'un panneau
+   * (évite re-clic → rechargements multiples).
+   * @param {string} key  rod | build | explore | eval | final-*
+   * @param {boolean} busy
+   */
+  setNavBusy(key, busy) {
+    const el = this._navButtonMap()[key];
+    if (!el) return;
+    el.disabled = !!busy;
+    el.classList.toggle("is-loading", !!busy);
+    el.setAttribute("aria-busy", busy ? "true" : "false");
+    if (busy) el.setAttribute("title", "Chargement en cours…");
+    else el.removeAttribute("title");
+  }
+
+  /**
+   * Busy sur un bouton dataset (data-id).
+   * @param {string|null} datasetId  null = clear all dataset busy
+   * @param {boolean} busy
+   */
+  setDatasetNavBusy(datasetId, busy) {
+    $$(".sidebar .nav-item[data-id]").forEach((el) => {
+      const match = datasetId != null && el.dataset.id === datasetId;
+      const on = !!busy && match;
+      el.disabled = on;
+      el.classList.toggle("is-loading", on);
+      el.setAttribute("aria-busy", on ? "true" : "false");
     });
   }
 
@@ -93,6 +130,7 @@ export class NavController {
     [
       this.viewTable,
       this.viewRodSim,
+      this.viewRodExcel,
       this.viewModelBuild,
       this.viewModelExplore,
       this.viewModelEval,
@@ -121,6 +159,14 @@ export class NavController {
     if (this.viewRodSim) this.viewRodSim.classList.remove("hidden");
     this.clearDatasetNavActive();
     this.setModelNavActive("rod");
+  }
+
+  showRodExcelPanel() {
+    this.state.panel = "rod-excel";
+    this.hideAllViews();
+    if (this.viewRodExcel) this.viewRodExcel.classList.remove("hidden");
+    this.clearDatasetNavActive();
+    this.setModelNavActive("excel");
   }
 
   showModelBuildPanel() {
@@ -174,6 +220,8 @@ export class NavController {
   wire() {
     if (this.navRodSim)
       this.navRodSim.addEventListener("click", this.handlers.onRodSim);
+    if (this.navRodExcel)
+      this.navRodExcel.addEventListener("click", this.handlers.onRodExcel);
     if (this.navModelBuild)
       this.navModelBuild.addEventListener("click", this.handlers.onModelBuild);
     if (this.navModelExplore)

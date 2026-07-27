@@ -50,13 +50,28 @@ export class RodSimPanel {
     this._simSeq = 0;
     this._progressTimer = null;
     this._progressPct = 0;
+    this._openBusy = false;
   }
 
   async open() {
+    // Re-clic pendant chargement → ignoré
+    if (this._openBusy) return;
+    // Déjà ouvert et chargé → afficher seulement (pas de rechargement)
+    if (this.state.panel === "rod-sim" && this.meta != null && this.pilots != null) {
+      this.nav.showRodSimPanel();
+      return;
+    }
     if (!this.state.confirmLeaveDirty()) return;
-    this.nav.showRodSimPanel();
-    await this.loadMeta();
-    await this.loadPilots();
+    this._openBusy = true;
+    this.nav.setNavBusy("rod", true);
+    try {
+      this.nav.showRodSimPanel();
+      await this.loadMeta();
+      await this.loadPilots();
+    } finally {
+      this._openBusy = false;
+      this.nav.setNavBusy("rod", false);
+    }
   }
 
   year() {

@@ -25,9 +25,24 @@ export class FinalModelExplorePanel {
   }
 
   async open() {
+    if (this._openBusy) return;
+    if (
+      this.state.panel === "final-explore" &&
+      this.state.finalExplore?.models?.length
+    ) {
+      this.nav.showFinalExplorePanel();
+      return;
+    }
     if (!this.state.confirmLeaveDirty()) return;
-    this.nav.showFinalExplorePanel();
-    await this.loadModels();
+    this._openBusy = true;
+    this.nav.setNavBusy("final-explore", true);
+    try {
+      this.nav.showFinalExplorePanel();
+      await this.loadModels();
+    } finally {
+      this._openBusy = false;
+      this.nav.setNavBusy("final-explore", false);
+    }
   }
 
   async loadModels() {

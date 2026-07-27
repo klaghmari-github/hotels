@@ -25,6 +25,7 @@ import { FinalModelBuildPanel } from "./final-model-build-panel.js";
 import { FinalModelExplorePanel } from "./final-model-explore-panel.js";
 import { ModelEvalPanel } from "./model-eval-panel.js";
 import { RodSimPanel } from "./rod-sim-panel.js";
+import { RodExcelPanel } from "./rod-excel-panel.js";
 
 export class AdminApp {
   constructor() {
@@ -34,6 +35,7 @@ export class AdminApp {
     this.nav = new NavController(this.state, {
       onSelectDataset: (id) => this.datasets.selectDataset(id),
       onRodSim: () => this.rodSim.open(),
+      onRodExcel: () => this.rodExcel.open(),
       onModelBuild: () => this.modelBuild.open(),
       onModelExplore: () => this.modelExplore.open(),
       onModelEval: () => this.modelEval.open(),
@@ -55,6 +57,7 @@ export class AdminApp {
       this.els
     );
     this.rodSim = new RodSimPanel(this.state, this.nav);
+    this.rodExcel = new RodExcelPanel(this.state, this.nav);
     this.modelBuild = new ModelBuildPanel(this.state, this.nav);
     this.modelExplore = new ModelExplorePanel(this.state, this.nav);
     this.finalBuild = new FinalModelBuildPanel(this.state, this.nav);
@@ -139,6 +142,7 @@ export class AdminApp {
 
     this.nav.wire();
     this.rodSim.wire();
+    this.rodExcel.wire();
     this.modelBuild.wire();
     this.modelExplore.wire();
     this.finalBuild.wire();
