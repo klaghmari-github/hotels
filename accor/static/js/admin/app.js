@@ -36,9 +36,10 @@ export class AdminApp {
       onRodSim: () => this.rodSim.open(),
       onModelBuild: () => this.modelBuild.open(),
       onModelExplore: () => this.modelExplore.open(),
+      onModelEval: () => this.modelEval.open("intermediate"),
       onFinalBuild: () => this.finalBuild.open(),
       onFinalExplore: () => this.finalExplore.open(),
-      onModelEval: () => this.modelEval.open(),
+      onFinalEval: () => this.modelEval.open("final"),
     });
 
     this.table = new TableRenderer(this.state, this.els, {

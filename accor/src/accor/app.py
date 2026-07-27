@@ -508,13 +508,13 @@ def api_model_eval_meta():
     """
     Prépare l'onglet Evaluation.
 
-    Retourne target_cols, main_target, eval_year, models, top_model,
-    n_eval_rows, méthode (somme mois / 12). Voir model_eval.eval_meta.
+    Query ``tier`` = intermediate (défaut) | final.
     """
     try:
         from accor.model_eval import eval_meta
 
-        return jsonify(eval_meta())
+        tier = request.args.get("tier") or "intermediate"
+        return jsonify(eval_meta(tier=tier))
     except Exception as exc:
         return jsonify({"ok": False, "error": str(exc)}), 400
 
@@ -523,11 +523,9 @@ def api_model_eval_meta():
 @app.post("/api/model/eval")
 def api_model_eval():
     """
-    Évalue un modèle design sur l'année incomplete (défaut meta.eval_year).
+    Évalue un modèle (intermédiaire ou final) sur l'année incomplete.
 
-    Body JSON ou query : model_id, target, year.
-    Métrique métier : par hôtel avg = sum(mois dispo) / 12 (pred vs réel),
-    puis MAE/RMSE/R²/MAPE + détail mois. Voir docs/MODEL.md.
+    Body/query : model_id, target, year, tier (intermediate|final).
     """
     try:
         from accor.model_eval import evaluate_model
@@ -544,7 +542,8 @@ def api_model_eval():
         target = body.get("target") or request.args.get("target")
         year_raw = body.get("year") if "year" in body else request.args.get("year")
         year = int(year_raw) if year_raw not in (None, "") else None
-        result = evaluate_model(model_id, target=target, year=year)
+        tier = body.get("tier") or request.args.get("tier") or "intermediate"
+        result = evaluate_model(model_id, target=target, year=year, tier=tier)
         status = 200 if result.get("ok") else 400
         return jsonify(result), status
     except Exception as exc:

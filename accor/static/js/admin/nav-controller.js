@@ -33,6 +33,7 @@ export class NavController {
     this.navModelExplore = $("#nav-model-explore");
     this.navFinalBuild = $("#nav-final-build");
     this.navFinalExplore = $("#nav-final-explore");
+    this.navFinalEval = $("#nav-final-eval");
     this.navModelEval = $("#nav-model-eval");
   }
 
@@ -77,9 +78,10 @@ export class NavController {
       rod: this.navRodSim,
       build: this.navModelBuild,
       explore: this.navModelExplore,
+      eval: this.navModelEval,
       "final-build": this.navFinalBuild,
       "final-explore": this.navFinalExplore,
-      eval: this.navModelEval,
+      "final-eval": this.navFinalEval,
     };
     Object.entries(map).forEach(([key, el]) => {
       if (el) el.classList.toggle("active", which === key);
@@ -151,12 +153,12 @@ export class NavController {
     this.setModelNavActive("final-explore");
   }
 
-  showModelEvalPanel() {
-    this.state.panel = "model-eval";
+  showModelEvalPanel(tier = "intermediate") {
+    this.state.panel = tier === "final" ? "final-eval" : "model-eval";
     this.hideAllViews();
     if (this.viewModelEval) this.viewModelEval.classList.remove("hidden");
     this.clearDatasetNavActive();
-    this.setModelNavActive("eval");
+    this.setModelNavActive(tier === "final" ? "final-eval" : "eval");
   }
 
   wire() {
@@ -166,11 +168,13 @@ export class NavController {
       this.navModelBuild.addEventListener("click", this.handlers.onModelBuild);
     if (this.navModelExplore)
       this.navModelExplore.addEventListener("click", this.handlers.onModelExplore);
+    if (this.navModelEval)
+      this.navModelEval.addEventListener("click", this.handlers.onModelEval);
     if (this.navFinalBuild)
       this.navFinalBuild.addEventListener("click", this.handlers.onFinalBuild);
     if (this.navFinalExplore)
       this.navFinalExplore.addEventListener("click", this.handlers.onFinalExplore);
-    if (this.navModelEval)
-      this.navModelEval.addEventListener("click", this.handlers.onModelEval);
+    if (this.navFinalEval)
+      this.navFinalEval.addEventListener("click", this.handlers.onFinalEval);
   }
 }

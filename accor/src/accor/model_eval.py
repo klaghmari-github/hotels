@@ -84,37 +84,67 @@ def _metrics_1d(y_true: np.ndarray, y_pred: np.ndarray) -> dict[str, float]:
     }
 
 
-def eval_meta() -> dict[str, Any]:
+def eval_meta(*, tier: str = "intermediate") -> dict[str, Any]:
     """
     Payload pour l'onglet Evaluation / GET /api/model/eval/meta.
 
-    target_cols, main_target, eval_year, models, top_model, n_eval_rows,
-    divisor_months=12, texte method.
+    ``tier`` = intermediate (models/design) ou final (models/final/design).
     """
+    tier = "final" if tier == "final" else "intermediate"
     try:
         _, meta = _load_model_frame()
     except Exception as exc:
+        models = []
+        top = None
+        if tier == "final":
+            from accor.model_final import get_final_top_model, list_final_models
+
+            models = list_final_models()
+            top = get_final_top_model()
+        else:
+            models = list_design_models()
+            top = get_top_model()
         return {
             "ok": False,
             "error": str(exc),
+            "tier": tier,
             "target_cols": [],
             "main_target": MAIN_TARGET,
             "eval_year": 2026,
-            "models": list_design_models(),
+            "models": models,
+            "top_model": top,
         }
+
+    if tier == "final":
+        from accor.model_final import get_final_top_model, list_final_models
+
+        models = list_final_models()
+        top = get_final_top_model()
+        target_cols = [meta.get("main_target") or MAIN_TARGET]
+    else:
+        models = list_design_models()
+        top = get_top_model()
+        target_cols = meta.get("target_columns") or []
+
     return {
         "ok": True,
-        "target_cols": meta.get("target_columns") or [],
+        "tier": tier,
+        "target_cols": target_cols,
         "main_target": meta.get("main_target") or MAIN_TARGET,
         "eval_year": int(meta.get("eval_year") or 2026),
         "n_eval_rows": meta.get("n_eval"),
         "n_train_rows": meta.get("n_train"),
-        "models": list_design_models(),
-        "top_model": get_top_model(),
+        "models": models,
+        "top_model": top,
         "divisor_months": 12,
         "method": (
             "Pour chaque hotel : moyenne_mensuelle = somme(mois disponibles) / 12. "
             "Compare moyenne predite vs moyenne reelle."
+            + (
+                " Modèle final = stacking descriptives + pred_*."
+                if tier == "final"
+                else " Modèles intermédiaires multi-cibles."
+            )
         ),
     }
 
@@ -124,29 +154,52 @@ def evaluate_model(
     *,
     target: str | None = None,
     year: int | None = None,
+    tier: str = "intermediate",
 ) -> dict[str, Any]:
     """
-    Évalue un modèle design sur l'année ``year`` (défaut meta.eval_year).
+    Évalue un modèle sur l'année ``year`` (défaut meta.eval_year).
 
-    model_id None → top_model puis premier design.
+    ``tier`` = intermediate (design multi-output) ou final (stacking).
+    model_id None → top_model puis premier dispo.
     target None → main_target (montant_ventes).
 
     Retourne ok, metrics_hotel_avg, metrics_month_level, hotels[],
     months_detail[], totals (sum et avg /12). Voir docs/MODEL.md.
     """
-    models = list_design_models()
-    if not model_id:
-        top = get_top_model()
-        model_id = (top or {}).get("id") or (top or {}).get("name")
-    if not model_id and models:
-        model_id = models[0].get("id") or models[0].get("name")
-    if not model_id:
-        return {"ok": False, "error": "Aucun modele design disponible."}
+    tier = "final" if tier == "final" else "intermediate"
 
-    try:
-        loaded = load_design_model(str(model_id))
-    except Exception as exc:
-        return {"ok": False, "error": f"Chargement modele impossible : {exc}"}
+    if tier == "final":
+        from accor.model_final import (
+            get_final_top_model,
+            list_final_models,
+            load_final_model,
+        )
+
+        models = list_final_models()
+        if not model_id:
+            top = get_final_top_model()
+            model_id = (top or {}).get("id") or (top or {}).get("name")
+        if not model_id and models:
+            model_id = models[0].get("id") or models[0].get("name")
+        if not model_id:
+            return {"ok": False, "error": "Aucun modele final disponible.", "tier": tier}
+        try:
+            loaded = load_final_model(str(model_id))
+        except Exception as exc:
+            return {"ok": False, "error": f"Chargement modele final impossible : {exc}"}
+    else:
+        models = list_design_models()
+        if not model_id:
+            top = get_top_model()
+            model_id = (top or {}).get("id") or (top or {}).get("name")
+        if not model_id and models:
+            model_id = models[0].get("id") or models[0].get("name")
+        if not model_id:
+            return {"ok": False, "error": "Aucun modele intermediaire disponible.", "tier": tier}
+        try:
+            loaded = load_design_model(str(model_id))
+        except Exception as exc:
+            return {"ok": False, "error": f"Chargement modele impossible : {exc}"}
 
     bundle = loaded.get("bundle") or {}
     conf_meta = loaded.get("meta") or {}
@@ -157,22 +210,62 @@ def evaluate_model(
     target_cols: list[str] = list(
         bundle.get("target_cols") or conf_meta.get("target_cols") or []
     )
-    if model is None or not feature_cols or not target_cols:
-        return {"ok": False, "error": "Bundle modele incomplet (features/cibles)."}
+    if model is None or not feature_cols:
+        return {"ok": False, "error": "Bundle modele incomplet (features).", "tier": tier}
+    if not target_cols:
+        target_cols = [MAIN_TARGET]
 
     frame, meta = _load_model_frame()
     eval_year = int(year if year is not None else (meta.get("eval_year") or 2026))
     main_t = (target or meta.get("main_target") or MAIN_TARGET or target_cols[0]).strip()
+
+    # --- Features : intermediaire = descriptives ; final = stacking ---
+    work = frame.copy()
+    if tier == "final":
+        from accor.model_final import build_stacked_features
+        from accor.model_train import load_design_model as _load_inter
+
+        mid = conf_meta.get("intermediate_model_id") or bundle.get("intermediate_model_id")
+        if not mid:
+            return {
+                "ok": False,
+                "error": "Modele final sans intermediate_model_id.",
+                "tier": tier,
+            }
+        try:
+            inter_bundle = _load_inter(str(mid))["bundle"]
+        except Exception as exc:
+            return {
+                "ok": False,
+                "error": f"Intermediaire {mid} introuvable : {exc}",
+                "tier": tier,
+            }
+        try:
+            work, feature_cols, _, _ = build_stacked_features(
+                work, meta, inter_bundle
+            )
+        except Exception as exc:
+            return {"ok": False, "error": f"Stacking features : {exc}", "tier": tier}
+        # mono-cible final
+        target_cols = [main_t] if main_t in work.columns else list(target_cols)
+        if main_t not in target_cols and main_t in work.columns:
+            target_cols = [main_t]
+    else:
+        for c in feature_cols:
+            if c not in work.columns:
+                work[c] = 0.0
+            work[c] = pd.to_numeric(work[c], errors="coerce").fillna(0.0)
+
     if main_t not in target_cols:
-        if main_t not in frame.columns:
+        if main_t not in work.columns:
             return {
                 "ok": False,
                 "error": f"Cible inconnue : {main_t}",
                 "target_cols": target_cols,
+                "tier": tier,
             }
-        # autoriser cible presente dans frame meme si hors bundle (rare)
         target_cols = list(target_cols)
-        if main_t not in target_cols:
+        if main_t not in target_cols and tier != "final":
             return {
                 "ok": False,
                 "error": (
@@ -180,18 +273,17 @@ def evaluate_model(
                     f"(cibles modele : {len(target_cols)})."
                 ),
                 "target_cols": target_cols,
+                "tier": tier,
             }
 
-    target_idx = target_cols.index(main_t)
+    target_idx = target_cols.index(main_t) if main_t in target_cols else 0
 
-    # Features manquantes → 0 (meme convention train)
-    work = frame.copy()
-    for c in feature_cols:
-        if c not in work.columns:
-            work[c] = 0.0
-        work[c] = pd.to_numeric(work[c], errors="coerce").fillna(0.0)
     if main_t not in work.columns:
-        return {"ok": False, "error": f"Colonne cible absente de model_data : {main_t}"}
+        return {
+            "ok": False,
+            "error": f"Colonne cible absente de model_data : {main_t}",
+            "tier": tier,
+        }
     work[main_t] = pd.to_numeric(work[main_t], errors="coerce")
 
     years = pd.to_numeric(work.get("annee"), errors="coerce")
@@ -207,13 +299,22 @@ def evaluate_model(
             "eval_year": eval_year,
             "target": main_t,
             "model_id": model_id,
+            "tier": tier,
+        }
+
+    missing = [c for c in feature_cols if c not in eval_df.columns]
+    if missing:
+        return {
+            "ok": False,
+            "error": f"Features manquantes : {missing[:8]}",
+            "tier": tier,
         }
 
     X = eval_df[feature_cols].to_numpy(dtype=float)
     try:
         y_pred_all = model.predict(X)
     except Exception as exc:
-        return {"ok": False, "error": f"Prediction echouee : {exc}"}
+        return {"ok": False, "error": f"Prediction echouee : {exc}", "tier": tier}
 
     y_pred_all = np.asarray(y_pred_all)
     if y_pred_all.ndim == 1:
@@ -301,6 +402,7 @@ def evaluate_model(
 
     return {
         "ok": True,
+        "tier": tier,
         "model_id": str(model_id),
         "model_name": conf_meta.get("name") or bundle.get("name") or str(model_id),
         "target": main_t,
@@ -312,6 +414,7 @@ def evaluate_model(
         "method": (
             f"avg_monthly = sum(cible sur mois disponibles {months_present}) / {int(DIV)}. "
             "Comparaison hotel par hotel puis metriques globales."
+            + (" Stacking final." if tier == "final" else "")
         ),
         "metrics_hotel_avg": metrics_hotel,
         "metrics_month_level": metrics_month,

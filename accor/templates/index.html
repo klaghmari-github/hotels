@@ -83,6 +83,13 @@
               <span class="nav-desc">Arbres · importances</span>
             </span>
           </button>
+          <button type="button" class="nav-item" id="nav-model-eval" data-panel="model-eval">
+            <span class="nav-icon">📊</span>
+            <span>
+              <span class="nav-label">Évaluation</span>
+              <span class="nav-desc">Pred vs réel · Σ/12</span>
+            </span>
+          </button>
 
           <div class="nav-section-label">Modèle final</div>
           <button type="button" class="nav-item" id="nav-final-build" data-panel="final-build">
@@ -99,13 +106,11 @@
               <span class="nav-desc">Super-modèle montant_ventes</span>
             </span>
           </button>
-
-          <div class="nav-section-label">Évaluation</div>
-          <button type="button" class="nav-item" id="nav-model-eval" data-panel="model-eval">
+          <button type="button" class="nav-item" id="nav-final-eval" data-panel="final-eval">
             <span class="nav-icon">📊</span>
             <span>
-              <span class="nav-label">Éval. modèle ML</span>
-              <span class="nav-desc">XGBoost · moyenne /12</span>
+              <span class="nav-label">Évaluation</span>
+              <span class="nav-desc">Pred finale vs réel · Σ/12</span>
             </span>
           </button>
         </div>
@@ -651,14 +656,13 @@
         </div>
       </div>
 
-      <!-- ===== Vue Evaluation ML ===== -->
+      <!-- ===== Vue Evaluation ML (intermédiaire ou final selon nav) ===== -->
       <div id="view-model-eval" class="view hidden">
         <header class="topbar">
           <div class="topbar-left">
-            <h1>Évaluation modèle ML</h1>
-            <p class="subtitle">
-              Performance XGBoost sur l annee incomplete :
-              moyenne mensuelle = somme(mois disponibles) / 12, pred vs reel.
+            <h1 id="eval-page-title">Évaluation · modèles intermédiaires</h1>
+            <p class="subtitle" id="eval-page-subtitle">
+              Pred vs réel · moyenne mensuelle = somme(mois) / 12.
             </p>
           </div>
           <div class="topbar-actions">

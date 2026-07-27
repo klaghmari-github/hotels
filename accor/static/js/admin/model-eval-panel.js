@@ -25,19 +25,42 @@ export class ModelEvalPanel {
     this.nav = nav;
     this.meta = null;
     this.lastResult = null;
+    /** @type {"intermediate"|"final"} */
+    this.tier = "intermediate";
   }
 
-  async open() {
+  /**
+   * @param {"intermediate"|"final"} [tier]
+   */
+  async open(tier = "intermediate") {
     if (!this.state.confirmLeaveDirty()) return;
-    this.nav.showModelEvalPanel();
+    this.tier = tier === "final" ? "final" : "intermediate";
+    this.nav.showModelEvalPanel(this.tier);
+    this.applyTitles();
     await this.loadMeta();
+  }
+
+  applyTitles() {
+    const title = $("#eval-page-title");
+    const sub = $("#eval-page-subtitle");
+    if (this.tier === "final") {
+      if (title) title.textContent = "Évaluation · modèle final";
+      if (sub)
+        sub.textContent =
+          "Stacking final (descriptives + pred_*) · pred vs réel · Σ mois / 12.";
+    } else {
+      if (title) title.textContent = "Évaluation · modèles intermédiaires";
+      if (sub)
+        sub.textContent =
+          "Multi-cibles · pred vs réel · moyenne mensuelle = somme(mois) / 12.";
+    }
   }
 
   async loadMeta() {
     const status = $("#eval-status");
     if (status) status.textContent = "Chargement…";
     try {
-      const meta = await api.get("/api/model/eval/meta");
+      const meta = await api.get("/api/model/eval/meta", { tier: this.tier });
       this.meta = meta;
       this.fillModels(meta.models || [], meta.top_model);
       this.fillTargets(meta.target_cols || [], meta.main_target);
@@ -111,6 +134,7 @@ export class ModelEvalPanel {
         model_id: modelId,
         target,
         year,
+        tier: this.tier,
       });
       if (!res.ok) throw new Error(res.error || "Echec evaluation");
       this.lastResult = res;
