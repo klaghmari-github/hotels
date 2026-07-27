@@ -223,25 +223,42 @@ export class RodSimPanel {
   }
 
   renderNeedsToggles(meta) {
+    const syncState = (item) => {
+      const on = !!item.querySelector("input[data-need]")?.checked;
+      const st = item.querySelector(".rod-need-state");
+      if (st) st.textContent = on ? "Autorisé" : "Interdit";
+      item.classList.toggle("is-on", on);
+      item.classList.toggle("is-off", !on);
+    };
+
     const fill = (hostId, items) => {
       const host = $("#" + hostId);
       if (!host) return;
       host.innerHTML = (items || [])
-        .map(
-          (it) => `
-        <label class="rod-need-item">
-          <span>${escapeHtml(it.label || it.id)}</span>
-          <span class="switch">
-            <input type="checkbox" data-need="${escapeHtml(it.id)}" ${
-              it.default !== false ? "checked" : ""
-            } />
-            <span></span>
+        .map((it) => {
+          const on = it.default !== false;
+          return `
+        <label class="rod-need-item ${on ? "is-on" : "is-off"}">
+          <span class="rod-need-label">
+            <strong>${escapeHtml(it.label || it.id)}</strong>
+            <span class="rod-need-state">${on ? "Autorisé" : "Interdit"}</span>
           </span>
-        </label>`
-        )
+          <span class="switch" title="${on ? "Désactiver" : "Activer"}">
+            <input type="checkbox" role="switch" data-need="${escapeHtml(it.id)}"
+              aria-label="${escapeHtml(it.label || it.id)}"
+              ${on ? "checked" : ""} />
+            <span aria-hidden="true"></span>
+          </span>
+        </label>`;
+        })
         .join("");
-      host.querySelectorAll("input[data-need]").forEach((el) => {
-        el.addEventListener("change", () => {
+      host.querySelectorAll(".rod-need-item").forEach((item) => {
+        const input = item.querySelector("input[data-need]");
+        if (!input) return;
+        input.addEventListener("change", () => {
+          syncState(item);
+          const sw = item.querySelector(".switch");
+          if (sw) sw.title = input.checked ? "Désactiver" : "Activer";
           this._paramsTouched = true;
           this.scheduleSim();
         });
@@ -255,6 +272,15 @@ export class RodSimPanel {
     $$("#rod-needs-fb input[data-need], #rod-needs-nfb input[data-need]").forEach(
       (el) => {
         el.checked = !!on;
+        const item = el.closest(".rod-need-item");
+        if (item) {
+          item.classList.toggle("is-on", !!on);
+          item.classList.toggle("is-off", !on);
+          const st = item.querySelector(".rod-need-state");
+          if (st) st.textContent = on ? "Autorisé" : "Interdit";
+          const sw = item.querySelector(".switch");
+          if (sw) sw.title = on ? "Désactiver" : "Activer";
+        }
       }
     );
     this._paramsTouched = true;
@@ -503,7 +529,18 @@ export class RodSimPanel {
         const needs = p.client_needs || data.client_needs || {};
         Object.keys(needs).forEach((id) => {
           const el = document.querySelector(`input[data-need="${id}"]`);
-          if (el) el.checked = !!needs[id];
+          if (!el) return;
+          const on = !!needs[id];
+          el.checked = on;
+          const item = el.closest(".rod-need-item");
+          if (item) {
+            item.classList.toggle("is-on", on);
+            item.classList.toggle("is-off", !on);
+            const st = item.querySelector(".rod-need-state");
+            if (st) st.textContent = on ? "Autorisé" : "Interdit";
+            const sw = item.querySelector(".switch");
+            if (sw) sw.title = on ? "Désactiver" : "Activer";
+          }
         });
       }
 
