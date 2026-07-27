@@ -1,3 +1,5 @@
+run_dev url : http://192.168.1.80:5060
+
 # Accor ROD
 
 Deux applications Flask qui partagent le même package Python `accor` et les
@@ -90,7 +92,20 @@ accor-admin
 python run_user.py
 # ou
 accor-user
+
+# Dev console Grok (web) → 0.0.0.0:5060
+python run_dev.py
+# ou
+accor-dev
+
+# Garde run_dev UP (toutes les 60s) + met à jour « run_dev url » en tête du README + git push
+python scripts/dev_watchdog.py
+# nohup python scripts/dev_watchdog.py >> /tmp/accor-dev-watchdog.log 2>&1 &
 ```
+
+La ligne **`run_dev url : …`** en tête de ce README est maintenue par le
+watchdog (IP LAN du PC). Désactiver le push : `ACCOR_DEV_NO_PUSH=1`.
+
 
 Au démarrage, la console affiche les URL **local** et **réseau** (IP LAN).
 
