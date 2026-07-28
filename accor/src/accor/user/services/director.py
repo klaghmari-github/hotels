@@ -182,31 +182,43 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
     nb_bars = int(services_map.get("nb_bars") or 0)
     derniere_reno = _i(params.get("hotel_derniere_reno"), None)
 
-    needs = dict(DEFAULT_CLIENT_NEEDS)
-    raw_needs = body.get("client_needs") if isinstance(body.get("client_needs"), dict) else {}
-    for k, v in raw_needs.items():
-        needs[str(k)] = bool(v)
+    from accor.user.rules.assortment import (
+        FB_KEYS,
+        NFB_KEYS,
+        needs_from_shares,
+        optimize_repartition,
+        parse_shares_payload,
+        shares_for_api,
+    )
+
+    # Parts relatives F&B / N-F&B (somme forcée à 1 par catégorie)
+    shares_fb, shares_nfb, needs, _ = parse_shares_payload(
+        body, default_needs=dict(DEFAULT_CLIENT_NEEDS)
+    )
     for k in list(RULE3_FB_COEFFS) + list(RULE3_NFB_COEFFS):
         needs.setdefault(k, False)
 
+    optimize = bool(
+        body.get("optimize_repartition")
+        or body.get("optimize")
+        or body.get("optimize_shares")
+    )
+
     # Clientèle % depuis hotel_params si fournis
-    profile_kw: dict[str, Any] = {"client_needs": dict(needs)}
+    profile_base: dict[str, Any] = {}
     if params.get("hotel_loisirs_pct") is not None:
-        profile_kw["loisirs_pct"] = float(params["hotel_loisirs_pct"])
+        profile_base["loisirs_pct"] = float(params["hotel_loisirs_pct"])
     if params.get("hotel_affaires_pct") is not None:
-        profile_kw["affaires_pct"] = float(params["hotel_affaires_pct"])
+        profile_base["affaires_pct"] = float(params["hotel_affaires_pct"])
     if params.get("hotel_national_pct") is not None:
-        profile_kw["national_pct"] = float(params["hotel_national_pct"])
+        profile_base["national_pct"] = float(params["hotel_national_pct"])
     if params.get("hotel_international_pct") is not None:
-        profile_kw["international_pct"] = float(params["hotel_international_pct"])
+        profile_base["international_pct"] = float(params["hotel_international_pct"])
 
     ref = RodReference()
     rev = RevenueRules(ref)
     cost = CostRules(ref)
     reco_engine = RecommendationRules()
-
-    sim_by: dict[str, Any] = {}
-    req_for_reco: SimulationRequest | None = None
 
     services_obj = HotelServices(
         bar=bool(services_map.get("bar")),
@@ -242,39 +254,97 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
         corner_nfb_reception=bool(services_map.get("corner_nfb_reception")),
     )
 
-    for concept in CONCEPTS:
-        req = SimulationRequest(
-            identity=HotelIdentity(
-                hotel_code=code,
-                hotel_name=identity_name,
-                hotel_brand=identity_brand,
-            ),
-            operating=HotelOperating(
-                nb_chambres=int(round(n)),
-                taux_occupation=to,
-                guests_per_chambre=g,
-            ),
-            services=services_obj,
-            client_profile=ClientProfile(**profile_kw),
-            store=StoreConfig(
-                concept=concept,
-                m_lin=m_lin,
-                mix_fb=mix_fb,
-                mix_nf=1.0 - mix_fb,
-            ),
-        )
-        if concept == CONCEPTS[0]:
-            req_for_reco = req
+    identity = HotelIdentity(
+        hotel_code=code,
+        hotel_name=identity_name,
+        hotel_brand=identity_brand,
+    )
+    operating = HotelOperating(
+        nb_chambres=int(round(n)),
+        taux_occupation=to,
+        guests_per_chambre=g,
+    )
 
-        rev_res = rev.compute(req, concept)
-        cost_res = cost.compute(req, concept)
-        ca = float(rev_res.ca_ht_mensuel or 0)
-        marge_prod = float(rev_res.marge_produit_mensuelle or 0)
-        cout = float(cost_res.monthly_cost or 0)
-        capex = float(cost_res.capex or 0)
-        sim_by[concept] = _money_block(
-            ca=ca, cout=cout, capex=capex, marge_produit=marge_prod
+    def _run_three(
+        mix: float, sh_fb: dict[str, float], sh_nfb: dict[str, float]
+    ) -> tuple[dict[str, Any], SimulationRequest | None, dict[str, Any]]:
+        nd = needs_from_shares(sh_fb, sh_nfb)
+        profile = ClientProfile(
+            client_needs=nd,
+            shares_fb=dict(sh_fb),
+            shares_nfb=dict(sh_nfb),
+            **profile_base,
         )
+        by: dict[str, Any] = {}
+        req0: SimulationRequest | None = None
+        ca_by: dict[str, float] = {}
+        for concept in CONCEPTS:
+            req = SimulationRequest(
+                identity=identity,
+                operating=operating,
+                services=services_obj,
+                client_profile=profile,
+                store=StoreConfig(
+                    concept=concept,
+                    m_lin=m_lin,
+                    mix_fb=mix,
+                    mix_nf=1.0 - mix,
+                ),
+            )
+            if concept == CONCEPTS[0]:
+                req0 = req
+            rev_res = rev.compute(req, concept)
+            cost_res = cost.compute(req, concept)
+            ca = float(rev_res.ca_ht_mensuel or 0)
+            ca_by[concept] = ca
+            by[concept] = _money_block(
+                ca=ca,
+                cout=float(cost_res.monthly_cost or 0),
+                capex=float(cost_res.capex or 0),
+                marge_produit=float(rev_res.marge_produit_mensuelle or 0),
+            )
+        # CA de la solution recommandée (ou max si reco échoue)
+        rec, _, _ = reco_engine.recommend_tree(req0 or SimulationRequest(), m_lin=m_lin, to=to)
+        ca_ht = ca_by.get(rec) if rec in ca_by else max(ca_by.values(), default=0.0)
+        if ca_ht is None:
+            ca_ht = max(ca_by.values(), default=0.0)
+        return by, req0, {"ca_ht": float(ca_ht), "ca_by": ca_by, "recommended": rec}
+
+    opt_meta: dict[str, Any] = {"optimized": False, "normalized": True}
+    if optimize:
+        en_fb = {k: bool(needs.get(k, False)) for k in FB_KEYS}
+        en_nfb = {k: bool(needs.get(k, False)) for k in NFB_KEYS}
+        # au moins un produit par canal si possible
+        if not any(en_fb.values()):
+            en_fb = {k: True for k in FB_KEYS}
+        if not any(en_nfb.values()):
+            en_nfb = {k: True for k in NFB_KEYS}
+
+        def _sim(mix: float, sh_fb: dict, sh_nfb: dict) -> dict:
+            _, _, meta = _run_three(mix, sh_fb, sh_nfb)
+            return meta
+
+        opt = optimize_repartition(
+            simulate_fn=_sim,
+            enabled_fb=en_fb,
+            enabled_nfb=en_nfb,
+            m_lin=m_lin,
+        )
+        if opt.get("ok"):
+            mix_fb = float(opt["mix_fb"])
+            shares_fb = dict(opt["shares_fb"])
+            shares_nfb = dict(opt["shares_nfb"])
+            needs = needs_from_shares(shares_fb, shares_nfb)
+            opt_meta = {
+                "optimized": True,
+                "normalized": True,
+                "strategy": opt.get("strategy"),
+                "trials": opt.get("trials"),
+                "ca_ht_best": opt.get("ca_ht"),
+            }
+
+    sim_by, req_for_reco, _meta_run = _run_three(mix_fb, shares_fb, shares_nfb)
+    category_shares_out = shares_for_api(shares_fb, shares_nfb)
 
     # Prédictions IA (3 scénarios solution) — mêmes coûts, CA modèle
     ai_note = ""
@@ -389,7 +459,12 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
             "mix_fb": round(mix_fb, 4),
             "mix_nf": round(1.0 - mix_fb, 4),
             "hotel_params": params,
+            "client_needs": needs,
+            "shares_fb": shares_fb,
+            "shares_nfb": shares_nfb,
         },
+        "category_shares": category_shares_out,
+        "assortment": opt_meta,
         "recommended_solution": recommended,
         "concept_order": order,
         "recommendation_reasons": reasons,

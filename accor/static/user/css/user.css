@@ -1367,6 +1367,123 @@ body.rod-body {
   }
 }
 
+/* Répartition produits (parts relatives) */
+.share-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.45rem 0.65rem;
+  align-items: center;
+  padding: 0.35rem 0.4rem;
+  border-radius: 10px;
+  border: 1px solid transparent;
+}
+.share-row.is-off { opacity: 0.55; }
+.share-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  padding: 0.2rem 0;
+}
+.share-pct {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.share-pct input {
+  width: 3.6rem;
+  padding: 0.28rem 0.35rem;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.04);
+  color: var(--text, #eef2f7);
+  font: inherit;
+  text-align: right;
+}
+.share-pct input:disabled {
+  opacity: 0.4;
+}
+.needs-sum {
+  margin-left: auto;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+.needs-sum.is-ok { color: var(--success, #3ecf8e); }
+.needs-sum.is-bad { color: var(--danger, #ff5c7a); }
+.needs-h {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.wiz-actions-split {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.wiz-actions-right {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+.assortment-panel {
+  margin: 1rem 0 1.25rem;
+  padding: 1rem 1.1rem;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.03);
+}
+.assortment-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+@media (max-width: 720px) {
+  .assortment-cols { grid-template-columns: 1fr; }
+}
+.assort-bar-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.4fr) auto;
+  gap: 0.4rem 0.55rem;
+  align-items: center;
+  font-size: 0.78rem;
+  margin-bottom: 0.4rem;
+}
+.assort-lab {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.assort-track {
+  height: 0.45rem;
+  border-radius: 99px;
+  background: rgba(255,255,255,0.08);
+  overflow: hidden;
+}
+.assort-track i {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--accent, #d4af37), #f0d56a);
+}
+.assort-pct {
+  font-weight: 600;
+  min-width: 3.2rem;
+  text-align: right;
+}
+
 /* Paramètres hotel_data (étape 2) */
 .form-prefill-hint {
   margin: 0 0 1rem;

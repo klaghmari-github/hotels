@@ -241,6 +241,9 @@ class ClientProfile:
     client_needs: dict[str, bool] = field(
         default_factory=lambda: dict(DEFAULT_CLIENT_NEEDS)
     )
+    # Parts relatives par catégorie (somme ≈ 1 au sein de F&B et de N-F&B)
+    shares_fb: dict[str, float] = field(default_factory=dict)
+    shares_nfb: dict[str, float] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -263,12 +266,34 @@ class ClientProfile:
                 v = v / 100.0
             return min(max(v, 0.0), 1.0)
 
+        def _shares(key: str) -> dict[str, float]:
+            raw_s = data.get(key) or {}
+            if not isinstance(raw_s, dict):
+                return {}
+            out: dict[str, float] = {}
+            for k, v in raw_s.items():
+                try:
+                    out[str(k)] = float(v)
+                except (TypeError, ValueError):
+                    continue
+            return out
+
+        cat = data.get("category_shares") if isinstance(data.get("category_shares"), dict) else {}
+        shares_fb = _shares("shares_fb")
+        shares_nfb = _shares("shares_nfb")
+        if not shares_fb and isinstance(cat.get("fb"), dict):
+            shares_fb = {str(k): float(v) for k, v in cat["fb"].items() if v is not None}
+        if not shares_nfb and isinstance(cat.get("nfb"), dict):
+            shares_nfb = {str(k): float(v) for k, v in cat["nfb"].items() if v is not None}
+
         return cls(
             loisirs_pct=_pct("loisirs_pct", 0.30),
             affaires_pct=_pct("affaires_pct", 0.70),
             national_pct=_pct("national_pct", 0.60),
             international_pct=_pct("international_pct", 0.40),
             client_needs=needs,
+            shares_fb=shares_fb,
+            shares_nfb=shares_nfb,
         )
 
 

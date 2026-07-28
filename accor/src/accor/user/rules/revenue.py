@@ -111,7 +111,39 @@ class RevenueRules:
         return ca_fb + unit_fb * abs_diff, ca_nf + unit_nf * abs_diff, diff
 
     @staticmethod
-    def cumul_rule3(client_needs: dict[str, bool]) -> Tuple[float, float]:
+    def cumul_rule3(
+        client_needs: dict[str, bool],
+        *,
+        shares_fb: dict[str, float] | None = None,
+        shares_nfb: dict[str, float] | None = None,
+    ) -> Tuple[float, float]:
+        """
+        Cumuls règle 3.
+
+        Si ``shares_fb`` / ``shares_nfb`` fournis (parts relatives catégorie),
+        utilise le score base×qualité (voir assortment.cumul_rule3_from_shares).
+        Sinon comportement historique booléen (produit ON → +coeff).
+        """
+        if shares_fb is not None or shares_nfb is not None:
+            from accor.user.rules.assortment import (
+                cumul_rule3_from_shares,
+                equal_shares,
+                FB_KEYS,
+                NFB_KEYS,
+            )
+
+            if shares_fb is None:
+                shares_fb = equal_shares(
+                    FB_KEYS, {k: bool(client_needs.get(k, True)) for k in FB_KEYS}
+                )
+            if shares_nfb is None:
+                shares_nfb = equal_shares(
+                    NFB_KEYS, {k: bool(client_needs.get(k, True)) for k in NFB_KEYS}
+                )
+            return (
+                cumul_rule3_from_shares(shares_fb, RULE3_FB_COEFFS),
+                cumul_rule3_from_shares(shares_nfb, RULE3_NFB_COEFFS),
+            )
         cumul_fb = sum(
             c for k, c in RULE3_FB_COEFFS.items() if client_needs.get(k, True)
         )
@@ -217,7 +249,14 @@ class RevenueRules:
         )
         # Plancher par canal apres R2 (evite un mix extreme d annuler tout le CA)
         ca_fb, ca_nf = max(ca_fb, 0.0), max(ca_nf, 0.0)
-        cumul_fb, cumul_nf = self.cumul_rule3(request.client_profile.client_needs)
+        profile = request.client_profile
+        shares_fb = getattr(profile, "shares_fb", None) or None
+        shares_nfb = getattr(profile, "shares_nfb", None) or None
+        cumul_fb, cumul_nf = self.cumul_rule3(
+            profile.client_needs or {},
+            shares_fb=shares_fb,
+            shares_nfb=shares_nfb,
+        )
         ca_fb, ca_nf, delta_fb, delta_nf = self.rule3_categories(
             ca_fb, ca_nf, cumul_fb, cumul_nf
         )

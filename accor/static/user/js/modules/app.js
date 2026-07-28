@@ -234,7 +234,8 @@ class DirectorApp {
       if (this.hotel) this.goStep(2);
     });
     $("#btn-step2-next")?.addEventListener("click", () => this.goStep(3));
-    $("#btn-run-sim")?.addEventListener("click", () => this.runSim());
+    $("#btn-run-sim")?.addEventListener("click", () => this.runSim(true));
+    $("#btn-run-sim-manual")?.addEventListener("click", () => this.runSim(false));
 
     $$("[data-goto]").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -676,52 +677,175 @@ class DirectorApp {
   }
 
   renderNeeds(meta) {
-    const fill = (hostId, items) => {
+    const fill = (hostId, items, channel) => {
       const host = $("#" + hostId);
       if (!host) return;
-      host.innerHTML = (items || [])
+      const list = items || [];
+      const active = list.filter((it) => it.default !== false);
+      const eq = active.length ? Math.round(1000 / active.length) / 10 : 0;
+      host.innerHTML = list
         .map((it) => {
           const on = it.default !== false;
+          const pct = on ? eq : 0;
           return `
-        <button
-          type="button"
-          class="need-toggle ${on ? "is-on" : ""}"
-          role="switch"
-          aria-checked="${on ? "true" : "false"}"
-          data-need="${escapeHtml(it.id)}"
-        >
-          <span class="need-toggle-lab">${escapeHtml(it.label || it.id)}</span>
-          <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
-        </button>`;
+        <div class="share-row ${on ? "is-on" : "is-off"}" data-need="${escapeHtml(
+          it.id
+        )}" data-channel="${channel}">
+          <button type="button" class="share-toggle" role="switch"
+            aria-checked="${on ? "true" : "false"}" data-need-toggle="${escapeHtml(it.id)}">
+            <span class="need-toggle-lab">${escapeHtml(it.label || it.id)}</span>
+            <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+          </button>
+          <label class="share-pct">
+            <input type="number" min="0" max="100" step="1"
+              data-share="${escapeHtml(it.id)}" data-channel="${channel}"
+              value="${pct}" ${on ? "" : "disabled"} />
+            <span>%</span>
+          </label>
+        </div>`;
         })
         .join("");
-      host.querySelectorAll(".need-toggle").forEach((btn) => {
+      host.querySelectorAll("[data-need-toggle]").forEach((btn) => {
         btn.addEventListener("click", () => {
-          const on = !btn.classList.contains("is-on");
-          btn.classList.toggle("is-on", on);
-          btn.setAttribute("aria-checked", on ? "true" : "false");
+          const row = btn.closest(".share-row");
+          const next = btn.getAttribute("aria-checked") !== "true";
+          btn.setAttribute("aria-checked", next ? "true" : "false");
+          btn.classList.toggle("is-on", next);
+          if (row) {
+            row.classList.toggle("is-on", next);
+            row.classList.toggle("is-off", !next);
+            const inp = row.querySelector("[data-share]");
+            if (inp) {
+              inp.disabled = !next;
+              if (!next) inp.value = "0";
+              else this._redistributeEqual(channel);
+            }
+          }
+          this._updateShareSums();
         });
       });
+      host.querySelectorAll("[data-share]").forEach((inp) => {
+        inp.addEventListener("input", () => this._updateShareSums());
+        inp.addEventListener("change", () => this._updateShareSums());
+      });
     };
-    fill("needs-fb", meta.client_needs_fb);
-    fill("needs-nfb", meta.client_needs_nfb);
+    fill("needs-fb", meta.client_needs_fb, "fb");
+    fill("needs-nfb", meta.client_needs_nfb, "nfb");
+    this._updateShareSums();
+  }
+
+  _redistributeEqual(channel) {
+    const rows = $$(`.share-row[data-channel="${channel}"].is-on [data-share]`);
+    if (!rows.length) return;
+    const eq = Math.floor(1000 / rows.length) / 10;
+    let acc = 0;
+    rows.forEach((inp, i) => {
+      if (i === rows.length - 1) inp.value = String(Math.round((100 - acc) * 10) / 10);
+      else {
+        inp.value = String(eq);
+        acc += eq;
+      }
+    });
+  }
+
+  _updateShareSums() {
+    const sum = (channel) => {
+      let s = 0;
+      $$(`[data-share][data-channel="${channel}"]`).forEach((inp) => {
+        if (inp.disabled) return;
+        s += Number(inp.value) || 0;
+      });
+      return s;
+    };
+    const fb = sum("fb");
+    const nfb = sum("nfb");
+    const elFb = $("#sum-fb");
+    const elNfb = $("#sum-nfb");
+    if (elFb) {
+      elFb.textContent = `${Math.round(fb * 10) / 10} %`;
+      elFb.classList.toggle("is-ok", Math.abs(fb - 100) < 0.6);
+      elFb.classList.toggle("is-bad", Math.abs(fb - 100) >= 0.6);
+    }
+    if (elNfb) {
+      elNfb.textContent = `${Math.round(nfb * 10) / 10} %`;
+      elNfb.classList.toggle("is-ok", Math.abs(nfb - 100) < 0.6);
+      elNfb.classList.toggle("is-bad", Math.abs(nfb - 100) >= 0.6);
+    }
   }
 
   applyNeeds(map) {
-    $$(".need-toggle[data-need]").forEach((btn) => {
-      const id = btn.dataset.need;
-      if (!(id in map)) return;
+    Object.keys(map || {}).forEach((id) => {
       const on = !!map[id];
-      btn.classList.toggle("is-on", on);
-      btn.setAttribute("aria-checked", on ? "true" : "false");
+      const btn = document.querySelector(`[data-need-toggle="${id}"]`);
+      const row = document.querySelector(`.share-row[data-need="${id}"]`);
+      if (btn) {
+        btn.setAttribute("aria-checked", on ? "true" : "false");
+        btn.classList.toggle("is-on", on);
+      }
+      if (row) {
+        row.classList.toggle("is-on", on);
+        row.classList.toggle("is-off", !on);
+        const inp = row.querySelector("[data-share]");
+        if (inp) {
+          inp.disabled = !on;
+          if (!on) inp.value = "0";
+        }
+      }
     });
+    // égaliser chaque canal
+    this._redistributeEqual("fb");
+    this._redistributeEqual("nfb");
+    this._updateShareSums();
+  }
+
+  applyCategoryShares(cat) {
+    if (!cat) return;
+    const applyList = (list, channel) => {
+      (list || []).forEach((row) => {
+        const id = row.id;
+        const on = row.enabled !== false && (row.share || 0) > 0;
+        const btn = document.querySelector(`[data-need-toggle="${id}"]`);
+        const rowEl = document.querySelector(`.share-row[data-need="${id}"]`);
+        if (btn) {
+          btn.setAttribute("aria-checked", on ? "true" : "false");
+          btn.classList.toggle("is-on", on);
+        }
+        if (rowEl) {
+          rowEl.classList.toggle("is-on", on);
+          rowEl.classList.toggle("is-off", !on);
+          const inp = rowEl.querySelector("[data-share]");
+          if (inp) {
+            inp.disabled = !on;
+            inp.value = on ? String(Math.round((row.pct ?? row.share * 100) * 10) / 10) : "0";
+          }
+        }
+      });
+    };
+    applyList(cat.fb, "fb");
+    applyList(cat.nfb, "nfb");
+    this._updateShareSums();
   }
 
   setAllNeeds(on) {
-    $$(".need-toggle[data-need]").forEach((btn) => {
-      btn.classList.toggle("is-on", !!on);
-      btn.setAttribute("aria-checked", on ? "true" : "false");
+    $$(".share-row").forEach((row) => {
+      const btn = row.querySelector("[data-need-toggle]");
+      const inp = row.querySelector("[data-share]");
+      if (btn) {
+        btn.setAttribute("aria-checked", on ? "true" : "false");
+        btn.classList.toggle("is-on", !!on);
+      }
+      row.classList.toggle("is-on", !!on);
+      row.classList.toggle("is-off", !on);
+      if (inp) {
+        inp.disabled = !on;
+        if (!on) inp.value = "0";
+      }
     });
+    if (on) {
+      this._redistributeEqual("fb");
+      this._redistributeEqual("nfb");
+    }
+    this._updateShareSums();
   }
 
   setMLin(v) {
@@ -746,20 +870,36 @@ class DirectorApp {
 
   collectNeeds() {
     const needs = {};
-    $$(".need-toggle[data-need]").forEach((btn) => {
-      needs[btn.dataset.need] = btn.classList.contains("is-on");
+    $$(".share-row[data-need]").forEach((row) => {
+      needs[row.dataset.need] = row.classList.contains("is-on");
     });
     return needs;
   }
 
-  collectBody() {
+  collectShares() {
+    const fb = {};
+    const nfb = {};
+    $$("[data-share]").forEach((inp) => {
+      const id = inp.dataset.share;
+      const ch = inp.dataset.channel;
+      const on = !inp.disabled;
+      let pct = on ? Number(inp.value) || 0 : 0;
+      if (pct < 0) pct = 0;
+      const share = pct / 100;
+      if (ch === "fb") fb[id] = share;
+      else nfb[id] = share;
+    });
+    return { fb, nfb };
+  }
+
+  collectBody(optimize = true) {
     const hotel_params = this.collectHotelParams();
+    const shares = this.collectShares();
     return {
       hotel_code: ($("#hotel_code")?.value || this.hotel?.hotel_code || "").trim(),
       hotel_name: this.hotel?.hotel_name || "",
       hotel_brand: this.hotel?.hotel_brand || "",
       hotel_params,
-      // aliases plats (rétrocompat API)
       nb_chambres: hotel_params.hotel_nb_chambres ?? null,
       taux_occupation: hotel_params.hotel_to_annuel ?? null,
       guests_per_chambre: hotel_params.guests_per_chambre ?? null,
@@ -770,11 +910,15 @@ class DirectorApp {
       m_lin: Math.round(Number($("#m_lin")?.value)) || 6,
       mix_fb: (Number($("#mix_fb")?.value) || 70) / 100,
       client_needs: this.collectNeeds(),
+      category_shares: shares,
+      shares_fb: shares.fb,
+      shares_nfb: shares.nfb,
+      optimize_repartition: !!optimize,
     };
   }
 
-  async runSim() {
-    const body = this.collectBody();
+  async runSim(optimize = true) {
+    const body = this.collectBody(optimize);
     if (!body.hotel_code) {
       toast.show("Choisissez d'abord un hôtel", "err");
       this.goStep(1);
@@ -783,11 +927,20 @@ class DirectorApp {
     this.goStep(4);
     $("#dir-loading")?.classList.remove("hidden");
     $("#dir-results")?.classList.add("hidden");
-    this.setStatus("Calcul en cours…");
+    this.setStatus(
+      optimize ? "Optimisation de la répartition…" : "Calcul avec votre répartition…"
+    );
     try {
       const data = await api.post("/api/rod/simulate", body);
       if (!data.ok) throw new Error(data.error || "La simulation n'a pas abouti");
       this.result = data;
+      // Appliquer la répartition retenue (optimisée ou normalisée) dans l'UI
+      if (data.category_shares) this.applyCategoryShares(data.category_shares);
+      if (data.hotel?.mix_fb != null) {
+        let m = Number(data.hotel.mix_fb);
+        if (m <= 1) m *= 100;
+        this.setMix(Math.round(m));
+      }
       this.renderResults(data);
       $("#dir-loading")?.classList.add("hidden");
       $("#dir-results")?.classList.remove("hidden");
@@ -888,6 +1041,54 @@ class DirectorApp {
       .join("");
   }
 
+  renderAssortment(data) {
+    const cat = data.category_shares || {};
+    const ass = data.assortment || {};
+    const h = data.hotel || {};
+    const note = $("#dir-assortment-note");
+    if (note) {
+      if (ass.optimized) {
+        note.textContent = `Répartition optimisée (${ass.strategy || "—"}${
+          ass.trials ? ` · ${ass.trials} essais` : ""
+        }) pour maximiser le CA. Parts relatives à chaque canal (somme 100 %).`;
+      } else {
+        note.textContent =
+          "Répartition saisie normalisée (somme forcée à 100 % par canal F&B et Non F&B).";
+      }
+    }
+    let mixFb = Number(h.mix_fb);
+    if (Number.isFinite(mixFb)) {
+      if (mixFb <= 1) mixFb *= 100;
+      if ($("#dir-mix-fb")) $("#dir-mix-fb").textContent = `${Math.round(mixFb)} % du mix`;
+      if ($("#dir-mix-nfb"))
+        $("#dir-mix-nfb").textContent = `${Math.round(100 - mixFb)} % du mix`;
+    }
+    const paint = (hostId, rows) => {
+      const host = $("#" + hostId);
+      if (!host) return;
+      const list = (rows || []).filter((r) => r.enabled && (r.share || 0) > 0);
+      if (!list.length) {
+        host.innerHTML = `<p class="muted">Aucun produit actif</p>`;
+        return;
+      }
+      host.innerHTML = list
+        .map(
+          (r) => `
+        <div class="assort-bar-row">
+          <span class="assort-lab">${escapeHtml(r.label || r.id)}</span>
+          <span class="assort-track"><i style="width:${Math.min(
+            100,
+            Math.round((r.pct || r.share * 100) * 10) / 10
+          )}%"></i></span>
+          <span class="assort-pct">${Math.round((r.pct || r.share * 100) * 10) / 10} %</span>
+        </div>`
+        )
+        .join("");
+    };
+    paint("dir-shares-fb", cat.fb);
+    paint("dir-shares-nfb", cat.nfb);
+  }
+
   renderResults(data) {
     const reco = data.recommended_solution || "—";
     if ($("#dir-reco-name")) $("#dir-reco-name").textContent = reco;
@@ -903,6 +1104,7 @@ class DirectorApp {
     }
     const reasons = (data.recommendation_reasons || []).join(" ");
     if ($("#dir-reco-why")) $("#dir-reco-why").textContent = reasons;
+    this.renderAssortment(data);
 
     const sim = data.simulator || {};
     const ai = data.ai || {};
