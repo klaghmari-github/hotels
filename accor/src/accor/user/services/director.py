@@ -168,6 +168,8 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
     # m_lin corner dédié si fourni dans params et pas dans body
     if body.get("m_lin") in (None, "") and params.get("hotel_metres_lineaires_dedies_corner"):
         m_lin = float(params["hotel_metres_lineaires_dedies_corner"]) or m_lin
+    # UI user : mètres linéaires en entier (pas de demi-mètres)
+    m_lin = float(max(1, int(round(float(m_lin)))))
     mix_fb = _f(body.get("mix_fb"), def_mix) or def_mix
     if mix_fb > 1.0:
         mix_fb /= 100.0
@@ -383,7 +385,7 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
             "nb_bars": int(nb_bars),
             "has_pool": bool(has_pool),
             "has_vitrine": bool(has_vitrine),
-            "m_lin": round(m_lin, 2),
+            "m_lin": int(round(m_lin)),
             "mix_fb": round(mix_fb, 4),
             "mix_nf": round(1.0 - mix_fb, 4),
             "hotel_params": params,

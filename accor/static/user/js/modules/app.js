@@ -725,10 +725,13 @@ class DirectorApp {
   }
 
   setMLin(v) {
-    const n = Number(v) || 6;
+    // Entiers uniquement (pas de virgule / demi-mètre)
+    let n = Math.round(Number(v));
+    if (!Number.isFinite(n) || n < 1) n = 6;
+    n = Math.min(40, Math.max(1, n));
     if ($("#m_lin_slider")) $("#m_lin_slider").value = String(n);
     if ($("#m_lin")) $("#m_lin").value = String(n);
-    if ($("#m-lin-val")) $("#m-lin-val").textContent = fmt(n, 1);
+    if ($("#m-lin-val")) $("#m-lin-val").textContent = String(n);
   }
 
   setMix(pct) {
@@ -764,7 +767,7 @@ class DirectorApp {
       nb_restaurants: hotel_params.hotel_f_b_restaurant ?? null,
       has_pool: !!hotel_params.hotel_non_f_b_piscine,
       has_vitrine: !!hotel_params.hotel_dispo_dans_lobby_vitrine_refrigeree,
-      m_lin: Number($("#m_lin")?.value) || 6,
+      m_lin: Math.round(Number($("#m_lin")?.value)) || 6,
       mix_fb: (Number($("#mix_fb")?.value) || 70) / 100,
       client_needs: this.collectNeeds(),
     };
