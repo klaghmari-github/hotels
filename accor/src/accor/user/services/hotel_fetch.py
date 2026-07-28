@@ -5,8 +5,8 @@ Quand le directeur saisit un code inconnu, on tente un scrape unitaire :
 
   https://all.accor.com/hotel/{code}/index.fr.shtml
   → scrape_accor.hotels
-  → upsert data/hotel_data.xlsx
-  → invalidation des caches store / catalogue
+  → **par défaut** : ligne en mémoire seulement (session, pas d'écriture Excel)
+  → option ``persist=True`` : upsert data/hotel_data.xlsx (admin / outils)
 
 normalize_lookup_code / code_variants gèrent H0338, 0338, 338, pad 4, etc.
 Échec réseau ou 404 : on remonte une erreur propre à l'API, sans casser
@@ -122,13 +122,11 @@ def hotel_exists(code: str) -> str | None:
     return None
 
 
-def fetch_and_upsert_hotel(code: str) -> dict[str, Any]:
+def _scrape_accor_row(code: str) -> dict[str, Any]:
     """
-    Scrape Accor + upsert hotel_data.
+    Scrape all.accor.com pour un code. Aucune écriture disque.
 
-    Returns
-    -------
-    dict : ok, hotel_code, source, row, error?
+    Returns dict ok / hotel_code / row / url / error / scraped.
     """
     from accor.scrape_accor.hotels import code_for_url, fetch_hotel
 
@@ -145,8 +143,9 @@ def fetch_and_upsert_hotel(code: str) -> dict[str, Any]:
             "scraped": False,
         }
 
-    url_code = code_for_url(raw.lstrip("H").lstrip("h") if raw.upper().startswith("H") else raw)
-    # tenter aussi le code tel quel
+    url_code = code_for_url(
+        raw.lstrip("H").lstrip("h") if raw.upper().startswith("H") else raw
+    )
     attempts = [url_code]
     bare = raw[1:] if raw.upper().startswith("H") else raw
     if bare not in attempts:
@@ -173,6 +172,46 @@ def fetch_and_upsert_hotel(code: str) -> dict[str, Any]:
         }
 
     row = scrape_to_hotel_row(scraped)
+    return {
+        "ok": True,
+        "hotel_code": row["hotel_code"],
+        "source": "all.accor.com",
+        "scraped": True,
+        "row": row,
+        "url": scraped.get("url")
+        or f"https://all.accor.com/hotel/{url_code}/index.fr.shtml",
+    }
+
+
+def fetch_hotel_session(code: str) -> dict[str, Any]:
+    """
+    Scrape Accor **sans** écrire dans hotel_data.xlsx.
+
+    Destiné à l'app user : l'hôtel n'existe que pour la session courante
+    (mémoire client / réponse API).
+    """
+    return _scrape_accor_row(code)
+
+
+def fetch_and_upsert_hotel(code: str, *, persist: bool = True) -> dict[str, Any]:
+    """
+    Scrape Accor ; si ``persist=True`` (défaut historique), upsert hotel_data.
+
+    Pour l'UI user, préférer ``fetch_hotel_session`` ou ``persist=False``.
+    """
+    result = _scrape_accor_row(code)
+    if not result.get("ok"):
+        return result
+    if not result.get("scraped"):
+        return result
+    if not persist:
+        result["persisted"] = False
+        return result
+
+    row = dict(result.get("row") or {})
+    if not row:
+        return {**result, "ok": False, "error": "Ligne scrape vide"}
+
     path = HOTEL_XLSX
     path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -181,14 +220,12 @@ def fetch_and_upsert_hotel(code: str) -> dict[str, Any]:
         if df.empty:
             df = pd.DataFrame([row])
         else:
-            # align columns
             for col in row:
                 if col not in df.columns:
                     df[col] = None
             for col in df.columns:
                 if col not in row:
                     row[col] = None
-            # drop existing same code
             mask = df["hotel_code"].astype(str).str.strip().str.upper() == str(
                 row["hotel_code"]
             ).upper()
@@ -197,11 +234,9 @@ def fetch_and_upsert_hotel(code: str) -> dict[str, Any]:
     else:
         df = pd.DataFrame([row])
 
-    # hotel_code as text
     df["hotel_code"] = df["hotel_code"].astype(str)
     df.to_excel(path, index=False)
 
-    # invalidate admin store + catalogs
     try:
         from accor.store import reload_dataset
 
@@ -210,10 +245,7 @@ def fetch_and_upsert_hotel(code: str) -> dict[str, Any]:
         pass
 
     return {
-        "ok": True,
-        "hotel_code": row["hotel_code"],
+        **result,
+        "persisted": True,
         "source": "all.accor.com",
-        "scraped": True,
-        "row": row,
-        "url": scraped.get("url") or f"https://all.accor.com/hotel/{url_code}/index.fr.shtml",
     }

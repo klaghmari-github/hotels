@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0a0e17" />
   <title>ROD · Simulateur hôtel</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -10,205 +11,398 @@
   <link rel="stylesheet" href="{{ asset('shared/css/tokens.css') }}" />
   <link rel="stylesheet" href="{{ asset('user/css/user.css') }}" />
 </head>
-<body>
+<body class="rod-body">
+  <div class="ambient" aria-hidden="true">
+    <div class="ambient-orb ambient-orb-a"></div>
+    <div class="ambient-orb ambient-orb-b"></div>
+    <div class="ambient-orb ambient-orb-c"></div>
+    <div class="ambient-grid"></div>
+  </div>
+
   <div class="dir-shell">
     <header class="dir-top">
       <div class="brand">
-        <span class="brand-mark">A</span>
-        <div>
+        <span class="brand-mark" aria-hidden="true">
+          <img src="{{ asset('img/accor-logo.svg') }}" alt="" class="brand-logo" onerror="this.remove()" />
+          <span class="brand-mark-fallback">R</span>
+        </span>
+        <div class="brand-text">
           <strong>ROD</strong>
-          <span class="brand-sub">Retail On Demand · Simulateur hôtel</span>
+          <span class="brand-sub">Retail On Demand · Simulateur directeur</span>
         </div>
       </div>
       <div class="dir-top-right">
-        <span class="status" id="dir-status"></span>
+        <span class="status-pill" id="dir-status-wrap">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span class="status" id="dir-status">Prêt</span>
+        </span>
       </div>
     </header>
 
-    <!-- Étapes -->
-    <nav class="wiz-steps" id="wiz-steps" aria-label="Étapes">
+    <!-- Stepper -->
+    <nav class="wiz-steps" id="wiz-steps" aria-label="Étapes du parcours">
+      <div class="wiz-steps-track" aria-hidden="true"></div>
       <button type="button" class="wiz-step is-active" data-step="1">
         <span class="wiz-n">1</span>
-        <span class="wiz-lab">Hôtel</span>
+        <span class="wiz-lab">
+          <span class="wiz-lab-main">Hôtel</span>
+          <span class="wiz-lab-sub">Identifier</span>
+        </span>
       </button>
       <button type="button" class="wiz-step" data-step="2" disabled>
         <span class="wiz-n">2</span>
-        <span class="wiz-lab">Votre établissement</span>
+        <span class="wiz-lab">
+          <span class="wiz-lab-main">Établissement</span>
+          <span class="wiz-lab-sub">Vérifier</span>
+        </span>
       </button>
       <button type="button" class="wiz-step" data-step="3" disabled>
         <span class="wiz-n">3</span>
-        <span class="wiz-lab">Offre corner</span>
+        <span class="wiz-lab">
+          <span class="wiz-lab-main">Corner</span>
+          <span class="wiz-lab-sub">Paramétrer</span>
+        </span>
       </button>
       <button type="button" class="wiz-step" data-step="4" disabled>
         <span class="wiz-n">4</span>
-        <span class="wiz-lab">Résultats</span>
+        <span class="wiz-lab">
+          <span class="wiz-lab-main">Résultats</span>
+          <span class="wiz-lab-sub">Décider</span>
+        </span>
       </button>
     </nav>
 
     <main class="wiz-main">
-      <!-- Étape 1 : trouver l'hôtel -->
+      <!-- Étape 1 -->
       <section class="wiz-panel is-active" data-panel="1">
-        <div class="wiz-card wiz-card-narrow">
+        <div class="wiz-card wiz-card-hero wiz-card-narrow">
+          <div class="step-kicker">
+            <span class="step-kicker-n">01</span>
+            <span class="step-kicker-lab">Parcours</span>
+          </div>
           <h1 class="wiz-title">Quel est votre hôtel&nbsp;?</h1>
           <p class="wiz-lead">
-            Saisissez le code Accor ou le nom de l'établissement.
-            Nous proposons des suggestions au fil de la frappe.
+            Parcourez le parc Accor ou filtrez par code et nom.
+            Les suggestions s’affichent dès la première frappe.
           </p>
-          <label class="field ac-wrap">
-            <span>Code ou nom</span>
-            <input
-              id="hotel_search"
-              type="text"
-              placeholder="Ex. H0373 ou Mercure Paris…"
-              autocomplete="off"
-              autofocus
-            />
-            <ul id="ac-hotels" class="ac-list hidden" role="listbox"></ul>
+
+          <label class="field field-search ac-wrap">
+            <span class="field-label">Code ou nom de l’établissement</span>
+            <div class="search-shell">
+              <span class="search-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/>
+                  <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </span>
+              <input
+                id="hotel_search"
+                type="text"
+                placeholder="Ex. H0373 · Mercure Paris…"
+                autocomplete="off"
+                autofocus
+              />
+            </div>
+            <ul id="ac-hotels" class="ac-list hidden" role="listbox" aria-label="Hôtels proposés"></ul>
           </label>
           <input type="hidden" id="hotel_code" />
+
           <div id="hotel-summary" class="hotel-summary empty">
-            Aucun hôtel sélectionné pour l'instant.
+            <span class="hs-placeholder">Aucun hôtel sélectionné pour l’instant</span>
           </div>
-          <p class="wiz-note">
-            Les informations chargées servent uniquement à cette simulation.
-            Elles ne modifient pas la base de données.
-          </p>
+
+          <div class="info-banner">
+            <span class="info-banner-icon" aria-hidden="true">i</span>
+            <p>
+              Simulation en session uniquement — un code inconnu peut être récupéré
+              depuis Accor sans être enregistré en base.
+            </p>
+          </div>
+
           <div class="wiz-actions">
-            <button type="button" class="btn btn-primary" id="btn-step1-next" disabled>
+            <button type="button" class="btn btn-primary btn-lg" id="btn-step1-next" disabled>
               Continuer
+              <span class="btn-arrow" aria-hidden="true">→</span>
             </button>
           </div>
         </div>
       </section>
 
-      <!-- Étape 2 : revue établissement -->
+      <!-- Étape 2 -->
       <section class="wiz-panel" data-panel="2">
         <div class="wiz-card">
-          <h1 class="wiz-title">Vérifiez les infos de l'établissement</h1>
+          <div class="step-kicker">
+            <span class="step-kicker-n">02</span>
+            <span class="step-kicker-lab">Fiche</span>
+          </div>
+          <h1 class="wiz-title">Votre établissement</h1>
           <p class="wiz-lead">
-            Ces valeurs viennent de la fiche hôtel. Vous pouvez les ajuster
-            pour la simulation (chambres, occupation, vitrine…).
+            Valeurs pré-remplies depuis la fiche et l’historique connu.
+            Ajustez ce qui a évolué avant de continuer.
           </p>
+
           <div id="step2-hotel-line" class="wiz-hotel-line"></div>
-          <div class="wiz-grid-3">
-            <label class="field">
-              <span>Nombre de chambres</span>
-              <input id="nb_chambres" type="number" min="1" max="2000" step="1" />
-            </label>
-            <label class="field">
-              <span>Taux d'occupation (%)</span>
-              <input id="taux_occupation" type="number" min="1" max="100" step="0.1" />
-            </label>
-            <label class="field">
-              <span>Clients par chambre</span>
-              <input id="guests_per_chambre" type="number" min="0.5" max="5" step="0.1" />
-            </label>
-          </div>
-          <label class="field field-check">
-            <input type="checkbox" id="has_vitrine" />
-            <span>Nous avons déjà une vitrine réfrigérée (ou frigo en lobby)</span>
-          </label>
-          <p class="wiz-note">
-            Si vous avez déjà une vitrine, le coût de cet équipement n'est pas
-            ajouté pour Simply et Liberty.
-          </p>
-          <div class="wiz-actions">
-            <button type="button" class="btn btn-ghost" data-goto="1">Retour</button>
-            <button type="button" class="btn btn-primary" id="btn-step2-next">Continuer</button>
-          </div>
-        </div>
-      </section>
 
-      <!-- Étape 3 : offre corner -->
-      <section class="wiz-panel" data-panel="3">
-        <div class="wiz-card">
-          <h1 class="wiz-title">Paramétrez votre corner</h1>
-          <p class="wiz-lead">
-            Mètres linéaires, répartition F&amp;B / non F&amp;B, et catégories
-            que vous souhaitez proposer.
-          </p>
-          <div class="wiz-grid-2">
-            <label class="field">
-              <span>Mètres linéaires <strong id="m-lin-val">6</strong></span>
-              <div class="slider-row">
-                <input type="range" id="m_lin_slider" min="1" max="40" step="0.5" value="6" />
-                <input type="number" id="m_lin" min="1" max="40" step="0.5" value="6" />
-              </div>
-            </label>
-            <label class="field">
-              <span>Mix F&amp;B <strong id="mix-val">70</strong> % · non F&amp;B <strong id="mix-nf-val">30</strong> %</span>
-              <div class="slider-row">
-                <input type="range" id="mix_slider" min="0" max="100" step="1" value="70" />
-                <input type="number" id="mix_fb" min="0" max="100" step="1" value="70" />
-              </div>
-            </label>
-          </div>
+          <section class="form-block">
+            <header class="form-block-head">
+              <h2 class="wiz-section-title">Exploitation</h2>
+              <span class="form-block-hint">Capacité &amp; fréquentation</span>
+            </header>
+            <div class="wiz-grid-3">
+              <label class="field field-float">
+                <span>Nombre de chambres</span>
+                <input id="nb_chambres" type="number" min="1" max="2000" step="1" />
+              </label>
+              <label class="field field-float">
+                <span>Taux d’occupation (%)</span>
+                <input id="taux_occupation" type="number" min="1" max="100" step="0.1" />
+              </label>
+              <label class="field field-float">
+                <span>Clients par chambre</span>
+                <input id="guests_per_chambre" type="number" min="0.5" max="5" step="0.1" />
+              </label>
+            </div>
+          </section>
 
-          <div class="dir-card-head" style="margin-top:1.25rem">
-            <h2 class="dir-card-title" style="margin:0">Catégories de produits</h2>
-            <div class="needs-actions">
-              <button type="button" class="btn-text" id="needs-all-on">Tout autoriser</button>
-              <button type="button" class="btn-text" id="needs-all-off">Tout retirer</button>
+          <section class="form-block">
+            <header class="form-block-head">
+              <h2 class="wiz-section-title">Établissement</h2>
+              <span class="form-block-hint">Profil de l’hôtel</span>
+            </header>
+            <div class="wiz-grid-3">
+              <label class="field field-float">
+                <span>Dernière rénovation (année)</span>
+                <input id="derniere_reno" type="number" min="1950" max="2100" step="1" placeholder="Ex. 2019" />
+              </label>
+              <label class="field field-float">
+                <span>Nombre de restaurants</span>
+                <input id="nb_restaurants" type="number" min="0" max="20" step="1" />
+              </label>
+              <label class="field field-float">
+                <span>Nombre de bars</span>
+                <input id="nb_bars" type="number" min="0" max="20" step="1" />
+              </label>
             </div>
-          </div>
-          <p class="wiz-note">
-            Décochez ce que vous ne souhaitez pas vendre (alcool, salé, etc.).
-            Pour un hôtel de 50 chambres ou plus, cocher au moins une catégorie
-            « lifestyle » (cosmétiques, enfants, prêt-à-porter, accessoires, souvenirs)
-            oriente la recommandation vers Liberty.
-          </p>
-          <div class="needs-cols">
-            <div>
-              <h3 class="needs-h">F&amp;B</h3>
-              <div id="needs-fb" class="needs-list"></div>
+
+            <div class="toggle-grid">
+              <button type="button" class="toggle-row" id="tog-pool" role="switch" aria-checked="false" data-toggle="has_pool">
+                <span class="toggle-icon" aria-hidden="true">◈</span>
+                <span class="toggle-copy">
+                  <strong>Piscine</strong>
+                  <em>L’établissement dispose d’une piscine</em>
+                </span>
+                <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+              </button>
+              <button type="button" class="toggle-row" id="tog-vitrine" role="switch" aria-checked="false" data-toggle="has_vitrine">
+                <span class="toggle-icon" aria-hidden="true">▣</span>
+                <span class="toggle-copy">
+                  <strong>Vitrine réfrigérée</strong>
+                  <em>Frigo / vitrine déjà en lobby</em>
+                </span>
+                <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+              </button>
             </div>
-            <div>
-              <h3 class="needs-h">Non F&amp;B</h3>
-              <div id="needs-nfb" class="needs-list"></div>
-            </div>
+          </section>
+
+          <div class="info-banner soft">
+            <span class="info-banner-icon" aria-hidden="true">i</span>
+            <p>
+              Si une vitrine est déjà en place, le coût d’équipement n’est pas ajouté
+              pour Simply et Liberty.
+            </p>
           </div>
 
           <div class="wiz-actions">
-            <button type="button" class="btn btn-ghost" data-goto="2">Retour</button>
-            <button type="button" class="btn btn-primary" id="btn-run-sim">
-              Lancer la simulation
+            <button type="button" class="btn btn-ghost" data-goto="1">← Retour</button>
+            <button type="button" class="btn btn-primary btn-lg" id="btn-step2-next">
+              Continuer
+              <span class="btn-arrow" aria-hidden="true">→</span>
             </button>
           </div>
         </div>
       </section>
 
-      <!-- Étape 4 : résultats -->
+      <!-- Étape 3 -->
+      <section class="wiz-panel" data-panel="3">
+        <div class="wiz-card">
+          <div class="step-kicker">
+            <span class="step-kicker-n">03</span>
+            <span class="step-kicker-lab">Offre</span>
+          </div>
+          <h1 class="wiz-title">Paramétrez votre corner</h1>
+          <p class="wiz-lead">
+            Surface, mix F&amp;B et catégories proposées.
+            Les valeurs sont pré-remplies lorsqu’un historique existe.
+          </p>
+
+          <section class="form-block">
+            <header class="form-block-head">
+              <h2 class="wiz-section-title">Dimensionnement</h2>
+            </header>
+            <div class="wiz-grid-2 slider-cards">
+              <label class="field slider-card">
+                <span class="slider-card-top">
+                  <span>Mètres linéaires</span>
+                  <strong id="m-lin-val" class="slider-value">6</strong>
+                </span>
+                <div class="slider-row">
+                  <input type="range" id="m_lin_slider" min="1" max="40" step="0.5" value="6" />
+                  <input type="number" id="m_lin" min="1" max="40" step="0.5" value="6" />
+                </div>
+              </label>
+              <label class="field slider-card">
+                <span class="slider-card-top">
+                  <span>Mix F&amp;B / non F&amp;B</span>
+                  <strong class="slider-value">
+                    <span id="mix-val">70</span><span class="slider-unit">%</span>
+                    <span class="slider-split">·</span>
+                    <span id="mix-nf-val">30</span><span class="slider-unit">%</span>
+                  </strong>
+                </span>
+                <div class="slider-row">
+                  <input type="range" id="mix_slider" min="0" max="100" step="1" value="70" />
+                  <input type="number" id="mix_fb" min="0" max="100" step="1" value="70" />
+                </div>
+                <div class="mix-bar" aria-hidden="true">
+                  <i id="mix-bar-fb" style="width:70%"></i>
+                </div>
+              </label>
+            </div>
+          </section>
+
+          <section class="form-block">
+            <header class="form-block-head">
+              <h2 class="wiz-section-title">Catégories de produits</h2>
+              <div class="needs-actions">
+                <button type="button" class="btn-text" id="needs-all-on">Tout autoriser</button>
+                <button type="button" class="btn-text" id="needs-all-off">Tout retirer</button>
+              </div>
+            </header>
+            <p class="wiz-note tight">
+              Désactivez ce que vous ne souhaitez pas vendre.
+              ≥ 50 chambres + une catégorie lifestyle (cosmétiques, enfants, PAP, accessoires, souvenirs)
+              oriente la reco vers Liberty.
+            </p>
+            <div class="needs-cols">
+              <div class="needs-panel">
+                <h3 class="needs-h">
+                  <span class="needs-dot fb"></span>
+                  F&amp;B
+                </h3>
+                <div id="needs-fb" class="needs-list"></div>
+              </div>
+              <div class="needs-panel">
+                <h3 class="needs-h">
+                  <span class="needs-dot nfb"></span>
+                  Non F&amp;B
+                </h3>
+                <div id="needs-nfb" class="needs-list"></div>
+              </div>
+            </div>
+          </section>
+
+          <div class="wiz-actions">
+            <button type="button" class="btn btn-ghost" data-goto="2">← Retour</button>
+            <button type="button" class="btn btn-primary btn-lg btn-shine" id="btn-run-sim">
+              Lancer l’estimation
+              <span class="btn-arrow" aria-hidden="true">→</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Étape 4 -->
       <section class="wiz-panel" data-panel="4">
-        <div class="wiz-card wiz-card-wide">
+        <div class="wiz-card wiz-card-wide results-shell">
           <div id="dir-loading" class="dir-empty hidden">
+            <div class="loader-ring" aria-hidden="true"></div>
             <p class="dir-empty-title">Calcul en cours…</p>
             <p class="dir-empty-sub">Estimation du CA, des coûts et de la solution adaptée.</p>
           </div>
 
           <div id="dir-results" class="dir-results hidden">
             <section id="dir-hero" class="dir-hero">
+              <div class="dir-hero-glow" aria-hidden="true"></div>
               <div class="dir-hero-tag">Solution recommandée</div>
               <h1 id="dir-reco-name">—</h1>
               <p id="dir-hotel-line" class="dir-hotel-line"></p>
               <p id="dir-reco-why" class="dir-reco-why"></p>
             </section>
 
-            <section class="dir-big-metrics" id="dir-big-metrics"></section>
+            <div class="result-tabs" role="tablist" aria-label="Source des résultats">
+              <button
+                type="button"
+                class="result-tab is-active"
+                role="tab"
+                id="tab-sim"
+                aria-selected="true"
+                aria-controls="pane-sim"
+                data-result-tab="sim"
+              >
+                <span class="result-tab-ico" aria-hidden="true">◎</span>
+                Simulateur
+              </button>
+              <button
+                type="button"
+                class="result-tab"
+                role="tab"
+                id="tab-ai"
+                aria-selected="false"
+                aria-controls="pane-ai"
+                data-result-tab="ai"
+              >
+                <span class="result-tab-ico" aria-hidden="true">✦</span>
+                Estimation IA
+              </button>
+            </div>
 
-            <p class="wiz-note" id="dir-ai-note"></p>
-            <p class="wiz-note" id="dir-disclaimer"></p>
+            <div
+              id="pane-sim"
+              class="result-pane is-active"
+              role="tabpanel"
+              aria-labelledby="tab-sim"
+              data-result-pane="sim"
+            >
+              <p class="result-pane-lead">
+                Projection basée sur les règles métier ROD — pilotes, mix et mètres linéaires.
+              </p>
+              <section class="dir-big-metrics" id="dir-metrics-sim"></section>
+              <h2 class="dir-subh">Les trois solutions</h2>
+              <div id="dir-cards-sim" class="dir-concept-cards"></div>
+            </div>
 
-            <h2 class="dir-subh">Les trois solutions en un coup d'œil</h2>
-            <div id="dir-concept-cards" class="dir-concept-cards"></div>
+            <div
+              id="pane-ai"
+              class="result-pane"
+              role="tabpanel"
+              aria-labelledby="tab-ai"
+              data-result-pane="ai"
+              hidden
+            >
+              <p class="result-pane-lead" id="dir-ai-note">
+                Estimation du CA par le modèle, avec les mêmes coûts et une marge recalculée.
+              </p>
+              <section class="dir-big-metrics" id="dir-metrics-ai"></section>
+              <h2 class="dir-subh">Les trois solutions · modèle</h2>
+              <div id="dir-cards-ai" class="dir-concept-cards"></div>
+            </div>
 
-            <div class="wiz-actions" style="margin-top:1.5rem">
+            <p class="wiz-note disclaimer" id="dir-disclaimer"></p>
+
+            <div class="wiz-actions results-actions">
               <button type="button" class="btn btn-ghost" data-goto="3">Modifier les paramètres</button>
-              <button type="button" class="btn btn-ghost" data-goto="1">Changer d'hôtel</button>
+              <button type="button" class="btn btn-ghost" data-goto="1">Changer d’hôtel</button>
             </div>
           </div>
         </div>
       </section>
     </main>
+
+    <footer class="dir-foot">
+      <span>Accor · Retail On Demand</span>
+      <span class="dir-foot-sep">·</span>
+      <span>Estimation indicative — hors validation budget interne</span>
+    </footer>
   </div>
 
   <div id="toast" class="toast hidden"></div>

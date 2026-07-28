@@ -152,8 +152,19 @@ def api_rule1():
 
 @app.get("/api/hotels")
 def hotels():
-    """Liste complete (peut etre lourde) — preferer /api/hotels/search pour l UI."""
+    """Liste complete (peut etre lourde) — preferer /api/hotels/index pour l UI."""
     return jsonify({"hotels": _catalog.list_hotels(), "n": len(_catalog.list_hotels())})
+
+
+@app.get("/api/hotels/index")
+def hotels_index():
+    """
+    Index léger (code, nom, marque, ville) pour filtrage autocomplete côté client.
+
+    Chargé une fois au démarrage du wizard ; le filtre se fait en local à la frappe.
+    """
+    items = _catalog.list_hotel_index()
+    return jsonify({"ok": True, "n": len(items), "hotels": items})
 
 
 @app.get("/api/hotels/search")
@@ -161,13 +172,14 @@ def hotels_search():
     """
     Autocomplete hotels (hotel_data).
 
-    Query: q (code, nom, ville, marque), limit (defaut 20, max 50).
+    Query: q (code, nom, ville, marque ; vide = aperçu de la base),
+    limit (défaut 40, max 80).
     """
     q = str(request.args.get("q") or request.args.get("query") or "").strip()
     try:
-        limit = int(request.args.get("limit") or 20)
+        limit = int(request.args.get("limit") or 40)
     except (TypeError, ValueError):
-        limit = 20
+        limit = 40
     results = _catalog.search_hotels(q, limit=limit)
     return jsonify({"ok": True, "q": q, "n": len(results), "hotels": results})
 
@@ -191,24 +203,36 @@ def hotel_context(hotel_code: str):
     Contexte complet pour le wizard + simulateur.
 
     1. hotel_data + model_data si le code existe.
-    2. Sinon scrape all.accor.com/hotel/{code}/ puis upsert hotel_data
-       (prod : pas de rebuild massif, uniquement fiche a la demande).
+    2. Sinon scrape all.accor.com (par défaut **session only** : pas d'écriture
+       dans hotel_data.xlsx). Passer ``persist=1`` pour forcer l'upsert (outils).
     """
     try:
-        fetch = str(request.args.get("fetch") or "1").strip() not in {
+        fetch = str(request.args.get("fetch") or "1").strip().lower() not in {
             "0",
             "false",
             "no",
         }
-        ctx = _context.build(hotel_code, fetch_if_missing=fetch)
-        # catalogue autocomplete a jour apres scrape
-        if (ctx.sources or {}).get("scrape"):
+        # User app : ne jamais écrire en base par défaut
+        persist = str(request.args.get("persist") or "0").strip().lower() in {
+            "1",
+            "true",
+            "yes",
+        }
+        ctx = _context.build(
+            hotel_code,
+            fetch_if_missing=fetch,
+            persist_scrape=persist,
+        )
+        scrape_meta = (ctx.sources or {}).get("scrape") or {}
+        if persist and scrape_meta.get("persisted"):
             _catalog.invalidate_hotels()
         payload = {
             "ok": True,
             **ctx.to_dict(),
             "payload": ctx.to_simulation_payload(),
-            "scraped": bool((ctx.sources or {}).get("scrape")),
+            "scraped": bool(scrape_meta.get("scraped")),
+            "session_only": bool(scrape_meta.get("session_only")),
+            "persisted": bool(scrape_meta.get("persisted")),
         }
         return jsonify(payload)
     except Exception as exc:  # noqa: BLE001

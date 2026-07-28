@@ -196,17 +196,51 @@ class AdminCatalog:
         self._hotels_mtime = mtime
         return out
 
+    def _hotel_summary(self, h: dict[str, Any]) -> dict[str, Any]:
+        code = str(h.get("hotel_code") or "").strip()
+        name = str(h.get("hotel_name") or "").strip()
+        city = str(h.get("hotel_city") or "").strip()
+        brand = str(h.get("hotel_brand") or "").strip()
+        return {
+            "hotel_code": code,
+            "hotel_name": name,
+            "hotel_brand": brand,
+            "hotel_city": city,
+            "hotel_code_postal": h.get("hotel_code_postal"),
+            "hotel_country": h.get("hotel_country"),
+            "label": f"{code} — {name}" if code and name else (code or name),
+        }
+
+    def list_hotel_index(self) -> list[dict[str, Any]]:
+        """
+        Index léger pour autocomplete client (code, nom, ville, marque).
+
+        ~5–6k lignes max — chargé une fois par le navigateur puis filtré localement.
+        """
+        return [self._hotel_summary(h) for h in self.list_hotels()]
+
     def search_hotels(self, query: str, *, limit: int = 25) -> list[dict[str, Any]]:
         """
         Autocomplete : code, nom, ville, marque (hotel_data).
 
-        Retourne un resume leger pour la liste + champs d affiche.
+        ``query`` vide → premiers hôtels (tri nom) pour afficher une liste
+        dès le focus / la première frappe.
         """
         q = str(query or "").strip().lower()
-        if len(q) < 1:
-            return []
-        limit = max(1, min(int(limit or 25), 50))
+        limit = max(1, min(int(limit or 25), 80))
         hotels = self.list_hotels()
+
+        # Pas de filtre : aperçu de la base (tri nom)
+        if not q:
+            summaries = [self._hotel_summary(h) for h in hotels]
+            summaries.sort(
+                key=lambda x: (
+                    str(x.get("hotel_name") or "").lower(),
+                    str(x.get("hotel_code") or "").lower(),
+                )
+            )
+            return summaries[:limit]
+
         scored: list[tuple[int, dict[str, Any]]] = []
         q_compact = q.replace(" ", "")
         for h in hotels:
@@ -234,21 +268,13 @@ class AdminCatalog:
             elif q in brand_l:
                 score = 30
             else:
-                continue
-            scored.append(
-                (
-                    score,
-                    {
-                        "hotel_code": code,
-                        "hotel_name": name,
-                        "hotel_brand": brand,
-                        "hotel_city": city,
-                        "hotel_code_postal": h.get("hotel_code_postal"),
-                        "hotel_country": h.get("hotel_country"),
-                        "label": f"{code} — {name}" if code and name else (code or name),
-                    },
-                )
-            )
+                # tokens multi-mots dans le nom
+                tokens = [t for t in q.split() if t]
+                if tokens and all(t in name_l or t in city_l or t in brand_l for t in tokens):
+                    score = 55
+                else:
+                    continue
+            scored.append((score, self._hotel_summary(h)))
         scored.sort(key=lambda x: (-x[0], str(x[1].get("hotel_name") or "")))
         return [item for _, item in scored[:limit]]
 

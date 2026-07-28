@@ -1,9 +1,13 @@
 """
 Simulation « directeur » — résultats simples pour l'interface user.
 
-Pas de détail de formules : CA simulé, CA estimé par le modèle, coûts,
-marge, solution recommandée. Les réglages (m linéaires, mix, vitrine,
-sous-catégories) restent en session côté navigateur.
+Deux vues distinctes (même saisie utilisateur, sans étiqueter sim vs IA
+dans le formulaire) :
+
+* **simulateur** — CA règles métier + coûts + marge nette
+* **ia** — CA prédit par le modèle + mêmes coûts + marge recalculée
+
+Les réglages restent en session côté navigateur (pas d'écriture base).
 """
 
 from __future__ import annotations
@@ -42,13 +46,59 @@ def _f(v: Any, default: float | None = None) -> float | None:
         return default
 
 
+def _i(v: Any, default: int | None = None) -> int | None:
+    f = _f(v, None)
+    if f is None:
+        return default
+    return int(round(f))
+
+
+def _money_block(
+    *,
+    ca: float | None,
+    cout: float,
+    capex: float,
+    marge_produit: float | None = None,
+) -> dict[str, Any]:
+    """Bloc CA / coûts / marge pour une solution (sim ou IA)."""
+    ca_v = None if ca is None else round(float(ca), 2)
+    cout_v = round(float(cout), 2)
+    capex_v = round(float(capex), 2)
+    if ca_v is None:
+        return {
+            "ca_mensuel": None,
+            "marge_produit_mensuelle": None,
+            "cout_mensuel": cout_v,
+            "capex": capex_v,
+            "marge_nette_mensuelle": None,
+            "marge_nette_annuelle": None,
+        }
+    if marge_produit is None:
+        # fallback grossier si pas de marge produit (ne devrait pas arriver côté sim)
+        marge_prod = ca_v * 0.35
+    else:
+        marge_prod = float(marge_produit)
+    marge_nette = marge_prod - cout_v
+    return {
+        "ca_mensuel": ca_v,
+        "marge_produit_mensuelle": round(marge_prod, 2),
+        "cout_mensuel": cout_v,
+        "capex": capex_v,
+        "marge_nette_mensuelle": round(marge_nette, 2),
+        "marge_nette_annuelle": round(marge_nette * 12, 2),
+    }
+
+
 def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
     """
     Calcule les 3 solutions pour un hôtel.
 
-    Body attendu (champs optionnels sauf hotel_code) :
+    Body attendu (champs optionnels sauf hotel_code) — tous collectés avant
+    calcul, sans distinction sim / IA côté UI :
+
       hotel_code, hotel_name, hotel_brand,
       nb_chambres, taux_occupation, guests_per_chambre,
+      derniere_reno, nb_restaurants, nb_bars, has_pool,
       m_lin, mix_fb, has_vitrine, client_needs
     """
     code = str(body.get("hotel_code") or "").strip()
@@ -58,46 +108,85 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
     # Contexte fiche (sans écrire en base)
     identity_name = str(body.get("hotel_name") or "").strip()
     identity_brand = str(body.get("hotel_brand") or "").strip()
+    def_n, def_to, def_g = 100.0, 0.7, 1.7
+    def_vitrine = False
+    def_reno: int | None = None
+    def_restos, def_bars = 0, 0
+    def_pool = False
+    def_m_lin = 6.0
+    def_mix = 0.70
     try:
         from accor.user.services.hotel_context import HotelContextBuilder
 
         ctx = HotelContextBuilder().build(code, fetch_if_missing=True)
         ident = ctx.identity or {}
         op0 = ctx.operating if isinstance(ctx.operating, dict) else {}
+        ind0 = ctx.indicators if isinstance(ctx.indicators, dict) else {}
         if not identity_name:
             identity_name = str(ident.get("hotel_name") or "")
         if not identity_brand:
             identity_brand = str(ident.get("hotel_brand") or "")
-        def_n = float(op0.get("nb_chambres") or getattr(ctx.operating, "nb_chambres", 100) or 100)
-        def_to = float(op0.get("taux_occupation") or getattr(ctx.operating, "taux_occupation", 0.7) or 0.7)
-        def_g = float(op0.get("guests_per_chambre") or getattr(ctx.operating, "guests_per_chambre", 1.7) or 1.7)
-        services0 = getattr(ctx, "services", None) or {}
-        if isinstance(services0, dict):
-            def_vitrine = bool(
-                services0.get("lobby_fridge")
-                or services0.get("has_vitrine")
-                or services0.get("vitrine_refrigeree")
-            )
-        else:
-            def_vitrine = bool(getattr(services0, "lobby_fridge", False))
+        def_n = float(op0.get("nb_chambres") or 100) or 100.0
+        def_to = float(op0.get("taux_occupation") or 0.7) or 0.7
+        def_g = float(op0.get("guests_per_chambre") or 1.7) or 1.7
+        def_reno = _i(op0.get("derniere_reno") or ind0.get("derniere_reno"), None)
+        def_restos = max(0, _i(op0.get("nb_restaurants") or ind0.get("nb_restaurants"), 0) or 0)
+        def_bars = max(0, _i(op0.get("nb_bars") or ind0.get("nb_bars"), 0) or 0)
+        def_pool = bool(op0.get("has_pool") if "has_pool" in op0 else ind0.get("has_pool"))
+        services0 = ctx.services if isinstance(ctx.services, dict) else {}
+        def_vitrine = bool(
+            op0.get("has_vitrine")
+            or services0.get("lobby_fridge")
+            or services0.get("has_vitrine")
+            or def_vitrine
+        )
+        if ind0.get("m_lin") is not None:
+            def_m_lin = float(ind0["m_lin"]) or 6.0
+        elif (ctx.corner or {}).get("m_lin") is not None:
+            def_m_lin = float(ctx.corner["m_lin"]) or 6.0
+        if ind0.get("mix_fb") is not None:
+            def_mix = float(ind0["mix_fb"])
     except Exception:
-        def_n, def_to, def_g, def_vitrine = 100.0, 0.7, 1.7, False
+        pass
 
     n = _f(body.get("nb_chambres"), def_n) or def_n
     to = _f(body.get("taux_occupation"), def_to) or def_to
     if to > 1.0:
         to /= 100.0
     g = _f(body.get("guests_per_chambre"), def_g) or def_g
-    m_lin = _f(body.get("m_lin"), 6.0) or 6.0
-    mix_fb = _f(body.get("mix_fb"), 0.70) or 0.70
+    m_lin = _f(body.get("m_lin"), def_m_lin) or def_m_lin
+    mix_fb = _f(body.get("mix_fb"), def_mix) or def_mix
     if mix_fb > 1.0:
         mix_fb /= 100.0
     mix_fb = min(max(mix_fb, 0.0), 1.0)
+
     has_vitrine = body.get("has_vitrine")
     if has_vitrine is None:
         has_vitrine = def_vitrine
     else:
         has_vitrine = bool(has_vitrine)
+
+    has_pool = body.get("has_pool")
+    if has_pool is None:
+        has_pool = def_pool
+    else:
+        has_pool = bool(has_pool)
+
+    derniere_reno = _i(
+        body.get("derniere_reno") if body.get("derniere_reno") not in (None, "") else def_reno,
+        def_reno,
+    )
+    if derniere_reno is not None and (derniere_reno < 1950 or derniere_reno > 2100):
+        derniere_reno = def_reno
+
+    if body.get("nb_restaurants") is not None and body.get("nb_restaurants") != "":
+        nb_restaurants = max(0, _i(body.get("nb_restaurants"), 0) or 0)
+    else:
+        nb_restaurants = def_restos
+    if body.get("nb_bars") is not None and body.get("nb_bars") != "":
+        nb_bars = max(0, _i(body.get("nb_bars"), 0) or 0)
+    else:
+        nb_bars = def_bars
 
     from accor.user.models import DEFAULT_CLIENT_NEEDS
     from accor.user.rules.coeffs import RULE3_FB_COEFFS, RULE3_NFB_COEFFS
@@ -114,7 +203,7 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
     cost = CostRules(ref)
     reco_engine = RecommendationRules()
 
-    by_solution: dict[str, Any] = {}
+    sim_by: dict[str, Any] = {}
     req_for_reco: SimulationRequest | None = None
 
     for concept in CONCEPTS:
@@ -129,7 +218,12 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
                 taux_occupation=to,
                 guests_per_chambre=g,
             ),
-            services=HotelServices(lobby_fridge=bool(has_vitrine)),
+            services=HotelServices(
+                lobby_fridge=bool(has_vitrine),
+                bar=nb_bars > 0,
+                restaurant=nb_restaurants > 0,
+                pool=bool(has_pool),
+            ),
             client_profile=ClientProfile(client_needs=dict(needs)),
             store=StoreConfig(
                 concept=concept,
@@ -147,47 +241,108 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
         marge_prod = float(rev_res.marge_produit_mensuelle or 0)
         cout = float(cost_res.monthly_cost or 0)
         capex = float(cost_res.capex or 0)
-        marge_nette = marge_prod - cout
-        by_solution[concept] = {
-            "ca_simule_mensuel": round(ca, 2),
-            "ca_predit_mensuel": None,  # rempli plus bas si modèle dispo
-            "marge_produit_mensuelle": round(marge_prod, 2),
-            "cout_mensuel": round(cout, 2),
-            "capex": round(capex, 2),
-            "marge_nette_mensuelle": round(marge_nette, 2),
-            "marge_nette_annuelle": round(marge_nette * 12, 2),
-        }
+        sim_by[concept] = _money_block(
+            ca=ca, cout=cout, capex=capex, marge_produit=marge_prod
+        )
 
-    # Prédictions IA (3 scénarios solution) — optionnel
+    # Prédictions IA (3 scénarios solution) — mêmes coûts, CA modèle
     ai_note = ""
+    ai_available = False
+    ai_by: dict[str, Any] = {}
+    feature_overrides = {
+        "hotel_nb_chambres": n,
+        "hotel_to_annuel": to,
+        "hotel_derniere_reno": derniere_reno,
+        "hotel_f_b_restaurant": nb_restaurants,
+        "hotel_f_b_bar": nb_bars,
+        "hotel_non_f_b_piscine": 1 if has_pool else 0,
+        "hotel_dispo_dans_lobby_vitrine_refrigeree": 1 if has_vitrine else 0,
+    }
     try:
-        preds = _ai_predict_three(code, n, to, g)
+        preds = _ai_predict_three(code, feature_overrides)
         if preds:
-            for c in CONCEPTS:
-                if preds.get(c) is not None:
-                    by_solution[c]["ca_predit_mensuel"] = preds[c]
+            ai_available = True
             ai_note = "Estimation modèle sur la base des hôtels déjà équipés."
+            for c in CONCEPTS:
+                ca_ai = preds.get(c)
+                # Marge produit proportionnelle au ratio marge/CA du simulateur
+                sim = sim_by[c]
+                ca_sim = sim.get("ca_mensuel") or 0
+                mp_sim = sim.get("marge_produit_mensuelle") or 0
+                if ca_ai is not None and ca_sim and ca_sim > 0:
+                    mp_ai = float(mp_sim) * (float(ca_ai) / float(ca_sim))
+                elif ca_ai is not None:
+                    mp_ai = float(ca_ai) * 0.35
+                else:
+                    mp_ai = None
+                ai_by[c] = _money_block(
+                    ca=ca_ai,
+                    cout=float(sim.get("cout_mensuel") or 0),
+                    capex=float(sim.get("capex") or 0),
+                    marge_produit=mp_ai,
+                )
         else:
-            ai_note = "Estimation modèle indisponible pour le moment — le simulateur reste la référence."
+            ai_note = (
+                "Estimation modèle indisponible pour le moment — "
+                "consultez l'onglet Simulateur."
+            )
+            for c in CONCEPTS:
+                sim = sim_by[c]
+                ai_by[c] = _money_block(
+                    ca=None,
+                    cout=float(sim.get("cout_mensuel") or 0),
+                    capex=float(sim.get("capex") or 0),
+                )
     except Exception:
-        ai_note = "Estimation modèle indisponible pour le moment — le simulateur reste la référence."
+        ai_note = (
+            "Estimation modèle indisponible pour le moment — "
+            "consultez l'onglet Simulateur."
+        )
+        for c in CONCEPTS:
+            sim = sim_by[c]
+            ai_by[c] = _money_block(
+                ca=None,
+                cout=float(sim.get("cout_mensuel") or 0),
+                capex=float(sim.get("capex") or 0),
+            )
 
     recommended, order, reasons = reco_engine.recommend_tree(
         req_for_reco or SimulationRequest(),
         m_lin=m_lin,
         to=to,
     )
-    # Si la reco pointe une solution peu rentable, on le dit sans cacher les autres
     best_margin = max(
         CONCEPTS,
-        key=lambda c: float(by_solution[c]["marge_nette_mensuelle"] or -1e18),
+        key=lambda c: float(sim_by[c].get("marge_nette_mensuelle") or -1e18),
     )
+    best_margin_ai = None
+    if ai_available:
+        best_margin_ai = max(
+            CONCEPTS,
+            key=lambda c: float(
+                (ai_by.get(c) or {}).get("marge_nette_mensuelle") or -1e18
+            ),
+        )
 
     lifestyle_on = [
         CLIENT_NEED_LABELS.get(k, k)
         for k in LIBERTY_NFB_NEEDS
         if needs.get(k, False)
     ]
+
+    # Compat legacy (anciens clients API) : ca_simule + ca_predit côte à côte
+    by_solution_legacy: dict[str, Any] = {}
+    for c in CONCEPTS:
+        s, a = sim_by[c], ai_by.get(c) or {}
+        by_solution_legacy[c] = {
+            "ca_simule_mensuel": s.get("ca_mensuel"),
+            "ca_predit_mensuel": a.get("ca_mensuel"),
+            "marge_produit_mensuelle": s.get("marge_produit_mensuelle"),
+            "cout_mensuel": s.get("cout_mensuel"),
+            "capex": s.get("capex"),
+            "marge_nette_mensuelle": s.get("marge_nette_mensuelle"),
+            "marge_nette_annuelle": s.get("marge_nette_annuelle"),
+        }
 
     return {
         "ok": True,
@@ -198,6 +353,10 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
             "nb_chambres": int(round(n)),
             "taux_occupation": round(to, 4),
             "guests_per_chambre": round(g, 3),
+            "derniere_reno": derniere_reno,
+            "nb_restaurants": int(nb_restaurants),
+            "nb_bars": int(nb_bars),
+            "has_pool": bool(has_pool),
             "has_vitrine": bool(has_vitrine),
             "m_lin": round(m_lin, 2),
             "mix_fb": round(mix_fb, 4),
@@ -207,8 +366,22 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
         "concept_order": order,
         "recommendation_reasons": reasons,
         "best_margin_solution": best_margin,
+        "best_margin_solution_ai": best_margin_ai,
         "lifestyle_categories_on": lifestyle_on,
-        "by_solution": by_solution,
+        "simulator": {
+            "label": "Simulateur",
+            "by_solution": sim_by,
+            "best_margin_solution": best_margin,
+        },
+        "ai": {
+            "label": "Estimation IA",
+            "available": ai_available,
+            "note": ai_note,
+            "by_solution": ai_by,
+            "best_margin_solution": best_margin_ai,
+        },
+        # legacy
+        "by_solution": by_solution_legacy,
         "ai_note": ai_note,
         "disclaimer": (
             "Les chiffres sont des estimations pour vous aider à choisir. "
@@ -219,14 +392,14 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
 
 def _ai_predict_three(
     hotel_code: str,
-    nb_chambres: float,
-    to: float,
-    guests: float,
+    feature_overrides: dict[str, Any] | None = None,
 ) -> dict[str, float] | None:
     """
     Trois prédictions de CA mensuel (simply / liberty / connected = 1).
 
-    Utilise le modèle final si possible, sinon l'intermédiaire.
+    ``feature_overrides`` applique les valeurs saisies par le directeur
+    (chambres, TO, rénovation, restos/bars, piscine, vitrine…) sur la ligne
+    model_data avant prédiction.
     """
     try:
         from accor.model_train import _load_model_frame, load_design_model, get_top_model
@@ -241,19 +414,18 @@ def _ai_predict_three(
     if frame is None or frame.empty:
         return None
 
-    # Ligne type pour l'hôtel (moyenne des mois de modélisation si dispo)
+    overrides = {k: v for k, v in (feature_overrides or {}).items() if v is not None}
+
     work = frame.copy()
     work["hotel_code"] = work["hotel_code"].astype(str).str.strip()
     sub = work.loc[work["hotel_code"] == hotel_code]
     if sub.empty:
-        # hôtel hors historique : on part d'une ligne moyenne et on force l'exploitation
         row = work.mean(numeric_only=True).to_dict()
         base = work.iloc[[0]].copy()
         for k, v in row.items():
             if k in base.columns:
                 base[k] = v
     else:
-        # moyenne numérique des mois connus
         base = sub.mean(numeric_only=True).to_frame().T
         for col in sub.columns:
             if col not in base.columns:
@@ -261,16 +433,15 @@ def _ai_predict_three(
         base = base.reset_index(drop=True)
 
     base["hotel_code"] = hotel_code
-    base["hotel_nb_chambres"] = nb_chambres
-    if "hotel_to_annuel" in base.columns:
-        base["hotel_to_annuel"] = to
+    for col, val in overrides.items():
+        if col in base.columns or True:
+            base[col] = val
     for col in SOLUTION_FLAG_COLS:
         if col not in base.columns:
             base[col] = 0
 
     model = None
     feature_cols: list[str] = []
-    # Final
     try:
         top = get_final_top_model()
         if top:
@@ -287,7 +458,6 @@ def _ai_predict_three(
                     expanded, feature_cols, _, _ = build_stacked_features(
                         work, meta or {}, inter
                     )
-                    # Reprendre une ligne pour notre hôtel après stacking
                     exp = expanded.loc[
                         expanded["hotel_code"].astype(str).str.strip() == hotel_code
                     ]
@@ -298,8 +468,9 @@ def _ai_predict_three(
                                 base[col] = exp[col].iloc[0]
                         base = base.reset_index(drop=True)
                         base["hotel_code"] = hotel_code
+                        for col, val in overrides.items():
+                            base[col] = val
                 except Exception:
-                    # fallback intermédiaire seul
                     inter_loaded = load_design_model(str(imid))
                     model = (inter_loaded.get("bundle") or {}).get("model")
                     feature_cols = list(
@@ -329,6 +500,10 @@ def _ai_predict_three(
     if model is None or not feature_cols:
         return None
 
+    # Ré-appliquer overrides après stacking / fallback
+    for col, val in overrides.items():
+        base[col] = val
+
     for col in feature_cols:
         if col not in base.columns:
             base[col] = 0.0
@@ -338,11 +513,9 @@ def _ai_predict_three(
         sc = base.copy()
         for c in CONCEPTS:
             col = FLAG_BY[c]
-            if col in sc.columns or col in feature_cols:
-                sc[col] = 1 if c == sol else 0
-                if col not in sc.columns:
-                    sc[col] = 1 if c == sol else 0
+            sc[col] = 1 if c == sol else 0
         try:
+            import numpy as np
             import pandas as pd
 
             X = (
@@ -352,8 +525,6 @@ def _ai_predict_three(
                 .to_numpy(dtype=float)
             )
             pred = model.predict(X)
-            import numpy as np
-
             pred = np.asarray(pred, dtype=float)
             if pred.ndim > 1:
                 pred = pred[:, 0]

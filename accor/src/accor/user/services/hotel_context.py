@@ -185,6 +185,8 @@ class HotelContextBuilder:
         hotel_code: str,
         *,
         fetch_if_missing: bool = True,
+        persist_scrape: bool = False,
+        session_row: dict[str, Any] | None = None,
     ) -> HotelContext:
         code = str(hotel_code or "").strip()
         warnings: list[str] = []
@@ -215,30 +217,55 @@ class HotelContextBuilder:
         else:
             warnings.append("hotel_data.xlsx vide ou introuvable.")
 
-        # Prod : hotel inconnu → scrape all.accor.com puis upsert
+        # Ligne fournie par la session navigateur (jamais écrite en base)
+        if not row and session_row:
+            row = dict(session_row)
+            code = str(row.get("hotel_code") or code).strip()
+            sources["identity"] = "session"
+            scraped_meta = {
+                "scraped": bool(session_row.get("_scraped")),
+                "session_only": True,
+                "hotel_code": code,
+            }
+
+        # Hôtel inconnu → scrape Accor (défaut user : mémoire seule, pas d'Excel)
         if not row and fetch_if_missing and code:
             try:
-                from accor.user.services.hotel_fetch import fetch_and_upsert_hotel
+                from accor.user.services.hotel_fetch import (
+                    fetch_and_upsert_hotel,
+                    fetch_hotel_session,
+                )
 
-                fetched = fetch_and_upsert_hotel(code)
-                if fetched.get("ok") and fetched.get("scraped"):
-                    self.invalidate()
-                    hotels = self._load_hotels()
-                    code = str(fetched.get("hotel_code") or code).strip()
-                    if not hotels.empty and "hotel_code" in hotels.columns:
-                        codes = hotels["hotel_code"].astype(str).str.strip()
-                        match = hotels[codes.str.upper() == code.upper()]
-                        if not match.empty:
-                            row = match.iloc[0].to_dict()
-                            sources["identity"] = "all.accor.com (scrape)"
-                            scraped_meta = {
-                                "scraped": True,
-                                "url": fetched.get("url"),
-                                "hotel_code": code,
-                            }
-                            warnings.append(
-                                f"Hotel {code} recupere depuis all.accor.com et ajoute a hotel_data."
-                            )
+                if persist_scrape:
+                    fetched = fetch_and_upsert_hotel(code, persist=True)
+                else:
+                    fetched = fetch_hotel_session(code)
+
+                if fetched.get("ok") and fetched.get("scraped") and fetched.get("row"):
+                    row = dict(fetched["row"])
+                    code = str(fetched.get("hotel_code") or row.get("hotel_code") or code).strip()
+                    sources["identity"] = (
+                        "all.accor.com (scrape+fichier)"
+                        if persist_scrape
+                        else "all.accor.com (session)"
+                    )
+                    scraped_meta = {
+                        "scraped": True,
+                        "session_only": not persist_scrape,
+                        "persisted": bool(fetched.get("persisted")),
+                        "url": fetched.get("url"),
+                        "hotel_code": code,
+                    }
+                    if persist_scrape:
+                        self.invalidate()
+                        warnings.append(
+                            f"Hôtel {code} récupéré depuis all.accor.com et ajouté à hotel_data."
+                        )
+                    else:
+                        warnings.append(
+                            f"Hôtel {code} récupéré depuis all.accor.com "
+                            f"(session uniquement — non enregistré en base)."
+                        )
                 elif fetched.get("ok") and not fetched.get("scraped"):
                     code = str(fetched.get("hotel_code") or code).strip()
                     self.invalidate()
@@ -252,7 +279,7 @@ class HotelContextBuilder:
                 elif not fetched.get("ok"):
                     warnings.append(
                         fetched.get("error")
-                        or f"Scrape Accor echoue pour {code}."
+                        or f"Scrape Accor échoué pour {code}."
                     )
             except Exception as exc:  # noqa: BLE001
                 warnings.append(f"Scrape Accor indisponible : {exc}")
@@ -427,13 +454,42 @@ class HotelContextBuilder:
         else:
             sources["m_lin"] = "concept_pilot_default"
 
+        # Préférer model_data (si hôtel connu) pour les attributs hôteliers UI / IA
+        def _pref(col: str, default: Any = None) -> Any:
+            """Valeur model_data d'abord, sinon hotel_data."""
+            if col in md_stats and md_stats.get(col) is not None:
+                return md_stats.get(col)
+            if row.get(col) is not None and not (
+                isinstance(row.get(col), float) and pd.isna(row.get(col))
+            ):
+                return row.get(col)
+            return default
+
+        derniere_reno = _as_int(_pref("hotel_derniere_reno"), 0) or None
+        if derniere_reno is not None and (derniere_reno < 1950 or derniere_reno > 2100):
+            derniere_reno = None
+        nb_restaurants = max(0, _as_int(_pref("hotel_f_b_restaurant"), 0))
+        nb_bars = max(0, _as_int(_pref("hotel_f_b_bar"), 0))
+        has_pool = bool(_as_int(_pref("hotel_non_f_b_piscine"), 0))
+        has_vitrine = bool(
+            _as_int(_pref("hotel_dispo_dans_lobby_vitrine_refrigeree"), 0)
+        )
+        if md_stats.get("hotel_derniere_reno") is not None:
+            sources["derniere_reno"] = "model_data"
+        elif row.get("hotel_derniere_reno") is not None:
+            sources["derniere_reno"] = "hotel_data"
+        else:
+            sources["derniere_reno"] = "empty"
+
         # --- Services ---
         services = {
-            # F&B
-            "bar": bool(_as_int(row.get("hotel_f_b_bar"), 0)),
-            "restaurant": bool(_as_int(row.get("hotel_f_b_restaurant"), 0)),
-            "room_service": bool(_as_int(row.get("hotel_f_b_room_service"), 0)),
-            "minibar": bool(_as_int(row.get("hotel_f_b_minibar"), 0)),
+            # F&B (bool + compteurs exposés aussi dans operating)
+            "bar": nb_bars > 0,
+            "restaurant": nb_restaurants > 0,
+            "nb_bars": nb_bars,
+            "nb_restaurants": nb_restaurants,
+            "room_service": bool(_as_int(_pref("hotel_f_b_room_service"), 0)),
+            "minibar": bool(_as_int(_pref("hotel_f_b_minibar"), 0)),
             # Non F&B
             "meeting_rooms": bool(
                 _as_int(row.get("hotel_non_f_b_salles_de_reunion"), 0)
@@ -441,7 +497,7 @@ class HotelContextBuilder:
             ),
             "gym": bool(_as_int(row.get("hotel_non_f_b_salle_de_sport"), 0)),
             "spa": bool(_as_int(row.get("hotel_non_f_b_spa"), 0)),
-            "pool": bool(_as_int(row.get("hotel_non_f_b_piscine"), 0)),
+            "pool": has_pool,
             # Confort / access (hotel_has_*)
             "parking": bool(_as_int(row.get("hotel_has_parking"), 0)),
             "wifi": bool(_as_int(row.get("hotel_has_wifi"), 0)),
@@ -452,9 +508,8 @@ class HotelContextBuilder:
             "non_smoking": bool(_as_int(row.get("hotel_has_non_fumeur"), 0)),
             "shuttle": bool(_as_int(row.get("hotel_has_navette"), 0)),
             # Lobby
-            "lobby_fridge": bool(
-                _as_int(row.get("hotel_dispo_dans_lobby_vitrine_refrigeree"), 0)
-            ),
+            "lobby_fridge": has_vitrine,
+            "has_vitrine": has_vitrine,
             "lobby_microwave": bool(
                 _as_int(row.get("hotel_dispo_dans_lobby_micro_ondes"), 0)
             ),
@@ -545,6 +600,11 @@ class HotelContextBuilder:
             "mix_fb": mix_fb,
             "mix_nf": mix_nf,
             "m_lin": m_lin,
+            "derniere_reno": derniere_reno,
+            "nb_restaurants": nb_restaurants,
+            "nb_bars": nb_bars,
+            "has_pool": has_pool,
+            "has_vitrine": has_vitrine,
             "ca_historique_mensuel": md_stats.get("ca_historique_mensuel"),
             "ventes_historiques_mensuelles": md_stats.get("ventes_historiques_mensuelles"),
             "n_months_model_data": md_stats.get("n_months", 0),
@@ -565,6 +625,11 @@ class HotelContextBuilder:
                 "guests_per_chambre": guests,
                 "clients_jour": clients_jour,
                 "clients_mois": clients_mois,
+                "derniere_reno": derniere_reno,
+                "nb_restaurants": nb_restaurants,
+                "nb_bars": nb_bars,
+                "has_pool": has_pool,
+                "has_vitrine": has_vitrine,
             },
             services=services,
             client_profile={
@@ -609,6 +674,26 @@ class HotelContextBuilder:
 
         if "hotel_brand" in frame.columns:
             out["hotel_brand"] = str(frame["hotel_brand"].iloc[0] or "")
+
+        # Attributs hôteliers (souvent constants sur les mois) — source model_data
+        def first_num(col: str) -> float | None:
+            if col not in frame.columns:
+                return None
+            s = pd.to_numeric(frame[col], errors="coerce").dropna()
+            if s.empty:
+                return None
+            return float(s.iloc[0])
+
+        out["hotel_derniere_reno"] = first_num("hotel_derniere_reno")
+        out["hotel_lobby_derniere_reno"] = first_num("hotel_lobby_derniere_reno")
+        out["hotel_f_b_restaurant"] = first_num("hotel_f_b_restaurant")
+        out["hotel_f_b_bar"] = first_num("hotel_f_b_bar")
+        out["hotel_non_f_b_piscine"] = first_num("hotel_non_f_b_piscine")
+        out["hotel_dispo_dans_lobby_vitrine_refrigeree"] = first_num(
+            "hotel_dispo_dans_lobby_vitrine_refrigeree"
+        )
+        out["hotel_f_b_minibar"] = first_num("hotel_f_b_minibar")
+        out["hotel_f_b_room_service"] = first_num("hotel_f_b_room_service")
 
         needs: dict[str, bool] = {}
         for col, need_id in SOUS_CAT_TO_NEED.items():
