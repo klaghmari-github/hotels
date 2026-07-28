@@ -2784,6 +2784,35 @@ input[type="range"] {
   }
 }
 
+/* Onglets solution (Simply / Liberty / Connected) — modèles ML */
+.sol-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.25rem 0 0.15rem;
+}
+.sol-tab {
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+.sol-tab:hover {
+  color: var(--text);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+.sol-tab.active {
+  color: #1a1405;
+  background: linear-gradient(135deg, var(--accent, #c9a227), #e0c35a);
+  border-color: transparent;
+}
+
 /* Très petit écran : même logique, padding réduit */
 @media (max-width: 600px) {
   .sidebar {

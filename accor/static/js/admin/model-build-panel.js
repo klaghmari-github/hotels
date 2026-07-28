@@ -19,6 +19,7 @@ export class ModelBuildPanel {
     this.state = state;
     this.nav = nav;
     this._pollTimer = null;
+    this.solution = "SIMPLY";
   }
 
   async open() {
@@ -32,6 +33,7 @@ export class ModelBuildPanel {
     this.nav.setNavBusy("build", true);
     try {
       this.nav.showModelBuildPanel();
+      this._wireSolTabs();
       await this.loadConfig();
       try {
         const prog = await api.get("/api/model/build/progress");
@@ -50,11 +52,29 @@ export class ModelBuildPanel {
     }
   }
 
+  _wireSolTabs() {
+    if (this._solWired) return;
+    this._solWired = true;
+    document.querySelectorAll("#model-sol-tabs .sol-tab").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const sol = btn.dataset.solution;
+        if (!sol || sol === this.solution) return;
+        this.solution = sol;
+        document.querySelectorAll("#model-sol-tabs .sol-tab").forEach((b) => {
+          b.classList.toggle("active", b.dataset.solution === sol);
+        });
+        await this.loadConfig();
+      });
+    });
+  }
+
   async loadConfig() {
     const status = $("#model-status");
     if (status) status.textContent = "Chargement…";
     try {
-      const cfg = await api.get("/api/model/config");
+      const cfg = await api.get("/api/model/config", {
+        solution: this.solution,
+      });
       this.state.modelConfig = cfg;
       this.renderConfig(cfg);
       this.updateJobCountChip();
@@ -68,9 +88,16 @@ export class ModelBuildPanel {
   renderConfig(cfg) {
     const chipSrc = $("#model-chip-source");
     const chipStats = $("#model-chip-stats");
-    if (chipSrc) chipSrc.textContent = "source · model_data";
+    const sol = cfg.solution || this.solution || "—";
+    if (chipSrc) chipSrc.textContent = `source · model_data · ${sol}`;
+    const nSol = cfg.n_rows_solution ?? cfg.n_rows_by_solution?.[sol];
     if (chipStats) {
-      chipStats.textContent = `train ${cfg.n_train ?? "—"} · éval ${cfg.n_eval ?? "—"} · ${cfg.n_features ?? "—"} feat · ${cfg.n_targets ?? "—"} cibles`;
+      chipStats.textContent = `sol ${sol} · ${nSol ?? "—"} lignes · train ${cfg.n_train ?? "—"} · éval ${cfg.n_eval ?? "—"} · ${cfg.n_features ?? "—"} feat`;
+    }
+    const hint = $("#model-sol-hint");
+    if (hint) {
+      const counts = cfg.n_rows_by_solution || {};
+      hint.textContent = `Spécialité ${sol} : ${nSol ?? "—"} lignes model_data (S=${counts.SIMPLY ?? "—"} · L=${counts.LIBERTY ?? "—"} · C=${counts.CONNECTED ?? "—"}). Apprentissage uniquement sur cette solution.`;
     }
     const nameEl = $("#model-name");
     if (nameEl && cfg.model_name) nameEl.value = cfg.model_name;
@@ -467,6 +494,7 @@ export class ModelBuildPanel {
         "montant_ventes",
       rank_metric:
         ($("#model-rank-metric") && $("#model-rank-metric").value) || "r2",
+      solution: this.solution || "SIMPLY",
       async: true,
     };
     if (btn) btn.disabled = true;

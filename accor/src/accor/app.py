@@ -514,12 +514,38 @@ def api_sync_hotel_solution_flags():
 def api_model_config():
     """
     Config Model Build : hyperparams par défaut, grilles, cible principale,
-    dernier modèle. Features issues de model_data.
+    dernier modèle. Query ``solution`` = SIMPLY|LIBERTY|CONNECTED (spécialité).
     """
     try:
-        from accor.model_train import get_config_payload
+        from accor.hotel_solutions import SOLUTIONS, normalize_solution
+        from accor.model_train import get_config_payload, list_design_models
 
-        return jsonify(get_config_payload())
+        sol = normalize_solution(request.args.get("solution"))
+        payload = get_config_payload()
+        payload["solution"] = sol
+        payload["solutions"] = list(SOLUTIONS)
+        if sol:
+            payload["model_name"] = f"xgb_sales_{sol.lower()}"
+            payload["solution_note"] = (
+                f"Apprentissage uniquement sur hôtels {sol} "
+                f"(hotel_solution_{sol.lower()}=1)."
+            )
+        # effectifs par solution (indicatif)
+        try:
+            from accor.model_train import _load_model_frame, _apply_solution_filter
+
+            frame, meta = _load_model_frame()
+            counts = {}
+            for s in SOLUTIONS:
+                f2, _, _ = _apply_solution_filter(frame, meta, s)
+                counts[s] = int(len(f2))
+            payload["n_rows_by_solution"] = counts
+            if sol:
+                payload["n_rows_solution"] = counts.get(sol)
+        except Exception:
+            pass
+        payload["models_for_solution"] = list_design_models(solution=sol)
+        return jsonify(payload)
     except FileNotFoundError as exc:
         return jsonify({"error": str(exc)}), 404
     except Exception as exc:
@@ -528,15 +554,18 @@ def api_model_config():
 
 @app.get("/api/model/list")
 def api_model_list():
-    """Liste models/design, last_trained et top_model (ranking cible principale)."""
+    """Liste models/design, last_trained et top_model. Query ``solution``."""
     try:
+        from accor.hotel_solutions import normalize_solution
         from accor.model_train import get_last_trained, get_top_model, list_design_models
 
+        sol = normalize_solution(request.args.get("solution"))
         return jsonify(
             {
-                "models": list_design_models(),
-                "last_trained": get_last_trained(),
-                "top_model": get_top_model(),
+                "solution": sol,
+                "models": list_design_models(solution=sol),
+                "last_trained": get_last_trained(solution=sol),
+                "top_model": get_top_model(solution=sol),
             }
         )
     except Exception as exc:
@@ -549,12 +578,16 @@ def api_model_eval_meta():
     Prépare l'onglet Evaluation.
 
     Query ``tier`` = intermediate (défaut) | final.
+    Query ``solution`` = SIMPLY|LIBERTY|CONNECTED.
     """
     try:
+        from accor.hotel_solutions import normalize_solution
         from accor.model_eval import eval_meta
 
         tier = request.args.get("tier") or "intermediate"
-        return jsonify(eval_meta(tier=tier))
+        sol = normalize_solution(request.args.get("solution"))
+        payload = eval_meta(tier=tier, solution=sol)
+        return jsonify(payload)
     except Exception as exc:
         return jsonify({"ok": False, "error": str(exc)}), 400
 
@@ -651,6 +684,7 @@ def api_model_build():
         else:
             grid_norm = {}
 
+        sol = body.get("solution")
         if use_async:
             result = start_build_batch(
                 model_name=body.get("model_name"),
@@ -658,9 +692,11 @@ def api_model_build():
                 grid_search=grid_norm or None,
                 main_target=body.get("main_target"),
                 rank_metric=body.get("rank_metric") or "r2",
+                solution=sol,
             )
             counts = count_grid_jobs(body.get("xgb_params"), grid_norm or None)
             result["counts"] = counts
+            result["solution"] = sol
             return jsonify(result)
 
         # mode sync simple (un seul modele, sans grid)
@@ -670,11 +706,16 @@ def api_model_build():
                     "error": "Utilisez async=true pour un build avec grid search",
                 }
             ), 400
-        result = build_and_save(
+        from accor.model_train import train_model
+
+        result = train_model(
             xgb_params=body.get("xgb_params"),
             model_name=body.get("model_name"),
             main_target=body.get("main_target"),
+            save=True,
+            solution=sol,
         )
+        result.pop("bundle", None)
         return jsonify(result)
     except ImportError as exc:
         return jsonify({"error": str(exc)}), 500
@@ -829,11 +870,15 @@ def api_model_importance(model_id: str):
 
 @app.get("/api/model/final/config")
 def api_final_config():
-    """Config build final + liste des intermédiaires disponibles."""
+    """Config build final + intermédiaires. Query ``solution``."""
     try:
+        from accor.hotel_solutions import SOLUTIONS, normalize_solution
         from accor.model_final import get_final_config_payload
 
-        return jsonify(get_final_config_payload())
+        sol = normalize_solution(request.args.get("solution"))
+        payload = get_final_config_payload(solution=sol)
+        payload["solutions"] = list(SOLUTIONS)
+        return jsonify(payload)
     except Exception as exc:
         return jsonify({"error": str(exc)}), 400
 
@@ -841,17 +886,20 @@ def api_final_config():
 @app.get("/api/model/final/list")
 def api_final_list():
     try:
+        from accor.hotel_solutions import normalize_solution
         from accor.model_final import (
             get_final_last_trained,
             get_final_top_model,
             list_final_models,
         )
 
+        sol = normalize_solution(request.args.get("solution"))
         return jsonify(
             {
-                "models": list_final_models(),
+                "solution": sol,
+                "models": list_final_models(solution=sol),
                 "last_trained": get_final_last_trained(),
-                "top_model": get_final_top_model(),
+                "top_model": get_final_top_model(solution=sol),
                 "tier": "final",
             }
         )
@@ -864,7 +912,8 @@ def api_final_build():
     """
     Build modèle final : preds intermédiaires + descriptives → XGB montant_ventes.
 
-    Body : intermediate_model_id, model_name, xgb_params, grid_search, main_target.
+    Body : intermediate_model_id, model_name, xgb_params, grid_search, main_target,
+    solution (SIMPLY|LIBERTY|CONNECTED).
     """
     body = request.get_json(force=True, silent=True) or {}
     try:
@@ -880,14 +929,17 @@ def api_final_build():
             }
         else:
             grid_norm = {}
+        sol = body.get("solution")
         result = start_final_build(
             intermediate_model_id=body.get("intermediate_model_id"),
             model_name=body.get("model_name") or "xgb_final",
             xgb_params=body.get("xgb_params"),
             main_target=body.get("main_target"),
             grid_search=grid_norm or None,
+            solution=sol,
         )
         result["counts"] = count_grid_jobs(body.get("xgb_params"), grid_norm or None)
+        result["solution"] = sol
         return jsonify(result)
     except FileNotFoundError as exc:
         return jsonify({"ok": False, "error": str(exc)}), 404

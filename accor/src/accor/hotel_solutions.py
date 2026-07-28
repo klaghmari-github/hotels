@@ -24,6 +24,8 @@ import pandas as pd
 
 from accor.data_io import DATA_DIR
 
+SOLUTIONS = ("SIMPLY", "LIBERTY", "CONNECTED")
+
 SOLUTION_FLAG_COLS = (
     "hotel_solution_simply",
     "hotel_solution_liberty",
@@ -35,6 +37,80 @@ _SOLUTION_TO_COL = {
     "LIBERTY": "hotel_solution_liberty",
     "CONNECTED": "hotel_solution_connected",
 }
+
+_COL_TO_SOLUTION = {v: k for k, v in _SOLUTION_TO_COL.items()}
+
+
+def normalize_solution(value: str | None) -> str | None:
+    """``simply`` / ``SIMPLY`` / ``hotel_solution_simply`` → ``SIMPLY`` ou None."""
+    if value is None:
+        return None
+    s = str(value).strip()
+    if not s:
+        return None
+    u = s.upper().replace("-", "_")
+    if u in _SOLUTION_TO_COL:
+        return u
+    if u.startswith("HOTEL_SOLUTION_"):
+        u2 = u.replace("HOTEL_SOLUTION_", "")
+        if u2 in _SOLUTION_TO_COL:
+            return u2
+    low = s.lower()
+    for sol in SOLUTIONS:
+        if low == sol.lower() or low == f"hotel_solution_{sol.lower()}":
+            return sol
+    return None
+
+
+def solution_flag_col(solution: str | None) -> str | None:
+    sol = normalize_solution(solution)
+    if not sol:
+        return None
+    return _SOLUTION_TO_COL[sol]
+
+
+def filter_frame_by_solution(
+    frame: "pd.DataFrame",
+    solution: str | None,
+    *,
+    drop_solution_flags: bool = True,
+) -> "pd.DataFrame":
+    """
+    Garde uniquement les lignes de la solution (flag = 1).
+
+    Si la colonne flag est absente, filtre via ``rod_pilot_concepts`` (hotel_code).
+    """
+    import pandas as pd
+
+    sol = normalize_solution(solution)
+    if sol is None or frame is None or frame.empty:
+        return frame
+    out = frame.copy()
+    col = _SOLUTION_TO_COL[sol]
+    if col in out.columns:
+        mask = pd.to_numeric(out[col], errors="coerce").fillna(0).astype(int) == 1
+        out = out.loc[mask].copy()
+    elif "hotel_code" in out.columns:
+        pilots = load_pilot_solution_codes()
+        codes = {
+            c for c, s in pilots.items() if s == sol
+        }
+        out = out.loc[
+            out["hotel_code"].astype(str).str.strip().isin(codes)
+        ].copy()
+    else:
+        return out.iloc[0:0].copy()
+
+    if drop_solution_flags:
+        for c in SOLUTION_FLAG_COLS:
+            if c in out.columns:
+                out = out.drop(columns=[c])
+    return out
+
+
+def solution_slug(solution: str | None) -> str | None:
+    sol = normalize_solution(solution)
+    return sol.lower() if sol else None
 
 PILOT_MAP_PATH = DATA_DIR / "rod_pilot_concepts.json"
 HOTEL_PATH = DATA_DIR / "hotel_data.xlsx"

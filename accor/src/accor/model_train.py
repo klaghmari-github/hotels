@@ -60,8 +60,54 @@ DEPLOY_DIR = MODELS_DIR / "deploy"
 LAST_TRAINED_FILE = MODELS_DIR / "last_trained.json"
 BUILD_PROGRESS_FILE = MODELS_DIR / "build_progress.json"
 
+# Min. lignes train (spécialité solution = peu de pilotes / mois)
+MIN_TRAIN_ROWS = 3
+MIN_EVAL_ROWS = 1
+
 _build_lock = threading.Lock()
 _build_thread: threading.Thread | None = None
+
+
+def _norm_sol(solution: str | None) -> str | None:
+    from accor.hotel_solutions import normalize_solution
+
+    return normalize_solution(solution)
+
+
+def design_dir_for(solution: str | None = None) -> Path:
+    """``models/design/`` ou ``models/design/<simply|liberty|connected>/``."""
+    sol = _norm_sol(solution)
+    if sol:
+        return DESIGN_DIR / sol.lower()
+    return DESIGN_DIR
+
+
+def _apply_solution_filter(
+    frame: pd.DataFrame,
+    meta: dict[str, Any],
+    solution: str | None,
+) -> tuple[pd.DataFrame, dict[str, Any], list[str]]:
+    """Filtre model_data sur la solution + retire les flags solution des features."""
+    from accor.hotel_solutions import SOLUTION_FLAG_COLS, filter_frame_by_solution
+
+    sol = _norm_sol(solution)
+    if not sol:
+        return frame, meta, list(meta.get("descriptive_columns") or [])
+
+    filtered = filter_frame_by_solution(frame, sol, drop_solution_flags=True)
+    desc = [
+        c
+        for c in (meta.get("descriptive_columns") or [])
+        if c in filtered.columns and c not in SOLUTION_FLAG_COLS
+    ]
+    meta2 = {
+        **meta,
+        "solution": sol,
+        "solution_filter": sol,
+        "n_rows_solution": int(len(filtered)),
+        "descriptive_columns": desc,
+    }
+    return filtered, meta2, desc
 
 
 class BuildProgress:
@@ -401,19 +447,55 @@ def get_config_payload() -> dict[str, Any]:
     }
 
 
-def list_design_models() -> list[dict[str, Any]]:
+def list_design_models(solution: str | None = None) -> list[dict[str, Any]]:
     """Liste les modèles design, triés par perf (R² montant_ventes eval, puis mean_r2)."""
     DESIGN_DIR.mkdir(parents=True, exist_ok=True)
+    sol = _norm_sol(solution)
     out: list[dict[str, Any]] = []
-    for conf_path in DESIGN_DIR.glob("*/config.json"):
-        try:
-            meta = json.loads(conf_path.read_text(encoding="utf-8"))
-            meta["id"] = conf_path.parent.name
-            meta["name"] = meta.get("name") or conf_path.parent.name
-            meta["path"] = str(conf_path.parent)
-            out.append(meta)
-        except Exception:
+    roots: list[Path] = []
+    if sol:
+        roots = [design_dir_for(sol)]
+    else:
+        roots = [DESIGN_DIR]
+        from accor.hotel_solutions import SOLUTIONS
+
+        for s in SOLUTIONS:
+            roots.append(design_dir_for(s))
+
+    seen: set[str] = set()
+    for root in roots:
+        if not root.exists():
             continue
+        for conf_path in root.glob("*/config.json"):
+            try:
+                meta = json.loads(conf_path.read_text(encoding="utf-8"))
+                mid = conf_path.parent.name
+                # id stable : solution/slug si sous-dossier
+                if conf_path.parent.parent.resolve() != DESIGN_DIR.resolve():
+                    mid = f"{conf_path.parent.parent.name}/{conf_path.parent.name}"
+                if mid in seen:
+                    continue
+                seen.add(mid)
+                meta["id"] = mid
+                meta["name"] = meta.get("name") or conf_path.parent.name
+                meta["path"] = str(conf_path.parent)
+                meta.setdefault(
+                    "solution",
+                    meta.get("solution_filter")
+                    or (
+                        conf_path.parent.parent.name.upper()
+                        if conf_path.parent.parent.name
+                        in ("simply", "liberty", "connected")
+                        else None
+                    ),
+                )
+                if sol and _norm_sol(meta.get("solution")) not in (sol, None):
+                    # si dossier solution, on garde ; sinon filtre
+                    if conf_path.parent.parent.name != sol.lower():
+                        continue
+                out.append(meta)
+            except Exception:
+                continue
 
     def score(m: dict[str, Any]) -> float:
         mt = m.get("metrics_eval") or m.get("metrics_test") or {}
@@ -436,34 +518,62 @@ def list_design_models() -> list[dict[str, Any]]:
     return out
 
 
-def get_last_trained() -> dict[str, Any] | None:
-    if LAST_TRAINED_FILE.exists():
+def get_last_trained(solution: str | None = None) -> dict[str, Any] | None:
+    sol = _norm_sol(solution)
+    last_file = (
+        design_dir_for(sol) / "last_trained.json" if sol else LAST_TRAINED_FILE
+    )
+    if last_file.exists():
         try:
-            info = json.loads(LAST_TRAINED_FILE.read_text(encoding="utf-8"))
+            info = json.loads(last_file.read_text(encoding="utf-8"))
             name = info.get("name") or info.get("id")
             if name:
-                conf = DESIGN_DIR / name / "config.json"
-                if conf.exists():
-                    meta = json.loads(conf.read_text(encoding="utf-8"))
+                loaded = _resolve_design_paths(name, sol)
+                if loaded and loaded[1].exists():
+                    meta = json.loads(loaded[1].read_text(encoding="utf-8"))
                     meta["id"] = name
-                    meta["name"] = name
+                    meta["name"] = meta.get("name") or name
                     return meta
             return info
         except Exception:
             pass
-    models = list_design_models()
+    models = list_design_models(solution=sol)
     if not models:
         return None
-    # plus récent par created_at
     models_by_date = sorted(
         models, key=lambda m: m.get("created_at") or "", reverse=True
     )
     return models_by_date[0]
 
 
-def get_top_model() -> dict[str, Any] | None:
-    models = list_design_models()
+def get_top_model(solution: str | None = None) -> dict[str, Any] | None:
+    models = list_design_models(solution=solution)
     return models[0] if models else None
+
+
+def _resolve_design_paths(
+    model_id: str, solution: str | None = None
+) -> tuple[Path, Path] | None:
+    """Retourne (model.pkl, config.json) pour un id ``slug`` ou ``sol/slug``."""
+    mid = str(model_id or "").strip().replace("\\", "/")
+    candidates: list[Path] = []
+    if "/" in mid:
+        candidates.append(DESIGN_DIR / mid)
+    sol = _norm_sol(solution)
+    slug = _slug(mid.split("/")[-1])
+    if sol:
+        candidates.append(design_dir_for(sol) / slug)
+    candidates.append(DESIGN_DIR / slug)
+    from accor.hotel_solutions import SOLUTIONS
+
+    for s in SOLUTIONS:
+        candidates.append(design_dir_for(s) / slug)
+    for parent in candidates:
+        pkl = parent / "model.pkl"
+        conf = parent / "config.json"
+        if pkl.exists():
+            return pkl, conf
+    return None
 
 
 def _coerce_params(xgb_params: dict[str, Any] | None) -> dict[str, Any]:
@@ -783,9 +893,14 @@ def train_model(
     frame: pd.DataFrame | None = None,
     meta: dict[str, Any] | None = None,
     progress_hook: Any | None = None,
+    solution: str | None = None,
 ) -> dict[str, Any]:
     """
     Entraîne sur model_data.
+
+    Si ``solution`` (SIMPLY|LIBERTY|CONNECTED) : n'utilise que les lignes
+    de cette solution (spécialité) et n'inclut pas les flags solution
+    en features. Sauvegarde sous ``design/<solution>/<name>/``.
 
     Si ``save=True``, écrit immédiatement dans design/<name>/.
     ``rebuild_data=False`` + frame/meta : reutilise les donnees (batch grid).
@@ -799,6 +914,8 @@ def train_model(
             "xgboost et scikit-learn sont requis : pip install xgboost scikit-learn"
         ) from exc
 
+    sol = _norm_sol(solution)
+
     if rebuild_data or frame is None or meta is None:
         if progress_hook:
             try:
@@ -808,7 +925,8 @@ def train_model(
         rebuild_model_data()
         frame, meta = _load_model_frame()
 
-    feature_cols = [c for c in (meta.get("descriptive_columns") or []) if c in frame.columns]
+    frame, meta, feature_cols = _apply_solution_filter(frame, meta, sol)
+    feature_cols = [c for c in feature_cols if c in frame.columns]
     target_cols = [c for c in (meta.get("target_columns") or []) if c in frame.columns]
     main_t = (main_target or meta.get("main_target") or MAIN_TARGET).strip()
     if main_t not in target_cols:
@@ -818,6 +936,11 @@ def train_model(
             main_t = target_cols[0]
     main_target = main_t
 
+    if frame.empty:
+        raise ValueError(
+            f"Aucune ligne model_data pour la solution {sol or 'GLOBAL'} "
+            f"(flags hotel_solution_* / pilotes)."
+        )
     if not feature_cols:
         raise ValueError("Aucune feature descriptive dans model_data.")
     if not target_cols:
@@ -840,10 +963,21 @@ def train_model(
 
     train_df = work.loc[~is_eval]
     eval_df = work.loc[is_eval]
-    if len(train_df) < 5:
-        raise ValueError(f"Trop peu de lignes d'apprentissage ({len(train_df)}).")
-    if len(eval_df) < 1:
-        raise ValueError("Aucune ligne d'évaluation (dernière année).")
+    if len(train_df) < MIN_TRAIN_ROWS:
+        raise ValueError(
+            f"Trop peu de lignes d'apprentissage ({len(train_df)}) "
+            f"pour {sol or 'GLOBAL'} (min {MIN_TRAIN_ROWS})."
+        )
+    if len(eval_df) < MIN_EVAL_ROWS:
+        # Si pas d'éval temporelle, réutilise un hold-out aléatoire minimal
+        if len(work) >= MIN_TRAIN_ROWS + 1:
+            eval_df = work.tail(max(1, len(work) // 5))
+            train_df = work.drop(index=eval_df.index)
+        else:
+            raise ValueError(
+                f"Aucune ligne d'évaluation pour {sol or 'GLOBAL'} "
+                f"(n={len(work)})."
+            )
 
     X_train = train_df[feature_cols].to_numpy(dtype=float)
     y_train = train_df[target_cols].to_numpy(dtype=float)
@@ -887,20 +1021,25 @@ def train_model(
         importance = {}
     top_imp = sorted(importance.items(), key=lambda x: -x[1])[:40]
 
-    name = _slug(model_name or "xgb_sales")
+    base_name = _slug(model_name or ("xgb_sales_" + sol.lower() if sol else "xgb_sales"))
+    # id public : simply/slug si spécialisé
+    public_id = f"{sol.lower()}/{base_name}" if sol else base_name
     bundle = {
         "model": model,
         "feature_cols": feature_cols,
         "target_cols": target_cols,
         "params": params,
         "main_target": main_target,
+        "solution": sol,
     }
 
     config = {
-        "name": name,
-        "id": name,
+        "name": base_name,
+        "id": public_id,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "source": "model_data",
+        "solution": sol,
+        "solution_filter": sol,
         "eval_year": meta.get("eval_year"),
         "n_rows_used": int(len(work)),
         "n_train": int(len(train_df)),
@@ -923,8 +1062,9 @@ def train_model(
 
     result = {
         "ok": True,
-        "id": name,
-        "name": name,
+        "id": public_id,
+        "name": base_name,
+        "solution": sol,
         "bundle": bundle,
         "config": config,
         "metrics_train": metrics_train,
@@ -943,11 +1083,11 @@ def train_model(
     }
 
     if save:
-        saved = save_design_model(name, bundle, config)
+        saved = save_design_model(base_name, bundle, config, solution=sol)
         result.update(saved)
         result["saved"] = True
+        result["id"] = public_id
 
-    # remember last trained (in memory file even if not saved? save always on build per user)
     return result
 
 
@@ -955,12 +1095,15 @@ def save_design_model(
     name: str,
     bundle: dict[str, Any],
     config: dict[str, Any],
+    *,
+    solution: str | None = None,
 ) -> dict[str, Any]:
-    """Écrit / écrase ``models/design/<name>/``."""
+    """Écrit / écrase ``models/design/<name>/`` ou ``design/<sol>/<name>/``."""
     name = _slug(name)
-    DESIGN_DIR.mkdir(parents=True, exist_ok=True)
-    out_dir = DESIGN_DIR / name
-    # écrase
+    sol = _norm_sol(solution or config.get("solution"))
+    root = design_dir_for(sol)
+    root.mkdir(parents=True, exist_ok=True)
+    out_dir = root / name
     if out_dir.exists():
         shutil.rmtree(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -969,20 +1112,34 @@ def save_design_model(
     with model_path.open("wb") as f:
         pickle.dump(bundle, f)
 
-    config = {**config, "name": name, "id": name, "path": str(out_dir)}
+    public_id = f"{sol.lower()}/{name}" if sol else name
+    config = {
+        **config,
+        "name": name,
+        "id": public_id,
+        "solution": sol,
+        "path": str(out_dir),
+    }
     conf_path = out_dir / "config.json"
     conf_path.write_text(json.dumps(config, ensure_ascii=False, indent=2), encoding="utf-8")
 
+    last_payload = {
+        "name": name,
+        "id": public_id,
+        "solution": sol,
+        "created_at": config.get("created_at"),
+    }
     LAST_TRAINED_FILE.parent.mkdir(parents=True, exist_ok=True)
-    LAST_TRAINED_FILE.write_text(
-        json.dumps({"name": name, "id": name, "created_at": config.get("created_at")}, indent=2),
-        encoding="utf-8",
-    )
+    LAST_TRAINED_FILE.write_text(json.dumps(last_payload, indent=2), encoding="utf-8")
+    if sol:
+        last_sol = root / "last_trained.json"
+        last_sol.write_text(json.dumps(last_payload, indent=2), encoding="utf-8")
 
     return {
         "ok": True,
-        "id": name,
+        "id": public_id,
         "name": name,
+        "solution": sol,
         "path": str(out_dir),
         "model_file": str(model_path),
         "config_file": str(conf_path),
@@ -1014,12 +1171,15 @@ def _run_build_batch(
     grid_search: dict[str, list[Any]] | None,
     main_target: str,
     rank_metric: str,
+    solution: str | None = None,
 ) -> None:
     """Thread worker: modele manuel + toutes les combinaisons grid search."""
     progress = _BUILD_PROGRESS
+    sol = _norm_sol(solution)
     try:
+        base = model_name or ("xgb_sales_" + sol.lower() if sol else "xgb_sales")
         planner = GridSearchPlanner(
-            base_name=model_name or "xgb_sales",
+            base_name=base,
             manual_params=xgb_params or {},
             grid=grid_search,
         )
@@ -1053,6 +1213,12 @@ def _run_build_batch(
 
         rebuild_model_data()
         frame, meta = _load_model_frame()
+        frame, meta, _ = _apply_solution_filter(frame, meta, sol)
+        if frame.empty:
+            raise ValueError(
+                f"Aucune donnée pour solution {sol or 'GLOBAL'} "
+                f"(hotel_solution_* = 1 sur model_data)."
+            )
         target_cols = meta.get("target_columns") or []
         main_t = (main_target or meta.get("main_target") or MAIN_TARGET).strip()
         if main_t not in target_cols:
@@ -1066,6 +1232,13 @@ def _run_build_batch(
         results: list[dict[str, Any]] = []
         manual_done = 0
         grid_done = 0
+        progress.update(
+            message=(
+                f"Données {sol or 'GLOBAL'} · {len(frame)} lignes · "
+                f"{n_jobs} job(s)…"
+            ),
+            solution=sol,
+        )
 
         for idx, (name, kind, params) in enumerate(jobs):
             kind = (kind or "manual").lower()
@@ -1139,6 +1312,7 @@ def _run_build_batch(
                     frame=frame,
                     meta=meta,
                     progress_hook=_hook,
+                    solution=sol,
                 )
                 res.pop("bundle", None)
                 res["kind"] = kind
@@ -1232,9 +1406,11 @@ def start_build_batch(
     grid_search: dict[str, list[Any]] | None = None,
     main_target: str | None = None,
     rank_metric: str = "r2",
+    solution: str | None = None,
 ) -> dict[str, Any]:
     """
     Lance en arriere-plan le build manuel + grid search.
+    ``solution`` : SIMPLY|LIBERTY|CONNECTED (spécialité, données filtrées).
     Suivre via get_build_progress().
     """
     global _build_thread
@@ -1245,8 +1421,10 @@ def start_build_batch(
             "progress": _BUILD_PROGRESS.snapshot(),
         }
 
+    sol = _norm_sol(solution)
+    base = model_name or ("xgb_sales_" + sol.lower() if sol else "xgb_sales")
     planner = GridSearchPlanner(
-        base_name=model_name or "xgb_sales",
+        base_name=base,
         manual_params=xgb_params or {},
         grid=grid_search,
     )
@@ -1258,15 +1436,20 @@ def start_build_batch(
         main_target=main_t,
         rank_metric=metric,
     )
+    try:
+        _BUILD_PROGRESS.update(solution=sol)
+    except Exception:
+        pass
 
     t = threading.Thread(
         target=_run_build_batch,
         kwargs={
-            "model_name": model_name or "xgb_sales",
+            "model_name": base,
             "xgb_params": xgb_params or {},
             "grid_search": grid_search,
             "main_target": main_t,
             "rank_metric": metric,
+            "solution": sol,
         },
         daemon=True,
     )
@@ -1340,11 +1523,13 @@ def deploy_model(model_name: str | None = None) -> dict[str, Any]:
     }
 
 
-def load_design_model(model_id: str) -> dict[str, Any]:
-    path = DESIGN_DIR / _slug(model_id) / "model.pkl"
-    conf_path = DESIGN_DIR / _slug(model_id) / "config.json"
-    if not path.exists():
+def load_design_model(
+    model_id: str, *, solution: str | None = None
+) -> dict[str, Any]:
+    resolved = _resolve_design_paths(model_id, solution)
+    if not resolved:
         raise FileNotFoundError(f"Modèle introuvable : {model_id}")
+    path, conf_path = resolved
     with path.open("rb") as f:
         bundle = pickle.load(f)
     meta = {}

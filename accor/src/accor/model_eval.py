@@ -71,12 +71,16 @@ def _metrics_1d(y_true: np.ndarray, y_pred: np.ndarray) -> dict[str, float]:
     }
 
 
-def eval_meta(*, tier: str = "intermediate") -> dict[str, Any]:
+def eval_meta(*, tier: str = "intermediate", solution: str | None = None) -> dict[str, Any]:
     """
     Payload pour l'onglet Evaluation / GET /api/model/eval/meta.
 
     ``tier`` = intermediate (models/design) ou final (models/final/design).
+    ``solution`` = SIMPLY|LIBERTY|CONNECTED pour filtrer les modèles spécialisés.
     """
+    from accor.hotel_solutions import normalize_solution
+
+    solution = normalize_solution(solution)
     tier = "final" if tier == "final" else "intermediate"
     try:
         _, meta = _load_model_frame()
@@ -86,15 +90,16 @@ def eval_meta(*, tier: str = "intermediate") -> dict[str, Any]:
         if tier == "final":
             from accor.model_final import get_final_top_model, list_final_models
 
-            models = list_final_models()
-            top = get_final_top_model()
+            models = list_final_models(solution=solution)
+            top = get_final_top_model(solution=solution)
         else:
-            models = list_design_models()
-            top = get_top_model()
+            models = list_design_models(solution=solution)
+            top = get_top_model(solution=solution)
         return {
             "ok": False,
             "error": str(exc),
             "tier": tier,
+            "solution": solution,
             "target_cols": [],
             "main_target": MAIN_TARGET,
             "eval_year": 2026,
@@ -105,17 +110,18 @@ def eval_meta(*, tier: str = "intermediate") -> dict[str, Any]:
     if tier == "final":
         from accor.model_final import get_final_top_model, list_final_models
 
-        models = list_final_models()
-        top = get_final_top_model()
+        models = list_final_models(solution=solution)
+        top = get_final_top_model(solution=solution)
         target_cols = [meta.get("main_target") or MAIN_TARGET]
     else:
-        models = list_design_models()
-        top = get_top_model()
+        models = list_design_models(solution=solution)
+        top = get_top_model(solution=solution)
         target_cols = meta.get("target_columns") or []
 
     return {
         "ok": True,
         "tier": tier,
+        "solution": solution,
         "target_cols": target_cols,
         "main_target": meta.get("main_target") or MAIN_TARGET,
         "eval_year": int(meta.get("eval_year") or 2026),

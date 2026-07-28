@@ -494,15 +494,27 @@ def _ai_predict_three(
     feature_overrides: dict[str, Any] | None = None,
 ) -> dict[str, float] | None:
     """
-    Trois prédictions de CA mensuel (simply / liberty / connected = 1).
+    Trois prédictions de CA mensuel — **un modèle final par solution**.
 
-    ``feature_overrides`` applique les valeurs saisies par le directeur
-    (chambres, TO, rénovation, restos/bars, piscine, vitrine…) sur la ligne
-    model_data avant prédiction.
+    Chaque spécialité (SIMPLY / LIBERTY / CONNECTED) a son propre modèle
+    entraîné uniquement sur les hôtels de cette solution. La reco reste
+    basée sur les règles métier + coûts, pas sur le ML.
     """
+    import numpy as np
+    import pandas as pd
+
     try:
-        from accor.model_train import _load_model_frame, load_design_model, get_top_model
-        from accor.model_final import get_final_top_model, load_final_model, build_stacked_features
+        from accor.hotel_solutions import SOLUTIONS
+        from accor.model_final import (
+            build_stacked_features,
+            get_final_top_model,
+            load_final_model,
+        )
+        from accor.model_train import (
+            _load_model_frame,
+            get_top_model,
+            load_design_model,
+        )
     except Exception:
         return None
 
@@ -514,120 +526,64 @@ def _ai_predict_three(
         return None
 
     overrides = {k: v for k, v in (feature_overrides or {}).items() if v is not None}
-
     work = frame.copy()
     work["hotel_code"] = work["hotel_code"].astype(str).str.strip()
-    sub = work.loc[work["hotel_code"] == hotel_code]
-    if sub.empty:
-        row = work.mean(numeric_only=True).to_dict()
-        base = work.iloc[[0]].copy()
-        for k, v in row.items():
-            if k in base.columns:
-                base[k] = v
-    else:
-        base = sub.mean(numeric_only=True).to_frame().T
-        for col in sub.columns:
-            if col not in base.columns:
-                base[col] = sub[col].iloc[0]
-        base = base.reset_index(drop=True)
+    code = str(hotel_code).strip()
+    sub = work.loc[work["hotel_code"] == code]
+    base_src = sub.copy() if not sub.empty else work.iloc[[0]].copy()
 
-    base["hotel_code"] = hotel_code
-    for col, val in overrides.items():
-        if col in base.columns or True:
-            base[col] = val
-    for col in SOLUTION_FLAG_COLS:
-        if col not in base.columns:
-            base[col] = 0
-
-    model = None
-    feature_cols: list[str] = []
-    try:
-        top = get_final_top_model()
-        if top:
-            mid = top.get("id") or top.get("name")
-            loaded = load_final_model(str(mid))
+    out: dict[str, float] = {}
+    for sol in SOLUTIONS:
+        try:
+            top = get_final_top_model(solution=sol) or get_top_model(solution=sol)
+            if not top:
+                continue
+            mid = str(top.get("id") or top.get("name") or "")
+            is_final = top.get("tier") == "final" or top.get("kind") == "stacked_final"
+            loaded = (
+                load_final_model(mid, solution=sol)
+                if is_final
+                else load_design_model(mid, solution=sol)
+            )
             bundle = loaded.get("bundle") or {}
             conf = loaded.get("meta") or {}
             model = bundle.get("model")
-            feature_cols = list(bundle.get("feature_cols") or conf.get("feature_cols") or [])
-            imid = conf.get("intermediate_model_id") or bundle.get("intermediate_model_id")
-            if imid and model is not None:
+            feature_cols = list(
+                bundle.get("feature_cols") or conf.get("feature_cols") or []
+            )
+            if model is None or not feature_cols:
+                continue
+            row = base_src.copy()
+            imid = conf.get("intermediate_model_id") or bundle.get(
+                "intermediate_model_id"
+            )
+            if imid:
                 try:
-                    inter = load_design_model(str(imid))["bundle"]
+                    inter = load_design_model(str(imid), solution=sol)["bundle"]
                     expanded, feature_cols, _, _ = build_stacked_features(
                         work, meta or {}, inter
                     )
                     exp = expanded.loc[
-                        expanded["hotel_code"].astype(str).str.strip() == hotel_code
+                        expanded["hotel_code"].astype(str).str.strip() == code
                     ]
-                    if not exp.empty:
-                        base = exp.mean(numeric_only=True).to_frame().T
-                        for col in exp.columns:
-                            if col not in base.columns:
-                                base[col] = exp[col].iloc[0]
-                        base = base.reset_index(drop=True)
-                        base["hotel_code"] = hotel_code
-                        for col, val in overrides.items():
-                            base[col] = val
+                    row = exp if not exp.empty else expanded.iloc[[0]].copy()
                 except Exception:
-                    inter_loaded = load_design_model(str(imid))
-                    model = (inter_loaded.get("bundle") or {}).get("model")
-                    feature_cols = list(
-                        (inter_loaded.get("bundle") or {}).get("feature_cols")
-                        or (inter_loaded.get("meta") or {}).get("feature_cols")
-                        or []
-                    )
-    except Exception:
-        model = None
-
-    if model is None:
-        try:
-            top = get_top_model()
-            if not top:
-                return None
-            mid = top.get("id") or top.get("name")
-            loaded = load_design_model(str(mid))
-            model = (loaded.get("bundle") or {}).get("model")
-            feature_cols = list(
-                (loaded.get("bundle") or {}).get("feature_cols")
-                or (loaded.get("meta") or {}).get("feature_cols")
-                or []
-            )
-        except Exception:
-            return None
-
-    if model is None or not feature_cols:
-        return None
-
-    # Ré-appliquer overrides après stacking / fallback
-    for col, val in overrides.items():
-        base[col] = val
-
-    for col in feature_cols:
-        if col not in base.columns:
-            base[col] = 0.0
-
-    out: dict[str, float] = {}
-    for sol in CONCEPTS:
-        sc = base.copy()
-        for c in CONCEPTS:
-            col = FLAG_BY[c]
-            sc[col] = 1 if c == sol else 0
-        try:
-            import numpy as np
-            import pandas as pd
-
+                    pass
+            for col, val in overrides.items():
+                row[col] = val
+            for c in feature_cols:
+                if c not in row.columns:
+                    row[c] = 0.0
             X = (
-                sc[feature_cols]
+                row[feature_cols]
                 .apply(pd.to_numeric, errors="coerce")
                 .fillna(0.0)
                 .to_numpy(dtype=float)
             )
-            pred = model.predict(X)
-            pred = np.asarray(pred, dtype=float)
-            if pred.ndim > 1:
-                pred = pred[:, 0]
-            out[sol] = round(float(pred.mean()), 2)
+            if X.ndim == 1:
+                X = X.reshape(1, -1)
+            pred = np.asarray(model.predict(X), dtype=float)
+            out[sol] = round(float(np.nanmean(pred)), 2)
         except Exception:
             continue
     return out or None

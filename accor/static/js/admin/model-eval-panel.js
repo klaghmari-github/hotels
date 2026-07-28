@@ -85,6 +85,7 @@ export class ModelEvalPanel {
     this.ids = this.tier === "final" ? FINAL_IDS : INTER_IDS;
     this.meta = null;
     this.lastResult = null;
+    this.solution = "SIMPLY";
   }
 
   el(key) {
@@ -109,6 +110,7 @@ export class ModelEvalPanel {
     try {
       if (this.tier === "final") this.nav.showFinalEvalPanel();
       else this.nav.showModelEvalPanel();
+      this._wireSolTabs();
       await this.loadMeta();
       if (this.lastResult) this.render(this.lastResult);
     } finally {
@@ -117,11 +119,32 @@ export class ModelEvalPanel {
     }
   }
 
+  _wireSolTabs() {
+    if (this.tier !== "intermediate") return;
+    if (this._solWired) return;
+    this._solWired = true;
+    document.querySelectorAll("#eval-sol-tabs .sol-tab").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const sol = btn.dataset.solution;
+        if (!sol || sol === this.solution) return;
+        this.solution = sol;
+        document.querySelectorAll("#eval-sol-tabs .sol-tab").forEach((b) => {
+          b.classList.toggle("active", b.dataset.solution === sol);
+        });
+        this.lastResult = null;
+        await this.loadMeta();
+      });
+    });
+  }
+
   async loadMeta() {
     const status = this.el("status");
     if (status) status.textContent = "Chargement…";
     try {
-      const meta = await api.get("/api/model/eval/meta", { tier: this.tier });
+      const meta = await api.get("/api/model/eval/meta", {
+        tier: this.tier,
+        solution: this.solution || undefined,
+      });
       this.meta = meta;
       this.fillModels(meta.models || [], meta.top_model);
       this.fillTargets(meta.target_cols || [], meta.main_target);
@@ -197,6 +220,7 @@ export class ModelEvalPanel {
         target,
         year,
         tier: this.tier,
+        solution: this.solution || undefined,
       });
       if (!res.ok) throw new Error(res.error || "Echec evaluation");
       this.lastResult = res;

@@ -251,13 +251,22 @@
           <span class="status" id="model-status"></span>
         </section>
 
+        <div class="sol-tabs" id="model-sol-tabs" role="tablist" aria-label="Solution spécialité">
+          <button type="button" class="sol-tab active" data-solution="SIMPLY">Simply</button>
+          <button type="button" class="sol-tab" data-solution="LIBERTY">Liberty</button>
+          <button type="button" class="sol-tab" data-solution="CONNECTED">Connected</button>
+        </div>
+        <p class="card-hint" id="model-sol-hint" style="margin:0.35rem 0 0.75rem">
+          Chaque modèle n’apprend que sur les hôtels de sa solution (flags pilotes).
+        </p>
+
         <div class="model-layout model-build-layout">
           <div class="model-col">
             <section class="card">
               <h2 class="card-title">Nom et ranking</h2>
               <p class="card-hint">
-                Stockage : <code>models/design/&lt;nom&gt;/</code> (manuel) et
-                <code>&lt;nom&gt;_gs_001</code>… pour le grid. Ecrase si meme nom.
+                Stockage : <code>models/design/&lt;solution&gt;/&lt;nom&gt;/</code>
+                (ex. <code>design/simply/xgb_sales_simply</code>).
               </p>
               <div class="form-grid form-grid-3">
                 <label class="field">
@@ -426,6 +435,14 @@
           <span class="chip chip-muted" id="final-chip-jobs">1 modele</span>
           <span class="status" id="final-status"></span>
         </section>
+        <div class="sol-tabs" id="final-sol-tabs" role="tablist" aria-label="Solution spécialité final">
+          <button type="button" class="sol-tab active" data-solution="SIMPLY">Simply</button>
+          <button type="button" class="sol-tab" data-solution="LIBERTY">Liberty</button>
+          <button type="button" class="sol-tab" data-solution="CONNECTED">Connected</button>
+        </div>
+        <p class="card-hint" style="margin:0.35rem 0 0.75rem">
+          Modèle final <strong>par solution</strong> : stacking sur intermédiaire de la même spécialité.
+        </p>
         <div class="model-layout model-build-layout">
           <div class="model-col">
             <section class="card">
@@ -705,6 +722,11 @@
           <span class="chip chip-muted" id="eval-chip-n">—</span>
           <span class="status" id="eval-status"></span>
         </section>
+        <div class="sol-tabs" id="eval-sol-tabs" role="tablist" aria-label="Solution évaluation">
+          <button type="button" class="sol-tab active" data-solution="SIMPLY">Simply</button>
+          <button type="button" class="sol-tab" data-solution="LIBERTY">Liberty</button>
+          <button type="button" class="sol-tab" data-solution="CONNECTED">Connected</button>
+        </div>
         <div class="model-layout explore-layout">
           <div class="model-col">
             <section class="card">

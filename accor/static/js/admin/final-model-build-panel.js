@@ -19,6 +19,7 @@ export class FinalModelBuildPanel {
     this.state = state;
     this.nav = nav;
     this._pollTimer = null;
+    this.solution = "SIMPLY";
   }
 
   async open() {
@@ -50,11 +51,30 @@ export class FinalModelBuildPanel {
     }
   }
 
+  _wireSolTabs() {
+    if (this._solWired) return;
+    this._solWired = true;
+    document.querySelectorAll("#final-sol-tabs .sol-tab").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const sol = btn.dataset.solution;
+        if (!sol || sol === this.solution) return;
+        this.solution = sol;
+        document.querySelectorAll("#final-sol-tabs .sol-tab").forEach((b) => {
+          b.classList.toggle("active", b.dataset.solution === sol);
+        });
+        await this.loadConfig();
+      });
+    });
+  }
+
   async loadConfig() {
     const status = $("#final-status");
     if (status) status.textContent = "Chargement…";
     try {
-      const cfg = await api.get("/api/model/final/config");
+      this._wireSolTabs();
+      const cfg = await api.get("/api/model/final/config", {
+        solution: this.solution,
+      });
       this.state.modelConfig = cfg;
       this.renderConfig(cfg);
       this.updateJobCountChip();
@@ -68,8 +88,14 @@ export class FinalModelBuildPanel {
   renderConfig(cfg) {
     const chipSrc = $("#final-chip-source");
     const chipStats = $("#final-chip-stats");
-    if (chipSrc) chipSrc.textContent = "stacking · descriptives + pred_*";
-    // liste intermédiaires
+    const sol = cfg.solution || this.solution || "—";
+    if (chipSrc) chipSrc.textContent = `stacking · ${sol}`;
+    if (chipStats) {
+      chipStats.textContent = `intermédiaires ${
+        (cfg.intermediate_models || []).length
+      } · sol ${sol}`;
+    }
+    // liste intermédiaires (même spécialité)
     const interSel = $("#final-intermediate-select");
     if (interSel) {
       const inter = cfg.intermediate_models || [];
@@ -80,7 +106,7 @@ export class FinalModelBuildPanel {
             const lab = `#${m.rank || "?"} ${m.name || id}`;
             return `<option value="${id}"${id === def ? " selected" : ""}>${lab}</option>`;
           }).join("")
-        : `<option value="">— aucun intermédiaire (Build d\'abord) —</option>`;
+        : `<option value="">— aucun intermédiaire ${sol} (Build d'abord) —</option>`;
     }
     const pipe = $("#final-pipeline-hint");
     if (pipe && cfg.pipeline && cfg.pipeline.note) {
@@ -484,6 +510,11 @@ export class FinalModelBuildPanel {
         "montant_ventes",
       rank_metric:
         ($("#final-rank-metric") && $("#final-rank-metric").value) || "r2",
+      intermediate_model_id:
+        ($("#final-intermediate-select") &&
+          $("#final-intermediate-select").value) ||
+        null,
+      solution: this.solution || "SIMPLY",
       async: true,
     };
     if (btn) btn.disabled = true;
