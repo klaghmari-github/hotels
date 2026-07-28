@@ -1,236 +1,76 @@
 # API User (port 5056)
 
-Serveur : `accor.user.app` — `python run_user.py` ou `accor-user`.
+Serveur : `python run_user.py` (ou `accor-user`).
 
-Base URL : `http://127.0.0.1:5056`
+Adresse locale : `http://127.0.0.1:5056`
 
-Même moteur ROD que l’admin (`rod_admin.simulate_hotel_trace`) : ref catégorie
-sur années train, corner, 3 concepts + reco. **Sans** écart hold-out.
-
-Static : `PROJECT_ROOT/static` (user + shared).
+Interface destinée au directeur d'hôtel : choisir un établissement, ajuster
+le corner, obtenir une estimation. Aucune écriture en base depuis cette app.
 
 ---
 
-## Pages
+## Page
 
 ### `GET /`
 
-UI directeur (`templates/user/index.html`) — grands résultats, onglets.
+Parcours en quatre étapes (hôtel → établissement → offre → résultats).
 
 ### `GET /api/health`
 
-```json
-{
-  "status": "ok",
-  "app": "accord-rod-user",
-  "concepts": ["SIMPLY", "LIBERTY", "CONNECTED"],
-  "reference_loaded": true
-}
-```
-
----
-
-## Simulateur ROD (directeur)
-
-### `GET /api/rod/meta` (alias `GET /api/meta`)
-
-Sous-catégories F&B / N-F&B, défauts corner (`mix_fb` 70 %, `m_lin` 6),
-pivots concepts.
-
-### `POST /api/rod/simulate`
-
-Body JSON :
-
-| Champ | Rôle |
-|-------|------|
-| `hotel_code` | **requis** — scrape Accor si fiche absente |
-| `m_lin`, `mix_fb` | corner (mix 0–1 ou %) |
-| `client_needs` | `{ id: bool }` |
-| `nb_chambres`, `taux_occupation`, `guests_per_chambre` | exploitation |
-
-Réponse : même structure que l’admin **sans** `gaps` / `real_holdout`
-(`by_concept`, `recommendation`, `category_reference`, `params`…).
-
-```bash
-curl -s -X POST http://127.0.0.1:5056/api/rod/simulate \
-  -H 'Content-Type: application/json' \
-  -d '{"hotel_code":"H0373","m_lin":6,"mix_fb":0.7}'
-```
-
----
-
-## Méta UI (legacy)
-
-### `GET /api/meta`
-
-Alias de `/api/rod/meta`.
-
-### `GET /api/brands`
-
-```json
-{ "brands": [ { "Marque": "IBIS", … }, … ] }
-```
-
-Source : `hotel_brand_data.xlsx` via `AdminCatalog`.
-
-### `GET /api/concept_pilote/brand/<path:brand>`
-
-Moyennes d’exploitation pour une marque (contexte / prefill).
-
-- Lit `concept_pilote.xlsx`
-- Filtre la marque
-- Exclut en général l’année la plus récente (hold-out type 2026)
-- Renvoie aussi un bloc `rule1` (CA attendu par concept après impact TO + R1)
-
-404 si marque sans données.
-
----
-
-## Hôtels
-
-### `GET /api/hotels`
-
-Liste complète des fiches `hotel_data`. Peut être lourde — préférer
-`/search` pour l’UI.
-
-### `GET /api/hotels/search`
-
-Autocomplete.
-
-| Query | Défaut | Rôle |
-|-------|--------|------|
-| `q` / `query` | | code, nom, ville, marque |
-| `limit` | 20 (max 50) | nombre de résultats |
-
-```json
-{ "ok": true, "q": "montmartre", "n": 3, "hotels": [ … ] }
-```
-
-### `GET /api/hotels/<hotel_code>`
-
-Fiche brute. 404 si inconnu.
-
-### `GET /api/hotels/<hotel_code>/context`
-
-Contexte complet pour la simu directeur + payload simulation.
-
-| Query | Défaut | Rôle |
-|-------|--------|------|
-| `fetch` | 1 | si `0`/`false`, ne scrape pas si absent |
-
-Comportement :
-
-1. Charge `hotel_data` + agrégats `model_data` si le code existe.
-2. Sinon, si `fetch` actif : scrape
-   `all.accor.com/hotel/{code}/`, upsert `hotel_data`, invalide le cache
-   catalogue.
-
-Réponse : identité, operating, sources, `payload` prêt pour `/api/simulate`,
-flag `scraped`.
-
----
-
-## Géocode & enrichissement
-
-### `POST /api/geocode`
-
-Localise lat/lon.
-
-Body (tous optionnels, combiner ce qu’on a) :
-
-```json
-{
-  "street": "…",
-  "postal_code": "75018",
-  "city": "Paris",
-  "hotel_name": "…",
-  "hotel_code": "0373",
-  "accor_url": "https://all.accor.com/hotel/0373/…"
-}
-```
-
-Ordre des sources : BAN (data.gouv) → fiche Accor → Nominatim.
-
-HTTP 200 même en échec métier : lire `ok` dans le JSON.
-
-### `POST /api/enrich`
-
-Complète un `SimulationRequest` (proximity, weather, holidays, coords).
-
-```json
-{
-  "identity": { … },
-  "operating": { … },
-  "light": false
-}
-```
-
-`light: true` saute Overpass / Meteostat (plus rapide).
-
----
-
-## Règle 1 (aperçu)
-
-### `POST /api/rule1`
-
-Aperçu impact TO + scaling clients pour les 3 concepts, sans lancer la
-simu complète.
-
-```json
-{
-  "nb_chambres": 100,
-  "taux_occupation": 0.75,
-  "guests_per_chambre": 1.7
-}
-```
-
-`taux_occupation` : 0–1 ou pourcentage selon le helper backend.
+État du service et liste des solutions connues.
 
 ---
 
 ## Simulation
 
-### `POST /api/simulate`
+### `GET /api/rod/meta`
 
-Simulation multi-concepts (SIMPLY / LIBERTY / CONNECTED) + recommandation.
+Catégories de produits, valeurs par défaut (mix, mètres linéaires), repères
+par solution.
 
-Query / body :
+### `POST /api/rod/simulate`
+
+Corps JSON principal :
 
 | Champ | Rôle |
 |-------|------|
-| `light` / `light_enrich` | saute enrichissement lourd |
-| body = `SimulationRequest` | identity, operating, services, client_profile, corner… |
-| `hotel_code` seul | hydrate 100 % depuis admin (context) |
+| `hotel_code` | obligatoire |
+| `nb_chambres`, `taux_occupation`, `guests_per_chambre` | exploitation (modifiable à l'écran) |
+| `m_lin`, `mix_fb` | taille du corner et part F&B |
+| `has_vitrine` | true si vitrine déjà en place |
+| `client_needs` | catégories autorisées / non autorisées |
 
-Réponse (extrait) :
+Réponse simplifiée :
 
-```json
-{
-  "ok": true,
-  "by_concept": {
-    "SIMPLY": { "revenue": {…}, "costs": {…}, "marge_nette_mensuelle": … },
-    "LIBERTY": { … },
-    "CONNECTED": { … }
-  },
-  "recommended_concept": "LIBERTY",
-  "warnings": [ … ],
-  "calc_summary": { … }
-}
+- `recommended_solution` et les motifs
+- `by_solution` pour Simply, Liberty, Connected : CA simulé, CA modèle (si dispo), coûts, marge
+- `hotel` : synthèse des paramètres utilisés
+- `disclaimer` : rappel que ce sont des estimations
+
+```bash
+curl -s -X POST http://127.0.0.1:5056/api/rod/simulate \
+  -H 'Content-Type: application/json' \
+  -d '{"hotel_code":"H0373","m_lin":6,"mix_fb":0.7,"has_vitrine":false}'
 ```
-
-`calc_summary` détaille le concept recommandé (clients hôtel/pilote,
-facteur, CA).
 
 ---
 
-## Exemples curl
+## Hôtels
 
-```bash
-curl -s 'http://127.0.0.1:5056/api/hotels/search?q=H0373'
+### `GET /api/hotels/search?q=…`
 
-curl -s 'http://127.0.0.1:5056/api/hotels/H0373/context'
+Suggestions pour l'auto-complétion (code, nom, ville, marque).
 
-curl -s -X POST http://127.0.0.1:5056/api/simulate?light=1 \
-  -H 'Content-Type: application/json' \
-  -d '{"hotel_code":"H0373"}'
-```
+### `GET /api/hotels/<code>/context`
+
+Fiche et exploitation pour préremplir l'écran. Si la fiche manque, tentative
+de récupération Accor (sans modifier durablement les tables métier hors upsert
+ponctuel déjà prévu par le service).
+
+---
+
+## Notes
+
+- Pas d'évaluation « vrai CA 2026 » côté user : beaucoup d'hôtels n'ont pas
+  encore de ventes ; ils explorent une solution avant d'investir.
+- Seul l'admin enregistre des données de façon permanente.

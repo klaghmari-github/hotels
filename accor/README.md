@@ -528,14 +528,16 @@ curl -s -X POST http://127.0.0.1:5055/api/model/eval \
 
 ## 10. Interface user (simulateur)
 
-UI directeur : `templates/user/index.html` + `static/user/js/modules/app.js`
-(`DirectorApp`). **Même moteur** que l’admin (`simulate_hotel_trace`), sans
-écart hold-out — focus **résultat** (grands chiffres, onglets).
+Application directeur (`python run_user.py`, port 5056) : parcours en
+quatre étapes, sans jargon technique.
 
-1. Recherche hôtel (scrape Accor si fiche absente).
-2. Corner : m_lin, mix F&B, sous-catégories, exploitation.
-3. Recalcul **auto** → reco + CA / marge nette / coûts (très lisible).
-4. Onglets : Résultat (3 solutions) · Détail CA · Coûts & marge.
+1. **Hôtel** — saisie du code ou du nom, suggestions automatiques.
+2. **Établissement** — chambres, occupation, vitrine déjà en place (modifiable à l'écran seulement).
+3. **Offre corner** — mètres linéaires, mix F&B, catégories de produits.
+4. **Résultats** — solution recommandée, CA simulé, CA estimé par le modèle (si dispo), coûts et marge pour Simply, Liberty et Connected.
+
+Rien n'est enregistré en base depuis cette interface. Pas d'évaluation
+« vrai CA » côté user : on aide à choisir une solution avant d'investir.
 
 ---
 
@@ -545,13 +547,12 @@ Base : `http://127.0.0.1:5056` — détail [docs/API_USER.md](docs/API_USER.md).
 
 | Méthode | Chemin | Description |
 |---------|--------|-------------|
-| GET | `/` | UI directeur |
-| GET | `/api/health` | ping |
-| GET | `/api/rod/meta` | sous-cat. + défauts corner (alias `/api/meta`) |
-| POST | `/api/rod/simulate` | **simu directeur** (ref cat. train, sans gaps) |
-| GET | `/api/hotels/search` | recherche (q) |
-| GET | `/api/hotels/<code>/context` | contexte (peut scraper) |
-| POST | `/api/simulate` | legacy orchestrator (encore dispo) |
+| GET | `/` | interface directeur |
+| GET | `/api/health` | état du service |
+| GET | `/api/rod/meta` | catégories et défauts corner |
+| POST | `/api/rod/simulate` | simulation (résumé CA, coûts, reco) |
+| GET | `/api/hotels/search` | suggestions d'hôtels |
+| GET | `/api/hotels/<code>/context` | fiche pour préremplir l'écran |
 
 ---
 

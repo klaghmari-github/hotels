@@ -159,8 +159,18 @@ export class SimVsIaPanel {
       </tr>`;
     }
     html += `</tbody></table>
-      <p class="card-hint">CA mensuel moyen = somme des mois disponibles ÷ nombre de mois
-      (pas ÷ 12). Cellules en surbrillance = solution réellement installée sur le pilote.</p>`;
+      <p class="card-hint">
+        CA mensuel moyen = somme des mois disponibles ÷ nombre de mois (pas ÷ 12).
+        Cellules en surbrillance = solution réellement installée sur le pilote.
+      </p>
+      <p class="card-hint" style="margin-top:0.5rem">
+        <strong>À retenir pour l'évaluation :</strong> même si l'on calcule le CA
+        pour les trois solutions, la comparaison avec le CA réel n'est fiable
+        que pour la solution déjà en place dans l'hôtel. Si l'hôtel est en Simply
+        et que l'on regarde Liberty ou Connected, l'écart avec le réel est normal&nbsp;:
+        ce n'est pas le même dispositif. Simply / Liberty / Connected hors solution
+        installée restent utiles à titre indicatif.
+      </p>`;
     host.innerHTML = html;
   }
 }

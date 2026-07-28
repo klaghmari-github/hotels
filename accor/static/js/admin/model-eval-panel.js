@@ -237,6 +237,10 @@ export class ModelEvalPanel {
         <div class="metric-box"><span class="m-label">Σ prédit</span><span class="m-value">${fmtNum(tot.sum_pred)}</span></div>
         <div class="metric-box"><span class="m-label">Moy. mens. réelle (Σ/n mois)</span><span class="m-value">${fmtNum(tot.avg_monthly_true_all)}</span></div>
         <div class="metric-box good"><span class="m-label">Moy. mens. prédite (Σ/n mois)</span><span class="m-value">${fmtNum(tot.avg_monthly_pred_all)}</span></div>
+        <p class="card-hint" style="grid-column:1/-1;margin:0.35rem 0 0">
+          La comparaison avec le CA réel n'est fiable que pour la solution déjà
+          installée dans l'hôtel. Les scénarios des autres solutions sont indicatifs.
+        </p>
       `;
     }
 

@@ -99,12 +99,15 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
     else:
         has_vitrine = bool(has_vitrine)
 
-    needs = body.get("client_needs") if isinstance(body.get("client_needs"), dict) else {}
-    needs = {str(k): bool(v) for k, v in needs.items()}
+    from accor.user.models import DEFAULT_CLIENT_NEEDS
     from accor.user.rules.coeffs import RULE3_FB_COEFFS, RULE3_NFB_COEFFS
 
+    needs = dict(DEFAULT_CLIENT_NEEDS)
+    raw_needs = body.get("client_needs") if isinstance(body.get("client_needs"), dict) else {}
+    for k, v in raw_needs.items():
+        needs[str(k)] = bool(v)
     for k in list(RULE3_FB_COEFFS) + list(RULE3_NFB_COEFFS):
-        needs.setdefault(k, True)
+        needs.setdefault(k, False)
 
     ref = RodReference()
     rev = RevenueRules(ref)

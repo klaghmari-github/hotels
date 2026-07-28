@@ -1,20 +1,11 @@
 """
-Flask — interface **user** ROD (directeur d'hôtel).
+Interface user — simulateur ROD pour le directeur d'hôtel.
 
-Même moteur que l'admin (``rod_admin.simulate_hotel_trace``) :
-ref catégorie sur années **train**, corner (m_lin, mix, sous-cat.),
-3 concepts + reco. **Pas** d'écart hold-out (réservé admin).
+Parcours simple : trouver l'hôtel, vérifier la fiche, régler le corner,
+lire le résultat (CA, coûts, marge, solution recommandée).
+Rien n'est enregistré en base depuis cette interface.
 
-Lancer : ``python run_user.py`` → http://127.0.0.1:5056
-
-API clés
---------
-  GET  /api/rod/meta
-  POST /api/rod/simulate     → simu directeur (fetch Accor si besoin)
-  GET  /api/hotels/search    → autocomplete
-  GET  /api/hotels/<code>/context
-
-Legacy : POST /api/simulate (orchestrator) encore dispo.
+Lancer : python run_user.py  →  port 5056
 """
 
 from __future__ import annotations
@@ -100,48 +91,17 @@ def meta():
 @app.post("/api/rod/simulate")
 def api_rod_simulate():
     """
-    Simulation directeur — **même moteur** que l'admin.
+    Simulation pour le directeur d'hôtel.
 
-    Body : hotel_code (requis), m_lin, mix_fb, client_needs,
-    nb_chambres, taux_occupation, guests_per_chambre.
-    Scrape Accor si fiche absente. Pas d'écart hold-out.
+    Retourne un résumé clair : CA simulé, CA estimé par le modèle (si dispo),
+    coûts, marge et solution recommandée pour Simply, Liberty et Connected.
+    Les réglages ne sont pas enregistrés en base.
     """
-    from accor.rod_admin import simulate_hotel_trace
-
     body = request.get_json(force=True, silent=True) or {}
-    code = str(body.get("hotel_code") or request.args.get("hotel_code") or "").strip()
-    if not code:
-        return jsonify({"ok": False, "error": "hotel_code requis"}), 400
-
-    def _opt_float(key):
-        v = body.get(key)
-        if v is None or v == "":
-            return None
-        try:
-            return float(v)
-        except (TypeError, ValueError):
-            return None
-
-    needs = body.get("client_needs")
-    year = None
-    if body.get("year") not in (None, ""):
-        try:
-            year = int(body.get("year"))
-        except (TypeError, ValueError):
-            year = None
     try:
-        result = simulate_hotel_trace(
-            code,
-            year=year,
-            m_lin=_opt_float("m_lin"),
-            mix_fb=_opt_float("mix_fb"),
-            client_needs=needs if isinstance(needs, dict) else None,
-            nb_chambres=_opt_float("nb_chambres"),
-            taux_occupation=_opt_float("taux_occupation"),
-            guests_per_chambre=_opt_float("guests_per_chambre"),
-            fetch_if_missing=True,
-            include_gaps=False,
-        )
+        from accor.user.services.director import director_simulate
+
+        result = director_simulate(body)
         status = 200 if result.get("ok") else 400
         return jsonify(result), status
     except Exception as exc:  # noqa: BLE001

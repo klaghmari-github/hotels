@@ -1,17 +1,9 @@
 <!DOCTYPE html>
-<!--
-  ROD · Simulateur directeur (user :5056)
-
-  Même moteur que l'admin (ref catégorie train, corner, 3 concepts + reco).
-  UX : résultats grands / lisibles, onglets, recalcul auto (pas de bouton Simuler).
-  Front : static/user/js/modules/app.js
-  API  : POST /api/rod/simulate, GET /api/rod/meta, /api/hotels/*
--->
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ROD · Simulateur Directeur</title>
+  <title>ROD · Simulateur hôtel</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
@@ -25,138 +17,198 @@
         <span class="brand-mark">A</span>
         <div>
           <strong>ROD</strong>
-          <span class="brand-sub">Retail On Demand · Directeur</span>
+          <span class="brand-sub">Retail On Demand · Simulateur hôtel</span>
         </div>
       </div>
       <div class="dir-top-right">
         <span class="status" id="dir-status"></span>
-        <span class="pill">User</span>
       </div>
     </header>
 
-    <div class="dir-layout">
-      <!-- ===== Contrôles (gauche) ===== -->
-      <aside class="dir-side">
-        <section class="dir-card">
-          <h2 class="dir-card-title">Votre hôtel</h2>
+    <!-- Étapes -->
+    <nav class="wiz-steps" id="wiz-steps" aria-label="Étapes">
+      <button type="button" class="wiz-step is-active" data-step="1">
+        <span class="wiz-n">1</span>
+        <span class="wiz-lab">Hôtel</span>
+      </button>
+      <button type="button" class="wiz-step" data-step="2" disabled>
+        <span class="wiz-n">2</span>
+        <span class="wiz-lab">Votre établissement</span>
+      </button>
+      <button type="button" class="wiz-step" data-step="3" disabled>
+        <span class="wiz-n">3</span>
+        <span class="wiz-lab">Offre corner</span>
+      </button>
+      <button type="button" class="wiz-step" data-step="4" disabled>
+        <span class="wiz-n">4</span>
+        <span class="wiz-lab">Résultats</span>
+      </button>
+    </nav>
+
+    <main class="wiz-main">
+      <!-- Étape 1 : trouver l'hôtel -->
+      <section class="wiz-panel is-active" data-panel="1">
+        <div class="wiz-card wiz-card-narrow">
+          <h1 class="wiz-title">Quel est votre hôtel&nbsp;?</h1>
+          <p class="wiz-lead">
+            Saisissez le code Accor ou le nom de l'établissement.
+            Nous proposons des suggestions au fil de la frappe.
+          </p>
           <label class="field ac-wrap">
             <span>Code ou nom</span>
-            <input id="hotel_search" type="text" placeholder="H0373, ibis Paris…" autocomplete="off" />
+            <input
+              id="hotel_search"
+              type="text"
+              placeholder="Ex. H0373 ou Mercure Paris…"
+              autocomplete="off"
+              autofocus
+            />
             <ul id="ac-hotels" class="ac-list hidden" role="listbox"></ul>
           </label>
           <input type="hidden" id="hotel_code" />
-          <div id="hotel-summary" class="hotel-summary empty">Choisissez un hôtel</div>
-        </section>
+          <div id="hotel-summary" class="hotel-summary empty">
+            Aucun hôtel sélectionné pour l'instant.
+          </div>
+          <p class="wiz-note">
+            Les informations chargées servent uniquement à cette simulation.
+            Elles ne modifient pas la base de données.
+          </p>
+          <div class="wiz-actions">
+            <button type="button" class="btn btn-primary" id="btn-step1-next" disabled>
+              Continuer
+            </button>
+          </div>
+        </div>
+      </section>
 
-        <section class="dir-card">
-          <h2 class="dir-card-title">Exploitation</h2>
-          <div class="dir-kpi-inputs">
+      <!-- Étape 2 : revue établissement -->
+      <section class="wiz-panel" data-panel="2">
+        <div class="wiz-card">
+          <h1 class="wiz-title">Vérifiez les infos de l'établissement</h1>
+          <p class="wiz-lead">
+            Ces valeurs viennent de la fiche hôtel. Vous pouvez les ajuster
+            pour la simulation (chambres, occupation, vitrine…).
+          </p>
+          <div id="step2-hotel-line" class="wiz-hotel-line"></div>
+          <div class="wiz-grid-3">
             <label class="field">
-              <span>Chambres</span>
+              <span>Nombre de chambres</span>
               <input id="nb_chambres" type="number" min="1" max="2000" step="1" />
             </label>
             <label class="field">
-              <span>TO %</span>
+              <span>Taux d'occupation (%)</span>
               <input id="taux_occupation" type="number" min="1" max="100" step="0.1" />
             </label>
             <label class="field">
-              <span>Guests / ch</span>
+              <span>Clients par chambre</span>
               <input id="guests_per_chambre" type="number" min="0.5" max="5" step="0.1" />
             </label>
           </div>
-        </section>
-
-        <section class="dir-card">
-          <h2 class="dir-card-title">Corner</h2>
-          <label class="field">
-            <span>Mètres linéaires <strong id="m-lin-val">6</strong></span>
-            <div class="slider-row">
-              <input type="range" id="m_lin_slider" min="1" max="40" step="0.5" value="6" />
-              <input type="number" id="m_lin" min="1" max="40" step="0.5" value="6" />
-            </div>
+          <label class="field field-check">
+            <input type="checkbox" id="has_vitrine" />
+            <span>Nous avons déjà une vitrine réfrigérée (ou frigo en lobby)</span>
           </label>
-          <label class="field">
-            <span>Mix F&amp;B <strong id="mix-val">70</strong> % · N-F&amp;B <strong id="mix-nf-val">30</strong> %</span>
-            <div class="slider-row">
-              <input type="range" id="mix_slider" min="0" max="100" step="1" value="70" />
-              <input type="number" id="mix_fb" min="0" max="100" step="1" value="70" />
-            </div>
-          </label>
-        </section>
+          <p class="wiz-note">
+            Si vous avez déjà une vitrine, le coût de cet équipement n'est pas
+            ajouté pour Simply et Liberty.
+          </p>
+          <div class="wiz-actions">
+            <button type="button" class="btn btn-ghost" data-goto="1">Retour</button>
+            <button type="button" class="btn btn-primary" id="btn-step2-next">Continuer</button>
+          </div>
+        </div>
+      </section>
 
-        <section class="dir-card dir-card-needs">
-          <div class="dir-card-head">
-            <h2 class="dir-card-title">Sous-catégories</h2>
+      <!-- Étape 3 : offre corner -->
+      <section class="wiz-panel" data-panel="3">
+        <div class="wiz-card">
+          <h1 class="wiz-title">Paramétrez votre corner</h1>
+          <p class="wiz-lead">
+            Mètres linéaires, répartition F&amp;B / non F&amp;B, et catégories
+            que vous souhaitez proposer.
+          </p>
+          <div class="wiz-grid-2">
+            <label class="field">
+              <span>Mètres linéaires <strong id="m-lin-val">6</strong></span>
+              <div class="slider-row">
+                <input type="range" id="m_lin_slider" min="1" max="40" step="0.5" value="6" />
+                <input type="number" id="m_lin" min="1" max="40" step="0.5" value="6" />
+              </div>
+            </label>
+            <label class="field">
+              <span>Mix F&amp;B <strong id="mix-val">70</strong> % · non F&amp;B <strong id="mix-nf-val">30</strong> %</span>
+              <div class="slider-row">
+                <input type="range" id="mix_slider" min="0" max="100" step="1" value="70" />
+                <input type="number" id="mix_fb" min="0" max="100" step="1" value="70" />
+              </div>
+            </label>
+          </div>
+
+          <div class="dir-card-head" style="margin-top:1.25rem">
+            <h2 class="dir-card-title" style="margin:0">Catégories de produits</h2>
             <div class="needs-actions">
-              <button type="button" class="btn-text" id="needs-all-on">Tout</button>
-              <button type="button" class="btn-text" id="needs-all-off">Rien</button>
+              <button type="button" class="btn-text" id="needs-all-on">Tout autoriser</button>
+              <button type="button" class="btn-text" id="needs-all-off">Tout retirer</button>
             </div>
           </div>
+          <p class="wiz-note">
+            Décochez ce que vous ne souhaitez pas vendre (alcool, salé, etc.).
+            Pour un hôtel de 50 chambres ou plus, cocher au moins une catégorie
+            « lifestyle » (cosmétiques, enfants, prêt-à-porter, accessoires, souvenirs)
+            oriente la recommandation vers Liberty.
+          </p>
           <div class="needs-cols">
             <div>
               <h3 class="needs-h">F&amp;B</h3>
               <div id="needs-fb" class="needs-list"></div>
             </div>
             <div>
-              <h3 class="needs-h">N-F&amp;B</h3>
+              <h3 class="needs-h">Non F&amp;B</h3>
               <div id="needs-nfb" class="needs-list"></div>
             </div>
           </div>
-        </section>
-      </aside>
 
-      <!-- ===== Résultats (droite) ===== -->
-      <main class="dir-main">
-        <div id="dir-empty" class="dir-empty">
-          <p class="dir-empty-title">Simulation corner</p>
-          <p class="dir-empty-sub">Sélectionnez un hôtel pour estimer CA, coûts et solution recommandée.</p>
+          <div class="wiz-actions">
+            <button type="button" class="btn btn-ghost" data-goto="2">Retour</button>
+            <button type="button" class="btn btn-primary" id="btn-run-sim">
+              Lancer la simulation
+            </button>
+          </div>
         </div>
+      </section>
 
-        <div id="dir-results" class="dir-results hidden">
-          <!-- Hero reco -->
-          <section id="dir-hero" class="dir-hero">
-            <div class="dir-hero-tag">Solution recommandée</div>
-            <h1 id="dir-reco-name">—</h1>
-            <p id="dir-hotel-line" class="dir-hotel-line"></p>
-          </section>
-
-          <!-- Gros chiffres solution reco -->
-          <section class="dir-big-metrics" id="dir-big-metrics"></section>
-
-          <!-- Sélecteur concept + onglets -->
-          <div class="dir-toolbar">
-            <div class="concept-pills" id="concept-pills">
-              <button type="button" class="concept-pill" data-concept="SIMPLY">SIMPLY</button>
-              <button type="button" class="concept-pill" data-concept="LIBERTY">LIBERTY</button>
-              <button type="button" class="concept-pill" data-concept="CONNECTED">CONNECTED</button>
-            </div>
-            <div class="dir-tabs" role="tablist">
-              <button type="button" class="dir-tab active" data-tab="resultat">Résultat</button>
-              <button type="button" class="dir-tab" data-tab="ca">Détail CA</button>
-              <button type="button" class="dir-tab" data-tab="marge">Coûts &amp; marge</button>
-            </div>
+      <!-- Étape 4 : résultats -->
+      <section class="wiz-panel" data-panel="4">
+        <div class="wiz-card wiz-card-wide">
+          <div id="dir-loading" class="dir-empty hidden">
+            <p class="dir-empty-title">Calcul en cours…</p>
+            <p class="dir-empty-sub">Estimation du CA, des coûts et de la solution adaptée.</p>
           </div>
 
-          <!-- Tab Résultat : 3 cartes concept -->
-          <section class="dir-panel" data-panel="resultat">
+          <div id="dir-results" class="dir-results hidden">
+            <section id="dir-hero" class="dir-hero">
+              <div class="dir-hero-tag">Solution recommandée</div>
+              <h1 id="dir-reco-name">—</h1>
+              <p id="dir-hotel-line" class="dir-hotel-line"></p>
+              <p id="dir-reco-why" class="dir-reco-why"></p>
+            </section>
+
+            <section class="dir-big-metrics" id="dir-big-metrics"></section>
+
+            <p class="wiz-note" id="dir-ai-note"></p>
+            <p class="wiz-note" id="dir-disclaimer"></p>
+
+            <h2 class="dir-subh">Les trois solutions en un coup d'œil</h2>
             <div id="dir-concept-cards" class="dir-concept-cards"></div>
-          </section>
 
-          <!-- Tab CA -->
-          <section class="dir-panel hidden" data-panel="ca">
-            <div id="dir-ca-kpi" class="dir-panel-kpi"></div>
-            <div id="dir-sales-steps" class="dir-steps"></div>
-          </section>
-
-          <!-- Tab Marge -->
-          <section class="dir-panel hidden" data-panel="marge">
-            <div id="dir-margin-table" class="dir-table-wrap"></div>
-            <h3 class="dir-subh">Lignes de coûts — solution affichée</h3>
-            <div id="dir-cost-lines" class="dir-table-wrap"></div>
-          </section>
+            <div class="wiz-actions" style="margin-top:1.5rem">
+              <button type="button" class="btn btn-ghost" data-goto="3">Modifier les paramètres</button>
+              <button type="button" class="btn btn-ghost" data-goto="1">Changer d'hôtel</button>
+            </div>
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+    </main>
   </div>
 
   <div id="toast" class="toast hidden"></div>
