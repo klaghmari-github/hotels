@@ -17,7 +17,8 @@
 #   ./scripts/deploy_to_adixon.sh --dry-run    # affiche sans copier
 #
 # Ne touche JAMAIS (sauf flags explicites) :
-#   .venv/  ecosystem.config.js  data/  models/  logs PM2
+#   .venv/  data/  models/  logs PM2
+# Sync aussi ecosystem.config.js (watch .py + ACCOR_RELOAD=0)
 #
 # Cible : adixon@178.62.220.14:/var/www/rod-ia
 # =============================================================================
@@ -101,7 +102,7 @@ log "Sync templates/"
 sync_tree "templates/" "$REMOTE/templates/"
 
 log "Sync entrypoints + deps meta"
-for f in run_user.py run_admin.py pyproject.toml requirements.txt; do
+for f in run_user.py run_admin.py pyproject.toml requirements.txt ecosystem.config.js; do
   if [[ -f "$f" ]]; then
     if [[ "$DRY" -eq 1 ]]; then
       echo "  (dry) $f"
@@ -158,14 +159,21 @@ if [[ "$DO_DEPS" -eq 1 && "$DRY" -eq 0 ]]; then
   '"
 fi
 
-# --- Restart PM2 (sauf dry-run) ---
+# --- Restart / reload PM2 (sauf dry-run) ---
 if [[ "$DRY" -eq 0 ]]; then
-  log "Restart PM2 (user + admin)"
+  log "Reload PM2 (user + admin, watch backend .py)"
   "${SSH[@]}" "$HOST" "bash -lc '
     set -e
     ${PM2_PATH}
     cd ${REMOTE}
-    pm2 restart rod-ia-user rod-ia-admin || pm2 restart all
+    mkdir -p /var/log/rod-ia
+    # Recharge la conf (watch + env ACCOR_RELOAD=0) puis redémarre
+    if [[ -f ecosystem.config.js ]]; then
+      pm2 startOrReload ecosystem.config.js --update-env
+    else
+      pm2 restart rod-ia-user rod-ia-admin || pm2 restart all
+    fi
+    pm2 save || true
     sleep 2
     pm2 status
   '"

@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import os
 import socket
+from pathlib import Path
 from typing import Any
 
 
@@ -115,20 +116,65 @@ def apply_url_prefix(app: Any) -> None:
     app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix)
 
 
+def _env_flag(name: str, default: bool = False) -> bool:
+    raw = (os.environ.get(name) or "").strip().lower()
+    if not raw:
+        return default
+    return raw in ("1", "true", "yes", "on", "y")
+
+
+def _python_watch_files() -> list[str]:
+    """Fichiers .py à surveiller pour le reloader Flask."""
+    try:
+        from accor.data_io import PROJECT_ROOT
+
+        root = PROJECT_ROOT
+    except Exception:
+        root = Path(__file__).resolve().parents[2]
+    files: list[str] = []
+    src = root / "src" / "accor"
+    if src.is_dir():
+        for p in src.rglob("*.py"):
+            if "__pycache__" in p.parts:
+                continue
+            files.append(str(p))
+    for name in ("run_admin.py", "run_user.py", "run_dev.py"):
+        cand = root / name
+        if cand.is_file():
+            files.append(str(cand))
+    return files
+
+
 def run_flask_app(app: Any, *, host: str, port: int, debug: bool = False) -> None:
     """
-    Lance Flask en mode développement.
+    Lance Flask.
 
-    ``threaded=True`` pour plusieurs clients réseau.
-    Pas de reloader multi-process si host public (évite doubles binds).
-    Respecte ``ACCOR_URL_PREFIX`` (ex. admin derrière ``/studio``).
+    * ``threaded=True`` pour plusieurs clients réseau.
+    * Rechargement auto du process si le **backend** (.py) change :
+      - actif par défaut en local (``ACCOR_RELOAD=1``)
+      - désactiver en prod PM2 : ``ACCOR_RELOAD=0`` (PM2 watch à la place)
+    * Templates HTML : ``TEMPLATES_AUTO_RELOAD`` (via cache_bust) sans restart.
+    * Respecte ``ACCOR_URL_PREFIX`` (ex. admin derrière ``/studio``).
     """
-    use_reloader = bool(debug) and host in ("127.0.0.1", "localhost")
+    # Prod derrière PM2 : ACCOR_RELOAD=0. Local : reloader par défaut.
+    use_reloader = bool(debug) or _env_flag("ACCOR_RELOAD", default=True)
     apply_url_prefix(app)
+
+    extra = _python_watch_files() if use_reloader else None
+    if use_reloader:
+        print(
+            f"  Reload  →  ON (ACCOR_RELOAD) · {len(extra or [])} fichiers .py surveillés"
+        )
+    else:
+        print(
+            "  Reload  →  OFF (ACCOR_RELOAD=0) — redémarrage géré par PM2 / process manager"
+        )
+
     app.run(
         host=host,
         port=port,
         debug=debug,
         threaded=True,
         use_reloader=use_reloader,
+        extra_files=extra or None,
     )

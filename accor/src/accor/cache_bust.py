@@ -106,14 +106,21 @@ def make_asset_helper(static_root: Path) -> Callable[[str], str]:
 
 def register_cache_bust(app: Flask, static_root: Path) -> None:
     """
-    * ``asset()`` dans les templates
+    * ``asset()`` dans les templates (``?dt=<mtime>``)
     * route ``/static/<path>`` qui réécrit imports JS/CSS avec ``?dt=``
+    * HTML / API : jamais de cache navigateur agressif
+    * Static avec ``?dt=`` : cache long (URL change si le fichier change)
     """
     import os
 
     static_root = Path(static_root).resolve()
     asset = make_asset_helper(static_root)
     url_prefix = (os.environ.get("ACCOR_URL_PREFIX") or "").strip().rstrip("/")
+
+    # Recharge templates dès qu'un .html change (sans redémarrer le process)
+    app.config["TEMPLATES_AUTO_RELOAD"] = True
+    app.jinja_env.auto_reload = True
+    app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 
     @app.context_processor
     def _inject_asset():
@@ -122,6 +129,24 @@ def register_cache_bust(app: Flask, static_root: Path) -> None:
             "static_dt": asset,
             "url_prefix": url_prefix,
         }
+
+    @app.after_request
+    def _no_cache_html_and_api(resp: Response):
+        """
+        Le HTML doit toujours être rechargé : il porte les ?dt= des JS/CSS.
+        Sans ça, un vieux index.html garde d'anciens dt → faux cache « vide-cache ».
+        """
+        ctype = (resp.content_type or "").split(";")[0].strip().lower()
+        path = request.path or ""
+        if ctype in ("text/html", "application/xhtml+xml"):
+            resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+            resp.headers["Pragma"] = "no-cache"
+            resp.headers["Expires"] = "0"
+        elif path.startswith("/api/") or ctype == "application/json":
+            resp.headers.setdefault(
+                "Cache-Control", "no-store, no-cache, must-revalidate, max-age=0"
+            )
+        return resp
 
     # Remplace l'envoi static Flask par une version cache-bust
     @app.route("/static/<path:filename>")
@@ -146,9 +171,26 @@ def register_cache_bust(app: Flask, static_root: Path) -> None:
             body = rewrite_css_urls(text, full, static_root)
             resp = Response(body, mimetype="text/css; charset=utf-8")
         else:
-            return send_from_directory(static_root, filename)
+            resp = send_from_directory(static_root, filename)
+            # send_from_directory returns a Response already
+            if not isinstance(resp, Response):
+                return resp
+            # fall through to headers
 
-        # Long cache OK : l'URL change quand le fichier change
-        resp.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        # Avec ?dt= (via asset()) → cache long sûr. Sans dt → revalider (évite vieux JS).
+        has_dt = "dt=" in (request.query_string.decode("utf-8", errors="ignore") or "")
+        if has_dt:
+            resp.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        else:
+            resp.headers["Cache-Control"] = "no-cache, must-revalidate, max-age=0"
         resp.headers["X-Content-Type-Options"] = "nosniff"
+        # Aide reverse-proxy / CDN à ne pas coller un vieux static sans dt
+        try:
+            resp.headers["Last-Modified"] = (
+                __import__("email.utils", fromlist=["formatdate"]).formatdate(
+                    full.stat().st_mtime, usegmt=True
+                )
+            )
+        except OSError:
+            pass
         return resp

@@ -63,7 +63,9 @@ cd accor
 | `data/` | données runtime prod (`--data` pour forcer) |
 | `models/` | modèles déployés (`--models` pour forcer) |
 | `.venv/` | env Python serveur (`--deps` réinstalle) |
-| `ecosystem.config.js` | ports PM2 / env prod |
+
+`ecosystem.config.js` **est synchronisé** par le script (watch backend `.py`,
+`ACCOR_RELOAD=0`, ports 8000/8001).
 
 ## Après chaque demande de modification
 
