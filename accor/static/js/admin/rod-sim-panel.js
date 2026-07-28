@@ -893,18 +893,23 @@ export class RodSimPanel {
 
   renderEval(data) {
     const m = data.metrics || {};
+    const trainY = (data.train_years || []).join(", ") || "—";
     const mh = $("#rod-eval-metrics");
     if (mh) {
       mh.className = "metrics-grid";
       mh.innerHTML = `
         <div class="metric-box"><span class="m-label">n pilotes</span><span class="m-value">${m.n_predicted ?? data.n_hotels ?? "—"}</span></div>
+        <div class="metric-box"><span class="m-label">Années modél.</span><span class="m-value">${escapeHtml(trainY)}</span></div>
         <div class="metric-box"><span class="m-label">n éval (réel)</span><span class="m-value">${m.n ?? "—"}</span></div>
-        <div class="metric-box"><span class="m-label">MAE</span><span class="m-value">${euro(m.mae)}</span></div>
+        <div class="metric-box"><span class="m-label">MAE CA</span><span class="m-value">${euro(m.mae)}</span></div>
         <div class="metric-box"><span class="m-label">RMSE</span><span class="m-value">${euro(m.rmse)}</span></div>
         <div class="metric-box"><span class="m-label">Biais</span><span class="m-value">${euro(m.bias)}</span></div>
         <div class="metric-box"><span class="m-label">MAPE %</span><span class="m-value">${fmt(m.mape, 1)}</span></div>
         <div class="metric-box good"><span class="m-label">Moy. sim reco</span><span class="m-value">${euro(m.mean_sim ?? m.mean_sim_all)}</span></div>
-        <div class="metric-box"><span class="m-label">Moy. réel</span><span class="m-value">${euro(m.mean_true)}</span></div>
+        <div class="metric-box"><span class="m-label">Moy. réel éval</span><span class="m-value">${euro(m.mean_true)}</span></div>
+        <div class="metric-box"><span class="m-label">Moy. coût (installée)</span><span class="m-value">${euro(m.mean_cout_installee)}</span></div>
+        <div class="metric-box good"><span class="m-label">Moy. marge nette (installée)</span><span class="m-value">${euro(m.mean_marge_nette_installee)}</span></div>
+        <div class="metric-box"><span class="m-label">Moy. marge produit (installée)</span><span class="m-value">${euro(m.mean_marge_produit_installee)}</span></div>
       `;
     }
     const host = $("#rod-eval-table");
@@ -912,29 +917,54 @@ export class RodSimPanel {
     if (!host) return;
     host.className = "perf-table-wrap";
     host.innerHTML = `
+      <p class="card-hint" style="margin-bottom:0.65rem">
+        <strong>Solution installée</strong> = dispositif pilote (Simply / Liberty / Connected).
+        Coût et marge nette mensuels sont ceux de cette solution (barème ROD).
+        CA train = réel période de modélisation ; réel éval = hold-out (ex. 2026) Σ/12.
+      </p>
       <table>
         <thead>
           <tr>
-            <th>Hôtel</th><th>Catégorie</th><th>CA ref</th><th>Réel Σ/12</th>
-            <th>Reco</th><th>CA sim</th><th>Écart</th><th>%</th>
+            <th>Hôtel</th>
+            <th>Catégorie</th>
+            <th>Sol. installée</th>
+            <th>CA train / mois</th>
+            <th>CA sim installée</th>
+            <th>Coût / mois</th>
+            <th>Marge produit</th>
+            <th>Marge nette</th>
+            <th>Réel éval Σ/12</th>
+            <th>Reco</th>
+            <th>CA sim reco</th>
+            <th>Écart</th>
+            <th>%</th>
           </tr>
         </thead>
         <tbody>
           ${rows
             .map((r) => {
               if (r.error)
-                return `<tr><td>${escapeHtml(r.hotel_code)}</td><td colspan="7">${escapeHtml(
+                return `<tr><td>${escapeHtml(r.hotel_code)}</td><td colspan="12">${escapeHtml(
                   r.error
                 )}</td></tr>`;
               const hasH = !!r.has_holdout;
               const gapCls =
                 r.gap_reco != null ? ((r.gap_reco || 0) >= 0 ? "pos" : "neg") : "";
+              const inst = r.installed_solution || "—";
+              const mInst = r.marge_nette_installee;
+              const mCls =
+                mInst != null ? (Number(mInst) >= 0 ? "pos" : "neg") : "";
               return `<tr>
                 <td>${escapeHtml(r.hotel_code)}<br><small>${escapeHtml(
                   r.hotel_name || ""
                 )}</small></td>
                 <td>${escapeHtml(r.category || "—")}</td>
-                <td>${euro(r.ca_ref_categorie)}</td>
+                <td><strong>${escapeHtml(inst)}</strong></td>
+                <td>${euro(r.avg_monthly_train ?? r.reference_monthly)}</td>
+                <td>${euro(r.ca_sim_installee)}</td>
+                <td>${euro(r.cout_mensuel_installee)}</td>
+                <td>${euro(r.marge_produit_installee)}</td>
+                <td class="${mCls}">${euro(r.marge_nette_installee)}</td>
                 <td>${hasH ? euro(r.avg_monthly_true) : "—"}</td>
                 <td><strong>${escapeHtml(r.recommended_concept || "—")}</strong></td>
                 <td>${euro(r.ca_sim_reco)}</td>

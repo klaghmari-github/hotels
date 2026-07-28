@@ -402,6 +402,11 @@ def list_pilot_hotels(year: int | None = None) -> dict[str, Any]:
             .unique()
             .tolist()
         )
+        # CA réel moyen / mois sur période de modélisation (train)
+        href = hotel_reference_over_years(sales, code, train_years)
+        avg_train = href.get("reference_monthly")
+        if avg_train is not None:
+            avg_train = _round(avg_train, 2)
 
         hotels.append(
             {
@@ -415,6 +420,8 @@ def list_pilot_hotels(year: int | None = None) -> dict[str, Any]:
                 "months": months,
                 "sum_montant_ventes": sum_true_r,
                 "avg_monthly_true": avg_true,
+                "avg_monthly_train": avg_train,
+                "reference_monthly": avg_train,
             }
         )
     hotels.sort(key=lambda h: (not h.get("has_holdout"), h["hotel_code"]))
@@ -1089,21 +1096,65 @@ def simulate_hotel_trace(
     return out
 
 
+def _concept_economics(tr: dict[str, Any], concept: str) -> dict[str, Any]:
+    """CA / coûts / marges pour une solution dans une trace simulateur."""
+    block = (tr.get("by_concept") or {}).get(concept) or {}
+    sales = block.get("sales") or {}
+    costs = block.get("costs") or {}
+    margin = block.get("margin") or {}
+    ca = sales.get("ca_ht_mensuel")
+    cout = margin.get("cout_mensuel")
+    if cout is None:
+        cout = costs.get("monthly_cost")
+    marge_prod = margin.get("marge_produit_mensuelle")
+    marge_nette = margin.get("marge_nette_mensuelle")
+    if (
+        marge_nette is None
+        and marge_prod is not None
+        and cout is not None
+    ):
+        try:
+            marge_nette = float(marge_prod) - float(cout)
+        except (TypeError, ValueError):
+            marge_nette = None
+    return {
+        "ca_sim_mensuel": _round(ca, 2) if ca is not None else None,
+        "cout_mensuel": _round(cout, 2) if cout is not None else None,
+        "marge_produit_mensuelle": _round(marge_prod, 2)
+        if marge_prod is not None
+        else None,
+        "marge_nette_mensuelle": _round(marge_nette, 2)
+        if marge_nette is not None
+        else None,
+        "capex": _round(costs.get("capex"), 2)
+        if costs.get("capex") is not None
+        else None,
+    }
+
+
 def evaluate_pilots_year(year: int | None = None) -> dict[str, Any]:
     """
     Batch d'évaluation **temporelle** : ref = années train, vérité = hold-out
     (ex. 2026). Tous les pilotes (peu nombreux) ; pas d'exclusion d'hôtel
     dans la ref. Métriques d'écart si réel hold-out présent.
+
+    Pour chaque pilote, expose aussi **coûts et marge** de la **solution
+    installée** (connue via ``rod_pilot_concepts`` / flags hotel_data) :
+    ce sont les grandeurs « réalisées » associées au dispositif en place.
     """
+    from accor.hotel_solutions import load_pilot_solution_codes
+
     pilots = list_pilot_hotels(year)
     if not pilots.get("ok"):
         return pilots
 
     eval_year = int(pilots["eval_year"])
+    pilot_sol = load_pilot_solution_codes()
     rows: list[dict[str, Any]] = []
     for h in pilots.get("hotels") or []:
         code = h["hotel_code"]
         has_holdout = bool(h.get("has_holdout"))
+        installed = pilot_sol.get(str(code).strip())
         try:
             tr = simulate_hotel_trace(code, year=eval_year)
             if not tr.get("ok"):
@@ -1114,6 +1165,8 @@ def evaluate_pilots_year(year: int | None = None) -> dict[str, Any]:
                         "error": tr.get("error"),
                         "has_holdout": has_holdout,
                         "avg_monthly_true": h.get("avg_monthly_true"),
+                        "installed_solution": installed,
+                        "train_years": h.get("train_years") or pilots.get("train_years"),
                     }
                 )
                 continue
@@ -1125,6 +1178,28 @@ def evaluate_pilots_year(year: int | None = None) -> dict[str, Any]:
             if ca_sim is None:
                 block = (tr.get("by_concept") or {}).get(reco) or {}
                 ca_sim = (block.get("sales") or {}).get("ca_ht_mensuel")
+
+            by_c: dict[str, Any] = {}
+            for c in CONCEPTS:
+                eco = _concept_economics(tr, c)
+                g = gaps.get(c) or {}
+                by_c[c] = {
+                    **eco,
+                    "gap": g.get("gap"),
+                    "gap_pct": g.get("gap_pct"),
+                }
+
+            # Solution installée = vérité métier du pilote (coût / marge connus)
+            inst = installed if installed in CONCEPTS else None
+            eco_inst = by_c.get(inst) if inst else None
+            eco_reco = by_c.get(reco) or {}
+
+            # CA réel période modélisation (train) si dispo dans list_pilot
+            train_ca = h.get("avg_monthly_train")
+            if train_ca is None:
+                # fallback : moyenne multi-années via hotel_reference si présent
+                train_ca = h.get("reference_monthly")
+
             rows.append(
                 {
                     "hotel_code": code,
@@ -1134,38 +1209,35 @@ def evaluate_pilots_year(year: int | None = None) -> dict[str, Any]:
                     "has_holdout": bool(tr.get("has_holdout", has_holdout)),
                     "n_months": h.get("n_months"),
                     "months": h.get("months"),
+                    "train_years": h.get("train_years") or pilots.get("train_years"),
                     "avg_monthly_true": (
                         h.get("avg_monthly_true")
                         if (tr.get("has_holdout") or has_holdout)
                         else None
                     ),
+                    "avg_monthly_train": train_ca,
                     "ca_ref_categorie": _round(
                         (tr.get("category_reference") or {}).get("ca_monthly_ref"), 2
                     ),
+                    "installed_solution": inst,
                     "recommended_concept": reco,
                     "ca_sim_reco": ca_sim,
+                    "cout_mensuel_reco": eco_reco.get("cout_mensuel"),
+                    "marge_produit_reco": eco_reco.get("marge_produit_mensuelle"),
+                    "marge_nette_reco": eco_reco.get("marge_nette_mensuelle"),
+                    # Grandeurs « réalisées » = solution pilote installée
+                    "ca_sim_installee": (eco_inst or {}).get("ca_sim_mensuel"),
+                    "cout_mensuel_installee": (eco_inst or {}).get("cout_mensuel"),
+                    "marge_produit_installee": (eco_inst or {}).get(
+                        "marge_produit_mensuelle"
+                    ),
+                    "marge_nette_installee": (eco_inst or {}).get(
+                        "marge_nette_mensuelle"
+                    ),
+                    "capex_installee": (eco_inst or {}).get("capex"),
                     "gap_reco": g_reco.get("gap") if tr.get("has_holdout") else None,
                     "gap_pct_reco": g_reco.get("gap_pct") if tr.get("has_holdout") else None,
-                    "by_concept": {
-                        c: {
-                            "ca_sim_mensuel": (gaps.get(c) or {}).get("ca_sim_mensuel")
-                            or (
-                                (tr.get("by_concept") or {})
-                                .get(c, {})
-                                .get("sales", {})
-                                .get("ca_ht_mensuel")
-                            ),
-                            "gap": (gaps.get(c) or {}).get("gap"),
-                            "gap_pct": (gaps.get(c) or {}).get("gap_pct"),
-                            "marge_nette": (
-                                (tr.get("by_concept") or {})
-                                .get(c, {})
-                                .get("margin", {})
-                                .get("marge_nette_mensuelle")
-                            ),
-                        }
-                        for c in CONCEPTS
-                    },
+                    "by_concept": by_c,
                 }
             )
         except Exception as exc:
@@ -1176,6 +1248,7 @@ def evaluate_pilots_year(year: int | None = None) -> dict[str, Any]:
                     "error": str(exc),
                     "has_holdout": has_holdout,
                     "avg_monthly_true": h.get("avg_monthly_true"),
+                    "installed_solution": installed,
                 }
             )
 
@@ -1185,9 +1258,10 @@ def evaluate_pilots_year(year: int | None = None) -> dict[str, Any]:
         for r in rows
         if r.get("gap_reco") is not None and r.get("avg_monthly_true") is not None
     ]
+    ok_rows = [r for r in rows if not r.get("error")]
     metrics: dict[str, Any] = {
         "n": len(scored),
-        "n_predicted": len([r for r in rows if not r.get("error")]),
+        "n_predicted": len(ok_rows),
         "n_total": len(rows),
     }
     if scored:
@@ -1211,6 +1285,30 @@ def evaluate_pilots_year(year: int | None = None) -> dict[str, Any]:
         if all_sim:
             metrics["mean_sim_all"] = _round(float(np.mean(all_sim)), 2)
 
+    # Moyennes coûts / marges sur solution **installée** (modélisation pilote)
+    couts = [
+        float(r["cout_mensuel_installee"])
+        for r in ok_rows
+        if r.get("cout_mensuel_installee") is not None
+    ]
+    margs = [
+        float(r["marge_nette_installee"])
+        for r in ok_rows
+        if r.get("marge_nette_installee") is not None
+    ]
+    mprods = [
+        float(r["marge_produit_installee"])
+        for r in ok_rows
+        if r.get("marge_produit_installee") is not None
+    ]
+    if couts:
+        metrics["mean_cout_installee"] = _round(float(np.mean(couts)), 2)
+        metrics["n_with_installed_costs"] = len(couts)
+    if margs:
+        metrics["mean_marge_nette_installee"] = _round(float(np.mean(margs)), 2)
+    if mprods:
+        metrics["mean_marge_produit_installee"] = _round(float(np.mean(mprods)), 2)
+
     return {
         "ok": True,
         "eval_year": eval_year,
@@ -1222,9 +1320,10 @@ def evaluate_pilots_year(year: int | None = None) -> dict[str, Any]:
         "method": (
             f"Split temporel : ref = {pilots.get('train_years')} (tous les "
             f"pilotes de la catégorie, sans exclusion d'hôtel) ; "
-            f"éval = {eval_year}. n={len(rows)} pilote(s) — peu d'hôtels "
-            f"en apprentissage, c'est normal. "
-            f"Écart = CA_sim_reco − (Σ réel {eval_year}/12) ; "
+            f"éval = {eval_year}. n={len(rows)} pilote(s). "
+            f"Coût & marge « réalisés » = solution installée du pilote "
+            f"(Simply/Liberty/Connected) via barème ROD. "
+            f"Écart CA = CA_sim_reco − (Σ réel {eval_year}/12) ; "
             f"MAE sur n={metrics.get('n', 0)} avec réel."
         ),
         "metrics": metrics,
