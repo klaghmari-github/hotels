@@ -54,6 +54,10 @@ ID_DETAIL_CANDIDATES = [
     "brand_category",
     "Marque",
     "logo_path",
+    # Flags solution ROD (0/1) — pilotes Simply / Liberty / Connected
+    "hotel_solution_simply",
+    "hotel_solution_liberty",
+    "hotel_solution_connected",
     "hotel_adresse_postale_1",
     "hotel_adresse_postale_2",
     "hotel_code_postal",
@@ -211,7 +215,18 @@ def build_model_dataframe(all_data: pd.DataFrame | None = None) -> tuple[pd.Data
     # 3. Colonnes constantes
     const = _constant_columns(frame)
     # ne pas dropper les clés minimales même si constantes (peu probable)
-    protect = {"hotel_code", "annee", "mois", "hotel_brand", "nombre_ventes", "montant_ventes"}
+    protect = {
+        "hotel_code",
+        "annee",
+        "mois",
+        "hotel_brand",
+        "nombre_ventes",
+        "montant_ventes",
+        # Flags solution ROD (0/1) — ne pas drop même si quasi-constants
+        "hotel_solution_simply",
+        "hotel_solution_liberty",
+        "hotel_solution_connected",
+    }
     const = [c for c in const if c not in protect]
     frame = frame.drop(columns=const, errors="ignore")
 

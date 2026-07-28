@@ -173,7 +173,14 @@ class RevenueRules:
             # Si mix_fb a été overridé sans mix_nf, compléter
             if "mix_fb" in ov:
                 ref_mix_nf = 1.0 - ref_mix_fb
-        impact_to = float(self._ref.get("impact_to.ht_per_0_01_to", 9.233974) or 9.233974)
+        if "ca_ht_par_1pct_to" in ov and ov["ca_ht_par_1pct_to"] not in (None, ""):
+            impact_to = float(ov["ca_ht_par_1pct_to"])
+        elif "impact_to" in ov and ov["impact_to"] not in (None, ""):
+            impact_to = float(ov["impact_to"])
+        else:
+            impact_to = float(
+                self._ref.get("impact_to.ht_per_0_01_to", 9.233974) or 9.233974
+            )
 
         store = request.store
         user_mix_fb = float(store.mix_fb)

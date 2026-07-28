@@ -468,6 +468,44 @@ def api_rebuild_concept_pilote():
         return jsonify({"error": str(exc)}), 400
 
 
+@app.post("/api/datasets/simulateur_data/rebuild")
+def api_rebuild_simulateur_data():
+    """
+    Recalcule ``simulateur_data.xlsx`` depuis ``hotel_sales_raw_data.xlsx``.
+
+    Mesures ventes des pilotes regroupés par solution SIMPLY / LIBERTY /
+    CONNECTED (CA HT/TTC F&B·N-F&B, mix, nb ventes, impact TO…).
+    Feuilles : simulateur_data, mensuel, moyennes_solution, meta.
+
+    Synchronise aussi ``hotel_solution_simply|liberty|connected`` (0/1)
+    sur hotel_data pour les joints all_data / model_data.
+    """
+    try:
+        from accor.simulator_data import rebuild_simulateur_data
+        from accor.store import _cache
+
+        result = rebuild_simulateur_data()
+        _cache.pop("simulateur_data", None)
+        _cache.pop("hotel", None)
+        return jsonify(result)
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
+@app.post("/api/datasets/hotel/sync_solution_flags")
+def api_sync_hotel_solution_flags():
+    """Pose hotel_solution_simply|liberty|connected (0/1) depuis rod_pilot_concepts."""
+    try:
+        from accor.hotel_solutions import sync_hotel_data_solution_flags
+        from accor.store import _cache
+
+        result = sync_hotel_data_solution_flags()
+        _cache.pop("hotel", None)
+        return jsonify(result)
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
 # ---------------------------------------------------------------------------
 # API — modèle XGBoost (build design + explore + deploy)
 # ---------------------------------------------------------------------------

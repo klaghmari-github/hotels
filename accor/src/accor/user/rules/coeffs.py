@@ -15,7 +15,16 @@ from __future__ import annotations
 
 from typing import Dict, Set
 
-# F&B — colonnes H SIMULATEUR *
+# ---------------------------------------------------------------------------
+# Règle 3 — poids d'impact (Excel SIMULATEUR)
+#
+# Dans l'Excel ce sont des **exemples** de parts sur le **total** des ventes
+# (pas seulement au sein de F&B ou N-F&B). Leur somme n'atteint pas 100 %
+# (≈ 48 % F&B + 34 % N-F&B) : ce sont des leviers ±X % sur le CA canal.
+#
+# Dans le simulateur data / modélisation, les % réels par sous-catégorie
+# sont recalculés : nb_ventes(sous_cat) / nb_ventes(total) → somme ≈ 100 %.
+# ---------------------------------------------------------------------------
 RULE3_FB_COEFFS: Dict[str, float] = {
     "fb_soft_drinks": 0.10,
     "fb_alcohol": 0.05,
@@ -26,7 +35,6 @@ RULE3_FB_COEFFS: Dict[str, float] = {
     "fb_gourmet": 0.03,
 }
 
-# NON-F&B — colonnes O
 RULE3_NFB_COEFFS: Dict[str, float] = {
     "nfb_sos": 0.08,
     "nfb_hygiene": 0.05,
@@ -40,7 +48,8 @@ RULE3_NFB_COEFFS: Dict[str, float] = {
 RULE3_BASELINE_FB = sum(RULE3_FB_COEFFS.values())
 RULE3_BASELINE_NF = sum(RULE3_NFB_COEFFS.values())
 
-# Règle reco #2 — au moins une catégorie N-F&B « lifestyle »
+# Règle reco : hôtel ≥ 50 ch. + ≥ 1 des 5 lifestyle → LIBERTY
+# (Cosmétiques, Kids, Ready-to-wear, Accessories, Souvenirs)
 LIBERTY_NFB_NEEDS: Set[str] = {
     "nfb_cosmetics",
     "nfb_kids",

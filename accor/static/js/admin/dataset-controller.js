@@ -102,7 +102,7 @@ export class DatasetController {
       this.state.currentId === id &&
       this.state.payload
     ) {
-      this.nav.showTablePanel();
+      this.nav.showTablePanel(id);
       return;
     }
     if (this.state.currentId && this.state.currentId !== id) {
@@ -113,7 +113,7 @@ export class DatasetController {
     this._selectBusyId = id;
     this.nav.setDatasetNavBusy(id, true);
     try {
-      this.nav.showTablePanel();
+      this.nav.showTablePanel(id);
       if (this.state.currentId !== id) {
         this.state.clearEdits();
         if (!keepPage) this.state.page = 1;
@@ -131,7 +131,8 @@ export class DatasetController {
       const ro =
         this.state.datasets.find((d) => d.id === id)?.readonly ||
         id === "sales" ||
-        id === "concept_pilote";
+        id === "concept_pilote" ||
+        id === "simulateur_data";
       if ($("#btn-add")) $("#btn-add").classList.toggle("hidden", !!ro);
       if ($("#btn-save")) $("#btn-save").classList.toggle("hidden", !!ro);
       if ($("#btn-delete")) $("#btn-delete").classList.toggle("hidden", !!ro);

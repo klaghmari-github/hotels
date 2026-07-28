@@ -130,6 +130,10 @@ _HOTEL_EDITABLE = [
     "hotel_to_annuel",
     "hotel_to_le_plus_bas_taux",
     "hotel_to_le_plus_haut_taux",
+    # Solutions ROD (0/1) — pilotes Simply / Liberty / Connected
+    "hotel_solution_simply",
+    "hotel_solution_liberty",
+    "hotel_solution_connected",
     "hotel_dispo_dans_lobby_assises",
     "hotel_dispo_dans_lobby_bouilloire",
     "hotel_dispo_dans_lobby_fontaine_a_eau",
@@ -178,6 +182,9 @@ _HOTEL_EDITABLE = [
 
 # Champs binaires (0/1) — l'UI propose un input numérique 0–1
 _HOTEL_BOOL = [
+    "hotel_solution_simply",
+    "hotel_solution_liberty",
+    "hotel_solution_connected",
     "hotel_dispo_dans_lobby_assises",
     "hotel_dispo_dans_lobby_bouilloire",
     "hotel_dispo_dans_lobby_fontaine_a_eau",
@@ -384,8 +391,10 @@ _CONCEPT_PILOTE_EDITABLE = [
 
 # Ordre logique sidebar :
 # All (UI pinned) : Brand → Hotel → Proximity → Holidays → Weather
-# Pilotes (scroll) : Sales Raw → Sales → All Data → Concept → Model Data
-# Modèles (hors datasets) : Model Build / Explore
+# Pilotes (scroll) : Sales Raw → Sales → All Data → Concept Pilote →
+#                    Simulateur Data → Model Data
+# Simulateur ROD (footer, hors datasets) : ROD + Excel Simply/Liberty/Connected
+# Modèles (footer) : Build / Explore / Éval
 DATASETS: dict[str, DatasetSchema] = {
     # ----- All (parc Accor, pas seulement pilotes) -----
     "brand": DatasetSchema(
@@ -517,6 +526,64 @@ DATASETS: dict[str, DatasetSchema] = {
         icon="table",
         page_size=25,
     ),
+    # Concept pilote : agrégats annuels
+    "concept_pilote": DatasetSchema(
+        id="concept_pilote",
+        label="Concept Pilote",
+        description="Donnees des ventes transformees agregees par annee",
+        filename="concept_pilote.xlsx",
+        sheet="concept_pilote",
+        editable_columns=_CONCEPT_PILOTE_EDITABLE,
+        key_columns=["hotel_code", "annee"],
+        icon="chart",
+        page_size=25,
+        readonly=True,
+    ),
+    # Baselines pilotes pour les 3 simulateurs Excel (Simply / Liberty / Connected)
+    # Feuilles xlsx : simulateur_data | mensuel | pilotes_train | moyennes_solution | meta
+    # Bouton Reconstruire = recalcul depuis hotel_sales_raw_data (période de modélisation)
+    "simulateur_data": DatasetSchema(
+        id="simulateur_data",
+        label="Simulateur Data",
+        description=(
+            "Baselines pilotes Simply·Liberty·Connected (CA, mix, ventes, TO) "
+            "— source des simulateurs Excel · Reconstruire après maj sales raw"
+        ),
+        filename="simulateur_data.xlsx",
+        sheet="simulateur_data",
+        editable_columns=[
+            "solution",
+            "hotel_code",
+            "hotel_label",
+            "hotel_name",
+            "annee",
+            "n_mois",
+            "ca_ht_fb_mensuel",
+            "ca_ht_nf_mensuel",
+            "ca_ht_total_mensuel",
+            "ca_ttc_fb_mensuel",
+            "ca_ttc_nf_mensuel",
+            "ca_ttc_total_mensuel",
+            "nb_ventes_mensuel",
+            "nb_paniers_mensuel",
+            "mix_fb",
+            "mix_nf",
+            "ticket_moyen_ht",
+            "panier_moyen_ht",
+            "margin_fb",
+            "margin_nf",
+            "margin_ponderee",
+            "taux_occupation",
+            "nb_chambres",
+            "clients_mois_estimes",
+            "taux_acheteur",
+            "ca_ht_par_1pct_to",
+        ],
+        key_columns=["solution", "hotel_code", "annee"],
+        icon="chart",
+        page_size=25,
+        readonly=True,
+    ),
     # Model Data : sous-ensemble pour l'apprentissage (dérivé d'all_data)
     "model_data": DatasetSchema(
         id="model_data",
@@ -526,19 +593,6 @@ DATASETS: dict[str, DatasetSchema] = {
         sheet="model_data",
         editable_columns=[],  # toutes les colonnes du fichier
         key_columns=["hotel_code", "annee", "mois"],
-        icon="chart",
-        page_size=25,
-        readonly=True,
-    ),
-    # Concept pilote : agrégats annuels (avant Model Build)
-    "concept_pilote": DatasetSchema(
-        id="concept_pilote",
-        label="Concept Pilote",
-        description="Donnees des ventes transformees agregees par annee",
-        filename="concept_pilote.xlsx",
-        sheet="concept_pilote",
-        editable_columns=_CONCEPT_PILOTE_EDITABLE,
-        key_columns=["hotel_code", "annee"],
         icon="chart",
         page_size=25,
         readonly=True,

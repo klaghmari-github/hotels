@@ -30,6 +30,7 @@ from accor.user.models import (
     ClientProfile,
     HotelIdentity,
     HotelOperating,
+    HotelServices,
     SimulationRequest,
     StoreConfig,
 )
@@ -90,10 +91,13 @@ EXCEL_COMMENTS: dict[str, str] = {
     "r3": (
         "REGLE 3 = Si la catégorie est cochée +X% sur le CA ; "
         "si la catégorie n'est pas cochée −X% sur le CA.\n"
-        "Pour les hôtels de + de 50 ch. : si minimum 1 des 5 catégories "
-        "lifestyle N-F&B est cochée, alors solution recommandée = LIBERTY.\n"
-        "Attention : si le CA de l'étape précédente est négatif, sélectionner "
-        "de nombreuses catégories permet de « réduire » la perte de CA."
+        "Les X% Excel sont des exemples de parts sur le TOTAL des ventes "
+        "(pas seulement au sein de F&B ou N-F&B).\n"
+        "Pour les hôtels ≥ 50 ch. : si minimum 1 des 5 catégories lifestyle "
+        "N-F&B (Cosmétiques, Kids, PAP, Accessoires, Souvenirs) est cochée "
+        "→ solution recommandée = LIBERTY "
+        "(les 3 solutions restent calculées à titre informatif).\n"
+        "En modélisation : mix / sous-cat = nb_ventes / nb_ventes total → ≈ 100 %."
     ),
     "r4_title": "REGLE N°4 — REVENUS POUR 1 METRE LINEAIRE (DE PLUS OU DE MOINS)",
     "r4": (
@@ -183,14 +187,16 @@ def recommend_display_order(
     nb_frigos: float | int | None = None,
 ) -> tuple[str, list[str], list[str]]:
     """
-    Arbre de reco audit HTML (ordre d'affichage, pas d'exclusion).
+    Arbre de reco (audit + Excel) — **ordre d'affichage**, les 3 solutions
+    restent toujours calculées (P&L informatif).
 
-    IF rooms <= 49 → SIMPLY first
-    ELIF any lifestyle NFB need ON → LIBERTY first
-    ELIF m_lin > 4 → LIBERTY first
-    ELIF has_vitrine → LIBERTY first
-    ELIF TO < 0.70 → LIBERTY first
-    ELSE → CONNECTED first
+    IF rooms ≤ 49 → SIMPLY
+    ELIF rooms ≥ 50 AND ≥ 1 des 5 lifestyle N-F&B ON
+         (Cosmétiques, Kids, PAP, Accessoires, Souvenirs) → LIBERTY
+    ELIF m_lin > 4 → LIBERTY
+    ELIF has_vitrine → LIBERTY
+    ELIF TO < 0.70 → LIBERTY
+    ELSE → CONNECTED
 
     Returns
     -------
@@ -208,9 +214,10 @@ def recommend_display_order(
     if rooms <= 49:
         recommended = "SIMPLY"
         reasons.append(
-            f"Nb. chambres ≤ 49 ({int(round(rooms))}) → SIMPLY en premier."
+            f"Nb. chambres ≤ 49 ({int(round(rooms))}) → SIMPLY recommandé "
+            "(Simply / Liberty / Connected restent calculés à titre informatif)."
         )
-    elif _has_lifestyle_nfb(needs):
+    elif rooms >= 50 and _has_lifestyle_nfb(needs):
         recommended = "LIBERTY"
         active = [
             CLIENT_NEED_LABELS.get(k, k)
@@ -218,25 +225,25 @@ def recommend_display_order(
             if bool(needs.get(k, False))
         ]
         reasons.append(
-            "Catégorie(s) lifestyle N-F&B active(s) "
-            f"({', '.join(active) or '—'}) → LIBERTY en premier."
+            "Hôtel ≥ 50 chambres + au moins 1 des 5 catégories lifestyle N-F&B "
+            f"cochée ({', '.join(active) or '—'}) → LIBERTY recommandé."
         )
     elif ml > 4:
         recommended = "LIBERTY"
-        reasons.append(f"Mètres linéaires > 4 ({_r(ml, 2)}) → LIBERTY en premier.")
+        reasons.append(f"Mètres linéaires > 4 ({_r(ml, 2)}) → LIBERTY recommandé.")
     elif bool(has_vitrine):
         recommended = "LIBERTY"
-        reasons.append("Vitrine réfrigérée déjà présente → LIBERTY en premier.")
+        reasons.append("Vitrine réfrigérée déjà présente → LIBERTY recommandé.")
     elif to_rate < 0.70:
         recommended = "LIBERTY"
         reasons.append(
-            f"TO moyen < 70 % ({_r(to_rate * 100, 1)} %) → LIBERTY en premier."
+            f"TO moyen < 70 % ({_r(to_rate * 100, 1)} %) → LIBERTY recommandé."
         )
     else:
         recommended = "CONNECTED"
         reasons.append(
             "Hôtel ≥ 50 ch., sans lifestyle N-F&B, ML ≤ 4, sans vitrine, "
-            f"TO ≥ 70 % ({_r(to_rate * 100, 1)} %) → CONNECTED en premier."
+            f"TO ≥ 70 % ({_r(to_rate * 100, 1)} %) → CONNECTED recommandé."
         )
 
     ordered = [recommended] + [c for c in CONCEPTS if c != recommended]
@@ -376,13 +383,25 @@ def collect_validation_warnings(
 
 
 def load_excel_sheets() -> dict[str, Any]:
-    """Feuilles REVENUS - MIX & MARGES + IMPACT TO (captures Excel)."""
-    if not SHEETS_PATH.exists():
-        return {}
-    try:
-        return json.loads(SHEETS_PATH.read_text(encoding="utf-8"))
-    except Exception:
-        return {}
+    """
+    Feuilles REVENUS - MIX & MARGES + IMPACT TO.
+
+    Priorité :
+      1. ``rod_excel_sheets_live.json`` (rebuild simulateur_data — **tous** les pilotes)
+      2. ``rod_excel_sheets.json`` (captures Excel historiques)
+    """
+    live_path = DATA_DIR / "rod_excel_sheets_live.json"
+    for path in (live_path, SHEETS_PATH):
+        if not path.exists():
+            continue
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            if data:
+                data["_loaded_from"] = path.name
+                return data
+        except Exception:
+            continue
+    return {}
 
 
 def excel_ui_meta() -> dict[str, Any]:
@@ -428,9 +447,11 @@ def build_concept_reference(
     """
     Moyenne des pilotes de la **solution** ``concept``.
 
-    - Paramètres hôtel : moyenne live (ventes train + fiche) si dispo.
-    - CA F&B / N-F&B / ventes / mix / marges : pivots Excel ``rod_reference``
-      (déjà moyennes multi-pilotes extraites de l'Excel).
+    Priorité des baselines CA / mix / ventes :
+      1. ``simulateur_data.xlsx`` (mesures ventes live Simply/Liberty/Connected)
+      2. pivots Excel ``rod_reference.json`` (fallback)
+
+    Params hôtel : moyenne live (fiches + simulateur_data) si dispo.
     """
     concept = concept.upper()
     if concept not in CONCEPTS:
@@ -451,14 +472,6 @@ def build_concept_reference(
         "ca_nf": float(ref.get(f"{key}.base_monthly_ca_nf", 0) or 0),
         "nb_ventes": float(ref.get(f"{key}.base_monthly_sales", 0) or 0),
     }
-    excel["ca_ht"] = excel["ca_fb"] + excel["ca_nf"]
-    excel["clients_jour"] = (
-        excel["nb_chambres"] * excel["taux_occupation"] * excel["guests_per_chambre"]
-    )
-    excel["clients_mois"] = excel["clients_jour"] * JOURS_MOIS
-    excel["taux_acheteur"] = (
-        excel["nb_ventes"] / excel["clients_mois"] if excel["clients_mois"] else 0.0
-    )
 
     mapping = load_pilot_concept_map().get(concept) or []
     sales = _load_sales()
@@ -478,6 +491,52 @@ def build_concept_reference(
     else:
         eval_year = eval_year or 2026
         train_years = train_years or []
+
+    # --- Baselines simulateur_data (ventes live) ---
+    sim_base: dict[str, Any] = {}
+    try:
+        from accor.simulator_data import load_solution_baselines
+
+        all_bases = load_solution_baselines(train_years=train_years or None)
+        sim_base = all_bases.get(concept) or {}
+    except Exception:
+        sim_base = {}
+
+    baseline_source = "rod_reference"
+    if sim_base and float(sim_base.get("ca_ht") or 0) > 0:
+        baseline_source = str(sim_base.get("source") or "simulateur_data")
+        if sim_base.get("ca_fb") is not None:
+            excel["ca_fb"] = float(sim_base["ca_fb"])
+        if sim_base.get("ca_nf") is not None:
+            excel["ca_nf"] = float(sim_base["ca_nf"])
+        if sim_base.get("nb_ventes") is not None:
+            excel["nb_ventes"] = float(sim_base["nb_ventes"])
+        if sim_base.get("mix_fb") is not None:
+            excel["mix_fb"] = float(sim_base["mix_fb"])
+            excel["mix_nf"] = float(
+                sim_base.get("mix_nf")
+                if sim_base.get("mix_nf") is not None
+                else (1.0 - excel["mix_fb"])
+            )
+        if sim_base.get("margin_fb") is not None:
+            excel["margin_fb"] = float(sim_base["margin_fb"])
+        if sim_base.get("margin_nf") is not None:
+            excel["margin_nf"] = float(sim_base["margin_nf"])
+        if sim_base.get("nb_chambres") is not None:
+            excel["nb_chambres"] = float(sim_base["nb_chambres"])
+        if sim_base.get("taux_occupation") is not None:
+            excel["taux_occupation"] = float(sim_base["taux_occupation"])
+
+    excel["ca_ht"] = excel["ca_fb"] + excel["ca_nf"]
+    excel["clients_jour"] = (
+        excel["nb_chambres"] * excel["taux_occupation"] * excel["guests_per_chambre"]
+    )
+    excel["clients_mois"] = excel["clients_jour"] * JOURS_MOIS
+    excel["taux_acheteur"] = (
+        excel["nb_ventes"] / excel["clients_mois"] if excel["clients_mois"] else 0.0
+    )
+    if sim_base.get("ca_ht_par_1pct_to"):
+        excel["ca_ht_par_1pct_to"] = float(sim_base["ca_ht_par_1pct_to"])
 
     hotel_refs: list[dict[str, Any]] = []
     rooms: list[float] = []
@@ -552,17 +611,26 @@ def build_concept_reference(
     def _mean(xs: list[float]) -> float | None:
         return float(np.mean(xs)) if xs else None
 
-    # Params live si dispo, sinon Excel
+    # Params : sim data (déjà dans excel) / live fiche / rod_reference
     live_nb = _mean(rooms)
     live_to = _mean(tos)
     live_g = _mean(guests)
     live_clients = _mean(clients)
     live_ca = _mean(ca_live)
 
+    # Si pas de simulateur_data : moyenne fiches hôtels pour n/TO
+    pref_n = excel["nb_chambres"]
+    pref_to = excel["taux_occupation"]
+    if not baseline_source.startswith("simulateur_data"):
+        if live_nb is not None:
+            pref_n = live_nb
+        if live_to is not None:
+            pref_to = live_to
+
     left_params = {
-        "nb_chambres": live_nb if live_nb is not None else excel["nb_chambres"],
+        "nb_chambres": pref_n,
         "guests_per_chambre": live_g if live_g is not None else excel["guests_per_chambre"],
-        "taux_occupation": live_to if live_to is not None else excel["taux_occupation"],
+        "taux_occupation": pref_to,
         "m_lin": excel["m_lin"],
         "mix_fb": excel["mix_fb"],
         "mix_nf": excel["mix_nf"],
@@ -578,20 +646,40 @@ def build_concept_reference(
         * left_params["guests_per_chambre"]
     )
     left_params["clients_mois"] = left_params["clients_jour"] * JOURS_MOIS
+    # Recalcule taux acheteur avec params finaux
+    excel["nb_chambres"] = left_params["nb_chambres"]
+    excel["taux_occupation"] = left_params["taux_occupation"]
+    excel["guests_per_chambre"] = left_params["guests_per_chambre"]
+    excel["clients_jour"] = left_params["clients_jour"]
+    excel["clients_mois"] = left_params["clients_mois"]
+    excel["taux_acheteur"] = (
+        excel["nb_ventes"] / excel["clients_mois"] if excel["clients_mois"] else 0.0
+    )
 
-    # CA base = toujours Excel (split F&B/N-F&B de la solution)
-    source = "excel_rod_reference"
-    if live_clients is not None and live_ca is not None:
+    source = baseline_source
+    if baseline_source == "rod_reference" and live_clients is not None and live_ca is not None:
         source = "excel_ca_fb_nf + live_params_moyenne_pilotes"
 
+    method_ca = (
+        f"CA F&B/N-F&B / ventes / mix = {baseline_source}"
+        if baseline_source.startswith("simulateur_data")
+        else "CA F&B/N-F&B = pivots Excel rod_reference (fallback)"
+    )
     return {
         "ok": True,
         "concept": concept,
         "source": source,
+        "baseline_source": baseline_source,
         "eval_year": eval_year,
         "train_years": train_years or [],
         "n_pilots": len(hotel_refs),
         "pilots": hotel_refs,
+        "simulateur_data": {
+            k: (_r(v, 4) if isinstance(v, float) else v)
+            for k, v in (sim_base or {}).items()
+        }
+        if sim_base
+        else None,
         "excel_fallback": {
             k: _r(v, 4) if isinstance(v, float) else v for k, v in excel.items()
         },
@@ -608,8 +696,7 @@ def build_concept_reference(
         "method": (
             f"Pilotes = hôtels de la solution {concept} "
             f"({', '.join(p['hotel_code'] for p in hotel_refs) or '—'}). "
-            f"Moyenne multi-années train {train_years or '—'} pour params live ; "
-            f"CA F&B/N-F&B = pivots Excel rod_reference (moyenne solution)."
+            f"Période de modélisation {train_years or '—'}. {method_ca}."
         ),
     }
 
@@ -626,6 +713,7 @@ def _build_request(
     mix_fb: float,
     client_needs: dict[str, bool],
     concept: str,
+    has_vitrine: bool = False,
 ) -> SimulationRequest:
     mix_fb = float(mix_fb)
     if mix_fb > 1.0:
@@ -643,6 +731,7 @@ def _build_request(
             taux_occupation=float(taux_occupation),
             guests_per_chambre=float(guests_per_chambre),
         ),
+        services=HotelServices(lobby_fridge=bool(has_vitrine)),
         client_profile=ClientProfile(client_needs=dict(client_needs)),
         store=StoreConfig(
             concept=concept.upper(),
@@ -1207,13 +1296,25 @@ def simulate_excel_dual(
 
     ov_by_concept = _normalize_pilot_overrides(pilot_overrides)
 
+    # Baselines ventes live (simulateur_data) — injectées aussi en colonne droite
+    try:
+        from accor.simulator_data import (
+            load_solution_baselines,
+            solution_baseline_as_pilot_overrides,
+        )
+
+        sim_baselines = load_solution_baselines(train_years=train_years or None)
+    except Exception:
+        sim_baselines = {}
+        solution_baseline_as_pilot_overrides = lambda _b: {}  # noqa: E731
+
     by_concept: dict[str, Any] = {}
     for concept in CONCEPTS:
         concept_ref = build_concept_reference(
             concept, eval_year=eval_year, train_years=train_years
         )
         left_p = (concept_ref.get("left") or {}).get("params") or {}
-        # Pivots Excel (feuille SIMULATEUR *) — modifiables via pilot_overrides
+        # Baselines (simulateur_data prioritaire via build_concept_reference)
         xf = concept_ref.get("excel_fallback") or {}
         excel_fb = float(
             (concept_ref.get("left") or {}).get("ca_fb")
@@ -1250,31 +1351,70 @@ def simulate_excel_dual(
             or 1.45
         )
 
-        # Overrides utilisateur (colonne pilote éditable)
-        cov = ov_by_concept.get(concept) or {}
-        if cov:
-            if "nb_chambres" in cov:
-                excel_n = cov["nb_chambres"]
-            if "guests_per_chambre" in cov:
-                excel_g = cov["guests_per_chambre"]
-            if "taux_occupation" in cov:
-                excel_to = cov["taux_occupation"]
-            if "m_lin" in cov:
-                excel_ml = cov["m_lin"]
-            if "mix_fb" in cov:
-                excel_mix_fb = cov["mix_fb"]
-            if "ca_fb" in cov:
-                excel_fb = cov["ca_fb"]
-            if "ca_nf" in cov:
-                excel_nf = cov["ca_nf"]
-            if "nb_ventes" in cov:
-                excel_ventes = cov["nb_ventes"]
-            if "margin_fb" in cov:
-                excel_fb_m = cov["margin_fb"]
-            if "margin_nf" in cov:
-                excel_nf_m = cov["margin_nf"]
+        # Base pilote = simulateur_data (+ rod_ref déjà dans xf) + overrides UI
+        base_ov = solution_baseline_as_pilot_overrides(sim_baselines.get(concept))
+        # Aligner base_ov sur les valeurs effectives de la colonne gauche
+        base_ov = {
+            **base_ov,
+            "ca_fb": excel_fb,
+            "ca_nf": excel_nf,
+            "nb_ventes": excel_ventes,
+            "mix_fb": excel_mix_fb,
+            "mix_nf": max(0.0, 1.0 - excel_mix_fb),
+            "margin_fb": excel_fb_m,
+            "margin_nf": excel_nf_m,
+            "nb_chambres": excel_n,
+            "taux_occupation": excel_to,
+            "guests_per_chambre": excel_g,
+            "m_lin": excel_ml,
+        }
+        # Impact TO mesuré sur les ventes (simulateur_data)
+        sim_b = sim_baselines.get(concept) or {}
+        if sim_b.get("ca_ht_par_1pct_to"):
+            base_ov["ca_ht_par_1pct_to"] = float(sim_b["ca_ht_par_1pct_to"])
+        cov = dict(base_ov)
+        user_ov = ov_by_concept.get(concept) or {}
+        if user_ov:
+            cov.update(user_ov)
+            if "nb_chambres" in user_ov:
+                excel_n = user_ov["nb_chambres"]
+            if "guests_per_chambre" in user_ov:
+                excel_g = user_ov["guests_per_chambre"]
+            if "taux_occupation" in user_ov:
+                excel_to = user_ov["taux_occupation"]
+            if "m_lin" in user_ov:
+                excel_ml = user_ov["m_lin"]
+            if "mix_fb" in user_ov:
+                excel_mix_fb = user_ov["mix_fb"]
+            if "ca_fb" in user_ov:
+                excel_fb = user_ov["ca_fb"]
+            if "ca_nf" in user_ov:
+                excel_nf = user_ov["ca_nf"]
+            if "nb_ventes" in user_ov:
+                excel_ventes = user_ov["nb_ventes"]
+            if "margin_fb" in user_ov:
+                excel_fb_m = user_ov["margin_fb"]
+            if "margin_nf" in user_ov:
+                excel_nf_m = user_ov["margin_nf"]
+            # resync cov with final left values
+            cov.update(
+                {
+                    "ca_fb": excel_fb,
+                    "ca_nf": excel_nf,
+                    "nb_ventes": excel_ventes,
+                    "mix_fb": excel_mix_fb,
+                    "mix_nf": max(0.0, 1.0 - excel_mix_fb),
+                    "margin_fb": excel_fb_m,
+                    "margin_nf": excel_nf_m,
+                    "nb_chambres": excel_n,
+                    "taux_occupation": excel_to,
+                    "guests_per_chambre": excel_g,
+                    "m_lin": excel_ml,
+                }
+            )
 
         # Colonne gauche = moyenne pilotes solution (CA base, sans R2–R4)
+        # Pilote : vitrine « déjà là » (pas de coût vitrine sur la réf.)
         left_req = _build_request(
             hotel_code=f"PILOT_AVG_{concept}",
             hotel_name=f"Moyenne pilotes {concept}",
@@ -1286,6 +1426,7 @@ def simulate_excel_dual(
             mix_fb=excel_mix_fb,
             client_needs=all_needs_open(),
             concept=concept,
+            has_vitrine=True,
         )
         left = _left_snapshot(
             cost,
@@ -1298,7 +1439,7 @@ def simulate_excel_dual(
             margin_nf=excel_nf_m,
         )
 
-        # Colonne droite = hôtel désigné projeté avec réf. pilote (évent. overridée)
+        # Colonne droite = hôtel désigné (vitrine = fiche hôtel)
         right_req = _build_request(
             hotel_code=code,
             hotel_name=hotel_name,
@@ -1310,6 +1451,7 @@ def simulate_excel_dual(
             mix_fb=mx,
             client_needs=needs,
             concept=concept,
+            has_vitrine=bool(has_vitrine),
         )
         right = _right_snapshot(
             rev, cost, right_req, concept, pilot_overrides=cov or None
@@ -1347,6 +1489,7 @@ def simulate_excel_dual(
             "n_pilots": concept_ref.get("n_pilots") or 0,
             "method": concept_ref.get("method"),
             "source": concept_ref.get("source"),
+            "baseline_source": concept_ref.get("baseline_source"),
             "left": left,
             "right": right,
             "steps": dual_steps,
@@ -1365,7 +1508,7 @@ def simulate_excel_dual(
             },
             # contexte Excel brut (debug / chips)
             "excel_base": {
-                # Pivots feuille Excel (colonne gauche — éditables via pilot_overrides)
+                # Baselines pilote (simulateur_data prioritaire) — éditables
                 "nb_chambres": _r(excel_n, 1),
                 "guests_per_chambre": _r(excel_g, 3),
                 "taux_occupation": _r(excel_to, 4),
@@ -1379,8 +1522,9 @@ def simulate_excel_dual(
                 "nb_ventes": _r(excel_ventes, 1),
                 "clients_jour": _r(excel_n * excel_to * excel_g, 2),
                 "clients_mois": _r(excel_n * excel_to * excel_g * JOURS_MOIS, 1),
-                "overridden": bool(cov),
-                "overrides_applied": list(cov.keys()) if cov else [],
+                "baseline_source": concept_ref.get("baseline_source") or "rod_reference",
+                "overridden": bool(user_ov),
+                "overrides_applied": list(user_ov.keys()) if user_ov else [],
             },
             # Feuilles annexe Excel (MIX PRODUITS + IMPACT TO) pour ce concept
             "sheet_mix": (load_excel_sheets().get("mix_products") or {}).get(concept),

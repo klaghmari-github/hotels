@@ -194,6 +194,26 @@ export class RodExcelPanel {
       this._setAllNeeds(false);
       this.simulate();
     });
+    // Sous-catégories : scroll de la zone haute (sticky) pour ne jamais
+    // bloquer le retour vers hôtel / params.
+    const needsDetails = document.querySelector("#view-rod-excel .rx-needs-details");
+    const sticky = document.querySelector("#view-rod-excel .rod-excel-sticky");
+    needsDetails?.addEventListener("toggle", () => {
+      if (!sticky) return;
+      if (needsDetails.open) {
+        // Amener le summary en vue en haut de la zone scrollable
+        requestAnimationFrame(() => {
+          const sum = needsDetails.querySelector("summary");
+          if (sum) {
+            const top =
+              sum.offsetTop - sticky.offsetTop - 8;
+            sticky.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+          }
+        });
+      } else {
+        sticky.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    });
   }
 
   _syncMixLabel() {
@@ -989,10 +1009,9 @@ export class RodExcelPanel {
     return `
       <details class="xl-ref-sheet" open>
         <summary>REVENUS ► MIX PRODUITS · ${escapeHtml(concept)} STORE</summary>
-        <p class="xl-ref-note">Construction des marges pondérées par pilote
-          (feuille Excel <em>REVENUS - MIX &amp; MARGES</em>).
-          Le mix de référence Règle 2 du simulateur peut différer
-          (ex. SIMPLY 40/60 dans SIMULATEUR vs 70/30 ici).</p>
+        <p class="xl-ref-note">Tous les pilotes de la solution (moyenne train à poids égaux).
+          Source : <em>simulateur_data</em> / ventes live.
+          Le mix ci-dessous alimente la colonne gauche et la règle 2.</p>
         <table class="xl-ref-table">
           <thead>
             <tr>
@@ -1151,22 +1170,29 @@ export class RodExcelPanel {
           w
         )}</strong></div>`)
         .join("");
+      const src =
+        block.baseline_source ||
+        block.source ||
+        excel.baseline_source ||
+        "";
+      const srcLabel = String(src).startsWith("simulateur_data")
+        ? "simulateur_data.xlsx"
+        : src
+          ? String(src)
+          : "rod_reference";
+      // Bandeau contextuel uniquement (pas le résultat final CA/marge —
+      // ceux-ci apparaissent en bas de feuille après R1→R4).
       kpiBar.innerHTML = `
         ${recoHtml}${warns}
+        <div class="rx-kpi-item"><span>Source pilote</span><strong title="${escapeHtml(
+          src
+        )}">${escapeHtml(srcLabel)}</strong></div>
         <div class="rx-kpi-item"><span>Pilotes</span><strong>${escapeHtml(
           pilots || "—"
         )}</strong></div>
-        <div class="rx-kpi-item"><span>CA pilotes</span><strong>${euro(
+        <div class="rx-kpi-item"><span>CA base pilotes</span><strong>${euro(
           k.left_ca_ht
         )}</strong></div>
-        <div class="rx-kpi-item"><span>CA projeté</span><strong>${
-          np ? "Not profitable" : euro(k.right_ca_ht_num ?? k.right_ca_ht)
-        }</strong></div>
-        <div class="rx-kpi-item"><span>Marge nette</span><strong>${
-          np
-            ? "Not profitable"
-            : euro(k.right_marge_nette_num ?? k.right_marge_nette)
-        }</strong></div>
       `;
     }
 
@@ -1243,10 +1269,16 @@ export class RodExcelPanel {
       mlL != null && mlR != null ? mlR - mlL : this._num(this._stepRow(steps, "r4", "Diff. ML").right);
 
     const storeName = `${concept} STORE`;
+    const pilotList = (block.pilots || [])
+      .map((p) => p.label || p.hotel_code)
+      .filter(Boolean);
+    const nPilots = pilotList.length || block.n_pilots || 0;
     const leftHead =
-      concept === "SIMPLY"
-        ? "MOYENNE RESULTATS PILOTE (ajouter résultats hôtels vente en réception)"
-        : "MOYENNE RESULTATS PILOTES";
+      nPilots > 1
+        ? `MOYENNE RESULTATS PILOTES (${nPilots} hôtels · ${pilotList.join(" + ")})`
+        : nPilots === 1
+          ? `MOYENNE RESULTATS PILOTE (${pilotList[0] || "—"})`
+          : "MOYENNE RESULTATS PILOTES";
 
     const mixData =
       block.sheet_mix ||
@@ -1343,8 +1375,13 @@ export class RodExcelPanel {
       Si la catégorie est cochée <strong>+X%</strong> sur le CA ·
       Si la catégorie n'est pas cochée <strong>−X%</strong> sur le CA
     </p>
-    <p class="xl-comment xl-note">* Pour les hôtels de + de 50 ch., si minimum 1 des 5 catégories
-      lifestyle N-F&B cochées, alors solution recommandée = LIBERTY.</p>
+    <p class="xl-comment xl-note">* Pour les hôtels de <strong>≥ 50 chambres</strong> : si
+      <strong>au moins 1 des 5 catégories</strong> lifestyle N-F&B est cochée
+      (Cosmétiques, Articles enfants, Prêt-à-porter, Accessoires, Souvenirs)
+      → solution recommandée = <strong>LIBERTY</strong>.
+      Les 3 solutions restent toujours calculées (P&amp;L informatif).
+      Les % Excel sont des exemples de parts sur le <em>total</em> des ventes ;
+      en modélisation, mix = nb_ventes(sous-cat) / nb_ventes(total) → somme ≈ 100&nbsp;%.</p>
     <div class="xl-cats-grid">
       <div>
         <div class="xl-cats-h">CATEGORIES F&amp;B</div>

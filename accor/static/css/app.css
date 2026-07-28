@@ -849,10 +849,13 @@ body {
   overflow: hidden;
   gap: 0.4rem;
 }
-/* Contrôles : hauteur limitée pour ne jamais masquer la feuille */
+/* Contrôles : hauteur limitée quand les sous-cat. sont repliées.
+   Ouvertes : la zone s’agrandit, mais reste scrollable pour ne jamais
+   bloquer le haut de page (hôtel, M.lin, mix…). */
 .rod-excel-sticky {
-  flex: 0 0 auto;
-  max-height: 38vh;
+  flex: 0 1 auto;
+  max-height: 48vh;
+  overflow-x: hidden;
   overflow-y: auto;
   z-index: 25;
   display: flex;
@@ -863,6 +866,16 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   scrollbar-width: thin;
+  overscroll-behavior: contain;
+  /* scroll fluide pour remonter vers le summary / les params */
+  scroll-behavior: smooth;
+}
+/* Ouvert : plus de place + scroll sur CETTE zone si le contenu dépasse */
+.rod-excel-sticky:has(.rx-needs-details[open]) {
+  max-height: min(78vh, calc(100% - 8rem));
+  overflow-x: hidden;
+  overflow-y: auto;
+  flex: 0 1 auto;
 }
 /* FEUILLE : zone principale — toujours une hauteur utile */
 .rod-excel-scroll {
@@ -895,6 +908,7 @@ body {
   font-weight: 600;
   padding: 0.25rem 0;
   list-style: none;
+  user-select: none;
 }
 .rx-needs-details > summary::-webkit-details-marker {
   display: none;
@@ -906,11 +920,15 @@ body {
 .rx-needs-details[open] > summary::before {
   content: "▾ ";
 }
+/* Contenu besoins : pas de second scroll interne — le parent sticky scrolle */
 .rx-needs-wrap {
   margin-top: 0.45rem;
-  max-height: 28vh;
-  overflow-y: auto;
-  scrollbar-width: thin;
+  max-height: none;
+  overflow: visible;
+}
+#view-rod-excel .rod-needs-list {
+  max-height: none;
+  overflow: visible;
 }
 .rx-top-actions {
   display: flex;
@@ -941,10 +959,14 @@ body {
     grid-template-columns: 1fr 1fr;
   }
   .rod-excel-sticky {
-    max-height: 42vh;
+    max-height: 52vh;
+  }
+  .rod-excel-sticky:has(.rx-needs-details[open]) {
+    max-height: min(75vh, calc(100% - 7rem));
+    overflow-y: auto;
   }
   .rod-excel-scroll {
-    min-height: 45vh;
+    min-height: 42vh;
   }
 }
 .rx-kpi-bar {

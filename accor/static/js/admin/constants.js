@@ -16,12 +16,11 @@ export const ICONS = {
 };
 
 /**
- * Prod : boutons Reconstruire masques (logique API conservee).
- * Pour reafficher en admin avance, remettre les ids ici.
+ * Boutons Reconstruire visibles pour ces onglets.
+ * Logique API aussi pour sales, weather, proximity, holidays,
+ * all_data, model_data, concept_pilote (masqués en prod).
  */
-export const REBUILD_TABS = new Set([]);
-// Logique serveur intacte : sales, weather, proximity, holidays,
-// all_data, model_data, concept_pilote via POST /api/datasets/<id>/rebuild
+export const REBUILD_TABS = new Set(["simulateur_data"]);
 
 export const REBUILD_TITLES = {
   sales: "Reconstruire hotel_sales_data depuis hotel_sales_raw_data (agrégats + mix %)",
@@ -34,6 +33,8 @@ export const REBUILD_TITLES = {
   model_data: "Reconstruire model_data depuis all_data",
   concept_pilote:
     "Recalculer concept_pilote (hôtel × année : clients, CA moyen, mix produits)",
+  simulateur_data:
+    "Recalculer simulateur_data.xlsx depuis hotel_sales_raw_data (mesures Simply / Liberty / Connected)",
   all_data:
     "Base = mois de vente (sales), left join holidays/weather/hotel/proximity/brand → all_data.xlsx",
   data:
@@ -71,6 +72,11 @@ export const REBUILD_MAP = {
     body: {},
     msg: "Calcul concept_pilote (clients, CA, mix produits)…",
   },
+  simulateur_data: {
+    url: "/api/datasets/simulateur_data/rebuild",
+    body: {},
+    msg: "Calcul mesures ventes Simply / Liberty / Connected → simulateur_data.xlsx…",
+  },
   all_data: {
     url: "/api/datasets/all_data/rebuild",
     body: { fill_weather: false, fill_proximity: false },
@@ -94,4 +100,5 @@ export const HEAVY_LOAD_SUB = {
   weather: "Séries météo — un instant…",
   brand: "Marques — un instant…",
   concept_pilote: "Indicateurs pilotes — un instant…",
+  simulateur_data: "Mesures simulateur Simply / Liberty / Connected…",
 };

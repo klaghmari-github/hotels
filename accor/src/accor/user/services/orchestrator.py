@@ -250,7 +250,9 @@ class SimulationOrchestrator:
             req = self.request_for_concept(request, concept)
             by_concept[concept] = self.simulator.simulate(req, concept)
 
-        recommended, best_margin, reason = self.reco.recommend(by_concept, allowed)
+        recommended, best_margin, reason = self.reco.recommend(
+            by_concept, allowed, request=request
+        )
 
         enriched = request.enriched.to_dict()
         enriched["indicators"] = prep_meta.get("indicators") or {}

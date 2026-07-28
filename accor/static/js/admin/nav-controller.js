@@ -150,11 +150,17 @@ export class NavController {
     );
   }
 
-  showTablePanel() {
+  showTablePanel(datasetId = null) {
     this.state.panel = "table";
     this.hideAllViews();
     if (this.viewTable) this.viewTable.classList.remove("hidden");
     this.setModelNavActive(null);
+    // Active le dataset dans la section Pilotes (si présent)
+    if (datasetId) {
+      $$(".sidebar .nav-item[data-id]").forEach((el) => {
+        el.classList.toggle("active", el.dataset.id === datasetId);
+      });
+    }
   }
 
   showRodSimPanel() {

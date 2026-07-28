@@ -1,0 +1,211 @@
+{
+  "_source": "simulateur_data.xlsx (rebuild ventes live)",
+  "_note": "Tous les hôtels pilotes de chaque solution, moyenne train à poids égaux par hôtel (règle multi-pilotes).",
+  "mix_products": {
+    "title": "REVENUS ► MIX PRODUITS (live ventes)",
+    "SIMPLY": {
+      "pilots": [
+        {
+          "label": "IBB NICE",
+          "hotel_code": "H2075",
+          "mix_fb": 0.5333,
+          "mix_nf": 0.4667,
+          "margin_fb": 2.6,
+          "margin_nf": 1.45,
+          "margin_ponderee": 2.0633,
+          "margin_affichee": 2.0633
+        },
+        {
+          "label": "IBB STRA",
+          "hotel_code": "HB6A3",
+          "mix_fb": 1.0,
+          "mix_nf": 0.0,
+          "margin_fb": 2.6,
+          "margin_nf": 1.45,
+          "margin_ponderee": 2.6,
+          "margin_affichee": 2.6
+        }
+      ],
+      "moyenne": {
+        "mix_fb": 0.7667,
+        "mix_nf": 0.2333,
+        "margin_fb": 2.6,
+        "margin_nf": 1.45,
+        "margin_ponderee": 2.3317
+      }
+    },
+    "LIBERTY": {
+      "pilots": [
+        {
+          "label": "MER BOUL",
+          "hotel_code": "H6188",
+          "mix_fb": 1.0,
+          "mix_nf": 0.0,
+          "margin_fb": 2.6,
+          "margin_nf": 2.0,
+          "margin_ponderee": 2.6,
+          "margin_affichee": 2.6
+        },
+        {
+          "label": "NOV MEG",
+          "hotel_code": "HB5I0",
+          "mix_fb": 0.5765,
+          "mix_nf": 0.4236,
+          "margin_fb": 2.6,
+          "margin_nf": 2.0,
+          "margin_ponderee": 2.3459,
+          "margin_affichee": 2.3459
+        }
+      ],
+      "moyenne": {
+        "mix_fb": 0.7882,
+        "mix_nf": 0.2118,
+        "margin_fb": 2.6,
+        "margin_nf": 2.0,
+        "margin_ponderee": 2.4729
+      }
+    },
+    "CONNECTED": {
+      "pilots": [
+        {
+          "label": "MER MONT",
+          "hotel_code": "H0373",
+          "mix_fb": 0.9438,
+          "mix_nf": 0.0562,
+          "margin_fb": 2.6,
+          "margin_nf": 1.8,
+          "margin_ponderee": 2.5551,
+          "margin_affichee": 2.5551
+        }
+      ],
+      "moyenne": {
+        "mix_fb": 0.9438,
+        "mix_nf": 0.0562,
+        "margin_fb": 2.6,
+        "margin_nf": 1.8,
+        "margin_ponderee": 2.555
+      }
+    }
+  },
+  "impact_to": {
+    "title": "REVENUS ► TAUX D'OCCUPATION (live ventes)",
+    "SIMPLY": {
+      "pilots": [
+        {
+          "label": "IBB NICE",
+          "hotel_code": "H2075",
+          "to": 0.8000000000000002,
+          "ca_ht_fb": 277.39,
+          "ca_ht_nf": 223.61,
+          "ca_ht_total": 501.0,
+          "ca_ttc_fb": 305.28,
+          "ca_ttc_nf": 268.32,
+          "ca_ttc_total": 573.6
+        },
+        {
+          "label": "IBB STRA",
+          "hotel_code": "HB6A3",
+          "to": 0.7,
+          "ca_ht_fb": 1349.05,
+          "ca_ht_nf": 0.0,
+          "ca_ht_total": 1349.05,
+          "ca_ttc_fb": 1483.99,
+          "ca_ttc_nf": 0.0,
+          "ca_ttc_total": 1483.99
+        }
+      ],
+      "moyenne": {
+        "to": 0.75,
+        "ca_ht_fb": 813.22,
+        "ca_ht_nf": 111.8033,
+        "ca_ht_total": 925.0233,
+        "ca_ttc_fb": 894.6342,
+        "ca_ttc_nf": 134.1583,
+        "ca_ttc_total": 1028.7925
+      },
+      "impact_1pct": {
+        "ca_ht_fb": null,
+        "ca_ht_nf": null,
+        "ca_ht_total": 12.7692,
+        "ca_ttc_fb": null,
+        "ca_ttc_nf": null,
+        "ca_ttc_total": null
+      }
+    },
+    "LIBERTY": {
+      "pilots": [
+        {
+          "label": "MER BOUL",
+          "hotel_code": "H6188",
+          "to": 0.7,
+          "ca_ht_fb": 1277.97,
+          "ca_ht_nf": 0.0,
+          "ca_ht_total": 1277.97,
+          "ca_ttc_fb": 1422.8,
+          "ca_ttc_nf": 0.0,
+          "ca_ttc_total": 1422.8
+        },
+        {
+          "label": "NOV MEG",
+          "hotel_code": "HB5I0",
+          "to": 0.7,
+          "ca_ht_fb": 401.31,
+          "ca_ht_nf": 1032.74,
+          "ca_ht_total": 1434.06,
+          "ca_ttc_fb": 443.38,
+          "ca_ttc_nf": 1236.28,
+          "ca_ttc_total": 1679.66
+        }
+      ],
+      "moyenne": {
+        "to": 0.7,
+        "ca_ht_fb": 839.64,
+        "ca_ht_nf": 516.3725,
+        "ca_ht_total": 1356.0125,
+        "ca_ttc_fb": 933.0925,
+        "ca_ttc_nf": 618.14,
+        "ca_ttc_total": 1551.2325
+      },
+      "impact_1pct": {
+        "ca_ht_fb": null,
+        "ca_ht_nf": null,
+        "ca_ht_total": 19.3725,
+        "ca_ttc_fb": null,
+        "ca_ttc_nf": null,
+        "ca_ttc_total": null
+      }
+    },
+    "CONNECTED": {
+      "pilots": [
+        {
+          "label": "MER MONT",
+          "hotel_code": "H0373",
+          "to": 0.75,
+          "ca_ht_fb": 4676.94,
+          "ca_ht_nf": 157.0,
+          "ca_ht_total": 4833.95,
+          "ca_ttc_fb": 4934.14,
+          "ca_ttc_nf": 165.64,
+          "ca_ttc_total": 5099.78
+        }
+      ],
+      "moyenne": {
+        "to": 0.75,
+        "ca_ht_fb": 4676.94,
+        "ca_ht_nf": 157.005,
+        "ca_ht_total": 4833.945,
+        "ca_ttc_fb": 4934.135,
+        "ca_ttc_nf": 165.645,
+        "ca_ttc_total": 5099.78
+      },
+      "impact_1pct": {
+        "ca_ht_fb": null,
+        "ca_ht_nf": null,
+        "ca_ht_total": 64.45,
+        "ca_ttc_fb": null,
+        "ca_ttc_nf": null,
+        "ca_ttc_total": null
+      }
+    }
+  }
+}
