@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROD – Audit Complet des Règles & Simulateurs</title>
+<style>
+  :root {
+    --simply: #2563eb;
+    --liberty: #059669;
+    --connected: #d97706;
+    --bg: #0f172a;
+    --card: #1e293b;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --border: #334155;
+    --accent: #38bdf8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    padding: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 1.9rem; margin-bottom: .4rem; color: #f8fafc; }
+  h2 {
+    font-size: 1.35rem;
+    margin: 2.4rem 0 .8rem;
+    padding-bottom: .35rem;
+    border-bottom: 2px solid var(--accent);
+    color: #f1f5f9;
+  }
+  h3 { font-size: 1.1rem; margin: 1.5rem 0 .5rem; color: #cbd5e1; }
+  h4 { font-size: 1rem; margin: 1.1rem 0 .4rem; color: #94a3b8; }
+  p, li { margin-bottom: .45rem; }
+  .subtitle { color: var(--muted); margin-bottom: 2rem; font-size: .95rem; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin: 1rem 0;
+  }
+  .tag {
+    display: inline-block;
+    padding: .15rem .55rem;
+    border-radius: 4px;
+    font-size: .78rem;
+    font-weight: 600;
+    letter-spacing: .02em;
+  }
+  .tag-simply { background: #1e3a8a; color: #93c5fd; }
+  .tag-liberty { background: #064e3b; color: #6ee7b7; }
+  .tag-connected { background: #78350f; color: #fcd34d; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: .8rem 0 1.2rem;
+    font-size: .9rem;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: .45rem .7rem;
+    text-align: left;
+  }
+  th { background: #0f172a; color: #94a3b8; font-weight: 600; }
+  tr:nth-child(even) { background: #1a2332; }
+  code, .formula {
+    background: #0f172a;
+    padding: .12rem .4rem;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: .85rem;
+    color: #7dd3fc;
+  }
+  .formula-block {
+    background: #0f172a;
+    border-left: 3px solid var(--accent);
+    padding: .8rem 1rem;
+    margin: .7rem 0;
+    border-radius: 0 6px 6px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .84rem;
+    white-space: pre-wrap;
+    color: #a5f3fc;
+  }
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: .4rem;
+    margin: 1rem 0;
+  }
+  .flow-step {
+    background: #0f172a;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .7rem 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: .8rem;
+  }
+  .flow-num {
+    background: var(--accent);
+    color: #0f172a;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: .85rem;
+    flex-shrink: 0;
+  }
+  .warn {
+    background: #422006;
+    border: 1px solid #a16207;
+    border-radius: 8px;
+    padding: .8rem 1rem;
+    margin: 1rem 0;
+    color: #fde68a;
+  }
+  .ok {
+    background: #052e16;
+    border: 1px solid #166534;
+    border-radius: 8px;
+    padding: .8rem 1rem;
+    margin: 1rem 0;
+    color: #bbf7d0;
+  }
+  ul, ol { padding-left: 1.3rem; }
+  .grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  @media (max-width: 700px) { .grid2 { grid-template-columns: 1fr; } }
+  .hotel-map td:first-child { font-weight: 600; }
+  footer {
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: .85rem;
+  }
+</style>
+</head>
+<body>
+
+<h1>ROD – Audit Complet des Règles &amp; Simulateurs</h1>
+<p class="subtitle">
+  Croisement des 3 fichiers Excel · Ordre d’exécution · Calcul CA / Coûts / Marge · Recommandation de concept<br>
+  Fichiers sources : <em>Simulateurs + détail des coûts</em> · <em>Paramètres &amp; règles + projections</em> · <em>Analyse poids catégories / Ventes</em>
+</p>
+
+<!-- ============================================================ -->
+<h2>1. Mapping Hôtel pilote → Solution</h2>
+
+<p>Identifié explicitement dans les feuilles <code>COUTS - AGENCEMENT</code>, <code>REVENUS - MIX &amp; MARGES</code> et <code>REVENUS - IMPACT TO</code> :</p>
+
+<table class="hotel-map">
+  <thead>
+    <tr><th>Hôtel (données ventes)</th><th>Code dans fichiers</th><th>Solution</th><th>Rôle</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Ibis budget Nice</td>
+      <td>IBB NICE</td>
+      <td><span class="tag tag-simply">SIMPLY</span></td>
+      <td>Pilote principal Simply</td>
+    </tr>
+    <tr>
+      <td>Ibis budget Strasbourg Centre République</td>
+      <td>IBB STRA</td>
+      <td><span class="tag tag-simply">SIMPLY</span></td>
+      <td>Référence secondaire Simply (agencement)</td>
+    </tr>
+    <tr>
+      <td>Mercure Paris Boulogne</td>
+      <td>MER BOUL</td>
+      <td><span class="tag tag-liberty">LIBERTY</span></td>
+      <td>Pilote Liberty</td>
+    </tr>
+    <tr>
+      <td>Novotel Megève Mont-Blanc</td>
+      <td>NOV MEG</td>
+      <td><span class="tag tag-liberty">LIBERTY</span></td>
+      <td>Pilote Liberty (mix N-F&amp;B élevé)</td>
+    </tr>
+    <tr>
+      <td>Mercure Paris Montmartre Sacré-Cœur</td>
+      <td>MER MONT</td>
+      <td><span class="tag tag-connected">CONNECTED</span></td>
+      <td>Pilote Connected</td>
+    </tr>
+    <tr>
+      <td>Novotel Paris Tour Eiffel</td>
+      <td>—</td>
+      <td><span class="tag tag-connected">CONNECTED ?</span></td>
+      <td>Volume très élevé, mix ~80/20 – non explicitement taggé</td>
+    </tr>
+    <tr>
+      <td>Novotel Porte d’Italie</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Petit volume, non utilisé comme référence</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="ok">
+  <strong>Période de modélisation :</strong> 2023 + 2024 + 2025 uniquement.<br>
+  <strong>2026</strong> est exclu des calculs de référence (réservé à l’évaluation / back-test).
+</div>
+
+<!-- ============================================================ -->
+<h2>2. Architecture des 3 fichiers et leurs liens</h2>
+
+<div class="card">
+  <h4>Fichier A – Analyse poids catégories / Ventes (BASE)</h4>
+  <ul>
+    <li>Source des <strong>ventes réelles</strong> (bornes) par hôtel, produit, type, gamme</li>
+    <li>Fournit les <strong>poids réels de catégories</strong> (colonne « Réalité CA ») utilisés pour valider les coefficients de la Règle 3</li>
+    <li>Permet de recalculer mix, CA mensuel, nb d’orders par hôtel</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h4>Fichier B – Simulateurs + détail des coûts</h4>
+  <ul>
+    <li><strong>3 simulateurs</strong> (Simply / Liberty / Connected) : calcul CA → Marge produits → Coûts → Marge nette → Amortissement</li>
+    <li>Feuilles de <strong>coûts unitaires</strong> : TECHNOS, ANNEXES, AGENCEMENT</li>
+    <li>Feuilles de <strong>référence mix &amp; TO</strong></li>
+    <li>Zone gauche = données pilotes · Zone droite = simulation paramétrable</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h4>Fichier C – Paramètres &amp; règles + projections nb. d’hôtels</h4>
+  <ul>
+    <li><strong>Arbre de décision</strong> de recommandation de concept (5 règles)</li>
+    <li>Projection du volume d’hôtels (parc 1 343)</li>
+    <li>Tests panel + prototype UI + sources de données</li>
+  </ul>
+</div>
+
+<!-- ============================================================ -->
+<h2>3. Ordre d’exécution complet (logique métier à implémenter)</h2>
+
+<p>Lorsqu’un hôtel saisit ses paramètres dans le simulateur, l’ordre strict est le suivant :</p>
+
+<div class="flow">
+  <div class="flow-step">
+    <div class="flow-num">1</div>
+    <div>
+      <strong>Collecte des paramètres hôtel</strong><br>
+      Nb chambres · Guests/room · TO (YTD) · Mètres linéaires · Mix F&amp;B / N-F&amp;B souhaité · Catégories cochées · Possession vitrine réfrigérée · Nb frigos (Connected) · Type agencement
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-num">2</div>
+    <div>
+      <strong>Recommandation de concept</strong> (arbre de décision Fichier C)<br>
+      Détermine quelle solution s’affiche <em>en premier</em> (recommandée). Les 3 solutions restent accessibles ; la reco n’est pas un exclusif.
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-num">3</div>
+    <div>
+      <strong>Pour chaque solution (Simply / Liberty / Connected)</strong> → calcul complet du P&amp;L via les 4 règles de revenus + coûts (Fichier B)
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-num">4</div>
+    <div>
+      <strong>Affichage des résultats</strong> : CA HT F&amp;B / N-F&amp;B · Marge produits · Coûts totaux · Marge nette · Amortissement<br>
+      + indication de la solution recommandée par les règles (même si une autre a un meilleur CA brut).
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>4. Arbre de recommandation de concept (Fichier C)</h2>
+
+<p>La solution qui s’affiche <strong>en premier</strong> est déterminée ainsi (ordre strict) :</p>
+
+<div class="formula-block">SI nb_chambres ≤ 49
+    → SIMPLY en premier
+
+SINON SI au moins 1 catégorie parmi
+         {Cosmetics, Kids items, Ready-to-wear, Accessories, Souvenirs}
+    → LIBERTY en premier
+
+SINON SI mètres_linéaires > 4
+    → LIBERTY en premier
+
+SINON SI l’hôtel possède déjà une vitrine réfrigérée
+    → LIBERTY en premier
+
+SINON SI TO moyen < 70 %
+    → LIBERTY en premier
+
+SINON
+    → CONNECTED en premier</div>
+
+<div class="warn">
+  <strong>Point critique :</strong> La recommandation n’est <em>pas</em> purement basée sur le CA maximum.<br>
+  On peut recommander la 2<sup>e</sup> meilleure solution en CA si les règles structurelles (taille, catégories, ML, vitrine, TO) l’imposent.<br>
+  C’est volontaire : on privilégie l’adéquation opérationnelle / conceptuelle.
+</div>
+
+<h3>Projections de volume (parc 1 343 hôtels)</h3>
+<table>
+  <thead><tr><th>Solution</th><th>Nb hôtels projetés</th><th>%</th></tr></thead>
+  <tbody>
+    <tr><td><span class="tag tag-simply">SIMPLY</span></td><td>178</td><td>13,3 %</td></tr>
+    <tr><td><span class="tag tag-liberty">LIBERTY</span></td><td>~937</td><td>69,8 %</td></tr>
+    <tr><td><span class="tag tag-connected">CONNECTED</span></td><td>~228</td><td>17,0 %</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>5. Calcul des revenus (4 règles – Fichier B)</h2>
+
+<p>Appliquées <strong>dans l’ordre</strong> pour chaque solution, en partant des chiffres de référence pilote (gauche du simulateur).</p>
+
+<h3>Règle 1 – Clients acheteurs</h3>
+<div class="formula-block">Clients_hébergés_mois = Nb_chambres × Guests_per_room × TO × 30,5
+
+Taux_acheteurs = Nb_ventes_pilote / Clients_hébergés_pilote
+
+Nb_acheteurs_simulé = Clients_hébergés_mois × Taux_acheteurs
+
+CA_F&amp;B  = (CA_F&amp;B_pilote / Nb_acheteurs_pilote) × Nb_acheteurs_simulé
+CA_NFB  = (CA_NFB_pilote / Nb_acheteurs_pilote) × Nb_acheteurs_simulé</div>
+
+<p>Références pilotes (mensuel) :</p>
+<table>
+  <thead><tr><th></th><th>Simply</th><th>Liberty</th><th>Connected</th></tr></thead>
+  <tbody>
+    <tr><td>Nb ventes / mois</td><td>231</td><td>312</td><td>534</td></tr>
+    <tr><td>CA F&amp;B HT</td><td>533 €</td><td>1 055 €</td><td>3 503 €</td></tr>
+    <tr><td>CA N-F&amp;B HT</td><td>187 €</td><td>424 €</td><td>131 €</td></tr>
+  </tbody>
+</table>
+<p><em>Note : ces chiffres incluent des ventes réception non présentes dans le fichier bornes seul.</em></p>
+
+<h3>Règle 2 – Impact du Mix (±10 %)</h3>
+<div class="formula-block">Diff_mix_F&amp;B = Mix_F&amp;B_simulé − Mix_F&amp;B_référence_concept
+Nb_x10pct   = Diff_mix_F&amp;B × 10
+
+CA_add_F&amp;B  = (CA_F&amp;B_10pct_réf) × Nb_x10pct
+(idem N-F&amp;B)
+
+CA_après_R2 = CA_après_R1 + CA_add</div>
+
+<p>Mix de référence concept :</p>
+<table>
+  <thead><tr><th></th><th>Simply</th><th>Liberty</th><th>Connected</th></tr></thead>
+  <tbody>
+    <tr><td>F&amp;B</td><td>0,40</td><td>0,70</td><td>0,80</td></tr>
+    <tr><td>N-F&amp;B</td><td>0,60</td><td>0,30</td><td>0,20</td></tr>
+  </tbody>
+</table>
+
+<h3>Règle 3 – Catégories sélectionnées</h3>
+<div class="formula-block">SI catégorie cochée   → + coeff × CA
+SI catégorie non cochée → − coeff × CA
+
+(appliqué séparément sur CA F&amp;B et CA N-F&amp;B après R2)
+
+Si CA précédent &lt; 0, la formule « réduit la perte » (toujours + ou − selon sélection).</div>
+
+<table>
+  <thead><tr><th>Catégorie F&amp;B</th><th>Coeff</th><th>Catégorie N-F&amp;B</th><th>Coeff</th></tr></thead>
+  <tbody>
+    <tr><td>Drinks without alcohol</td><td>0,10</td><td>SOS</td><td>0,08</td></tr>
+    <tr><td>Drinks with alcohol</td><td>0,05</td><td>Hygiene</td><td>0,05</td></tr>
+    <tr><td>Sugary food (dry)</td><td>0,10</td><td>Cosmetics</td><td>0,03</td></tr>
+    <tr><td>Sugary food (fresh)</td><td>0,05</td><td>Kids items</td><td>0,08</td></tr>
+    <tr><td>Salty food (dry)</td><td>0,10</td><td>Ready-to-wear</td><td>0,03</td></tr>
+    <tr><td>Salty food (fresh)</td><td>0,05</td><td>Accessories</td><td>0,03</td></tr>
+    <tr><td>Gourmet food</td><td>0,03</td><td>Souvenirs</td><td>0,03</td></tr>
+    <tr><td><strong>Cumul max</strong></td><td><strong>0,48</strong></td><td><strong>Cumul max</strong></td><td><strong>0,19</strong></td></tr>
+  </tbody>
+</table>
+
+<div class="ok">
+  Ces coefficients sont des <strong>leviers de simulation</strong> (pas les poids historiques).<br>
+  Les poids réels 2023-2025 (SANS ALCOOL 41 %, SALTY FRESH 14 %, etc.) sont affichés à côté pour validation uniquement.
+</div>
+
+<h3>Règle 4 – Surface / Équipement</h3>
+<ul>
+  <li><strong>Simply &amp; Liberty</strong> : chaque mètre linéaire en plus ou en moins vs référence (6 ML Simply / 8 ML Liberty)</li>
+  <li><strong>Connected</strong> : chaque frigo connecté en plus ou en moins vs référence (3 frigos)</li>
+</ul>
+<div class="formula-block">Diff = ML_simulé − ML_référence   (ou Frigo_simulé − Frigo_réf)
+CA_unit = CA_réf / ML_réf
+
+SI Diff &lt; 0  → CA = CA_après_R3 − (CA_unit × |Diff|)
+SI Diff ≥ 0  → CA = CA_après_R3 + (CA_unit × Diff)</div>
+
+<!-- ============================================================ -->
+<h2>6. Calcul de la Marge produits</h2>
+
+<div class="formula-block">Marge_F&amp;B  = CA_F&amp;B − (CA_F&amp;B / coeff_marge_F&amp;B)
+Marge_NFB  = CA_NFB − (CA_NFB / coeff_marge_NFB)
+
+Marge_produits = Marge_F&amp;B + Marge_NFB</div>
+
+<table>
+  <thead><tr><th>Concept</th><th>Coeff F&amp;B</th><th>Coeff N-F&amp;B</th></tr></thead>
+  <tbody>
+    <tr><td>Simply</td><td>2,6</td><td>1,45</td></tr>
+    <tr><td>Liberty</td><td>2,6</td><td>2,0 (pilote) / 1,45 (simu)</td></tr>
+    <tr><td>Connected</td><td>2,6</td><td>1,8 (pilote) / 1,45 (simu)</td></tr>
+  </tbody>
+</table>
+<p>Ces coefficients sont des <strong>hypothèses business</strong> (PV / PR), non calculés depuis les ventes.</p>
+
+<!-- ============================================================ -->
+<h2>7. Calcul des Coûts mensuels</h2>
+
+<p>Coût total mensuel = <strong>Techno + Annexes + Agencement</strong></p>
+
+<h3>7.1 Coûts Techno (équipement + licence + frais OS)</h3>
+<table>
+  <thead><tr><th>Concept</th><th>Équipement principal</th><th>Coût unitaire (BUY)</th><th>Mensualisation</th></tr></thead>
+  <tbody>
+    <tr><td>Simply</td><td>Scanner</td><td>500 €</td><td>/ 60 mois</td></tr>
+    <tr><td>Liberty</td><td>Caisse</td><td>15 000 € (lease 250 €/mois) ou BUY −20 %</td><td>/ 60 mois</td></tr>
+    <tr><td>Connected</td><td>Frigo froid</td><td>27 000 € (lease 450 €/mois)</td><td>/ 60 mois</td></tr>
+    <tr><td>Tous</td><td>Vitrine</td><td>800 €</td><td>/ 60 mois</td></tr>
+    <tr><td>Tous</td><td>Licence logicielle</td><td>3 000 €</td><td>50 €/mois</td></tr>
+    <tr><td>Simply</td><td>Frais OS</td><td>1 000 €</td><td>/ 60 mois</td></tr>
+    <tr><td>Liberty</td><td>Frais OS</td><td>2 000 €</td><td>/ 60 mois</td></tr>
+    <tr><td>Connected</td><td>Frais OS</td><td>3 000 €</td><td>/ 60 mois</td></tr>
+  </tbody>
+</table>
+
+<h3>7.2 Coûts Annexes (électricité + personnel)</h3>
+<table>
+  <thead><tr><th></th><th>Simply</th><th>Liberty</th><th>Connected</th></tr></thead>
+  <tbody>
+    <tr><td>Élec. équipement principal</td><td>2 €/mois (scanner)</td><td>10 €/mois (caisse)</td><td>20 €/mois (frigo froid)</td></tr>
+    <tr><td>Élec. vitrine / frigo amb.</td><td>10 €/mois</td><td>10 €/mois</td><td>15 €/mois</td></tr>
+    <tr><td>Staff</td><td>3 €/mois</td><td>10 €/mois</td><td>10 €/mois</td></tr>
+  </tbody>
+</table>
+
+<h3>7.3 Coûts Agencement (amortis sur 84 mois)</h3>
+<table>
+  <thead><tr><th>Type</th><th>Simply / Liberty (par ML)</th><th>Connected (par ML)</th></tr></thead>
+  <tbody>
+    <tr><td>Classic</td><td>1 000 €</td><td>800 €</td></tr>
+    <tr><td>Premium</td><td>1 200 €</td><td>1 000 €</td></tr>
+    <tr><td>Bespoke</td><td>2 200 €</td><td>1 600 €</td></tr>
+  </tbody>
+</table>
+<p>Mensualité = (Prix × Nb ML) / 84</p>
+
+<!-- ============================================================ -->
+<h2>8. Marge nette &amp; Amortissement</h2>
+
+<div class="formula-block">Marge_nette_mensuelle = Marge_produits − Coûts_mensuels_totaux
+
+Taux_marge = Marge_nette / CA_HT_total
+             (affiche « N/A » ou « Not profitable » si Marge_nette &lt; 0)
+
+Amortissement_mois = Coût_total_sur_60_mois / Marge_nette_mensuelle
+Amortissement_ans  = Amortissement_mois / 12</div>
+
+<div class="warn">
+  <strong>Règle d’affichage à respecter (corrections ND) :</strong><br>
+  Si revenus F&amp;B ou N-F&amp;B ou TOTAL négatifs → afficher <strong>« Not profitable »</strong> plutôt qu’un chiffre négatif trompeur.
+</div>
+
+<!-- ============================================================ -->
+<h2>9. Différences structurelles des 3 concepts</h2>
+
+<table>
+  <thead>
+    <tr><th></th><th><span class="tag tag-simply">SIMPLY</span></th><th><span class="tag tag-liberty">LIBERTY</span></th><th><span class="tag tag-connected">CONNECTED</span></th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Cible principale</td><td>≤ 49 chambres</td><td>≥ 50 ch. + N-F&amp;B ou surface</td><td>≥ 50 ch. · ≤ 4 ML · TO élevé</td></tr>
+    <tr><td>Équipement cœur</td><td>Scanner</td><td>Caisse</td><td>Frigo(s) connecté(s)</td></tr>
+    <tr><td>ML / Frigos réf.</td><td>6 ML</td><td>8 ML</td><td>3 Frigos froid</td></tr>
+    <tr><td>Mix F&amp;B réf.</td><td>40 %</td><td>70 %</td><td>80 %</td></tr>
+    <tr><td>Marge N-F&amp;B</td><td>1,45</td><td>~2,0</td><td>~1,8</td></tr>
+    <tr><td>Coût techno</td><td>Bas</td><td>Moyen</td><td>Élevé</td></tr>
+    <tr><td>Règle 4 basée sur</td><td>Mètres linéaires</td><td>Mètres linéaires</td><td>Nombre de frigos</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>10. Points d’implémentation critiques (sans les bugs)</h2>
+
+<ol>
+  <li><strong>Recommandation ≠ meilleur CA</strong> : toujours appliquer l’arbre de décision en premier ; le CA sert à informer, pas à choisir la reco.</li>
+  <li><strong>Minimum 2 mètres linéaires</strong> : message d’erreur en dessous.</li>
+  <li><strong>Slider F&amp;B</strong> : pas de 10 %. Si tous les toggles catégories sont OFF → forcer 0 % ou message d’erreur.</li>
+  <li><strong>Frigo froid</strong> (Connected) : n’apparaît que si Mix F&amp;B ≥ 10 %.</li>
+  <li><strong>Frigo ambiant</strong> : n’apparaît que si Mix N-F&amp;B ≥ 10 %.</li>
+  <li><strong>Vitrine</strong> : minimum 1 obligatoire (Simply &amp; Liberty).</li>
+  <li><strong>Couleur rouge (#DC2C3E)</strong> : quand le système force automatiquement un paramètre pour rendre le résultat positif.</li>
+  <li><strong>Refresh</strong> : toute modification de paramètre doit recalculer immédiatement la solution recommandée + les 3 P&amp;L.</li>
+  <li><strong>Années de référence</strong> : uniquement 2023-2025 pour calibrer ; 2026 hors modélisation.</li>
+  <li><strong>Ventes réception</strong> : les chiffres pilotes du simulateur intègrent des ventes hors bornes → ne pas recalibrer bêtement sur le fichier ventes seul.</li>
+</ol>
+
+<!-- ============================================================ -->
+<h2>11. Synthèse de l’ordre d’exécution à coder</h2>
+
+<div class="formula-block">1. Lire paramètres hôtel (chambres, TO, ML, mix, catégories, vitrine, frigos, agencement)
+
+2. Appliquer arbre de reco → déterminer solution_recommandee
+   (Simply / Liberty / Connected)
+
+3. Pour chacune des 3 solutions :
+     a. Règle 1 – proportionnalité clients acheteurs
+     b. Règle 2 – ajustement mix
+     c. Règle 3 – ajustement catégories (+/− X %)
+     d. Règle 4 – ajustement ML ou Frigos
+     e. Calcul Marge produits (coeff 2,6 / 1,45…)
+     f. Calcul Coûts (Techno + Annexes + Agencement)
+     g. Marge nette + Amortissement
+     h. Si marge nette &lt; 0 → « Not profitable »
+
+4. Afficher :
+     - Solution recommandée en premier
+     - Résultats des 3 solutions (CA, coûts, marge, amort)
+     - Possibilité de forcer une autre solution</div>
+
+<footer>
+  Document généré le 27 juillet 2026 · Audit croisé des 3 fichiers Excel ROD<br>
+  Sources : Simulateurs + détail des coûts · Paramètres &amp; règles + projections · Analyse poids catégories / Ventes complètes
+</footer>
+
+</body>
+</html>

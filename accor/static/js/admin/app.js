@@ -26,6 +26,7 @@ import { FinalModelExplorePanel } from "./final-model-explore-panel.js";
 import { ModelEvalPanel } from "./model-eval-panel.js";
 import { RodSimPanel } from "./rod-sim-panel.js";
 import { RodExcelPanel } from "./rod-excel-panel.js";
+import { SimVsIaPanel } from "./sim-vs-ia-panel.js";
 
 export class AdminApp {
   constructor() {
@@ -36,6 +37,8 @@ export class AdminApp {
       onSelectDataset: (id) => this.datasets.selectDataset(id),
       onRodSim: () => this.rodSim.open(),
       onRodExcel: (concept) => this.rodExcel.open(concept),
+      onSimVsIa: () => this.simVsIa.open(),
+      onRodEval: () => this.simVsIa.open(),
       onModelBuild: () => this.modelBuild.open(),
       onModelExplore: () => this.modelExplore.open(),
       onModelEval: () => this.modelEval.open(),
@@ -58,6 +61,7 @@ export class AdminApp {
     );
     this.rodSim = new RodSimPanel(this.state, this.nav);
     this.rodExcel = new RodExcelPanel(this.state, this.nav);
+    this.simVsIa = new SimVsIaPanel(this.state, this.nav);
     this.modelBuild = new ModelBuildPanel(this.state, this.nav);
     this.modelExplore = new ModelExplorePanel(this.state, this.nav);
     this.finalBuild = new FinalModelBuildPanel(this.state, this.nav);
@@ -143,6 +147,7 @@ export class AdminApp {
     this.nav.wire();
     this.rodSim.wire();
     this.rodExcel.wire();
+    this.simVsIa.wire();
     this.modelBuild.wire();
     this.modelExplore.wire();
     this.finalBuild.wire();

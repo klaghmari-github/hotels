@@ -89,6 +89,20 @@
               <span class="nav-desc">Excel · dual-colonne Connected</span>
             </span>
           </button>
+          <button type="button" class="nav-item" id="nav-sim-vs-ia" data-panel="sim-vs-ia">
+            <span class="nav-icon">⚖</span>
+            <span>
+              <span class="nav-label">Simulateur vs IA</span>
+              <span class="nav-desc">Vrai · sim · préd · 3 solutions</span>
+            </span>
+          </button>
+          <button type="button" class="nav-item" id="nav-rod-eval" data-panel="rod-eval">
+            <span class="nav-icon">📊</span>
+            <span>
+              <span class="nav-label">Évaluation</span>
+              <span class="nav-desc">Pilotes 2026 · MAE / MSE</span>
+            </span>
+          </button>
 
           <div class="nav-section-label">Modèles intermédiaires</div>
           <button type="button" class="nav-item" id="nav-model-build" data-panel="model-build">
@@ -109,7 +123,7 @@
             <span class="nav-icon">📊</span>
             <span>
               <span class="nav-label">Évaluation</span>
-              <span class="nav-desc">Pred vs réel · Σ/12</span>
+              <span class="nav-desc">Pred vs réel · MAE / MSE</span>
             </span>
           </button>
 
@@ -132,7 +146,7 @@
             <span class="nav-icon">📊</span>
             <span>
               <span class="nav-label">Évaluation</span>
-              <span class="nav-desc">Pred finale vs réel · Σ/12</span>
+              <span class="nav-desc">Pred finale vs réel · MAE / MSE</span>
             </span>
           </button>
         </div>
@@ -795,13 +809,50 @@
         </div>
       </div>
 
+      <!-- ===== Simulateur vs IA (pilotes) ===== -->
+      <div id="view-sim-vs-ia" class="view hidden">
+        <header class="topbar">
+          <div class="topbar-left">
+            <h1>Simulateur vs IA</h1>
+            <p class="subtitle">
+              Pilotes · CA mensuel moyen (somme ÷ n mois dispo) · vrai · simulé · prédit
+              pour Simply, Liberty et Connected. Métriques : MAE et MSE.
+            </p>
+          </div>
+          <div class="topbar-actions">
+            <label class="field field-inline" style="margin:0">
+              <span class="muted small">Année éval</span>
+              <input type="number" id="sim-vs-ia-year" min="2020" max="2100" value="2026" style="width:5rem" />
+            </label>
+            <label class="field field-inline" style="margin:0">
+              <span class="muted small">Modèle</span>
+              <select id="sim-vs-ia-tier">
+                <option value="final" selected>Final (recommandé)</option>
+                <option value="intermediate">Intermédiaire</option>
+              </select>
+            </label>
+            <button type="button" class="btn btn-primary" id="btn-sim-vs-ia-run">Comparer</button>
+          </div>
+        </header>
+        <section class="meta-bar">
+          <span class="chip" id="sim-vs-ia-chip">—</span>
+          <span class="status" id="sim-vs-ia-status"></span>
+        </section>
+        <p class="card-hint" id="sim-vs-ia-method" style="padding:0 1rem"></p>
+        <div id="sim-vs-ia-metrics" class="rod-layout" style="padding:0.5rem 1rem;display:grid;gap:0.75rem;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr))"></div>
+        <section class="card card-wide" style="margin:0.75rem 1rem 1.5rem">
+          <h2 class="card-title">Synthèse par hôtel pilote</h2>
+          <div id="sim-vs-ia-table" class="perf-table-wrap empty">Lancez la comparaison…</div>
+        </section>
+      </div>
+
       <!-- ===== Évaluation · modèles intermédiaires ===== -->
       <div id="view-model-eval" class="view hidden">
         <header class="topbar">
           <div class="topbar-left">
             <h1 id="eval-page-title">Évaluation · modèles intermédiaires</h1>
             <p class="subtitle" id="eval-page-subtitle">
-              Multi-cibles (models/design) · pred vs réel · Σ mois / 12.
+              Multi-cibles · pred vs réel · CA mensuel moyen (Σ / n mois dispo) · MAE / MSE.
             </p>
           </div>
           <div class="topbar-actions">
@@ -864,7 +915,8 @@
           <div class="topbar-left">
             <h1 id="final-eval-page-title">Évaluation · modèle final</h1>
             <p class="subtitle" id="final-eval-page-subtitle">
-              Stacking (descriptives + pred_*) · models/final/design · pred vs réel · Σ/12.
+              Stacking (descriptives + pred_* + hotel_solution_*) · pred vs réel ·
+              CA mensuel moyen (Σ / n mois dispo) · MAE / MSE.
             </p>
           </div>
           <div class="topbar-actions">

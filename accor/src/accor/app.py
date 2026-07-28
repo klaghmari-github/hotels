@@ -590,6 +590,33 @@ def api_model_eval():
         return jsonify({"ok": False, "error": str(exc)}), 400
 
 
+@app.route("/api/rod/eval/compare", methods=["GET", "POST"])
+def api_rod_eval_compare():
+    """
+    Éval pilotes 2026 : vrai CA vs simulateur Excel vs IA (3 solutions).
+
+    Body/query : year (défaut 2026), tier (final|intermediate), model_id.
+    CA mensuel moyen = somme / n_mois disponibles. Métriques MAE + MSE.
+    """
+    try:
+        from accor.rod_compare_eval import evaluate_pilots_sim_vs_ia
+
+        body = {}
+        if request.method == "POST":
+            body = request.get_json(force=True, silent=True) or {}
+        year_raw = body.get("year", request.args.get("year", 2026))
+        year = int(year_raw) if year_raw not in (None, "") else 2026
+        tier = body.get("tier") or request.args.get("tier") or "final"
+        model_id = body.get("model_id") or request.args.get("model_id")
+        result = evaluate_pilots_sim_vs_ia(
+            year=year, tier=tier, model_id=model_id or None
+        )
+        status = 200 if result.get("ok") else 400
+        return jsonify(result), status
+    except Exception as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+
 @app.post("/api/model/build")
 def api_model_build():
     """

@@ -54,10 +54,8 @@ ID_DETAIL_CANDIDATES = [
     "brand_category",
     "Marque",
     "logo_path",
-    # Flags solution ROD (0/1) — pilotes Simply / Liberty / Connected
-    "hotel_solution_simply",
-    "hotel_solution_liberty",
-    "hotel_solution_connected",
+    # NB : hotel_solution_* sont des **features descriptives** (pas id_detail)
+    # pour que le modèle conditionne le CA à la solution installée.
     "hotel_adresse_postale_1",
     "hotel_adresse_postale_2",
     "hotel_code_postal",

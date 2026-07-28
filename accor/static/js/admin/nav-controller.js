@@ -34,7 +34,10 @@ export class NavController {
     this.navRodExcelSimply = $("#nav-rod-excel-simply");
     this.navRodExcelLiberty = $("#nav-rod-excel-liberty");
     this.navRodExcelConnected = $("#nav-rod-excel-connected");
+    this.navSimVsIa = $("#nav-sim-vs-ia");
+    this.navRodEval = $("#nav-rod-eval");
     this.navModelBuild = $("#nav-model-build");
+    this.viewSimVsIa = $("#view-sim-vs-ia");
     this.navModelExplore = $("#nav-model-explore");
     this.navFinalBuild = $("#nav-final-build");
     this.navFinalExplore = $("#nav-final-explore");
@@ -84,6 +87,8 @@ export class NavController {
       "excel-simply": this.navRodExcelSimply,
       "excel-liberty": this.navRodExcelLiberty,
       "excel-connected": this.navRodExcelConnected,
+      "sim-vs-ia": this.navSimVsIa,
+      "rod-eval": this.navRodEval,
       build: this.navModelBuild,
       explore: this.navModelExplore,
       eval: this.navModelEval,
@@ -135,6 +140,7 @@ export class NavController {
       this.viewTable,
       this.viewRodSim,
       this.viewRodExcel,
+      this.viewSimVsIa,
       this.viewModelBuild,
       this.viewModelExplore,
       this.viewModelEval,
@@ -142,6 +148,20 @@ export class NavController {
       this.viewFinalExplore,
       this.viewFinalEval,
     ].forEach((v) => v && v.classList.add("hidden"));
+  }
+
+  showSimVsIaPanel() {
+    this.state.panel = "sim-vs-ia";
+    this.hideAllViews();
+    if (this.viewSimVsIa) this.viewSimVsIa.classList.remove("hidden");
+    this.clearDatasetNavActive();
+    this.setModelNavActive("sim-vs-ia");
+  }
+
+  showRodEvalPanel() {
+    // Même vue Compare (évaluation simulateur zone)
+    this.showSimVsIaPanel();
+    this.setModelNavActive("rod-eval");
   }
 
   clearDatasetNavActive() {
@@ -248,6 +268,14 @@ export class NavController {
     if (this.navRodExcelConnected)
       this.navRodExcelConnected.addEventListener("click", () =>
         this.handlers.onRodExcel?.("CONNECTED")
+      );
+    if (this.navSimVsIa)
+      this.navSimVsIa.addEventListener("click", () =>
+        this.handlers.onSimVsIa?.()
+      );
+    if (this.navRodEval)
+      this.navRodEval.addEventListener("click", () =>
+        this.handlers.onRodEval?.()
       );
     if (this.navModelBuild)
       this.navModelBuild.addEventListener("click", this.handlers.onModelBuild);

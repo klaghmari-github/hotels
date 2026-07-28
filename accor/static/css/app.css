@@ -1369,6 +1369,16 @@ table.rx-sheet .is-not-profitable {
   padding: 0.15rem 0.45rem;
   line-height: 1.2;
 }
+/* Synthèse Simulateur vs IA — solution installée */
+#sim-vs-ia-table td.is-installed {
+  background: rgba(62, 207, 142, 0.12);
+  font-weight: 700;
+}
+/* Synthèse Simulateur vs IA — solution installée */
+#sim-vs-ia-table td.is-installed {
+  background: rgba(62, 207, 142, 0.12);
+  font-weight: 700;
+}
 .xl-hint {
   grid-column: 1 / -1;
   font-size: 0.7rem;

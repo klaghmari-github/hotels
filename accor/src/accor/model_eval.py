@@ -46,38 +46,25 @@ def _safe_float(x: Any, default: float = float("nan")) -> float:
 
 
 def _metrics_1d(y_true: np.ndarray, y_pred: np.ndarray) -> dict[str, float]:
-    from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+    """Métriques simples (public non-datascientist) : MAE + MSE (+ biais)."""
+    from sklearn.metrics import mean_absolute_error, mean_squared_error
 
     mask = np.isfinite(y_true) & np.isfinite(y_pred)
     n = int(mask.sum())
     if n == 0:
         return {
             "n": 0,
-            "rmse": float("nan"),
             "mae": float("nan"),
-            "r2": float("nan"),
-            "mape": float("nan"),
+            "mse": float("nan"),
             "bias": float("nan"),
             "mean_true": float("nan"),
             "mean_pred": float("nan"),
         }
     yt, yp = y_true[mask], y_pred[mask]
-    mape = float("nan")
-    nz = np.abs(yt) > 1e-9
-    if nz.any():
-        mape = float(np.mean(np.abs((yt[nz] - yp[nz]) / yt[nz])) * 100.0)
-    r2 = float("nan")
-    if n >= 2 and float(np.std(yt)) > 1e-12:
-        try:
-            r2 = float(r2_score(yt, yp))
-        except Exception:
-            r2 = float("nan")
     return {
         "n": n,
-        "rmse": float(np.sqrt(mean_squared_error(yt, yp))),
         "mae": float(mean_absolute_error(yt, yp)),
-        "r2": r2,
-        "mape": mape,
+        "mse": float(mean_squared_error(yt, yp)),
         "bias": float(np.mean(yp - yt)),
         "mean_true": float(np.mean(yt)),
         "mean_pred": float(np.mean(yp)),
@@ -136,14 +123,15 @@ def eval_meta(*, tier: str = "intermediate") -> dict[str, Any]:
         "n_train_rows": meta.get("n_train"),
         "models": models,
         "top_model": top,
-        "divisor_months": 12,
+        "divisor_months": "n_months_available",
+        "metrics_public": ["mae", "mse"],
         "method": (
-            "Pour chaque hotel : moyenne_mensuelle = somme(mois disponibles) / 12. "
-            "Compare moyenne predite vs moyenne reelle."
+            "CA mensuel moyen = somme(mois dispo) / n_mois_dispo (pas /12). "
+            "Metriques : MAE et MSE."
             + (
-                " Modèle final = stacking descriptives + pred_*."
+                " Modele final = stacking + hotel_solution_simply|liberty|connected."
                 if tier == "final"
-                else " Modèles intermédiaires multi-cibles."
+                else " Features descriptives incluent hotel_solution_*."
             )
         ),
     }
@@ -345,16 +333,15 @@ def evaluate_model(
             }
         )
 
-    # Aggregation hotel : somme / 12
-    DIV = 12.0
+    # Aggregation hotel : CA mensuel moyen = somme / nb mois **disponibles**
+    # (pas /12 — 2023 et 2026 souvent incomplets)
     hotel_rows: list[dict[str, Any]] = []
-    group_cols = ["hotel_code"]
     for code, g in eval_df.groupby(eval_df["hotel_code"].astype(str).str.strip()):
-        n_m = int(len(g))
+        n_m = max(int(len(g)), 1)
         s_true = float(pd.to_numeric(g["_y_true"], errors="coerce").fillna(0).sum())
         s_pred = float(pd.to_numeric(g["_y_pred"], errors="coerce").fillna(0).sum())
-        avg_true = s_true / DIV
-        avg_pred = s_pred / DIV
+        avg_true = s_true / n_m
+        avg_pred = s_pred / n_m
         name = ""
         brand = ""
         if "hotel_name" in g.columns:
@@ -399,6 +386,7 @@ def evaluate_model(
         int(m)
         for m in pd.to_numeric(eval_df.get("mois"), errors="coerce").dropna().unique()
     )
+    n_m_global = max(len(months_present), 1)
 
     return {
         "ok": True,
@@ -407,13 +395,13 @@ def evaluate_model(
         "model_name": conf_meta.get("name") or bundle.get("name") or str(model_id),
         "target": main_t,
         "eval_year": eval_year,
-        "divisor_months": int(DIV),
+        "divisor_months": "n_months_available",
         "months_present": months_present,
         "n_month_rows": int(len(eval_df)),
         "n_hotels": int(len(hotel_rows)),
         "method": (
-            f"avg_monthly = sum(cible sur mois disponibles {months_present}) / {int(DIV)}. "
-            "Comparaison hotel par hotel puis metriques globales."
+            f"CA mensuel moyen = somme(mois dispo {months_present}) / n_mois_dispo "
+            "(pas /12). Métriques : MAE et MSE uniquement."
             + (" Stacking final." if tier == "final" else "")
         ),
         "metrics_hotel_avg": metrics_hotel,
@@ -423,7 +411,7 @@ def evaluate_model(
         "totals": {
             "sum_true": round(float(np.nansum(y_true)), 4),
             "sum_pred": round(float(np.nansum(y_pred)), 4),
-            "avg_monthly_true_all": round(float(np.nansum(y_true)) / DIV, 4),
-            "avg_monthly_pred_all": round(float(np.nansum(y_pred)) / DIV, 4),
+            "avg_monthly_true_all": round(float(np.nansum(y_true)) / n_m_global, 4),
+            "avg_monthly_pred_all": round(float(np.nansum(y_pred)) / n_m_global, 4),
         },
     }

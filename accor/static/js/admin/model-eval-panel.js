@@ -149,17 +149,14 @@ export class ModelEvalPanel {
     models.forEach((m) => {
       const opt = document.createElement("option");
       opt.value = m.id || m.name;
-      let r2 = "—";
-      if (m.score_r2 != null) r2 = Number(m.score_r2).toFixed(3);
-      else if (m.metrics_eval?.mean_r2 != null)
-        r2 = Number(m.metrics_eval.mean_r2).toFixed(3);
-      else {
-        const main = m.main_target || "montant_ventes";
-        const per = m.metrics_eval?.per_target?.[main];
-        if (per?.r2 != null) r2 = Number(per.r2).toFixed(3);
-      }
+      let mae = "—";
+      const main = m.main_target || "montant_ventes";
+      const per = m.metrics_eval?.per_target?.[main];
+      if (per?.mae != null) mae = Number(per.mae).toFixed(0);
+      else if (m.metrics_eval?.mean_mae != null)
+        mae = Number(m.metrics_eval.mean_mae).toFixed(0);
       const tag = this.tier === "final" ? "final" : "inter";
-      opt.textContent = `[${tag}] ${m.name || m.id} · R² ${r2}`;
+      opt.textContent = `[${tag}] ${m.name || m.id} · MAE ${mae}`;
       sel.appendChild(opt);
     });
     if (top && (top.id || top.name)) {
@@ -230,16 +227,16 @@ export class ModelEvalPanel {
       chipN.textContent = `${tierLab} · ${res.n_hotels} hotels · ${res.n_month_rows} lignes · ${res.target}`;
     }
 
-    this.renderMetrics(this.el("metrics"), res.metrics_hotel_avg, "hotel /12");
+    this.renderMetrics(this.el("metrics"), res.metrics_hotel_avg, "hotel · mois dispo");
     const tot = res.totals || {};
     const totHost = this.el("totals");
     if (totHost) {
       totHost.classList.remove("empty");
       totHost.innerHTML = `
-        <div class="metric-box"><span class="m-label">Σ reel</span><span class="m-value">${fmtNum(tot.sum_true)}</span></div>
-        <div class="metric-box"><span class="m-label">Σ pred</span><span class="m-value">${fmtNum(tot.sum_pred)}</span></div>
-        <div class="metric-box"><span class="m-label">Moy. mens. reelle (Σ/12)</span><span class="m-value">${fmtNum(tot.avg_monthly_true_all)}</span></div>
-        <div class="metric-box good"><span class="m-label">Moy. mens. pred (Σ/12)</span><span class="m-value">${fmtNum(tot.avg_monthly_pred_all)}</span></div>
+        <div class="metric-box"><span class="m-label">Σ réel</span><span class="m-value">${fmtNum(tot.sum_true)}</span></div>
+        <div class="metric-box"><span class="m-label">Σ prédit</span><span class="m-value">${fmtNum(tot.sum_pred)}</span></div>
+        <div class="metric-box"><span class="m-label">Moy. mens. réelle (Σ/n mois)</span><span class="m-value">${fmtNum(tot.avg_monthly_true_all)}</span></div>
+        <div class="metric-box good"><span class="m-label">Moy. mens. prédite (Σ/n mois)</span><span class="m-value">${fmtNum(tot.avg_monthly_pred_all)}</span></div>
       `;
     }
 
@@ -256,14 +253,12 @@ export class ModelEvalPanel {
     }
     host.className = "metrics-grid";
     host.innerHTML = `
-      <div class="metric-box good"><span class="m-label">R² (${escapeHtml(label)})</span><span class="m-value">${fmtNum(m.r2, 3)}</span></div>
-      <div class="metric-box"><span class="m-label">RMSE</span><span class="m-value">${fmtNum(m.rmse, 2)}</span></div>
-      <div class="metric-box"><span class="m-label">MAE</span><span class="m-value">${fmtNum(m.mae, 2)}</span></div>
-      <div class="metric-box"><span class="m-label">MAPE %</span><span class="m-value">${fmtNum(m.mape, 1)}</span></div>
-      <div class="metric-box"><span class="m-label">Biais (pred−reel)</span><span class="m-value">${fmtNum(m.bias, 2)}</span></div>
-      <div class="metric-box"><span class="m-label">n hotels</span><span class="m-value">${m.n}</span></div>
-      <div class="metric-box"><span class="m-label">Moy. reelle</span><span class="m-value">${fmtNum(m.mean_true, 2)}</span></div>
-      <div class="metric-box"><span class="m-label">Moy. pred</span><span class="m-value">${fmtNum(m.mean_pred, 2)}</span></div>
+      <div class="metric-box good"><span class="m-label">MAE (${escapeHtml(label)})</span><span class="m-value">${fmtNum(m.mae, 0)}</span></div>
+      <div class="metric-box"><span class="m-label">MSE</span><span class="m-value">${fmtNum(m.mse, 0)}</span></div>
+      <div class="metric-box"><span class="m-label">Biais (préd − réel)</span><span class="m-value">${fmtNum(m.bias, 0)}</span></div>
+      <div class="metric-box"><span class="m-label">n hôtels</span><span class="m-value">${m.n}</span></div>
+      <div class="metric-box"><span class="m-label">Moy. réelle</span><span class="m-value">${fmtNum(m.mean_true, 0)}</span></div>
+      <div class="metric-box"><span class="m-label">Moy. prédite</span><span class="m-value">${fmtNum(m.mean_pred, 0)}</span></div>
     `;
   }
 
