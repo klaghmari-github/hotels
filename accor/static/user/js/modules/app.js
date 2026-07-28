@@ -41,16 +41,18 @@ class DirectorApp {
     this.hotelIndex = [];
     this.sessionHotels = [];
     this._acHighlight = -1;
-    this._toggles = {
-      has_pool: false,
-      has_vitrine: false,
-    };
+    /** Valeurs hotel_params (saisie / préremplissage) */
+    this.hotelParams = {};
+    this.hotelParamsDefaults = {};
+    this._hotelFormBuilt = false;
   }
 
   async init() {
     try {
       this.meta = await api.get("/api/rod/meta");
       this.renderNeeds(this.meta);
+      this.hotelParamsDefaults = this.meta.hotel_params_defaults || {};
+      this.renderHotelParamsForm(this.meta.hotel_form);
       const d = this.meta.defaults || {};
       this.setMLin(d.m_lin ?? 6);
       this.setMix(Math.round((d.mix_fb ?? 0.7) * 100));
@@ -275,14 +277,6 @@ class DirectorApp {
     $("#needs-all-on")?.addEventListener("click", () => this.setAllNeeds(true));
     $("#needs-all-off")?.addEventListener("click", () => this.setAllNeeds(false));
 
-    // Toggles booléens (piscine / vitrine)
-    $$("[data-toggle]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const key = btn.dataset.toggle;
-        this.setToggle(key, !this._toggles[key]);
-      });
-    });
-
     // Onglets résultats
     $$("[data-result-tab]").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -291,12 +285,177 @@ class DirectorApp {
     });
   }
 
-  setToggle(key, on) {
-    this._toggles[key] = !!on;
-    const btn = document.querySelector(`[data-toggle="${key}"]`);
+  /**
+   * Construit le formulaire paramètres de base (toutes variables hotel_data utiles).
+   */
+  renderHotelParamsForm(formMeta) {
+    const host = $("#hotel-params-form");
+    if (!host) return;
+    const sections = (formMeta && formMeta.sections) || [];
+    if (!sections.length) {
+      host.innerHTML =
+        '<p class="muted">Schéma paramètres indisponible — rechargez la page.</p>';
+      return;
+    }
+    host.innerHTML = sections
+      .map((sec) => {
+        const fields = sec.fields || [];
+        const bools = fields.filter((f) => f.kind === "bool");
+        const nums = fields.filter((f) => f.kind !== "bool");
+        const numHtml = nums.length
+          ? `<div class="wiz-grid-3">${nums
+              .map((f) => {
+                const min =
+                  f.min != null ? ` min="${f.min}"` : "";
+                const max =
+                  f.max != null ? ` max="${f.max}"` : "";
+                const step =
+                  f.step != null ? ` step="${f.step}"` : ' step="any"';
+                return `<label class="field field-float" data-field="${escapeHtml(
+                  f.id
+                )}">
+                <span>${escapeHtml(f.label)}${
+                  f.hint
+                    ? ` <em class="field-hint" title="${escapeHtml(
+                        f.hint
+                      )}">?</em>`
+                    : ""
+                }</span>
+                <input type="number" data-hp="${escapeHtml(
+                  f.id
+                )}" data-kind="${escapeHtml(f.kind)}"${min}${max}${step} />
+              </label>`;
+              })
+              .join("")}</div>`
+          : "";
+        const boolHtml = bools.length
+          ? `<div class="toggle-grid hotel-params-toggles">${bools
+              .map(
+                (f) => `<button type="button" class="toggle-row" role="switch"
+                aria-checked="false" data-hp-bool="${escapeHtml(f.id)}"
+                title="${escapeHtml(f.hint || f.label)}">
+                <span class="toggle-icon" aria-hidden="true">●</span>
+                <span class="toggle-copy">
+                  <strong>${escapeHtml(f.label)}</strong>
+                  ${
+                    f.hint
+                      ? `<em>${escapeHtml(f.hint)}</em>`
+                      : ""
+                  }
+                </span>
+                <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+              </button>`
+              )
+              .join("")}</div>`
+          : "";
+        return `<section class="form-block" data-section="${escapeHtml(
+          sec.id
+        )}">
+          <header class="form-block-head">
+            <h2 class="wiz-section-title">${escapeHtml(sec.label)}</h2>
+          </header>
+          ${numHtml}
+          ${boolHtml}
+        </section>`;
+      })
+      .join("");
+
+    host.querySelectorAll("[data-hp-bool]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const on = btn.getAttribute("aria-checked") !== "true";
+        this._setHpBool(btn.dataset.hpBool, on, btn);
+        // Contrat franchise / managé mutuellement exclusifs
+        if (on && btn.dataset.hpBool === "hotel_contrat_type_franchise") {
+          this._setHpBool("hotel_contrat_type_manage", false);
+        }
+        if (on && btn.dataset.hpBool === "hotel_contrat_type_manage") {
+          this._setHpBool("hotel_contrat_type_franchise", false);
+        }
+      });
+    });
+    this._hotelFormBuilt = true;
+  }
+
+  _setHpBool(id, on, btnEl) {
+    const btn =
+      btnEl || document.querySelector(`[data-hp-bool="${id}"]`);
     if (!btn) return;
     btn.classList.toggle("is-on", !!on);
     btn.setAttribute("aria-checked", on ? "true" : "false");
+    this.hotelParams[id] = !!on;
+  }
+
+  /**
+   * Préremplit le formulaire : valeur hôtel si présente, sinon défaut
+   * (majorité bool / moyenne num). Rates affichés en %.
+   */
+  applyHotelParams(rawParams, defaults) {
+    const raw = rawParams || {};
+    const def = defaults || this.hotelParamsDefaults || {};
+    this.hotelParams = {};
+    const fields = (this.meta?.hotel_form?.fields || []);
+    for (const f of fields) {
+      let v = raw[f.id];
+      const fromHotel = v != null && v !== "";
+      if (!fromHotel) v = def[f.id];
+      if (f.kind === "bool") {
+        const on = !!v;
+        this._setHpBool(f.id, on);
+        const btn = document.querySelector(`[data-hp-bool="${f.id}"]`);
+        if (btn) btn.classList.toggle("is-default", !fromHotel);
+        continue;
+      }
+      const input = document.querySelector(`[data-hp="${f.id}"]`);
+      if (!input) continue;
+      let display = v;
+      if (f.kind === "rate" && display != null && display !== "") {
+        let n = Number(display);
+        if (!Number.isNaN(n) && n <= 1) n *= 100;
+        display = Math.round(n * 10) / 10;
+      } else if (f.kind === "int" && display != null && display !== "") {
+        display = Math.round(Number(display));
+      } else if (f.kind === "float" && display != null && display !== "") {
+        display = Number(display);
+      }
+      input.value =
+        display == null || display === "" || Number.isNaN(Number(display))
+          ? ""
+          : String(display);
+      input.classList.toggle("is-default", !fromHotel);
+      this.hotelParams[f.id] = fromHotel ? raw[f.id] : def[f.id];
+    }
+  }
+
+  collectHotelParams() {
+    const out = {};
+    const fields = (this.meta?.hotel_form?.fields || []);
+    for (const f of fields) {
+      if (f.kind === "bool") {
+        const btn = document.querySelector(`[data-hp-bool="${f.id}"]`);
+        out[f.id] = btn
+          ? btn.getAttribute("aria-checked") === "true"
+          : !!this.hotelParams[f.id];
+        continue;
+      }
+      const input = document.querySelector(`[data-hp="${f.id}"]`);
+      if (!input) continue;
+      const raw = input.value;
+      if (raw === "" || raw == null) {
+        // laisse le backend appliquer majorité / moyenne
+        continue;
+      }
+      let n = Number(raw);
+      if (Number.isNaN(n)) continue;
+      if (f.kind === "rate") {
+        if (n > 1) n = n / 100;
+        out[f.id] = n;
+      } else if (f.kind === "int") {
+        out[f.id] = Math.round(n);
+      } else {
+        out[f.id] = n;
+      }
+    }
+    return out;
   }
 
   onSearch() {
@@ -418,26 +577,9 @@ class DirectorApp {
         hotel_name: id.hotel_name || id.name || "",
         hotel_brand: id.hotel_brand || id.brand || "",
         hotel_city: id.hotel_city || id.city || "",
-        nb_chambres: op.nb_chambres ?? ind.nb_chambres ?? id.hotel_nb_chambres,
-        taux_occupation:
-          op.taux_occupation ?? ind.taux_occupation ?? id.hotel_to_annuel,
-        guests_per_chambre:
-          op.guests_per_chambre ?? ind.guests_per_chambre ?? 1.7,
-        derniere_reno: op.derniere_reno ?? ind.derniere_reno ?? null,
-        nb_restaurants:
-          op.nb_restaurants ??
-          ind.nb_restaurants ??
-          services.nb_restaurants ??
-          (services.restaurant ? 1 : 0),
-        nb_bars:
-          op.nb_bars ?? ind.nb_bars ?? services.nb_bars ?? (services.bar ? 1 : 0),
-        has_pool: !!(op.has_pool ?? ind.has_pool ?? services.pool),
-        has_vitrine: !!(
-          op.has_vitrine ??
-          ind.has_vitrine ??
-          services.lobby_fridge ??
-          services.has_vitrine
-        ),
+        hotel_params: ctx.hotel_params || {},
+        hotel_params_defaults:
+          ctx.hotel_params_defaults || this.hotelParamsDefaults || {},
         m_lin: ind.m_lin ?? corner.m_lin ?? null,
         mix_fb: ind.mix_fb ?? corner.mix_fb ?? null,
         client_needs: profile.client_needs || ind.client_needs || null,
@@ -509,34 +651,13 @@ class DirectorApp {
         <span class="hl-name">${escapeHtml(this.hotel.hotel_name || "")}</span>
         ${meta ? `<span class="hl-meta">${escapeHtml(meta)}</span>` : ""}`;
     }
-    if (this.hotel.nb_chambres != null)
-      $("#nb_chambres").value = String(Math.round(Number(this.hotel.nb_chambres)));
-    if (this.hotel.taux_occupation != null) {
-      let to = Number(this.hotel.taux_occupation);
-      if (to <= 1) to *= 100;
-      $("#taux_occupation").value = String(Math.round(to * 10) / 10);
+    if (!this._hotelFormBuilt && this.meta?.hotel_form) {
+      this.renderHotelParamsForm(this.meta.hotel_form);
     }
-    if (this.hotel.guests_per_chambre != null)
-      $("#guests_per_chambre").value = String(
-        Number(this.hotel.guests_per_chambre).toFixed(1)
-      );
-
-    if (this.hotel.derniere_reno != null && this.hotel.derniere_reno !== "")
-      $("#derniere_reno").value = String(Math.round(Number(this.hotel.derniere_reno)));
-    else if ($("#derniere_reno")) $("#derniere_reno").value = "";
-
-    if (this.hotel.nb_restaurants != null)
-      $("#nb_restaurants").value = String(
-        Math.max(0, Math.round(Number(this.hotel.nb_restaurants)))
-      );
-    else if ($("#nb_restaurants")) $("#nb_restaurants").value = "0";
-
-    if (this.hotel.nb_bars != null)
-      $("#nb_bars").value = String(Math.max(0, Math.round(Number(this.hotel.nb_bars))));
-    else if ($("#nb_bars")) $("#nb_bars").value = "0";
-
-    this.setToggle("has_pool", !!this.hotel.has_pool);
-    this.setToggle("has_vitrine", !!this.hotel.has_vitrine);
+    this.applyHotelParams(
+      this.hotel.hotel_params || {},
+      this.hotel.hotel_params_defaults || this.hotelParamsDefaults
+    );
   }
 
   fillStep3FromHotel() {
@@ -629,27 +750,20 @@ class DirectorApp {
   }
 
   collectBody() {
-    const toRaw = $("#taux_occupation")?.value;
-    let to = toRaw === "" || toRaw == null ? null : Number(toRaw);
-    if (to != null && to > 1) to = to / 100;
-    const renoRaw = $("#derniere_reno")?.value;
-    const derniere_reno =
-      renoRaw === "" || renoRaw == null ? null : Number(renoRaw);
+    const hotel_params = this.collectHotelParams();
     return {
       hotel_code: ($("#hotel_code")?.value || this.hotel?.hotel_code || "").trim(),
       hotel_name: this.hotel?.hotel_name || "",
       hotel_brand: this.hotel?.hotel_brand || "",
-      nb_chambres: Number($("#nb_chambres")?.value) || null,
-      taux_occupation: to,
-      guests_per_chambre: Number($("#guests_per_chambre")?.value) || null,
-      derniere_reno:
-        derniere_reno != null && !Number.isNaN(derniere_reno)
-          ? Math.round(derniere_reno)
-          : null,
-      nb_restaurants: Math.max(0, Number($("#nb_restaurants")?.value) || 0),
-      nb_bars: Math.max(0, Number($("#nb_bars")?.value) || 0),
-      has_pool: !!this._toggles.has_pool,
-      has_vitrine: !!this._toggles.has_vitrine,
+      hotel_params,
+      // aliases plats (rétrocompat API)
+      nb_chambres: hotel_params.hotel_nb_chambres ?? null,
+      taux_occupation: hotel_params.hotel_to_annuel ?? null,
+      guests_per_chambre: hotel_params.guests_per_chambre ?? null,
+      derniere_reno: hotel_params.hotel_derniere_reno ?? null,
+      nb_restaurants: hotel_params.hotel_f_b_restaurant ?? null,
+      has_pool: !!hotel_params.hotel_non_f_b_piscine,
+      has_vitrine: !!hotel_params.hotel_dispo_dans_lobby_vitrine_refrigeree,
       m_lin: Number($("#m_lin")?.value) || 6,
       mix_fb: (Number($("#mix_fb")?.value) || 70) / 100,
       client_needs: this.collectNeeds(),

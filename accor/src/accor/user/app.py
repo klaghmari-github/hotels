@@ -85,6 +85,15 @@ def meta():
         }
     base["concepts"] = concepts
     base["model_defaults"] = _catalog.model_defaults()
+    # Formulaire paramètres de base (hotel_data) + défauts majorité/moyenne
+    try:
+        from accor.user.hotel_form import compute_global_defaults, schema_for_api
+
+        base["hotel_form"] = schema_for_api()
+        base["hotel_params_defaults"] = compute_global_defaults()
+    except Exception as exc:  # noqa: BLE001
+        base["hotel_form"] = {"sections": [], "fields": [], "error": str(exc)}
+        base["hotel_params_defaults"] = {}
     return jsonify(base)
 
 

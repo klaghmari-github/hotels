@@ -122,6 +122,10 @@ class HotelContext:
     indicators: dict[str, Any] = field(default_factory=dict)
     sources: dict[str, str] = field(default_factory=dict)
     warnings: list[str] = field(default_factory=list)
+    # Paramètres hotel_data pour le formulaire (null si non renseigné)
+    hotel_params: dict[str, Any] = field(default_factory=dict)
+    # Défauts population (majorité bool / moyenne num)
+    hotel_params_defaults: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -135,6 +139,7 @@ class HotelContext:
             "client_profile": self.client_profile,
             "corner": self.corner,
             "indicators": self.indicators,
+            "hotel_params": self.hotel_params,
         }
 
 
@@ -615,6 +620,31 @@ class HotelContextBuilder:
         if scraped_meta:
             sources["scrape"] = scraped_meta
 
+        # Paramètres formulaire : colonnes hotel_data (+ guests synthétique)
+        from accor.user.hotel_form import (
+            compute_global_defaults,
+            extract_row_params,
+        )
+
+        hotel_params = extract_row_params(row if row else {})
+        hotel_params["guests_per_chambre"] = guests
+        # Préférer model_data pour quelques attributs si hotel_data vide
+        for col in (
+            "hotel_nb_chambres",
+            "hotel_to_annuel",
+            "hotel_derniere_reno",
+            "hotel_f_b_restaurant",
+            "hotel_f_b_bar",
+            "hotel_non_f_b_piscine",
+            "hotel_dispo_dans_lobby_vitrine_refrigeree",
+        ):
+            if hotel_params.get(col) is None and md_stats.get(col) is not None:
+                hotel_params[col] = md_stats.get(col)
+        if hotel_params.get("hotel_nb_chambres") is None:
+            hotel_params["hotel_nb_chambres"] = nb_chambres
+        if hotel_params.get("hotel_to_annuel") is None:
+            hotel_params["hotel_to_annuel"] = taux_occupation
+
         return HotelContext(
             hotel_code=code,
             identity=identity,
@@ -646,6 +676,8 @@ class HotelContextBuilder:
             indicators=indicators,
             sources=sources,
             warnings=warnings,
+            hotel_params=hotel_params,
+            hotel_params_defaults=compute_global_defaults(),
         )
 
     def _aggregate_model(self, frame: pd.DataFrame) -> dict[str, Any]:

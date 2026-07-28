@@ -1366,3 +1366,53 @@ body.rod-body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Paramètres hotel_data (étape 2) */
+.form-prefill-hint {
+  margin: 0 0 1rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+.form-prefill-hint strong {
+  color: var(--ink-soft, #c5ced9);
+  font-weight: 600;
+}
+.hotel-params-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  max-height: min(62vh, 720px);
+  overflow: auto;
+  padding-right: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+.hotel-params-form .form-block {
+  margin: 0;
+}
+.hotel-params-toggles {
+  margin-top: 0.55rem;
+}
+.hotel-params-form input.is-default {
+  border-style: dashed;
+  opacity: 0.95;
+}
+.hotel-params-form .toggle-row.is-default {
+  opacity: 0.9;
+}
+.field-hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 0.95rem;
+  height: 0.95rem;
+  border-radius: 50%;
+  font-size: 0.65rem;
+  font-style: normal;
+  font-weight: 700;
+  background: rgba(212, 175, 55, 0.15);
+  color: var(--accent, #d4af37);
+  cursor: help;
+  vertical-align: middle;
+  margin-left: 0.2rem;
+}

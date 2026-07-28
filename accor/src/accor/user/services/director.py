@@ -93,53 +93,44 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
     """
     Calcule les 3 solutions pour un hôtel.
 
-    Body attendu (champs optionnels sauf hotel_code) — tous collectés avant
-    calcul, sans distinction sim / IA côté UI :
+    Body attendu (champs optionnels sauf hotel_code) :
 
       hotel_code, hotel_name, hotel_brand,
-      nb_chambres, taux_occupation, guests_per_chambre,
-      derniere_reno, nb_restaurants, nb_bars, has_pool,
-      m_lin, mix_fb, has_vitrine, client_needs
+      hotel_params (dict colonnes hotel_data + guests_per_chambre),
+      m_lin, mix_fb, client_needs
+      (+ aliases plats legacy : nb_chambres, has_pool, …)
     """
+    from accor.user.hotel_form import (
+        params_to_feature_overrides,
+        params_to_services,
+        resolve_params,
+    )
+    from accor.user.models import DEFAULT_CLIENT_NEEDS
+    from accor.user.rules.coeffs import RULE3_FB_COEFFS, RULE3_NFB_COEFFS
+
     code = str(body.get("hotel_code") or "").strip()
     if not code:
         return {"ok": False, "error": "Indiquez un code hôtel."}
 
-    # Contexte fiche (sans écrire en base)
     identity_name = str(body.get("hotel_name") or "").strip()
     identity_brand = str(body.get("hotel_brand") or "").strip()
-    def_n, def_to, def_g = 100.0, 0.7, 1.7
-    def_vitrine = False
-    def_reno: int | None = None
-    def_restos, def_bars = 0, 0
-    def_pool = False
+    hotel_values: dict[str, Any] = {}
     def_m_lin = 6.0
     def_mix = 0.70
+    def_g = 1.7
     try:
         from accor.user.services.hotel_context import HotelContextBuilder
 
         ctx = HotelContextBuilder().build(code, fetch_if_missing=True)
         ident = ctx.identity or {}
-        op0 = ctx.operating if isinstance(ctx.operating, dict) else {}
         ind0 = ctx.indicators if isinstance(ctx.indicators, dict) else {}
         if not identity_name:
             identity_name = str(ident.get("hotel_name") or "")
         if not identity_brand:
             identity_brand = str(ident.get("hotel_brand") or "")
-        def_n = float(op0.get("nb_chambres") or 100) or 100.0
-        def_to = float(op0.get("taux_occupation") or 0.7) or 0.7
-        def_g = float(op0.get("guests_per_chambre") or 1.7) or 1.7
-        def_reno = _i(op0.get("derniere_reno") or ind0.get("derniere_reno"), None)
-        def_restos = max(0, _i(op0.get("nb_restaurants") or ind0.get("nb_restaurants"), 0) or 0)
-        def_bars = max(0, _i(op0.get("nb_bars") or ind0.get("nb_bars"), 0) or 0)
-        def_pool = bool(op0.get("has_pool") if "has_pool" in op0 else ind0.get("has_pool"))
-        services0 = ctx.services if isinstance(ctx.services, dict) else {}
-        def_vitrine = bool(
-            op0.get("has_vitrine")
-            or services0.get("lobby_fridge")
-            or services0.get("has_vitrine")
-            or def_vitrine
-        )
+        hotel_values = dict(ctx.hotel_params or {})
+        op0 = ctx.operating if isinstance(ctx.operating, dict) else {}
+        def_g = float(op0.get("guests_per_chambre") or def_g) or def_g
         if ind0.get("m_lin") is not None:
             def_m_lin = float(ind0["m_lin"]) or 6.0
         elif (ctx.corner or {}).get("m_lin") is not None:
@@ -149,47 +140,45 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
     except Exception:
         pass
 
-    n = _f(body.get("nb_chambres"), def_n) or def_n
-    to = _f(body.get("taux_occupation"), def_to) or def_to
+    # Saisie user (hotel_params) + aliases plats rétrocompat
+    user_params: dict[str, Any] = {}
+    if isinstance(body.get("hotel_params"), dict):
+        user_params.update(body["hotel_params"])
+    alias = {
+        "hotel_nb_chambres": body.get("nb_chambres"),
+        "hotel_to_annuel": body.get("taux_occupation"),
+        "guests_per_chambre": body.get("guests_per_chambre"),
+        "hotel_derniere_reno": body.get("derniere_reno"),
+        "hotel_f_b_restaurant": body.get("nb_restaurants"),
+        "hotel_f_b_bar": body.get("nb_bars") if body.get("nb_bars") is not None else body.get("has_bar"),
+        "hotel_non_f_b_piscine": body.get("has_pool"),
+        "hotel_dispo_dans_lobby_vitrine_refrigeree": body.get("has_vitrine"),
+    }
+    for k, v in alias.items():
+        if v is not None and v != "" and k not in user_params:
+            user_params[k] = v
+
+    params = resolve_params(hotel_values, user_params, guests_fallback=def_g)
+    n = float(params.get("hotel_nb_chambres") or 100) or 100.0
+    to = float(params.get("hotel_to_annuel") or 0.7) or 0.7
     if to > 1.0:
         to /= 100.0
-    g = _f(body.get("guests_per_chambre"), def_g) or def_g
+    g = float(params.get("guests_per_chambre") or def_g) or def_g
     m_lin = _f(body.get("m_lin"), def_m_lin) or def_m_lin
+    # m_lin corner dédié si fourni dans params et pas dans body
+    if body.get("m_lin") in (None, "") and params.get("hotel_metres_lineaires_dedies_corner"):
+        m_lin = float(params["hotel_metres_lineaires_dedies_corner"]) or m_lin
     mix_fb = _f(body.get("mix_fb"), def_mix) or def_mix
     if mix_fb > 1.0:
         mix_fb /= 100.0
     mix_fb = min(max(mix_fb, 0.0), 1.0)
 
-    has_vitrine = body.get("has_vitrine")
-    if has_vitrine is None:
-        has_vitrine = def_vitrine
-    else:
-        has_vitrine = bool(has_vitrine)
-
-    has_pool = body.get("has_pool")
-    if has_pool is None:
-        has_pool = def_pool
-    else:
-        has_pool = bool(has_pool)
-
-    derniere_reno = _i(
-        body.get("derniere_reno") if body.get("derniere_reno") not in (None, "") else def_reno,
-        def_reno,
-    )
-    if derniere_reno is not None and (derniere_reno < 1950 or derniere_reno > 2100):
-        derniere_reno = def_reno
-
-    if body.get("nb_restaurants") is not None and body.get("nb_restaurants") != "":
-        nb_restaurants = max(0, _i(body.get("nb_restaurants"), 0) or 0)
-    else:
-        nb_restaurants = def_restos
-    if body.get("nb_bars") is not None and body.get("nb_bars") != "":
-        nb_bars = max(0, _i(body.get("nb_bars"), 0) or 0)
-    else:
-        nb_bars = def_bars
-
-    from accor.user.models import DEFAULT_CLIENT_NEEDS
-    from accor.user.rules.coeffs import RULE3_FB_COEFFS, RULE3_NFB_COEFFS
+    services_map = params_to_services(params)
+    has_vitrine = bool(services_map.get("lobby_fridge") or services_map.get("has_vitrine"))
+    has_pool = bool(services_map.get("pool") or services_map.get("has_pool"))
+    nb_restaurants = int(services_map.get("nb_restaurants") or 0)
+    nb_bars = int(services_map.get("nb_bars") or 0)
+    derniere_reno = _i(params.get("hotel_derniere_reno"), None)
 
     needs = dict(DEFAULT_CLIENT_NEEDS)
     raw_needs = body.get("client_needs") if isinstance(body.get("client_needs"), dict) else {}
@@ -198,6 +187,17 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
     for k in list(RULE3_FB_COEFFS) + list(RULE3_NFB_COEFFS):
         needs.setdefault(k, False)
 
+    # Clientèle % depuis hotel_params si fournis
+    profile_kw: dict[str, Any] = {"client_needs": dict(needs)}
+    if params.get("hotel_loisirs_pct") is not None:
+        profile_kw["loisirs_pct"] = float(params["hotel_loisirs_pct"])
+    if params.get("hotel_affaires_pct") is not None:
+        profile_kw["affaires_pct"] = float(params["hotel_affaires_pct"])
+    if params.get("hotel_national_pct") is not None:
+        profile_kw["national_pct"] = float(params["hotel_national_pct"])
+    if params.get("hotel_international_pct") is not None:
+        profile_kw["international_pct"] = float(params["hotel_international_pct"])
+
     ref = RodReference()
     rev = RevenueRules(ref)
     cost = CostRules(ref)
@@ -205,6 +205,40 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
 
     sim_by: dict[str, Any] = {}
     req_for_reco: SimulationRequest | None = None
+
+    services_obj = HotelServices(
+        bar=bool(services_map.get("bar")),
+        restaurant=bool(services_map.get("restaurant")),
+        room_service=bool(services_map.get("room_service")),
+        minibar=bool(services_map.get("minibar")),
+        meeting_rooms=bool(services_map.get("meeting_rooms")),
+        gym=bool(services_map.get("gym")),
+        spa=bool(services_map.get("spa")),
+        pool=bool(has_pool),
+        parking=bool(services_map.get("parking")),
+        wifi=bool(services_map.get("wifi")),
+        clim=bool(services_map.get("clim")),
+        breakfast=bool(services_map.get("breakfast")),
+        accessible=bool(services_map.get("accessible")),
+        pets=bool(services_map.get("pets")),
+        non_smoking=bool(services_map.get("non_smoking")),
+        shuttle=bool(services_map.get("shuttle")),
+        lobby_fridge=bool(has_vitrine),
+        lobby_microwave=bool(services_map.get("lobby_microwave")),
+        lobby_water=bool(services_map.get("lobby_water")),
+        lobby_coffee=bool(services_map.get("lobby_coffee")),
+        lobby_kettle=bool(services_map.get("lobby_kettle")),
+        lobby_seating=bool(services_map.get("lobby_seating")),
+        corner_fb_caisse=bool(services_map.get("corner_fb_caisse")),
+        corner_fb_distributeur=bool(services_map.get("corner_fb_distributeur")),
+        corner_fb_frigo=bool(services_map.get("corner_fb_frigo")),
+        corner_fb_reception=bool(services_map.get("corner_fb_reception")),
+        corner_fb_snacking=bool(services_map.get("corner_fb_snacking")),
+        corner_nfb_armoire=bool(services_map.get("corner_nfb_armoire")),
+        corner_nfb_caisse=bool(services_map.get("corner_nfb_caisse")),
+        corner_nfb_distributeur=bool(services_map.get("corner_nfb_distributeur")),
+        corner_nfb_reception=bool(services_map.get("corner_nfb_reception")),
+    )
 
     for concept in CONCEPTS:
         req = SimulationRequest(
@@ -218,13 +252,8 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
                 taux_occupation=to,
                 guests_per_chambre=g,
             ),
-            services=HotelServices(
-                lobby_fridge=bool(has_vitrine),
-                bar=nb_bars > 0,
-                restaurant=nb_restaurants > 0,
-                pool=bool(has_pool),
-            ),
-            client_profile=ClientProfile(client_needs=dict(needs)),
+            services=services_obj,
+            client_profile=ClientProfile(**profile_kw),
             store=StoreConfig(
                 concept=concept,
                 m_lin=m_lin,
@@ -249,15 +278,11 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
     ai_note = ""
     ai_available = False
     ai_by: dict[str, Any] = {}
-    feature_overrides = {
-        "hotel_nb_chambres": n,
-        "hotel_to_annuel": to,
-        "hotel_derniere_reno": derniere_reno,
-        "hotel_f_b_restaurant": nb_restaurants,
-        "hotel_f_b_bar": nb_bars,
-        "hotel_non_f_b_piscine": 1 if has_pool else 0,
-        "hotel_dispo_dans_lobby_vitrine_refrigeree": 1 if has_vitrine else 0,
-    }
+    feature_overrides = params_to_feature_overrides(params)
+    feature_overrides["hotel_nb_chambres"] = n
+    feature_overrides["hotel_to_annuel"] = to
+    if derniere_reno is not None:
+        feature_overrides["hotel_derniere_reno"] = derniere_reno
     try:
         preds = _ai_predict_three(code, feature_overrides)
         if preds:
@@ -361,6 +386,7 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
             "m_lin": round(m_lin, 2),
             "mix_fb": round(mix_fb, 4),
             "mix_nf": round(1.0 - mix_fb, 4),
+            "hotel_params": params,
         },
         "recommended_solution": recommended,
         "concept_order": order,

@@ -135,73 +135,14 @@
 
           <div id="step2-hotel-line" class="wiz-hotel-line"></div>
 
-          <section class="form-block">
-            <header class="form-block-head">
-              <h2 class="wiz-section-title">Exploitation</h2>
-              <span class="form-block-hint">Capacité &amp; fréquentation</span>
-            </header>
-            <div class="wiz-grid-3">
-              <label class="field field-float">
-                <span>Nombre de chambres</span>
-                <input id="nb_chambres" type="number" min="1" max="2000" step="1" />
-              </label>
-              <label class="field field-float">
-                <span>Taux d’occupation (%)</span>
-                <input id="taux_occupation" type="number" min="1" max="100" step="0.1" />
-              </label>
-              <label class="field field-float">
-                <span>Clients par chambre</span>
-                <input id="guests_per_chambre" type="number" min="0.5" max="5" step="0.1" />
-              </label>
-            </div>
-          </section>
+          <p class="form-prefill-hint" id="hotel-params-hint">
+            Prérempli depuis la fiche hôtel. Les champs vides reçoivent la
+            <strong>valeur majoritaire</strong> (binaires) ou la
+            <strong>moyenne</strong> (numériques) du parc.
+          </p>
 
-          <section class="form-block">
-            <header class="form-block-head">
-              <h2 class="wiz-section-title">Établissement</h2>
-              <span class="form-block-hint">Profil de l’hôtel</span>
-            </header>
-            <div class="wiz-grid-3">
-              <label class="field field-float">
-                <span>Dernière rénovation (année)</span>
-                <input id="derniere_reno" type="number" min="1950" max="2100" step="1" placeholder="Ex. 2019" />
-              </label>
-              <label class="field field-float">
-                <span>Nombre de restaurants</span>
-                <input id="nb_restaurants" type="number" min="0" max="20" step="1" />
-              </label>
-              <label class="field field-float">
-                <span>Nombre de bars</span>
-                <input id="nb_bars" type="number" min="0" max="20" step="1" />
-              </label>
-            </div>
-
-            <div class="toggle-grid">
-              <button type="button" class="toggle-row" id="tog-pool" role="switch" aria-checked="false" data-toggle="has_pool">
-                <span class="toggle-icon" aria-hidden="true">◈</span>
-                <span class="toggle-copy">
-                  <strong>Piscine</strong>
-                  <em>L’établissement dispose d’une piscine</em>
-                </span>
-                <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
-              </button>
-              <button type="button" class="toggle-row" id="tog-vitrine" role="switch" aria-checked="false" data-toggle="has_vitrine">
-                <span class="toggle-icon" aria-hidden="true">▣</span>
-                <span class="toggle-copy">
-                  <strong>Vitrine réfrigérée</strong>
-                  <em>Frigo / vitrine déjà en lobby</em>
-                </span>
-                <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
-              </button>
-            </div>
-          </section>
-
-          <div class="info-banner soft">
-            <span class="info-banner-icon" aria-hidden="true">i</span>
-            <p>
-              Si une vitrine est déjà en place, le coût d’équipement n’est pas ajouté
-              pour Simply et Liberty.
-            </p>
+          <div id="hotel-params-form" class="hotel-params-form">
+            <!-- Généré dynamiquement depuis hotel_data (meta.hotel_form) -->
           </div>
 
           <div class="wiz-actions">
