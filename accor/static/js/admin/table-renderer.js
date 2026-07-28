@@ -6,6 +6,7 @@
  */
 
 import { $, escapeHtml } from "../../shared/js/dom.js";
+import { appBase } from "../../shared/js/api.js";
 
 export class TableRenderer {
   /**
@@ -25,7 +26,7 @@ export class TableRenderer {
     if (!relpath) return "";
     let s = String(relpath).trim().replace(/\\/g, "/");
     if (!s || s === "nan" || s === "None" || s === "null") return "";
-    if (/^https?:\/\//i.test(s) || s.startsWith("/api/")) return s;
+    if (/^https?:\/\//i.test(s) || s.startsWith("/api/") || s.startsWith("/studio/api/")) return s;
     s = s.replace(/^\/+/, "").replace(/^\.\/+/, "");
     s = s.replace(/^data\/marques\//i, "").replace(/^marques\//i, "");
     const encoded = s
@@ -33,7 +34,7 @@ export class TableRenderer {
       .filter(Boolean)
       .map((seg) => encodeURIComponent(seg))
       .join("/");
-    return `/api/marques/logos/${encoded}`;
+    return `${appBase()}/api/marques/logos/${encoded}`;
   }
 
   renderModelDataStats(payload) {

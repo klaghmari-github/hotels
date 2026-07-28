@@ -5,6 +5,12 @@ watchdog status : UP · interval=60s · ports dev=5500 admin=5055 user=5056
 
 # Accor ROD
 
+> **Deux déploiements**
+> - **Client (prod)** : https://rod-ia.adixon-dev.fr/ (user) · https://rod-ia.adixon-dev.fr/studio/ (admin)
+> - **Lab / agent (tunnels gratuits)** : URLs Cloudflare en tête de ce README (`run_dev` = console pour parler à Grok)
+> - Détail : [docs/PRODUCTION_URLS.md](docs/PRODUCTION_URLS.md)
+
+
 Deux applications Flask qui partagent le même package Python `accor` et les
 mêmes fichiers sous `data/` / `models/` :
 

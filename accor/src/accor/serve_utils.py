@@ -76,14 +76,55 @@ def print_listen_banner(app_name: str, host: str, port: int) -> None:
     print(f"{'═' * 56}\n")
 
 
+class PrefixMiddleware:
+    """
+    Monte l'app Flask sous un préfixe d'URL (ex. ``/studio``).
+
+    Apache reverse-proxy envoie ``/studio/...`` ; on expose SCRIPT_NAME
+    et on réduit PATH_INFO pour les routes Flask internes.
+    """
+
+    def __init__(self, wsgi_app: Any, prefix: str) -> None:
+        self.wsgi_app = wsgi_app
+        p = (prefix or "").strip().rstrip("/")
+        self.prefix = p if p.startswith("/") else (f"/{p}" if p else "")
+
+    def __call__(self, environ: dict, start_response: Any) -> Any:
+        if not self.prefix:
+            return self.wsgi_app(environ, start_response)
+        path = environ.get("PATH_INFO") or ""
+        if path == self.prefix or path.startswith(self.prefix + "/"):
+            environ["SCRIPT_NAME"] = (
+                (environ.get("SCRIPT_NAME") or "").rstrip("/") + self.prefix
+            )
+            rest = path[len(self.prefix) :] or "/"
+            environ["PATH_INFO"] = rest
+        return self.wsgi_app(environ, start_response)
+
+
+def apply_url_prefix(app: Any) -> None:
+    """Applique ``ACCOR_URL_PREFIX`` sur ``app.wsgi_app`` si défini."""
+    import os
+
+    prefix = (os.environ.get("ACCOR_URL_PREFIX") or "").strip()
+    if not prefix:
+        return
+    if not prefix.startswith("/"):
+        prefix = "/" + prefix
+    prefix = prefix.rstrip("/") or prefix
+    app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix)
+
+
 def run_flask_app(app: Any, *, host: str, port: int, debug: bool = False) -> None:
     """
     Lance Flask en mode développement.
 
     ``threaded=True`` pour plusieurs clients réseau.
     Pas de reloader multi-process si host public (évite doubles binds).
+    Respecte ``ACCOR_URL_PREFIX`` (ex. admin derrière ``/studio``).
     """
     use_reloader = bool(debug) and host in ("127.0.0.1", "localhost")
+    apply_url_prefix(app)
     app.run(
         host=host,
         port=port,

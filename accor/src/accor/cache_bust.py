@@ -90,13 +90,16 @@ def rewrite_css_urls(content: str, base_file: Path, static_root: Path) -> str:
 
 def make_asset_helper(static_root: Path) -> Callable[[str], str]:
     """Pour templates Jinja : ``{{ asset('css/app.css') }}`` → ``/static/css/app.css?dt=…``."""
+    import os
+
+    prefix = (os.environ.get("ACCOR_URL_PREFIX") or "").strip().rstrip("/")
 
     def asset(rel: str) -> str:
         rel = rel.lstrip("/")
         if rel.startswith("static/"):
             rel = rel[len("static/") :]
         path = static_root / rel
-        return with_dt(f"/static/{rel}", file_dt(path))
+        return with_dt(f"{prefix}/static/{rel}", file_dt(path))
 
     return asset
 
@@ -106,12 +109,19 @@ def register_cache_bust(app: Flask, static_root: Path) -> None:
     * ``asset()`` dans les templates
     * route ``/static/<path>`` qui réécrit imports JS/CSS avec ``?dt=``
     """
+    import os
+
     static_root = Path(static_root).resolve()
     asset = make_asset_helper(static_root)
+    url_prefix = (os.environ.get("ACCOR_URL_PREFIX") or "").strip().rstrip("/")
 
     @app.context_processor
     def _inject_asset():
-        return {"asset": asset, "static_dt": asset}
+        return {
+            "asset": asset,
+            "static_dt": asset,
+            "url_prefix": url_prefix,
+        }
 
     # Remplace l'envoi static Flask par une version cache-bust
     @app.route("/static/<path:filename>")

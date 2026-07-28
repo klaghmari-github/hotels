@@ -6,14 +6,26 @@
  * Doc : docs/FRONT.md
  */
 
+/** Préfixe URL (ex. /studio) — meta[name=accor-base] ou window.ACCOR_BASE. */
+export function appBase() {
+  if (typeof window !== "undefined" && window.ACCOR_BASE != null) {
+    return String(window.ACCOR_BASE).replace(/\/$/, "");
+  }
+  if (typeof document !== "undefined") {
+    const m = document.querySelector('meta[name="accor-base"]');
+    if (m && m.content) return String(m.content).replace(/\/$/, "");
+  }
+  return "";
+}
+
 export class ApiClient {
   /**
    * @param {object} [opts]
-   * @param {string} [opts.base] prefixe optionnel
+   * @param {string} [opts.base] prefixe optionnel (défaut : appBase())
    * @param {object} [opts.defaultHeaders]
    */
-  constructor({ base = "", defaultHeaders = {} } = {}) {
-    this.base = base.replace(/\/$/, "");
+  constructor({ base, defaultHeaders = {} } = {}) {
+    this.base = (base != null ? base : appBase()).replace(/\/$/, "");
     this.defaultHeaders = {
       "Content-Type": "application/json",
       Accept: "application/json",

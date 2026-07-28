@@ -15,6 +15,7 @@ Index des docs détaillées. Le point d’entrée reste le
 | [ROD_EXCEL_SIM.md](ROD_EXCEL_SIM.md) | **Simulateur Excel** — réf. par solution, dual-colonne, R1–R4, reco |
 | [MODEL.md](MODEL.md) | Intermédiaires, final (stacking), explore, éval ML |
 | [DEPLOY.md](DEPLOY.md) | **Plan de déploiement** VPS (Apache/PM2, packages versionnés, user-only) — plan only |
+| [PRODUCTION_URLS.md](PRODUCTION_URLS.md) | **URLs prod** user + admin |
 
 Les docstrings en tête de chaque module Python / fichier JS reprennent
 l’essentiel ; en cas d’écart, le code fait foi.
