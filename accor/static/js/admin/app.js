@@ -4,7 +4,7 @@
  * Modules ES (pas de bundler) :
  *   shared/  → dom, api, toast, loading, format
  *   admin/   → state, nav, table, datasets,
- *              rod-sim, model build / explore / eval
+ *              excel sim (Simply/Liberty/Connected), model build / explore / eval
  *
  * HTML : templates/index.html
  * API  : /api/datasets/* , /api/model/* , /api/rod/*
@@ -24,7 +24,6 @@ import { ModelExplorePanel } from "./model-explore-panel.js";
 import { FinalModelBuildPanel } from "./final-model-build-panel.js";
 import { FinalModelExplorePanel } from "./final-model-explore-panel.js";
 import { ModelEvalPanel } from "./model-eval-panel.js";
-import { RodSimPanel } from "./rod-sim-panel.js";
 import { RodExcelPanel } from "./rod-excel-panel.js";
 import { SimVsIaPanel } from "./sim-vs-ia-panel.js";
 
@@ -35,7 +34,6 @@ export class AdminApp {
 
     this.nav = new NavController(this.state, {
       onSelectDataset: (id) => this.datasets.selectDataset(id),
-      onRodSim: () => this.rodSim.open(),
       onRodExcel: (concept) => this.rodExcel.open(concept),
       onSimVsIa: () => this.simVsIa.open(),
       onRodEval: () => this.simVsIa.open(),
@@ -59,7 +57,6 @@ export class AdminApp {
       this.table,
       this.els
     );
-    this.rodSim = new RodSimPanel(this.state, this.nav);
     this.rodExcel = new RodExcelPanel(this.state, this.nav);
     this.simVsIa = new SimVsIaPanel(this.state, this.nav);
     this.modelBuild = new ModelBuildPanel(this.state, this.nav);
@@ -145,7 +142,6 @@ export class AdminApp {
     });
 
     this.nav.wire();
-    this.rodSim.wire();
     this.rodExcel.wire();
     this.simVsIa.wire();
     this.modelBuild.wire();

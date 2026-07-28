@@ -14,12 +14,28 @@ Source de vérité live : en-tête de [`accor/README.md`](../README.md)
 
 ## A. Production client (serveur `accor-ia`)
 
-| Application | Rôle | URL |
-|-------------|------|-----|
+| Application | Rôle | URL **opérationnelle** |
+|-------------|------|------------------------|
 | **User** | Simulateur directeur | **https://rod-ia.adixon-dev.fr/** |
 | **Admin** | Data & Model Studio | **https://rod-ia.adixon-dev.fr/studio/** |
 
-- Host : `178.62.220.14` · SSH `adixon@…`
+### URL souhaitée admin (pas encore DNS)
+
+| URL | État |
+|-----|------|
+| https://rod-ia.adixon-admin.fr/ | **Ne résout pas** (pas d’enregistrement DNS) |
+
+**À faire sur le DNS du client** (Gandi `adixon-admin.fr` ou zone concernée) :
+
+```text
+Type : A
+Host : rod-ia   (→ rod-ia.adixon-admin.fr)
+IP   : 178.62.220.14
+```
+
+Ensuite : `certbot` pour le certificat HTTPS (Apache déjà préparé pour ce `ServerName`).
+
+- Host VPS : `178.62.220.14` · SSH `adixon@…`
 - PM2 : `rod-ia-user` (:8000), `rod-ia-admin` (:8001, préfixe `/studio`)
 - README serveur : `/var/www/rod-ia/README.md`
 

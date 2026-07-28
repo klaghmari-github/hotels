@@ -14,7 +14,8 @@ Index des docs détaillées. Le point d’entrée reste le
 | [ROD_ADMIN.md](ROD_ADMIN.md) | **Simulateur ROD** admin/user (hôtel cible, éval temporelle) |
 | [ROD_EXCEL_SIM.md](ROD_EXCEL_SIM.md) | **Simulateur Excel** — réf. par solution, dual-colonne, R1–R4, reco |
 | [MODEL.md](MODEL.md) | Intermédiaires, final (stacking), explore, éval ML |
-| [DEPLOY.md](DEPLOY.md) | **Plan de déploiement** VPS (Apache/PM2, packages versionnés, user-only) — plan only |
+| [DEPLOY.md](DEPLOY.md) | Plan de déploiement VPS (historique / packages) |
+| [SYNC_ADIXON.md](SYNC_ADIXON.md) | **Sync local → Adixon** : règle local d’abord, puis `deploy_to_adixon.sh` |
 | [PRODUCTION_URLS.md](PRODUCTION_URLS.md) | **URLs prod** user + admin |
 
 Les docstrings en tête de chaque module Python / fichier JS reprennent
@@ -24,8 +25,8 @@ l’essentiel ; en cas d’écart, le code fait foi.
 
 ```
 All → Pilotes
-  → Simulateur ROD          (réf. catégorie + écart 2026)
-  → Simulateur Excel        (réf. solution · dual-colonne · voir ROD_EXCEL_SIM.md)
+  → Simulateur Simply / Liberty / Connected  (Excel dual-colonne · ROD_EXCEL_SIM.md)
+  → Simulateur vs IA · Évaluation
   → Modèles intermédiaires  (Build · Explore · Évaluation)
   → Modèle final            (Build · Explore · Évaluation)
 ```

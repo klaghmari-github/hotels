@@ -3,7 +3,7 @@
  *
  * datasets, currentId, page/pageSize/q, payload page courante,
  * dirty (Map index → row patch), selected indices, panel courant
- * (table | rod-sim | model-build | model-explore | model-eval).
+ * (table | rod-excel-* | model-build | model-explore | model-eval).
  *
  * confirmLeaveDirty() — garde-fou avant de quitter un dataset modifié.
  */

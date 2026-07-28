@@ -2,7 +2,7 @@
  * Navigation sidebar admin.
  *
  * - Datasets (All / Pilotes)
- * - Simulateur ROD
+ * - Simulateurs Excel (Simply / Liberty / Connected)
  * - Modèles intermédiaires (Build / Explore)
  * - Modèle final (Build / Explore)
  * - Éval ML
@@ -22,7 +22,6 @@ export class NavController {
     this.nav = $("#nav-tabs");
     this.navPinnedTop = $("#nav-pinned-top");
     this.viewTable = $("#view-table");
-    this.viewRodSim = $("#view-rod-sim");
     this.viewRodExcel = $("#view-rod-excel");
     this.viewModelBuild = $("#view-model-build");
     this.viewModelExplore = $("#view-model-explore");
@@ -30,7 +29,6 @@ export class NavController {
     this.viewFinalExplore = $("#view-final-explore");
     this.viewFinalEval = $("#view-final-eval");
     this.viewModelEval = $("#view-model-eval");
-    this.navRodSim = $("#nav-rod-sim");
     this.navRodExcelSimply = $("#nav-rod-excel-simply");
     this.navRodExcelLiberty = $("#nav-rod-excel-liberty");
     this.navRodExcelConnected = $("#nav-rod-excel-connected");
@@ -83,7 +81,6 @@ export class NavController {
 
   _navButtonMap() {
     return {
-      rod: this.navRodSim,
       "excel-simply": this.navRodExcelSimply,
       "excel-liberty": this.navRodExcelLiberty,
       "excel-connected": this.navRodExcelConnected,
@@ -138,7 +135,6 @@ export class NavController {
   hideAllViews() {
     [
       this.viewTable,
-      this.viewRodSim,
       this.viewRodExcel,
       this.viewSimVsIa,
       this.viewModelBuild,
@@ -181,14 +177,6 @@ export class NavController {
         el.classList.toggle("active", el.dataset.id === datasetId);
       });
     }
-  }
-
-  showRodSimPanel() {
-    this.state.panel = "rod-sim";
-    this.hideAllViews();
-    if (this.viewRodSim) this.viewRodSim.classList.remove("hidden");
-    this.clearDatasetNavActive();
-    this.setModelNavActive("rod");
   }
 
   showRodExcelPanel(concept = "SIMPLY") {
@@ -255,8 +243,6 @@ export class NavController {
   }
 
   wire() {
-    if (this.navRodSim)
-      this.navRodSim.addEventListener("click", this.handlers.onRodSim);
     if (this.navRodExcelSimply)
       this.navRodExcelSimply.addEventListener("click", () =>
         this.handlers.onRodExcel?.("SIMPLY")

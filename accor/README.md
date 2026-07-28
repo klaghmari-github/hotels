@@ -17,6 +17,9 @@ mêmes fichiers sous `data/` / `models/` :
 **Documentation détaillée** (API, modules, front, données, règles, ML) :
 voir le dossier [`docs/`](docs/README.md).
 
+**Sync prod Adixon** : modifications en **local d’abord**, puis  
+`./scripts/deploy_to_adixon.sh` — détail [docs/SYNC_ADIXON.md](docs/SYNC_ADIXON.md).
+
 | App | Port | Rôle |
 |-----|------|------|
 | **Admin** — Data & Model Studio | 5055 | Excel, Simulateur ROD (trace pilotes), entraîner / explorer / éval ML / déployer |
