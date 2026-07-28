@@ -239,7 +239,6 @@ HOTEL_FORM_FIELDS: list[HotelFormField] = [
         "bool",
         "Vitrine réfrigérée",
         "lobby",
-        hint="Si déjà présente, le coût vitrine n’est pas ajouté (Simply / Liberty)",
     ),
     # Clientèle
     _f(

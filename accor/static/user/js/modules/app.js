@@ -167,6 +167,80 @@ class DirectorApp {
     if (el) el.textContent = msg || "Prêt";
   }
 
+  /**
+   * Overlay de chargement fiche hôtel (étape 1).
+   * @param {string} code
+   * @param {string} [label]
+   */
+  showHotelLoading(code, label) {
+    const box = $("#hotel-loading");
+    if (!box) return;
+    box.classList.remove("hidden");
+    box.setAttribute("aria-busy", "true");
+    document.body.classList.add("is-hotel-loading");
+    const title = label
+      ? `Chargement de ${label}…`
+      : `Chargement de l’hôtel ${code || ""}…`;
+    if ($("#hotel-loading-title")) $("#hotel-loading-title").textContent = title.trim();
+    if ($("#hotel-loading-sub")) {
+      $("#hotel-loading-sub").textContent =
+        "Récupération de la fiche et des paramètres — veuillez patienter.";
+    }
+    this.setHotelLoadProgress(8, 1);
+    // Progression « indéterminée » tant que l’API n’a pas répondu
+    this._clearHotelLoadTimer();
+    this._hotelLoadPct = 8;
+    this._hotelLoadTimer = setInterval(() => {
+      // monte doucement jusqu’à ~70 % en attendant le réseau
+      if (this._hotelLoadPct < 68) {
+        this._hotelLoadPct = Math.min(68, this._hotelLoadPct + 2 + Math.random() * 4);
+        this.setHotelLoadProgress(this._hotelLoadPct, this._hotelLoadStep || 2);
+      }
+    }, 280);
+  }
+
+  /**
+   * @param {number} pct 0–100
+   * @param {number} step 1–4
+   * @param {string} [sub]
+   */
+  setHotelLoadProgress(pct, step, sub) {
+    const p = Math.max(0, Math.min(100, Math.round(Number(pct) || 0)));
+    this._hotelLoadPct = p;
+    this._hotelLoadStep = step || this._hotelLoadStep || 1;
+    const fill = $("#hotel-loading-fill");
+    const bar = $("#hotel-loading-bar");
+    const pctEl = $("#hotel-loading-pct");
+    if (fill) fill.style.width = `${p}%`;
+    if (bar) bar.setAttribute("aria-valuenow", String(p));
+    if (pctEl) pctEl.innerHTML = `${p}&nbsp;%`;
+    if (sub && $("#hotel-loading-sub")) {
+      $("#hotel-loading-sub").textContent = sub;
+    }
+    $$("#hotel-loading-steps [data-load-step]").forEach((li) => {
+      const s = Number(li.dataset.loadStep);
+      li.classList.toggle("is-done", s < this._hotelLoadStep);
+      li.classList.toggle("is-active", s === this._hotelLoadStep);
+    });
+  }
+
+  _clearHotelLoadTimer() {
+    if (this._hotelLoadTimer) {
+      clearInterval(this._hotelLoadTimer);
+      this._hotelLoadTimer = null;
+    }
+  }
+
+  hideHotelLoading() {
+    this._clearHotelLoadTimer();
+    const box = $("#hotel-loading");
+    if (box) {
+      box.classList.add("hidden");
+      box.setAttribute("aria-busy", "false");
+    }
+    document.body.classList.remove("is-hotel-loading");
+  }
+
   goStep(n) {
     this.step = n;
     document.body.dataset.step = String(n);
@@ -551,8 +625,22 @@ class DirectorApp {
 
   async selectHotel(code, { forceFetch = false } = {}) {
     if (!code) return;
+    if (this._hotelLoading) return;
+    this._hotelLoading = true;
     this.hideAc();
+
+    // Label provisoire depuis la liste autocomplete si dispo
+    const fromIndex = this.allHotelsForSearch().find(
+      (h) => String(h.hotel_code || "").toUpperCase() === String(code).toUpperCase()
+    );
+    const provisional =
+      fromIndex &&
+      [fromIndex.hotel_code, fromIndex.hotel_name].filter(Boolean).join(" · ");
+
+    this.showHotelLoading(code, provisional || code);
     this.setStatus("Chargement de la fiche…");
+    this.setHotelLoadProgress(15, 2, "Lecture de la fiche hôtel…");
+
     try {
       // persist=0 : jamais d'écriture hotel_data depuis l'UI user
       const ctx = await api.get(`/api/hotels/${encodeURIComponent(code)}/context`, {
@@ -562,10 +650,16 @@ class DirectorApp {
       if (!ctx.ok && !ctx.identity && !ctx.hotel) {
         throw new Error(ctx.error || "Hôtel introuvable");
       }
+
+      this._clearHotelLoadTimer();
+      this.setHotelLoadProgress(
+        78,
+        3,
+        "Préparation des paramètres d’exploitation…"
+      );
+
       this.context = ctx;
       const id = ctx.identity || ctx.hotel || {};
-      const op = ctx.operating || {};
-      const services = ctx.services || {};
       const ind = ctx.indicators || {};
       const corner = ctx.corner || {};
       const profile = ctx.client_profile || {};
@@ -602,17 +696,29 @@ class DirectorApp {
       $("#hotel_search").value =
         `${this.hotel.hotel_code} · ${this.hotel.hotel_name || ""}`.trim();
       this.fillHotelSummary();
+
+      // yield UI pour peindre la barre avant le rendu formulaire (peut être lourd)
+      await new Promise((r) => requestAnimationFrame(() => r()));
+      this.setHotelLoadProgress(90, 3, "Remplissage du formulaire…");
       this.fillStep2();
       this.fillStep3FromHotel();
       $("#btn-step1-next").disabled = false;
+
+      this.setHotelLoadProgress(100, 4, "Fiche prête.");
+      await new Promise((r) => setTimeout(r, 220));
+
+      this.hideHotelLoading();
       this.setStatus("");
       if (ctx.session_only) {
         toast.show("Hôtel chargé", "ok");
       }
       this.goStep(2);
     } catch (err) {
+      this.hideHotelLoading();
       this.setStatus(err.message);
       toast.show(err.message, "err");
+    } finally {
+      this._hotelLoading = false;
     }
   }
 
@@ -629,6 +735,7 @@ class DirectorApp {
     const el = $("#hotel-summary");
     if (!el || !this.hotel) return;
     el.classList.remove("empty");
+    el.hidden = false;
     const meta = [this.hotel.hotel_brand, this.hotel.hotel_city]
       .filter(Boolean)
       .join(" · ");

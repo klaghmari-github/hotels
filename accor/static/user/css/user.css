@@ -1032,6 +1032,124 @@ body.rod-body {
   animation: spin 0.85s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ========== Hotel load (étape 1) ========== */
+.hotel-loading {
+  margin-top: 1rem;
+  padding: 1.1rem 1.15rem 1.15rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  background:
+    linear-gradient(145deg, rgba(212, 175, 55, 0.1) 0%, rgba(255, 255, 255, 0.03) 55%);
+  box-shadow: var(--shadow-soft);
+  animation: panelIn 0.3s var(--ease);
+}
+.hotel-loading-head {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 0.95rem;
+}
+.hotel-loading-ring {
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  flex-shrink: 0;
+  border-width: 2.5px;
+}
+.hotel-loading-copy { min-width: 0; }
+.hotel-loading-title {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 650;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.hotel-loading-sub {
+  margin: 0.25rem 0 0;
+  font-size: 0.86rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+.hotel-loading-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+.hotel-loading-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  box-shadow: 0 0 12px var(--accent-glow);
+  transition: width 0.35s var(--ease);
+}
+.hotel-loading-pct {
+  margin: 0.4rem 0 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent-2);
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.hotel-loading-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+.hotel-loading-steps li {
+  position: relative;
+  padding: 0.35rem 0.5rem 0.35rem 1.55rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+  border-radius: 8px;
+  transition: color 0.2s, background 0.2s;
+}
+.hotel-loading-steps li::before {
+  content: "";
+  position: absolute;
+  left: 0.45rem;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin-top: -4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid var(--line-strong);
+}
+.hotel-loading-steps li.is-active {
+  color: var(--ink);
+  background: rgba(212, 175, 55, 0.08);
+  font-weight: 600;
+}
+.hotel-loading-steps li.is-active::before {
+  background: var(--accent);
+  border-color: var(--accent-2);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+  animation: pulse-dot 1s ease-in-out infinite;
+}
+.hotel-loading-steps li.is-done {
+  color: var(--success);
+}
+.hotel-loading-steps li.is-done::before {
+  background: var(--success);
+  border-color: var(--success);
+  box-shadow: none;
+  animation: none;
+}
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.15); opacity: 0.85; }
+}
+body.is-hotel-loading .search-shell input,
+body.is-hotel-loading #btn-step1-next {
+  pointer-events: none;
+  opacity: 0.55;
+}
 .dir-empty-title {
   font-family: var(--serif);
   font-size: clamp(1.8rem, 3.5vw, 2.4rem);

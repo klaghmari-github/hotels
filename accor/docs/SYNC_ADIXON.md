@@ -9,10 +9,29 @@ Toi  ──consignes──►  Console Cloudflare (run_dev LOCAL uniquement)
                      Agent applique en LOCAL (accor/)
                               │
                               ▼
-                     ./scripts/deploy_to_adixon.sh
+         (tests manuels : tu lances run_admin / run_user)
                               │
-                              ▼
-                     Prod client Adixon (PAS de Cloudflare)
+              déploiement Adixon SEULEMENT si tu le demandes
+              explicitement  →  ./scripts/deploy_to_adixon.sh
+```
+
+**Par défaut : pas de deploy Adixon.** Uniquement sur consigne explicite (« déploie sur Adixon », etc.).
+
+### Ports lab locaux
+
+- **5500** : `run_dev` (maintenu par le watchdog + tunnel CF)
+- **5055 / 5056** : **libres pour toi** — lance toi-même :
+
+```bash
+cd accor && source .venv/bin/activate
+python run_admin.py    # :5055
+python run_user.py     # :5056
+```
+
+Watchdog en mode manuel (ne relance pas admin/user) :
+
+```bash
+ACCOR_WD_SERVICES=dev nohup python3 scripts/dev_watchdog.py >> /tmp/accor-dev-watchdog.log 2>&1 &
 ```
 
 | Environnement | Rôle | Cloudflare ? |

@@ -52,7 +52,7 @@ MAX_RETRIES = 3
 CHECK_EVERY = int(os.environ.get("ACCOR_DEV_WATCH_INTERVAL") or 60)
 PYTHON = sys.executable
 
-SERVICES = {
+_ALL_SERVICES = {
     "dev": {
         "port": PREFERRED_DEV_PORT,
         "script": ROOT / "run_dev.py",
@@ -87,6 +87,26 @@ SERVICES = {
         "fallback_ports": [USER_PORT],
     },
 }
+
+
+def _active_service_names() -> list[str]:
+    """
+    Services gérés par le watchdog.
+
+    Env ``ACCOR_WD_SERVICES`` = liste CSV (ex. ``dev`` ou ``dev,admin,user``).
+    Défaut : tous. Mode lab manuel : ``ACCOR_WD_SERVICES=dev`` pour laisser
+    free les ports 5055/5056 à l'utilisateur.
+    """
+    raw = (os.environ.get("ACCOR_WD_SERVICES") or "").strip()
+    if not raw:
+        return list(_ALL_SERVICES.keys())
+    names = [x.strip().lower() for x in raw.split(",") if x.strip()]
+    out = [n for n in names if n in _ALL_SERVICES]
+    return out or ["dev"]
+
+
+# Vue filtrée (référencée partout dans le module)
+SERVICES = {k: _ALL_SERVICES[k] for k in _active_service_names()}
 
 _running = True
 _service_ports: dict[str, int] = {
@@ -858,14 +878,14 @@ def cycle() -> None:
     _cycle_n += 1
     # check HTTP public every 5th cycle (plus rapide sinon)
     check_public = (_cycle_n % 5 == 1)
-    _log(
-        f"cycle #{_cycle_n} · "
-        f"dev={health_ok('dev')} admin={health_ok('admin')} user={health_ok('user')} · "
-        f"pub_check={check_public}"
+    managed = list(SERVICES.keys())
+    health_bits = " ".join(
+        f"{n}={health_ok(n) if n in SERVICES else 'off'}" for n in ("dev", "admin", "user")
     )
+    _log(f"cycle #{_cycle_n} · {health_bits} · managed={managed} · pub_check={check_public}")
 
     # 1) services
-    for name in ("dev", "admin", "user"):
+    for name in managed:
         try:
             ok = ensure_service(name)
             if not ok:
@@ -873,12 +893,17 @@ def cycle() -> None:
         except Exception as exc:
             _log(f"ensure_service {name}: {exc}")
 
-    # 2) tunnels (dev + admin obligatoires, user aussi)
-    for name in ("dev", "admin", "user"):
+    # 2) tunnels
+    for name in managed:
         try:
             if name == "user" and not health_ok(name):
                 continue
-            ensure_tunnel(name, check_public=check_public or SERVICES[name].get("public_required", False) and not read_tunnel_url(name))
+            ensure_tunnel(
+                name,
+                check_public=check_public
+                or SERVICES[name].get("public_required", False)
+                and not read_tunnel_url(name),
+            )
         except Exception as exc:
             _log(f"ensure_tunnel {name}: {exc}")
 
@@ -957,7 +982,8 @@ def main() -> None:
 
     _log(
         f"watchdog PERMANENT démarré pid={os.getpid()} "
-        f"interval={CHECK_EVERY}s cloudflared={_resolve_cloudflared()}"
+        f"interval={CHECK_EVERY}s services={list(SERVICES.keys())} "
+        f"cloudflared={_resolve_cloudflared()}"
     )
     try:
         cycle()

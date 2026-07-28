@@ -28,7 +28,7 @@
         </span>
         <div class="brand-text">
           <strong>ROD</strong>
-          <span class="brand-sub">Retail On Demand · Simulateur directeur</span>
+          <span class="brand-sub">Retail On Demand</span>
         </div>
       </div>
       <div class="dir-top-right">
@@ -107,8 +107,27 @@
           </label>
           <input type="hidden" id="hotel_code" />
 
-          <div id="hotel-summary" class="hotel-summary empty">
-            <span class="hs-placeholder">Aucun hôtel sélectionné pour l’instant</span>
+          <div id="hotel-summary" class="hotel-summary empty" hidden></div>
+
+          <!-- Chargement fiche hôtel (visible pendant selectHotel) -->
+          <div id="hotel-loading" class="hotel-loading hidden" role="status" aria-live="polite" aria-busy="false">
+            <div class="hotel-loading-head">
+              <div class="loader-ring hotel-loading-ring" aria-hidden="true"></div>
+              <div class="hotel-loading-copy">
+                <p class="hotel-loading-title" id="hotel-loading-title">Chargement de l’hôtel…</p>
+                <p class="hotel-loading-sub" id="hotel-loading-sub">Récupération des données, un instant.</p>
+              </div>
+            </div>
+            <div class="hotel-loading-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="hotel-loading-bar">
+              <i id="hotel-loading-fill" style="width: 8%"></i>
+            </div>
+            <p class="hotel-loading-pct" id="hotel-loading-pct">0&nbsp;%</p>
+            <ul class="hotel-loading-steps" id="hotel-loading-steps">
+              <li data-load-step="1" class="is-active">Sélection de l’hôtel</li>
+              <li data-load-step="2">Lecture de la fiche</li>
+              <li data-load-step="3">Préparation des paramètres</li>
+              <li data-load-step="4">Prêt</li>
+            </ul>
           </div>
 
           <div class="wiz-actions">
