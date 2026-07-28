@@ -2642,59 +2642,74 @@ input[type="range"] {
 
 @media (max-width: 960px) {
   /*
-   * Mobile / téléphone : le shell desktop est verrouillé en 100vh + overflow
-   * hidden (scroll interne sidebar). Sur petit écran ce verrou coupe la nav
-   * après « All » — on repasse en page scrollable (document + touch).
+   * Mobile / téléphone : un seul scroll = document (touch).
+   * On casse tous les conteneurs 100vh + overflow:hidden/auto imbriqués
+   * qui bloquent le doigt sur iOS/Android.
    */
-  html,
-  body {
-    height: auto;
-    min-height: 100%;
-    max-height: none;
-    overflow-x: hidden;
-    overflow-y: auto;
+  html {
+    height: auto !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: contain;
+    touch-action: pan-y;
+  }
+
+  body {
+    height: auto !important;
+    min-height: 100%;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    overscroll-behavior-y: auto;
+    position: relative !important;
+  }
+
+  /* Pendant un fetch : ne pas figer le scroll mobile */
+  body.is-loading {
+    overflow: auto !important;
+    cursor: progress;
   }
 
   .app-shell {
-    display: flex;
-    flex-direction: column;
-    grid-template-columns: none;
-    height: auto;
-    max-height: none;
-    min-height: 100dvh;
-    min-height: 100vh;
-    overflow: visible;
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: none !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 100%;
+    overflow: visible !important;
+    position: relative;
   }
 
   .sidebar {
-    position: relative;
+    position: relative !important;
+    top: auto !important;
     width: 100%;
-    height: auto;
-    max-height: none;
+    height: auto !important;
+    max-height: none !important;
     flex: 0 0 auto;
     border-right: 0;
     border-bottom: 1px solid var(--border);
-    overflow: visible;
-    /* safe-area iPhone (barre bas) */
+    overflow: visible !important;
     padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
   }
 
   .sidebar-scroll {
-    display: block;
-    flex: none;
-    height: auto;
-    max-height: none;
-    min-height: 0;
-    overflow: visible;
-    padding-bottom: 1.25rem;
+    display: block !important;
+    flex: none !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    padding-bottom: 1.5rem;
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Ne pas coller le footer nav en bas (margin-top: auto casse le flux mobile) */
   .nav-footer {
-    margin-top: 0.75rem;
+    margin-top: 0.75rem !important;
   }
 
   .nav-tabs {
@@ -2703,35 +2718,83 @@ input[type="range"] {
 
   .nav-item {
     min-width: 0;
+    /* zone tactile plus large */
+    min-height: 2.75rem;
   }
 
   .main {
-    position: relative;
-    height: auto;
-    max-height: none;
-    min-height: 0;
+    position: relative !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
     flex: 1 1 auto;
-    overflow: visible;
-    padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
+    overflow: visible !important;
+    padding-bottom: max(2rem, env(safe-area-inset-bottom, 0px));
   }
 
-  #view-rod-sim.view-rod-sim {
-    max-height: none;
-    height: auto;
-    overflow: visible;
+  .view:not(.hidden) {
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    flex: none !important;
   }
 
-  .rod-scroll-body {
-    overflow: visible;
-    flex: none;
+  #view-rod-sim.view-rod-sim,
+  #view-rod-sim {
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
   }
 
+  .rod-scroll-body,
+  .rod-sticky-head,
+  .rod-layout,
+  .rod-excel-sticky,
+  .model-layout,
+  .explore-layout,
+  .table-scroll,
+  .perf-table-wrap,
+  .card,
+  .build-progress-card {
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+    flex: none !important;
+    min-height: 0 !important;
+  }
+
+  /* Tables : scroll horizontal OK, vertical = page */
   .table-scroll {
-    max-height: 60vh;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    -webkit-overflow-scrolling: touch;
+    max-height: none !important;
   }
 
   .model-layout {
-    max-height: none;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* Overlay loading : ne pas capturer le scroll hors carte */
+  .loading-overlay:not(.hidden) {
+    overscroll-behavior: contain;
+    touch-action: none;
+  }
+}
+
+/* Très petit écran : même logique, padding réduit */
+@media (max-width: 600px) {
+  .sidebar {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  .main {
+    padding: 0.85rem 0.75rem 2rem;
+  }
+  .nav-item {
+    padding: 0.7rem 0.65rem;
   }
 }
 

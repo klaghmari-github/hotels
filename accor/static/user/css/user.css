@@ -40,6 +40,7 @@
 html, body {
   margin: 0;
   min-height: 100%;
+  height: auto;
   font-family: var(--font);
   color: var(--ink);
   background: var(--bg);
@@ -49,6 +50,10 @@ html, body {
 
 body.rod-body {
   overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overscroll-behavior-y: auto;
 }
 
 .hidden { display: none !important; }
@@ -1340,11 +1345,82 @@ body.rod-body {
   .dir-big-metrics { grid-template-columns: repeat(2, 1fr); }
   .dir-concept-cards { grid-template-columns: 1fr; }
 }
+
+/*
+ * Mobile : un seul scroll document. Les max-height + overflow:auto
+ * imbriqués (params, needs, listes) bloquent le doigt sur iOS.
+ */
+@media (max-width: 900px) {
+  html,
+  body,
+  body.rod-body {
+    height: auto !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    position: relative !important;
+  }
+
+  .dir-shell {
+    min-height: 100%;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    display: block;
+  }
+
+  .dir-top,
+  .wiz-steps,
+  .wiz-main,
+  .dir-foot {
+    position: relative;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .wiz-main {
+    padding-bottom: max(2.5rem, env(safe-area-inset-bottom, 0px));
+  }
+
+  .wiz-panel,
+  .wiz-card,
+  .form-block,
+  .hotel-params-form,
+  .needs-list,
+  .shares-list,
+  .ac-list,
+  .toggle-grid {
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Autocomplete : reste scrollable localement (petite liste) */
+  .ac-list:not(.hidden) {
+    max-height: min(50vh, 280px) !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .hotel-params-form {
+    max-height: none !important;
+    overflow: visible !important;
+    padding-right: 0;
+  }
+
+  .needs-list {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+}
+
 @media (max-width: 720px) {
   .dir-top { padding: 0.75rem 1rem; }
   .brand-sub { display: none; }
   .wiz-lab-sub { display: none; }
-  .wiz-main { padding: 1.15rem 0.85rem 2rem; }
+  .wiz-main { padding: 1.15rem 0.85rem 2.5rem; }
   .wiz-card { padding: 1.25rem 1.1rem 1.4rem; }
   .wiz-grid-2,
   .wiz-grid-3,
@@ -1357,8 +1433,20 @@ body.rod-body {
   .dir-big-metrics { grid-template-columns: 1fr 1fr; }
   .results-actions { justify-content: stretch; }
   .results-actions .btn { flex: 1; justify-content: center; }
-  .wiz-actions { justify-content: stretch; }
+  .wiz-actions { justify-content: stretch; flex-wrap: wrap; }
   .wiz-actions .btn-primary { flex: 1; justify-content: center; }
+  .wiz-actions-split {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .wiz-actions-right {
+    flex-direction: column;
+    width: 100%;
+  }
+  .wiz-actions-right .btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -1503,6 +1591,8 @@ body.rod-body {
   overflow: auto;
   padding-right: 0.25rem;
   margin-bottom: 0.5rem;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 .hotel-params-form .form-block {
   margin: 0;
