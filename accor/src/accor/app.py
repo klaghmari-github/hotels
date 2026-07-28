@@ -1199,6 +1199,10 @@ def main(argv: list[str] | None = None) -> None:
 
     Par défaut écoute sur ``0.0.0.0`` (LAN + exposable publiquement).
     Override : ``--host 127.0.0.1`` ou env ``ACCOR_HOST`` / ``ACCOR_PORT``.
+
+    Au démarrage : si un modèle intermédiaire ou final manque pour une
+    solution ROD (Simply / Liberty / Connected), lance l'entraînement en
+    arrière-plan (``ACCOR_SKIP_INIT_MODELS=1`` pour désactiver).
     """
     import argparse
 
@@ -1224,6 +1228,12 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--debug", action="store_true", help="Mode debug Flask")
     args = parser.parse_args(argv)
     print_listen_banner("Accor · Data & Model Studio (admin)", args.host, args.port)
+    try:
+        from accor.init_solution_models import spawn_ensure_if_missing
+
+        spawn_ensure_if_missing()
+    except Exception as exc:
+        print(f"[init_models] démarrage skip: {exc}", flush=True)
     run_flask_app(app, host=args.host, port=args.port, debug=args.debug)
 
 

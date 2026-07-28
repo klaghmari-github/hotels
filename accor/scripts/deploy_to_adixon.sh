@@ -13,8 +13,10 @@
 #   ./scripts/deploy_to_adixon.sh --deps       # + pip install -e . sur le serveur
 #   ./scripts/deploy_to_adixon.sh --data       # + package data runtime
 #   ./scripts/deploy_to_adixon.sh --models     # + models final + intermédiaire
-#   ./scripts/deploy_to_adixon.sh --all        # code + deps + data + models
-#   ./scripts/deploy_to_adixon.sh --dry-run    # affiche sans copier
+#   ./scripts/deploy_to_adixon.sh --init-models     # force init CLI après deploy (défaut: auto)
+#   ./scripts/deploy_to_adixon.sh --no-init-models  # ne lance pas l'init CLI (admin le fait au boot)
+#   ./scripts/deploy_to_adixon.sh --all             # code + deps + data + models + init
+#   ./scripts/deploy_to_adixon.sh --dry-run         # affiche sans copier
 #
 # Ne touche JAMAIS (sauf flags explicites) :
 #   .venv/  data/  models/  logs PM2
@@ -35,6 +37,8 @@ PM2_PATH='export PATH="$HOME/.nvm/versions/node/v22.23.1/bin:$PATH"'
 DO_DEPS=0
 DO_DATA=0
 DO_MODELS=0
+# Par défaut : après deploy, assure inter+final par solution s'ils manquent
+DO_INIT_MODELS=1
 DRY=0
 
 for arg in "$@"; do
@@ -42,10 +46,12 @@ for arg in "$@"; do
     --deps) DO_DEPS=1 ;;
     --data) DO_DATA=1 ;;
     --models) DO_MODELS=1 ;;
-    --all) DO_DEPS=1; DO_DATA=1; DO_MODELS=1 ;;
+    --init-models) DO_INIT_MODELS=1 ;;
+    --no-init-models) DO_INIT_MODELS=0 ;;
+    --all) DO_DEPS=1; DO_DATA=1; DO_MODELS=1; DO_INIT_MODELS=1 ;;
     --dry-run) DRY=1; RSYNC+=( --dry-run -v ) ;;
     -h|--help)
-      sed -n '2,30p' "$0"
+      sed -n '2,34p' "$0"
       exit 0
       ;;
     *)
@@ -61,7 +67,7 @@ cd "$ROOT"
 
 log "Source  : $ROOT"
 log "Cible   : $HOST:$REMOTE"
-log "Flags   : deps=$DO_DEPS data=$DO_DATA models=$DO_MODELS dry=$DRY"
+log "Flags   : deps=$DO_DEPS data=$DO_DATA models=$DO_MODELS init_models=$DO_INIT_MODELS dry=$DRY"
 
 # Connexion
 "${SSH[@]}" "$HOST" "test -d $REMOTE && echo ok_remote" >/dev/null
@@ -111,6 +117,13 @@ for f in run_user.py run_admin.py pyproject.toml requirements.txt ecosystem.conf
     fi
   fi
 done
+
+log "Sync scripts/"
+if [[ -d scripts ]]; then
+  sync_tree "scripts/" "$REMOTE/scripts/" \
+    --exclude '__pycache__/' \
+    --exclude '*.pyc'
+fi
 
 # RELEASE stamp
 if [[ "$DRY" -eq 0 ]]; then
@@ -178,6 +191,25 @@ if [[ "$DRY" -eq 0 ]]; then
     pm2 status
   '"
 
+  # Admin démarre spawn_ensure_if_missing() : entraîne si manquant.
+  # --init-models force un run CLI dédié (log /var/log/rod-ia/init_models.log).
+  if [[ "$DO_INIT_MODELS" -eq 1 ]]; then
+    log "Init modèles solution manquants sur le serveur (background)"
+    "${SSH[@]}" "$HOST" "bash -lc '
+      set -e
+      cd ${REMOTE}
+      source .venv/bin/activate
+      mkdir -p /var/log/rod-ia
+      # status d abord
+      python -m accor.init_solution_models --status || true
+      nohup python -m accor.init_solution_models \
+        >> /var/log/rod-ia/init_models.log 2>&1 &
+      echo \"init_models pid=\$! → /var/log/rod-ia/init_models.log\"
+    '"
+  else
+    log "Init modèles : auto au démarrage admin si manquants (ou --init-models)"
+  fi
+
   log "Smoke HTTPS"
   code_user=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 15 https://rod-ia.adixon-dev.fr/ || echo fail)
   code_admin=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 15 https://rod-ia.adixon-dev.fr/studio/ || echo fail)
@@ -188,3 +220,4 @@ fi
 log "Terminé · git_sha=$GIT_SHA · $BUILT_AT"
 echo
 echo "Rappel : éditer uniquement en local, puis relancer ce script pour Adixon."
+echo "Modèles solution manquants → entraînés auto (admin) ou via --init-models."
