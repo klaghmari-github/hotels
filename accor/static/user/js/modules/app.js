@@ -357,8 +357,7 @@ class DirectorApp {
           codeUp
         )}" data-action="fetch">
           <strong>${escapeHtml(codeUp)}</strong>
-          <span>Récupérer depuis Accor (session uniquement)</span>
-          <em>non enregistré en base</em>
+          <span>Récupérer depuis Accor</span>
         </li>`);
       }
     }
@@ -463,11 +462,9 @@ class DirectorApp {
       this.fillStep2();
       this.fillStep3FromHotel();
       $("#btn-step1-next").disabled = false;
+      this.setStatus("");
       if (ctx.session_only) {
-        this.setStatus("Fiche session (non enregistrée en base)");
-        toast.show("Hôtel chargé pour cette session uniquement", "ok");
-      } else {
-        this.setStatus("");
+        toast.show("Hôtel chargé", "ok");
       }
       this.goStep(2);
     } catch (err) {
@@ -825,8 +822,6 @@ class DirectorApp {
         data.ai_note ||
         "Estimation du CA par le modèle, avec les mêmes coûts et une marge recalculée.";
     }
-    if ($("#dir-disclaimer"))
-      $("#dir-disclaimer").textContent = data.disclaimer || "";
 
     // Onglet IA un peu grisé si indispo
     const tabAi = $("#tab-ai");

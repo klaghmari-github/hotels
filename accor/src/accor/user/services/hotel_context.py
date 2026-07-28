@@ -263,8 +263,7 @@ class HotelContextBuilder:
                         )
                     else:
                         warnings.append(
-                            f"Hôtel {code} récupéré depuis all.accor.com "
-                            f"(session uniquement — non enregistré en base)."
+                            f"Hôtel {code} récupéré depuis all.accor.com."
                         )
                 elif fetched.get("ok") and not fetched.get("scraped"):
                     code = str(fetched.get("hotel_code") or code).strip()

@@ -383,10 +383,6 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
         # legacy
         "by_solution": by_solution_legacy,
         "ai_note": ai_note,
-        "disclaimer": (
-            "Les chiffres sont des estimations pour vous aider à choisir. "
-            "Ils ne remplacent pas un budget d'investissement validé en interne."
-        ),
     }
 
 
