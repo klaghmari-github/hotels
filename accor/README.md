@@ -1,4 +1,4 @@
-run_dev url : https://knowing-emails-commons-ready.trycloudflare.com
+run_dev url : https://tries-loved-written-explicit.trycloudflare.com
 run_admin url : https://behind-presentation-destination-breed.trycloudflare.com
 run_user url : https://warnings-rrp-export-england.trycloudflare.com
 watchdog status : UP · interval=60s · ports dev=5500 admin=5055 user=5056
@@ -191,7 +191,7 @@ ligne `run_dev url` en tête de ce README (sinon l’IP LAN).
 
 | Service | Port local | URL publique |
 |---------|------------|--------------|
-| **run_dev** (console) | 5500 | https://knowing-emails-commons-ready.trycloudflare.com |
+| **run_dev** (console) | 5500 | https://tries-loved-written-explicit.trycloudflare.com |
 | **Admin** | 5055 | https://behind-presentation-destination-breed.trycloudflare.com |
 | **User** | 5056 | https://warnings-rrp-export-england.trycloudflare.com |
 
