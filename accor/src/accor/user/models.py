@@ -328,6 +328,14 @@ class StoreConfig:
     m_lin: float
     mix_fb: float
     mix_nf: float
+    # Équipements / contrat (spec simulateur_rules)
+    nb_frigos_froid: int = 3
+    nb_frigos_ambiant: int = 0
+    nb_scanners: int = 1
+    nb_caisses: int = 1
+    nb_vitrines: int = 1
+    contract: str = "BUY"  # BUY | LEASE
+    agencement: str = "CLASSIC"  # CLASSIC | PREMIUM | BESPOKE
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -418,7 +426,7 @@ class RevenueResult:
     ca_nf_mensuel: float
     nbr_ventes_mensuel: float
     marge_produit_mensuelle: float
-    breakdown: dict[str, float] = field(default_factory=dict)
+    breakdown: dict[str, Any] = field(default_factory=dict)
     warnings: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
@@ -438,6 +446,7 @@ class CostResult:
     agencement_monthly: float
     cost_lines: list[dict[str, Any]] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
+    cost_over_60m: float = 0.0
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -445,7 +454,7 @@ class CostResult:
 
 @dataclass
 class ConceptSimulation:
-    """Agrégation revenus + coûts + marge pour un concept."""
+    """Agrégation revenus + coûts + marge pour un concept (spec §11)."""
 
     source: str  # ROD_RULES | AI (futur)
     concept: str
@@ -465,6 +474,18 @@ class ConceptSimulation:
     revenue: dict[str, Any] = field(default_factory=dict)
     costs: dict[str, Any] = field(default_factory=dict)
     warnings: list[str] = field(default_factory=list)
+    # Détail CA / coûts (spec Excel)
+    ca_fb_mensuel: float = 0.0
+    ca_nfb_mensuel: float = 0.0
+    techno_monthly: float = 0.0
+    annexes_monthly: float = 0.0
+    agencement_monthly: float = 0.0
+    cost_over_60m: float = 0.0
+    # Spec §11 : Not profitable si marge nette < 0 ou CA < 0
+    status: str = "ok"  # ok | not_profitable
+    amort_months: float | None = None
+    amort_years: float | None = None
+    taux_marge: float | None = None  # Marge_nette / CA_HT si profitable
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

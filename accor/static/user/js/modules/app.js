@@ -308,8 +308,10 @@ class DirectorApp {
       if (this.hotel) this.goStep(2);
     });
     $("#btn-step2-next")?.addEventListener("click", () => this.goStep(3));
-    $("#btn-run-sim")?.addEventListener("click", () => this.runSim(true));
-    $("#btn-run-sim-manual")?.addEventListener("click", () => this.runSim(false));
+    // Simulation fidèle aux rules Excel (pas d'optimisation des parts)
+    $("#btn-run-sim")?.addEventListener("click", () => this.runSim(false));
+    // Bonus hors schéma : maximise le CA en testant d'autres parts
+    $("#btn-run-sim-manual")?.addEventListener("click", () => this.runSim(true));
 
     $$("[data-goto]").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -339,6 +341,7 @@ class DirectorApp {
 
     const syncMix = () => {
       this.setMix($("#mix_fb")?.value || $("#mix_slider")?.value);
+      this._syncFrigoVisibility();
     };
     $("#mix_slider")?.addEventListener("input", () => {
       $("#mix_fb").value = $("#mix_slider").value;
@@ -351,6 +354,7 @@ class DirectorApp {
 
     $("#needs-all-on")?.addEventListener("click", () => this.setAllNeeds(true));
     $("#needs-all-off")?.addEventListener("click", () => this.setAllNeeds(false));
+    this._syncFrigoVisibility();
 
     // Onglets résultats
     $$("[data-result-tab]").forEach((btn) => {
@@ -956,10 +960,10 @@ class DirectorApp {
   }
 
   setMLin(v) {
-    // Entiers uniquement (pas de virgule / demi-mètre)
+    // Entiers uniquement — minimum métier 2 m linéaires
     let n = Math.round(Number(v));
-    if (!Number.isFinite(n) || n < 1) n = 6;
-    n = Math.min(40, Math.max(1, n));
+    if (!Number.isFinite(n) || n < 2) n = Math.max(2, n || 6);
+    n = Math.min(40, Math.max(2, n));
     if ($("#m_lin_slider")) $("#m_lin_slider").value = String(n);
     if ($("#m_lin")) $("#m_lin").value = String(n);
     if ($("#m-lin-val")) $("#m-lin-val").textContent = String(n);
@@ -999,9 +1003,19 @@ class DirectorApp {
     return { fb, nfb };
   }
 
-  collectBody(optimize = true) {
+  _syncFrigoVisibility() {
+    const mix = (Number($("#mix_fb")?.value) || 0) / 100;
+    const ff = $("#field-frigos-froid");
+    const fa = $("#field-frigos-ambiant");
+    if (ff) ff.classList.toggle("is-dimmed", mix < 0.1);
+    if (fa) fa.classList.toggle("is-dimmed", mix > 0.9);
+  }
+
+  collectBody(optimize = false) {
     const hotel_params = this.collectHotelParams();
     const shares = this.collectShares();
+    let mLin = Math.round(Number($("#m_lin")?.value)) || 6;
+    if (mLin < 2) mLin = 2;
     return {
       hotel_code: ($("#hotel_code")?.value || this.hotel?.hotel_code || "").trim(),
       hotel_name: this.hotel?.hotel_name || "",
@@ -1014,17 +1028,24 @@ class DirectorApp {
       nb_restaurants: hotel_params.hotel_f_b_restaurant ?? null,
       has_pool: !!hotel_params.hotel_non_f_b_piscine,
       has_vitrine: !!hotel_params.hotel_dispo_dans_lobby_vitrine_refrigeree,
-      m_lin: Math.round(Number($("#m_lin")?.value)) || 6,
+      m_lin: mLin,
       mix_fb: (Number($("#mix_fb")?.value) || 70) / 100,
       client_needs: this.collectNeeds(),
       category_shares: shares,
       shares_fb: shares.fb,
       shares_nfb: shares.nfb,
+      contract: ($("#contract")?.value || "BUY").toUpperCase(),
+      agencement: ($("#agencement")?.value || "CLASSIC").toUpperCase(),
+      nb_scanners: Math.max(0, Math.round(Number($("#nb_scanners")?.value) || 1)),
+      nb_caisses: Math.max(0, Math.round(Number($("#nb_caisses")?.value) || 1)),
+      nb_vitrines: Math.max(0, Math.round(Number($("#nb_vitrines")?.value) || 1)),
+      nb_frigos_froid: Math.max(0, Math.round(Number($("#nb_frigos_froid")?.value) || 0)),
+      nb_frigos_ambiant: Math.max(0, Math.round(Number($("#nb_frigos_ambiant")?.value) || 0)),
       optimize_repartition: !!optimize,
     };
   }
 
-  async runSim(optimize = true) {
+  async runSim(optimize = false) {
     const body = this.collectBody(optimize);
     if (!body.hotel_code) {
       toast.show("Choisissez d'abord un hôtel", "err");
@@ -1035,7 +1056,7 @@ class DirectorApp {
     $("#dir-loading")?.classList.remove("hidden");
     $("#dir-results")?.classList.add("hidden");
     this.setStatus(
-      optimize ? "Optimisation de la répartition…" : "Calcul avec votre répartition…"
+      optimize ? "Optimisation des parts…" : "Calcul fidèle aux règles ROD…"
     );
     try {
       const data = await api.post("/api/rod/simulate", body);
@@ -1080,38 +1101,133 @@ class DirectorApp {
 
   _metricsHtml(block, { caLabel, emptyCa }) {
     const ca = block?.ca_mensuel;
-    const caDisplay = ca == null ? emptyCa || "—" : euro(ca);
+    const notProf = block?.not_profitable || block?.status === "not_profitable";
+    const caDisplay =
+      ca == null ? emptyCa || "—" : notProf && Number(ca) < 0 ? "Not profitable" : euro(ca);
     const marge = block?.marge_nette_mensuelle;
+    const margeDisplay = notProf ? "Not profitable" : marge == null ? "—" : euro(marge);
+    const amort =
+      notProf || block?.amort_months == null
+        ? "—"
+        : `${Number(block.amort_months).toFixed(1)} mois` +
+          (block.amort_years != null ? ` · ${Number(block.amort_years).toFixed(1)} ans` : "");
     return `
-      <div class="big-metric primary">
+      <div class="big-metric primary ${notProf ? "is-np" : ""}">
         <span class="bm-icon" aria-hidden="true">◆</span>
         <span class="bm-label">${caLabel}</span>
         <span class="bm-value">${caDisplay}</span>
-        <span class="bm-sub">par mois</span>
+        <span class="bm-sub">HT / mois · F&amp;B ${
+          block?.ca_fb_mensuel == null ? "—" : euro(block.ca_fb_mensuel)
+        } · N-F&amp;B ${
+          block?.ca_nfb_mensuel == null ? "—" : euro(block.ca_nfb_mensuel)
+        }</span>
       </div>
       <div class="big-metric">
         <span class="bm-icon" aria-hidden="true">◇</span>
         <span class="bm-label">Coûts / mois</span>
         <span class="bm-value">${euro(block?.cout_mensuel)}</span>
-        <span class="bm-sub">capex ${euro(block?.capex)}</span>
+        <span class="bm-sub">techno ${euro(block?.techno_monthly)} · annexes ${euro(
+          block?.annexes_monthly
+        )} · agenc. ${euro(block?.agencement_monthly)}</span>
       </div>
-      <div class="big-metric">
+      <div class="big-metric ${notProf ? "is-np" : ""}">
         <span class="bm-icon" aria-hidden="true">▣</span>
         <span class="bm-label">Marge nette / mois</span>
         <span class="bm-value ${
-          marge == null ? "" : Number(marge) >= 0 ? "pos" : "neg"
-        }">${marge == null ? "—" : euro(marge)}</span>
+          notProf ? "neg" : marge == null ? "" : Number(marge) >= 0 ? "pos" : "neg"
+        }">${margeDisplay}</span>
         <span class="bm-sub">${
-          block?.marge_nette_annuelle == null
-            ? "—"
-            : euro(block.marge_nette_annuelle) + " / an"
+          notProf
+            ? "Marge produits − coûts &lt; 0"
+            : block?.marge_nette_annuelle == null
+              ? "—"
+              : euro(block.marge_nette_annuelle) +
+                " / an" +
+                (block.taux_marge != null
+                  ? ` · ${(Number(block.taux_marge) * 100).toFixed(1)} %`
+                  : "")
         }</span>
       </div>
       <div class="big-metric">
         <span class="bm-icon" aria-hidden="true">○</span>
-        <span class="bm-label">Marge produit / mois</span>
-        <span class="bm-value">${euro(block?.marge_produit_mensuelle)}</span>
-        <span class="bm-sub">avant coûts corner</span>
+        <span class="bm-label">Amortissement</span>
+        <span class="bm-value ${notProf ? "neg" : ""}">${
+          notProf ? "—" : amort === "—" ? "—" : amort.split(" · ")[0]
+        }</span>
+        <span class="bm-sub">${
+          notProf
+            ? "Non calculé si non rentable"
+            : amort === "—"
+              ? "coût 60 mois / marge nette"
+              : amort
+        }</span>
+      </div>`;
+  }
+
+  _pnlDetailHtml(block) {
+    if (!block || block.ca_mensuel == null) return "";
+    const lines = Array.isArray(block.cost_lines) ? block.cost_lines : [];
+    const byGroup = { techno: [], annexes: [], agencement: [] };
+    lines.forEach((l) => {
+      const g = l.group || "techno";
+      if (!byGroup[g]) byGroup[g] = [];
+      byGroup[g].push(l);
+    });
+    const renderGroup = (title, rows) => {
+      if (!rows.length) return "";
+      return `
+        <div class="pnl-group">
+          <h4>${title}</h4>
+          ${rows
+            .map(
+              (r) => `
+            <div class="pnl-line">
+              <span>${escapeHtml(r.label || r.id)}${
+                r.qty && r.qty !== 1 ? ` ×${r.qty}` : ""
+              }</span>
+              <strong>${euro(r.monthly)}/mois</strong>
+            </div>`
+            )
+            .join("")}
+        </div>`;
+    };
+    const bd = block.breakdown || {};
+    return `
+      <div class="pnl-detail-grid">
+        <div class="pnl-card">
+          <h3 class="dir-subh">CA HT (cascade règles)</h3>
+          <div class="pnl-line"><span>R1 · clients acheteurs</span><strong>${euro(
+            (bd.ca_r1_fb || 0) + (bd.ca_r1_nfb || 0)
+          )}</strong></div>
+          <div class="pnl-line"><span>R2 · après mix</span><strong>${euro(
+            (bd.ca_r2_fb || 0) + (bd.ca_r2_nfb || 0)
+          )}</strong></div>
+          <div class="pnl-line"><span>R3 · catégories</span><strong>${euro(
+            (bd.ca_r3_fb || 0) + (bd.ca_r3_nfb || 0)
+          )}</strong></div>
+          <div class="pnl-line pnl-total"><span>R4 · CA final F&amp;B</span><strong>${euro(
+            block.ca_fb_mensuel
+          )}</strong></div>
+          <div class="pnl-line pnl-total"><span>R4 · CA final N-F&amp;B</span><strong>${euro(
+            block.ca_nfb_mensuel
+          )}</strong></div>
+          <div class="pnl-line"><span>Marge produits</span><strong class="pos">${euro(
+            block.marge_produit_mensuelle
+          )}</strong></div>
+        </div>
+        <div class="pnl-card">
+          <h3 class="dir-subh">Coûts mensuels</h3>
+          ${renderGroup("Techno", byGroup.techno || [])}
+          ${renderGroup("Annexes", byGroup.annexes || [])}
+          ${renderGroup("Agencement", byGroup.agencement || [])}
+          <div class="pnl-line pnl-total"><span>Total coûts</span><strong>${euro(
+            block.cout_mensuel
+          )}</strong></div>
+          <div class="pnl-line"><span>Capex initial</span><strong>${euro(block.capex)}</strong></div>
+          <div class="pnl-line"><span>Coût sur 60 mois</span><strong>${euro(
+            block.cost_over_60m
+          )}</strong></div>
+        </div>
       </div>`;
   }
 
@@ -1120,29 +1236,45 @@ class DirectorApp {
       .map((c) => {
         const b = (bySolution || {})[c] || {};
         const isReco = c === reco;
+        const notProf = b.not_profitable || b.status === "not_profitable";
         const marge = b.marge_nette_mensuelle;
         return `
-          <article class="concept-card ${isReco ? "recommended" : ""}">
+          <article class="concept-card ${isReco ? "recommended" : ""} ${
+            notProf ? "is-np" : ""
+          }">
             <header>
               <h3>${c}</h3>
-              ${
-                isReco
-                  ? `<span class="badge-reco">Recommandée</span>`
-                  : ""
-              }
+              <div class="cc-badges">
+              ${isReco ? `<span class="badge-reco">Recommandée</span>` : ""}
+              ${notProf ? `<span class="badge-np">Not profitable</span>` : ""}
+              </div>
             </header>
-            <div class="cc-row"><span>CA / mois</span><strong>${
+            <div class="cc-row"><span>CA F&amp;B / mois</span><strong>${
+              b.ca_fb_mensuel == null ? "—" : euro(b.ca_fb_mensuel)
+            }</strong></div>
+            <div class="cc-row"><span>CA N-F&amp;B / mois</span><strong>${
+              b.ca_nfb_mensuel == null ? "—" : euro(b.ca_nfb_mensuel)
+            }</strong></div>
+            <div class="cc-row"><span>CA total / mois</span><strong>${
               b.ca_mensuel == null ? "—" : euro(b.ca_mensuel)
+            }</strong></div>
+            <div class="cc-row"><span>Marge produit</span><strong>${
+              b.marge_produit_mensuelle == null ? "—" : euro(b.marge_produit_mensuelle)
             }</strong></div>
             <div class="cc-row"><span>Coût / mois</span><strong>${euro(
               b.cout_mensuel
             )}</strong></div>
             <div class="cc-row"><span>Marge nette / mois</span><strong class="${
-              marge == null ? "" : Number(marge) >= 0 ? "pos" : "neg"
-            }">${marge == null ? "—" : euro(marge)}</strong></div>
-            <div class="cc-row"><span>Capex</span><strong>${euro(
-              b.capex
-            )}</strong></div>
+              notProf ? "neg" : marge == null ? "" : Number(marge) >= 0 ? "pos" : "neg"
+            }">${
+              notProf ? "Not profitable" : marge == null ? "—" : euro(marge)
+            }</strong></div>
+            <div class="cc-row"><span>Amortissement</span><strong>${
+              notProf || b.amort_months == null
+                ? "—"
+                : Number(b.amort_months).toFixed(1) + " mois"
+            }</strong></div>
+            <div class="cc-row"><span>Capex</span><strong>${euro(b.capex)}</strong></div>
           </article>`;
       })
       .join("");
@@ -1221,11 +1353,33 @@ class DirectorApp {
     const simBlock = simBy[reco] || {};
     const aiBlock = aiBy[reco] || {};
 
+    const banner = $("#dir-status-banner");
+    if (banner) {
+      if (simBlock.not_profitable || simBlock.status === "not_profitable") {
+        banner.classList.remove("hidden");
+        banner.className = "status-banner is-np";
+        banner.textContent =
+          "Not profitable — la marge nette de la solution recommandée est négative (ou le CA l’est).";
+      } else if (h.m_lin_forced_min) {
+        banner.classList.remove("hidden");
+        banner.className = "status-banner is-warn";
+        banner.textContent =
+          "Mètres linéaires forcés au minimum métier de 2 m (paramètre système).";
+      } else {
+        banner.classList.add("hidden");
+        banner.textContent = "";
+      }
+    }
+
     const hostSim = $("#dir-metrics-sim");
     if (hostSim) {
       hostSim.innerHTML = this._metricsHtml(simBlock, {
-        caLabel: "CA estimé / mois",
+        caLabel: "CA HT / mois",
       });
+    }
+    const hostPnl = $("#dir-pnl-detail-sim");
+    if (hostPnl) {
+      hostPnl.innerHTML = this._pnlDetailHtml(simBlock);
     }
     const hostAi = $("#dir-metrics-ai");
     if (hostAi) {

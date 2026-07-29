@@ -1,8 +1,10 @@
 """
-Simulation « directeur » — résultats simples pour l'interface user.
+Simulation « directeur » — résultats pour l'interface user.
 
-Deux vues distinctes (même saisie utilisateur, sans étiqueter sim vs IA
-dans le formulaire) :
+Fidèle à ``simulateur_rules.html`` :
+  arbre reco → 3× (R1→R2→R3→R4 → marge produits → coûts → marge nette / amort)
+
+Deux vues (même saisie) :
 
 * **simulateur** — CA règles métier + coûts + marge nette
 * **ia** — CA prédit par le modèle + mêmes coûts + marge recalculée
@@ -14,7 +16,6 @@ from __future__ import annotations
 
 from typing import Any
 
-from accor.hotel_solutions import SOLUTION_FLAG_COLS
 from accor.user.models import (
     ClientProfile,
     HotelIdentity,
@@ -26,15 +27,15 @@ from accor.user.models import (
 from accor.user.reference import RodReference
 from accor.user.rules.coeffs import CLIENT_NEED_LABELS, LIBERTY_NFB_NEEDS
 from accor.user.rules.costs import CostRules
+from accor.user.rules.pilot_table import get_pilot
 from accor.user.rules.recommendation import RecommendationRules
 from accor.user.rules.revenue import RevenueRules
+from accor.user.services.simulator import RodSimulator
 
 CONCEPTS = ("SIMPLY", "LIBERTY", "CONNECTED")
-FLAG_BY = {
-    "SIMPLY": "hotel_solution_simply",
-    "LIBERTY": "hotel_solution_liberty",
-    "CONNECTED": "hotel_solution_connected",
-}
+
+# Minimum métier (spec §13)
+MIN_M_LIN = 2.0
 
 
 def _f(v: Any, default: float | None = None) -> float | None:
@@ -53,52 +54,149 @@ def _i(v: Any, default: int | None = None) -> int | None:
     return int(round(f))
 
 
-def _money_block(
+def _bool(v: Any, default: bool = False) -> bool:
+    if v is None or v == "":
+        return default
+    if isinstance(v, bool):
+        return v
+    if isinstance(v, (int, float)):
+        return bool(v)
+    s = str(v).strip().lower()
+    if s in ("1", "true", "yes", "oui", "on"):
+        return True
+    if s in ("0", "false", "no", "non", "off"):
+        return False
+    return default
+
+
+def _pnl_block(
+    sim_result: Any,
     *,
-    ca: float | None,
-    cout: float,
-    capex: float,
-    marge_produit: float | None = None,
+    ca_override: float | None = None,
+    marge_produit_override: float | None = None,
 ) -> dict[str, Any]:
-    """Bloc CA / coûts / marge pour une solution (sim ou IA)."""
-    ca_v = None if ca is None else round(float(ca), 2)
-    cout_v = round(float(cout), 2)
-    capex_v = round(float(capex), 2)
-    if ca_v is None:
-        return {
-            "ca_mensuel": None,
-            "marge_produit_mensuelle": None,
-            "cout_mensuel": cout_v,
-            "capex": capex_v,
-            "marge_nette_mensuelle": None,
-            "marge_nette_annuelle": None,
-        }
-    if marge_produit is None:
-        # fallback grossier si pas de marge produit (ne devrait pas arriver côté sim)
-        marge_prod = ca_v * 0.35
-    else:
-        marge_prod = float(marge_produit)
-    marge_nette = marge_prod - cout_v
+    """
+    Bloc P&L complet pour une solution (sim ou IA).
+
+    Spec §11 :
+      Marge_nette = Marge_produits − Coûts
+      SI < 0 ou CA < 0 → status not_profitable
+      SINON amort = cost_60 / marge_nette
+    """
+    cout = float(getattr(sim_result, "cout_mensuel", 0) or 0)
+    capex = float(getattr(sim_result, "capex", 0) or 0)
+    techno = float(getattr(sim_result, "techno_monthly", 0) or 0)
+    annexes = float(getattr(sim_result, "annexes_monthly", 0) or 0)
+    agencement = float(getattr(sim_result, "agencement_monthly", 0) or 0)
+    cost_60 = float(getattr(sim_result, "cost_over_60m", 0) or 0)
+    cost_lines = list(
+        (getattr(sim_result, "costs", None) or {}).get("cost_lines")
+        or getattr(sim_result, "cost_lines", None)
+        or []
+    )
+
+    ca_fb = float(getattr(sim_result, "ca_fb_mensuel", 0) or 0)
+    ca_nfb = float(getattr(sim_result, "ca_nfb_mensuel", 0) or 0)
+    ca = float(getattr(sim_result, "ca_mensuel", 0) or 0)
+    mp = float(getattr(sim_result, "marge_produit_mensuelle", 0) or 0)
+
+    # Override IA : redimensionne CA F&B/NFB proportionnellement
+    if ca_override is not None:
+        if ca > 0 and ca_override is not None:
+            ratio = float(ca_override) / ca if ca else 1.0
+            ca_fb = ca_fb * ratio
+            ca_nfb = ca_nfb * ratio
+            ca = float(ca_override)
+        else:
+            ca = float(ca_override)
+            ca_fb = ca * 0.7
+            ca_nfb = ca * 0.3
+        if marge_produit_override is not None:
+            mp = float(marge_produit_override)
+        elif ca > 0 and float(getattr(sim_result, "ca_mensuel", 0) or 0) > 0:
+            mp = float(getattr(sim_result, "marge_produit_mensuelle", 0) or 0) * (
+                ca / float(sim_result.ca_mensuel)
+            )
+        else:
+            mp = ca * 0.35
+
+    marge_nette = mp - cout
+    not_profitable = marge_nette < 0 or ca < 0 or ca_fb < 0 or ca_nfb < 0
+    status = "not_profitable" if not_profitable else "ok"
+
+    amort_months: float | None = None
+    amort_years: float | None = None
+    taux_marge: float | None = None
+    if not not_profitable and marge_nette > 0:
+        amort_months = round(cost_60 / marge_nette, 2) if cost_60 > 0 else None
+        amort_years = round(amort_months / 12.0, 2) if amort_months is not None else None
+        taux_marge = round(marge_nette / ca, 4) if ca > 0 else None
+
+    rev = getattr(sim_result, "revenue", None) or {}
+    breakdown = rev.get("breakdown") if isinstance(rev, dict) else {}
+
     return {
-        "ca_mensuel": ca_v,
-        "marge_produit_mensuelle": round(marge_prod, 2),
-        "cout_mensuel": cout_v,
-        "capex": capex_v,
+        "ca_mensuel": round(ca, 2),
+        "ca_fb_mensuel": round(ca_fb, 2),
+        "ca_nfb_mensuel": round(ca_nfb, 2),
+        "marge_produit_mensuelle": round(mp, 2),
+        "cout_mensuel": round(cout, 2),
+        "techno_monthly": round(techno, 2),
+        "annexes_monthly": round(annexes, 2),
+        "agencement_monthly": round(agencement, 2),
+        "capex": round(capex, 2),
+        "cost_over_60m": round(cost_60, 2),
+        "cost_lines": cost_lines,
         "marge_nette_mensuelle": round(marge_nette, 2),
-        "marge_nette_annuelle": round(marge_nette * 12, 2),
+        "marge_nette_annuelle": round(marge_nette * 12.0, 2),
+        "status": status,
+        "not_profitable": not_profitable,
+        "amort_months": amort_months,
+        "amort_years": amort_years,
+        "taux_marge": taux_marge,
+        "ventes_mensuel": round(
+            float(getattr(sim_result, "ventes_mensuel", 0) or 0), 2
+        ),
+        "breakdown": breakdown if isinstance(breakdown, dict) else {},
+        "warnings": list(getattr(sim_result, "warnings", None) or []),
+    }
+
+
+def _empty_pnl(*, cout: float = 0, capex: float = 0) -> dict[str, Any]:
+    return {
+        "ca_mensuel": None,
+        "ca_fb_mensuel": None,
+        "ca_nfb_mensuel": None,
+        "marge_produit_mensuelle": None,
+        "cout_mensuel": round(cout, 2),
+        "techno_monthly": None,
+        "annexes_monthly": None,
+        "agencement_monthly": None,
+        "capex": round(capex, 2),
+        "cost_over_60m": None,
+        "cost_lines": [],
+        "marge_nette_mensuelle": None,
+        "marge_nette_annuelle": None,
+        "status": "unavailable",
+        "not_profitable": None,
+        "amort_months": None,
+        "amort_years": None,
+        "taux_marge": None,
+        "ventes_mensuel": None,
+        "breakdown": {},
+        "warnings": [],
     }
 
 
 def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
     """
-    Calcule les 3 solutions pour un hôtel.
+    Calcule les 3 solutions pour un hôtel (iso simulateur_rules).
 
-    Body attendu (champs optionnels sauf hotel_code) :
-
+    Body :
       hotel_code, hotel_name, hotel_brand,
-      hotel_params (dict colonnes hotel_data + guests_per_chambre),
-      m_lin, mix_fb, client_needs
-      (+ aliases plats legacy : nb_chambres, has_pool, …)
+      hotel_params, m_lin, mix_fb, client_needs,
+      contract (BUY|LEASE), agencement (CLASSIC|PREMIUM|BESPOKE),
+      nb_frigos_froid, nb_frigos_ambiant, nb_scanners, nb_caisses, nb_vitrines
     """
     from accor.user.hotel_form import (
         params_to_feature_overrides,
@@ -106,6 +204,14 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
         resolve_params,
     )
     from accor.user.models import DEFAULT_CLIENT_NEEDS
+    from accor.user.rules.assortment import (
+        FB_KEYS,
+        NFB_KEYS,
+        needs_from_shares,
+        optimize_repartition,
+        parse_shares_payload,
+        shares_for_api,
+    )
     from accor.user.rules.coeffs import RULE3_FB_COEFFS, RULE3_NFB_COEFFS
 
     code = str(body.get("hotel_code") or "").strip()
@@ -140,7 +246,6 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
     except Exception:
         pass
 
-    # Saisie user (hotel_params) + aliases plats rétrocompat
     user_params: dict[str, Any] = {}
     if isinstance(body.get("hotel_params"), dict):
         user_params.update(body["hotel_params"])
@@ -150,8 +255,11 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
         "guests_per_chambre": body.get("guests_per_chambre"),
         "hotel_derniere_reno": body.get("derniere_reno"),
         "hotel_f_b_restaurant": body.get("nb_restaurants"),
-        "hotel_f_b_bar": body.get("nb_bars") if body.get("nb_bars") is not None else body.get("has_bar"),
+        "hotel_f_b_bar": body.get("nb_bars")
+        if body.get("nb_bars") is not None
+        else body.get("has_bar"),
         "hotel_non_f_b_piscine": body.get("has_pool"),
+        "hotel_dispo_dans_lobby_vitrine_refrigerree": body.get("has_vitrine"),
         "hotel_dispo_dans_lobby_vitrine_refrigeree": body.get("has_vitrine"),
     }
     for k, v in alias.items():
@@ -164,47 +272,70 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
     if to > 1.0:
         to /= 100.0
     g = float(params.get("guests_per_chambre") or def_g) or def_g
-    m_lin = _f(body.get("m_lin"), def_m_lin) or def_m_lin
-    # m_lin corner dédié si fourni dans params et pas dans body
-    if body.get("m_lin") in (None, "") and params.get("hotel_metres_lineaires_dedies_corner"):
-        m_lin = float(params["hotel_metres_lineaires_dedies_corner"]) or m_lin
-    # UI user : mètres linéaires en entier (pas de demi-mètres)
-    m_lin = float(max(1, int(round(float(m_lin)))))
+
+    # --- ML min 2 (spec §13) ---
+    m_lin_raw = _f(body.get("m_lin"), def_m_lin)
+    if m_lin_raw is None:
+        m_lin_raw = def_m_lin
+    if body.get("m_lin") in (None, "") and params.get(
+        "hotel_metres_lineaires_dedies_corner"
+    ):
+        m_lin_raw = (
+            float(params["hotel_metres_lineaires_dedies_corner"]) or m_lin_raw
+        )
+    m_lin = float(max(MIN_M_LIN, int(round(float(m_lin_raw)))))
+    m_lin_forced = float(m_lin_raw) < MIN_M_LIN
+
     mix_fb = _f(body.get("mix_fb"), def_mix) or def_mix
     if mix_fb > 1.0:
         mix_fb /= 100.0
     mix_fb = min(max(mix_fb, 0.0), 1.0)
 
+    # Équipements / contrat (spec §2)
+    contract = str(body.get("contract") or "BUY").upper().strip()
+    if contract not in ("BUY", "LEASE"):
+        contract = "BUY"
+    agencement = str(body.get("agencement") or "CLASSIC").upper().strip()
+    if agencement not in ("CLASSIC", "PREMIUM", "BESPOKE"):
+        agencement = "CLASSIC"
+    nb_scanners = max(_i(body.get("nb_scanners"), 1) or 1, 0)
+    nb_caisses = max(_i(body.get("nb_caisses"), 1) or 1, 0)
+    nb_vitrines = max(_i(body.get("nb_vitrines"), 1) or 1, 0)
+    nb_frigos_froid = max(_i(body.get("nb_frigos_froid"), 3) or 0, 0)
+    nb_frigos_ambiant = max(_i(body.get("nb_frigos_ambiant"), 0) or 0, 0)
+
     services_map = params_to_services(params)
-    has_vitrine = bool(services_map.get("lobby_fridge") or services_map.get("has_vitrine"))
+    has_vitrine = bool(
+        services_map.get("lobby_fridge")
+        or services_map.get("has_vitrine")
+        or body.get("has_vitrine")
+    )
     has_pool = bool(services_map.get("pool") or services_map.get("has_pool"))
     nb_restaurants = int(services_map.get("nb_restaurants") or 0)
     nb_bars = int(services_map.get("nb_bars") or 0)
     derniere_reno = _i(params.get("hotel_derniere_reno"), None)
 
-    from accor.user.rules.assortment import (
-        FB_KEYS,
-        NFB_KEYS,
-        needs_from_shares,
-        optimize_repartition,
-        parse_shares_payload,
-        shares_for_api,
-    )
-
-    # Parts relatives F&B / N-F&B (somme forcée à 1 par catégorie)
     shares_fb, shares_nfb, needs, _ = parse_shares_payload(
         body, default_needs=dict(DEFAULT_CLIENT_NEEDS)
     )
     for k in list(RULE3_FB_COEFFS) + list(RULE3_NFB_COEFFS):
         needs.setdefault(k, False)
 
+    # Garde-fou : toutes catégories OFF
+    any_cat = any(bool(v) for v in needs.values())
+    if not any_cat:
+        return {
+            "ok": False,
+            "error": "Activez au moins une catégorie produit (F&B ou Non F&B).",
+        }
+
+    # optimize_repartition = hors schéma Excel pur (bonus UI) — défaut False
     optimize = bool(
         body.get("optimize_repartition")
         or body.get("optimize")
         or body.get("optimize_shares")
     )
 
-    # Clientèle % depuis hotel_params si fournis
     profile_base: dict[str, Any] = {}
     if params.get("hotel_loisirs_pct") is not None:
         profile_base["loisirs_pct"] = float(params["hotel_loisirs_pct"])
@@ -217,7 +348,8 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
 
     ref = RodReference()
     rev = RevenueRules(ref)
-    cost = CostRules(ref)
+    cost_rules = CostRules(ref)
+    sim_engine = RodSimulator(rev, cost_rules)
     reco_engine = RecommendationRules()
 
     services_obj = HotelServices(
@@ -265,10 +397,31 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
         guests_per_chambre=g,
     )
 
+    def _store_for(concept: str, mix: float) -> StoreConfig:
+        return StoreConfig(
+            concept=concept,
+            m_lin=m_lin,
+            mix_fb=mix,
+            mix_nf=1.0 - mix,
+            nb_frigos_froid=nb_frigos_froid,
+            nb_frigos_ambiant=nb_frigos_ambiant,
+            nb_scanners=nb_scanners,
+            nb_caisses=nb_caisses,
+            nb_vitrines=nb_vitrines,
+            contract=contract,
+            agencement=agencement,
+        )
+
     def _run_three(
         mix: float, sh_fb: dict[str, float], sh_nfb: dict[str, float]
-    ) -> tuple[dict[str, Any], SimulationRequest | None, dict[str, Any]]:
-        nd = needs_from_shares(sh_fb, sh_nfb)
+    ) -> tuple[dict[str, Any], SimulationRequest | None, dict[str, Any], dict[str, Any]]:
+        # R3 Excel = toggles ±coeff (parts relatives = affichage / opti hors schéma)
+        # needs_from_shares : part > 0 ⇒ catégorie ON (aligné saisie UI)
+        nd = needs_from_shares(sh_fb or {}, sh_nfb or {})
+        for k in list(RULE3_FB_COEFFS) + list(RULE3_NFB_COEFFS):
+            if k in needs and k not in (sh_fb or {}) and k not in (sh_nfb or {}):
+                nd[k] = bool(needs[k])
+            nd.setdefault(k, False)
         profile = ClientProfile(
             client_needs=nd,
             shares_fb=dict(sh_fb),
@@ -276,6 +429,7 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
             **profile_base,
         )
         by: dict[str, Any] = {}
+        raw: dict[str, Any] = {}
         req0: SimulationRequest | None = None
         ca_by: dict[str, float] = {}
         for concept in CONCEPTS:
@@ -284,44 +438,33 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
                 operating=operating,
                 services=services_obj,
                 client_profile=profile,
-                store=StoreConfig(
-                    concept=concept,
-                    m_lin=m_lin,
-                    mix_fb=mix,
-                    mix_nf=1.0 - mix,
-                ),
+                store=_store_for(concept, mix),
             )
             if concept == CONCEPTS[0]:
                 req0 = req
-            rev_res = rev.compute(req, concept)
-            cost_res = cost.compute(req, concept)
-            ca = float(rev_res.ca_ht_mensuel or 0)
-            ca_by[concept] = ca
-            by[concept] = _money_block(
-                ca=ca,
-                cout=float(cost_res.monthly_cost or 0),
-                capex=float(cost_res.capex or 0),
-                marge_produit=float(rev_res.marge_produit_mensuelle or 0),
-            )
-        # CA de la solution recommandée (ou max si reco échoue)
-        rec, _, _ = reco_engine.recommend_tree(req0 or SimulationRequest(), m_lin=m_lin, to=to)
+            cs = sim_engine.simulate(req, concept)
+            raw[concept] = cs
+            ca_by[concept] = float(cs.ca_mensuel or 0)
+            by[concept] = _pnl_block(cs)
+        rec, _, _ = reco_engine.recommend_tree(
+            req0 or SimulationRequest(store=_store_for("SIMPLY", mix)),
+            m_lin=m_lin,
+            to=to,
+        )
         ca_ht = ca_by.get(rec) if rec in ca_by else max(ca_by.values(), default=0.0)
-        if ca_ht is None:
-            ca_ht = max(ca_by.values(), default=0.0)
-        return by, req0, {"ca_ht": float(ca_ht), "ca_by": ca_by, "recommended": rec}
+        return by, req0, {"ca_ht": float(ca_ht or 0), "ca_by": ca_by, "recommended": rec}, raw
 
     opt_meta: dict[str, Any] = {"optimized": False, "normalized": True}
     if optimize:
         en_fb = {k: bool(needs.get(k, False)) for k in FB_KEYS}
         en_nfb = {k: bool(needs.get(k, False)) for k in NFB_KEYS}
-        # au moins un produit par canal si possible
         if not any(en_fb.values()):
             en_fb = {k: True for k in FB_KEYS}
         if not any(en_nfb.values()):
             en_nfb = {k: True for k in NFB_KEYS}
 
         def _sim(mix: float, sh_fb: dict, sh_nfb: dict) -> dict:
-            _, _, meta = _run_three(mix, sh_fb, sh_nfb)
+            _, _, meta, _ = _run_three(mix, sh_fb, sh_nfb)
             return meta
 
         opt = optimize_repartition(
@@ -343,10 +486,12 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
                 "ca_ht_best": opt.get("ca_ht"),
             }
 
-    sim_by, req_for_reco, _meta_run = _run_three(mix_fb, shares_fb, shares_nfb)
+    sim_by, req_for_reco, _meta_run, raw_by = _run_three(
+        mix_fb, shares_fb, shares_nfb
+    )
     category_shares_out = shares_for_api(shares_fb, shares_nfb)
 
-    # Prédictions IA (3 scénarios solution) — mêmes coûts, CA modèle
+    # Prédictions IA
     ai_note = ""
     ai_available = False
     ai_by: dict[str, Any] = {}
@@ -362,33 +507,32 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
             ai_note = "Estimation modèle sur la base des hôtels déjà équipés."
             for c in CONCEPTS:
                 ca_ai = preds.get(c)
-                # Marge produit proportionnelle au ratio marge/CA du simulateur
-                sim = sim_by[c]
-                ca_sim = sim.get("ca_mensuel") or 0
-                mp_sim = sim.get("marge_produit_mensuelle") or 0
-                if ca_ai is not None and ca_sim and ca_sim > 0:
-                    mp_ai = float(mp_sim) * (float(ca_ai) / float(ca_sim))
-                elif ca_ai is not None:
-                    mp_ai = float(ca_ai) * 0.35
+                cs = raw_by[c]
+                if ca_ai is not None:
+                    ca_sim = float(cs.ca_mensuel or 0)
+                    mp_sim = float(cs.marge_produit_mensuelle or 0)
+                    if ca_sim > 0:
+                        mp_ai = mp_sim * (float(ca_ai) / ca_sim)
+                    else:
+                        mp_ai = float(ca_ai) * 0.35
+                    ai_by[c] = _pnl_block(
+                        cs, ca_override=float(ca_ai), marge_produit_override=mp_ai
+                    )
                 else:
-                    mp_ai = None
-                ai_by[c] = _money_block(
-                    ca=ca_ai,
-                    cout=float(sim.get("cout_mensuel") or 0),
-                    capex=float(sim.get("capex") or 0),
-                    marge_produit=mp_ai,
-                )
+                    ai_by[c] = _empty_pnl(
+                        cout=float(cs.cout_mensuel or 0),
+                        capex=float(cs.capex or 0),
+                    )
         else:
             ai_note = (
                 "Estimation modèle indisponible pour le moment — "
                 "consultez l'onglet Simulateur."
             )
             for c in CONCEPTS:
-                sim = sim_by[c]
-                ai_by[c] = _money_block(
-                    ca=None,
-                    cout=float(sim.get("cout_mensuel") or 0),
-                    capex=float(sim.get("capex") or 0),
+                cs = raw_by[c]
+                ai_by[c] = _empty_pnl(
+                    cout=float(cs.cout_mensuel or 0),
+                    capex=float(cs.capex or 0),
                 )
     except Exception:
         ai_note = (
@@ -396,30 +540,43 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
             "consultez l'onglet Simulateur."
         )
         for c in CONCEPTS:
-            sim = sim_by[c]
-            ai_by[c] = _money_block(
-                ca=None,
-                cout=float(sim.get("cout_mensuel") or 0),
-                capex=float(sim.get("capex") or 0),
-            )
+            cs = raw_by.get(c)
+            if cs is not None:
+                ai_by[c] = _empty_pnl(
+                    cout=float(cs.cout_mensuel or 0),
+                    capex=float(cs.capex or 0),
+                )
+            else:
+                ai_by[c] = _empty_pnl()
 
     recommended, order, reasons = reco_engine.recommend_tree(
-        req_for_reco or SimulationRequest(),
+        req_for_reco
+        or SimulationRequest(
+            identity=identity,
+            operating=operating,
+            services=services_obj,
+            store=_store_for("SIMPLY", mix_fb),
+        ),
         m_lin=m_lin,
         to=to,
     )
-    best_margin = max(
-        CONCEPTS,
-        key=lambda c: float(sim_by[c].get("marge_nette_mensuelle") or -1e18),
-    )
-    best_margin_ai = None
-    if ai_available:
-        best_margin_ai = max(
+    if m_lin_forced:
+        reasons = list(reasons) + [
+            f"Mètres linéaires forcés à {int(MIN_M_LIN)} (minimum métier)."
+        ]
+
+    def _best_margin(by: dict[str, Any]) -> str:
+        return max(
             CONCEPTS,
-            key=lambda c: float(
-                (ai_by.get(c) or {}).get("marge_nette_mensuelle") or -1e18
+            key=lambda c: (
+                -1e18
+                if (by.get(c) or {}).get("not_profitable")
+                else float((by.get(c) or {}).get("marge_nette_mensuelle") or -1e18)
             ),
         )
+
+    best_margin = _best_margin(sim_by)
+    best_margin_ai = _best_margin(ai_by) if ai_available else None
 
     lifestyle_on = [
         CLIENT_NEED_LABELS.get(k, k)
@@ -427,22 +584,31 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
         if needs.get(k, False)
     ]
 
-    # Compat legacy (anciens clients API) : ca_simule + ca_predit côte à côte
+    # Legacy flatten
     by_solution_legacy: dict[str, Any] = {}
     for c in CONCEPTS:
         s, a = sim_by[c], ai_by.get(c) or {}
         by_solution_legacy[c] = {
             "ca_simule_mensuel": s.get("ca_mensuel"),
             "ca_predit_mensuel": a.get("ca_mensuel"),
+            "ca_fb_mensuel": s.get("ca_fb_mensuel"),
+            "ca_nfb_mensuel": s.get("ca_nfb_mensuel"),
             "marge_produit_mensuelle": s.get("marge_produit_mensuelle"),
             "cout_mensuel": s.get("cout_mensuel"),
             "capex": s.get("capex"),
             "marge_nette_mensuelle": s.get("marge_nette_mensuelle"),
             "marge_nette_annuelle": s.get("marge_nette_annuelle"),
+            "status": s.get("status"),
+            "amort_months": s.get("amort_months"),
+            "amort_years": s.get("amort_years"),
         }
+
+    # Pilotes exposés pour UI info (zone gauche)
+    pilots = {c: get_pilot(c) for c in CONCEPTS}
 
     return {
         "ok": True,
+        "schema": "simulateur_rules_v1",
         "hotel": {
             "hotel_code": code,
             "hotel_name": identity_name,
@@ -456,8 +622,16 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
             "has_pool": bool(has_pool),
             "has_vitrine": bool(has_vitrine),
             "m_lin": int(round(m_lin)),
+            "m_lin_forced_min": m_lin_forced,
             "mix_fb": round(mix_fb, 4),
             "mix_nf": round(1.0 - mix_fb, 4),
+            "contract": contract,
+            "agencement": agencement,
+            "nb_scanners": nb_scanners,
+            "nb_caisses": nb_caisses,
+            "nb_vitrines": nb_vitrines,
+            "nb_frigos_froid": nb_frigos_froid,
+            "nb_frigos_ambiant": nb_frigos_ambiant,
             "hotel_params": params,
             "client_needs": needs,
             "shares_fb": shares_fb,
@@ -471,6 +645,19 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
         "best_margin_solution": best_margin,
         "best_margin_solution_ai": best_margin_ai,
         "lifestyle_categories_on": lifestyle_on,
+        "pilots": {
+            c: {
+                "ventes": p["ventes"],
+                "ca_fb": p["ca_fb"],
+                "ca_nfb": p["ca_nfb"],
+                "mix_fb": p["mix_fb"],
+                "ml_ref": p.get("ml_ref"),
+                "frigo_ref": p.get("frigo_ref"),
+                "coeff_fb": p["coeff_fb"],
+                "coeff_nfb": p["coeff_nfb"],
+            }
+            for c, p in pilots.items()
+        },
         "simulator": {
             "label": "Simulateur",
             "by_solution": sim_by,
@@ -483,7 +670,6 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
             "by_solution": ai_by,
             "best_margin_solution": best_margin_ai,
         },
-        # legacy
         "by_solution": by_solution_legacy,
         "ai_note": ai_note,
     }
@@ -493,13 +679,7 @@ def _ai_predict_three(
     hotel_code: str,
     feature_overrides: dict[str, Any] | None = None,
 ) -> dict[str, float] | None:
-    """
-    Trois prédictions de CA mensuel — **un modèle final par solution**.
-
-    Chaque spécialité (SIMPLY / LIBERTY / CONNECTED) a son propre modèle
-    entraîné uniquement sur les hôtels de cette solution. La reco reste
-    basée sur les règles métier + coûts, pas sur le ML.
-    """
+    """Trois prédictions de CA mensuel — un modèle final par solution."""
     import numpy as np
     import pandas as pd
 

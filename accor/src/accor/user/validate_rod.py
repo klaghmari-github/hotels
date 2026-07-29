@@ -1,283 +1,190 @@
-#!/usr/bin/env python3
 """
-Validation des règles ROD du simulateur user.
+Validation rapide du moteur ROD (iso simulateur_rules.html).
 
-Usage (venv activé) :
-  accor-validate-rod
-  python -m accor.user.validate_rod
-
-Vérifie sans serveur HTTP (logique pure) :
-  - clients jour/mois (nb × TO × guests × 30.5)
-  - impact TO + R1 (rule1_ca_by_concept == RevenueRules)
-  - R2–R4 neutres au mix/m_lin pilote + besoins complets
-  - reco <50 chambres, ouverture LIBERTY N-F&B, cas IBB
-  - coûts agencement proportionnels à m_lin
-  - enchaînement SimulationOrchestrator cohérent
-
-Exit code 0 si tout passe, 1 sinon (messages sur stderr/stdout).
+Usage :
+  PYTHONPATH=src python -m accor.user.validate_rod
 """
 
 from __future__ import annotations
 
-import sys
-from pathlib import Path
+from accor.user.models import (
+    DEFAULT_CLIENT_NEEDS,
+    ClientProfile,
+    HotelIdentity,
+    HotelOperating,
+    HotelServices,
+    SimulationRequest,
+    StoreConfig,
+)
+from accor.user.rules.costs import CostRules
+from accor.user.rules.pilot_table import get_pilot
+from accor.user.rules.recommendation import RecommendationRules
+from accor.user.rules.revenue import RevenueRules
+from accor.user.services.simulator import RodSimulator
 
-# package installé (editable) — plus de sys.path hack
+
+def _all_on() -> dict[str, bool]:
+    return {k: True for k in DEFAULT_CLIENT_NEEDS}
+
+
+def _req(
+    concept: str,
+    *,
+    rooms: int = 100,
+    to: float = 0.75,
+    guests: float = 1.5,
+    m_lin: float = 6.0,
+    mix: float = 0.7,
+    needs: dict[str, bool] | None = None,
+    frigos: int = 3,
+    contract: str = "BUY",
+    agencement: str = "CLASSIC",
+    vitrine: bool = False,
+) -> SimulationRequest:
+    return SimulationRequest(
+        identity=HotelIdentity(
+            hotel_code="VAL001", hotel_name="Validation", hotel_brand="IBIS"
+        ),
+        operating=HotelOperating(
+            nb_chambres=rooms, taux_occupation=to, guests_per_chambre=guests
+        ),
+        services=HotelServices(lobby_fridge=vitrine),
+        client_profile=ClientProfile(client_needs=needs or _all_on()),
+        store=StoreConfig(
+            concept=concept,
+            m_lin=m_lin,
+            mix_fb=mix,
+            mix_nf=1.0 - mix,
+            nb_frigos_froid=frigos,
+            nb_frigos_ambiant=0,
+            nb_scanners=1,
+            nb_caisses=1,
+            nb_vitrines=1,
+            contract=contract,
+            agencement=agencement,
+        ),
+    )
+
+
+def run_checks() -> list[str]:
+    errors: list[str] = []
+    rev = RevenueRules()
+    cost = CostRules()
+    sim = RodSimulator(rev, cost)
+    reco = RecommendationRules()
+
+    def check(cond: bool, msg: str) -> None:
+        if not cond:
+            errors.append(msg)
+
+    # Pilotes
+    p = get_pilot("SIMPLY")
+    check(abs(p["clients_heb"] - 5350.92) < 0.01, "clients_heb Simply")
+    check(p["ca_10_fb"] == 133.25, "ca_10_fb Simply")
+    check(p["coeff_nfb"] == 1.45, "coeff_nfb simu = 1.45")
+
+    # R1 à l'échelle pilote
+    r = rev.compute(
+        _req("SIMPLY", rooms=129, to=0.80, guests=1.7, m_lin=6, mix=0.40),
+        "SIMPLY",
+    )
+    check(abs(r.breakdown["ca_r1_fb"] - 533) < 1, f"R1 FB={r.breakdown['ca_r1_fb']}")
+    check(abs(r.breakdown["ca_r1_nfb"] - 187) < 1, f"R1 NFB={r.breakdown['ca_r1_nfb']}")
+    check(abs(r.breakdown["mult_rule3_fb"] - 1.48) < 0.001, "R3 mult FB all ON")
+    check(abs(r.breakdown["mult_rule3_nfb"] - 1.33) < 0.001, "R3 mult NFB all ON")
+
+    # R2 +10 % F&B
+    r2 = rev.compute(
+        _req("SIMPLY", rooms=129, to=0.8, guests=1.7, m_lin=6, mix=0.50),
+        "SIMPLY",
+    )
+    check(abs(r2.breakdown["ca_r2_fb"] - 666.25) < 0.5, "R2 +10% FB")
+    check(abs(r2.breakdown["ca_r2_nfb"] - 155.83) < 0.5, "R2 -10% NFB")
+
+    # R4 ML
+    r4 = rev.compute(
+        _req("SIMPLY", rooms=129, to=0.8, guests=1.7, m_lin=4, mix=0.4),
+        "SIMPLY",
+    )
+    exp_fb = 533 * 1.48 - 2 * 88.83
+    check(abs(r4.ca_fb_mensuel - exp_fb) < 0.5, f"R4 FB got {r4.ca_fb_mensuel}")
+
+    # Connected frigos
+    rc = rev.compute(
+        _req(
+            "CONNECTED",
+            rooms=305,
+            to=0.75,
+            guests=1.8,
+            m_lin=7,
+            mix=0.80,
+            frigos=3,
+        ),
+        "CONNECTED",
+    )
+    check(rc.breakdown["r4_mode"] == "frigos_froid", "R4 Connected mode")
+    check(abs(rc.breakdown["ca_r1_fb"] - 3503) < 2, "Connected R1")
+
+    # Coûts
+    cs = cost.compute(
+        _req("SIMPLY", rooms=129, to=0.8, guests=1.7, m_lin=6, mix=0.4),
+        "SIMPLY",
+    )
+    check(abs(cs.annexes_monthly - 15) < 0.05, f"annexes Simply={cs.annexes_monthly}")
+    check(
+        abs(cs.techno_monthly - (500 / 60 + 800 / 60 + 50 + 1000 / 60)) < 0.05,
+        "techno Simply",
+    )
+
+    cl = cost.compute(
+        _req("LIBERTY", rooms=100, m_lin=8, mix=0.7, contract="LEASE"),
+        "LIBERTY",
+    )
+    check(
+        abs(cl.techno_monthly - (250 + 800 / 60 + 50 + 2000 / 60)) < 0.1,
+        "Liberty LEASE techno",
+    )
+
+    # Full + amort
+    full = sim.simulate(
+        _req("SIMPLY", rooms=129, to=0.8, guests=1.7, m_lin=6, mix=0.4),
+        "SIMPLY",
+    )
+    check(full.status in ("ok", "not_profitable"), "status")
+    if full.marge_nette_mensuelle > 0:
+        check(full.amort_months is not None, "amort set when profitable")
+
+    # Reco
+    rec, _, _ = reco.recommend_tree(
+        _req("SIMPLY", rooms=40), m_lin=3, to=0.8
+    )
+    check(rec == "SIMPLY", f"reco 40ch={rec}")
+
+    needs_no_life = _all_on()
+    for k in (
+        "nfb_cosmetics",
+        "nfb_kids",
+        "nfb_apparel",
+        "nfb_accessories",
+        "nfb_souvenirs",
+    ):
+        needs_no_life[k] = False
+    rec, _, _ = reco.recommend_tree(
+        _req("CONNECTED", rooms=100, needs=needs_no_life), m_lin=3, to=0.75
+    )
+    check(rec == "CONNECTED", f"reco connected path={rec}")
+
+    return errors
 
 
 def main() -> int:
-    from accor.concept_pilote import rule1_ca_by_concept
-    from accor.user.models import DEFAULT_CLIENT_NEEDS, HotelOperating, SimulationRequest, StoreConfig
-    from accor.user.reference import RodReference
-    from accor.user.rules.coeffs import LIBERTY_NFB_NEEDS, RULE3_FB_COEFFS, RULE3_NFB_COEFFS
-    from accor.user.rules.costs import CostRules
-    from accor.user.rules.recommendation import RecommendationRules
-    from accor.user.rules.revenue import RevenueRules
-    from accor.user.services.orchestrator import SimulationOrchestrator
-
-    errors: list[str] = []
-    ref = RodReference()
-    rev = RevenueRules(ref)
-    costs = CostRules(ref)
-    reco = RecommendationRules()
-
-    # --- clients ---
-    op = HotelOperating(100, 0.75, 1.7)
-    expect_jour = 100 * 0.75 * 1.7
-    expect_mois = expect_jour * 30.5
-    if abs(op.clients_jour - expect_jour) > 1e-9 or abs(op.clients_mois - expect_mois) > 1e-9:
-        errors.append(f"clients jour/mois incorrects: {op.clients_jour} / {op.clients_mois}")
-
-    # --- R1 API vs engine ---
-    n, to, g = 100, 0.75, 1.7
-    r1 = rule1_ca_by_concept(nb_chambres=n, taux_occupation=to, guests_per_chambre=g)
-    for concept in ("SIMPLY", "LIBERTY", "CONNECTED"):
-        key = f"concepts.{concept}"
-        pivot_m = float(ref.get(f"{key}.pivot_m_lin") or 6)
-        mix_fb = float(ref.get(f"{key}.mix_fb") or 0.7)
-        mix_nf = float(ref.get(f"{key}.mix_nf") or 0.3)
-        all_true = {
-            **{k: True for k in RULE3_FB_COEFFS},
-            **{k: True for k in RULE3_NFB_COEFFS},
-        }
-        req = SimulationRequest.from_dict(
-            {
-                "identity": {"hotel_brand": "IBIS BUDGET"},
-                "operating": {
-                    "nb_chambres": n,
-                    "taux_occupation": to,
-                    "guests_per_chambre": g,
-                },
-                "client_profile": {"client_needs": all_true},
-                "corner": {"m_lin": pivot_m, "mix_fb": mix_fb},
-            }
-        )
-        req.store = StoreConfig(
-            concept=concept, m_lin=pivot_m, mix_fb=mix_fb, mix_nf=mix_nf
-        )
-        full = rev.compute(req, concept)
-        api_ca = float(r1["by_concept"][concept]["ca_ht_mensuel"])
-        # R2=0 R3=0 R4=0 → full == R1
-        if abs(full.ca_ht_mensuel - api_ca) > 0.5:
-            errors.append(
-                f"{concept}: CA full {full.ca_ht_mensuel:.2f} != R1 API {api_ca:.2f} "
-                f"(attendu egal au mix/m_lin pilote + besoins complets)"
-            )
-
-    # --- reco ---
-    small = SimulationRequest.from_dict(
-        {
-            "identity": {"hotel_brand": "NOVOTEL"},
-            "operating": {"nb_chambres": 40, "taux_occupation": 0.8, "guests_per_chambre": 1.8},
-            "client_profile": {
-                "client_needs": {
-                    **{k: True for k in RULE3_FB_COEFFS},
-                    **{k: True for k in RULE3_NFB_COEFFS},
-                }
-            },
-        }
-    )
-    allowed, _ = reco.allowed_concepts(small)
-    if allowed != ["SIMPLY"]:
-        errors.append(f"reco n<50 attendu [SIMPLY], got {allowed}")
-
-    needs_no = {
-        **{k: True for k in RULE3_FB_COEFFS},
-        **{k: True for k in RULE3_NFB_COEFFS},
-    }
-    for k in LIBERTY_NFB_NEEDS:
-        needs_no[k] = False
-    mid = SimulationRequest.from_dict(
-        {
-            "identity": {"hotel_brand": "IBIS"},
-            "operating": {"nb_chambres": 100, "taux_occupation": 0.7, "guests_per_chambre": 1.8},
-            "client_profile": {"client_needs": needs_no},
-        }
-    )
-    allowed2, _ = reco.allowed_concepts(mid)
-    if "LIBERTY" in allowed2:
-        errors.append(f"LIBERTY ne doit pas etre autorise sans N-F&B lifestyle: {allowed2}")
-    if "CONNECTED" not in allowed2:
-        errors.append(f"CONNECTED manquant: {allowed2}")
-
-    ibb = SimulationRequest.from_dict(
-        {
-            "identity": {"hotel_brand": "IBIS BUDGET"},
-            "operating": {"nb_chambres": 150, "taux_occupation": 0.75, "guests_per_chambre": 1.7},
-            "client_profile": {
-                "client_needs": {
-                    **{k: True for k in RULE3_FB_COEFFS},
-                    **{k: True for k in RULE3_NFB_COEFFS},
-                }
-            },
-        }
-    )
-    allowed3, _ = reco.allowed_concepts(ibb)
-    for c in ("SIMPLY", "LIBERTY", "CONNECTED"):
-        if c not in allowed3:
-            errors.append(f"IBB 150 doit autoriser {c}: {allowed3}")
-
-    # --- costs m_lin ---
-    req_c = SimulationRequest.from_dict(
-        {
-            "identity": {"hotel_brand": "IBIS"},
-            "operating": {"nb_chambres": 100, "taux_occupation": 0.7, "guests_per_chambre": 1.7},
-        }
-    )
-    req_c.store = StoreConfig(concept="SIMPLY", m_lin=6, mix_fb=0.4, mix_nf=0.6)
-    c6 = costs.compute(req_c, "SIMPLY")
-    req_c.store = StoreConfig(concept="SIMPLY", m_lin=12, mix_fb=0.4, mix_nf=0.6)
-    c12 = costs.compute(req_c, "SIMPLY")
-    per_m = float(ref.get("concepts.SIMPLY.agencement_per_m") or 1000)
-    if abs((c12.capex - c6.capex) - 6 * per_m) > 1.0:
-        errors.append(
-            f"capex agencement non lineaire: d={c12.capex - c6.capex} attendu {6 * per_m}"
-        )
-
-    # --- pilot MN / costs vs rod_reference (reference metier) ---
-    all_true = {
-        **{k: True for k in RULE3_FB_COEFFS},
-        **{k: True for k in RULE3_NFB_COEFFS},
-    }
-    for concept in ("SIMPLY", "LIBERTY", "CONNECTED"):
-        key = f"concepts.{concept}"
-        pivot_n = float(ref.get(f"{key}.pivot_nb_chambres"))
-        pivot_to = float(ref.get(f"{key}.pivot_to"))
-        pivot_g = float(ref.get(f"{key}.pivot_guests_per_chambre"))
-        pivot_m = float(ref.get(f"{key}.pivot_m_lin"))
-        mix_fb = float(ref.get(f"{key}.mix_fb"))
-        mix_nf = float(ref.get(f"{key}.mix_nf"))
-        ref_cost = float(ref.get(f"{key}.monthly_cost_total") or 0)
-        ref_mn = float(ref.get(f"{key}.marge_nette_mensuelle_pilote") or 0)
-        req_p = SimulationRequest.from_dict(
-            {
-                "identity": {"hotel_brand": "IBIS"},
-                "operating": {
-                    "nb_chambres": pivot_n,
-                    "taux_occupation": pivot_to,
-                    "guests_per_chambre": pivot_g,
-                },
-                "client_profile": {"client_needs": all_true},
-                "corner": {"m_lin": pivot_m, "mix_fb": mix_fb},
-            }
-        )
-        req_p.store = StoreConfig(
-            concept=concept, m_lin=pivot_m, mix_fb=mix_fb, mix_nf=mix_nf
-        )
-        rev_p = rev.compute(req_p, concept)
-        cost_p = costs.compute(req_p, concept)
-        mn = rev_p.marge_produit_mensuelle - cost_p.monthly_cost
-        if abs(cost_p.monthly_cost - ref_cost) > 0.5:
-            errors.append(
-                f"{concept} pilot cost {cost_p.monthly_cost:.2f} != ref {ref_cost:.2f}"
-            )
-        if abs(mn - ref_mn) > 0.5:
-            errors.append(
-                f"{concept} pilot MN {mn:.2f} != ref {ref_mn:.2f}"
-            )
-
-    # --- reco: recommend never picks blocked concept ---
-    orch_r = SimulationOrchestrator(auto_enrich=False)
-    req_block = SimulationRequest.from_dict(
-        {
-            "identity": {"hotel_brand": "NOVOTEL"},
-            "operating": {
-                "nb_chambres": 40,
-                "taux_occupation": 0.8,
-                "guests_per_chambre": 1.8,
-            },
-            "client_profile": {"client_needs": all_true},
-            "corner": {},
-        }
-    )
-    sim_b = orch_r.simulate_all(req_block, enrich=False, hydrate_from_admin=False)
-    if sim_b.recommended_concept != "SIMPLY":
-        errors.append(
-            f"n=40 reco doit etre SIMPLY, got {sim_b.recommended_concept}"
-        )
-    if sim_b.allowed_concepts != ["SIMPLY"]:
-        errors.append(f"n=40 allowed={sim_b.allowed_concepts}")
-
-    # --- orchestrator + flask ---
-    orch = SimulationOrchestrator(auto_enrich=False)
-    req_o = SimulationRequest.from_dict(
-        {
-            "identity": {"hotel_brand": "IBIS BUDGET"},
-            "operating": {"nb_chambres": n, "taux_occupation": to, "guests_per_chambre": g},
-            "client_profile": {"client_needs": dict(DEFAULT_CLIENT_NEEDS)},
-            "corner": {},
-        }
-    )
-    sim = orch.simulate_all(req_o, enrich=False, hydrate_from_admin=False)
-    if sim.recommended_concept not in sim.allowed_concepts:
-        errors.append("recommended_concept hors allowed_concepts")
-    if not sim.by_concept.get("SIMPLY") or sim.by_concept["SIMPLY"].ca_mensuel <= 0:
-        errors.append("SIMPLY CA doit etre > 0 sur scenario standard")
-
-    from accor.user.app import app
-
-    client = app.test_client()
-    resp = client.post(
-        "/api/simulate?light=1",
-        json={
-            "identity": {"hotel_brand": "IBIS BUDGET"},
-            "operating": {
-                "nb_chambres": n,
-                "taux_occupation": to,
-                "guests_per_chambre": g,
-            },
-            "client_profile": {"client_needs": dict(DEFAULT_CLIENT_NEEDS)},
-            "corner": {},
-            "light_enrich": True,
-        },
-    )
-    data = resp.get_json() or {}
-    if resp.status_code != 200 or not data.get("ok"):
-        errors.append(f"API simulate echec: {resp.status_code} {data}")
-    else:
-        api_simply = (data.get("by_concept") or {}).get("SIMPLY") or {}
-        eng = sim.by_concept["SIMPLY"].ca_mensuel
-        if abs(float(api_simply.get("ca_mensuel") or 0) - eng) > 0.5:
-            errors.append(
-                f"API CA SIMPLY {api_simply.get('ca_mensuel')} != engine {eng}"
-            )
-
-    if errors:
-        print("ROD VALIDATION FAILED")
-        for e in errors:
+    errs = run_checks()
+    if errs:
+        print("FAILED:")
+        for e in errs:
             print(" -", e)
         return 1
-
-    print("ROD VALIDATION OK")
-    print(
-        f"  R1 SIMPLY={r1['by_concept']['SIMPLY']['ca_ht_mensuel']} "
-        f"clients_mois={r1['clients_mois']}"
-    )
-    print(
-        f"  sim reco={sim.recommended_concept} "
-        f"SIMPLY CA={sim.by_concept['SIMPLY'].ca_mensuel:.1f} "
-        f"allowed={sim.allowed_concepts}"
-    )
+    print("validate_rod: OK — moteur fidèle à simulateur_rules.html")
     return 0
 
 

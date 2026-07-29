@@ -198,9 +198,10 @@
                   <strong id="m-lin-val" class="slider-value">6</strong>
                 </span>
                 <div class="slider-row">
-                  <input type="range" id="m_lin_slider" min="1" max="40" step="1" value="6" />
-                  <input type="number" id="m_lin" min="1" max="40" step="1" value="6" />
+                  <input type="range" id="m_lin_slider" min="2" max="40" step="1" value="6" />
+                  <input type="number" id="m_lin" min="2" max="40" step="1" value="6" />
                 </div>
+                <p class="field-help">Minimum métier&nbsp;: 2&nbsp;m linéaires</p>
               </label>
               <label class="field slider-card">
                 <span class="slider-card-top">
@@ -218,6 +219,53 @@
                 <div class="mix-bar" aria-hidden="true">
                   <i id="mix-bar-fb" style="width:70%"></i>
                 </div>
+              </label>
+            </div>
+          </section>
+
+          <section class="form-block" id="equip-block">
+            <header class="form-block-head">
+              <h2 class="wiz-section-title">Équipements &amp; contrat</h2>
+            </header>
+            <p class="wiz-note tight">
+              Paramètres de coûts (techno, annexes, agencement).
+              Les frigos Connected n’impactent le CA que si le mix le permet (≥&nbsp;10&nbsp;%).
+            </p>
+            <div class="wiz-grid-3 equip-grid">
+              <label class="field">
+                <span class="field-label">Type de contrat</span>
+                <select id="contract" class="field-select">
+                  <option value="BUY" selected>Achat (BUY)</option>
+                  <option value="LEASE">Location (LEASE)</option>
+                </select>
+              </label>
+              <label class="field">
+                <span class="field-label">Agencement</span>
+                <select id="agencement" class="field-select">
+                  <option value="CLASSIC" selected>Classic</option>
+                  <option value="PREMIUM">Premium</option>
+                  <option value="BESPOKE">Bespoke</option>
+                </select>
+              </label>
+              <label class="field">
+                <span class="field-label">Nb. vitrines</span>
+                <input type="number" id="nb_vitrines" min="0" max="10" step="1" value="1" />
+              </label>
+              <label class="field">
+                <span class="field-label">Nb. scanners <span class="field-tag">Simply</span></span>
+                <input type="number" id="nb_scanners" min="0" max="10" step="1" value="1" />
+              </label>
+              <label class="field">
+                <span class="field-label">Nb. caisses <span class="field-tag">Liberty</span></span>
+                <input type="number" id="nb_caisses" min="0" max="10" step="1" value="1" />
+              </label>
+              <label class="field" id="field-frigos-froid">
+                <span class="field-label">Frigos froid <span class="field-tag">Connected</span></span>
+                <input type="number" id="nb_frigos_froid" min="0" max="12" step="1" value="3" />
+              </label>
+              <label class="field" id="field-frigos-ambiant">
+                <span class="field-label">Frigos ambiant <span class="field-tag">Connected</span></span>
+                <input type="number" id="nb_frigos_ambiant" min="0" max="12" step="1" value="0" />
               </label>
             </div>
           </section>
@@ -259,11 +307,11 @@
           <div class="wiz-actions wiz-actions-split">
             <button type="button" class="btn btn-ghost" data-goto="2">← Retour</button>
             <div class="wiz-actions-right">
-              <button type="button" class="btn btn-ghost" id="btn-run-sim-manual">
-                Calculer ma répartition
+              <button type="button" class="btn btn-ghost" id="btn-run-sim-manual" title="Maximise le CA en testant d'autres parts (hors schéma Excel pur)">
+                Optimiser les parts
               </button>
               <button type="button" class="btn btn-primary btn-lg btn-shine" id="btn-run-sim">
-                Optimiser la répartition
+                Lancer la simulation
                 <span class="btn-arrow" aria-hidden="true">→</span>
               </button>
             </div>
@@ -324,11 +372,13 @@
               data-result-pane="sim"
             >
               <p class="result-pane-lead">
-                Projection basée sur les règles métier ROD — pilotes, mix et mètres linéaires.
+                Projection fidèle aux règles Excel ROD — R1 clients · R2 mix · R3 catégories · R4 surface · coûts · marge nette.
               </p>
+              <div id="dir-status-banner" class="status-banner hidden" role="status"></div>
               <section class="dir-big-metrics" id="dir-metrics-sim"></section>
+              <section class="pnl-detail" id="dir-pnl-detail-sim"></section>
               <section class="assortment-panel" id="dir-assortment">
-                <h2 class="dir-subh">Répartition recommandée</h2>
+                <h2 class="dir-subh">Répartition des catégories</h2>
                 <p class="result-pane-lead" id="dir-assortment-note"></p>
                 <div class="assortment-cols">
                   <div>
