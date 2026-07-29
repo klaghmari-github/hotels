@@ -496,6 +496,7 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
     user_mix = float(mix_fb)
     user_shares_fb = dict(shares_fb)
     user_shares_nfb = dict(shares_nfb)
+    # Parts déjà normalisées côté parse_shares_payload (somme forcée à 1)
     sum_fb = sum(float(v or 0) for v in user_shares_fb.values())
     sum_nfb = sum(float(v or 0) for v in user_shares_nfb.values())
     shares_ok = abs(sum_fb - 1.0) < 0.02 and abs(sum_nfb - 1.0) < 0.02

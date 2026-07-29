@@ -1021,48 +1021,82 @@ class DirectorApp {
   }
 
   /**
-   * Vérifie que les parts actives font ~100 % par canal.
-   * @returns {{ ok: boolean, message?: string, sumFb: number, sumNfb: number }}
+   * Redistribue l'écart pour que les parts actives d'un canal = 100 %.
+   * Écart proportionnel aux parts actuelles (si somme 0 → égalitaire).
+   * @returns {{ adjusted: boolean, sumBefore: number, sumAfter: number, n: number }}
    */
-  validateShares() {
-    const sum = (channel) => {
-      let s = 0;
-      let n = 0;
-      $$(`[data-share][data-channel="${channel}"]`).forEach((inp) => {
-        if (inp.disabled) return;
-        n += 1;
-        s += Number(inp.value) || 0;
+  _normalizeChannelPct(channel) {
+    const inputs = [];
+    $$(`[data-share][data-channel="${channel}"]`).forEach((inp) => {
+      if (inp.disabled) return;
+      let v = Number(inp.value);
+      if (!Number.isFinite(v) || v < 0) v = 0;
+      inputs.push({ inp, v });
+    });
+    const n = inputs.length;
+    if (n === 0) return { adjusted: false, sumBefore: 0, sumAfter: 0, n: 0 };
+
+    let sum = inputs.reduce((a, x) => a + x.v, 0);
+    const sumBefore = sum;
+    if (Math.abs(sum - 100) < 0.05) {
+      return { adjusted: false, sumBefore, sumAfter: sum, n };
+    }
+
+    if (sum <= 1e-9) {
+      // Toutes à 0 → parts égales
+      const eq = Math.floor((1000 / n)) / 10;
+      let acc = 0;
+      inputs.forEach((x, i) => {
+        if (i === n - 1) x.inp.value = String(Math.round((100 - acc) * 10) / 10);
+        else {
+          x.inp.value = String(eq);
+          acc += eq;
+        }
       });
-      return { s, n };
+    } else {
+      // Redistribue l'écart proportionnellement (scale pour somme = 100)
+      const coef = 100 / sum;
+      let acc = 0;
+      inputs.forEach((x, i) => {
+        if (i === n - 1) {
+          x.inp.value = String(Math.round((100 - acc) * 10) / 10);
+        } else {
+          const nv = Math.round(x.v * coef * 10) / 10;
+          x.inp.value = String(nv);
+          acc += nv;
+        }
+      });
+    }
+    sum = 0;
+    inputs.forEach((x) => {
+      sum += Number(x.inp.value) || 0;
+    });
+    return {
+      adjusted: Math.abs(sumBefore - 100) >= 0.05,
+      sumBefore,
+      sumAfter: sum,
+      n,
     };
-    const fb = sum("fb");
-    const nfb = sum("nfb");
-    if (fb.n === 0 && nfb.n === 0) {
+  }
+
+  /**
+   * Normalise F&B et N-F&B sans bloquer. Ne refuse que s'il n'y a aucune catégorie.
+   * @returns {{ ok: boolean, message?: string, renormalized: boolean }}
+   */
+  ensureSharesReady() {
+    const nOn = $$(".share-row.is-on").length;
+    if (nOn === 0) {
       return {
         ok: false,
         message: "Activez au moins une sous-catégorie produit.",
-        sumFb: 0,
-        sumNfb: 0,
+        renormalized: false,
       };
     }
-    // Tolérance 0,6 % (arrondis UI)
-    if (fb.n > 0 && Math.abs(fb.s - 100) >= 0.6) {
-      return {
-        ok: false,
-        message: `Parts F&B = ${Math.round(fb.s * 10) / 10} % (doivent totaliser 100 %).`,
-        sumFb: fb.s,
-        sumNfb: nfb.s,
-      };
-    }
-    if (nfb.n > 0 && Math.abs(nfb.s - 100) >= 0.6) {
-      return {
-        ok: false,
-        message: `Parts Non F&B = ${Math.round(nfb.s * 10) / 10} % (doivent totaliser 100 %).`,
-        sumFb: fb.s,
-        sumNfb: nfb.s,
-      };
-    }
-    return { ok: true, sumFb: fb.s, sumNfb: nfb.s };
+    const fb = this._normalizeChannelPct("fb");
+    const nfb = this._normalizeChannelPct("nfb");
+    this._updateShareSums();
+    const renormalized = fb.adjusted || nfb.adjusted;
+    return { ok: true, renormalized, fb, nfb };
   }
 
   collectBody(optimize = false) {
@@ -1102,14 +1136,17 @@ class DirectorApp {
   }
 
   async runSim(optimize = false) {
-    // Simulation : exiger 100 % ; optimisation : le moteur normalise / redistribue
-    if (!optimize) {
-      const v = this.validateShares();
-      if (!v.ok) {
-        toast.show(v.message || "Parts invalides", "err");
-        this._updateShareSums();
-        return;
-      }
+    // Ne bloque pas si ≠ 100 % : on redistribue l'écart sur les catégories actives
+    const prep = this.ensureSharesReady();
+    if (!prep.ok) {
+      toast.show(prep.message || "Parts invalides", "err");
+      return;
+    }
+    if (prep.renormalized && !optimize) {
+      toast.show(
+        "Parts réajustées à 100 % (écart réparti sur les sous-catégories actives).",
+        "ok"
+      );
     }
     const body = this.collectBody(optimize);
     if (!body.hotel_code) {

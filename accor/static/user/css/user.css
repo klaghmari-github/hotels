@@ -2125,6 +2125,22 @@ body.is-hotel-loading #btn-step1-next {
   color: #7dd3fc;
   border: 1px solid rgba(56, 189, 248, 0.25);
 }
+/* Solutions : teintes distinctes (alignées palette ROD) */
+.field-tag-simply {
+  background: rgba(59, 130, 246, 0.14);
+  color: #93c5fd;
+  border-color: rgba(59, 130, 246, 0.35);
+}
+.field-tag-liberty {
+  background: rgba(16, 185, 129, 0.14);
+  color: #6ee7b7;
+  border-color: rgba(16, 185, 129, 0.35);
+}
+.field-tag-connected {
+  background: rgba(245, 158, 11, 0.14);
+  color: #fcd34d;
+  border-color: rgba(245, 158, 11, 0.4);
+}
 .field-select {
   width: 100%;
   background: rgba(15, 23, 42, 0.65);

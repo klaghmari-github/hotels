@@ -234,8 +234,9 @@
             </label>
 
             <p class="wiz-note tight mix-sub-note">
-              Sous-catégories actives et <strong>parts relatives</strong> dans chaque canal
-              (somme = 100&nbsp;% F&amp;B et 100&nbsp;% Non F&amp;B).
+              Sous-catégories actives et parts relatives par canal.
+              Si la somme n’est pas 100&nbsp;%, l’écart est
+              <strong>réparti automatiquement</strong> avant le calcul.
             </p>
             <div class="needs-cols">
               <div class="needs-panel needs-panel-fb">
@@ -286,19 +287,19 @@
                 <input type="number" id="nb_vitrines" min="0" max="10" step="1" value="1" />
               </label>
               <label class="field">
-                <span class="field-label">Nb. scanners <span class="field-tag">Simply</span></span>
+                <span class="field-label">Nb. scanners <span class="field-tag field-tag-simply">Simply</span></span>
                 <input type="number" id="nb_scanners" min="0" max="10" step="1" value="1" />
               </label>
               <label class="field">
-                <span class="field-label">Nb. caisses <span class="field-tag">Liberty</span></span>
+                <span class="field-label">Nb. caisses <span class="field-tag field-tag-liberty">Liberty</span></span>
                 <input type="number" id="nb_caisses" min="0" max="10" step="1" value="1" />
               </label>
               <label class="field" id="field-frigos-froid">
-                <span class="field-label">Frigos froid <span class="field-tag">Connected</span></span>
+                <span class="field-label">Frigos froid <span class="field-tag field-tag-connected">Connected</span></span>
                 <input type="number" id="nb_frigos_froid" min="0" max="12" step="1" value="3" />
               </label>
               <label class="field" id="field-frigos-ambiant">
-                <span class="field-label">Frigos ambiant <span class="field-tag">Connected</span></span>
+                <span class="field-label">Frigos ambiant <span class="field-tag field-tag-connected">Connected</span></span>
                 <input type="number" id="nb_frigos_ambiant" min="0" max="12" step="1" value="0" />
               </label>
             </div>
