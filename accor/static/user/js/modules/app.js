@@ -10,6 +10,7 @@
 import { $, $$, escapeHtml } from "../../../shared/js/dom.js";
 import { api } from "../../../shared/js/api.js";
 import { toast } from "../../../shared/js/toast.js";
+import { enhanceNumSteps } from "./num-step.js";
 
 function fmt(v, d = 1) {
   if (v == null || Number.isNaN(Number(v))) return "—";
@@ -64,6 +65,7 @@ class DirectorApp {
       console.warn("index hotels", err);
     });
     this.wire();
+    enhanceNumSteps(document);
     this.goStep(1);
   }
 
@@ -340,15 +342,10 @@ class DirectorApp {
     });
 
     const syncMix = () => {
-      this.setMix($("#mix_fb")?.value || $("#mix_slider")?.value);
+      this.setMix($("#mix_slider")?.value || $("#mix_fb")?.value);
       this._syncFrigoVisibility();
     };
     $("#mix_slider")?.addEventListener("input", () => {
-      $("#mix_fb").value = $("#mix_slider").value;
-      syncMix();
-    });
-    $("#mix_fb")?.addEventListener("input", () => {
-      $("#mix_slider").value = $("#mix_fb").value;
       syncMix();
     });
 
@@ -364,8 +361,38 @@ class DirectorApp {
     });
   }
 
+  _toggleBtnHtml(f) {
+    return `<button type="button" class="toggle-row" role="switch"
+      aria-checked="false" data-hp-bool="${escapeHtml(f.id)}"
+      title="${escapeHtml(f.hint || f.label)}">
+      <span class="toggle-icon" aria-hidden="true">●</span>
+      <span class="toggle-copy">
+        <strong>${escapeHtml(f.label)}</strong>
+        ${f.hint ? `<em>${escapeHtml(f.hint)}</em>` : ""}
+      </span>
+      <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+    </button>`;
+  }
+
+  _numFieldHtml(f) {
+    const min = f.min != null ? ` min="${f.min}"` : "";
+    const max = f.max != null ? ` max="${f.max}"` : "";
+    const step = f.step != null ? ` step="${f.step}"` : ' step="any"';
+    return `<label class="field field-float" data-field="${escapeHtml(f.id)}">
+      <span>${escapeHtml(f.label)}${
+        f.hint
+          ? ` <em class="field-hint" title="${escapeHtml(f.hint)}">?</em>`
+          : ""
+      }</span>
+      <input type="number" data-hp="${escapeHtml(f.id)}" data-kind="${escapeHtml(
+        f.kind
+      )}"${min}${max}${step} />
+    </label>`;
+  }
+
   /**
    * Construit le formulaire paramètres de base (toutes variables hotel_data utiles).
+   * Section « Corner » : F&B / Non F&B séparés en deux colonnes.
    */
   renderHotelParamsForm(formMeta) {
     const host = $("#hotel-params-form");
@@ -383,50 +410,27 @@ class DirectorApp {
         const nums = fields.filter((f) => f.kind !== "bool");
         const numHtml = nums.length
           ? `<div class="wiz-grid-3">${nums
-              .map((f) => {
-                const min =
-                  f.min != null ? ` min="${f.min}"` : "";
-                const max =
-                  f.max != null ? ` max="${f.max}"` : "";
-                const step =
-                  f.step != null ? ` step="${f.step}"` : ' step="any"';
-                return `<label class="field field-float" data-field="${escapeHtml(
-                  f.id
-                )}">
-                <span>${escapeHtml(f.label)}${
-                  f.hint
-                    ? ` <em class="field-hint" title="${escapeHtml(
-                        f.hint
-                      )}">?</em>`
-                    : ""
-                }</span>
-                <input type="number" data-hp="${escapeHtml(
-                  f.id
-                )}" data-kind="${escapeHtml(f.kind)}"${min}${max}${step} />
-              </label>`;
-              })
+              .map((f) => this._numFieldHtml(f))
               .join("")}</div>`
           : "";
-        const boolHtml = bools.length
-          ? `<div class="toggle-grid hotel-params-toggles">${bools
-              .map(
-                (f) => `<button type="button" class="toggle-row" role="switch"
-                aria-checked="false" data-hp-bool="${escapeHtml(f.id)}"
-                title="${escapeHtml(f.hint || f.label)}">
-                <span class="toggle-icon" aria-hidden="true">●</span>
-                <span class="toggle-copy">
-                  <strong>${escapeHtml(f.label)}</strong>
-                  ${
-                    f.hint
-                      ? `<em>${escapeHtml(f.hint)}</em>`
-                      : ""
-                  }
-                </span>
-                <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
-              </button>`
-              )
-              .join("")}</div>`
-          : "";
+
+        let boolHtml = "";
+        if (sec.id === "corner" && bools.length) {
+          // Formulaire simplifié : présence + frigo/vitrine (plus les 9 modes de vente)
+          boolHtml = `
+            <div class="toggle-grid hotel-params-toggles corner-general">
+              ${bools.map((f) => this._toggleBtnHtml(f)).join("")}
+            </div>
+            <p class="corner-data-note">
+              Infos issues de la fiche ROD (hotel_data), pas du scrap Accor.
+              Seuls la présence, les ML et le frigo/vitrine impactent la simulation.
+            </p>`;
+        } else if (bools.length) {
+          boolHtml = `<div class="toggle-grid hotel-params-toggles">${bools
+            .map((f) => this._toggleBtnHtml(f))
+            .join("")}</div>`;
+        }
+
         return `<section class="form-block" data-section="${escapeHtml(
           sec.id
         )}">
@@ -452,6 +456,7 @@ class DirectorApp {
         }
       });
     });
+    enhanceNumSteps(host);
     this._hotelFormBuilt = true;
   }
 
@@ -802,7 +807,7 @@ class DirectorApp {
         <div class="share-row ${on ? "is-on" : "is-off"}" data-need="${escapeHtml(
           it.id
         )}" data-channel="${channel}">
-          <button type="button" class="share-toggle" role="switch"
+          <button type="button" class="share-toggle ${on ? "is-on" : ""}" role="switch"
             aria-checked="${on ? "true" : "false"}" data-need-toggle="${escapeHtml(it.id)}">
             <span class="need-toggle-lab">${escapeHtml(it.label || it.id)}</span>
             <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
@@ -835,6 +840,7 @@ class DirectorApp {
           this._updateShareSums();
         });
       });
+      enhanceNumSteps(host);
       host.querySelectorAll("[data-share]").forEach((inp) => {
         inp.addEventListener("input", () => this._updateShareSums());
         inp.addEventListener("change", () => this._updateShareSums());
@@ -971,12 +977,14 @@ class DirectorApp {
 
   setMix(pct) {
     const p = Math.min(100, Math.max(0, Number(pct) || 0));
-    if ($("#mix_slider")) $("#mix_slider").value = String(p);
-    if ($("#mix_fb")) $("#mix_fb").value = String(p);
-    if ($("#mix-val")) $("#mix-val").textContent = String(Math.round(p));
-    if ($("#mix-nf-val")) $("#mix-nf-val").textContent = String(100 - Math.round(p));
-    const bar = $("#mix-bar-fb");
-    if (bar) bar.style.width = `${Math.round(p)}%`;
+    const r = Math.round(p);
+    if ($("#mix_slider")) {
+      $("#mix_slider").value = String(r);
+      $("#mix_slider").setAttribute("aria-valuenow", String(r));
+    }
+    if ($("#mix_fb")) $("#mix_fb").value = String(r);
+    if ($("#mix-val")) $("#mix-val").textContent = String(r);
+    if ($("#mix-nf-val")) $("#mix-nf-val").textContent = String(100 - r);
   }
 
   collectNeeds() {
@@ -1004,7 +1012,8 @@ class DirectorApp {
   }
 
   _syncFrigoVisibility() {
-    const mix = (Number($("#mix_fb")?.value) || 0) / 100;
+    const mix =
+      (Number($("#mix_slider")?.value ?? $("#mix_fb")?.value) || 0) / 100;
     const ff = $("#field-frigos-froid");
     const fa = $("#field-frigos-ambiant");
     if (ff) ff.classList.toggle("is-dimmed", mix < 0.1);
@@ -1029,7 +1038,7 @@ class DirectorApp {
       has_pool: !!hotel_params.hotel_non_f_b_piscine,
       has_vitrine: !!hotel_params.hotel_dispo_dans_lobby_vitrine_refrigeree,
       m_lin: mLin,
-      mix_fb: (Number($("#mix_fb")?.value) || 70) / 100,
+      mix_fb: (Number($("#mix_slider")?.value ?? $("#mix_fb")?.value) || 70) / 100,
       client_needs: this.collectNeeds(),
       category_shares: shares,
       shares_fb: shares.fb,

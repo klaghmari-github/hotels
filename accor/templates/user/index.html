@@ -191,7 +191,7 @@
             <header class="form-block-head">
               <h2 class="wiz-section-title">Dimensionnement</h2>
             </header>
-            <div class="wiz-grid-2 slider-cards">
+            <div class="slider-cards">
               <label class="field slider-card">
                 <span class="slider-card-top">
                   <span>Mètres linéaires</span>
@@ -203,23 +203,57 @@
                 </div>
                 <p class="field-help">Minimum métier&nbsp;: 2&nbsp;m linéaires</p>
               </label>
-              <label class="field slider-card">
-                <span class="slider-card-top">
-                  <span>Mix F&amp;B / non F&amp;B</span>
-                  <strong class="slider-value">
-                    <span id="mix-val">70</span><span class="slider-unit">%</span>
-                    <span class="slider-split">·</span>
-                    <span id="mix-nf-val">30</span><span class="slider-unit">%</span>
-                  </strong>
-                </span>
-                <div class="slider-row">
-                  <input type="range" id="mix_slider" min="0" max="100" step="1" value="70" />
-                  <input type="number" id="mix_fb" min="0" max="100" step="1" value="70" />
-                </div>
-                <div class="mix-bar" aria-hidden="true">
-                  <i id="mix-bar-fb" style="width:70%"></i>
-                </div>
-              </label>
+            </div>
+          </section>
+
+          <!-- Mix canal F&B / N-F&B puis sous-catégories juste en dessous -->
+          <section class="form-block form-block-mix" id="mix-block">
+            <header class="form-block-head">
+              <h2 class="wiz-section-title">Mix &amp; répartition produits</h2>
+              <div class="needs-actions">
+                <button type="button" class="btn-text" id="needs-all-on">Tout activer</button>
+                <button type="button" class="btn-text" id="needs-all-off">Tout retirer</button>
+              </div>
+            </header>
+
+            <label class="field slider-card mix-channel-card">
+              <span class="slider-card-top">
+                <span>Mix F&amp;B / non F&amp;B</span>
+                <strong class="slider-value" aria-live="polite">
+                  <span id="mix-val">70</span><span class="slider-unit">% F&amp;B</span>
+                  <span class="slider-split">·</span>
+                  <span id="mix-nf-val">30</span><span class="slider-unit">% N-F&amp;B</span>
+                </strong>
+              </span>
+              <div class="slider-row slider-row-solo">
+                <input type="range" id="mix_slider" min="0" max="100" step="1" value="70"
+                  aria-valuemin="0" aria-valuemax="100" aria-valuenow="70"
+                  aria-label="Part F&amp;B en pourcentage" />
+                <input type="hidden" id="mix_fb" value="70" />
+              </div>
+            </label>
+
+            <p class="wiz-note tight mix-sub-note">
+              Sous-catégories actives et <strong>parts relatives</strong> dans chaque canal
+              (somme = 100&nbsp;% F&amp;B et 100&nbsp;% Non F&amp;B).
+            </p>
+            <div class="needs-cols">
+              <div class="needs-panel needs-panel-fb">
+                <h3 class="needs-h">
+                  <span class="needs-dot fb"></span>
+                  F&amp;B
+                  <span class="needs-sum" id="sum-fb">0&nbsp;%</span>
+                </h3>
+                <div id="needs-fb" class="needs-list shares-list"></div>
+              </div>
+              <div class="needs-panel needs-panel-nfb">
+                <h3 class="needs-h">
+                  <span class="needs-dot nfb"></span>
+                  Non F&amp;B
+                  <span class="needs-sum" id="sum-nfb">0&nbsp;%</span>
+                </h3>
+                <div id="needs-nfb" class="needs-list shares-list"></div>
+              </div>
             </div>
           </section>
 
@@ -267,40 +301,6 @@
                 <span class="field-label">Frigos ambiant <span class="field-tag">Connected</span></span>
                 <input type="number" id="nb_frigos_ambiant" min="0" max="12" step="1" value="0" />
               </label>
-            </div>
-          </section>
-
-          <section class="form-block">
-            <header class="form-block-head">
-              <h2 class="wiz-section-title">Répartition des produits</h2>
-              <div class="needs-actions">
-                <button type="button" class="btn-text" id="needs-all-on">Tout activer</button>
-                <button type="button" class="btn-text" id="needs-all-off">Tout retirer</button>
-              </div>
-            </header>
-            <p class="wiz-note tight">
-              Activez les sous-catégories à vendre, puis réglez leur
-              <strong>part relative</strong> au sein de F&amp;B et de Non&nbsp;F&amp;B
-              (somme = 100&nbsp;% par canal). L’optimisation teste plusieurs
-              répartitions et garde celle qui maximise le CA.
-            </p>
-            <div class="needs-cols">
-              <div class="needs-panel">
-                <h3 class="needs-h">
-                  <span class="needs-dot fb"></span>
-                  F&amp;B
-                  <span class="needs-sum" id="sum-fb">0&nbsp;%</span>
-                </h3>
-                <div id="needs-fb" class="needs-list shares-list"></div>
-              </div>
-              <div class="needs-panel">
-                <h3 class="needs-h">
-                  <span class="needs-dot nfb"></span>
-                  Non F&amp;B
-                  <span class="needs-sum" id="sum-nfb">0&nbsp;%</span>
-                </h3>
-                <div id="needs-nfb" class="needs-list shares-list"></div>
-              </div>
             </div>
           </section>
 

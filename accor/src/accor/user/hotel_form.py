@@ -280,8 +280,17 @@ HOTEL_FORM_FIELDS: list[HotelFormField] = [
     _f("hotel_loisirs_top_1_amis", "bool", "Top loisirs · amis", "clientele"),
     _f("hotel_loisirs_top_1_couples", "bool", "Top loisirs · couples", "clientele"),
     _f("hotel_loisirs_top_1_familles", "bool", "Top loisirs · familles", "clientele"),
-    # Corner actuel
-    _f("hotel_corner_actuel_existe_deja", "bool", "Corner déjà en place", "corner"),
+    # Corner actuel — colonnes hotel_data (saisie ROD / Excel), PAS le scrap Accor.
+    # Les modes de vente détaillés (caisse, distributeur, snacking, réception…)
+    # sont quasi vides dans le parc (~7/5723) et n’entrent pas dans R1–R4 :
+    # on ne garde que ce qui sert (présence, ML, frigo/vitrine).
+    _f(
+        "hotel_corner_actuel_existe_deja",
+        "bool",
+        "Corner déjà en place",
+        "corner",
+        hint="Présence d’un corner de vente (fiche ROD, pas le site Accor).",
+    ),
     _f(
         "hotel_metres_lineaires_dedies_corner",
         "int",
@@ -290,6 +299,7 @@ HOTEL_FORM_FIELDS: list[HotelFormField] = [
         min_v=0,
         max_v=40,
         step=1,
+        hint="Surface linéaire cible / dédiée au projet corner.",
     ),
     _f(
         "hotel_corner_de_vente_actuel_metres_lineaires",
@@ -299,60 +309,14 @@ HOTEL_FORM_FIELDS: list[HotelFormField] = [
         min_v=0,
         max_v=40,
         step=1,
-    ),
-    _f(
-        "hotel_corner_actuel_offre_f_b_caisse_code_barres",
-        "bool",
-        "Offre F&B · caisse code-barres",
-        "corner",
-    ),
-    _f(
-        "hotel_corner_actuel_offre_f_b_distributeur_auto",
-        "bool",
-        "Offre F&B · distributeur auto",
-        "corner",
+        hint="Surface réelle du corner déjà en place, si différente de la cible.",
     ),
     _f(
         "hotel_corner_actuel_offre_f_b_frigo_connecte",
         "bool",
-        "Offre F&B · frigo connecté",
+        "Frigo / vitrine réfrigérée déjà en place",
         "corner",
-    ),
-    _f(
-        "hotel_corner_actuel_offre_f_b_reception",
-        "bool",
-        "Offre F&B · réception",
-        "corner",
-    ),
-    _f(
-        "hotel_corner_actuel_offre_f_b_snacking_comptoir",
-        "bool",
-        "Offre F&B · snacking comptoir",
-        "corner",
-    ),
-    _f(
-        "hotel_corner_actuel_offre_non_f_b_armoire_connectee",
-        "bool",
-        "Offre non F&B · armoire connectée",
-        "corner",
-    ),
-    _f(
-        "hotel_corner_actuel_offre_non_f_b_caisse_code_barres",
-        "bool",
-        "Offre non F&B · caisse code-barres",
-        "corner",
-    ),
-    _f(
-        "hotel_corner_actuel_offre_non_f_b_distributeur_auto",
-        "bool",
-        "Offre non F&B · distributeur auto",
-        "corner",
-    ),
-    _f(
-        "hotel_corner_actuel_offre_non_f_b_reception",
-        "bool",
-        "Offre non F&B · réception",
-        "corner",
+        hint="Impact reco (Liberty) et coûts : pas de vitrine à rééquiper si déjà présent.",
     ),
 ]
 
