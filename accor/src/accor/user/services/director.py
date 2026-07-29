@@ -329,12 +329,16 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
             "error": "Activez au moins une catégorie produit (F&B ou Non F&B).",
         }
 
-    # optimize_repartition = hors schéma Excel pur (bonus UI) — défaut False
+    # mode: "simulate" = choix user (+ suggestion) ; "optimize" = applique le meilleur
+    mode = str(body.get("mode") or "").strip().lower()
     optimize = bool(
         body.get("optimize_repartition")
         or body.get("optimize")
         or body.get("optimize_shares")
+        or mode in ("optimize", "optimise", "opt")
     )
+    # Toujours chercher une meilleure répartition pour signaler « optimisation possible »
+    suggest_opt = bool(body.get("suggest_optimization", True))
 
     profile_base: dict[str, Any] = {}
     if params.get("hotel_loisirs_pct") is not None:
@@ -412,27 +416,36 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
             agencement=agencement,
         )
 
-    def _run_three(
-        mix: float, sh_fb: dict[str, float], sh_nfb: dict[str, float]
-    ) -> tuple[dict[str, Any], SimulationRequest | None, dict[str, Any], dict[str, Any]]:
-        # R3 Excel = toggles ±coeff (parts relatives = affichage / opti hors schéma)
-        # needs_from_shares : part > 0 ⇒ catégorie ON (aligné saisie UI)
+    def _needs_from(sh_fb: dict, sh_nfb: dict) -> dict[str, bool]:
         nd = needs_from_shares(sh_fb or {}, sh_nfb or {})
         for k in list(RULE3_FB_COEFFS) + list(RULE3_NFB_COEFFS):
             if k in needs and k not in (sh_fb or {}) and k not in (sh_nfb or {}):
                 nd[k] = bool(needs[k])
             nd.setdefault(k, False)
+        return nd
+
+    def _run_concepts(
+        mix: float,
+        sh_fb: dict[str, float],
+        sh_nfb: dict[str, float],
+        *,
+        concepts: tuple[str, ...] | None = None,
+        fixed_rec: str | None = None,
+    ) -> tuple[dict[str, Any], SimulationRequest | None, dict[str, Any], dict[str, Any]]:
+        """P&L pour un ou plusieurs concepts (iso rules)."""
+        nd = _needs_from(sh_fb, sh_nfb)
         profile = ClientProfile(
             client_needs=nd,
             shares_fb=dict(sh_fb),
             shares_nfb=dict(sh_nfb),
             **profile_base,
         )
+        target = concepts or CONCEPTS
         by: dict[str, Any] = {}
         raw: dict[str, Any] = {}
         req0: SimulationRequest | None = None
         ca_by: dict[str, float] = {}
-        for concept in CONCEPTS:
+        for concept in target:
             req = SimulationRequest(
                 identity=identity,
                 operating=operating,
@@ -440,56 +453,155 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
                 client_profile=profile,
                 store=_store_for(concept, mix),
             )
-            if concept == CONCEPTS[0]:
+            if req0 is None:
                 req0 = req
             cs = sim_engine.simulate(req, concept)
             raw[concept] = cs
             ca_by[concept] = float(cs.ca_mensuel or 0)
             by[concept] = _pnl_block(cs)
-        rec, _, _ = reco_engine.recommend_tree(
-            req0 or SimulationRequest(store=_store_for("SIMPLY", mix)),
-            m_lin=m_lin,
-            to=to,
-        )
+        if fixed_rec and fixed_rec in by:
+            rec = fixed_rec
+        else:
+            rec, _, _ = reco_engine.recommend_tree(
+                req0 or SimulationRequest(store=_store_for("SIMPLY", mix)),
+                m_lin=m_lin,
+                to=to,
+            )
         ca_ht = ca_by.get(rec) if rec in ca_by else max(ca_by.values(), default=0.0)
-        return by, req0, {"ca_ht": float(ca_ht or 0), "ca_by": ca_by, "recommended": rec}, raw
+        marge_n = 0.0
+        if rec in by:
+            marge_n = float(by[rec].get("marge_nette_mensuelle") or 0)
+        elif by:
+            marge_n = max(
+                float(v.get("marge_nette_mensuelle") or 0) for v in by.values()
+            )
+        return (
+            by,
+            req0,
+            {
+                "ca_ht": float(ca_ht or 0),
+                "marge_nette": float(marge_n),
+                "ca_by": ca_by,
+                "recommended": rec,
+            },
+            raw,
+        )
 
-    opt_meta: dict[str, Any] = {"optimized": False, "normalized": True}
-    if optimize:
-        en_fb = {k: bool(needs.get(k, False)) for k in FB_KEYS}
-        en_nfb = {k: bool(needs.get(k, False)) for k in NFB_KEYS}
-        if not any(en_fb.values()):
-            en_fb = {k: True for k in FB_KEYS}
-        if not any(en_nfb.values()):
-            en_nfb = {k: True for k in NFB_KEYS}
+    def _run_three(
+        mix: float, sh_fb: dict[str, float], sh_nfb: dict[str, float]
+    ) -> tuple[dict[str, Any], SimulationRequest | None, dict[str, Any], dict[str, Any]]:
+        return _run_concepts(mix, sh_fb, sh_nfb, concepts=CONCEPTS)
 
-        def _sim(mix: float, sh_fb: dict, sh_nfb: dict) -> dict:
-            _, _, meta, _ = _run_three(mix, sh_fb, sh_nfb)
-            return meta
+    # --- Baseline user (parts normalisées à 100 %) ---
+    user_mix = float(mix_fb)
+    user_shares_fb = dict(shares_fb)
+    user_shares_nfb = dict(shares_nfb)
+    sum_fb = sum(float(v or 0) for v in user_shares_fb.values())
+    sum_nfb = sum(float(v or 0) for v in user_shares_nfb.values())
+    shares_ok = abs(sum_fb - 1.0) < 0.02 and abs(sum_nfb - 1.0) < 0.02
 
+    sim_user, req_user, meta_user, raw_user = _run_three(
+        user_mix, user_shares_fb, user_shares_nfb
+    )
+    user_ca = float(meta_user.get("ca_ht") or 0)
+    user_marge = float(meta_user.get("marge_nette") or 0)
+    # Reco stable pour la grille d'opti (dépend des toggles lifestyle / ML / TO, pas du mix)
+    fixed_rec = str(meta_user.get("recommended") or "LIBERTY")
+
+    # --- Optimisation mix F&B × sous-catégories (toujours évaluée) ---
+    en_fb = {k: bool(needs.get(k, False)) for k in FB_KEYS}
+    en_nfb = {k: bool(needs.get(k, False)) for k in NFB_KEYS}
+    # Respect des toggles user ; si un canal vide, tout activer pour ce canal
+    if not any(en_fb.values()):
+        en_fb = {k: True for k in FB_KEYS}
+    if not any(en_nfb.values()):
+        en_nfb = {k: True for k in NFB_KEYS}
+
+    def _sim_opt(mix: float, sh_fb: dict, sh_nfb: dict) -> dict:
+        # Pendant la recherche : 1 concept (reco) seulement → ~3× plus rapide
+        _, _, meta, _ = _run_concepts(
+            mix, sh_fb, sh_nfb, concepts=(fixed_rec,), fixed_rec=fixed_rec
+        )
+        return meta
+
+    opt: dict[str, Any] = {"ok": False}
+    if optimize or suggest_opt:
         opt = optimize_repartition(
-            simulate_fn=_sim,
+            simulate_fn=_sim_opt,
             enabled_fb=en_fb,
             enabled_nfb=en_nfb,
             m_lin=m_lin,
+            user_mix_fb=user_mix,
         )
-        if opt.get("ok"):
-            mix_fb = float(opt["mix_fb"])
-            shares_fb = dict(opt["shares_fb"])
-            shares_nfb = dict(opt["shares_nfb"])
-            needs = needs_from_shares(shares_fb, shares_nfb)
-            opt_meta = {
-                "optimized": True,
-                "normalized": True,
-                "strategy": opt.get("strategy"),
-                "trials": opt.get("trials"),
-                "ca_ht_best": opt.get("ca_ht"),
-            }
 
-    sim_by, req_for_reco, _meta_run, raw_by = _run_three(
-        mix_fb, shares_fb, shares_nfb
+    opt_ca = float(opt.get("ca_ht") or 0) if opt.get("ok") else user_ca
+    opt_marge = (
+        float(opt.get("marge_nette") or opt_ca) if opt.get("ok") else user_marge
     )
+    # Amélioration significative (marge puis CA)
+    eps_m, eps_ca = 0.5, 1.0  # € / mois
+    improvement = bool(opt.get("ok")) and (
+        opt_marge > user_marge + eps_m
+        or (abs(opt_marge - user_marge) <= eps_m and opt_ca > user_ca + eps_ca)
+    )
+
+    applied = False
+    if optimize and opt.get("ok"):
+        mix_fb = float(opt["mix_fb"])
+        shares_fb = dict(opt["shares_fb"])
+        shares_nfb = dict(opt["shares_nfb"])
+        needs = needs_from_shares(shares_fb, shares_nfb)
+        sim_by, req_for_reco, _meta_run, raw_by = _run_three(
+            mix_fb, shares_fb, shares_nfb
+        )
+        applied = True
+    else:
+        mix_fb = user_mix
+        shares_fb = user_shares_fb
+        shares_nfb = user_shares_nfb
+        sim_by, req_for_reco, _meta_run, raw_by = (
+            sim_user,
+            req_user,
+            meta_user,
+            raw_user,
+        )
+
     category_shares_out = shares_for_api(shares_fb, shares_nfb)
+
+    suggestion: dict[str, Any] | None = None
+    if opt.get("ok") and not applied:
+        suggestion = {
+            "available": improvement,
+            "mix_fb": opt.get("mix_fb"),
+            "mix_nf": opt.get("mix_nf"),
+            "shares_fb": opt.get("shares_fb"),
+            "shares_nfb": opt.get("shares_nfb"),
+            "category_shares": opt.get("category_shares"),
+            "strategy": opt.get("strategy"),
+            "trials": opt.get("trials"),
+            "ca_ht": opt_ca,
+            "marge_nette": opt_marge,
+            "user_ca_ht": user_ca,
+            "user_marge_nette": user_marge,
+            "delta_ca": round(opt_ca - user_ca, 2),
+            "delta_marge": round(opt_marge - user_marge, 2),
+            "recommended": opt.get("recommended"),
+        }
+
+    opt_meta: dict[str, Any] = {
+        "optimized": applied,
+        "normalized": True,
+        "shares_ok": shares_ok,
+        "mode": "optimize" if applied else "simulate",
+        "strategy": opt.get("strategy") if applied else None,
+        "trials": opt.get("trials") if opt.get("ok") else 0,
+        "ca_ht_best": opt_ca if opt.get("ok") else None,
+        "marge_nette_best": opt_marge if opt.get("ok") else None,
+        "user_ca_ht": user_ca,
+        "user_marge_nette": user_marge,
+        "improvement_possible": improvement and not applied,
+        "suggestion": suggestion,
+    }
 
     # Prédictions IA
     ai_note = ""

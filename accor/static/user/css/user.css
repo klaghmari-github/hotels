@@ -1440,9 +1440,14 @@ body.is-hotel-loading #btn-step1-next {
 /* Big metrics */
 .dir-big-metrics {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0.8rem;
   margin-bottom: 1.35rem;
+}
+@media (max-width: 1200px) {
+  .dir-big-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 .big-metric {
   position: relative;
@@ -2171,6 +2176,58 @@ body.is-hotel-loading #btn-step1-next {
   color: #fcd34d;
 }
 .status-banner.hidden { display: none; }
+
+/* Bannière optimisation possible / appliquée */
+.opt-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem 1.1rem;
+  margin: 0 0 1.1rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: 14px;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+.opt-banner.hidden { display: none; }
+.opt-banner.is-suggest {
+  background: linear-gradient(
+    135deg,
+    rgba(212, 175, 55, 0.16),
+    rgba(212, 175, 55, 0.06)
+  );
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.08);
+}
+.opt-banner.is-applied {
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  color: #a7f3d0;
+}
+.opt-banner-body {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+.opt-banner-body strong {
+  display: block;
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+  color: var(--accent-2, #f0d78c);
+}
+.opt-banner.is-applied .opt-banner-body strong {
+  color: #6ee7b7;
+}
+.opt-banner-body p {
+  margin: 0;
+  color: var(--ink-soft, #c5ced9);
+  font-size: 0.84rem;
+}
+.opt-banner .btn-sm {
+  padding: 0.55rem 1rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
 
 .big-metric.is-np {
   border-color: rgba(220, 44, 62, 0.35);

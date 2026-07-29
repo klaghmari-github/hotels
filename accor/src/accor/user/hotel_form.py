@@ -216,7 +216,6 @@ HOTEL_FORM_FIELDS: list[HotelFormField] = [
         min_v=0,
         max_v=50,
         step=1,
-        hint="Remplace l’indicateur binaire has_reunion",
     ),
     _f("hotel_non_f_b_spa", "bool", "Spa", "nfb"),
     # Confort

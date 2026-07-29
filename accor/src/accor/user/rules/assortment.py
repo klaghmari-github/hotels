@@ -22,7 +22,20 @@ FB_KEYS: tuple[str, ...] = tuple(RULE3_FB_COEFFS.keys())
 NFB_KEYS: tuple[str, ...] = tuple(RULE3_NFB_COEFFS.keys())
 
 # Grille mix F&B pour optimisation (complément N-F&B = 1 − mix)
-MIX_FB_GRID: tuple[float, ...] = (0.30, 0.40, 0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80)
+# Pas de 10 % imposé côté UI ; pas de 5 % pour explorer le R2
+MIX_FB_GRID: tuple[float, ...] = (
+    0.20,
+    0.30,
+    0.40,
+    0.50,
+    0.55,
+    0.60,
+    0.65,
+    0.70,
+    0.75,
+    0.80,
+    0.90,
+)
 
 
 def _as_float(v: Any, default: float = 0.0) -> float:
@@ -315,35 +328,62 @@ def optimize_repartition(
     enabled_nfb: dict[str, bool],
     mix_grid: Iterable[float] = MIX_FB_GRID,
     m_lin: float = 6.0,
+    user_mix_fb: float | None = None,
 ) -> dict[str, Any]:
     """
-    Cherche mix F&B + parts sous-cat. maximisant le CA HT (solution reco).
+    Pour chaque mix F&B de la grille (et le mix user si fourni), teste
+    plusieurs répartitions de sous-catégories ; score = (marge_nette, CA)
+    de la solution recommandée par l'arbre (règles simulateur).
 
     ``simulate_fn(mix_fb, shares_fb, shares_nfb) -> dict``
-    doit renvoyer au moins ``ca_ht`` (float) et éventuellement le résultat complet.
+    attendu : ``ca_ht``, ``marge_nette`` (optionnel), ``recommended``.
     """
     best: dict[str, Any] | None = None
-    best_ca = -1e99
+    best_score = (-1e99, -1e99)  # (marge_nette, ca_ht)
     trials = 0
-    for mix_fb in mix_grid:
-        mix_fb = float(mix_fb)
-        mix_fb = min(max(mix_fb, 0.05), 0.95)
-        for name, sh_fb, sh_nfb in build_share_strategies(enabled_fb, enabled_nfb):
+
+    mixes: list[float] = []
+    seen: set[float] = set()
+    if user_mix_fb is not None:
+        um = min(max(float(user_mix_fb), 0.05), 0.95)
+        mixes.append(round(um, 4))
+        seen.add(round(um, 4))
+    for m in mix_grid:
+        m = min(max(float(m), 0.05), 0.95)
+        key = round(m, 4)
+        if key not in seen:
+            seen.add(key)
+            mixes.append(key)
+
+    strategies = build_share_strategies(enabled_fb, enabled_nfb)
+    for mix_fb in mixes:
+        for name, sh_fb, sh_nfb in strategies:
             trials += 1
             try:
                 res = simulate_fn(mix_fb, sh_fb, sh_nfb)
             except Exception:
                 continue
-            ca = _as_float((res or {}).get("ca_ht"), -1e99)
-            if ca > best_ca:
-                best_ca = ca
+            if not res:
+                continue
+            ca = _as_float(res.get("ca_ht"), -1e99)
+            # Prefer explicit marge nette ; fallback CA
+            marge = res.get("marge_nette")
+            if marge is None:
+                marge = ca
+            else:
+                marge = _as_float(marge, ca)
+            score = (float(marge), float(ca))
+            if score > best_score:
+                best_score = score
                 best = {
                     "strategy": name,
                     "mix_fb": mix_fb,
-                    "mix_nf": 1.0 - mix_fb,
+                    "mix_nf": round(1.0 - mix_fb, 4),
                     "shares_fb": sh_fb,
                     "shares_nfb": sh_nfb,
                     "ca_ht": ca,
+                    "marge_nette": float(marge),
+                    "recommended": res.get("recommended"),
                     "result": res,
                 }
     if best is None:

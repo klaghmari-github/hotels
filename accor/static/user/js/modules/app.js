@@ -310,10 +310,10 @@ class DirectorApp {
       if (this.hotel) this.goStep(2);
     });
     $("#btn-step2-next")?.addEventListener("click", () => this.goStep(3));
-    // Simulation fidèle aux rules Excel (pas d'optimisation des parts)
+    // Simuler = choix user (+ signal « optimisation possible »)
     $("#btn-run-sim")?.addEventListener("click", () => this.runSim(false));
-    // Bonus hors schéma : maximise le CA en testant d'autres parts
-    $("#btn-run-sim-manual")?.addEventListener("click", () => this.runSim(true));
+    // Optimiser = grille mix F&B × sous-catégories, applique le meilleur
+    $("#btn-run-optimize")?.addEventListener("click", () => this.runSim(true));
 
     $$("[data-goto]").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -1020,6 +1020,51 @@ class DirectorApp {
     if (fa) fa.classList.toggle("is-dimmed", mix > 0.9);
   }
 
+  /**
+   * Vérifie que les parts actives font ~100 % par canal.
+   * @returns {{ ok: boolean, message?: string, sumFb: number, sumNfb: number }}
+   */
+  validateShares() {
+    const sum = (channel) => {
+      let s = 0;
+      let n = 0;
+      $$(`[data-share][data-channel="${channel}"]`).forEach((inp) => {
+        if (inp.disabled) return;
+        n += 1;
+        s += Number(inp.value) || 0;
+      });
+      return { s, n };
+    };
+    const fb = sum("fb");
+    const nfb = sum("nfb");
+    if (fb.n === 0 && nfb.n === 0) {
+      return {
+        ok: false,
+        message: "Activez au moins une sous-catégorie produit.",
+        sumFb: 0,
+        sumNfb: 0,
+      };
+    }
+    // Tolérance 0,6 % (arrondis UI)
+    if (fb.n > 0 && Math.abs(fb.s - 100) >= 0.6) {
+      return {
+        ok: false,
+        message: `Parts F&B = ${Math.round(fb.s * 10) / 10} % (doivent totaliser 100 %).`,
+        sumFb: fb.s,
+        sumNfb: nfb.s,
+      };
+    }
+    if (nfb.n > 0 && Math.abs(nfb.s - 100) >= 0.6) {
+      return {
+        ok: false,
+        message: `Parts Non F&B = ${Math.round(nfb.s * 10) / 10} % (doivent totaliser 100 %).`,
+        sumFb: fb.s,
+        sumNfb: nfb.s,
+      };
+    }
+    return { ok: true, sumFb: fb.s, sumNfb: nfb.s };
+  }
+
   collectBody(optimize = false) {
     const hotel_params = this.collectHotelParams();
     const shares = this.collectShares();
@@ -1051,10 +1096,21 @@ class DirectorApp {
       nb_frigos_froid: Math.max(0, Math.round(Number($("#nb_frigos_froid")?.value) || 0)),
       nb_frigos_ambiant: Math.max(0, Math.round(Number($("#nb_frigos_ambiant")?.value) || 0)),
       optimize_repartition: !!optimize,
+      mode: optimize ? "optimize" : "simulate",
+      suggest_optimization: true,
     };
   }
 
   async runSim(optimize = false) {
+    // Simulation : exiger 100 % ; optimisation : le moteur normalise / redistribue
+    if (!optimize) {
+      const v = this.validateShares();
+      if (!v.ok) {
+        toast.show(v.message || "Parts invalides", "err");
+        this._updateShareSums();
+        return;
+      }
+    }
     const body = this.collectBody(optimize);
     if (!body.hotel_code) {
       toast.show("Choisissez d'abord un hôtel", "err");
@@ -1064,25 +1120,45 @@ class DirectorApp {
     this.goStep(4);
     $("#dir-loading")?.classList.remove("hidden");
     $("#dir-results")?.classList.add("hidden");
+    const loadTitle = $("#dir-loading .dir-empty-title");
+    const loadSub = $("#dir-loading .dir-empty-sub");
+    if (loadTitle) {
+      loadTitle.textContent = optimize
+        ? "Optimisation en cours…"
+        : "Simulation en cours…";
+    }
+    if (loadSub) {
+      loadSub.textContent = optimize
+        ? "Exploration des mix F&B et des sous-catégories selon les règles ROD."
+        : "Calcul avec votre répartition, puis détection d’une meilleure option.";
+    }
     this.setStatus(
-      optimize ? "Optimisation des parts…" : "Calcul fidèle aux règles ROD…"
+      optimize
+        ? "Optimisation mix F&B × sous-catégories…"
+        : "Simulation avec votre répartition…"
     );
     try {
       const data = await api.post("/api/rod/simulate", body);
       if (!data.ok) throw new Error(data.error || "La simulation n'a pas abouti");
       this.result = data;
-      // Appliquer la répartition retenue (optimisée ou normalisée) dans l'UI
-      if (data.category_shares) this.applyCategoryShares(data.category_shares);
-      if (data.hotel?.mix_fb != null) {
-        let m = Number(data.hotel.mix_fb);
-        if (m <= 1) m *= 100;
-        this.setMix(Math.round(m));
+      const ass = data.assortment || {};
+      // N'applique mix / parts optimisés que si le mode optimise a été demandé
+      if (ass.optimized) {
+        if (data.category_shares) this.applyCategoryShares(data.category_shares);
+        if (data.hotel?.mix_fb != null) {
+          let m = Number(data.hotel.mix_fb);
+          if (m <= 1) m *= 100;
+          this.setMix(Math.round(m));
+        }
       }
       this.renderResults(data);
       $("#dir-loading")?.classList.add("hidden");
       $("#dir-results")?.classList.remove("hidden");
+      const tag = ass.optimized ? "optimisé" : "simulé";
       this.setStatus(
-        `${data.hotel?.hotel_code || body.hotel_code} · ${data.recommended_solution || "—"}`
+        `${data.hotel?.hotel_code || body.hotel_code} · ${
+          data.recommended_solution || "—"
+        } · ${tag}`
       );
       const s4 = document.querySelector('.wiz-step[data-step="4"]');
       if (s4) s4.disabled = false;
@@ -1113,6 +1189,7 @@ class DirectorApp {
     const notProf = block?.not_profitable || block?.status === "not_profitable";
     const caDisplay =
       ca == null ? emptyCa || "—" : notProf && Number(ca) < 0 ? "Not profitable" : euro(ca);
+    const mp = block?.marge_produit_mensuelle;
     const marge = block?.marge_nette_mensuelle;
     const margeDisplay = notProf ? "Not profitable" : marge == null ? "—" : euro(marge);
     const amort =
@@ -1132,6 +1209,12 @@ class DirectorApp {
         }</span>
       </div>
       <div class="big-metric">
+        <span class="bm-icon" aria-hidden="true">◈</span>
+        <span class="bm-label">Marge produits / mois</span>
+        <span class="bm-value">${mp == null ? "—" : euro(mp)}</span>
+        <span class="bm-sub">CA − CA/coeff (2,6 F&amp;B · 1,45 N-F&amp;B)</span>
+      </div>
+      <div class="big-metric">
         <span class="bm-icon" aria-hidden="true">◇</span>
         <span class="bm-label">Coûts / mois</span>
         <span class="bm-value">${euro(block?.cout_mensuel)}</span>
@@ -1141,20 +1224,20 @@ class DirectorApp {
       </div>
       <div class="big-metric ${notProf ? "is-np" : ""}">
         <span class="bm-icon" aria-hidden="true">▣</span>
-        <span class="bm-label">Marge nette / mois</span>
+        <span class="bm-label">Bénéfice (marge nette) / mois</span>
         <span class="bm-value ${
           notProf ? "neg" : marge == null ? "" : Number(marge) >= 0 ? "pos" : "neg"
         }">${margeDisplay}</span>
         <span class="bm-sub">${
           notProf
             ? "Marge produits − coûts &lt; 0"
-            : block?.marge_nette_annuelle == null
-              ? "—"
-              : euro(block.marge_nette_annuelle) +
-                " / an" +
-                (block.taux_marge != null
-                  ? ` · ${(Number(block.taux_marge) * 100).toFixed(1)} %`
-                  : "")
+            : `Marge produits − coûts` +
+              (block?.marge_nette_annuelle == null
+                ? ""
+                : ` · ${euro(block.marge_nette_annuelle)}/an`) +
+              (block.taux_marge != null
+                ? ` · ${(Number(block.taux_marge) * 100).toFixed(1)} % du CA`
+                : "")
         }</span>
       </div>
       <div class="big-metric">
@@ -1167,8 +1250,11 @@ class DirectorApp {
           notProf
             ? "Non calculé si non rentable"
             : amort === "—"
-              ? "coût 60 mois / marge nette"
-              : amort
+              ? "coût 60 mois ÷ marge nette"
+              : `coût 60 mois ${euro(block?.cost_over_60m)} ÷ marge nette` +
+                (block?.amort_years != null
+                  ? ` · ${Number(block.amort_years).toFixed(1)} ans`
+                  : "")
         }</span>
       </div>`;
   }
@@ -1220,9 +1306,21 @@ class DirectorApp {
           <div class="pnl-line pnl-total"><span>R4 · CA final N-F&amp;B</span><strong>${euro(
             block.ca_nfb_mensuel
           )}</strong></div>
-          <div class="pnl-line"><span>Marge produits</span><strong class="pos">${euro(
+          <div class="pnl-line"><span>Marge produits (CA − CA/coeff)</span><strong class="pos">${euro(
             block.marge_produit_mensuelle
           )}</strong></div>
+          <div class="pnl-line pnl-total"><span>Bénéfice = marge prod. − coûts</span><strong class="${
+            block.not_profitable || (block.marge_nette_mensuelle || 0) < 0 ? "neg" : "pos"
+          }">${
+            block.not_profitable
+              ? "Not profitable"
+              : euro(block.marge_nette_mensuelle)
+          }</strong></div>
+          <div class="pnl-line"><span>Amortissement (coût 60 m / bénéfice)</span><strong>${
+            block.not_profitable || block.amort_months == null
+              ? "—"
+              : Number(block.amort_months).toFixed(1) + " mois"
+          }</strong></div>
         </div>
         <div class="pnl-card">
           <h3 class="dir-subh">Coûts mensuels</h3>
@@ -1232,8 +1330,10 @@ class DirectorApp {
           <div class="pnl-line pnl-total"><span>Total coûts</span><strong>${euro(
             block.cout_mensuel
           )}</strong></div>
-          <div class="pnl-line"><span>Capex initial</span><strong>${euro(block.capex)}</strong></div>
-          <div class="pnl-line"><span>Coût sur 60 mois</span><strong>${euro(
+          <div class="pnl-line"><span>Capex initial (achat)</span><strong>${euro(
+            block.capex
+          )}</strong></div>
+          <div class="pnl-line"><span>Coût total sur 60 mois</span><strong>${euro(
             block.cost_over_60m
           )}</strong></div>
         </div>
@@ -1267,18 +1367,18 @@ class DirectorApp {
             <div class="cc-row"><span>CA total / mois</span><strong>${
               b.ca_mensuel == null ? "—" : euro(b.ca_mensuel)
             }</strong></div>
-            <div class="cc-row"><span>Marge produit</span><strong>${
+            <div class="cc-row"><span>Marge produits</span><strong>${
               b.marge_produit_mensuelle == null ? "—" : euro(b.marge_produit_mensuelle)
             }</strong></div>
             <div class="cc-row"><span>Coût / mois</span><strong>${euro(
               b.cout_mensuel
             )}</strong></div>
-            <div class="cc-row"><span>Marge nette / mois</span><strong class="${
+            <div class="cc-row"><span>Bénéfice (marge nette)</span><strong class="${
               notProf ? "neg" : marge == null ? "" : Number(marge) >= 0 ? "pos" : "neg"
             }">${
               notProf ? "Not profitable" : marge == null ? "—" : euro(marge)
             }</strong></div>
-            <div class="cc-row"><span>Amortissement</span><strong>${
+            <div class="cc-row"><span>Amort. (÷ bénéfice)</span><strong>${
               notProf || b.amort_months == null
                 ? "—"
                 : Number(b.amort_months).toFixed(1) + " mois"
@@ -1298,10 +1398,10 @@ class DirectorApp {
       if (ass.optimized) {
         note.textContent = `Répartition optimisée (${ass.strategy || "—"}${
           ass.trials ? ` · ${ass.trials} essais` : ""
-        }) pour maximiser le CA. Parts relatives à chaque canal (somme 100 %).`;
+        }) — meilleur mix F&B et sous-catégories selon les règles ROD.`;
       } else {
         note.textContent =
-          "Répartition saisie normalisée (somme forcée à 100 % par canal F&B et Non F&B).";
+          "Répartition saisie (parts = 100 % par canal F&B et Non F&B).";
       }
     }
     let mixFb = Number(h.mix_fb);
@@ -1337,6 +1437,56 @@ class DirectorApp {
     paint("dir-shares-nfb", cat.nfb);
   }
 
+  /**
+   * Bannière « Optimisation possible » après une simulation user.
+   */
+  renderOptBanner(data) {
+    const host = $("#dir-opt-banner");
+    if (!host) return;
+    const ass = data.assortment || {};
+    const sug = ass.suggestion || {};
+
+    if (ass.optimized) {
+      host.classList.remove("hidden");
+      host.className = "opt-banner is-applied";
+      const mixPct = Math.round(Number(data.hotel?.mix_fb ?? 0) * (Number(data.hotel?.mix_fb) <= 1 ? 100 : 1));
+      host.innerHTML = `
+        <div class="opt-banner-body">
+          <strong>Répartition optimisée appliquée</strong>
+          <p>Mix F&amp;B ${mixPct}&nbsp;% · stratégie ${escapeHtml(
+            ass.strategy || "—"
+          )} · ${ass.trials || 0} essais.</p>
+        </div>`;
+      return;
+    }
+
+    if (ass.improvement_possible && sug.available) {
+      const dM = Number(sug.delta_marge) || 0;
+      const dC = Number(sug.delta_ca) || 0;
+      const mixPct = Math.round((Number(sug.mix_fb) || 0) * 100);
+      host.classList.remove("hidden");
+      host.className = "opt-banner is-suggest";
+      host.innerHTML = `
+        <div class="opt-banner-body">
+          <strong>Optimisation possible</strong>
+          <p>
+            Une meilleure répartition a été trouvée
+            (mix F&amp;B ${mixPct}&nbsp;% · +${euro(dM)}/mois de marge nette
+            · +${euro(dC)}/mois de CA sur la solution recommandée,
+            ${sug.trials || 0} essais).
+          </p>
+        </div>
+        <button type="button" class="btn btn-primary btn-sm" id="btn-apply-opt">
+          Appliquer l’optimisation
+        </button>`;
+      $("#btn-apply-opt")?.addEventListener("click", () => this.runSim(true));
+      return;
+    }
+
+    host.classList.add("hidden");
+    host.innerHTML = "";
+  }
+
   renderResults(data) {
     const reco = data.recommended_solution || "—";
     if ($("#dir-reco-name")) $("#dir-reco-name").textContent = reco;
@@ -1353,6 +1503,7 @@ class DirectorApp {
     const reasons = (data.recommendation_reasons || []).join(" ");
     if ($("#dir-reco-why")) $("#dir-reco-why").textContent = reasons;
     this.renderAssortment(data);
+    this.renderOptBanner(data);
 
     const sim = data.simulator || {};
     const ai = data.ai || {};

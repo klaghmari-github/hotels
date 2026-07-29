@@ -307,11 +307,13 @@
           <div class="wiz-actions wiz-actions-split">
             <button type="button" class="btn btn-ghost" data-goto="2">← Retour</button>
             <div class="wiz-actions-right">
-              <button type="button" class="btn btn-ghost" id="btn-run-sim-manual" title="Maximise le CA en testant d'autres parts (hors schéma Excel pur)">
-                Optimiser les parts
+              <button type="button" class="btn btn-ghost" id="btn-run-optimize"
+                title="Teste plusieurs mix F&amp;B et répartitions de sous-catégories, applique le meilleur">
+                Optimiser
               </button>
-              <button type="button" class="btn btn-primary btn-lg btn-shine" id="btn-run-sim">
-                Lancer la simulation
+              <button type="button" class="btn btn-primary btn-lg btn-shine" id="btn-run-sim"
+                title="Calcule avec votre mix (parts normalisées à 100 %), puis signale si une optimisation est possible">
+                Simuler
                 <span class="btn-arrow" aria-hidden="true">→</span>
               </button>
             </div>
@@ -375,6 +377,7 @@
                 Projection fidèle aux règles Excel ROD — R1 clients · R2 mix · R3 catégories · R4 surface · coûts · marge nette.
               </p>
               <div id="dir-status-banner" class="status-banner hidden" role="status"></div>
+              <div id="dir-opt-banner" class="opt-banner hidden" role="status"></div>
               <section class="dir-big-metrics" id="dir-metrics-sim"></section>
               <section class="pnl-detail" id="dir-pnl-detail-sim"></section>
               <section class="assortment-panel" id="dir-assortment">
