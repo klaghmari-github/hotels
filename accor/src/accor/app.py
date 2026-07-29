@@ -1049,6 +1049,20 @@ def api_rod_meta():
         return jsonify({"ok": False, "error": str(exc)}), 400
 
 
+@app.get("/api/rod/sim-params")
+def api_rod_sim_params():
+    """
+    Tables de paramètres figés du simulateur (pilotes, marges, R3, coûts BUY/LEASE…).
+    Lecture seule — onglet admin « Simulateur params ».
+    """
+    try:
+        from accor.user.rules.sim_params import build_sim_params
+
+        return jsonify(build_sim_params())
+    except Exception as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+
 @app.route("/api/rod/hotel/<hotel_code>/trace", methods=["GET", "POST"])
 def api_rod_hotel_trace(hotel_code: str):
     """

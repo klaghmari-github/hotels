@@ -2976,3 +2976,104 @@ body.is-loading {
   align-items: center;
   justify-content: center;
 }
+
+/* Simulateur params (admin) — scroll page dans .main (overflow:hidden) */
+#view-sim-params.view {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+#view-sim-params .topbar,
+#view-sim-params .meta-bar {
+  flex-shrink: 0;
+}
+.sim-params-root {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 0.35rem 0.15rem 2.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 1400px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 162, 39, 0.4) transparent;
+}
+.sim-params-root::-webkit-scrollbar {
+  width: 8px;
+}
+.sim-params-root::-webkit-scrollbar-thumb {
+  background: rgba(201, 162, 39, 0.35);
+  border-radius: 99px;
+}
+.sim-params-card { margin: 0; flex-shrink: 0; }
+.sim-params-table-wrap {
+  overflow-x: auto;
+  overflow-y: visible;
+  max-height: none;
+}
+.sim-params-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--bg-elevated, #1a2230);
+}
+.sim-params-list {
+  margin: 0.35rem 0 0;
+  padding-left: 1.25rem;
+  line-height: 1.55;
+  font-size: 0.9rem;
+  color: var(--ink-soft, #c5ced9);
+}
+.sim-params-dl {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0.5rem 0 0;
+}
+.sim-params-dl > div {
+  display: grid;
+  grid-template-columns: minmax(7rem, 12rem) 1fr;
+  gap: 0.5rem 1rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  font-size: 0.88rem;
+}
+.sim-params-dl dt code {
+  font-size: 0.8rem;
+  color: #7dd3fc;
+}
+.sim-params-dl dd {
+  margin: 0;
+  color: var(--ink-soft, #c5ced9);
+  line-height: 1.45;
+}
+.tag-sol {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.tag-sol-simply {
+  background: rgba(59, 130, 246, 0.16);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+}
+.tag-sol-liberty {
+  background: rgba(16, 185, 129, 0.16);
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+.tag-sol-connected {
+  background: rgba(245, 158, 11, 0.16);
+  color: #fcd34d;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}

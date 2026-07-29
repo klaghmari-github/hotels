@@ -36,6 +36,8 @@ export class NavController {
     this.navRodEval = $("#nav-rod-eval");
     this.navModelBuild = $("#nav-model-build");
     this.viewSimVsIa = $("#view-sim-vs-ia");
+    this.viewSimParams = $("#view-sim-params");
+    this.navSimParams = $("#nav-sim-params");
     this.navModelExplore = $("#nav-model-explore");
     this.navFinalBuild = $("#nav-final-build");
     this.navFinalExplore = $("#nav-final-explore");
@@ -74,9 +76,39 @@ export class NavController {
     pinned.forEach((ds) => {
       if (this.navPinnedTop) this.navPinnedTop.appendChild(this.makeNavButton(ds));
     });
+    // Insérer « Simulateur params » juste après simulateur_data (avant model_data)
+    const makeSimParamsBtn = () => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className =
+        "nav-item" + (this.state.panel === "sim-params" ? " active" : "");
+      btn.id = "nav-sim-params";
+      btn.dataset.panel = "sim-params";
+      btn.innerHTML = `
+        <span class="nav-icon">⚙</span>
+        <span>
+          <span class="nav-label">Simulateur params</span>
+          <span class="nav-desc">Marges · mix · coûts BUY/LEASE</span>
+        </span>`;
+      btn.addEventListener("click", () => this.handlers.onSimParams?.());
+      return btn;
+    };
+    let simParamsInserted = false;
     middle.forEach((ds) => {
-      if (this.nav) this.nav.appendChild(this.makeNavButton(ds));
+      if (!this.nav) return;
+      this.nav.appendChild(this.makeNavButton(ds));
+      if (ds.id === "simulateur_data") {
+        const btn = makeSimParamsBtn();
+        this.nav.appendChild(btn);
+        this.navSimParams = btn;
+        simParamsInserted = true;
+      }
     });
+    if (this.nav && !simParamsInserted) {
+      const btn = makeSimParamsBtn();
+      this.nav.appendChild(btn);
+      this.navSimParams = btn;
+    }
   }
 
   _navButtonMap() {
@@ -137,6 +169,7 @@ export class NavController {
       this.viewTable,
       this.viewRodExcel,
       this.viewSimVsIa,
+      this.viewSimParams,
       this.viewModelBuild,
       this.viewModelExplore,
       this.viewModelEval,
@@ -144,6 +177,18 @@ export class NavController {
       this.viewFinalExplore,
       this.viewFinalEval,
     ].forEach((v) => v && v.classList.add("hidden"));
+  }
+
+  showSimParamsPanel() {
+    this.state.panel = "sim-params";
+    this.hideAllViews();
+    if (this.viewSimParams) this.viewSimParams.classList.remove("hidden");
+    this.clearDatasetNavActive();
+    this.setModelNavActive(null);
+    if (this.navSimParams) this.navSimParams.classList.add("active");
+    // aussi le bouton recréé dans render()
+    const dyn = $("#nav-sim-params");
+    if (dyn) dyn.classList.add("active");
   }
 
   showSimVsIaPanel() {
@@ -164,6 +209,7 @@ export class NavController {
     $$(".sidebar .nav-item[data-id]").forEach((el) =>
       el.classList.remove("active")
     );
+    $("#nav-sim-params")?.classList.remove("active");
   }
 
   showTablePanel(datasetId = null) {
@@ -171,6 +217,7 @@ export class NavController {
     this.hideAllViews();
     if (this.viewTable) this.viewTable.classList.remove("hidden");
     this.setModelNavActive(null);
+    $("#nav-sim-params")?.classList.remove("active");
     // Active le dataset dans la section Pilotes (si présent)
     if (datasetId) {
       $$(".sidebar .nav-item[data-id]").forEach((el) => {

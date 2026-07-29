@@ -664,6 +664,27 @@
         </div>
       </div>
 
+      <!-- ===== Simulateur params (tables figées) ===== -->
+      <div id="view-sim-params" class="view hidden">
+        <header class="topbar">
+          <div class="topbar-left">
+            <h1>Simulateur params</h1>
+            <p class="subtitle">
+              Paramètres figés du moteur ROD — pilotes, marges, mix catégories (R3),
+              coûts BUY / LEASE, agencement, arbre de reco.
+            </p>
+          </div>
+          <div class="topbar-actions">
+            <button type="button" class="btn btn-ghost" id="btn-sim-params-reload">Recharger</button>
+          </div>
+        </header>
+        <section class="meta-bar">
+          <span class="chip" id="sim-params-chip">—</span>
+          <span class="status muted">Lecture seule · iso Excel</span>
+        </section>
+        <div id="sim-params-root" class="sim-params-root"></div>
+      </div>
+
       <!-- ===== Simulateur vs IA (pilotes) ===== -->
       <div id="view-sim-vs-ia" class="view hidden">
         <header class="topbar">
