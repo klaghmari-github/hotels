@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>V3 — Spécification contractuelle du simulateur d’assortiment Corner Hôtel</title>
+<style>
+:root{
+  --ink:#162033; --muted:#667085; --paper:#f5f7fb; --card:#ffffff;
+  --navy:#0e214a; --blue:#2457ff; --blue2:#eaf0ff;
+  --green:#0f8a5f; --green2:#e9f8f1;
+  --orange:#c56a10; --orange2:#fff3e6;
+  --red:#b9313b; --red2:#ffedef;
+  --purple:#6f47c9; --purple2:#f2ecff;
+  --cyan:#087d96; --cyan2:#e8f7fb;
+  --line:#dfe5ef; --dark:#111827;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--ink);line-height:1.58}
+header{background:linear-gradient(135deg,#0c1835 0%,#173777 52%,#2b63df 100%);color:#fff;padding:78px 24px 62px}
+.header-inner{max-width:1200px;margin:auto}
+.kicker{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;font-weight:800;opacity:.82}
+h1{font-size:clamp(2.35rem,5vw,4.5rem);line-height:1.03;margin:.45rem 0 1rem;max-width:1050px}
+.lead{font-size:1.18rem;max-width:980px;color:#dfe8ff}
+.badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+.badge{padding:8px 12px;border:1px solid rgba(255,255,255,.26);background:rgba(255,255,255,.08);border-radius:999px;font-size:.89rem}
+.layout{max-width:1480px;margin:auto;display:grid;grid-template-columns:300px minmax(0,1fr);gap:28px;padding:28px}
+aside{position:sticky;top:18px;align-self:start;background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;max-height:calc(100vh - 36px);overflow:auto;box-shadow:0 10px 30px rgba(25,36,68,.06)}
+aside strong{display:block;margin-bottom:10px}
+aside a{display:block;color:#344058;text-decoration:none;padding:7px 9px;border-radius:8px;font-size:.9rem}
+aside a:hover{background:var(--blue2);color:var(--blue)}
+main{min-width:0}
+section{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:34px;margin-bottom:24px;box-shadow:0 10px 28px rgba(20,34,70,.045)}
+h2{font-size:2rem;line-height:1.2;margin:0 0 18px}
+h3{font-size:1.34rem;margin:30px 0 10px}
+h4{font-size:1.04rem;margin:22px 0 8px}
+p{margin:.65rem 0}
+.grid{display:grid;gap:16px}
+.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card{border:1px solid var(--line);border-radius:16px;padding:18px;background:#fff}
+.card h3,.card h4{margin-top:0}
+.card.blue{background:var(--blue2);border-color:#cbd8ff}
+.card.green{background:var(--green2);border-color:#c4ecd9}
+.card.orange{background:var(--orange2);border-color:#efd4b0}
+.card.red{background:var(--red2);border-color:#f2c5ca}
+.card.purple{background:var(--purple2);border-color:#d9c8ff}
+.card.cyan{background:var(--cyan2);border-color:#bfe9f1}
+.callout{border-left:5px solid var(--blue);background:var(--blue2);padding:16px 18px;border-radius:10px;margin:18px 0}
+.callout.warn{border-color:var(--orange);background:var(--orange2)}
+.callout.danger{border-color:var(--red);background:var(--red2)}
+.callout.ok{border-color:var(--green);background:var(--green2)}
+.callout.purple{border-color:var(--purple);background:var(--purple2)}
+pre{background:#111827;color:#eef3ff;padding:18px;border-radius:14px;overflow:auto;line-height:1.5}
+code,.code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.formula{font-family:Cambria Math,Georgia,serif;background:#f8faff;border:1px solid var(--line);padding:14px 16px;border-radius:12px;margin:12px 0;font-size:1.05rem}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:.94rem}
+th,td{border-bottom:1px solid var(--line);padding:11px 10px;text-align:left;vertical-align:top}
+th{background:#f5f7fb;color:#35415a}
+tr:last-child td{border-bottom:0}
+.flow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:18px 0}
+.step{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 13px;font-weight:700}
+.arrow{color:var(--blue);font-weight:900;font-size:1.25rem}
+.metric{font-size:1.72rem;font-weight:850;line-height:1}
+.small{font-size:.88rem;color:var(--muted)}
+.pill{display:inline-block;border-radius:999px;padding:3px 9px;font-size:.79rem;font-weight:800}
+.pill.blue{background:var(--blue2);color:var(--blue)}
+.pill.green{background:var(--green2);color:var(--green)}
+.pill.orange{background:var(--orange2);color:var(--orange)}
+.pill.red{background:var(--red2);color:var(--red)}
+.pill.purple{background:var(--purple2);color:var(--purple)}
+.diagram{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:center;margin:18px 0}
+.node{border:2px solid #cbd5e1;border-radius:16px;padding:18px;background:white}
+.node strong{display:block;font-size:1.04rem}
+.rule{border-top:5px solid var(--blue)}
+.rule.green{border-color:var(--green)}
+.rule.orange{border-color:var(--orange)}
+.rule.purple{border-color:var(--purple)}
+.checklist li{margin:.35rem 0}
+details{border:1px solid var(--line);border-radius:12px;padding:12px 15px;margin:10px 0;background:#fbfcff}
+summary{cursor:pointer;font-weight:780}
+footer{max-width:1200px;margin:18px auto 60px;padding:0 24px;color:var(--muted)}
+hr{border:none;border-top:1px solid var(--line);margin:28px 0}
+@media(max-width:1100px){.layout{grid-template-columns:1fr}aside{position:relative;top:auto;max-height:none}.grid-4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:760px){.layout{padding:14px}.grid-2,.grid-3,.grid-4,.diagram{grid-template-columns:1fr}section{padding:23px}.arrow{text-align:center}}
+@media print{aside{display:none}.layout{display:block;padding:0}section{break-inside:avoid;box-shadow:none}body{background:white}header{padding:38px}}
+</style>
+</head>
+<body>
+<header>
+<div class="header-inner">
+  <div class="kicker">Version 3 — source de vérité fonctionnelle, métier et mathématique</div>
+  <h1>Simulateur d’assortiment des corners hôtels</h1>
+  <p class="lead">Contrat complet pour l’ajout, la suppression et la modification des mix d’exposition par produit, gamme et type, avec isolation absolue par hôtel et par solution, recalcul cohérent des ventes, montants, marges et paniers, et séparation explicite entre règles mathématiques, hypothèses configurables et décisions métier.</p>
+  <div class="badges">
+    <span class="badge">Hôtel × solution</span>
+    <span class="badge">Produit atomique</span>
+    <span class="badge">Exposition ≠ demande</span>
+    <span class="badge">Plan atomique</span>
+    <span class="badge">Shares non renormalisés</span>
+    <span class="badge">Paniers estimés</span>
+    <span class="badge">Ratios reconstruits</span>
+  </div>
+</div>
+</header>
+
+<div class="layout">
+<aside>
+<strong>Sommaire</strong>
+<a href="#purpose">1. Objet et statut</a>
+<a href="#scope">2. Périmètre hôtel × solution</a>
+<a href="#source">3. Source d’entrée</a>
+<a href="#concepts">4. Concepts et définitions</a>
+<a href="#rules">5. Règles fixes vs paramètres</a>
+<a href="#data-model">6. Modèle de données</a>
+<a href="#pipeline">7. Pipeline d’un scénario</a>
+<a href="#ranking">8. Ranking et qualité</a>
+<a href="#remove-product">9. Suppression produit</a>
+<a href="#remove-set">10. Retraits multiples</a>
+<a href="#add-product">11. Ajout produit</a>
+<a href="#demand">12. Demande et cannibalisation</a>
+<a href="#baskets">13. Paniers et intensités</a>
+<a href="#remove-gamme">14. Suppression gamme</a>
+<a href="#add-gamme">15. Ajout gamme</a>
+<a href="#remove-type">16. Suppression type</a>
+<a href="#add-type">17. Ajout type</a>
+<a href="#mix-gamme">18. Mix gamme</a>
+<a href="#mix-type">19. Mix type</a>
+<a href="#rebuild">20. Reconstruction complète</a>
+<a href="#examples">21. Exemples complets</a>
+<a href="#limits">22. Limites déclarées</a>
+<a href="#api">23. Contrat API</a>
+<a href="#tests">24. Invariants et tests</a>
+<a href="#roadmap">25. Ordre d’implémentation</a>
+</aside>
+
+<main>
+
+<section id="purpose">
+<h2>1. Objet et statut de la spécification</h2>
+<p>Ce document définit le comportement attendu du moteur de simulation. Il doit permettre à deux développeurs différents d’obtenir le même résultat à partir des mêmes données et du même scénario.</p>
+<div class="grid grid-3">
+<div class="card blue"><h3>Ce document fixe</h3><p>Les formules, l’ordre des traitements, les invariants, les fallbacks et les erreurs bloquantes.</p></div>
+<div class="card green"><h3>Ce document distingue</h3><p>Les règles mathématiques non configurables, les politiques de simulation configurables et les paramètres métier à valider.</p></div>
+<div class="card orange"><h3>Ce document n’inclut pas</h3><p>Le nettoyage historique du fichier de marge. La source opérationnelle est déjà enrichie et fiable.</p></div>
+</div>
+<div class="callout ok"><strong>Statut cible.</strong> Cette v3 est la source de vérité durable du moteur. Elle ne dépend pas des étapes temporaires de dataprep.</div>
+</section>
+
+<section id="scope">
+<h2>2. Périmètre absolu : hôtel × solution</h2>
+<p>Les comportements d’achat diffèrent selon le dispositif de vente. Il est interdit de mélanger Simply, Liberty et Connected dans un même calcul de référence.</p>
+<div class="grid grid-3">
+<div class="card rule"><h3>Simply</h3><p>Produits exposés simplement ; paiement auprès d’un opérateur humain.</p></div>
+<div class="card rule purple"><h3>Liberty</h3><p>Commande et paiement via borne.</p></div>
+<div class="card rule green"><h3>Connected</h3><p>Frigo connecté ou parcours self-service automatisé.</p></div>
+</div>
+<div class="formula">simulation_scope = HOTEL_CODE × SOLUTION</div>
+<table>
+<tr><th>Calcul</th><th>Autorisé</th><th>Interdit</th></tr>
+<tr><td>Ranking local</td><td>Même hôtel, même solution</td><td>Autre solution</td></tr>
+<tr><td>Candidat multi-hôtels</td><td>Autres hôtels de la même solution</td><td>Hôtel d’une autre solution</td></tr>
+<tr><td>Médiane gamme</td><td>Même solution</td><td>Médiane toutes solutions</td></tr>
+<tr><td>Intensité panier</td><td>Fallback dans la même solution</td><td>Fallback inter-solution</td></tr>
+<tr><td>Coefficient de prix</td><td>Même hôtel et même solution, puis même solution</td><td>Coefficient global non segmenté</td></tr>
+</table>
+<div class="callout danger"><strong>Erreur bloquante.</strong> Toute fonction de simulation doit recevoir explicitement <code>hotel_code</code> et <code>solution</code>. Si la solution manque, le scénario est refusé.</div>
+</section>
+
+<section id="source">
+<h2>3. Source d’entrée du moteur</h2>
+<p>Le moteur utilise une table ou un fichier de ventes étendu, déjà nettoyé et enrichi.</p>
+<pre>hotel_sales_raw_extended_data.xlsx
+ou table de production équivalente</pre>
+<p>Cette source contient directement :</p>
+<ul>
+<li>l’hôtel et la solution ;</li>
+<li>le produit, la gamme et le type ;</li>
+<li>les quantités vendues ;</li>
+<li>le prix TTC unitaire ;</li>
+<li>le prix marché fiable ;</li>
+<li>la marge ligne ou les champs permettant de la recalculer ;</li>
+<li>les identifiants panier / commande lorsque disponibles.</li>
+</ul>
+<div class="callout warn"><strong>Règle documentaire.</strong> Le simulateur ne connaît jamais <code>marges.xlsx</code>, le scraping, les doublons de prix ni les étapes de consolidation. Ces sujets appartiennent à un document séparé et temporaire.</div>
+</section>
+
+<section id="concepts">
+<h2>4. Concepts et définitions</h2>
+<div class="grid grid-2">
+<div class="card">
+<h3>Exposition pilote</h3>
+<p>Faute de table d’assortiment physique, le pilote infère qu’un produit était exposé lorsqu’il possède au moins une vente valide.</p>
+<div class="formula">is_exposed_pilot = (STATUT = DONE) et (QUANTITE &gt; 0)</div>
+</div>
+<div class="card">
+<h3>Exposition scénario</h3>
+<p>Dans un scénario, l’exposition est décidée explicitement par le plan, indépendamment de la demande attendue.</p>
+<div class="formula">is_exposed_scenario = décision du plan d’assortiment</div>
+</div>
+<div class="card">
+<h3>Demande attendue</h3>
+<p>Les ventes simulées sont des espérances, éventuellement décimales. Une demande de 0,4 ne signifie pas 0,4 transaction réelle.</p>
+</div>
+<div class="card">
+<h3>Produit atomique</h3>
+<p>Toute opération gamme ou type est transformée en opérations produit avant exécution.</p>
+</div>
+<div class="card">
+<h3>Mix d’exposition</h3>
+<div class="formula">mix = nombre de produits exposés du segment / nombre total de produits exposés</div>
+<p>Ce n’est ni un mix de ventes, ni de montant, ni de marge.</p>
+</div>
+<div class="card">
+<h3>Plan atomique</h3>
+<p>Tous les retraits et ajouts sont résolus avant calcul. Le résultat ne dépend pas de l’ordre des actions utilisateur.</p>
+</div>
+</div>
+<div class="callout purple"><strong>Distinction structurante.</strong> Dans le pilote, « exposé » est inféré depuis les ventes. Dans un scénario, « exposé » vient du plan et « ventes attendues » vient du modèle de demande.</div>
+</section>
+
+<section id="rules">
+<h2>5. Règles fixes, politiques configurables et paramètres métier</h2>
+<div class="grid grid-3">
+<div class="card blue">
+<h3>Règles fixes</h3>
+<ul>
+<li>Isolation hôtel × solution</li>
+<li>Produit atomique</li>
+<li>Plan atomique</li>
+<li>Shares non renormalisés</li>
+<li>Perte = D × S<sub>R</sub></li>
+<li>Paniers non additifs</li>
+<li>Ratios toujours recalculés</li>
+</ul>
+</div>
+<div class="card green">
+<h3>Politiques configurables</h3>
+<ul>
+<li><code>demand_policy</code></li>
+<li><code>basket_policy</code></li>
+<li><code>mix_scope</code></li>
+<li><code>capacity_mode</code></li>
+<li><code>overflow_policy</code></li>
+<li><code>seasonality_adjustment</code></li>
+</ul>
+</div>
+<div class="card orange">
+<h3>Paramètres métier</h3>
+<ul>
+<li>plafond éventuel des nouveautés</li>
+<li>minimum de mois observés</li>
+<li>minimum de produits source</li>
+<li>seuils de confiance</li>
+<li>proxy de gamme</li>
+</ul>
+</div>
+</div>
+<p>Aucune valeur métier, par exemple 40 %, ne doit être codée comme vérité mathématique. Elle doit être nommée, documentée et validée.</p>
+</section>
+
+<section id="data-model">
+<h2>6. Modèle de données et champs</h2>
+<p>La nomenclature existante est conservée. Les champs actuels ne sont pas dupliqués.</p>
+<table>
+<tr><th>Niveau</th><th>Champs primaires</th><th>Champs dérivés</th></tr>
+<tr><td>Produit</td><td><code>produit_nombre_ventes</code>, <code>produit_montant_ventes</code>, <code>produit_marge_ventes</code>, <code>produit_nombre_paniers</code>, <code>is_exposed</code></td><td><code>_par_vente</code>, <code>_par_panier</code>, <code>_par_mois</code></td></tr>
+<tr><td>Gamme</td><td>sommes ventes, montant, marge ; paniers estimés ; nombre de produits exposés</td><td>ratios et mix gamme</td></tr>
+<tr><td>Type</td><td>sommes ventes, montant, marge ; paniers estimés ; nombre de produits exposés</td><td>ratios et mix type</td></tr>
+<tr><td>Hôtel</td><td>sommes produits ; paniers hôtel estimés ; nombre total de produits exposés</td><td>ratios globaux</td></tr>
+</table>
+<h3>Valeurs unitaires gelées pendant un scénario</h3>
+<div class="formula">prix_i = produit_montant_ventes_i / produit_nombre_ventes_i</div>
+<div class="formula">marge_unitaire_i = produit_marge_ventes_i / produit_nombre_ventes_i</div>
+<p>Une simulation d’assortiment ne change pas automatiquement le prix ni la marge unitaire. Un scénario de pricing serait un module distinct.</p>
+</section>
+
+<section id="pipeline">
+<h2>7. Pipeline contractuel d’un scénario</h2>
+<div class="flow">
+<span class="step">1. Charger le pilote</span><span class="arrow">→</span>
+<span class="step">2. Verrouiller hôtel × solution</span><span class="arrow">→</span>
+<span class="step">3. Résoudre le plan</span><span class="arrow">→</span>
+<span class="step">4. Appliquer les retraits</span><span class="arrow">→</span>
+<span class="step">5. Calculer la perte</span><span class="arrow">→</span>
+<span class="step">6. Estimer les ajouts</span><span class="arrow">→</span>
+<span class="step">7. Cannibaliser / additionner</span><span class="arrow">→</span>
+<span class="step">8. Reconstruire tous les KPI</span>
+</div>
+<pre>pilot_state
+  → ScopeValidator
+  → AssortmentPlanner
+  → CandidateRanker
+  → RemovalAllocator
+  → AdditionAllocator
+  → BasketEstimator
+  → MetricsRebuilder
+  → ScenarioAudit
+  → scenario_state</pre>
+<div class="callout"><strong>Interdiction.</strong> Le moteur ne modifie jamais directement un total gamme ou type. Il simule d’abord les produits puis reconstruit tout.</div>
+</section>
+
+<section id="ranking">
+<h2>8. Ranking et qualité des candidats</h2>
+<h3>8.1 Ranking de retrait</h3>
+<pre>ORDER BY
+  produit_marge_ventes_par_mois ASC,
+  produit_nombre_ventes_par_mois ASC,
+  produit_nombre_paniers_par_mois ASC,
+  nombre_mois_observes DESC,
+  produit_key ASC</pre>
+<p>Le dernier critère rend le tri déterministe.</p>
+<h3>8.2 Ranking d’ajout</h3>
+<pre>ORDER BY
+  marge_mensuelle_attendue DESC,
+  ventes_mensuelles_attendues DESC,
+  paniers_mensuels_attendus DESC,
+  nombre_hotels_support DESC,
+  produit_key ASC</pre>
+<p>Pour les familles à marge nulle ou proche de zéro, la rotation devient naturellement le premier critère discriminant.</p>
+<h3>8.3 Exclusion des artefacts</h3>
+<p>Les lignes invalides ou suspectes ne sont pas classées comme « mauvais produits ». Elles sont exclues et signalées.</p>
+<pre>QUANTITE > 0
+PRIX_TTC > 0
+PRIX_TTC_MARCHE >= 0
+PRIX_TTC_MARCHE <= PRIX_TTC
+clé produit complète
+périmètre hôtel × solution valide</pre>
+<h3>8.4 Éligibilité multi-hôtels</h3>
+<p>Un hôtel source ne contribue que s’il respecte :</p>
+<pre>same_solution = true
+months_observed >= minimum_months
+active_products_in_gamme >= minimum_products
+median_gamme_sales > 0</pre>
+<p>Les seuils sont configurables et la confiance est stockée dans le résultat.</p>
+</section>
+
+<section id="remove-product">
+<h2>9. Suppression d’un produit</h2>
+<h3>Entrée</h3>
+<pre>remove_product(
+  hotel_code="H001",
+  solution="CONNECTED",
+  product_key="P4"
+)</pre>
+<h3>Calcul</h3>
+<div class="formula">Q = Σ q_i</div>
+<div class="formula">s_i = q_i / Q</div>
+<div class="formula">D = q_r</div>
+<div class="formula">S_R = s_r</div>
+<div class="formula">q_i' = q_i + D × s_i, pour les produits restants</div>
+<div class="formula">perte = D × S_R</div>
+<p>Les shares utilisés sont ceux du snapshot avant plan. Ils ne sont pas renormalisés.</p>
+<table>
+<tr><th>Produit</th><th>Avant</th><th>Share</th><th>Après retrait de P4</th></tr>
+<tr><td>P1</td><td>20</td><td>20 %</td><td>24</td></tr>
+<tr><td>P2</td><td>40</td><td>40 %</td><td>48</td></tr>
+<tr><td>P3</td><td>20</td><td>20 %</td><td>24</td></tr>
+<tr><td>P4</td><td>20</td><td>20 %</td><td>retiré</td></tr>
+<tr><th>Total</th><th>100</th><th>100 %</th><th>96</th></tr>
+</table>
+<div class="callout danger"><strong>Formule interdite.</strong> Renormaliser les shares des restants redistribuerait 100 % de la demande et ferait disparaître la perte comportementale.</div>
+</section>
+
+<section id="remove-set">
+<h2>10. Retraits multiples et plan atomique</h2>
+<p>Pour un ensemble de produits retirés R :</p>
+<div class="formula">D = Σ<sub>r∈R</sub> q_r</div>
+<div class="formula">S_R = Σ<sub>r∈R</sub> s_r</div>
+<div class="formula">q_i' = q_i + D × s_i</div>
+<div class="formula">perte = D × S_R</div>
+<h3>Exemple</h3>
+<p>Avec 20 / 40 / 20 / 20, retrait simultané de P3 et P4 :</p>
+<div class="formula">D = 40 ; S_R = 0,40 ; perte = 16</div>
+<div class="formula">P1' = 20 + 40 × 0,20 = 28</div>
+<div class="formula">P2' = 40 + 40 × 0,40 = 56</div>
+<p>Total final : 84.</p>
+<div class="callout ok"><strong>Pourquoi atomique ?</strong> Retirer P3 puis recalculer avant P4 produirait un autre résultat. Le plan doit être résolu en bloc.</div>
+</section>
+
+<section id="add-product">
+<h2>11. Ajout d’un produit</h2>
+<h3>11.1 Hiérarchie des candidats</h3>
+<ol>
+<li>Produit local retiré précédemment dans le même hôtel et la même solution.</li>
+<li>Produit réel présent dans d’autres hôtels de la même solution.</li>
+<li>Produit synthétique de même solution et même gamme.</li>
+<li>Proxy explicite de même solution pour une gamme inconnue.</li>
+<li>Sinon refus.</li>
+</ol>
+<h3>11.2 Rotation relative</h3>
+<div class="formula">rotation_relative(c,h) = ventes_mensuelles(c,h) / médiane_ventes_mensuelles(gamme,h)</div>
+<div class="formula">rotation_relative(c) = médiane des hôtels admissibles de la même solution</div>
+<div class="formula">ventes_attendues(c,cible) = rotation_relative(c) × médiane_ventes_mensuelles(gamme,cible)</div>
+<h3>11.3 Prix et marge attendus</h3>
+<div class="formula">coefficient_prix(cible,g) = médiane(prix_vente / prix_marché) dans la même solution</div>
+<div class="formula">prix_vente_attendu = prix_marché_candidat × coefficient_prix</div>
+<div class="formula">marge_unitaire_attendue = prix_vente_attendu − prix_marché_candidat</div>
+<div class="formula">marge_mensuelle_attendue = ventes_mensuelles_attendues × marge_unitaire_attendue</div>
+<h3>11.4 Statut d’exposition</h3>
+<p>Le produit ajouté reçoit :</p>
+<pre>is_exposed = true
+value_status = SIMULATED_EXPECTATION</pre>
+<p>Même si sa demande attendue est inférieure à une vente sur la période, il reste exposé et reçoit un warning. Il n’est pas supprimé automatiquement.</p>
+</section>
+
+<section id="demand">
+<h2>12. Demande, cannibalisation et débordement</h2>
+<h3>12.1 Ordre contractuel</h3>
+<div class="flow">
+<span class="step">Retraits</span><span class="arrow">→</span>
+<span class="step">Perte des fans</span><span class="arrow">→</span>
+<span class="step">Demande brute nouveaux</span><span class="arrow">→</span>
+<span class="step">Cannibalisation</span><span class="arrow">→</span>
+<span class="step">Part additive</span>
+</div>
+
+<h3>12.2 CONSTANT_MARKET</h3>
+<p>Le total après perte reste constant.</p>
+<div class="formula">Q_remove = Σ q_i après retrait</div>
+<div class="formula">A = Σ a_j, demande brute des nouveautés</div>
+<p>Limite mathématique obligatoire :</p>
+<div class="formula">A_max_math = Q_remove</div>
+<p>Plafond métier facultatif :</p>
+<div class="formula">A_max_business = cap × Q_remove, seulement si cap renseigné</div>
+<div class="formula">A_max = min(A_max_math, A_max_business) si cap existe ; sinon A_max = Q_remove</div>
+<div class="formula">scale = min(1, A_max / A)</div>
+<div class="formula">a_j* = a_j × scale</div>
+<div class="formula">q_i_final = q_i_remove × (1 − A* / Q_remove)</div>
+<div class="formula">q_j_final = a_j*</div>
+<div class="callout warn"><strong>Décision v3.</strong> Aucun plafond de 40 % n’est imposé par défaut. Un plafond métier éventuel est explicite, facultatif et validé par Accor.</div>
+
+<h3>12.3 ADDITIVE_MARKET</h3>
+<div class="formula">q_i_final = q_i_remove</div>
+<div class="formula">q_j_final = a_j</div>
+<div class="formula">Q_final = Q_remove + A</div>
+
+<h3>12.4 HYBRID_MARKET</h3>
+<div class="formula">λ ∈ [0,1]</div>
+<div class="formula">C = (1 − λ) × A</div>
+<div class="formula">E = λ × A</div>
+<div class="formula">q_i_final = q_i_remove × (1 − C / Q_remove)</div>
+<div class="formula">q_j_final = a_j</div>
+<div class="formula">Q_final = Q_remove + E</div>
+</section>
+
+<section id="baskets">
+<h2>13. Paniers et politique d’intensité stable</h2>
+<p>Les paniers ne sont pas additifs. La V1 estime les paniers en conservant l’intensité observée à chaque niveau.</p>
+<div class="formula">intensité_hôtel = nombre_ventes / nombre_paniers</div>
+<div class="formula">nombre_paniers' = nombre_ventes' / intensité_hôtel</div>
+<h3>Produit, gamme et type</h3>
+<div class="formula">paniers_niveau' = min(paniers_hôtel', ventes_niveau' / intensité_niveau)</div>
+<p>Le plafond est appliqué individuellement, pas à la somme.</p>
+<div class="callout ok"><strong>Situation normale.</strong> Σ paniers produit peut dépasser les paniers hôtel, car un même panier contient plusieurs produits.</div>
+<h3>Intensité d’un nouveau produit</h3>
+<ol>
+<li>Médiane du même produit dans d’autres hôtels de la même solution.</li>
+<li>Sinon médiane des produits de la même gamme dans l’hôtel cible.</li>
+<li>Sinon médiane de la gamme dans d’autres hôtels de la même solution.</li>
+<li>Sinon intensité globale de l’hôtel cible.</li>
+</ol>
+<h3>Traçabilité</h3>
+<pre>basket_estimation_method = STABLE_INTENSITY
+basket_estimation_status = ESTIMATED
+basket_intensity_source =
+  PRODUCT_MULTI_HOTEL
+  HOTEL_GAMME_MEDIAN
+  SOLUTION_GAMME_MEDIAN
+  HOTEL_FALLBACK</pre>
+<p>Les paniers simulés peuvent être décimaux et ne sont arrondis qu’à l’affichage.</p>
+</section>
+
+<section id="remove-gamme">
+<h2>14. Suppression d’une gamme</h2>
+<p>Une suppression de gamme est transformée en suppression de tous ses produits exposés dans le périmètre hôtel × solution.</p>
+<div class="diagram">
+<div class="node"><strong>Commande</strong><code>remove_gamme("G2")</code></div>
+<div class="arrow">→</div>
+<div class="node"><strong>Plan résolu</strong><code>remove_product(P21...P60)</code></div>
+</div>
+<p>La demande totale retirée est calculée une seule fois, puis redistribuée une seule fois. Les agrégats gamme et type sont reconstruits après exécution.</p>
+</section>
+
+<section id="add-gamme">
+<h2>15. Ajout d’une gamme</h2>
+<h3>Gamme connue dans la même solution</h3>
+<p>Le moteur sélectionne les meilleurs candidats réels observés dans d’autres hôtels de la même solution.</p>
+<h3>Gamme inconnue dans l’hôtel mais connue ailleurs</h3>
+<p>Les profils sont réestimés dans l’hôtel cible à partir de rotations relatives, de prix et d’intensités de la même solution.</p>
+<h3>Gamme inconnue dans toute la solution</h3>
+<p>Deux choix seulement :</p>
+<ol>
+<li>fournir un proxy explicite dans la même solution ;</li>
+<li>refuser le scénario.</li>
+</ol>
+<div class="callout danger"><strong>Interdit.</strong> Construire une gamme Connected à partir d’observations Simply ou Liberty.</div>
+</section>
+
+<section id="remove-type">
+<h2>16. Suppression d’un type</h2>
+<p>Supprimer un type signifie retirer toutes ses gammes et tous ses produits exposés dans le périmètre ciblé.</p>
+<pre>remove_type("NON-F&B")
+→ resolve all exposed products
+→ one atomic removal set
+→ one loss calculation
+→ one complete rebuild</pre>
+</section>
+
+<section id="add-type">
+<h2>17. Ajout d’un type</h2>
+<p>Ajouter un type nécessite de définir ou d’inférer ses gammes, leur répartition et leurs produits, toujours dans la même solution.</p>
+<h3>Répartition intra-type</h3>
+<p>Par défaut, si le type existe déjà :</p>
+<div class="formula">part_gamme_dans_type = gamme_nombre_produits / type_nombre_produits</div>
+<p>Pour un type totalement nouveau, la répartition doit être fournie ou provenir d’un proxy explicite de même solution.</p>
+</section>
+
+<section id="mix-gamme">
+<h2>18. Modification du mix d’exposition par gamme</h2>
+<div class="formula">mix_gamme(g) = nombre_produits_exposés(g) / nombre_total_produits_exposés</div>
+<h3>scope = specified — défaut</h3>
+<p>Les gammes non citées restent inchangées. Les pourcentages s’appliquent uniquement aux gammes citées.</p>
+<h3>scope = all</h3>
+<p>Toutes les gammes actives doivent être citées et la somme doit être égale à 100 %.</p>
+<h3>Capacité constante</h3>
+<div class="formula">N_final = N_initial</div>
+<h3>Capacité libre</h3>
+<p><code>target_n</code> est obligatoire. Les pourcentages seuls ne suffisent pas.</p>
+<h3>Arrondis</h3>
+<p>Les effectifs cibles sont obtenus par la méthode des plus grands restes afin que leur somme soit exacte.</p>
+<h3>Exemple</h3>
+<p>G1 = 40, G2 = 60, cible 70/30, capacité 100 :</p>
+<div class="formula">G1 : 70 → +30 produits</div>
+<div class="formula">G2 : 30 → −30 produits</div>
+<p>Les 30 retraits et 30 ajouts sont ensuite résolus au niveau produit.</p>
+</section>
+
+<section id="mix-type">
+<h2>19. Modification du mix d’exposition par type</h2>
+<div class="formula">mix_type(t) = nombre_produits_exposés(t) / nombre_total_produits_exposés</div>
+<p>La cible type est transformée en effectifs, puis répartie entre les gammes du type.</p>
+<h3>Politique par défaut</h3>
+<pre>intra_type_policy = PRESERVE_CURRENT_EXPOSURE</pre>
+<p>Exemple : F&amp;B contient G1=30 et G2=20. Pour +10 produits F&amp;B, l’allocation initiale est +6 G1 et +4 G2.</p>
+<p>Une politique <code>MAXIMIZE_EXPECTED_MARGIN</code> peut être demandée explicitement, jamais activée silencieusement.</p>
+</section>
+
+<section id="rebuild">
+<h2>20. Reconstruction complète des indicateurs</h2>
+<h3>20.1 Produit</h3>
+<div class="formula">produit_montant_ventes' = produit_nombre_ventes' × prix_unitaire</div>
+<div class="formula">produit_marge_ventes' = produit_nombre_ventes' × marge_unitaire</div>
+<div class="formula">produit_nombre_paniers' = min(paniers_hôtel', ventes' / intensité)</div>
+<h3>20.2 Gamme et type</h3>
+<div class="formula">ventes = Σ ventes produit</div>
+<div class="formula">montant = Σ montant produit</div>
+<div class="formula">marge = Σ marge produit</div>
+<p>Les paniers sont estimés indépendamment avec l’intensité propre du niveau.</p>
+<h3>20.3 Hôtel</h3>
+<div class="formula">nombre_ventes = Σ produit_nombre_ventes</div>
+<div class="formula">montant_ventes = Σ produit_montant_ventes</div>
+<div class="formula">marge_ventes = Σ produit_marge_ventes</div>
+<h3>20.4 Ratios</h3>
+<p>Tous les champs suivants sont recalculés, jamais modifiés par delta :</p>
+<pre>_par_vente
+_par_panier
+_par_mois
+mix_exposition
+nombre_produits
+nombre_gammes
+nombre_types</pre>
+</section>
+
+<section id="examples">
+<h2>21. Exemples complets</h2>
+<h3>21.1 Remplacement simple : −1 produit, +1 produit</h3>
+<ol>
+<li>Retirer P4 selon la formule de perte.</li>
+<li>Estimer le candidat C1 dans la même solution.</li>
+<li>Appliquer <code>CONSTANT_MARKET</code>.</li>
+<li>Marquer C1 comme exposé.</li>
+<li>Recalculer ventes, montant, marge, paniers et mix.</li>
+</ol>
+
+<h3>21.2 Scénario complet : −9 G2, +6 G1, +3 G3</h3>
+<div class="grid grid-4">
+<div class="card red"><h4>G2</h4><div class="metric">−9</div><p>Plus faibles marges mensuelles.</p></div>
+<div class="card blue"><h4>G1</h4><div class="metric">+6</div><p>Meilleurs candidats même solution.</p></div>
+<div class="card purple"><h4>G3</h4><div class="metric">+3</div><p>Réels ou proxy explicite.</p></div>
+<div class="card green"><h4>Capacité</h4><div class="metric">=</div><p>Nombre de références constant.</p></div>
+</div>
+<div class="flow">
+<span class="step">Résoudre 9 retraits</span><span class="arrow">→</span>
+<span class="step">Calculer une perte unique</span><span class="arrow">→</span>
+<span class="step">Estimer 9 ajouts</span><span class="arrow">→</span>
+<span class="step">Appliquer la politique de demande</span><span class="arrow">→</span>
+<span class="step">Reconstruire tout</span>
+</div>
+<table>
+<tr><th>Indicateur</th><th>Comportement attendu</th></tr>
+<tr><td>Nombre de produits</td><td>Inchangé</td></tr>
+<tr><td>Ventes</td><td>Peuvent baisser à cause de la perte</td></tr>
+<tr><td>Montant</td><td>Peut monter ou baisser selon le mix prix</td></tr>
+<tr><td>Marge</td><td>Peut augmenter malgré un volume plus faible</td></tr>
+<tr><td>Paniers</td><td>Estimés par intensité stable</td></tr>
+<tr><td>Mix gamme</td><td>Recalculé sur les produits exposés</td></tr>
+</table>
+
+<h3>21.3 Produit à demande très faible</h3>
+<p>Un produit ajouté reçoit 0,4 vente attendue sur la période :</p>
+<pre>is_exposed = true
+expected_sales = 0.4
+performance_status = VERY_LOW_EXPECTED_DEMAND
+warning = "Moins d'une vente attendue sur la période"</pre>
+<p>Il reste dans le mix d’exposition tant que l’utilisateur ne le retire pas.</p>
+</section>
+
+<section id="limits">
+<h2>22. Limites déclarées de la V1</h2>
+<h3>22.1 Saisonnalité</h3>
+<pre>seasonality_adjustment = NONE</pre>
+<p>La V1 utilise des moyennes mensuelles sans correction saisonnière. Un warning est produit si les périodes source et cible sont peu comparables.</p>
+<h3>22.2 Disponibilité et ruptures</h3>
+<pre>availability_adjustment = NONE</pre>
+<p>Les ventes observées sont assimilées à la demande réalisée faute de données fiables sur les jours de disponibilité.</p>
+<h3>22.3 Paniers</h3>
+<p>Les paniers sont estimés, pas reconstruits transaction par transaction. Le statut doit rester <code>ESTIMATED</code>.</p>
+<h3>22.4 Faible historique</h3>
+<p>Les rankings bruts sont plus instables lorsque le nombre de mois ou de produits de référence est faible. La confiance doit être affichée.</p>
+</section>
+
+<section id="api">
+<h2>23. Contrat API</h2>
+<h3>Exemple de scénario</h3>
+<pre>{
+  "hotel_code": "H001",
+  "solution": "CONNECTED",
+  "capacity_mode": "constant",
+  "demand_policy": "CONSTANT_MARKET",
+  "basket_policy": "STABLE_INTENSITY",
+  "new_products_market_share_cap": null,
+  "mix_scope": "specified",
+  "operations": [
+    {"action": "remove", "level": "gamme", "value": "G2", "count": 9},
+    {"action": "add", "level": "gamme", "value": "G1", "count": 6},
+    {"action": "add", "level": "gamme", "value": "G3", "count": 3}
+  ]
+}</pre>
+<h3>Prévisualisation du plan</h3>
+<pre>{
+  "scope": {"hotel_code":"H001","solution":"CONNECTED"},
+  "resolved_removals": [...],
+  "resolved_additions": [...],
+  "assumptions": [...],
+  "warnings": [...],
+  "confidence": "MEDIUM",
+  "estimated_impacts": {
+    "sales": ...,
+    "revenue": ...,
+    "margin": ...,
+    "baskets": ...
+  }
+}</pre>
+<h3>Statuts utiles</h3>
+<pre>value_status:
+  OBSERVED
+  SIMULATED_EXPECTATION
+
+performance_status:
+  NORMAL
+  LOW_EXPECTED_DEMAND
+  VERY_LOW_EXPECTED_DEMAND
+
+confidence:
+  HIGH
+  MEDIUM
+  LOW</pre>
+</section>
+
+<section id="tests">
+<h2>24. Invariants et tests obligatoires</h2>
+<h3>24.1 Invariants additifs</h3>
+<ul>
+<li><code>nombre_ventes = Σ produit_nombre_ventes</code></li>
+<li><code>montant_ventes = Σ produit_montant_ventes</code></li>
+<li><code>marge_ventes = Σ produit_marge_ventes</code></li>
+<li>mêmes identités aux niveaux gamme et type</li>
+</ul>
+<h3>24.2 Invariants paniers</h3>
+<ul>
+<li>chaque panier produit/gamme/type ≤ paniers hôtel ;</li>
+<li>les sommes de paniers par produit/gamme/type peuvent dépasser les paniers hôtel ;</li>
+<li>aucune réconciliation additive n’est imposée.</li>
+</ul>
+<h3>24.3 Tests minimum</h3>
+<table>
+<tr><th>#</th><th>Test</th><th>Attendu</th></tr>
+<tr><td>1</td><td>20/40/20/20, retrait P4</td><td>24/48/24, perte 4</td></tr>
+<tr><td>2</td><td>Retrait simultané P3+P4</td><td>28/56, perte 16</td></tr>
+<tr><td>3</td><td>100 ventes, 50 paniers → 96 ventes</td><td>48 paniers</td></tr>
+<tr><td>4</td><td>2 unités × 6 €, marché 5 €</td><td>montant 12 €, marge 2 €</td></tr>
+<tr><td>5</td><td>Marge augmente avec volume en baisse</td><td>accepté et expliqué</td></tr>
+<tr><td>6</td><td>scope specified avec G3 non citée</td><td>G3 inchangée</td></tr>
+<tr><td>7</td><td>Σ paniers produit &gt; paniers hôtel</td><td>accepté</td></tr>
+<tr><td>8</td><td>Candidat d’une autre solution</td><td>rejeté</td></tr>
+<tr><td>9</td><td>A &gt; Q_remove</td><td>scaling uniforme</td></tr>
+<tr><td>10</td><td>Cap métier explicite</td><td>scaling + warning</td></tr>
+<tr><td>11</td><td>Nouveau produit sans intensité locale</td><td>fallback même solution</td></tr>
+<tr><td>12</td><td>Produit ajouté à 0,4 vente</td><td>reste exposé + warning</td></tr>
+<tr><td>13</td><td>Ordre des opérations différent</td><td>résultat identique</td></tr>
+<tr><td>14</td><td>Capacité libre sans target_n</td><td>erreur</td></tr>
+<tr><td>15</td><td>Hôtel source sous seuil minimum</td><td>exclu du benchmark</td></tr>
+<tr><td>16</td><td>Prix/marge invalides</td><td>exclus du ranking</td></tr>
+</table>
+</section>
+
+<section id="roadmap">
+<h2>25. Ordre d’implémentation recommandé</h2>
+<table>
+<tr><th>Phase</th><th>Contenu</th><th>Décision</th></tr>
+<tr><td>P0</td><td>Chargement source étendue, contrôles, vues de base, isolation hôtel × solution</td><td>Go</td></tr>
+<tr><td>P1</td><td>Suppression produit, retraits multiples, redistribution, perte</td><td>Go</td></tr>
+<tr><td>P2</td><td>Reconstruction ventes, montant, marge, paniers et ratios</td><td>Go</td></tr>
+<tr><td>P3</td><td>Ajout produit, candidats même solution, confiance</td><td>Go avec paramètres documentés</td></tr>
+<tr><td>P4</td><td>Ajout/suppression gamme et type</td><td>Go</td></tr>
+<tr><td>P5</td><td>Mix gamme et type, scopes, capacité libre</td><td>Go</td></tr>
+<tr><td>P6</td><td>Saisonnalité, disponibilité, modèles ticket</td><td>Évolution future</td></tr>
+</table>
+<div class="callout ok"><strong>Conclusion contractuelle.</strong> Le moteur sépare désormais clairement l’exposition décidée, la demande attendue, les contraintes mathématiques et les garde-fous métier. Cette séparation rend les scénarios explicables, testables et reproductibles.</div>
+</section>
+
+</main>
+</div>
+
+<footer>
+<p><strong>Version :</strong> V3 — spécification durable du moteur de simulation. Le dataprep initial du prix marché et de la marge doit être documenté dans un fichier séparé.</p>
+</footer>
+</body>
+</html>

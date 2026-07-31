@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<!--
+  Page unique de l interface admin Accor Data and Model Studio.
+
+  Sidebar (logo fixe, puis zone scroll All / Pilotes / Modeles):
+    All: brand, hotel, proximity, holidays, weather
+    Pilotes: sales_raw, sales, all_data, concept_pilote, model_data
+    Modeles: Model Build, Model Explore
+
+  Main:
+    view-table: table editable, recherche, pagination, Recharger, Reconstruire
+    view-model-build: nom + hyperparams XGBoost, bouton Build and Save
+    view-model-explore: liste modeles, perfs, importances, arbres, Deploy
+
+  Prod accor/ : donnees preconstruites ; boutons Reconstruire masques.
+  Logique front (ES modules OOP):
+    static/js/admin/app.js + static/shared/js/*
+  Styles: static/css/app.css + static/shared/css/tokens.css
+  API: /api/datasets/* et /api/model/*  Doc: README.md
+-->
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Accor · Data & Model Studio</title>
+  <meta name="accor-base" content="{{ url_prefix }}" />
+  <script>window.ACCOR_BASE = {{ url_prefix|tojson }};</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ asset('shared/css/tokens.css') }}" />
+  <link rel="stylesheet" href="{{ asset('css/app.css') }}" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <!-- Logo toujours visible (hors zone scroll) -->
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <!-- Logo officiel groupe Accor (group.accor.com / imgix) -->
+          <img
+            src="{{ asset('img/accor-logo.svg') }}"
+            alt="Accor"
+            class="brand-logo"
+            width="48"
+            height="40"
+          />
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">Accor</span>
+          <span class="brand-sub">Data &amp; Model Studio</span>
+        </div>
+      </div>
+
+      <!-- Une seule scrollbar : All / Pilotes / Modèles (séparations conservées) -->
+      <div class="sidebar-scroll">
+        <div class="nav-section-label" id="nav-all-label">All</div>
+        <nav class="nav-pinned-top" id="nav-pinned-top" aria-label="All"></nav>
+
+        <div class="nav-section-label" id="nav-pilots-label">Pilotes</div>
+        <nav class="nav-tabs" id="nav-tabs" aria-label="Pilotes"></nav>
+
+        <div class="nav-footer">
+          <div class="nav-section-label">Simulateurs Excel</div>
+          <button type="button" class="nav-item" id="nav-rod-excel-simply" data-panel="rod-excel-simply" data-rx-concept="SIMPLY">
+            <span class="nav-icon">🟦</span>
+            <span>
+              <span class="nav-label">Simulateur Simply</span>
+              <span class="nav-desc">Excel · dual-colonne Simply</span>
+            </span>
+          </button>
+          <button type="button" class="nav-item" id="nav-rod-excel-liberty" data-panel="rod-excel-liberty" data-rx-concept="LIBERTY">
+            <span class="nav-icon">🟩</span>
+            <span>
+              <span class="nav-label">Simulateur Liberty</span>
+              <span class="nav-desc">Excel · dual-colonne Liberty</span>
+            </span>
+          </button>
+          <button type="button" class="nav-item" id="nav-rod-excel-connected" data-panel="rod-excel-connected" data-rx-concept="CONNECTED">
+            <span class="nav-icon">🟧</span>
+            <span>
+              <span class="nav-label">Simulateur Connected</span>
+              <span class="nav-desc">Excel · dual-colonne Connected</span>
+            </span>
+          </button>
+          <button type="button" class="nav-item" id="nav-sim-vs-ia" data-panel="sim-vs-ia">
+            <span class="nav-icon">⚖</span>
+            <span>
+              <span class="nav-label">Simulateur vs IA</span>
+              <span class="nav-desc">Vrai · sim · préd · 3 solutions</span>
+            </span>
+          </button>
+          <button type="button" class="nav-item" id="nav-rod-eval" data-panel="rod-eval">
+            <span class="nav-icon">📊</span>
+            <span>
+              <span class="nav-label">Évaluation</span>
+              <span class="nav-desc">Pilotes 2026 · MAE / MSE</span>
+            </span>
+          </button>
+
+          <div class="nav-section-label">Modèles intermédiaires</div>
+          <button type="button" class="nav-item" id="nav-model-build" data-panel="model-build">
+            <span class="nav-icon">⚡</span>
+            <span>
+              <span class="nav-label">Build</span>
+              <span class="nav-desc">Multi-cibles · model_data</span>
+            </span>
+          </button>
+          <button type="button" class="nav-item" id="nav-model-explore" data-panel="model-explore">
+            <span class="nav-icon">🌳</span>
+            <span>
+              <span class="nav-label">Explore</span>
+              <span class="nav-desc">Arbres · importances</span>
+            </span>
+          </button>
+          <button type="button" class="nav-item" id="nav-model-eval" data-panel="model-eval">
+            <span class="nav-icon">📊</span>
+            <span>
+              <span class="nav-label">Évaluation</span>
+              <span class="nav-desc">Pred vs réel · MAE / MSE</span>
+            </span>
+          </button>
+
+          <div class="nav-section-label">Modèle final</div>
+          <button type="button" class="nav-item" id="nav-final-build" data-panel="final-build">
+            <span class="nav-icon">🏁</span>
+            <span>
+              <span class="nav-label">Build</span>
+              <span class="nav-desc">Stacking descriptives + pred_*</span>
+            </span>
+          </button>
+          <button type="button" class="nav-item" id="nav-final-explore" data-panel="final-explore">
+            <span class="nav-icon">🔍</span>
+            <span>
+              <span class="nav-label">Explore</span>
+              <span class="nav-desc">Super-modèle montant_ventes</span>
+            </span>
+          </button>
+          <button type="button" class="nav-item" id="nav-final-eval" data-panel="final-eval">
+            <span class="nav-icon">📊</span>
+            <span>
+              <span class="nav-label">Évaluation</span>
+              <span class="nav-desc">Pred finale vs réel · MAE / MSE</span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <!-- ===== Vue table (datasets) ===== -->
+      <div id="view-table" class="view">
+        <header class="topbar">
+          <div class="topbar-left">
+            <h1 id="panel-title">Chargement…</h1>
+            <p id="panel-desc" class="subtitle"></p>
+          </div>
+          <div class="topbar-actions">
+            <div class="search-wrap">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3-3"/></svg>
+              <input type="search" id="search-input" placeholder="Filtrer…" autocomplete="off" />
+            </div>
+            <button type="button" class="btn btn-ghost" id="btn-reload" title="Recharger depuis le fichier Excel (sans refaire la jointure)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M8 16H3v5"/></svg>
+              Recharger
+            </button>
+            <button type="button" class="btn btn-ghost hidden" id="btn-rebuild" title="Reconstruire le fichier dérivé (All Data ou Model Data)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v6h6"/><path d="M20 20v-6h-6"/><path d="M20 9A8 8 0 0 0 7 6L4 10"/><path d="M4 15a8 8 0 0 0 13 3l3-4"/></svg>
+              Reconstruire
+            </button>
+            <button type="button" class="btn btn-ghost" id="btn-add">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              Ligne
+            </button>
+            <button type="button" class="btn btn-primary" id="btn-save" disabled>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+              Enregistrer
+            </button>
+          </div>
+        </header>
+
+        <section class="meta-bar">
+          <span class="chip" id="chip-file"></span>
+          <span class="chip chip-muted" id="chip-stats"></span>
+          <span class="chip chip-warn hidden" id="chip-dirty">Modifications non enregistrées</span>
+          <span class="status" id="status-msg"></span>
+        </section>
+
+        <section class="table-panel">
+          <div class="table-scroll" id="table-scroll">
+            <table class="data-table" id="data-table">
+              <thead id="table-head"></thead>
+              <tbody id="table-body">
+                <tr><td class="empty-state">Chargement des données…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <div id="model-data-stats" class="model-data-stats hidden"></div>
+
+        <footer class="pager">
+          <div class="pager-left">
+            <label class="pager-size">
+              Lignes / page
+              <select id="page-size">
+                <option value="15">15</option>
+                <option value="25" selected>25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </label>
+          </div>
+          <div class="pager-center">
+            <button type="button" class="btn btn-icon" id="btn-first" title="Première">«</button>
+            <button type="button" class="btn btn-icon" id="btn-prev" title="Précédente">‹</button>
+            <span class="pager-info" id="pager-info">—</span>
+            <button type="button" class="btn btn-icon" id="btn-next" title="Suivante">›</button>
+            <button type="button" class="btn btn-icon" id="btn-last" title="Dernière">»</button>
+          </div>
+          <div class="pager-right">
+            <button type="button" class="btn btn-danger-ghost" id="btn-delete" disabled>
+              Supprimer sélection
+            </button>
+          </div>
+        </footer>
+      </div>
+
+      <!-- ===== Vue Model Build (intermédiaires multi-cibles) ===== -->
+      <div id="view-model-build" class="view hidden">
+        <header class="topbar">
+          <div class="topbar-left">
+            <h1>Modèles intermédiaires · Build</h1>
+            <p class="subtitle">
+              XGBoost multi-cibles sur <strong>model_data</strong> (manuel + grid).
+              Produit les pred_* pour le modèle final.
+            </p>
+          </div>
+          <div class="topbar-actions">
+            <button type="button" class="btn btn-primary" id="btn-model-build" title="Entrainer manuel + grid search, sauvegarder dans models/design">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              Build &amp; Save
+            </button>
+          </div>
+        </header>
+
+        <section class="meta-bar">
+          <span class="chip" id="model-chip-source">model_data</span>
+          <span class="chip chip-muted" id="model-chip-stats"></span>
+          <span class="chip chip-muted" id="model-chip-jobs">1 modele</span>
+          <span class="status" id="model-status"></span>
+        </section>
+
+        <div class="sol-tabs" id="model-sol-tabs" role="tablist" aria-label="Solution spécialité">
+          <button type="button" class="sol-tab active" data-solution="SIMPLY">Simply</button>
+          <button type="button" class="sol-tab" data-solution="LIBERTY">Liberty</button>
+          <button type="button" class="sol-tab" data-solution="CONNECTED">Connected</button>
+        </div>
+        <p class="card-hint" id="model-sol-hint" style="margin:0.35rem 0 0.75rem">
+          Chaque modèle n’apprend que sur les hôtels de sa solution (flags pilotes).
+        </p>
+
+        <div class="model-layout model-build-layout">
+          <div class="model-col">
+            <section class="card">
+              <h2 class="card-title">Nom et ranking</h2>
+              <p class="card-hint">
+                Stockage : <code>models/design/&lt;solution&gt;/&lt;nom&gt;/</code>
+                (ex. <code>design/simply/xgb_sales_simply</code>).
+              </p>
+              <div class="form-grid form-grid-3">
+                <label class="field">
+                  <span>Nom de base</span>
+                  <input type="text" id="model-name" value="xgb_sales" maxlength="60" />
+                </label>
+                <label class="field">
+                  <span>Cible principale</span>
+                  <select id="model-main-target"></select>
+                </label>
+                <label class="field">
+                  <span>Metrique de ranking</span>
+                  <select id="model-rank-metric">
+                    <option value="r2">R2 (plus eleve = mieux)</option>
+                    <option value="rmse">RMSE (plus bas = mieux)</option>
+                    <option value="mae">MAE (plus bas = mieux)</option>
+                  </select>
+                </label>
+              </div>
+            </section>
+
+            <section class="card">
+              <h2 class="card-title">Parametres manuels XGBoost</h2>
+              <p class="card-hint">Toujours testes et sauvegardes sous le nom de base.</p>
+              <div id="model-params" class="form-grid form-grid-3"></div>
+            </section>
+
+            <section class="card">
+              <h2 class="card-title">Grid search</h2>
+              <p class="card-hint">
+                Valeurs separees par des virgules pour chaque parametre a explorer.
+                Laissez vide pour ne pas griller ce parametre.
+                Le produit cartesien des listes + le modele manuel seront compares.
+              </p>
+              <label class="field field-inline">
+                <input type="checkbox" id="model-grid-enabled" checked />
+                <span>Activer le grid search</span>
+              </label>
+              <div id="model-grid-params" class="form-grid form-grid-3"></div>
+              <p class="card-hint" id="model-grid-count">1 modele (manuel uniquement)</p>
+            </section>
+          </div>
+
+          <div class="model-col">
+            <section class="card build-progress-card" id="model-build-progress-card">
+              <h2 class="card-title">Progression</h2>
+              <div class="build-stages hidden" id="model-build-stages" aria-label="Étapes du build"></div>
+              <div class="build-progress" id="model-build-progress">
+                <div class="build-progress-head">
+                  <span class="build-progress-pct" id="model-build-progress-pct">0&nbsp;%</span>
+                  <span class="build-progress-phase" id="model-build-progress-phase">—</span>
+                </div>
+                <div class="build-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="model-build-progress-bar">
+                  <i id="model-build-progress-fill" style="width: 0%"></i>
+                </div>
+                <div class="build-progress-meta">
+                  <span id="model-build-progress-text">En attente d’un build</span>
+                  <span id="model-build-progress-count">0 / 0</span>
+                </div>
+                <p class="card-hint" id="model-build-progress-detail"></p>
+              </div>
+            </section>
+
+            <section class="card card-wide">
+              <h2 class="card-title">Resultats (tries par ranking)</h2>
+              <p class="card-hint" id="model-results-hint">
+                Apres Build, les modeles sont ordonnes selon la metrique et la cible choisies.
+              </p>
+              <div id="model-build-results" class="build-results empty">
+                Aucun build pour le moment.
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Vue Model Explore (intermédiaires) ===== -->
+      <div id="view-model-explore" class="view hidden">
+        <header class="topbar">
+          <div class="topbar-left">
+            <h1>Modèles intermédiaires · Explore</h1>
+            <p class="subtitle">
+              <code>models/design</code> — multi-cibles, importances, arbres.
+            </p>
+          </div>
+          <div class="topbar-actions">
+            <button type="button" class="btn btn-ghost" id="btn-explore-refresh" title="Recharger la liste et les graphiques">
+              Recharger
+            </button>
+            <button type="button" class="btn btn-primary" id="btn-explore-deploy" title="Copier vers models/deploy/model">
+              Deploy
+            </button>
+          </div>
+        </header>
+
+        <section class="meta-bar explore-banner">
+          <span class="chip" id="explore-chip-last">Dernier entraîné : —</span>
+          <span class="chip chip-accent" id="explore-chip-top">Top model : —</span>
+          <span class="chip chip-muted" id="explore-chip-stats"></span>
+          <span class="status" id="explore-status"></span>
+        </section>
+
+        <div class="model-layout explore-layout">
+          <div class="model-col">
+            <section class="card">
+              <h2 class="card-title">Modèle à explorer</h2>
+              <label class="field">
+                <span>Modèle (classement build)</span>
+                <select id="explore-model-select"></select>
+              </label>
+              <div class="explore-global-metrics" id="explore-global-metrics"></div>
+              <p class="card-hint" id="explore-eval-hint">
+                Pour R² / RMSE / MAE vs réel (année incomplete, moyenne /12) :
+                onglet <strong>Evaluation</strong>.
+              </p>
+            </section>
+
+            <section class="card">
+              <h2 class="card-title">Feature importance</h2>
+              <div id="explore-importance" class="imp-bars empty">Choisissez un modèle…</div>
+            </section>
+          </div>
+
+          <div class="model-col">
+            <section class="card card-wide">
+              <h2 class="card-title">Arbres de décision</h2>
+              <p class="card-hint" id="explore-trees-note">
+                Perf = prédiction cumulative après k arbres (boosting XGBoost).
+              </p>
+              <div id="explore-trees-table" class="perf-table-wrap"></div>
+            </section>
+
+            <section class="card card-wide">
+              <h2 class="card-title">Visualiser un arbre</h2>
+              <label class="field">
+                <span>Arbre # <span id="explore-tree-label">0</span></span>
+                <input type="range" id="explore-tree-slider" min="0" max="0" value="0" step="1" />
+              </label>
+              <div id="explore-tree-meta" class="ci-meta" style="margin:0.5rem 0"></div>
+              <div id="explore-tree-view" class="tree-view empty">Sélectionnez un arbre…</div>
+            </section>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Vue Modèle FINAL Build (stacking) ===== -->
+      <div id="view-final-build" class="view hidden">
+        <header class="topbar">
+          <div class="topbar-left">
+            <h1>Modèle final · Build</h1>
+            <p class="subtitle">
+              Stacking enrichi : features descriptives + <strong>pred_*</strong>
+              (toutes cibles du modèle intermédiaire) → XGB sur
+              <strong>montant_ventes</strong>.
+            </p>
+          </div>
+          <div class="topbar-actions">
+            <button type="button" class="btn btn-primary" id="btn-final-build">
+              Build final &amp; Save
+            </button>
+          </div>
+        </header>
+        <section class="meta-bar">
+          <span class="chip" id="final-chip-source">stacking</span>
+          <span class="chip chip-muted" id="final-chip-stats"></span>
+          <span class="chip chip-muted" id="final-chip-jobs">1 modele</span>
+          <span class="status" id="final-status"></span>
+        </section>
+        <div class="sol-tabs" id="final-sol-tabs" role="tablist" aria-label="Solution spécialité final">
+          <button type="button" class="sol-tab active" data-solution="SIMPLY">Simply</button>
+          <button type="button" class="sol-tab" data-solution="LIBERTY">Liberty</button>
+          <button type="button" class="sol-tab" data-solution="CONNECTED">Connected</button>
+        </div>
+        <p class="card-hint" style="margin:0.35rem 0 0.75rem">
+          Modèle final <strong>par solution</strong> : stacking sur intermédiaire de la même spécialité.
+        </p>
+        <div class="model-layout model-build-layout">
+          <div class="model-col">
+            <section class="card">
+              <h2 class="card-title">Intermédiaire source</h2>
+              <label class="field">
+                <span>Modèle intermédiaire (multi-cibles)</span>
+                <select id="final-intermediate-select"></select>
+              </label>
+              <p class="card-hint" id="final-pipeline-hint">
+                1) pred toutes cibles sur model_data · 2) X = descriptives + pred_* ·
+                3) fit XGB mono-cible montant_ventes
+              </p>
+            </section>
+            <section class="card">
+              <h2 class="card-title">Nom et ranking</h2>
+              <div class="form-grid form-grid-3">
+                <label class="field">
+                  <span>Nom de base</span>
+                  <input type="text" id="final-model-name" value="xgb_final" maxlength="60" />
+                </label>
+                <label class="field">
+                  <span>Cible finale</span>
+                  <select id="final-main-target"></select>
+                </label>
+                <label class="field">
+                  <span>Metrique</span>
+                  <select id="final-rank-metric">
+                    <option value="r2">R2</option>
+                    <option value="rmse">RMSE</option>
+                    <option value="mae">MAE</option>
+                  </select>
+                </label>
+              </div>
+            </section>
+            <section class="card">
+              <h2 class="card-title">Parametres manuels XGBoost</h2>
+              <div id="final-model-params" class="form-grid form-grid-3"></div>
+            </section>
+            <section class="card">
+              <h2 class="card-title">Grid search</h2>
+              <label class="field field-inline">
+                <input type="checkbox" id="final-grid-enabled" checked />
+                <span>Activer le grid search</span>
+              </label>
+              <div id="final-grid-params" class="form-grid form-grid-3"></div>
+              <p class="card-hint" id="final-grid-count">1 modele</p>
+            </section>
+          </div>
+          <div class="model-col">
+            <section class="card build-progress-card" id="final-build-progress-card">
+              <h2 class="card-title">Progression</h2>
+              <div class="build-progress" id="final-build-progress">
+                <div class="build-progress-head">
+                  <span class="build-progress-pct" id="final-build-progress-pct">0&nbsp;%</span>
+                  <span class="build-progress-phase" id="final-build-progress-phase">—</span>
+                </div>
+                <div class="build-progress-bar" id="final-build-progress-bar">
+                  <i id="final-build-progress-fill" style="width:0%"></i>
+                </div>
+                <div class="build-progress-meta">
+                  <span id="final-build-progress-text">En attente</span>
+                  <span id="final-build-progress-count">0 / 0</span>
+                </div>
+                <p class="card-hint" id="final-build-progress-detail"></p>
+              </div>
+            </section>
+            <section class="card card-wide">
+              <h2 class="card-title">Resultats</h2>
+              <div id="final-build-results" class="build-results empty">Aucun build final.</div>
+            </section>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Vue Modèle FINAL Explore ===== -->
+      <div id="view-final-explore" class="view hidden">
+        <header class="topbar">
+          <div class="topbar-left">
+            <h1>Modèle final · Explore</h1>
+            <p class="subtitle">
+              <code>models/final/design</code> — stacking, importances (dont pred_*), arbres.
+            </p>
+          </div>
+          <div class="topbar-actions">
+            <button type="button" class="btn btn-ghost" id="btn-final-explore-refresh">Recharger</button>
+            <button type="button" class="btn btn-primary" id="btn-final-explore-deploy">Deploy final</button>
+          </div>
+        </header>
+        <section class="meta-bar explore-banner">
+          <span class="chip" id="final-explore-chip-last">Dernier : —</span>
+          <span class="chip chip-accent" id="final-explore-chip-top">Top final : —</span>
+          <span class="chip chip-muted" id="final-explore-chip-stats"></span>
+          <span class="status" id="final-explore-status"></span>
+        </section>
+        <div class="model-layout explore-layout">
+          <div class="model-col">
+            <section class="card">
+              <h2 class="card-title">Modèle final</h2>
+              <label class="field">
+                <span>Sélection</span>
+                <select id="final-explore-model-select"></select>
+              </label>
+              <div class="explore-global-metrics" id="final-explore-global-metrics"></div>
+            </section>
+            <section class="card">
+              <h2 class="card-title">Feature importance</h2>
+              <div id="final-explore-importance" class="imp-bars empty">—</div>
+            </section>
+          </div>
+          <div class="model-col">
+            <section class="card card-wide">
+              <h2 class="card-title">Arbres</h2>
+              <div id="final-explore-trees-table" class="perf-table-wrap"></div>
+            </section>
+            <section class="card card-wide">
+              <h2 class="card-title">Visualiser un arbre</h2>
+              <label class="field">
+                <span>Arbre # <span id="final-explore-tree-label">0</span></span>
+                <input type="range" id="final-explore-tree-slider" min="0" max="0" value="0" step="1" />
+              </label>
+              <div id="final-explore-tree-meta" class="ci-meta" style="margin:0.5rem 0"></div>
+              <div id="final-explore-tree-view" class="tree-view empty">—</div>
+            </section>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Vue Simulateur Excel (3 solutions via sidebar) ===== -->
+      <div id="view-rod-excel" class="view view-rod-excel hidden">
+        <!-- Barre compacte : ne doit PAS manger toute la hauteur -->
+        <div class="rod-excel-sticky">
+          <header class="topbar rx-topbar">
+            <div class="topbar-left">
+              <h1 id="rx-page-title">Simulateur Simply</h1>
+              <p class="subtitle">
+                Colonne gauche = moyenne pilotes · Colonne droite = hôtel désigné · comme l’Excel
+              </p>
+            </div>
+            <div class="topbar-actions rx-top-actions">
+              <div class="rx-concept-pill" id="rx-concept-pill" aria-live="polite">
+                <span class="rx-concept-pill-label">Solution</span>
+                <strong id="rx-concept-name">SIMPLY</strong>
+              </div>
+              <label class="field field-inline" style="margin:0">
+                <span class="muted small">Hôtel désigné</span>
+                <select id="rx-hotel-select" style="min-width:16rem"></select>
+              </label>
+            </div>
+          </header>
+          <section class="meta-bar">
+            <span class="chip" id="rx-chip-pilots">Pilotes —</span>
+            <span class="chip chip-muted" id="rx-chip-hotel">—</span>
+            <span class="status" id="rx-status"></span>
+          </section>
+          <section class="card build-progress-card rod-progress-card hidden" id="rx-progress-card" aria-live="polite">
+            <div class="build-progress" id="rx-progress">
+              <div class="build-progress-head">
+                <span class="build-progress-pct" id="rx-progress-pct">0&nbsp;%</span>
+                <span class="build-progress-phase" id="rx-progress-phase">Chargement</span>
+              </div>
+              <div class="build-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <i id="rx-progress-fill" style="width:0%"></i>
+              </div>
+              <div class="build-progress-meta">
+                <span id="rx-progress-text">En attente…</span>
+                <span id="rx-progress-detail"></span>
+              </div>
+            </div>
+          </section>
+
+          <!-- Params compacts (1 ligne) -->
+          <div class="rx-controls card rx-controls-compact">
+            <div class="rx-params-row">
+              <label class="field">
+                <span>M. lin.</span>
+                <div class="rod-m-lin-row">
+                  <input type="range" id="rx-m-lin-slider" min="1" max="40" step="0.5" value="6" />
+                  <input type="number" id="rx-m-lin" min="1" max="40" step="0.5" value="6" style="width:4rem" />
+                </div>
+              </label>
+              <label class="field">
+                <span>Mix F&amp;B %</span>
+                <div class="rod-m-lin-row">
+                  <input type="range" id="rx-mix-slider" min="0" max="100" step="1" value="70" />
+                  <input type="number" id="rx-mix-fb" min="0" max="100" step="1" value="70" style="width:4rem" />
+                </div>
+                <span class="muted small" id="rx-mix-nf-label">N-F&amp;B = 30 %</span>
+              </label>
+              <label class="field"><span># Chambres</span><input type="number" id="rx-nb-chambres" min="1" step="1" /></label>
+              <label class="field"><span>TO %</span><input type="number" id="rx-to" min="1" max="100" step="0.1" /></label>
+              <label class="field"><span>Guests/ch</span><input type="number" id="rx-guests" min="0.5" max="5" step="0.1" /></label>
+            </div>
+            <!-- Sous-catégories REPLIÉES par défaut (sinon masquent la feuille) -->
+            <details class="rx-needs-details">
+              <summary>Sous-catégories F&amp;B / N-F&amp;B (règle 3) — cliquer pour ouvrir</summary>
+              <div class="rx-needs-wrap">
+                <div class="rod-needs-actions">
+                  <button type="button" class="btn btn-ghost btn-sm" id="rx-needs-all-on">Tout autoriser</button>
+                  <button type="button" class="btn btn-ghost btn-sm" id="rx-needs-all-off">Tout interdire</button>
+                </div>
+                <h3 class="rod-needs-title">F&amp;B</h3>
+                <div id="rx-needs-fb" class="rod-needs-list"></div>
+                <h3 class="rod-needs-title">N-F&amp;B</h3>
+                <div id="rx-needs-nfb" class="rod-needs-list"></div>
+              </div>
+            </details>
+          </div>
+          <div id="rx-kpi-bar" class="rx-kpi-bar"></div>
+        </div>
+
+        <!-- FEUILLE EXCEL : zone principale (toujours visible / scrollable) -->
+        <div class="rod-excel-scroll" id="rx-scroll-body">
+          <div id="rx-panels" class="rx-panels">
+            <div class="xl-placeholder" id="rx-placeholder">
+              <p><strong>Chargement du simulateur…</strong></p>
+              <p class="muted">La feuille Excel (pilotes | hôtel désigné · règles 1→4 · coûts · marge) s’affiche ici.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Simulateur params (tables figées) ===== -->
+      <div id="view-sim-params" class="view hidden">
+        <header class="topbar">
+          <div class="topbar-left">
+            <h1>Simulateur params</h1>
+            <p class="subtitle">
+              Paramètres figés du moteur ROD — pilotes, marges, mix catégories (R3),
+              coûts BUY / LEASE, agencement, arbre de reco.
+            </p>
+          </div>
+          <div class="topbar-actions">
+            <button type="button" class="btn btn-ghost" id="btn-sim-params-reload">Recharger</button>
+          </div>
+        </header>
+        <section class="meta-bar">
+          <span class="chip" id="sim-params-chip">—</span>
+          <span class="status muted">Lecture seule · iso Excel</span>
+        </section>
+        <div id="sim-params-root" class="sim-params-root"></div>
+      </div>
+
+      <!-- ===== Simulateur vs IA (pilotes) ===== -->
+      <div id="view-sim-vs-ia" class="view hidden">
+        <header class="topbar">
+          <div class="topbar-left">
+            <h1>Simulateur vs IA</h1>
+            <p class="subtitle">
+              Pilotes · CA mensuel moyen (somme ÷ n mois dispo) · vrai · simulé · prédit
+              pour Simply, Liberty et Connected. Métriques : MAE et MSE.
+            </p>
+          </div>
+          <div class="topbar-actions">
+            <label class="field field-inline" style="margin:0">
+              <span class="muted small">Année éval</span>
+              <input type="number" id="sim-vs-ia-year" min="2020" max="2100" value="2026" style="width:5rem" />
+            </label>
+            <label class="field field-inline" style="margin:0">
+              <span class="muted small">Modèle</span>
+              <select id="sim-vs-ia-tier">
+                <option value="final" selected>Final (recommandé)</option>
+                <option value="intermediate">Intermédiaire</option>
+              </select>
+            </label>
+            <button type="button" class="btn btn-primary" id="btn-sim-vs-ia-run">Comparer</button>
+          </div>
+        </header>
+        <section class="meta-bar">
+          <span class="chip" id="sim-vs-ia-chip">—</span>
+          <span class="status" id="sim-vs-ia-status"></span>
+        </section>
+        <p class="card-hint" id="sim-vs-ia-method" style="padding:0 1rem"></p>
+        <div id="sim-vs-ia-metrics" class="rod-layout" style="padding:0.5rem 1rem;display:grid;gap:0.75rem;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr))"></div>
+        <section class="card card-wide" style="margin:0.75rem 1rem 1.5rem">
+          <h2 class="card-title">Synthèse par hôtel pilote</h2>
+          <div id="sim-vs-ia-table" class="perf-table-wrap empty">Lancez la comparaison…</div>
+        </section>
+      </div>
+
+      <!-- ===== Évaluation · modèles intermédiaires ===== -->
+      <div id="view-model-eval" class="view hidden">
+        <header class="topbar">
+          <div class="topbar-left">
+            <h1 id="eval-page-title">Évaluation · modèles intermédiaires</h1>
+            <p class="subtitle" id="eval-page-subtitle">
+              Multi-cibles · pred vs réel · CA mensuel moyen (Σ / n mois dispo) · MAE / MSE.
+            </p>
+          </div>
+          <div class="topbar-actions">
+            <button type="button" class="btn btn-primary" id="btn-eval-run">
+              Evaluer
+            </button>
+          </div>
+        </header>
+        <section class="meta-bar">
+          <span class="chip" id="eval-chip-year">Annee : —</span>
+          <span class="chip chip-muted" id="eval-chip-months">Mois : —</span>
+          <span class="chip chip-muted" id="eval-chip-n">—</span>
+          <span class="status" id="eval-status"></span>
+        </section>
+        <div class="sol-tabs" id="eval-sol-tabs" role="tablist" aria-label="Solution évaluation">
+          <button type="button" class="sol-tab active" data-solution="SIMPLY">Simply</button>
+          <button type="button" class="sol-tab" data-solution="LIBERTY">Liberty</button>
+          <button type="button" class="sol-tab" data-solution="CONNECTED">Connected</button>
+        </div>
+        <div class="model-layout explore-layout">
+          <div class="model-col">
+            <section class="card">
+              <h2 class="card-title">Parametres (intermediaires)</h2>
+              <label class="field">
+                <span>Modele design multi-cibles</span>
+                <select id="eval-model-select"></select>
+              </label>
+              <label class="field">
+                <span>Variable cible</span>
+                <select id="eval-target-select"></select>
+              </label>
+              <label class="field">
+                <span>Annee d evaluation</span>
+                <input type="number" id="eval-year" min="2020" max="2100" step="1" value="2026" />
+              </label>
+              <p class="card-hint" id="eval-method-hint">
+                Liste = models/design uniquement. Diviseur = 12 mois.
+              </p>
+            </section>
+            <section class="card">
+              <h2 class="card-title">Performance (moyenne mensuelle / hôtel)</h2>
+              <div id="eval-metrics" class="metrics-grid empty">Lancez une evaluation…</div>
+            </section>
+            <section class="card">
+              <h2 class="card-title">Totaux annee</h2>
+              <div id="eval-totals" class="metrics-grid empty">—</div>
+            </section>
+          </div>
+          <div class="model-col">
+            <section class="card card-wide">
+              <h2 class="card-title">Detail par hotel</h2>
+              <div id="eval-hotels-table" class="perf-table-wrap empty">—</div>
+            </section>
+            <section class="card card-wide">
+              <h2 class="card-title">Detail mois</h2>
+              <div id="eval-months-table" class="perf-table-wrap empty">—</div>
+            </section>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Évaluation · modèle final (séparée) ===== -->
+      <div id="view-final-eval" class="view hidden">
+        <header class="topbar">
+          <div class="topbar-left">
+            <h1 id="final-eval-page-title">Évaluation · modèle final</h1>
+            <p class="subtitle" id="final-eval-page-subtitle">
+              Stacking (descriptives + pred_* + hotel_solution_*) · pred vs réel ·
+              CA mensuel moyen (Σ / n mois dispo) · MAE / MSE.
+            </p>
+          </div>
+          <div class="topbar-actions">
+            <button type="button" class="btn btn-primary" id="btn-final-eval-run">
+              Evaluer final
+            </button>
+          </div>
+        </header>
+        <section class="meta-bar">
+          <span class="chip" id="final-eval-chip-year">Annee : —</span>
+          <span class="chip chip-muted" id="final-eval-chip-months">Mois : —</span>
+          <span class="chip chip-muted" id="final-eval-chip-n">—</span>
+          <span class="status" id="final-eval-status"></span>
+        </section>
+        <div class="model-layout explore-layout">
+          <div class="model-col">
+            <section class="card">
+              <h2 class="card-title">Parametres (modele final)</h2>
+              <label class="field">
+                <span>Modele final (stacking)</span>
+                <select id="final-eval-model-select"></select>
+              </label>
+              <label class="field">
+                <span>Variable cible</span>
+                <select id="final-eval-target-select"></select>
+              </label>
+              <label class="field">
+                <span>Annee d evaluation</span>
+                <input type="number" id="final-eval-year" min="2020" max="2100" step="1" value="2026" />
+              </label>
+              <p class="card-hint" id="final-eval-method-hint">
+                Liste = models/final/design uniquement. Pred = X_descriptives + pred_*.
+              </p>
+            </section>
+            <section class="card">
+              <h2 class="card-title">Performance (moyenne mensuelle / hôtel)</h2>
+              <div id="final-eval-metrics" class="metrics-grid empty">Lancez une evaluation…</div>
+            </section>
+            <section class="card">
+              <h2 class="card-title">Totaux annee</h2>
+              <div id="final-eval-totals" class="metrics-grid empty">—</div>
+            </section>
+          </div>
+          <div class="model-col">
+            <section class="card card-wide">
+              <h2 class="card-title">Detail par hotel</h2>
+              <div id="final-eval-hotels-table" class="perf-table-wrap empty">—</div>
+            </section>
+            <section class="card card-wide">
+              <h2 class="card-title">Detail mois</h2>
+              <div id="final-eval-months-table" class="perf-table-wrap empty">—</div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast-host" id="toast-host"></div>
+
+  <!-- Overlay chargement (changement d'onglet / fetch page) -->
+  <div
+    id="loading-overlay"
+    class="loading-overlay hidden"
+    aria-live="polite"
+    aria-busy="false"
+    role="status"
+  >
+    <div class="loading-card">
+      <div class="loading-ring" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="loading-text">
+        <strong id="loading-title">Chargement…</strong>
+        <span id="loading-sub">Préparation des données</span>
+      </div>
+      <div class="loading-bar" aria-hidden="true"><i></i></div>
+    </div>
+  </div>
+
+  <script type="module" src="{{ asset('js/admin/app.js') }}"></script>
+</body>
+</html>
