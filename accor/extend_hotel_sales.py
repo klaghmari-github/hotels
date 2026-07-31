@@ -5,7 +5,8 @@
   - HOTEL_CODE          code hôtel Accor
   - SOLUTION            simply | liberty | connected (pilotes ROD)
   - PRIX_TTC_MARCHE     prix unitaire marché (médiane) × QUANTITE
-  - MARGE               (PRIX_TTC × QUANTITE) − PRIX_TTC_MARCHE
+  - MARGE               PRIX_TTC − PRIX_TTC_MARCHE
+                        (PRIX_TTC est déjà le total ligne)
 
 Usage :
   python extend_hotel_sales.py
@@ -87,22 +88,27 @@ def extend(df: pd.DataFrame, pilot_map: dict[str, str]) -> pd.DataFrame:
         lambda c: pilot_map.get(c) if isinstance(c, str) else pd.NA
     )
 
-    q = pd.to_numeric(out["QUANTITE"], errors="coerce").fillna(1.0).clip(lower=0)
+    q = pd.to_numeric(out["QUANTITE"], errors="coerce").fillna(1.0)
     prix_ttc = pd.to_numeric(out["PRIX_TTC"], errors="coerce")
 
     ean = out["CODE_EAN"].astype(str).str.strip()
     ean = ean.where(~ean.isin(["", "nan", "None", "NaN", "<NA>"]), other=pd.NA)
     prod_key = ean.fillna(out["NOM_PRODUIT"].astype(str).str.strip())
 
-    # Prix unitaire habituel = médiane TTC observée du produit
-    unit_market = prix_ttc.groupby(prod_key).transform("median")
+    # PRIX_TTC = total ligne → unitaire = TTC / |QUANTITE| (ignore qty ≤ 0 pour le barème)
+    abs_q = q.abs().where(q != 0, other=pd.NA)
+    unit_ttc = prix_ttc / abs_q
+    # Uniquement ventes "normales" pour la médiane de référence
+    unit_for_ref = unit_ttc.where(q > 0)
+    unit_market = unit_for_ref.groupby(prod_key).transform("median")
     unit_market = unit_market.fillna(
-        prix_ttc.groupby(out["NOM_PRODUIT"].astype(str)).transform("median")
+        unit_for_ref.groupby(out["NOM_PRODUIT"].astype(str)).transform("median")
     )
 
-    # Niveau ligne (× quantité) pour être comparable au CA TTC ligne
+    # Marché total ligne = unitaire habituel × QUANTITE (signe conservé si retour)
     out["PRIX_TTC_MARCHE"] = (unit_market * q).astype(float)
-    out["MARGE"] = (prix_ttc * q - out["PRIX_TTC_MARCHE"]).astype(float)
+    # Marge = total vendu − total marché (PRIX_TTC déjà total, pas de × qty)
+    out["MARGE"] = (prix_ttc - out["PRIX_TTC_MARCHE"]).astype(float)
 
     extra = ["HOTEL_CODE", "SOLUTION", "PRIX_TTC_MARCHE", "MARGE"]
     base = [c for c in out.columns if c not in extra]
@@ -156,7 +162,7 @@ def main() -> None:
         "  HOTEL_CODE\n"
         "  SOLUTION           (simply / liberty / connected | vide si non pilote)\n"
         "  PRIX_TTC_MARCHE    (médiane unitaire produit × QUANTITE)\n"
-        "  MARGE              (PRIX_TTC × QUANTITE − PRIX_TTC_MARCHE)"
+        "  MARGE              (PRIX_TTC − PRIX_TTC_MARCHE ; TTC déjà total ligne)"
     )
 
 
