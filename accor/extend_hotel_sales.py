@@ -62,6 +62,21 @@ BOUTIQUE_TO_CODE: dict[str, str] = {
     "novotel paris 13 porte d italie": "H5586",
 }
 
+# Mètres linéaires dédiés — source brute :
+# archive/sources/raw/Récapitulatif de l'ensemble des données ROD (2).xlsx
+# feuille RECAP DATA ROD, ligne D129 « MÈTRES LINÉAIRES DEDIES A VOTRE CORNER »
+# Colonnes K→Q = NICE, STRASBOURG, CDG, MEGEVE, TOUR EIFFEL, MONTMARTRE, BOULOGNE
+# Porte d'Italie n'est PAS dans ce fichier source (pas de valeur officielle).
+METRES_LINEAIRES_RECAP: dict[str, float] = {
+    "H2075": 6.0,  # IBB Nice
+    "HB6A3": 2.0,  # IBB Strasbourg
+    "H0815": 5.0,  # Ibis Styles Roissy CDG (hors ventes)
+    "HB5I0": 8.0,  # Novotel Megève
+    "H3546": 7.0,  # Novotel Paris Centre Tour Eiffel
+    "H0373": 6.0,  # Mercure Montmartre
+    "H6188": 6.0,  # Mercure Boulogne
+}
+
 
 def _norm(s: object) -> str:
     text = str(s).strip().lower()
@@ -133,6 +148,21 @@ def load_hotel_lookup(hotel_path: Path) -> pd.DataFrame:
     dedie = dedie.where(dedie.notna() & (dedie > 0), other=pd.NA)
     actuel = actuel.where(actuel.notna() & (actuel > 0), other=pd.NA)
     frame["METRES_LINEAIRES"] = dedie.combine_first(actuel)
+    # Priorité aux valeurs officielles du Récapitulatif ROD (archive)
+    for code, mlin in METRES_LINEAIRES_RECAP.items():
+        mask = frame["HOTEL_CODE"] == code
+        if mask.any():
+            frame.loc[mask, "METRES_LINEAIRES"] = float(mlin)
+        else:
+            frame = pd.concat(
+                [
+                    frame,
+                    pd.DataFrame(
+                        [{"HOTEL_CODE": code, "HOTEL_NAME": pd.NA, "METRES_LINEAIRES": float(mlin)}]
+                    ),
+                ],
+                ignore_index=True,
+            )
     return frame.drop_duplicates("HOTEL_CODE", keep="first")
 
 
