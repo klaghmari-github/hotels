@@ -46,15 +46,20 @@ DEFAULT_HOTEL = ROOT / "data" / "hotel_data.xlsx"
 COL_M_LIN_DEDIE = "hotel_metres_lineaires_dedies_corner"
 COL_M_LIN_ACTUEL = "hotel_corner_de_vente_actuel_metres_lineaires"
 
-# Boutique caisse → hotel_code (évite les faux positifs du matcher générique)
+# Boutique caisse (NOM_BOUTIQUE) → hotel_code Accor
+# Source : archive/data/reference/hotel_identity_registry.json + tests + rod_recap
+# Attention : "Novotel Paris Tour Eiffel" = H3546 Centre (Quai de Grenelle),
+# PAS H1978 Vaugirard Montparnasse (faux positif du matcher fuzzy).
 BOUTIQUE_TO_CODE: dict[str, str] = {
     "ibis budget nice": "H2075",
     "ibis budget strasbourg centre republique": "HB6A3",
     "mercure paris boulogne": "H6188",
     "novotel megeve mont blanc": "HB5I0",
     "mercure paris montmartre sacre coeur": "H0373",
-    "novotel paris tour eiffel": "H1978",
-    # Novotel Porte d'Italie : pas de code fiable dans hotel_data / pilotes
+    "novotel paris tour eiffel": "H3546",
+    "novotel paris centre tour eiffel": "H3546",
+    "novotel porte d italie": "H5586",
+    "novotel paris 13 porte d italie": "H5586",
 }
 
 
@@ -77,18 +82,13 @@ def _norm(s: object) -> str:
 
 
 def boutique_to_code(name: object) -> str | None:
+    """Match exact sur nom normalisé uniquement (pas de fuzzy substring)."""
     key = _norm(name)
-    if key in BOUTIQUE_TO_CODE:
-        return BOUTIQUE_TO_CODE[key]
-    # tolère tirets / apostrophes déjà normalisés
-    for k, code in BOUTIQUE_TO_CODE.items():
-        if k in key or key in k:
-            return code
-    return None
+    return BOUTIQUE_TO_CODE.get(key)
 
 
 def load_pilot_map() -> dict[str, str]:
-    """hotel_code → simply|liberty|connected."""
+    """hotel_code → simply|liberty|connected (rod_pilot_concepts.json)."""
     sys.path.insert(0, str(ROOT / "src"))
     from accor.hotel_solutions import load_pilot_solution_codes
 
