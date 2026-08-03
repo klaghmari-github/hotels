@@ -1,11 +1,16 @@
-# =========================================================
-# pipeline.yaml - Définition des tables / vues SalesPilBase
-# =========================================================
+df_sales:
+  type: dataframe
+  requires: []
+  file: data/hotel_sales_raw_extended_data.xlsx
 
 t_sales:
   type: table
-  requires: []
-  file: data/hotel_sales_raw_extended_data.xlsx
+  requires: [df_sales]
+  sql: |
+    SELECT
+        *
+    FROM
+        df_sales
 
 v_paniers:
   type: view
