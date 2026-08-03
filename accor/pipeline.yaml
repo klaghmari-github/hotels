@@ -1,0 +1,50 @@
+v_sales:
+    type: table
+    requires:
+        - t_sales
+    sql: |
+        SELECT
+            *
+        FROM
+            t_sales
+            
+v_sales_model:
+    type: view
+    requires:
+        - v_sales
+    sql: |
+        SELECT 
+            * 
+        FROM 
+            v_sales 
+        WHERE 
+            (YEAR(DATE) < (SELECT YEAR(MAX(DATE)) FROM v_sales))
+            AND 
+            (STATUT = 'DONE')
+            AND 
+            (QUANTITE > 0)
+            AND
+            (TYPE IS NOT NULL)
+            AND
+            (GAMME IS NOT NULL)
+            AND
+            (NOM_PRODUIT IS NOT NULL)
+
+
+v_refs:
+    type: view
+    requires:
+        - v_sales_model
+    sql: |
+        SELECT DISTINCT
+            HOTEL_CODE AS hotel_code,
+            NOM_BOUTIQUE AS hotel_name,
+            SOLUTION AS solution,
+            METRES_LINEAIRES AS metres_lineaires
+        FROM 
+            v_sales_model
+        ORDER BY 
+            hotel_code,
+            hotel_name,
+            solution,
+            metres_lineaires
