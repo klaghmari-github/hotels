@@ -228,6 +228,45 @@ _PACK_TOKENS = {
 # ---------------------------------------------------------------------------
 # Nettoyage nom produit
 # ---------------------------------------------------------------------------
+def normalize_nom_produit(name: object) -> str:
+    """
+    NOM_PRODUIT SQL-safe :
+    - tout en MAJUSCULES
+    - sans accents
+    - sans apostrophe, virgule, ni caractère spécial
+    - multi-espaces → un seul espace
+    - jamais NaN → ""
+    """
+    if name is None or (isinstance(name, float) and pd.isna(name)):
+        return ""
+    try:
+        if pd.isna(name):
+            return ""
+    except (TypeError, ValueError):
+        pass
+    s = str(name).strip()
+    if not s or s.lower() in {"nan", "none", "<na>", "nat"}:
+        return ""
+    s = html.unescape(s)
+    s = (
+        s.replace("&#039;", "'")
+        .replace("&amp;", "&")
+        .replace("&quot;", '"')
+        .replace("&apos;", "'")
+    )
+    # accents → ASCII
+    s = unicodedata.normalize("NFKD", s)
+    s = "".join(c for c in s if not unicodedata.combining(c))
+    s = s.upper()
+    # apostrophes / quotes / virgules → espace
+    s = re.sub(r"[''`´’‘‚‛″‴]", " ", s)
+    s = s.replace(",", " ")
+    # tout sauf A-Z 0-9 → espace
+    s = re.sub(r"[^A-Z0-9]+", " ", s)
+    s = re.sub(r"\s+", " ", s).strip()
+    return s
+
+
 def clean_product_name(name: object) -> object:
     if pd.isna(name):
         return name
@@ -325,72 +364,253 @@ def clean_product_name(name: object) -> object:
     return re.sub(r"\s+", " ", s).strip()
 
 
-def nature_produit(name: object) -> object:
+def clean_text_field(value: object) -> str:
     """
-    Nature de produit (similaires regroupés) :
+    Nettoyage léger pour MARQUE / FOURNISSEUR / champs texte :
+    - NaN / None / "nan" / "None" → ""  (jamais pd.NA — évite GROUP BY SQL bizarre)
+    - tiret seul "-" ou espaces autour → ""
+    - multi-espaces → un seul espace
+    - strip
+    """
+    if value is None or (isinstance(value, float) and pd.isna(value)):
+        return ""
+    try:
+        if pd.isna(value):
+            return ""
+    except (TypeError, ValueError):
+        pass
+    s = str(value).strip()
+    if not s:
+        return ""
+    low = s.lower()
+    if low in {"nan", "none", "<na>", "nat", "null", "n/a", "na", "<nan>"}:
+        return ""
+    # tiret seul (éventuellement répété) = vide
+    if re.fullmatch(r"[-–—\s]+", s):
+        return ""
+    s = re.sub(r"\s+", " ", s).strip()
+    if s in {"-", "–", "—"}:
+        return ""
+    return s
 
-    - retire volumes (33cl, 50cl, 45g, 1,5l, SPF 30, cm, kg…)
-    - retire tailles (XS/S/M/L/XL/TU, 11-30 kg)
-    - retire couleurs (noir, bleu, rose…)
-    - retire genre (homme/femme/enfant) et conditionnement (PET, BTE, canette)
-    - normalise marques fréquentes (Coca-Cola, tongs…)
 
-    Ex. « Coca-Cola PET 50cl » → « Coca-Cola »
-        « Coca-Cola Zero Slim BTE 33cl » → « Coca-Cola Zero »
-        « Tongs Femme 100 Noir » → « Tongs »
-        « Short Running Homme Dry Noir L » → « Short Running Dry »
+# Colonnes texte de l'extended / clean : jamais de NaN ("" à la place)
+TEXT_EMPTY_COLS = (
+    "TYPE",
+    "TYPE_RAW",
+    "GAMME",
+    "GAMME_RAW",
+    "NOM_PRODUIT",
+    "NOM_PRODUIT_RAW",
+    "NATURE_PRODUIT",
+    "MACHINE",
+    "MACHINE_RAW",
+    "MARQUE",
+    "MARQUE_RAW",
+    "FOURNISSEUR",
+    "FOURNISSEUR_RAW",
+    "CATEGORIE",
+    "SOLUTION",
+    "HOTEL_CODE",
+    "HOTEL_NAME",
+    "NOM_BOUTIQUE",
+)
+
+
+def fill_text_empty(df: pd.DataFrame, cols: tuple[str, ...] | None = None) -> pd.DataFrame:
+    """Remplace NaN / None par \"\" sur les colonnes texte (SQL-friendly)."""
+    out = df
+    targets = cols or TEXT_EMPTY_COLS
+    for c in targets:
+        if c not in out.columns:
+            continue
+        # object / string
+        out[c] = out[c].map(clean_text_field)
+    return out
+
+
+def normalize_machine(value: object) -> str:
+    """
+    Canon MACHINE : BORNE | SCANNER | FRIGO | ARMOIRE.
+
+    ``MACHINE_RAW`` conserve le libellé caisse (ex. « FRIGO TOUR EIFFEL »,
+    « BORNE NICE », « ACCESSORIES (armoire sèche) »).
+    """
+    if value is None or (isinstance(value, float) and pd.isna(value)):
+        return "ARMOIRE"
+    s = str(value).strip()
+    if not s or s.lower() in {"nan", "none", "<na>", "nat"}:
+        return "ARMOIRE"
+    key = s.upper()
+    # accents / apostrophes
+    key = unicodedata.normalize("NFKD", key)
+    key = "".join(c for c in key if not unicodedata.combining(c))
+    if "BORNE" in key:
+        return "BORNE"
+    if "SCANNER" in key:
+        return "SCANNER"
+    if "FRIGO" in key:
+        return "FRIGO"
+    # ACCESSORIES, armoire, nom d'hôtel seul, etc.
+    return "ARMOIRE"
+
+
+def _nature_finalize(s: object) -> str:
+    """MAJUSCULES, regroupements Adaptateur/Yaourt/Champagne/Vin, NaN→\"\"."""
+    if s is None or (isinstance(s, float) and pd.isna(s)):
+        return ""
+    try:
+        if pd.isna(s):
+            return ""
+    except (TypeError, ValueError):
+        pass
+    text = str(s).strip()
+    if not text or text.lower() in {"nan", "none", "<na>", "nat", "unknown"}:
+        return ""
+    # accents → ASCII puis upper
+    text = unicodedata.normalize("NFKD", text)
+    text = "".join(c for c in text if not unicodedata.combining(c))
+    text = re.sub(r"\s+", " ", text).strip()
+    up = text.upper()
+
+    # Familles génériques (prioritaires)
+    if re.search(r"\bADAPTATEUR", up):
+        return "ADAPTATEUR"
+    if re.search(r"\bYAOURT", up):
+        return "YAOURT"
+    if re.search(r"\bCHAMPAGNE\b", up):
+        return "CHAMPAGNE"
+    # VIN mais pas vinaigre / vintage
+    if re.search(r"\bVIN\b", up) and not re.search(r"VINAIGRE|VINTAGE", up):
+        return "VIN"
+    if re.search(r"\bTONGS?\b|\bTHONG\b", up):
+        return "TONGS"
+    if re.search(r"\bCOCA", up):
+        if re.search(r"\bZERO\b", up):
+            return "COCA COLA ZERO"
+        if re.search(r"\bCHERRY\b", up):
+            return "COCA COLA CHERRY"
+        if re.search(r"\bLIGHT\b", up):
+            return "COCA COLA LIGHT"
+        return "COCA COLA"
+    if re.search(r"\bRED\s*BULL\b|\bREDBULL\b", up):
+        return "RED BULL"
+    if re.search(r"\bSPRITE\b", up):
+        return "SPRITE"
+    if re.search(r"\bFANTA\b", up):
+        return "FANTA"
+    if re.search(r"\bPERRIER\b", up):
+        return "PERRIER"
+    if re.search(r"\bVITTEL\b", up):
+        return "VITTEL"
+    if re.search(r"\bEVIAN\b", up):
+        return "EVIAN"
+    if re.search(r"\bORANGINA\b", up):
+        return "ORANGINA"
+    if re.search(r"\bICE\s*TEA\b|\bLIPTON\b|\bFUZE\s*TEA\b|\bFUSE\s*TEA\b", up):
+        return "ICE TEA"
+    if re.search(r"\bPRINGLES\b", up):
+        return "PRINGLES"
+    if re.search(r"\bDORITOS\b", up):
+        return "DORITOS"
+    if re.search(r"\bLAY'?S\b|\bLAYS\b", up):
+        return "CHIPS LAYS" if "CHIP" in up else "LAYS"
+    if re.search(r"\bKINDER\s+BUENO", up):
+        if re.search(r"\bWHITE\b|\bBLANC\b", up):
+            return "KINDER BUENO WHITE"
+        return "KINDER BUENO"
+    if re.search(r"\bM\s*&\s*M|\bMANDM\b", up) or "M&M" in text.upper():
+        return "M AND MS PEANUT" if "PEANUT" in up else "M AND MS"
+    if re.search(r"\bSAN\s*PELGRINO\b|\bSAN\s*PELGRINO\b", up) or "PELGRINO" in up:
+        return "SAN PELLEGRINO"
+    if re.search(r"\bSCHWEPPES\b", up):
+        return "SCHWEPPES"
+
+    # nettoyage final caractères spéciaux → espaces, multi-espaces
+    up = re.sub(r"[^A-Z0-9]+", " ", up)
+    up = re.sub(r"\s+", " ", up).strip()
+    return up
+
+
+def nature_produit(name: object) -> str:
+    """
+    Nature de produit (similaires regroupés), **toujours MAJUSCULES**, jamais NaN.
+
+    - retire volumes / tailles / couleurs / genre / conditionnement
+    - familles : ADAPTATEUR, YAOURT, CHAMPAGNE, VIN, COCA COLA, TONGS…
+
+    Ex. « Adaptateur Europe USB » → ADAPTATEUR
+        « Yaourt Fraise » → YAOURT
+        « Coca-Cola PET 50cl » → COCA COLA
+        « Tongs Femme 100 Noir » → TONGS
     """
     if name is None or (isinstance(name, float) and pd.isna(name)):
-        return pd.NA
+        return ""
+    try:
+        if pd.isna(name):
+            return ""
+    except (TypeError, ValueError):
+        pass
+
     s = clean_product_name(name)
-    if pd.isna(s):
-        return pd.NA
-    s = str(s)
+    if s is None or (isinstance(s, float) and pd.isna(s)):
+        return ""
+    s = str(s).strip()
+    if not s or s.lower() in {"nan", "none", "<na>"}:
+        return ""
     low0 = s.lower()
 
-    # --- Marques / familles connues en premier (avant strip couleur) ---
+    # --- Familles génériques tôt ---
+    if re.search(r"\badaptateur", low0):
+        return "ADAPTATEUR"
+    if re.search(r"\byaourt\b|\byogurt\b|\byoghurt\b", low0):
+        return "YAOURT"
+    if re.search(r"\bchampagne\b", low0):
+        return "CHAMPAGNE"
+    if re.search(r"\bvin\b", low0) and not re.search(r"vinaigre|vintage", low0):
+        return "VIN"
     if re.search(r"\btongs?\b|\bthong\b", low0):
-        return "Tongs"
+        return "TONGS"
     if "coca" in low0:
         if re.search(r"\bzero\b", low0):
-            return "Coca-Cola Zero"
+            return "COCA COLA ZERO"
         if re.search(r"\bcherry\b", low0):
-            return "Coca-Cola Cherry"
+            return "COCA COLA CHERRY"
         if re.search(r"\blight\b", low0):
-            return "Coca-Cola Light"
-        return "Coca-Cola"
+            return "COCA COLA LIGHT"
+        return "COCA COLA"
     if re.search(r"\bred\s*bull\b|\bredbull\b", low0):
-        return "Red Bull"
+        return "RED BULL"
     if re.search(r"\bsprite\b", low0):
-        return "Sprite"
+        return "SPRITE"
     if re.search(r"\bfanta\b", low0):
-        return "Fanta"
+        return "FANTA"
     if re.search(r"\bperrier\b", low0):
-        return "Perrier"
+        return "PERRIER"
     if re.search(r"\bvittel\b", low0):
-        return "Vittel"
+        return "VITTEL"
     if re.search(r"\bevian\b", low0):
-        return "Evian"
+        return "EVIAN"
     if re.search(r"\borangina\b", low0):
-        return "Orangina"
+        return "ORANGINA"
     if re.search(r"\bice\s*tea\b|\blipton\b|\bfuze\s*tea\b|\bfuse\s*tea\b", low0):
-        return "Ice Tea"
+        return "ICE TEA"
     if re.search(r"\bpringles\b", low0):
-        return "Pringles"
+        return "PRINGLES"
     if re.search(r"\bdoritos\b", low0):
-        return "Doritos"
+        return "DORITOS"
     if re.search(r"\blay'?s\b", low0):
-        return "Chips Lay's" if "chip" in low0 else "Lay's"
+        return "CHIPS LAYS" if "chip" in low0 else "LAYS"
     if re.search(r"\bkinder\s+bueno", low0):
         if re.search(r"\bwhite\b|\bblanc\b", low0):
-            return "Kinder Bueno White"
-        return "Kinder Bueno"
+            return "KINDER BUENO WHITE"
+        return "KINDER BUENO"
     if re.search(r"\bm&m", low0):
-        return "M&M's Peanut" if "peanut" in low0 else "M&M's"
+        return "M AND MS PEANUT" if "peanut" in low0 else "M AND MS"
     if re.search(r"\bsan\s*pellegrino\b", low0):
-        return "San Pellegrino"
+        return "SAN PELLEGRINO"
     if re.search(r"\bschweppes\b", low0):
-        return "Schweppes"
+        return "SCHWEPPES"
 
     # Unités / volumes / dimensions
     s = re.sub(
@@ -411,8 +631,7 @@ def nature_produit(name: object) -> object:
     s = re.sub(r"\([^)]*\)", " ", s)
     s = re.sub(r"\[[^\]]*\]", " ", s)
 
-    # "red" est une couleur mais aussi marque → ne pas strip si seul
-    color_drop = _COLOR_TOKENS - {"red"}  # Red Bull déjà géré plus haut
+    color_drop = _COLOR_TOKENS - {"red"}
     words = re.split(r"[\s/_\-]+", s)
     kept: list[str] = []
     for w in words:
@@ -429,9 +648,7 @@ def nature_produit(name: object) -> object:
 
     s = " ".join(kept)
     s = re.sub(r"\s+", " ", s).strip(" -/")
-    if s and (s.isupper() or s.islower()):
-        s = s.title()
-    return s if s else pd.NA
+    return _nature_finalize(s)
 
 
 def _slug_key(value: object) -> str:
@@ -527,12 +744,30 @@ def map_type_series(s: pd.Series) -> pd.Series:
     return s.map(normalize_type)
 
 
+def normalize_categorie(value: object) -> str:
+    """CATEGORIE en MAJUSCULES ; Unknown→\"\" ; NonF&B→NON_F_B."""
+    if value is None or (isinstance(value, float) and pd.isna(value)):
+        return ""
+    try:
+        if pd.isna(value):
+            return ""
+    except (TypeError, ValueError):
+        pass
+    s = str(value).strip()
+    if not s or s.lower() in {"nan", "none", "unknown", "<na>", "nat"}:
+        return ""
+    key = s.upper().replace(" ", "").replace("-", "_")
+    if key in {"NONF&B", "NON_F&B", "NONFB", "NON_FB", "NON_F_B"}:
+        return "NON_F_B"
+    return s.upper()
+
+
 def compute_categorie_row(type_, gamme_raw, gamme) -> str:
-    if pd.isna(type_):
-        return "Unknown"
+    if pd.isna(type_) or (isinstance(type_, str) and not str(type_).strip()):
+        return ""
     t = normalize_type(type_)
     if t == "NON_F_B":
-        return "NonF&B"
+        return "NON_F_B"
 
     g_raw = str(gamme_raw).strip() if pd.notna(gamme_raw) else ""
     g = normalize_gamme(gamme) if pd.notna(gamme) else ""
@@ -540,17 +775,17 @@ def compute_categorie_row(type_, gamme_raw, gamme) -> str:
 
     if g in ("FOOD_SALEE", "FOOD_SUCREE", "SALTY FOOD", "SUGARY FOOD"):
         if "(Fresh)" in g_raw or "(fresh)" in g_raw:
-            return "Fresh"
+            return "FRESH"
         if "(Dry)" in g_raw or "(dry)" in g_raw:
-            return "Dry"
+            return "DRY"
         # Ancien codage Accor (souvent imprécis hors mapping)
         if g_raw.upper() in {"FOOD SALEE", "FOOD SALÉE"}:
-            return "Fresh"
+            return "FRESH"
         if g_raw.upper() in {"FOOD SUCREE", "FOOD SUCRÉE"}:
-            return "Dry"
-        return "Unknown"
+            return "DRY"
+        return ""
 
-    return g if g else "Unknown"
+    return (g if g else "").upper() if g else ""
 
 
 def mode_or_first(series: pd.Series):
@@ -644,11 +879,11 @@ def resolve_categorie(
     group: pd.DataFrame, name: str, type_: str, gamme: str
 ) -> str:
     if normalize_type(type_) == "NON_F_B":
-        return "NonF&B"
+        return "NON_F_B"
     g = normalize_gamme(gamme)
     g = str(g) if pd.notna(g) else ""
     if g not in ("FOOD_SALEE", "FOOD_SUCREE", "SALTY FOOD", "SUGARY FOOD"):
-        return g if g else "Unknown"
+        return (g if g else "").upper() if g else ""
 
     modern = group[
         group["gamme_raw"]
@@ -736,7 +971,7 @@ def improve_map(map_df: pd.DataFrame) -> pd.DataFrame:
         .str.replace(" ", "", regex=False)
         .eq("NON-F&B")
     )
-    out.loc[nonfb, "categorie"] = "NonF&B"
+    out.loc[nonfb, "categorie"] = "NON_F_B"
     fb_fallback = ~nonfb & out["gamme"].isin(
         ["ALCOOL", "SANS ALCOOL", "FORMULE", "SOUVENIRS"]
     )
@@ -884,6 +1119,9 @@ def clean_raw(
     _ensure_raw_column(df, "TYPE_RAW", "TYPE")
     _ensure_raw_column(df, "GAMME_RAW", "GAMME")
     _ensure_raw_column(df, "NOM_PRODUIT_RAW", "NOM_PRODUIT")
+    _ensure_raw_column(df, "MACHINE_RAW", "MACHINE")
+    _ensure_raw_column(df, "MARQUE_RAW", "MARQUE")
+    _ensure_raw_column(df, "FOURNISSEUR_RAW", "FOURNISSEUR")
 
     df["_boutique_key"] = (
         df["NOM_BOUTIQUE"].astype(str).str.strip()
@@ -942,17 +1180,22 @@ def clean_raw(
     gamme_mapped = df["gamme_map_hp"].combine_first(df["gamme_map_p"])
     df["GAMME"] = map_gamme_series(gamme_mapped.combine_first(df["GAMME_RAW"]))
 
-    print("  → Nettoyage des noms de produits…")
-    cleaned_names = df["NOM_PRODUIT_RAW"].map(clean_product_name)
-    # mapping produit prioritaire, puis clean_product_name sur RAW
+    print("  → NOM_PRODUIT (MAJUSCULES, sans caractères spéciaux)…")
+    # mapping correctifs → sinon RAW ; toujours passe par normalize_nom_produit
     mapped_names = df["nom_produit_map_hp"].combine_first(df["nom_produit_map_p"])
-    # re-clean mapped names too (espaces, Title Case, marques)
-    df["NOM_PRODUIT"] = mapped_names.map(
-        lambda x: clean_product_name(x) if pd.notna(x) else pd.NA
-    ).combine_first(cleaned_names)
+    source_names = mapped_names.combine_first(df["NOM_PRODUIT_RAW"])
+    df["NOM_PRODUIT"] = source_names.map(normalize_nom_produit)
 
     print("  → Nature produit (similaires sans taille/couleur/volume)…")
-    df["NATURE_PRODUIT"] = df["NOM_PRODUIT"].map(nature_produit)
+    # nature basée sur le libellé source (plus riche que le slug)
+    df["NATURE_PRODUIT"] = source_names.map(nature_produit)
+
+    print("  → MACHINE (BORNE / SCANNER / FRIGO / ARMOIRE)…")
+    df["MACHINE"] = df["MACHINE_RAW"].map(normalize_machine)
+
+    print("  → MARQUE / FOURNISSEUR (nettoyage tirets / NaN / espaces)…")
+    df["MARQUE"] = df["MARQUE_RAW"].map(clean_text_field)
+    df["FOURNISSEUR"] = df["FOURNISSEUR_RAW"].map(clean_text_field)
 
     print("  → Calcul des catégories…")
     cat_from_map = df["categorie_map_hp"].combine_first(df["categorie_map_p"])
@@ -967,7 +1210,9 @@ def clean_raw(
 
     # Cohérence TYPE NON_F_B → categorie
     nonfb_mask = df["TYPE"].astype(str).eq("NON_F_B")
-    df.loc[nonfb_mask, "CATEGORIE"] = "NonF&B"
+    df.loc[nonfb_mask, "CATEGORIE"] = "NON_F_B"
+    if "CATEGORIE" in df.columns:
+        df["CATEGORIE"] = df["CATEGORIE"].map(normalize_categorie)
 
     drop_cols = [
         "_boutique_key",
@@ -983,6 +1228,9 @@ def clean_raw(
     ]
     df.drop(columns=[c for c in drop_cols if c in df.columns], inplace=True)
 
+    # Jamais de NaN sur colonnes texte ("" pour SQL GROUP BY)
+    df = fill_text_empty(df)
+
     core = [
         "TYPE_RAW",
         "TYPE",
@@ -991,6 +1239,12 @@ def clean_raw(
         "NOM_PRODUIT_RAW",
         "NOM_PRODUIT",
         "NATURE_PRODUIT",
+        "MACHINE_RAW",
+        "MACHINE",
+        "MARQUE_RAW",
+        "MARQUE",
+        "FOURNISSEUR_RAW",
+        "FOURNISSEUR",
         "CATEGORIE",
     ]
     other = [c for c in df.columns if c not in core]
@@ -1012,6 +1266,21 @@ def renorm_identifiers(df: pd.DataFrame) -> pd.DataFrame:
     _ensure_raw_column(out, "TYPE_RAW", "TYPE")
     _ensure_raw_column(out, "GAMME_RAW", "GAMME")
     _ensure_raw_column(out, "NOM_PRODUIT_RAW", "NOM_PRODUIT")
+    # MACHINE : si MACHINE est déjà canon (BORNE/…), ne pas l'écrire dans RAW
+    if "MACHINE_RAW" not in out.columns:
+        if "MACHINE" in out.columns:
+            raw_m = out["MACHINE"].astype(str)
+            already_canon = raw_m.str.upper().isin(
+                {"BORNE", "SCANNER", "FRIGO", "ARMOIRE", "NAN", "NONE"}
+            )
+            # si tout est déjà canon, RAW perdu — on garde quand même
+            out["MACHINE_RAW"] = out["MACHINE"]
+        else:
+            out["MACHINE_RAW"] = pd.NA
+    else:
+        # si MACHINE_RAW vide mais MACHINE a le détail historique
+        if out["MACHINE_RAW"].isna().all() and "MACHINE" in df.columns:
+            out["MACHINE_RAW"] = df["MACHINE"]
 
     # Priorité RAW → sinon re-normalise l'ancienne colonne normalisée
     out["TYPE"] = map_type_series(out["TYPE_RAW"]).combine_first(
@@ -1020,19 +1289,41 @@ def renorm_identifiers(df: pd.DataFrame) -> pd.DataFrame:
     out["GAMME"] = map_gamme_series(out["GAMME_RAW"]).combine_first(
         map_gamme_series(prev_gamme)
     )
-    from_raw = out["NOM_PRODUIT_RAW"].map(clean_product_name)
-    from_prev = prev_prod.map(
-        lambda x: clean_product_name(x) if pd.notna(x) else pd.NA
+    # NOM_PRODUIT_RAW intact ; NOM_PRODUIT = slug majuscules sans spéciaux
+    source = out["NOM_PRODUIT_RAW"].where(
+        out["NOM_PRODUIT_RAW"].notna()
+        & out["NOM_PRODUIT_RAW"].astype(str).str.strip().ne(""),
+        prev_prod,
     )
-    out["NOM_PRODUIT"] = from_raw.combine_first(from_prev)
-    out["NATURE_PRODUIT"] = out["NOM_PRODUIT"].map(nature_produit)
+    out["NOM_PRODUIT"] = source.map(normalize_nom_produit)
+    out["NATURE_PRODUIT"] = source.map(nature_produit)
+    out["MACHINE"] = out["MACHINE_RAW"].map(normalize_machine)
+
+    # MARQUE / FOURNISSEUR : RAW préservé, colonnes clean (vide si - / NaN)
+    if "MARQUE_RAW" not in out.columns:
+        out["MARQUE_RAW"] = df["MARQUE"] if "MARQUE" in df.columns else pd.NA
+    if "FOURNISSEUR_RAW" not in out.columns:
+        out["FOURNISSEUR_RAW"] = (
+            df["FOURNISSEUR"] if "FOURNISSEUR" in df.columns else pd.NA
+        )
+    out["MARQUE"] = out["MARQUE_RAW"].map(clean_text_field)
+    out["FOURNISSEUR"] = out["FOURNISSEUR_RAW"].map(clean_text_field)
 
     # CATEGORIE
     out["CATEGORIE"] = [
         compute_categorie_row(t, gr, g)
         for t, gr, g in zip(out["TYPE"], out["GAMME_RAW"], out["GAMME"])
     ]
-    out.loc[out["TYPE"].astype(str).eq("NON_F_B"), "CATEGORIE"] = "NonF&B"
+    out.loc[out["TYPE"].astype(str).eq("NON_F_B"), "CATEGORIE"] = "NON_F_B"
+    out["CATEGORIE"] = out["CATEGORIE"].map(normalize_categorie)
+
+    # TYPE/GAMME peuvent encore être pd.NA → forcer ""
+    for c in ("TYPE", "GAMME", "NOM_PRODUIT", "NATURE_PRODUIT", "CATEGORIE"):
+        if c in out.columns:
+            out[c] = out[c].apply(
+                lambda x: "" if x is None or (not isinstance(x, str) and pd.isna(x)) else str(x)
+            )
+    out = fill_text_empty(out)
     return out
 
 
@@ -1210,7 +1501,10 @@ def main():
     print("  GAMME_RAW         → GAMME")
     print("  NOM_PRODUIT_RAW   → NOM_PRODUIT")
     print("  NATURE_PRODUIT    (similaires sans taille/couleur/volume)")
-    print("  CATEGORIE         (Fresh / Dry / NonF&B / ou fallback gamme)")
+    print("  MACHINE_RAW       → MACHINE (BORNE|SCANNER|FRIGO|ARMOIRE)")
+    print("  MARQUE_RAW        → MARQUE (vide si - / NaN)")
+    print("  FOURNISSEUR_RAW   → FOURNISSEUR (vide si - / NaN)")
+    print("  CATEGORIE         (FRESH / DRY / NON_F_B / gamme / \"\")")
 
 
 if __name__ == "__main__":

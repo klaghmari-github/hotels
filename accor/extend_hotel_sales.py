@@ -188,6 +188,12 @@ def reorder_columns(df: pd.DataFrame) -> pd.DataFrame:
         "NOM_PRODUIT_RAW",
         "NOM_PRODUIT",
         "NATURE_PRODUIT",
+        "MACHINE_RAW",
+        "MACHINE",
+        "MARQUE_RAW",
+        "MARQUE",
+        "FOURNISSEUR_RAW",
+        "FOURNISSEUR",
         "CATEGORIE",
     ]
     tail = ["PRIX_TTC_MARCHE", "MARGE"]
