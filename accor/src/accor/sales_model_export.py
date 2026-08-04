@@ -138,12 +138,17 @@ def load_hotel_line(con: duckdb.DuckDBPyConnection) -> pd.DataFrame:
 
 def pivot_sales_model_base(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Transforme v_sales_model_base (grain produit) → 1 ligne / hôtel
-    (et / scénario si ``scenario_id`` présent).
+    Transforme v_sales_model_base (grain produit) → lignes hôtel (× scénario).
 
-    Aligné sur SalesPilBase.pivot_sales_model_base du notebook :
-    sans scénario → 1 ligne / hôtel ; avec scénarios de retrait →
-    1 ligne / (hôtel × scenario_id).
+    Pour chaque (hôtel [, scénario]) :
+      1. ligne ``mlin_source=hotel`` — m_lin **déclaré** corner (données d'origine)
+      2. ligne ``mlin_source=sum_produits`` — m_lin **exposé** =
+         Σ ``produit_metres_lineaires`` des produits encore présents
+
+    Les ``produit_metres_lineaires`` doivent être **figés sur l'assortiment de
+    base** (pas re-répartis 1/N après retrait). Ainsi, quand on retire des
+    produits, Σ m_lin produits < m_lin hôtel : on montre la réduction du
+    corner réellement exposé.
     """
     if df is None or df.empty:
         return pd.DataFrame()
@@ -152,6 +157,24 @@ def pivot_sales_model_base(df: pd.DataFrame) -> pd.DataFrame:
         s = str(name).strip().lower()
         s = re.sub(r"[^a-z0-9]+", "_", s)
         return re.sub(r"_+", "_", s).strip("_")
+
+    work = df.copy()
+    # Ne pas recalculer 1/N_courant ici : ça re-remplit le corner.
+    # Seulement si la colonne est absente (export base sans sim).
+    if "produit_metres_lineaires" not in work.columns:
+        if "produit_part_metres_lineaires" in work.columns and "metres_lineaires" in work.columns:
+            work["produit_metres_lineaires"] = pd.to_numeric(
+                work["metres_lineaires"], errors="coerce"
+            ) * pd.to_numeric(work["produit_part_metres_lineaires"], errors="coerce")
+        elif "produit_part_des_produits" in work.columns and "metres_lineaires" in work.columns:
+            # fallback base seule (assortiment complet → somme ≈ m_lin hôtel)
+            work["produit_metres_lineaires"] = pd.to_numeric(
+                work["metres_lineaires"], errors="coerce"
+            ) * pd.to_numeric(work["produit_part_des_produits"], errors="coerce")
+        else:
+            work["produit_metres_lineaires"] = pd.NA
+    if "produit_part_metres_lineaires" not in work.columns and "produit_part_des_produits" in work.columns:
+        work["produit_part_metres_lineaires"] = work["produit_part_des_produits"]
 
     scenario_cols = [
         c
@@ -163,34 +186,37 @@ def pivot_sales_model_base(df: pd.DataFrame) -> pd.DataFrame:
             "n_removed",
             "removed_items",
         )
-        if c in df.columns
+        if c in work.columns
     ]
     id_cols = scenario_cols + [
         c
         for c in ("hotel_code", "hotel_name", "solution", "metres_lineaires")
-        if c in df.columns
+        if c in work.columns
     ]
-    product_metrics = [c for c in df.columns if c.startswith("produit_") and c not in id_cols]
-    gamme_metrics = [c for c in df.columns if c.startswith("gamme_") and c not in id_cols]
-    type_metrics = [c for c in df.columns if c.startswith("type_") and c not in id_cols]
+    product_metrics = [c for c in work.columns if c.startswith("produit_") and c not in id_cols]
+    for extra in ("produit_metres_lineaires", "produit_part_metres_lineaires"):
+        if extra in work.columns and extra not in product_metrics:
+            product_metrics.append(extra)
+    gamme_metrics = [c for c in work.columns if c.startswith("gamme_") and c not in id_cols]
+    type_metrics = [c for c in work.columns if c.startswith("type_") and c not in id_cols]
     global_metrics = [
         c
-        for c in df.columns
+        for c in work.columns
         if not c.startswith(("produit_", "gamme_", "type_"))
         and c not in id_cols
         and c not in ("type", "gamme", "produit", "nombre_mois")
         and c not in scenario_cols
     ]
 
-    if "scenario_id" in df.columns:
+    if "scenario_id" in work.columns:
         group_keys = ["scenario_id", "hotel_code"]
-    elif "scenario_label" in df.columns:
+    elif "scenario_label" in work.columns:
         group_keys = ["scenario_label", "hotel_code"]
     else:
         group_keys = ["hotel_code"]
 
     rows: list[dict[str, Any]] = []
-    for _, g in df.groupby(group_keys, sort=False, dropna=False):
+    for _, g in work.groupby(group_keys, sort=False, dropna=False):
         row: dict[str, Any] = {}
         first = g.iloc[0]
         for col in id_cols:
@@ -198,20 +224,40 @@ def pivot_sales_model_base(df: pd.DataFrame) -> pd.DataFrame:
         for _, r in g.iterrows():
             prefix = f"produit__{sanitize(r['produit'])}__"
             for m in product_metrics:
-                row[prefix + m] = r[m]
+                if m in r.index:
+                    row[prefix + m] = r[m]
         subset_g = ["type", "gamme"] if "type" in g.columns else ["gamme"]
         for _, r in g.drop_duplicates(subset=subset_g).iterrows():
             prefix = f"gamme__{sanitize(r['gamme'])}__"
             for m in gamme_metrics:
-                row[prefix + m] = r[m]
+                if m in r.index:
+                    row[prefix + m] = r[m]
         if "type" in g.columns:
             for _, r in g.drop_duplicates(subset=["type"]).iterrows():
                 prefix = f"type__{sanitize(r['type'])}__"
                 for m in type_metrics:
-                    row[prefix + m] = r[m]
+                    if m in r.index:
+                        row[prefix + m] = r[m]
         for m in global_metrics:
             row[f"global__{m}"] = first[m]
-        rows.append(row)
+
+        row_hotel = dict(row)
+        row_hotel["mlin_source"] = "hotel"
+        rows.append(row_hotel)
+
+        sum_prod_mlin = float(
+            pd.to_numeric(g["produit_metres_lineaires"], errors="coerce").fillna(0).sum()
+        )
+        row_sum = dict(row)
+        row_sum["metres_lineaires"] = sum_prod_mlin
+        row_sum["mlin_source"] = "sum_produits"
+        if row_sum.get("scenario_id") is not None:
+            sid = str(row_sum["scenario_id"])
+            if not sid.endswith("__mlin_sum"):
+                row_sum["scenario_id"] = f"{sid}__mlin_sum"
+        if row_sum.get("scenario_label") is not None:
+            row_sum["scenario_label"] = f"{row_sum['scenario_label']} [m_lin=Σ produits]"
+        rows.append(row_sum)
 
     return pd.DataFrame(rows).fillna(0)
 
