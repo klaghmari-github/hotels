@@ -39,6 +39,16 @@ v_sales_model:
         AND (GAMME IS NOT NULL)
         AND (NOM_PRODUIT IS NOT NULL)
 
+t_sales_model:
+  type: table
+  requires:
+    - v_sales_model
+  sql: |
+    SELECT
+        *
+    FROM
+        v_sales_model    
+
 v_refs:
   type: view
   requires:
@@ -377,3 +387,13 @@ v_sales_model_base:
         v_ventes_mois
     USING
         (hotel_code, nombre_mois)
+
+t_sales_model_base:
+  type: table
+  requires:
+    - v_sales_model_base
+  sql: |
+    SELECT
+        *
+    FROM
+        v_sales_model_base
