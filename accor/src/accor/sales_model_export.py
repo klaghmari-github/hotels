@@ -139,7 +139,11 @@ def load_hotel_line(con: duckdb.DuckDBPyConnection) -> pd.DataFrame:
 def pivot_sales_model_base(df: pd.DataFrame) -> pd.DataFrame:
     """
     Transforme v_sales_model_base (grain produit) → 1 ligne / hôtel
-    (même logique que SalesPilBase.pivot_sales_model_base du notebook).
+    (et / scénario si ``scenario_id`` présent).
+
+    Aligné sur SalesPilBase.pivot_sales_model_base du notebook :
+    sans scénario → 1 ligne / hôtel ; avec scénarios de retrait →
+    1 ligne / (hôtel × scenario_id).
     """
     if df is None or df.empty:
         return pd.DataFrame()
@@ -149,7 +153,23 @@ def pivot_sales_model_base(df: pd.DataFrame) -> pd.DataFrame:
         s = re.sub(r"[^a-z0-9]+", "_", s)
         return re.sub(r"_+", "_", s).strip("_")
 
-    id_cols = ["hotel_code", "hotel_name", "solution", "metres_lineaires"]
+    scenario_cols = [
+        c
+        for c in (
+            "scenario_id",
+            "scenario_label",
+            "scenario_kind",
+            "scenario_rank",
+            "n_removed",
+            "removed_items",
+        )
+        if c in df.columns
+    ]
+    id_cols = scenario_cols + [
+        c
+        for c in ("hotel_code", "hotel_name", "solution", "metres_lineaires")
+        if c in df.columns
+    ]
     product_metrics = [c for c in df.columns if c.startswith("produit_") and c not in id_cols]
     gamme_metrics = [c for c in df.columns if c.startswith("gamme_") and c not in id_cols]
     type_metrics = [c for c in df.columns if c.startswith("type_") and c not in id_cols]
@@ -159,27 +179,36 @@ def pivot_sales_model_base(df: pd.DataFrame) -> pd.DataFrame:
         if not c.startswith(("produit_", "gamme_", "type_"))
         and c not in id_cols
         and c not in ("type", "gamme", "produit", "nombre_mois")
+        and c not in scenario_cols
     ]
 
+    if "scenario_id" in df.columns:
+        group_keys = ["scenario_id", "hotel_code"]
+    elif "scenario_label" in df.columns:
+        group_keys = ["scenario_label", "hotel_code"]
+    else:
+        group_keys = ["hotel_code"]
+
     rows: list[dict[str, Any]] = []
-    for hotel_code, g in df.groupby("hotel_code", sort=False):
+    for _, g in df.groupby(group_keys, sort=False, dropna=False):
         row: dict[str, Any] = {}
         first = g.iloc[0]
         for col in id_cols:
-            if col in g.columns:
-                row[col] = first[col]
+            row[col] = first[col]
         for _, r in g.iterrows():
             prefix = f"produit__{sanitize(r['produit'])}__"
             for m in product_metrics:
                 row[prefix + m] = r[m]
-        for _, r in g.drop_duplicates(subset=["type", "gamme"]).iterrows():
+        subset_g = ["type", "gamme"] if "type" in g.columns else ["gamme"]
+        for _, r in g.drop_duplicates(subset=subset_g).iterrows():
             prefix = f"gamme__{sanitize(r['gamme'])}__"
             for m in gamme_metrics:
                 row[prefix + m] = r[m]
-        for _, r in g.drop_duplicates(subset=["type"]).iterrows():
-            prefix = f"type__{sanitize(r['type'])}__"
-            for m in type_metrics:
-                row[prefix + m] = r[m]
+        if "type" in g.columns:
+            for _, r in g.drop_duplicates(subset=["type"]).iterrows():
+                prefix = f"type__{sanitize(r['type'])}__"
+                for m in type_metrics:
+                    row[prefix + m] = r[m]
         for m in global_metrics:
             row[f"global__{m}"] = first[m]
         rows.append(row)
