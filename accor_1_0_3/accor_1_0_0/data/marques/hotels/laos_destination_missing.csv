@@ -1,2 +1,0 @@
-hotel_code_accor,hotel_code_norm,hotel_name,hotel_brand_code,hotel_brand,hotel_city,hotel_country,hotel_adresse,hotel_code_postal,url_hotel,source,source_query,hotel_name_norm,city_norm,country_slug,country_label,region,match_type
-B1X0,B1X0,Homm Souvannaphoum Luang Prabang,HOM,HOM,LUANG PRABANG,République démocratique populaire lao,"Rue Chao Fa Ngum, Ban Thatluang, nil",23624,https://all.accor.com/hotel/B1X0/index.fr.shtml,catalog_api,laos,HOMM SOUVANNAPHOUM LUANG PRABANG,LUANG PRABANG,laos,Laos,asia,missing

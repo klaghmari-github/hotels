@@ -1,7 +1,0 @@
-{
-  "ok": true,
-  "path": "/media/laghmari/ssd-data/dev/hotels/accord/data/hotel_proximity_data.xlsx",
-  "n_hotels": 1747,
-  "n_shards_merged": 13,
-  "n_ok": 1743
-}
