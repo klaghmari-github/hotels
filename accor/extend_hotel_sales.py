@@ -171,7 +171,7 @@ def reorder_columns(df: pd.DataFrame) -> pd.DataFrame:
     Ordre stable pour analyses / GROUP BY notebook :
 
       SOLUTION, HOTEL_CODE, HOTEL_NAME, METRES_LINEAIRES,
-      TYPE, TYPE_RAW, GAMME, GAMME_RAW, NOM_PRODUIT, NOM_PRODUIT_RAW, CATEGORIE,
+      TYPE / RAW, GAMME / RAW, NOM_PRODUIT / RAW, NATURE_PRODUIT, CATEGORIE,
       … reste transactionnel …,
       PRIX_TTC_MARCHE, MARGE
     """
@@ -181,24 +181,20 @@ def reorder_columns(df: pd.DataFrame) -> pd.DataFrame:
         "HOTEL_NAME",
         "METRES_LINEAIRES",
         "NOM_BOUTIQUE",
-        "TYPE",
         "TYPE_RAW",
-        "GAMME",
+        "TYPE",
         "GAMME_RAW",
-        "NOM_PRODUIT",
+        "GAMME",
         "NOM_PRODUIT_RAW",
+        "NOM_PRODUIT",
+        "NATURE_PRODUIT",
         "CATEGORIE",
     ]
     tail = ["PRIX_TTC_MARCHE", "MARGE"]
-    middle = [
-        c
-        for c in df.columns
-        if c not in head and c not in tail
-    ]
+    middle = [c for c in df.columns if c not in head and c not in tail]
     ordered = [c for c in head if c in df.columns] + middle + [
         c for c in tail if c in df.columns
     ]
-    # colonnes imprévues déjà couvertes par middle ; garanti exhaustif
     rest = [c for c in df.columns if c not in ordered]
     return df[ordered + rest]
 
