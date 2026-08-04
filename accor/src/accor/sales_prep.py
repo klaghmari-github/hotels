@@ -25,6 +25,8 @@ import pandas as pd
 from accor.data_io import DATA_DIR, PROJECT_ROOT, read_excel
 
 RAW_FILENAME = "hotel_sales_raw_data.xlsx"
+# Prefer extended (avec MARGE / SOLUTION / METRES_LINEAIRES) si présent
+RAW_EXTENDED_FILENAME = "hotel_sales_raw_extended_data.xlsx"
 RAW_SHEET = "sales_raw"
 SALES_FILENAME = "hotel_sales_data.xlsx"
 SALES_SHEET = "hotel_sales"
@@ -39,50 +41,78 @@ RAW_COLUMN_MAP = {
     "statut": "statut",
     "code ean": "code_ean",
     "nom du produit": "nom_produit",
+    "nom_produit": "nom_produit",
     "quantite": "quantite",
     "prix ht": "prix_ht",
     "vat": "vat",
     "prix ttc": "prix_ttc",
     "type": "type_raw",
+    "type_raw": "type_raw",
     "gamme": "gamme_raw",
+    "gamme_raw": "gamme_raw",
     "marque": "marque_produit",
     "fournisseur": "fournisseur",
     "order id (ticket de caisse)": "order_id",
     "order_id": "order_id",
+    "marge": "marge",
+    "prix_ttc_marche": "prix_ttc_marche",
+    "prix ttc marche": "prix_ttc_marche",
+    "solution": "solution",
+    "hotel_code": "hotel_code_src",
+    "hotel name": "hotel_name_src",
+    "hotel_name": "hotel_name_src",
+    "metres_lineaires": "metres_lineaires",
 }
 
 TYPE_MAP = {
     "f&b": "f_b",
     "f_b": "f_b",
+    "f-b": "f_b",
     "fb": "f_b",
     "food": "f_b",
     "non-f&b": "n_f_b",
     "non_f&b": "n_f_b",
+    "non-f_b": "n_f_b",
+    "non_f_b": "n_f_b",
     "n-f&b": "n_f_b",
     "n_f_b": "n_f_b",
+    "n-f_b": "n_f_b",
     "non fb": "n_f_b",
     "non_fb": "n_f_b",
 }
 
 GAMME_MAP = {
     "sans alcool": "sans_alcool",
+    "sans-alcool": "sans_alcool",
     "food sucree": "food_sucree",
     "food sucrée": "food_sucree",
+    "sugary food": "food_sucree",
+    "sugary-food": "food_sucree",
     "food salee": "food_salee",
     "food salée": "food_salee",
+    "salty food": "food_salee",
+    "salty-food": "food_salee",
     "sos": "sos",
     "alcool": "alcool",
     "accessoires": "accessoires",
     "jeux / enfants": "jeux_enfants",
     "jeux enfants": "jeux_enfants",
+    "jeu_enfants": "jeux_enfants",
     "cosmetique": "cosmetique",
     "cosmétique": "cosmetique",
     "pap": "pap",
     "souvenirs": "souvenirs",
+    "formule": "formule",
     "ref": "ref",
 }
 
-MEASURES = ("nombre_ventes", "montant_ventes", "nombre_paniers", "nombre_produits")
+MEASURES = (
+    "nombre_ventes",
+    "montant_ventes",
+    "montant_marge",
+    "nombre_paniers",
+    "nombre_produits",
+)
 SOUS_CAT_SLUGS = (
     "ref",
     "accessoires",
@@ -159,10 +189,6 @@ def normalize_gamme(value: Any) -> str:
     return slugify(value) if key else "autre"
 
 
-def raw_path() -> Path:
-    return DATA_DIR / RAW_FILENAME
-
-
 def sales_path() -> Path:
     return DATA_DIR / SALES_FILENAME
 
@@ -235,7 +261,20 @@ def _normalize_raw_columns(frame: pd.DataFrame) -> pd.DataFrame:
             slug = slugify(c)
             if slug in RAW_COLUMN_MAP.values():
                 rename[c] = slug
-    return frame.rename(columns=rename)
+    out = frame.rename(columns=rename)
+    # Extended export has TYPE + TYPE_RAW (both → type_raw) and GAMME + GAMME_RAW.
+    # Keep the first occurrence (cleaned TYPE/GAMME columns come first).
+    if out.columns.duplicated().any():
+        out = out.loc[:, ~out.columns.duplicated()].copy()
+    return out
+
+
+def raw_path() -> Path:
+    """Préfère le fichier extended (marge / solution) s'il existe."""
+    ext = DATA_DIR / RAW_EXTENDED_FILENAME
+    if ext.exists():
+        return ext
+    return DATA_DIR / RAW_FILENAME
 
 
 def load_raw_sales(path: Path | None = None) -> pd.DataFrame:
@@ -252,8 +291,12 @@ def load_raw_sales(path: Path | None = None) -> pd.DataFrame:
             frame = pd.read_csv(legacy, dtype=str, low_memory=False)
             return _normalize_raw_columns(frame)
         return pd.DataFrame()
-    frame = read_excel(path, sheet=RAW_SHEET, dtype=str)
-    if frame.empty:
+    # extended n'a souvent pas de sheet sales_raw
+    try:
+        frame = read_excel(path, sheet=RAW_SHEET, dtype=str)
+    except Exception:
+        frame = pd.DataFrame()
+    if frame is None or frame.empty:
         frame = read_excel(path, sheet=0, dtype=str)
     return _normalize_raw_columns(frame)
 
@@ -309,7 +352,23 @@ def prepare_lines(
     )
     unit = ht.fillna(ttc).fillna(0.0)
     df["nombre_ventes"] = q
-    df["montant_ventes"] = (unit * q).astype(float)
+    # PRIX_TTC extended = total ligne (ne pas re-multiplier) ; sinon unit × qty
+    if "prix_ttc" in df.columns and ttc.notna().any():
+        # Heuristique : si médiane TTC ≈ HT*(1+TVA) pour q>1 → unitaire
+        # Sinon (fichier extended) TTC est déjà le total de ligne.
+        df["montant_ventes"] = ttc.fillna(unit * q).astype(float)
+    else:
+        df["montant_ventes"] = (unit * q).astype(float)
+
+    # Marge (cible finale ML) — colonne MARGE du extended, sinon TTC − marché
+    if "marge" in df.columns:
+        df["montant_marge"] = pd.to_numeric(df["marge"], errors="coerce").fillna(0.0)
+    elif "prix_ttc_marche" in df.columns:
+        marche = pd.to_numeric(df["prix_ttc_marche"], errors="coerce").fillna(0.0)
+        df["montant_marge"] = (df["montant_ventes"] - marche).astype(float)
+    else:
+        df["montant_marge"] = 0.0
+
     if "order_id" in df.columns:
         df["order_id"] = df["order_id"].astype(str)
     else:
@@ -327,18 +386,58 @@ def prepare_lines(
     df["categorie"] = type_src.map(normalize_type)
     df["sous_categorie"] = gamme_src.map(normalize_gamme)
 
-    if "nom_boutique" not in df.columns:
-        raise ValueError("Colonne NOM BOUTIQUE / nom_boutique manquante.")
+    if "nom_boutique" not in df.columns and "hotel_code_src" not in df.columns:
+        raise ValueError(
+            "Colonne NOM BOUTIQUE / nom_boutique (ou HOTEL_CODE) manquante."
+        )
     matcher = matcher or HotelBoutiqueMatcher(lookup)
-    codes = []
-    names = []
-    for nom in df["nom_boutique"].astype(str):
-        code, hname = matcher.match(nom)
-        codes.append(code)
-        names.append(hname or nom)
+    boutique_series = (
+        df["nom_boutique"].astype(str)
+        if "nom_boutique" in df.columns
+        else pd.Series([""] * len(df), index=df.index)
+    )
+
+    # Prefer HOTEL_CODE from extended export (vectorized)
+    codes: pd.Series
+    if "hotel_code_src" in df.columns:
+        src = df["hotel_code_src"].astype(str).str.strip()
+        bad = src.isin(("", "nan", "None", "NaT", "<NA>")) | df["hotel_code_src"].isna()
+        codes = src.mask(bad, other=pd.NA)
+    else:
+        codes = pd.Series(pd.NA, index=df.index, dtype=object)
+
+    # Fallback: boutique name → hotel_code (unique names only)
+    need = codes.isna()
+    if need.any() and boutique_series.notna().any():
+        unique_noms = boutique_series.loc[need].dropna().unique()
+        mapping: dict[str, tuple[str | None, str | None]] = {}
+        for nom in unique_noms:
+            mapping[str(nom)] = matcher.match(str(nom))
+        matched = boutique_series.loc[need].map(
+            lambda n: mapping.get(str(n), (None, None))[0]
+        )
+        codes.loc[need] = matched.values
+
+    # Display names from lookup / extended / boutique
+    lookup_names = {}
+    if not lookup.empty and "hotel_code" in lookup.columns:
+        lu = lookup.drop_duplicates("hotel_code", keep="first")
+        lookup_names = dict(
+            zip(
+                lu["hotel_code"].astype(str).str.strip(),
+                lu["hotel_name"].astype(str),
+            )
+        )
+    name_ref = codes.map(lambda c: lookup_names.get(str(c)) if pd.notna(c) else None)
+    if "hotel_name_src" in df.columns:
+        hn = df["hotel_name_src"].astype(str)
+        df["nom_hotel"] = boutique_series.where(
+            boutique_series.ne("") & boutique_series.notna(), hn
+        ).astype(str)
+    else:
+        df["nom_hotel"] = boutique_series.astype(str)
     df["hotel_code"] = codes
-    df["nom_hotel"] = df["nom_boutique"].astype(str)
-    df["hotel_name_ref"] = names
+    df["hotel_name_ref"] = name_ref.fillna(df["nom_hotel"])
     return df
 
 
@@ -348,16 +447,21 @@ def build_monthly_sales(lines: pd.DataFrame) -> pd.DataFrame:
         return pd.DataFrame()
 
     keys = ["hotel_code", "nom_hotel", "annee", "mois"]
+    agg_map = {
+        "nombre_ventes": ("nombre_ventes", "sum"),
+        "montant_ventes": ("montant_ventes", "sum"),
+        "nombre_paniers": ("order_id", "nunique"),
+        "nombre_produits": ("code_ean", "nunique"),
+    }
+    if "montant_marge" in lines.columns:
+        agg_map["montant_marge"] = ("montant_marge", "sum")
     base = (
         lines.groupby(keys, dropna=False)
-        .agg(
-            nombre_ventes=("nombre_ventes", "sum"),
-            montant_ventes=("montant_ventes", "sum"),
-            nombre_paniers=("order_id", "nunique"),
-            nombre_produits=("code_ean", "nunique"),
-        )
+        .agg(**{k: v for k, v in agg_map.items()})
         .reset_index()
     )
+    if "montant_marge" not in base.columns:
+        base["montant_marge"] = 0.0
 
     cat_counts = (
         lines.groupby(keys + ["categorie"], dropna=False)["sous_categorie"]
@@ -381,16 +485,22 @@ def build_monthly_sales(lines: pd.DataFrame) -> pd.DataFrame:
         base["nombre_categories_mois_n_f_b"] / tot_n.replace(0, pd.NA)
     ).fillna(0.0)
 
+    cat_agg = {
+        "nombre_ventes": ("nombre_ventes", "sum"),
+        "montant_ventes": ("montant_ventes", "sum"),
+        "nombre_paniers": ("order_id", "nunique"),
+        "nombre_produits": ("code_ean", "nunique"),
+    }
+    if "montant_marge" in lines.columns:
+        cat_agg["montant_marge"] = ("montant_marge", "sum")
     by_cat = (
         lines.groupby(keys + ["categorie"], dropna=False)
-        .agg(
-            nombre_ventes=("nombre_ventes", "sum"),
-            montant_ventes=("montant_ventes", "sum"),
-            nombre_paniers=("order_id", "nunique"),
-            nombre_produits=("code_ean", "nunique"),
-        )
+        .agg(**{k: v for k, v in cat_agg.items()})
         .reset_index()
     )
+    for measure in MEASURES:
+        if measure not in by_cat.columns:
+            by_cat[measure] = 0.0
     for measure in MEASURES:
         for cat in ("f_b", "n_f_b"):
             col = f"pct_cat_{cat}_{measure}"
@@ -402,16 +512,22 @@ def build_monthly_sales(lines: pd.DataFrame) -> pd.DataFrame:
             base[col] = (base["_v"] / base[measure].replace(0, pd.NA)).fillna(0.0)
             base = base.drop(columns=["_v"])
 
+    sub_agg = {
+        "nombre_ventes": ("nombre_ventes", "sum"),
+        "montant_ventes": ("montant_ventes", "sum"),
+        "nombre_paniers": ("order_id", "nunique"),
+        "nombre_produits": ("code_ean", "nunique"),
+    }
+    if "montant_marge" in lines.columns:
+        sub_agg["montant_marge"] = ("montant_marge", "sum")
     by_sub = (
         lines.groupby(keys + ["categorie", "sous_categorie"], dropna=False)
-        .agg(
-            nombre_ventes=("nombre_ventes", "sum"),
-            montant_ventes=("montant_ventes", "sum"),
-            nombre_paniers=("order_id", "nunique"),
-            nombre_produits=("code_ean", "nunique"),
-        )
+        .agg(**{k: v for k, v in sub_agg.items()})
         .reset_index()
     )
+    for measure in MEASURES:
+        if measure not in by_sub.columns:
+            by_sub[measure] = 0.0
     cat_tot = by_sub.groupby(keys + ["categorie"], dropna=False)[list(MEASURES)].transform(
         "sum"
     )

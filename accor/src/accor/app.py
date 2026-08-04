@@ -375,10 +375,11 @@ def api_rebuild_model_data():
 @app.post("/api/datasets/sales/rebuild")
 def api_rebuild_sales():
     """
-    Reconstruit ``hotel_sales_data.xlsx`` depuis ``hotel_sales_raw_data.xlsx``.
+    Reconstruit ``hotel_sales_data.xlsx`` depuis le raw extended
+    (``hotel_sales_raw_extended_data.xlsx`` si présent, sinon raw classique).
 
     Normalise TYPE/GAMME, mappe les boutiques → hotel_code (hotel_data),
-    agrège mensuellement + indicateurs %.
+    agrège mensuellement + indicateurs % (incl. ``montant_marge``).
     """
     try:
         from accor.sales_prep import ensure_raw_sales_from_archive, rebuild_hotel_sales_data
@@ -389,6 +390,25 @@ def api_rebuild_sales():
         _cache.pop("sales", None)
         _cache.pop("sales_raw", None)
         return jsonify(result)
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
+@app.post("/api/datasets/sales_model/export")
+def api_export_sales_model():
+    """
+    Exporte les indicateurs pilotes DuckDB (main.ipynb) vers Excel :
+
+    - ``data/hotel_sales_model_hotel.xlsx`` (base, 1 ligne / hôtel)
+    - ``data/hotel_sales_model_scenarios.xlsx`` (sim si accessible)
+
+    Lecture read-only de base.duckdb / sim.duckdb (n'interrompt pas un
+    pipeline notebook en cours si le lock le permet).
+    """
+    try:
+        from accor.sales_model_export import export_all
+
+        return jsonify(export_all())
     except Exception as exc:
         return jsonify({"error": str(exc)}), 400
 

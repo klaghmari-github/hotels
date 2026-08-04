@@ -1,6 +1,6 @@
-run_dev url : https://tries-loved-written-explicit.trycloudflare.com
-run_admin url : https://behind-presentation-destination-breed.trycloudflare.com
-run_user url : https://warnings-rrp-export-england.trycloudflare.com
+run_dev url : https://frank-prix-decrease-notify.trycloudflare.com
+run_admin url : https://interstate-plymouth-simulations-distributors.trycloudflare.com
+run_user url : https://sanyo-flickr-leaf-broker.trycloudflare.com
 watchdog status : UP · interval=60s · ports dev=5500 admin=5055 user=5056
 
 # Accor ROD
@@ -191,9 +191,9 @@ ligne `run_dev url` en tête de ce README (sinon l’IP LAN).
 
 | Service | Port local | URL publique |
 |---------|------------|--------------|
-| **run_dev** (console) | 5500 | https://tries-loved-written-explicit.trycloudflare.com |
-| **Admin** | 5055 | https://behind-presentation-destination-breed.trycloudflare.com |
-| **User** | 5056 | https://warnings-rrp-export-england.trycloudflare.com |
+| **run_dev** (console) | 5500 | https://frank-prix-decrease-notify.trycloudflare.com |
+| **Admin** | 5055 | https://interstate-plymouth-simulations-distributors.trycloudflare.com |
+| **User** | 5056 | https://sanyo-flickr-leaf-broker.trycloudflare.com |
 
 *(Si une URL ne répond plus : `./scripts/expose_public.sh all` pour en obtenir de nouvelles.)*
 

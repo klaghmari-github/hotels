@@ -312,6 +312,8 @@ def start_service(name: str, port: int) -> bool:
     env.pop("ACCOR_PORT", None)
     if name == "dev":
         env["ACCOR_DEV_PORT"] = str(port)
+        # Consignes web : exécution headless avec outils autorisés
+        env.setdefault("ACCOR_DEV_YOLO", "1")
 
     args = [PYTHON, str(script), *cfg["args_extra"](port)]
     logf = open(log_path, "a", encoding="utf-8")
@@ -710,6 +712,19 @@ def update_readme_urls(
             return False
     README.write_text(new_text, encoding="utf-8")
     _log(f"README mis à jour · dev={dev_u} admin={admin_u} meaningful={meaningful}")
+    # Garder liens.html aligné sur les tunnels publics
+    try:
+        import subprocess as _sp
+
+        _sp.run(
+            [sys.executable, str(ROOT / "scripts" / "sync_liens_html.py")],
+            cwd=str(ROOT),
+            timeout=15,
+            check=False,
+            capture_output=True,
+        )
+    except Exception as exc:
+        _log(f"sync_liens_html: {exc}")
     return meaningful
 
 

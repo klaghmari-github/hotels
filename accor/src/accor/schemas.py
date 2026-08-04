@@ -282,6 +282,7 @@ _SALES_CORE = [
     "mois",
     "nombre_ventes",
     "montant_ventes",
+    "montant_marge",
     "nombre_paniers",
     "nombre_produits",
     "nombre_categories_mois_f_b",
@@ -293,6 +294,8 @@ _SALES_CORE = [
     "pct_cat_n_f_b_nombre_ventes",
     "pct_cat_f_b_montant_ventes",
     "pct_cat_n_f_b_montant_ventes",
+    "pct_cat_f_b_montant_marge",
+    "pct_cat_n_f_b_montant_marge",
     "pct_cat_f_b_nombre_paniers",
     "pct_cat_n_f_b_nombre_paniers",
     "pct_cat_f_b_nombre_produits",
@@ -318,6 +321,7 @@ _SALES_PCT_SOUS_CAT = [
     for measure in (
         "nombre_ventes",
         "montant_ventes",
+        "montant_marge",
         "nombre_paniers",
         "nombre_produits",
     )

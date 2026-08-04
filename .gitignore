@@ -47,6 +47,20 @@ rod_ia/feature_store/**/simulations/
 rod_ia/feature_store/**/geo/
 # Accor app: huge generated merge (local only; >100MB GitHub limit)
 accord/data/all_data.xlsx
+accor/data/all_data.xlsx
+
+# DuckDB pilotes (gros, régénérables via main.ipynb) — limite GitHub/GitLab 100MB
+accor/duckdb/
+**/*.duckdb
+**/*.duckdb.wal
+
+# Binaire cloudflared local
+accor/bin/cloudflared
+
+# Runtime lab agents / console
+accor/data/dev_console/*.pid
+accor/data/dev_console/*.log
+accor/data/dev_console/chat.jsonl
 
 # Accor proximity intermediate shards/state (regenerable; keep final hotel_proximity_data if small)
 # Uncomment if they grow too large:

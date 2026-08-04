@@ -19,7 +19,10 @@ Règles
 6. Dernière année calendaire → _is_eval=1 (hold-out) ; le reste = train.
 7. Imputation uniquement ici (impute_model) : moyennes pilotes par
    catégorie de marque, sinon catégories adjacentes ; counts/flags → 0.
-8. Cible principale de ranking des modèles : montant_ventes (MAIN_TARGET).
+8. Cible principale de ranking des modèles : **montant_marge** (MAIN_TARGET).
+   (Ancienne version : montant_ventes / CA. Pipeline stacké inchangé :
+   stage1 multi-cibles sur descriptives → stage2 final sur MAIN_TARGET
+   avec descriptives + pred_*.)
 
 Sorties
 -------
@@ -44,6 +47,7 @@ from accor.schemas import get_schema
 MODEL_DATA_FILENAME = "model_data.xlsx"
 MODEL_DATA_SHEET = "model_data"
 META_FILENAME = "model_data_meta.json"
+HOTEL_SALES_MODEL_FILENAME = "hotel_sales_model_hotel.xlsx"
 
 # Identifiants / detail (en-tetes jaunes) — pas des features du modele
 ID_DETAIL_CANDIDATES = [
@@ -79,7 +83,31 @@ DROP_ALWAYS = {
     "hotel_geo_source",
 }
 
-MAIN_TARGET = "montant_ventes"
+# Cible finale du stacking (modèle final + ranking) : marge, pas CA.
+MAIN_TARGET = "montant_marge"
+
+# Préfixe pour les indicateurs hôteliers exportés depuis DuckDB / main.ipynb
+HOTEL_INDICATOR_PREFIX = "pilote_"
+
+# Colonnes du sheet hotel_summary à joindre (hors clés)
+HOTEL_SUMMARY_JOIN_COLS = (
+    "solution",
+    "metres_lineaires",
+    "nombre_mois",
+    "nombre_produits",
+    "nombre_gammes",
+    "nombre_types",
+    "montant_achats",
+    "montant_marge",
+    "montant_ventes",
+    "nombre_ventes",
+    "montant_marge_par_mois",
+    "montant_ventes_par_mois",
+    "nombre_ventes_par_mois",
+    "nombre_produits_par_metre_lineaire",
+    "montant_marge_par_metre_lineaire",
+    "montant_ventes_par_metre_lineaire",
+)
 
 
 def _sales_columns() -> list[str]:
@@ -187,6 +215,138 @@ def classify_columns(frame: pd.DataFrame) -> dict[str, list[str]]:
     }
 
 
+def _filter_base_scenario(df: pd.DataFrame) -> pd.DataFrame:
+    """Une ligne / hôtel : privilégie scenario_id=base si multi-scénarios."""
+    if df is None or df.empty or "hotel_code" not in df.columns:
+        return df if df is not None else pd.DataFrame()
+    out = df.copy()
+    out["hotel_code"] = out["hotel_code"].astype(str).str.strip()
+    if "scenario_id" in out.columns:
+        base = out[out["scenario_id"].astype(str).eq("base")]
+        if not base.empty:
+            out = base
+    return out.drop_duplicates("hotel_code", keep="first")
+
+
+def _attach_hotel_sales_indicators(frame: pd.DataFrame) -> pd.DataFrame:
+    """
+    Joint les indicateurs pilotes 1-ligne/hôtel (DuckDB / main.ipynb)
+    en features **descriptives** :
+
+    - résumé ``hotel_summary`` → préfixe ``pilote_*`` (m_lin, solution, densités)
+    - pivot large ``hotel_line`` → uniquement ``gamme__*`` et ``type__*``
+      (assortiment agrégé ; les 12k ``produit__*`` restent hors modèle)
+
+    Grain jointure : hotel_code (répliqué sur chaque mois de l'hôtel).
+    La cible mensuelle ``montant_marge`` n'est pas rejointe depuis le résumé.
+    """
+    path = DATA_DIR / HOTEL_SALES_MODEL_FILENAME
+    if not path.exists() or "hotel_code" not in frame.columns:
+        return frame
+
+    out = frame.copy()
+    out["hotel_code"] = out["hotel_code"].astype(str).str.strip()
+
+    # --- hotel_summary → pilote_* structurel ---
+    try:
+        summary = pd.read_excel(path, sheet_name="hotel_summary")
+    except Exception:
+        summary = pd.DataFrame()
+    if not summary.empty and "hotel_code" in summary.columns:
+        summary = _filter_base_scenario(summary)
+        structural = [
+            "solution",
+            "metres_lineaires",
+            "nombre_mois",
+            "nombre_produits",
+            "nombre_gammes",
+            "nombre_types",
+            "nombre_produits_par_metre_lineaire",
+            "nombre_metres_lineaires_par_produit",
+            "nombre_ventes_par_metre_lineaire",
+            "montant_ventes_par_metre_lineaire",
+            "montant_marge_par_metre_lineaire",
+            "montant_achats_par_metre_lineaire",
+        ]
+        use = ["hotel_code"] + [c for c in structural if c in summary.columns]
+        right = summary[use].copy()
+        rename = {
+            c: f"{HOTEL_INDICATOR_PREFIX}{c}"
+            for c in use
+            if c != "hotel_code"
+        }
+        right = right.rename(columns=rename)
+        drop_existing = [
+            c for c in right.columns if c != "hotel_code" and c in out.columns
+        ]
+        right = right.drop(columns=drop_existing, errors="ignore")
+        out = out.merge(right, on="hotel_code", how="left")
+
+    # --- hotel_line → gamme__* + type__* (pas produit__) ---
+    try:
+        line = pd.read_excel(path, sheet_name="hotel_line")
+    except Exception:
+        line = pd.DataFrame()
+    if not line.empty and "hotel_code" in line.columns:
+        line = _filter_base_scenario(line)
+        keep = ["hotel_code"] + [
+            c
+            for c in line.columns
+            if str(c).startswith("gamme__") or str(c).startswith("type__")
+        ]
+        # Dédupliquer noms de colonnes au cas où
+        keep = list(dict.fromkeys(keep))
+        right = line[[c for c in keep if c in line.columns]].copy()
+        # Préfixe pilote_ pour clarté UI / rôles (descriptives)
+        rename = {
+            c: f"{HOTEL_INDICATOR_PREFIX}{c}"
+            for c in right.columns
+            if c != "hotel_code"
+        }
+        right = right.rename(columns=rename)
+        drop_existing = [
+            c for c in right.columns if c != "hotel_code" and c in out.columns
+        ]
+        right = right.drop(columns=drop_existing, errors="ignore")
+        # Numériques : Excel peut lire des objets
+        for c in right.columns:
+            if c == "hotel_code":
+                continue
+            right[c] = pd.to_numeric(right[c], errors="coerce")
+        out = out.merge(right, on="hotel_code", how="left")
+
+    # Aligne hotel_solution_* sur la solution pilote (sales model / DuckDB).
+    # Sinon H3546/H5586 (connected) restaient à 0 et le modèle CONNECTED
+    # n'apprenait que sur H0373 → prédictions IA trop basses / R² catastrophique.
+    sol_col = None
+    if f"{HOTEL_INDICATOR_PREFIX}solution" in out.columns:
+        sol_col = f"{HOTEL_INDICATOR_PREFIX}solution"
+    elif "pilote_solution" in out.columns:
+        sol_col = "pilote_solution"
+    if sol_col is not None:
+        sol = out[sol_col].astype(str).str.strip().str.lower()
+        flag_map = {
+            "simply": "hotel_solution_simply",
+            "liberty": "hotel_solution_liberty",
+            "connected": "hotel_solution_connected",
+        }
+        for key, flag in flag_map.items():
+            if flag not in out.columns:
+                out[flag] = 0
+            mask = sol.eq(key)
+            if mask.any():
+                out.loc[mask, flag] = 1
+        # un seul flag actif par ligne pilote
+        for key, flag in flag_map.items():
+            others = [f for k, f in flag_map.items() if k != key]
+            mask = sol.eq(key)
+            for o in others:
+                if o in out.columns:
+                    out.loc[mask, o] = 0
+
+    return out
+
+
 def build_model_dataframe(all_data: pd.DataFrame | None = None) -> tuple[pd.DataFrame, dict[str, Any]]:
     """Construit le DataFrame model_data + meta."""
     if all_data is None:
@@ -200,6 +360,9 @@ def build_model_dataframe(all_data: pd.DataFrame | None = None) -> tuple[pd.Data
 
     # all_data peut contenir des nulls (sources non saisies) — on ne fill pas encore
     frame = all_data.copy()
+
+    # 0. Indicateurs pilotes (main.ipynb) — jointure hôtel
+    frame = _attach_hotel_sales_indicators(frame)
 
     # 1. Hôtels avec ventes uniquement
     if "hotel_code" in frame.columns:
@@ -220,6 +383,7 @@ def build_model_dataframe(all_data: pd.DataFrame | None = None) -> tuple[pd.Data
         "hotel_brand",
         "nombre_ventes",
         "montant_ventes",
+        "montant_marge",
         # Flags solution ROD (0/1) — ne pas drop même si quasi-constants
         "hotel_solution_simply",
         "hotel_solution_liberty",

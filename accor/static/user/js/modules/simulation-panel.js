@@ -76,6 +76,12 @@ export class SimulationPanel {
           ? Format.euro(ind.ca_historique_mensuel)
           : "—",
       ],
+      [
+        "Marge historique",
+        ind.marge_historique_mensuelle != null
+          ? Format.euro(ind.marge_historique_mensuelle)
+          : "—",
+      ],
       ["Mix F&B effectif", Format.pct(recoRev.mix_fb_effective)],
       ["m lin.", recoRev.m_lin],
     ];

@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "force": false,
+  "force": true,
   "dry_run": false,
   "solutions": {
     "SIMPLY": {
@@ -10,7 +10,7 @@
         "status": "trained",
         "n_train": 41,
         "n_eval": 8,
-        "r2": -3.190034372865581
+        "r2": -2.622451726106597
       },
       "final": {
         "id": "simply/xgb_final_simply",
@@ -18,7 +18,7 @@
         "intermediate_model_id": "simply/xgb_sales_simply",
         "n_train": 41,
         "n_eval": 8,
-        "r2": -1.9592637597909017
+        "r2": -2.6764923339320217
       },
       "actions": [
         "train_intermediate",
@@ -32,7 +32,7 @@
         "status": "trained",
         "n_train": 42,
         "n_eval": 5,
-        "r2": 0.5961086116983166
+        "r2": -13.712437619695617
       },
       "final": {
         "id": "liberty/xgb_final_liberty",
@@ -40,7 +40,7 @@
         "intermediate_model_id": "liberty/xgb_sales_liberty",
         "n_train": 42,
         "n_eval": 5,
-        "r2": 0.6785903804892098
+        "r2": -12.144867779525326
       },
       "actions": [
         "train_intermediate",
@@ -52,17 +52,17 @@
       "intermediate": {
         "id": "connected/xgb_sales_connected",
         "status": "trained",
-        "n_train": 24,
-        "n_eval": 4,
-        "r2": -13.139052632367092
+        "n_train": 59,
+        "n_eval": 12,
+        "r2": -7.358984985942952
       },
       "final": {
         "id": "connected/xgb_final_connected",
         "status": "trained",
         "intermediate_model_id": "connected/xgb_sales_connected",
-        "n_train": 24,
-        "n_eval": 4,
-        "r2": -13.431532506233202
+        "n_train": 59,
+        "n_eval": 12,
+        "r2": -7.8350054573970045
       },
       "actions": [
         "train_intermediate",
@@ -80,9 +80,9 @@
   ],
   "skipped": [],
   "errors": [],
-  "started_at": "2026-07-28T16:12:40.230327+00:00",
-  "elapsed_s": 23.3,
-  "finished_at": "2026-07-28T16:13:03.486140+00:00",
+  "started_at": "2026-08-04T06:52:49.281667+00:00",
+  "elapsed_s": 41.8,
+  "finished_at": "2026-08-04T06:53:31.096084+00:00",
   "status_after": {
     "any_missing": false,
     "all_ready": true,

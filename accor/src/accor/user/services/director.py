@@ -7,7 +7,8 @@ Fidèle à ``simulateur_rules.html`` :
 Deux vues (même saisie) :
 
 * **simulateur** — CA règles métier + coûts + marge nette
-* **ia** — CA prédit par le modèle + mêmes coûts + marge recalculée
+* **ia** — prédiction modèle (cible principale = **montant_marge**,
+  anciennement CA) + mêmes coûts + P&L recalculé
 
 Les réglages restent en session côté navigateur (pas d'écriture base).
 """
@@ -614,23 +615,51 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
     if derniere_reno is not None:
         feature_overrides["hotel_derniere_reno"] = derniere_reno
     try:
-        preds = _ai_predict_three(code, feature_overrides)
+        preds_payload = _ai_predict_three(code, feature_overrides)
+        preds = (preds_payload or {}).get("by_solution") if preds_payload else None
+        pred_kind = (preds_payload or {}).get("main_target") or "montant_ventes"
         if preds:
             ai_available = True
-            ai_note = "Estimation modèle sur la base des hôtels déjà équipés."
+            if pred_kind == "montant_marge":
+                ai_note = (
+                    "IA : marge produit mensuelle (cible modèle) ; "
+                    "marge nette = marge − coûts ; amort = CAPEX60 / marge nette mensuelle ; "
+                    "annuel = mensuel × 12."
+                )
+            else:
+                ai_note = (
+                    "IA (legacy CA) : chiffre d'affaires mensuel prédit ; "
+                    "marge recalculée proportionnellement au simulateur."
+                )
             for c in CONCEPTS:
-                ca_ai = preds.get(c)
+                pred_val = preds.get(c)
                 cs = raw_by[c]
-                if ca_ai is not None:
+                if pred_val is not None:
                     ca_sim = float(cs.ca_mensuel or 0)
                     mp_sim = float(cs.marge_produit_mensuelle or 0)
-                    if ca_sim > 0:
-                        mp_ai = mp_sim * (float(ca_ai) / ca_sim)
+                    if pred_kind == "montant_marge":
+                        # Cible finale = marge globale hôtel mensualisée
+                        mp_ai = float(pred_val)
+                        if mp_sim > 0 and ca_sim > 0:
+                            # CA affiché : même ratio marge/CA que le simu
+                            ca_ai = ca_sim * (mp_ai / mp_sim)
+                        elif ca_sim > 0:
+                            ca_ai = ca_sim
+                        else:
+                            ca_ai = max(mp_ai / 0.35, 0.0) if mp_ai else 0.0
                     else:
-                        mp_ai = float(ca_ai) * 0.35
-                    ai_by[c] = _pnl_block(
+                        # Legacy : prédiction = CA mensuel
+                        ca_ai = float(pred_val)
+                        if ca_sim > 0 and mp_sim != 0:
+                            mp_ai = mp_sim * (ca_ai / ca_sim)
+                        else:
+                            mp_ai = ca_ai * 0.35
+                    block = _pnl_block(
                         cs, ca_override=float(ca_ai), marge_produit_override=mp_ai
                     )
+                    block["main_target"] = pred_kind
+                    block["pred_raw"] = round(float(pred_val), 2)
+                    ai_by[c] = block
                 else:
                     ai_by[c] = _empty_pnl(
                         cout=float(cs.cout_mensuel or 0),
@@ -791,13 +820,20 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
 def _ai_predict_three(
     hotel_code: str,
     feature_overrides: dict[str, Any] | None = None,
-) -> dict[str, float] | None:
-    """Trois prédictions de CA mensuel — un modèle final par solution."""
+) -> dict[str, Any] | None:
+    """
+    Trois prédictions (un modèle final par solution).
+
+    Retourne ``{"main_target": str, "by_solution": {SOL: float}}``.
+    La cible principale vient de model_data_meta (montant_marge de préférence,
+    montant_ventes en legacy).
+    """
     import numpy as np
     import pandas as pd
 
     try:
         from accor.hotel_solutions import SOLUTIONS
+        from accor.model_data import MAIN_TARGET
         from accor.model_final import (
             build_stacked_features,
             get_final_top_model,
@@ -817,6 +853,11 @@ def _ai_predict_three(
         return None
     if frame is None or frame.empty:
         return None
+
+    meta_main = (meta or {}).get("main_target") or MAIN_TARGET or "montant_ventes"
+    main_target = (
+        str(meta_main).strip() if meta_main else "montant_ventes"
+    ) or "montant_ventes"
 
     overrides = {k: v for k, v in (feature_overrides or {}).items() if v is not None}
     work = frame.copy()
@@ -846,6 +887,19 @@ def _ai_predict_three(
             )
             if model is None or not feature_cols:
                 continue
+            # Cible du bundle final (mono-cible) prime si connue
+            bundle_target = (
+                conf.get("main_target")
+                or bundle.get("main_target")
+                or conf.get("target")
+                or bundle.get("target")
+            )
+            sol_target = main_target
+            if isinstance(bundle_target, str) and bundle_target.strip() in (
+                "montant_marge",
+                "montant_ventes",
+            ):
+                sol_target = bundle_target.strip()
             row = base_src.copy()
             imid = conf.get("intermediate_model_id") or bundle.get(
                 "intermediate_model_id"
@@ -876,7 +930,25 @@ def _ai_predict_three(
             if X.ndim == 1:
                 X = X.reshape(1, -1)
             pred = np.asarray(model.predict(X), dtype=float)
-            out[sol] = round(float(np.nanmean(pred)), 2)
+            # Multi-output intermédiaire : prendre la colonne de la main_target
+            if pred.ndim == 2 and pred.shape[1] > 1:
+                tcols = list(
+                    bundle.get("target_cols")
+                    or conf.get("target_cols")
+                    or (meta or {}).get("target_columns")
+                    or []
+                )
+                if sol_target in tcols:
+                    idx = tcols.index(sol_target)
+                    out[sol] = round(float(np.nanmean(pred[:, idx])), 2)
+                else:
+                    out[sol] = round(float(np.nanmean(pred[:, 0])), 2)
+            else:
+                out[sol] = round(float(np.nanmean(pred)), 2)
+            # Mémoriser la cible effective (premier modèle chargé)
+            main_target = sol_target
         except Exception:
             continue
-    return out or None
+    if not out:
+        return None
+    return {"main_target": main_target, "by_solution": out}

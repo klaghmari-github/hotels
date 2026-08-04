@@ -22,12 +22,14 @@ mix_fb / mix_nf                moyenne ``pct_cat_*_nombre_ventes`` model_data
 m_lin                          corner hôtel (sinon pilote concept)
 client_needs                   sous-cat model_data (seuil de présence)
 ca_historique_mensuel          moyenne ``montant_ventes`` model_data
+marge_historique_mensuelle     moyenne ``montant_marge`` model_data
 ventes_historiques_mensuelles  moyenne ``nombre_ventes`` model_data
 =============================  ================================================
 
 Ces indicateurs alimentent les règles Excel (scaling clients, mix, m_lin).
 Le CA **projeté** reste issu des pilotes ``rod_reference.json`` (pas une
-copie du CA historique) — le CA historique est exposé pour contrôle.
+copie du CA historique) — CA et marge historiques sont exposés pour contrôle.
+La cible ML finale est la **marge** (``montant_marge``), pas le CA.
 """
 
 from __future__ import annotations
@@ -610,6 +612,7 @@ class HotelContextBuilder:
             "has_pool": has_pool,
             "has_vitrine": has_vitrine,
             "ca_historique_mensuel": md_stats.get("ca_historique_mensuel"),
+            "marge_historique_mensuelle": md_stats.get("marge_historique_mensuelle"),
             "ventes_historiques_mensuelles": md_stats.get("ventes_historiques_mensuelles"),
             "n_months_model_data": md_stats.get("n_months", 0),
             "pct_jours_holidays_mean": md_stats.get("pct_jours_holidays_mean"),
@@ -691,6 +694,7 @@ class HotelContextBuilder:
             return float(s.mean()) if not s.empty else None
 
         out["ca_historique_mensuel"] = mean_col("montant_ventes")
+        out["marge_historique_mensuelle"] = mean_col("montant_marge")
         out["ventes_historiques_mensuelles"] = mean_col("nombre_ventes")
         out["hotel_nb_chambres"] = mean_col("hotel_nb_chambres")
         out["hotel_to_annuel"] = mean_col("hotel_to_annuel")
