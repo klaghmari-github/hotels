@@ -1,0 +1,10 @@
+{
+  "start": 6300,
+  "end": 6399,
+  "worker_id": "w053_6300_6399",
+  "n_ok": 39,
+  "n_missing": 54,
+  "n_error": 7,
+  "done": true,
+  "xlsx": "/media/laghmari/ssd-data/dev/hotels/accord/data/marques/hotels/hotels_6300_6399.xlsx"
+}

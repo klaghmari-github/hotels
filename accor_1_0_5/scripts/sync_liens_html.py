@@ -1,0 +1,156 @@
+#!/usr/bin/env python3
+"""Régénère accor/liens.html à partir des tunnels Cloudflare + LAN + prod."""
+
+from __future__ import annotations
+
+import socket
+from datetime import datetime, timezone
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+STATE = ROOT / "data" / "dev_console"
+OUT = ROOT / "liens.html"
+
+
+def _read_url(name: str) -> str:
+    p = STATE / f"tunnel_{name}.url"
+    if not p.exists():
+        return ""
+    return p.read_text(encoding="utf-8").strip().rstrip("/")
+
+
+def _lan_ip() -> str:
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return "192.168.1.80"
+
+
+def main() -> None:
+    dev = _read_url("dev") or "http://127.0.0.1:5500"
+    admin = _read_url("admin") or "http://127.0.0.1:5055"
+    user = _read_url("user") or "http://127.0.0.1:5056"
+    lan = _lan_ip()
+    stamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+
+    html = f"""<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Accor ROD — Liens</title>
+  <style>
+    :root {{
+      --bg: #0f1419; --card: #1a2332; --text: #e7ecf3; --muted: #8b9bb4;
+      --accent: #3d8bfd; --ok: #3dd68c; --border: #2a3548;
+    }}
+    * {{ box-sizing: border-box; }}
+    body {{
+      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.5;
+      padding: 2rem 1.25rem 3rem;
+    }}
+    main {{ max-width: 720px; margin: 0 auto; }}
+    h1 {{ font-size: 1.5rem; font-weight: 650; margin: 0 0 0.25rem; }}
+    .sub {{ color: var(--muted); font-size: 0.9rem; margin-bottom: 1.75rem; }}
+    section {{
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.1rem 1.25rem; margin-bottom: 1rem;
+    }}
+    h2 {{
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--muted); margin: 0 0 0.85rem; font-weight: 600;
+    }}
+    ul {{ list-style: none; margin: 0; padding: 0; }}
+    li {{
+      display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.35rem 0.75rem;
+      padding: 0.55rem 0; border-top: 1px solid var(--border);
+    }}
+    li:first-of-type {{ border-top: none; padding-top: 0; }}
+    .label {{ min-width: 10rem; font-weight: 600; font-size: 0.95rem; }}
+    a {{ color: var(--accent); text-decoration: none; word-break: break-all; }}
+    a:hover {{ text-decoration: underline; }}
+    .hint {{ color: var(--muted); font-size: 0.8rem; margin-top: 0.75rem; }}
+    code {{
+      font-size: 0.8rem; background: #0d1218; padding: 0.1rem 0.35rem;
+      border-radius: 4px; color: var(--ok);
+    }}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Accor ROD — Liens</h1>
+    <p class="sub">
+      Lab (Cloudflare + LAN) et production.
+      Mis à jour <code>{stamp}</code>.
+      Les URL <code>*.trycloudflare.com</code> changent si le tunnel redémarre.
+    </p>
+
+    <section>
+      <h2>Internet — Cloudflare (lab)</h2>
+      <ul>
+        <li>
+          <span class="label">Consignes (agent)</span>
+          <a href="{dev}" target="_blank" rel="noopener">{dev}</a>
+        </li>
+        <li>
+          <span class="label">Simulateur user</span>
+          <a href="{user}" target="_blank" rel="noopener">{user}</a>
+        </li>
+        <li>
+          <span class="label">Admin studio</span>
+          <a href="{admin}" target="_blank" rel="noopener">{admin}</a>
+        </li>
+      </ul>
+      <p class="hint">Source live : <code>data/dev_console/tunnel_*.url</code> · regénéré par le watchdog</p>
+    </section>
+
+    <section>
+      <h2>LAN / local</h2>
+      <ul>
+        <li>
+          <span class="label">Consignes</span>
+          <a href="http://{lan}:5500/">http://{lan}:5500/</a>
+          · <a href="http://127.0.0.1:5500/">127.0.0.1:5500</a>
+        </li>
+        <li>
+          <span class="label">Simulateur user</span>
+          <a href="http://{lan}:5056/">http://{lan}:5056/</a>
+          · <a href="http://127.0.0.1:5056/">127.0.0.1:5056</a>
+        </li>
+        <li>
+          <span class="label">Admin studio</span>
+          <a href="http://{lan}:5055/">http://{lan}:5055/</a>
+          · <a href="http://127.0.0.1:5055/">127.0.0.1:5055</a>
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Production client (Adixon)</h2>
+      <ul>
+        <li>
+          <span class="label">User</span>
+          <a href="https://rod-ia.adixon-dev.fr/" target="_blank" rel="noopener">https://rod-ia.adixon-dev.fr/</a>
+        </li>
+        <li>
+          <span class="label">Admin</span>
+          <a href="https://rod-ia.adixon-dev.fr/studio/" target="_blank" rel="noopener">https://rod-ia.adixon-dev.fr/studio/</a>
+        </li>
+      </ul>
+      <p class="hint">Déploiement : <code>./scripts/deploy_to_adixon.sh</code> (code local → serveur)</p>
+    </section>
+  </main>
+</body>
+</html>
+"""
+    OUT.write_text(html, encoding="utf-8")
+    print(f"wrote {OUT} dev={dev} admin={admin} user={user}")
+
+
+if __name__ == "__main__":
+    main()

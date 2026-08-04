@@ -1,0 +1,13 @@
+{
+  "ok": true,
+  "path": "/media/laghmari/ssd-data/dev/hotels/accord/data/hotel_holidays_data.xlsx",
+  "n_rows": 73416,
+  "n_hotels": 1748,
+  "n_shards_merged": 12,
+  "years": [
+    2023,
+    2024,
+    2025,
+    2026
+  ]
+}
