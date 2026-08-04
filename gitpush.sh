@@ -1,18 +1,17 @@
 #!/usr/bin/env bash
-# Commit + push si le dépôt hotels a des changements.
-# Safe pour une boucle 10 min : ne fait rien si working tree clean.
+# Commit + push si le dépôt hotels a des changements utiles.
+# Boucle 10 min safe : skip si clean ; n'ajoute jamais les gros artefacts.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT"
 
-# Ne pas committer des artefacts purement locaux/runtime (logs, pids)
-EXCLUDE=(
-  'accor/data/dev_console/*.pid'
-  'accor/data/dev_console/*.log'
-  'accor/data/dev_console/chat.jsonl'
-  '**/__pycache__/**'
-  '**/*.pyc'
+# Jamais versionner (même si un add -A les reprendrait)
+BLOCK=(
+  'accor/duckdb'
+  'accor/base.duckdb'
+  'accor/bin/cloudflared'
+  'accor/data/dev_console'
 )
 
 status="$(git status --porcelain 2>/dev/null || true)"
@@ -21,28 +20,43 @@ if [[ -z "${status// }" ]]; then
   exit 0
 fi
 
-# stage all (respecte .gitignore)
 git add -A
 
-# drop staged pure noise if still present
-for pat in "${EXCLUDE[@]}"; do
-  git reset -q -- "$pat" 2>/dev/null || true
+# Déstager les chemins bloqués + bruit runtime
+for p in "${BLOCK[@]}"; do
+  git reset -q -- "$p" 2>/dev/null || true
+  git rm -r --cached -f --ignore-unmatch "$p" 2>/dev/null || true
 done
+# wildcards duckdb
+while IFS= read -r f; do
+  [[ -n "$f" ]] || continue
+  git reset -q -- "$f" 2>/dev/null || true
+done < <(git diff --cached --name-only | grep -E '\.duckdb(\.wal)?$|/duckdb/' || true)
 
-# re-check after unstage noise
+# Refus explicite si un blob > 80 Mo est encore stagé
+big=0
+while IFS= read -r f; do
+  [[ -f "$f" ]] || continue
+  sz=$(stat -c%s "$f" 2>/dev/null || echo 0)
+  if [[ "$sz" -gt 80000000 ]]; then
+    echo "[gitpush] REFUS fichier trop gros stagé: $f ($sz bytes) — unstage"
+    git reset -q -- "$f" 2>/dev/null || true
+    big=1
+  fi
+done < <(git diff --cached --name-only --diff-filter=ACMR || true)
+
 if git diff --cached --quiet 2>/dev/null; then
-  echo "[gitpush] seuls des fichiers bruit — skip ($(date -Iseconds))"
+  echo "[gitpush] rien d'utile à committer (bruit/runtime only) ($(date -Iseconds))"
   exit 0
 fi
 
 MSG="${GITPUSH_MSG:-checkpoint: $(date -Iseconds)}"
-git commit -m "$MSG" || {
+if ! git commit -m "$MSG"; then
   echo "[gitpush] commit vide / refusé"
   exit 0
-}
+fi
 
 branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo main)"
-# origin = gitlab, github = github (comme historique du projet)
 ok=0
 if git remote get-url origin >/dev/null 2>&1; then
   if git push -u origin "HEAD:refs/heads/${branch}" 2>&1; then
