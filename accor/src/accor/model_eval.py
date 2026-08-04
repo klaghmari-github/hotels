@@ -17,7 +17,7 @@ plus un détail mois à mois.
 API admin : GET /api/model/eval/meta , GET|POST /api/model/eval
 UI : onglet Evaluation (static/js/admin/model-eval-panel.js)
 
-Cible par défaut = MAIN_TARGET (montant_marge) ; n'importe quelle
+Cible par défaut = MAIN_TARGET (montant_ventes) ; n'importe quelle
 colonne cible du multi-output est sélectionnable.
 """
 

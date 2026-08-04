@@ -7,8 +7,8 @@ Fidèle à ``simulateur_rules.html`` :
 Deux vues (même saisie) :
 
 * **simulateur** — CA règles métier + coûts + marge nette
-* **ia** — prédiction modèle (cible principale = **montant_marge**,
-  anciennement CA) + mêmes coûts + P&L recalculé
+* **ia** — prédiction modèle sur **montant_ventes** (CA) ; la marge produit
+  suit la règle fixe ``ventes = 2,5 × achats`` (pas de modèle de marge)
 
 Les réglages restent en session côté navigateur (pas d'écriture base).
 """
@@ -17,6 +17,12 @@ from __future__ import annotations
 
 from typing import Any
 
+from accor.model_data import (
+    MAIN_TARGET,
+    VENTES_SUR_ACHATS,
+    marge_from_ventes,
+    ventes_from_marge,
+)
 from accor.user.models import (
     ClientProfile,
     HotelIdentity,
@@ -617,48 +623,41 @@ def director_simulate(body: dict[str, Any]) -> dict[str, Any]:
     try:
         preds_payload = _ai_predict_three(code, feature_overrides)
         preds = (preds_payload or {}).get("by_solution") if preds_payload else None
-        pred_kind = (preds_payload or {}).get("main_target") or "montant_ventes"
+        pred_kind = (preds_payload or {}).get("main_target") or MAIN_TARGET
         if preds:
             ai_available = True
-            if pred_kind == "montant_marge":
-                ai_note = (
-                    "IA : marge produit mensuelle (cible modèle) ; "
-                    "marge nette = marge − coûts ; amort = CAPEX60 / marge nette mensuelle ; "
-                    "annuel = mensuel × 12."
-                )
-            else:
-                ai_note = (
-                    "IA (legacy CA) : chiffre d'affaires mensuel prédit ; "
-                    "marge recalculée proportionnellement au simulateur."
-                )
+            k_markup = float(VENTES_SUR_ACHATS)
+            ai_note = (
+                f"IA : prédiction du **montant des ventes** (CA mensuel). "
+                f"Règle marge : ventes = {k_markup:g} × achats "
+                f"(marge produit = ventes − ventes/{k_markup:g} = "
+                f"{(1 - 1 / k_markup) * 100:.0f} % du CA). "
+                "Marge nette = marge produit − coûts ; "
+                "amort = CAPEX60 / marge nette mensuelle ; annuel = mensuel × 12."
+            )
             for c in CONCEPTS:
                 pred_val = preds.get(c)
                 cs = raw_by[c]
                 if pred_val is not None:
-                    ca_sim = float(cs.ca_mensuel or 0)
-                    mp_sim = float(cs.marge_produit_mensuelle or 0)
+                    # Cible IA = montant_ventes ; legacy montant_marge → convertie
                     if pred_kind == "montant_marge":
-                        # Cible finale = marge globale hôtel mensualisée
                         mp_ai = float(pred_val)
-                        if mp_sim > 0 and ca_sim > 0:
-                            # CA affiché : même ratio marge/CA que le simu
-                            ca_ai = ca_sim * (mp_ai / mp_sim)
-                        elif ca_sim > 0:
-                            ca_ai = ca_sim
-                        else:
-                            ca_ai = max(mp_ai / 0.35, 0.0) if mp_ai else 0.0
+                        ca_ai = ventes_from_marge(mp_ai, k_markup)
                     else:
-                        # Legacy : prédiction = CA mensuel
                         ca_ai = float(pred_val)
-                        if ca_sim > 0 and mp_sim != 0:
-                            mp_ai = mp_sim * (ca_ai / ca_sim)
-                        else:
-                            mp_ai = ca_ai * 0.35
+                        mp_ai = marge_from_ventes(ca_ai, k_markup)
                     block = _pnl_block(
-                        cs, ca_override=float(ca_ai), marge_produit_override=mp_ai
+                        cs,
+                        ca_override=float(ca_ai),
+                        marge_produit_override=float(mp_ai),
                     )
-                    block["main_target"] = pred_kind
+                    block["main_target"] = "montant_ventes"
                     block["pred_raw"] = round(float(pred_val), 2)
+                    block["pred_kind_model"] = pred_kind
+                    block["ventes_sur_achats"] = k_markup
+                    block["montant_achats_ia"] = round(
+                        float(ca_ai) / k_markup if k_markup else 0.0, 2
+                    )
                     ai_by[c] = block
                 else:
                     ai_by[c] = _empty_pnl(
@@ -825,8 +824,8 @@ def _ai_predict_three(
     Trois prédictions (un modèle final par solution).
 
     Retourne ``{"main_target": str, "by_solution": {SOL: float}}``.
-    La cible principale vient de model_data_meta (montant_marge de préférence,
-    montant_ventes en legacy).
+    Cible attendue : **montant_ventes** (MAIN_TARGET). Les anciens bundles
+    encore tagués ``montant_marge`` sont signalés pour conversion côté P&L.
     """
     import numpy as np
     import pandas as pd
@@ -854,7 +853,8 @@ def _ai_predict_three(
     if frame is None or frame.empty:
         return None
 
-    meta_main = (meta or {}).get("main_target") or MAIN_TARGET or "montant_ventes"
+    # Priorité : constante code (montant_ventes), puis meta, puis bundle
+    meta_main = MAIN_TARGET or (meta or {}).get("main_target") or "montant_ventes"
     main_target = (
         str(meta_main).strip() if meta_main else "montant_ventes"
     ) or "montant_ventes"

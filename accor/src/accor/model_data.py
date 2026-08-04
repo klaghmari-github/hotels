@@ -19,10 +19,10 @@ Règles
 6. Dernière année calendaire → _is_eval=1 (hold-out) ; le reste = train.
 7. Imputation uniquement ici (impute_model) : moyennes pilotes par
    catégorie de marque, sinon catégories adjacentes ; counts/flags → 0.
-8. Cible principale de ranking des modèles : **montant_marge** (MAIN_TARGET).
-   (Ancienne version : montant_ventes / CA. Pipeline stacké inchangé :
-   stage1 multi-cibles sur descriptives → stage2 final sur MAIN_TARGET
-   avec descriptives + pred_*.)
+8. Cible principale de ranking / modèle final : **montant_ventes** (MAIN_TARGET).
+   La marge n'est plus une cible IA : on applique la règle métier fixe
+   ``montant_ventes = VENTES_SUR_ACHATS × montant_achats`` (défaut 2,5),
+   donc ``montant_marge = montant_ventes × (1 − 1/2,5)``.
 
 Sorties
 -------
@@ -83,8 +83,46 @@ DROP_ALWAYS = {
     "hotel_geo_source",
 }
 
-# Cible finale du stacking (modèle final + ranking) : marge, pas CA.
-MAIN_TARGET = "montant_marge"
+# Cible finale du stacking (modèle final + ranking) : CA / montant des ventes.
+MAIN_TARGET = "montant_ventes"
+
+# Règle métier IA : le prix / montant des ventes = k × montant d'achat.
+# Marge produit = ventes − achats = ventes × (1 − 1/k).
+VENTES_SUR_ACHATS = 2.5
+
+
+def achats_from_ventes(montant_ventes: float, k: float = VENTES_SUR_ACHATS) -> float:
+    """montant_achats tel que ventes = k × achats."""
+    try:
+        v = float(montant_ventes)
+        kk = float(k) if k else VENTES_SUR_ACHATS
+        if kk <= 0:
+            return 0.0
+        return v / kk
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def marge_from_ventes(montant_ventes: float, k: float = VENTES_SUR_ACHATS) -> float:
+    """Marge produit = ventes − ventes/k."""
+    try:
+        v = float(montant_ventes)
+        return v - achats_from_ventes(v, k)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def ventes_from_marge(montant_marge: float, k: float = VENTES_SUR_ACHATS) -> float:
+    """Inverse (modèles legacy entraînés sur la marge) : ventes = marge / (1 − 1/k)."""
+    try:
+        m = float(montant_marge)
+        kk = float(k) if k else VENTES_SUR_ACHATS
+        factor = 1.0 - (1.0 / kk) if kk else 0.0
+        if factor <= 0:
+            return 0.0
+        return m / factor
+    except (TypeError, ValueError):
+        return 0.0
 
 # Préfixe pour les indicateurs hôteliers exportés depuis DuckDB / main.ipynb
 HOTEL_INDICATOR_PREFIX = "pilote_"
@@ -238,7 +276,7 @@ def _attach_hotel_sales_indicators(frame: pd.DataFrame) -> pd.DataFrame:
       (assortiment agrégé ; les 12k ``produit__*`` restent hors modèle)
 
     Grain jointure : hotel_code (répliqué sur chaque mois de l'hôtel).
-    La cible mensuelle ``montant_marge`` n'est pas rejointe depuis le résumé.
+    La cible mensuelle principale est ``montant_ventes`` (pas rejointe depuis le résumé).
     """
     path = DATA_DIR / HOTEL_SALES_MODEL_FILENAME
     if not path.exists() or "hotel_code" not in frame.columns:

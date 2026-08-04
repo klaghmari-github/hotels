@@ -15,7 +15,7 @@ Sorties (data/) :
       même structure + colonne scenario_id / scenario_label
 
 Ces fichiers se joignent à hotel_data / all_data sur hotel_code pour
-alimenter model_data (cibles multi-output + main_target = montant_marge).
+alimenter model_data (cibles multi-output + main_target = montant_ventes).
 """
 
 from __future__ import annotations
@@ -288,7 +288,7 @@ def export_from_connection(
             {"key": "n_hotels_summary", "value": len(summary)},
             {"key": "n_hotels_line", "value": len(line)},
             {"key": "n_cols_line", "value": len(line.columns) if not line.empty else 0},
-            {"key": "main_target_intended", "value": "montant_marge"},
+            {"key": "main_target_intended", "value": "montant_ventes"},
         ]
     )
     return {"hotel_summary": summary, "hotel_line": line, "meta": meta}

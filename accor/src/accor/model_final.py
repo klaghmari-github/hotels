@@ -7,7 +7,7 @@ Pipeline
 2. Prédire **toutes** les cibles sur model_data (train + eval).
 3. Features finales = features descriptives d'origine
    **+** pred_<cible> pour chaque cible intermédiaire.
-4. Entraîner un XGB **mono-cible** sur la cible principale (montant_marge)
+4. Entraîner un XGB **mono-cible** sur la cible principale (montant_ventes)
    avec ce set enrichi.
 5. Sauver dans models/final/design/<slug>/
 

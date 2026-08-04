@@ -29,7 +29,8 @@ ventes_historiques_mensuelles  moyenne ``nombre_ventes`` model_data
 Ces indicateurs alimentent les règles Excel (scaling clients, mix, m_lin).
 Le CA **projeté** reste issu des pilotes ``rod_reference.json`` (pas une
 copie du CA historique) — CA et marge historiques sont exposés pour contrôle.
-La cible ML finale est la **marge** (``montant_marge``), pas le CA.
+La cible ML finale est le **montant des ventes** (``montant_ventes``) ;
+la marge suit la règle fixe ventes = 2,5 × achats.
 """
 
 from __future__ import annotations

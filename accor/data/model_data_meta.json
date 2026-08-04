@@ -619,7 +619,7 @@
     "n_filled": 2204,
     "n_columns_touched": 40
   },
-  "main_target": "montant_marge",
+  "main_target": "montant_ventes",
   "column_roles": {
     "hotel_code": "id_detail",
     "hotel_name": "id_detail",
