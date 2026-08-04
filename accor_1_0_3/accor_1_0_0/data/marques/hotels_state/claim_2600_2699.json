@@ -1,0 +1,11 @@
+{
+  "start": 2600,
+  "end": 2699,
+  "status": "done",
+  "finished_at": 1784966549.059426,
+  "worker_id": "w016_2600_2699",
+  "n_ok": 20,
+  "n_missing": 80,
+  "n_error": 0,
+  "xlsx": "/media/laghmari/ssd-data/dev/hotels/accord/data/marques/hotels/hotels_2600_2699.xlsx"
+}

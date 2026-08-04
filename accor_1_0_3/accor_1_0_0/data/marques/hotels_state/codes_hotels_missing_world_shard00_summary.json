@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "out": "/media/laghmari/ssd-data/dev/hotels/accord/data/marques/hotels/hotels_missing_world_shard00.xlsx",
+  "n_requested": 271,
+  "n_pending_at_start": 271,
+  "n_ok": 270,
+  "n_missing": 1,
+  "n_error": 0,
+  "elapsed_s": 102.5,
+  "rate_per_s": 2.64
+}

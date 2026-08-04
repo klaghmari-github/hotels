@@ -1,0 +1,298 @@
+{
+  "_source": "ROD - Simulateurs + détail des coûts.xlsx",
+  "_note": "Extrait automatiquement — cellules SIMULATEUR * (mois moyen pilote)",
+  "impact_to": {
+    "ht_per_0_01_to": 9.23397435897436,
+    "ttc_per_0_01_to": 10.403846153846153
+  },
+  "concepts": {
+    "SIMPLY": {
+      "pivot_nb_chambres": 129.0,
+      "pivot_guests_per_chambre": 1.7,
+      "pivot_to": 0.8,
+      "pivot_m_lin": 6.0,
+      "mix_fb": 0.4,
+      "mix_nf": 0.6,
+      "margin_fb_pct": 2.6,
+      "margin_nf_pct": 1.45,
+      "base_monthly_sales": 231.0,
+      "base_monthly_ca_fb": 533.0,
+      "base_monthly_ca_nf": 187.0,
+      "monthly_cost_total": 247.14285714285714,
+      "marge_nette_mensuelle_pilote": 138.89162561576356,
+      "cost_lines": {
+        "techno": [
+          {
+            "id": "scanner",
+            "label": "Scanner",
+            "group": "techno",
+            "qty_default": 1.0,
+            "capex_unit": 500.0,
+            "monthly_unit": 8.333333333333334,
+            "amort_months": 60.0
+          },
+          {
+            "id": "vitrine",
+            "label": "Vitrine",
+            "group": "techno",
+            "qty_default": 0.0,
+            "capex_unit": 0.0,
+            "monthly_unit": 0.0,
+            "amort_months": 60.0
+          },
+          {
+            "id": "licence",
+            "label": "Licence",
+            "group": "techno",
+            "qty_default": 1.0,
+            "capex_unit": 3000.0,
+            "monthly_unit": 50.0,
+            "amort_months": 60.0
+          },
+          {
+            "id": "frais_os",
+            "label": "Frais OS",
+            "group": "techno",
+            "qty_default": 1.0,
+            "capex_unit": 1000.0,
+            "monthly_unit": 16.666666666666668,
+            "amort_months": 60.0
+          }
+        ],
+        "annexes": [
+          {
+            "id": "elec_scanner",
+            "label": "Elec. scanner",
+            "group": "annexes",
+            "qty_default": 1.0,
+            "capex_unit": 120.0,
+            "monthly_unit": 2.0,
+            "amort_months": 60.0
+          },
+          {
+            "id": "elec_vitrine",
+            "label": "Elec. vitrine",
+            "group": "annexes",
+            "qty_default": 1.0,
+            "capex_unit": 600.0,
+            "monthly_unit": 10.0,
+            "amort_months": 60.0
+          },
+          {
+            "id": "staff",
+            "label": "Staff",
+            "group": "annexes",
+            "qty_default": 1.0,
+            "capex_unit": 180.0,
+            "monthly_unit": 3.0,
+            "amort_months": 60.0
+          }
+        ],
+        "agencement": {
+          "label": "ML Besp",
+          "capex_per_m": 2200.0,
+          "amort_months": 84.0,
+          "qty_default": 6.0
+        }
+      },
+      "base_monthly_ca": 720.0,
+      "techno_monthly": 75.0,
+      "annexes_monthly": 15.0,
+      "agencement_per_m": 2200.0,
+      "amort_months": 84.0,
+      "fixed_capex": 18500
+    },
+    "LIBERTY": {
+      "pivot_nb_chambres": 142.0,
+      "pivot_guests_per_chambre": 2.2,
+      "pivot_to": 0.7,
+      "pivot_m_lin": 8.0,
+      "mix_fb": 0.7,
+      "mix_nf": 0.3,
+      "margin_fb_pct": 2.6,
+      "margin_nf_pct": 2.0,
+      "base_monthly_sales": 312.0,
+      "base_monthly_ca_fb": 1055.0,
+      "base_monthly_ca_nf": 424.0,
+      "monthly_cost_total": 586.1904761904761,
+      "marge_nette_mensuelle_pilote": 275.04029304029314,
+      "cost_lines": {
+        "techno": [
+          {
+            "id": "caisse",
+            "label": "Caisse",
+            "group": "techno",
+            "qty_default": 1.0,
+            "capex_unit": 15000.0,
+            "monthly_unit": 250.0,
+            "amort_months": 60.0
+          },
+          {
+            "id": "vitrine",
+            "label": "Vitrine",
+            "group": "techno",
+            "qty_default": 1.0,
+            "capex_unit": 800.0,
+            "monthly_unit": 13.333333333333334,
+            "amort_months": 60.0
+          },
+          {
+            "id": "licence",
+            "label": "Licence",
+            "group": "techno",
+            "qty_default": 1.0,
+            "capex_unit": 3000.0,
+            "monthly_unit": 50.0,
+            "amort_months": 60.0
+          },
+          {
+            "id": "frais_os",
+            "label": "Frais OS",
+            "group": "techno",
+            "qty_default": 1.0,
+            "capex_unit": 2000.0,
+            "monthly_unit": 33.333333333333336,
+            "amort_months": 60.0
+          }
+        ],
+        "annexes": [
+          {
+            "id": "elec_scanner",
+            "label": "Elec. caisse",
+            "group": "annexes",
+            "qty_default": 1.0,
+            "capex_unit": 600.0,
+            "monthly_unit": 10.0,
+            "amort_months": 60.0
+          },
+          {
+            "id": "elec_vitrine",
+            "label": "Elec. vitrine",
+            "group": "annexes",
+            "qty_default": 1.0,
+            "capex_unit": 600.0,
+            "monthly_unit": 10.0,
+            "amort_months": 60.0
+          },
+          {
+            "id": "staff",
+            "label": "Staff",
+            "group": "annexes",
+            "qty_default": 1.0,
+            "capex_unit": 600.0,
+            "monthly_unit": 10.0,
+            "amort_months": 60.0
+          }
+        ],
+        "agencement": {
+          "label": "ML Besp",
+          "capex_per_m": 2200.0,
+          "amort_months": 84.0,
+          "qty_default": 8.0
+        }
+      },
+      "base_monthly_ca": 1479.0,
+      "techno_monthly": 346.66666666666663,
+      "annexes_monthly": 30.0,
+      "agencement_per_m": 2200.0,
+      "amort_months": 84.0,
+      "fixed_capex": 32000
+    },
+    "CONNECTED": {
+      "pivot_nb_chambres": 305.0,
+      "pivot_guests_per_chambre": 1.8,
+      "pivot_to": 0.75,
+      "pivot_m_lin": 7.0,
+      "mix_fb": 0.8,
+      "mix_nf": 0.2,
+      "margin_fb_pct": 2.6,
+      "margin_nf_pct": 1.8,
+      "base_monthly_sales": 534.0,
+      "base_monthly_ca_fb": 3503.0,
+      "base_monthly_ca_nf": 131.0,
+      "monthly_cost_total": 1968.3333333333333,
+      "marge_nette_mensuelle_pilote": 245.58119658119654,
+      "cost_lines": {
+        "techno": [
+          {
+            "id": "frigo_froid",
+            "label": "Frigo froid",
+            "group": "techno",
+            "qty_default": 3.0,
+            "capex_unit": 27000.0,
+            "monthly_unit": 450.0,
+            "amort_months": 60.0
+          },
+          {
+            "id": "frigo_ambiant",
+            "label": "Frigo amb.",
+            "group": "techno",
+            "qty_default": 1.0,
+            "capex_unit": 24000.0,
+            "monthly_unit": 400.0,
+            "amort_months": 60.0
+          },
+          {
+            "id": "licence",
+            "label": "Licence",
+            "group": "techno",
+            "qty_default": 0.0,
+            "capex_unit": 0.0,
+            "monthly_unit": 0.0,
+            "amort_months": 60.0
+          },
+          {
+            "id": "frais_os",
+            "label": "Frais OS",
+            "group": "techno",
+            "qty_default": 1.0,
+            "capex_unit": 3000.0,
+            "monthly_unit": 50.0,
+            "amort_months": 60.0
+          }
+        ],
+        "annexes": [
+          {
+            "id": "elec_scanner",
+            "label": "Elec. froid",
+            "group": "annexes",
+            "qty_default": 1.0,
+            "capex_unit": 3600.0,
+            "monthly_unit": 60.0,
+            "amort_months": 60.0
+          },
+          {
+            "id": "elec_vitrine",
+            "label": "Elec. amb.",
+            "group": "annexes",
+            "qty_default": 1.0,
+            "capex_unit": 900.0,
+            "monthly_unit": 15.0,
+            "amort_months": 60.0
+          },
+          {
+            "id": "staff",
+            "label": "Staff",
+            "group": "annexes",
+            "qty_default": 1.0,
+            "capex_unit": 600.0,
+            "monthly_unit": 10.0,
+            "amort_months": 60.0
+          }
+        ],
+        "agencement": {
+          "label": "ML Prem",
+          "capex_per_m": 1000.0,
+          "amort_months": 83.99999999999999,
+          "qty_default": 7.0
+        }
+      },
+      "base_monthly_ca": 3634.0,
+      "techno_monthly": 4500.0,
+      "annexes_monthly": 85.0,
+      "agencement_per_m": 1000.0,
+      "amort_months": 83.99999999999999,
+      "fixed_capex": 58000
+    }
+  }
+}

@@ -1,0 +1,386 @@
+{
+  "status": "done",
+  "phase": "done",
+  "done": 9,
+  "total": 9,
+  "job_fraction": 1.0,
+  "pct": 100.0,
+  "current_name": "xgb_final_gs_008",
+  "current_target": "montant_ventes",
+  "current_kind": "",
+  "job_index": 0,
+  "n_manual": 1,
+  "n_grid": 8,
+  "manual_done": 0,
+  "grid_done": 0,
+  "stage_label": "Job 9/9",
+  "message": "Terminé · 9/9 modèle(s) final(aux)",
+  "results": [
+    {
+      "name": "xgb_final",
+      "id": "xgb_final",
+      "kind": "manual",
+      "rank": 1,
+      "main_target": "montant_ventes",
+      "metrics_eval": {
+        "per_target": {
+          "montant_ventes": {
+            "rmse": 2668.992946932125,
+            "mae": 1704.341068725586,
+            "r2": 0.5025778037111723,
+            "n": 20
+          }
+        },
+        "mean_rmse": 2668.992946932125,
+        "mean_mae": 1704.341068725586,
+        "mean_r2": 0.5025778037111723
+      },
+      "n_features": 208,
+      "n_pred_features": 48,
+      "intermediate_model_id": "xgb_sales_1_gs_003",
+      "xgb_params": {
+        "n_estimators": 200,
+        "max_depth": 6,
+        "learning_rate": 0.08,
+        "subsample": 0.85,
+        "colsample_bytree": 0.85,
+        "min_child_weight": 1,
+        "reg_alpha": 0.0,
+        "reg_lambda": 1.0,
+        "gamma": 0.0,
+        "random_state": 42,
+        "n_jobs": -1,
+        "objective": "reg:squarederror",
+        "tree_method": "hist"
+      },
+      "error": null,
+      "ok": true
+    },
+    {
+      "name": "xgb_final_gs_007",
+      "id": "xgb_final_gs_007",
+      "kind": "grid",
+      "rank": 2,
+      "main_target": "montant_ventes",
+      "metrics_eval": {
+        "per_target": {
+          "montant_ventes": {
+            "rmse": 2710.9589439688675,
+            "mae": 1741.6853741455077,
+            "r2": 0.4868123582600372,
+            "n": 20
+          }
+        },
+        "mean_rmse": 2710.9589439688675,
+        "mean_mae": 1741.6853741455077,
+        "mean_r2": 0.4868123582600372
+      },
+      "n_features": 208,
+      "n_pred_features": 48,
+      "intermediate_model_id": "xgb_sales_1_gs_003",
+      "xgb_params": {
+        "n_estimators": 100,
+        "max_depth": 6,
+        "learning_rate": 0.1,
+        "subsample": 0.85,
+        "colsample_bytree": 0.85,
+        "min_child_weight": 1,
+        "reg_alpha": 0.0,
+        "reg_lambda": 1.0,
+        "gamma": 0.0,
+        "random_state": 42,
+        "n_jobs": -1,
+        "objective": "reg:squarederror",
+        "tree_method": "hist"
+      },
+      "error": null,
+      "ok": true
+    },
+    {
+      "name": "xgb_final_gs_008",
+      "id": "xgb_final_gs_008",
+      "kind": "grid",
+      "rank": 3,
+      "main_target": "montant_ventes",
+      "metrics_eval": {
+        "per_target": {
+          "montant_ventes": {
+            "rmse": 2711.559110119493,
+            "mae": 1737.223714904785,
+            "r2": 0.4865851088247347,
+            "n": 20
+          }
+        },
+        "mean_rmse": 2711.559110119493,
+        "mean_mae": 1737.223714904785,
+        "mean_r2": 0.4865851088247347
+      },
+      "n_features": 208,
+      "n_pred_features": 48,
+      "intermediate_model_id": "xgb_sales_1_gs_003",
+      "xgb_params": {
+        "n_estimators": 200,
+        "max_depth": 6,
+        "learning_rate": 0.1,
+        "subsample": 0.85,
+        "colsample_bytree": 0.85,
+        "min_child_weight": 1,
+        "reg_alpha": 0.0,
+        "reg_lambda": 1.0,
+        "gamma": 0.0,
+        "random_state": 42,
+        "n_jobs": -1,
+        "objective": "reg:squarederror",
+        "tree_method": "hist"
+      },
+      "error": null,
+      "ok": true
+    },
+    {
+      "name": "xgb_final_gs_001",
+      "id": "xgb_final_gs_001",
+      "kind": "grid",
+      "rank": 4,
+      "main_target": "montant_ventes",
+      "metrics_eval": {
+        "per_target": {
+          "montant_ventes": {
+            "rmse": 2713.8617665650463,
+            "mae": 1735.4782772827148,
+            "r2": 0.48571275455895413,
+            "n": 20
+          }
+        },
+        "mean_rmse": 2713.8617665650463,
+        "mean_mae": 1735.4782772827148,
+        "mean_r2": 0.48571275455895413
+      },
+      "n_features": 208,
+      "n_pred_features": 48,
+      "intermediate_model_id": "xgb_sales_1_gs_003",
+      "xgb_params": {
+        "n_estimators": 100,
+        "max_depth": 4,
+        "learning_rate": 0.05,
+        "subsample": 0.85,
+        "colsample_bytree": 0.85,
+        "min_child_weight": 1,
+        "reg_alpha": 0.0,
+        "reg_lambda": 1.0,
+        "gamma": 0.0,
+        "random_state": 42,
+        "n_jobs": -1,
+        "objective": "reg:squarederror",
+        "tree_method": "hist"
+      },
+      "error": null,
+      "ok": true
+    },
+    {
+      "name": "xgb_final_gs_006",
+      "id": "xgb_final_gs_006",
+      "kind": "grid",
+      "rank": 5,
+      "main_target": "montant_ventes",
+      "metrics_eval": {
+        "per_target": {
+          "montant_ventes": {
+            "rmse": 2724.9712935151,
+            "mae": 1749.3110272216795,
+            "r2": 0.48149354006777756,
+            "n": 20
+          }
+        },
+        "mean_rmse": 2724.9712935151,
+        "mean_mae": 1749.3110272216795,
+        "mean_r2": 0.48149354006777756
+      },
+      "n_features": 208,
+      "n_pred_features": 48,
+      "intermediate_model_id": "xgb_sales_1_gs_003",
+      "xgb_params": {
+        "n_estimators": 200,
+        "max_depth": 4,
+        "learning_rate": 0.1,
+        "subsample": 0.85,
+        "colsample_bytree": 0.85,
+        "min_child_weight": 1,
+        "reg_alpha": 0.0,
+        "reg_lambda": 1.0,
+        "gamma": 0.0,
+        "random_state": 42,
+        "n_jobs": -1,
+        "objective": "reg:squarederror",
+        "tree_method": "hist"
+      },
+      "error": null,
+      "ok": true
+    },
+    {
+      "name": "xgb_final_gs_005",
+      "id": "xgb_final_gs_005",
+      "kind": "grid",
+      "rank": 6,
+      "main_target": "montant_ventes",
+      "metrics_eval": {
+        "per_target": {
+          "montant_ventes": {
+            "rmse": 2725.0176111054775,
+            "mae": 1749.352132873535,
+            "r2": 0.48147591333241957,
+            "n": 20
+          }
+        },
+        "mean_rmse": 2725.0176111054775,
+        "mean_mae": 1749.352132873535,
+        "mean_r2": 0.48147591333241957
+      },
+      "n_features": 208,
+      "n_pred_features": 48,
+      "intermediate_model_id": "xgb_sales_1_gs_003",
+      "xgb_params": {
+        "n_estimators": 100,
+        "max_depth": 4,
+        "learning_rate": 0.1,
+        "subsample": 0.85,
+        "colsample_bytree": 0.85,
+        "min_child_weight": 1,
+        "reg_alpha": 0.0,
+        "reg_lambda": 1.0,
+        "gamma": 0.0,
+        "random_state": 42,
+        "n_jobs": -1,
+        "objective": "reg:squarederror",
+        "tree_method": "hist"
+      },
+      "error": null,
+      "ok": true
+    },
+    {
+      "name": "xgb_final_gs_002",
+      "id": "xgb_final_gs_002",
+      "kind": "grid",
+      "rank": 7,
+      "main_target": "montant_ventes",
+      "metrics_eval": {
+        "per_target": {
+          "montant_ventes": {
+            "rmse": 2727.8113518722434,
+            "mae": 1724.8707684326168,
+            "r2": 0.48041216647724116,
+            "n": 20
+          }
+        },
+        "mean_rmse": 2727.8113518722434,
+        "mean_mae": 1724.8707684326168,
+        "mean_r2": 0.48041216647724116
+      },
+      "n_features": 208,
+      "n_pred_features": 48,
+      "intermediate_model_id": "xgb_sales_1_gs_003",
+      "xgb_params": {
+        "n_estimators": 200,
+        "max_depth": 4,
+        "learning_rate": 0.05,
+        "subsample": 0.85,
+        "colsample_bytree": 0.85,
+        "min_child_weight": 1,
+        "reg_alpha": 0.0,
+        "reg_lambda": 1.0,
+        "gamma": 0.0,
+        "random_state": 42,
+        "n_jobs": -1,
+        "objective": "reg:squarederror",
+        "tree_method": "hist"
+      },
+      "error": null,
+      "ok": true
+    },
+    {
+      "name": "xgb_final_gs_003",
+      "id": "xgb_final_gs_003",
+      "kind": "grid",
+      "rank": 8,
+      "main_target": "montant_ventes",
+      "metrics_eval": {
+        "per_target": {
+          "montant_ventes": {
+            "rmse": 2742.492740486371,
+            "mae": 1763.981268005371,
+            "r2": 0.4748041547608777,
+            "n": 20
+          }
+        },
+        "mean_rmse": 2742.492740486371,
+        "mean_mae": 1763.981268005371,
+        "mean_r2": 0.4748041547608777
+      },
+      "n_features": 208,
+      "n_pred_features": 48,
+      "intermediate_model_id": "xgb_sales_1_gs_003",
+      "xgb_params": {
+        "n_estimators": 100,
+        "max_depth": 6,
+        "learning_rate": 0.05,
+        "subsample": 0.85,
+        "colsample_bytree": 0.85,
+        "min_child_weight": 1,
+        "reg_alpha": 0.0,
+        "reg_lambda": 1.0,
+        "gamma": 0.0,
+        "random_state": 42,
+        "n_jobs": -1,
+        "objective": "reg:squarederror",
+        "tree_method": "hist"
+      },
+      "error": null,
+      "ok": true
+    },
+    {
+      "name": "xgb_final_gs_004",
+      "id": "xgb_final_gs_004",
+      "kind": "grid",
+      "rank": 9,
+      "main_target": "montant_ventes",
+      "metrics_eval": {
+        "per_target": {
+          "montant_ventes": {
+            "rmse": 2752.88702278497,
+            "mae": 1757.608875732422,
+            "r2": 0.4708155360129601,
+            "n": 20
+          }
+        },
+        "mean_rmse": 2752.88702278497,
+        "mean_mae": 1757.608875732422,
+        "mean_r2": 0.4708155360129601
+      },
+      "n_features": 208,
+      "n_pred_features": 48,
+      "intermediate_model_id": "xgb_sales_1_gs_003",
+      "xgb_params": {
+        "n_estimators": 200,
+        "max_depth": 6,
+        "learning_rate": 0.05,
+        "subsample": 0.85,
+        "colsample_bytree": 0.85,
+        "min_child_weight": 1,
+        "reg_alpha": 0.0,
+        "reg_lambda": 1.0,
+        "gamma": 0.0,
+        "random_state": 42,
+        "n_jobs": -1,
+        "objective": "reg:squarederror",
+        "tree_method": "hist"
+      },
+      "error": null,
+      "ok": true
+    }
+  ],
+  "error": null,
+  "rank_metric": "r2",
+  "main_target": "montant_ventes",
+  "started_at": "2026-07-27T00:49:43.729059+00:00",
+  "finished_at": "2026-07-27T00:49:53.458301+00:00",
+  "tier": "final"
+}

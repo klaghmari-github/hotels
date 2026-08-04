@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "n_loaded": 84,
+  "n_to_scrape": 84,
+  "n_shards": 6,
+  "n_ok_merged": 84,
+  "shard_ok_sum": 84,
+  "shard_missing_sum": 0,
+  "shard_error_sum": 0,
+  "elapsed_s": 12.3,
+  "rate_per_s": 6.85,
+  "out": "/media/laghmari/ssd-data/dev/hotels/accord/data/marques/hotels/hotels_missing_multi.xlsx",
+  "workers": 6,
+  "threads_per_worker": 3,
+  "effective_concurrency": 18
+}
