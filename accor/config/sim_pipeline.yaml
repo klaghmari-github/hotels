@@ -405,13 +405,11 @@ t_produits_ordered:
     - t_sales_model_base
   sql: |
     SELECT DISTINCT
-        hotel_code,
         produit,
         produit_montant_marge
     FROM
         t_sales_model_base
     ORDER BY
-        hotel_code,
         produit_montant_marge,
         produit
 
@@ -422,13 +420,11 @@ t_gamme_ordered:
     - t_sales_model_base
   sql: |
     SELECT DISTINCT
-        hotel_code,
         gamme,
         gamme_montant_marge
     FROM
         t_sales_model_base
     ORDER BY
-        hotel_code,
         gamme_montant_marge,
         gamme
 
@@ -438,12 +434,20 @@ t_types_ordered:
     - t_sales_model_base
   sql: |
     SELECT DISTINCT
-        hotel_code,
         type,
         type_montant_marge
     FROM
         t_sales_model_base
     ORDER BY
-        hotel_code,
         type_montant_marge,
         type
+
+t_sales_model_sim:
+  type: table
+  requires:
+    - t_sales_model_base
+  sql: |
+    SELECT
+        *
+    FROM
+        t_sales_model_base
