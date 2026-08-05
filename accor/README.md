@@ -1,70 +1,73 @@
-# Simulation parallele Accor
+# Simulateur Accor et modeles XGBoost
 
-## Structure
+## Contenu
 
-- `main.py` : moteur de pipeline, generation des scenarios et orchestration parallele.
-- `main.ipynb` : notebook de lancement.
-- `config/` : pipelines YAML.
-- `data/` : placer `hotel_sales_raw_extended_data.xlsx`.
-- `duckdb/workers/` : bases DuckDB persistantes des buckets.
+- `main.py` : generation parallele des simulations de modelisation et restitution V2.
+- `ml_xgboost.py` : construction du dataset ML, optimisation Optuna, entrainement XGBoost et evaluation Leave-One-Hotel-Out.
+- `config/8_ml_dataset_pipeline.yaml` : vue d'apprentissage limitee aux variables de la restitution V2.
+- `main.ipynb` : sequence d'execution complete.
 
-## Lancement
+## Variables descriptives
+
+- `solution`
+- `hotel_nb_chambres`
+- `hotel_to_annuel`
+- `hotel_guests_per_chambre`
+- `metres_lineaires`
+- toutes les colonnes `type_*_part_natures`
+- toutes les colonnes `gamme_*_part_natures`
+
+`hotel_code` et `scenario_id` ne sont pas utilises comme variables d'apprentissage.
+
+## Cibles
+
+- `montant_ventes_par_mois`
+- `montant_marge_par_mois`
+- `montant_marge_selon_coef_par_mois`
+
+Un modele XGBoost distinct est entraine pour chaque cible.
+
+## Validation
+
+Pendant l'optimisation, `GroupKFold` maintient toutes les simulations d'un hotel dans le meme fold. Seule la ligne d'observation des hotels de validation est utilisee pour calculer le score.
+
+Pendant l'evaluation Leave-One-Hotel-Out :
+
+1. toutes les simulations de l'hotel evalue sont retirees de l'apprentissage ;
+2. le modele est entraine sur les autres hotels ;
+3. seule l'observation initiale de l'hotel exclu est predite ;
+4. la prediction est comparee a la valeur mensuelle observee.
+
+## Installation
+
+```bash
+pip install -r requirements_ml.txt
+```
+
+## Execution
 
 ```python
 from main import main
-
-simulation = main()
-```
-
-Par defaut, le nombre de buckets et de workers simultanes est calcule avec :
-
-```text
-max(1, nombre de vCPU - 2)
-```
-
-Pour imposer un nombre fixe de buckets, modifier `tasks` dans
-`config/4_simulation_pipeline.yaml`.
-
-Les resultats deja calcules dans la base partagee ou dans les bases workers
-sont conserves et repris lors d'une nouvelle execution.
-
-
-## Metres lineaires simules
-
-Les metres lineaires ne sont plus figes pendant les scenarios. Pour chaque hotel, le moteur calcule d abord la place moyenne occupee par une nature dans la configuration observee :
-
-```text
-metres_lineaires_par_nature = metres_lineaires_observes / nombre_natures_observees
-```
-
-Puis, pour chaque scenario :
-
-```text
-metres_lineaires = metres_lineaires_par_nature * nombre_natures_restantes
-```
-
-La valeur peut donc differer d un hotel a l autre pour une meme nature. Si toutes les natures sont retirees, les metres lineaires simules valent 0.
-
-
-## Restitution et evaluation Leave-One-Out
-
-```python
-from main import main, run_restitution, run_leave_one_out
+from ml_xgboost import MLConfig, XGBoostWorkflow
 
 simulation = main()
 cp = simulation["cp"]
 
-predictions = run_restitution(
+workflow = XGBoostWorkflow(
     cp,
-    hotel_nb_chambres=100,
-    hotel_to_annuel=0.5,
-    hotel_guests_per_chambre=1.0,
-    metres_lineaires=10.0,
-    type_mix={"F&B": 0.7, "NON F&B": 0.3},
-    gamme_mix={"G1": 0.3, "G2": 0.2, "G3": 0.2, "G8": 0.1, "G9": 0.1, "G10": 0.05, "G15": 0.05},
+    MLConfig(
+        optuna_trials=80,
+        cv_splits=5,
+    ),
 )
-
-loo = run_leave_one_out(cp, rebuild=True)
+result = workflow.run()
 ```
 
-La methode A moyenne toutes les predictions de variables. La methode B moyenne d'abord les predictions par famille (type et gamme), puis moyenne les familles.
+## Artefacts
+
+- `models/xgboost/*.json` : modeles finaux.
+- `models/xgboost/*_metadata.json` : variables, parametres et score CV.
+- `reports/xgboost/optuna/` : etudes et essais Optuna.
+- `reports/xgboost/leave_one_hotel_out.xlsx` : predictions et metriques ML.
+- `reports/xgboost/feature_importance.xlsx` : importance par gain.
+- `reports/xgboost/ml_vs_sim_v2.xlsx` : comparaison avec les methodes A et B si `t_loo_results` existe.

@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Documentation du moteur de simulation, restitution et evaluation Leave-One-Out</title>
+<style>
+:root {
+  --navy: #17324d;
+  --blue: #245f8f;
+  --teal: #2d7f7a;
+  --green: #2f7a58;
+  --orange: #a9642d;
+  --red: #9c4343;
+  --ink: #24313d;
+  --muted: #647382;
+  --line: #d7e0e8;
+  --panel: #f5f8fb;
+  --soft: #edf3f7;
+  --white: #ffffff;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--ink);
+  background: #edf2f6;
+  line-height: 1.55;
+}
+header {
+  background: linear-gradient(135deg, #142b44, #245f8f 68%, #2d7f7a);
+  color: white;
+  padding: 48px 24px 42px;
+}
+.header-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+h1 {
+  margin: 0 0 14px;
+  font-size: 2.6rem;
+  line-height: 1.12;
+}
+.subtitle {
+  max-width: 900px;
+  margin: 0;
+  font-size: 1.08rem;
+  color: #e5eef6;
+}
+.meta {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.meta span {
+  background: rgba(255,255,255,.13);
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: .88rem;
+}
+.layout {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 24px;
+}
+nav {
+  position: sticky;
+  top: 18px;
+  align-self: start;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px;
+}
+nav strong {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--navy);
+}
+nav a {
+  display: block;
+  text-decoration: none;
+  color: #405263;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: .9rem;
+}
+nav a:hover {
+  background: var(--soft);
+  color: var(--blue);
+}
+main { min-width: 0; }
+section {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 22px;
+}
+h2 {
+  color: var(--navy);
+  margin: 0 0 16px;
+  padding-bottom: 9px;
+  border-bottom: 2px solid #e6edf2;
+  font-size: 1.55rem;
+}
+h3 {
+  color: var(--blue);
+  margin: 24px 0 10px;
+  font-size: 1.16rem;
+}
+h4 {
+  margin: 18px 0 8px;
+  color: var(--ink);
+}
+p { margin: 9px 0; }
+ul, ol { padding-left: 22px; }
+li { margin: 5px 0; }
+code {
+  font-family: Consolas, Monaco, monospace;
+  background: #eef3f7;
+  color: #183d60;
+  padding: 2px 5px;
+  border-radius: 4px;
+}
+pre {
+  background: #132536;
+  color: #edf6fc;
+  padding: 16px;
+  border-radius: 10px;
+  overflow: auto;
+  font-size: .86rem;
+  line-height: 1.45;
+}
+pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: .91rem;
+}
+th {
+  background: var(--navy);
+  color: white;
+  padding: 9px 10px;
+  text-align: left;
+  border: 1px solid #2b4964;
+}
+td {
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  vertical-align: top;
+}
+tbody tr:nth-child(even) { background: #f7f9fb; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 16px 0;
+}
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  padding: 16px;
+}
+.card h3, .card h4 { margin-top: 0; }
+.flow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 18px 0;
+}
+.step {
+  flex: 1 1 150px;
+  min-width: 145px;
+  border: 1px solid #cad7e1;
+  background: #f0f5f9;
+  color: var(--navy);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  font-weight: bold;
+}
+.arrow {
+  color: var(--blue);
+  font-weight: bold;
+}
+.formula {
+  margin: 13px 0;
+  padding: 14px;
+  background: #f5f8fb;
+  border: 1px solid #cfdae4;
+  border-radius: 10px;
+  text-align: center;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.08rem;
+}
+.note, .warning, .success {
+  margin: 16px 0;
+  padding: 14px 16px;
+  border-left: 5px solid;
+  border-radius: 7px;
+}
+.note {
+  background: #edf6fb;
+  border-color: var(--blue);
+}
+.warning {
+  background: #fff3e7;
+  border-color: var(--orange);
+}
+.success {
+  background: #edf8f2;
+  border-color: var(--green);
+}
+.small {
+  color: var(--muted);
+  font-size: .88rem;
+}
+footer {
+  max-width: 1180px;
+  margin: 0 auto 36px;
+  padding: 18px;
+  color: var(--muted);
+  text-align: center;
+}
+@media (max-width: 960px) {
+  .layout {
+    grid-template-columns: 1fr;
+    padding: 14px;
+  }
+  nav { position: relative; top: 0; }
+  .grid { grid-template-columns: 1fr; }
+  section { padding: 22px; }
+  h1 { font-size: 2rem; }
+}
+@media print {
+  body { background: white; }
+  nav { display: none; }
+  .layout { display: block; max-width: none; padding: 0; }
+  section { border-radius: 0; break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <h1>Moteur de simulation, restitution et evaluation Leave-One-Out</h1>
+    <p class="subtitle">
+      Documentation fonctionnelle et technique du processus complet, depuis la generation
+      des scenarios de modelisation jusqu'a la restitution par solution et a l'evaluation
+      des methodes de prediction.
+    </p>
+    <div class="meta">
+      <span>Granularite atomique : nature de produit</span>
+      <span>Moteur : Python, DuckDB et pipelines YAML</span>
+      <span>Restitution : Simply, Liberty et Connected</span>
+      <span>Evaluation : Leave-One-Out</span>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+<nav>
+  <strong>Sommaire</strong>
+  <a href="#objectif">1. Objectif</a>
+  <a href="#hypotheses">2. Hypotheses</a>
+  <a href="#source">3. Donnees source</a>
+  <a href="#modelisation">4. Simulations de modelisation</a>
+  <a href="#scenario">5. Generation des scenarios</a>
+  <a href="#calculs">6. Calcul d'un scenario</a>
+  <a href="#mix">7. Mix et metres lineaires</a>
+  <a href="#parallelisation">8. Parallelisation</a>
+  <a href="#dataset">9. Dataset final de modelisation</a>
+  <a href="#restitution">10. Simulations de restitution</a>
+  <a href="#normalisation">11. Normalisation</a>
+  <a href="#methodes">12. Methodes A et B</a>
+  <a href="#loo">13. Leave-One-Out</a>
+  <a href="#metriques">14. Metriques</a>
+  <a href="#champs">15. Champs importants</a>
+  <a href="#pipeline">16. Organisation des pipelines</a>
+</nav>
+
+<main>
+
+<section id="objectif">
+<h2>1. Objectif general</h2>
+<p>
+Le projet poursuit trois objectifs successifs.
+</p>
+<ol>
+  <li>Generer des hotels simules a partir des hotels pilotes en faisant varier leur assortiment.</li>
+  <li>Construire un moteur de restitution capable d'estimer les performances mensuelles d'un hotel cible pour chaque solution.</li>
+  <li>Evaluer objectivement les methodes de restitution avec une procedure Leave-One-Out.</li>
+</ol>
+<div class="flow">
+  <div class="step">Donnees pilotes</div>
+  <div class="arrow">→</div>
+  <div class="step">Scenarios de modelisation</div>
+  <div class="arrow">→</div>
+  <div class="step">Coefficients de restitution</div>
+  <div class="arrow">→</div>
+  <div class="step">Predictions par solution</div>
+  <div class="arrow">→</div>
+  <div class="step">Evaluation LOO</div>
+</div>
+</section>
+
+<section id="hypotheses">
+<h2>2. Hypotheses principales</h2>
+<ul>
+  <li>La nature de produit est l'unite atomique de retrait.</li>
+  <li>Un retrait de gamme, type, categorie, marque ou fournisseur est converti en liste de natures a retirer.</li>
+  <li>Le nombre de ventes correspond a la somme de <code>QUANTITE</code>, jamais au nombre de lignes.</li>
+  <li>Les hotels utilisant des solutions differentes ne sont jamais melanges dans les agregations de restitution.</li>
+  <li>Les caracteristiques fixes de l'hotel sont le nombre de chambres, le taux d'occupation annuel et le nombre de guests par chambre.</li>
+  <li>Les valeurs economiques sont mensualisees avant comparaison ou restitution.</li>
+  <li>Les parts de types et de gammes sont des variables descriptives independantes utilisees comme predicteurs.</li>
+  <li>Les lignes avec vente non positive ou marge non positive sont exclues des le chargement de <code>t_sales</code>.</li>
+</ul>
+<div class="note">
+Le moteur peut produire un scenario avec zero vente et zero marge pour un hotel si toutes ses natures sont retirees. Ce resultat est volontaire.
+</div>
+</section>
+
+<section id="source">
+<h2>3. Preparation des donnees source</h2>
+<h3>3.1 Filtre qualite</h3>
+<p>La table <code>t_sales</code> ne conserve que les lignes suivantes :</p>
+<pre><code>PRIX_TTC &gt; 0
+AND MARGE &gt; 0</code></pre>
+<p>Ce filtre exclut les valeurs nulles, negatives et les ventes sans information economique exploitable.</p>
+
+<h3>3.2 Champs hotel</h3>
+<table>
+<thead><tr><th>Champ</th><th>Role</th></tr></thead>
+<tbody>
+<tr><td><code>HOTEL_CODE</code></td><td>Identifiant unique de l'hotel.</td></tr>
+<tr><td><code>SOLUTION</code></td><td>Solution utilisee : Simply, Liberty ou Connected.</td></tr>
+<tr><td><code>HOTEL_NB_CHAMBRES</code></td><td>Capacite de l'hotel.</td></tr>
+<tr><td><code>HOTEL_TO_ANNUEL</code></td><td>Taux d'occupation annuel.</td></tr>
+<tr><td><code>HOTEL_GUESTS_PER_CHAMBRE</code></td><td>Nombre moyen de guests par chambre occupee.</td></tr>
+<tr><td><code>METRES_LINEAIRES</code></td><td>Metres lineaires observes du corner.</td></tr>
+</tbody>
+</table>
+
+<h3>3.3 Nombre mensuel de guests</h3>
+<div class="formula">
+nombre_guests_par_mois = HOTEL_NB_CHAMBRES × HOTEL_TO_ANNUEL × HOTEL_GUESTS_PER_CHAMBRE × 30,5
+</div>
+</section>
+
+<section id="modelisation">
+<h2>4. Generation des simulations de modelisation</h2>
+<p>
+Les simulations de modelisation partent de la configuration observee de chaque hotel pilote.
+Chaque scenario contient une liste ordonnee et dedupliquee de natures a retirer.
+La meme liste est appliquee a tous les hotels.
+</p>
+
+<h3>4.1 Familles de scenarios</h3>
+<ul>
+  <li>Retraits cumulatifs des natures les moins rentables au niveau global.</li>
+  <li>Retraits cumulatifs dans chaque categorie.</li>
+  <li>Retraits cumulatifs dans chaque gamme.</li>
+  <li>Retraits cumulatifs dans chaque type.</li>
+  <li>Retraits cumulatifs dans chaque marque.</li>
+  <li>Retraits cumulatifs dans chaque fournisseur.</li>
+  <li>Retraits cumulatifs de groupes entiers classes par marge.</li>
+</ul>
+
+<h3>4.2 Classement</h3>
+<p>
+Les natures et groupes sont classes par marge croissante. Les elements ayant le moins
+d'interet economique sont retires en premier.
+</p>
+<div class="formula">
+marge_groupe = somme des marges des natures appartenant au groupe
+</div>
+</section>
+
+<section id="scenario">
+<h2>5. Identite et generation des scenarios</h2>
+<h3>5.1 Canonicalisation</h3>
+<p>Chaque liste de natures est nettoyee, dedupliquee et triee.</p>
+<pre><code>["Eau", "Coca", "Eau"]
+devient
+["Coca", "Eau"]</code></pre>
+
+<h3>5.2 Hash stable</h3>
+<p>
+Le champ <code>scenario_id</code> est un SHA-256 calcule sur la representation JSON compacte
+de la liste canonique.
+</p>
+<div class="formula">
+scenario_id = SHA256(JSON(liste_canonique))
+</div>
+<p>
+Le hash permet de reconnaitre un scenario deja calcule, quel que soit l'ordre initial
+des natures.
+</p>
+</section>
+
+<section id="calculs">
+<h2>6. Calcul d'un scenario de modelisation</h2>
+
+<h3>6.1 Retrait des ventes observees</h3>
+<p>
+Les lignes correspondant aux natures retirees sont exclues de la vue courante.
+Le volume retire est :
+</p>
+<div class="formula">
+ventes_retirees = somme de QUANTITE sur les natures retirees
+</div>
+
+<h3>6.2 Taux de conversion de l'hotel</h3>
+<div class="formula">
+taux_conversion = nombre_ventes_observees / nombre_guests_observes
+</div>
+
+<h3>6.3 Ventes potentielles recuperees</h3>
+<div class="formula">
+ventes_recuperees = ventes_retirees × taux_conversion
+</div>
+
+<h3>6.4 Redistribution selon le pilote</h3>
+<p>
+La part pilote de chaque nature est calculee sur les ventes observees de l'hotel :
+</p>
+<div class="formula">
+part_nature = ventes_nature / ventes_totales_hotel
+</div>
+<p>La quantite ajoutee a une nature restante est :</p>
+<div class="formula">
+ajout_nature = ventes_recuperees × part_nature
+</div>
+<p>
+Les parts ne sont pas renormalisees apres retrait. La part correspondant aux natures
+retirees est donc perdue.
+</p>
+
+<h3>6.5 Recalcul des montants</h3>
+<p>
+Les montants de chaque ligne restante evoluent proportionnellement a la nouvelle quantite.
+</p>
+<div class="formula">
+valeur_scenario = valeur_observee × quantite_scenario / quantite_observee
+</div>
+<p>Cette formule est appliquee a :</p>
+<ul>
+  <li><code>PRIX_HT</code></li>
+  <li><code>PRIX_TTC</code></li>
+  <li><code>PRIX_TTC_MARCHE</code></li>
+  <li><code>MARGE_SELON_COEF</code></li>
+  <li><code>MARGE</code></li>
+</ul>
+</section>
+
+<section id="mix">
+<h2>7. Mix d'exposition et metres lineaires</h2>
+<h3>7.1 Mix d'exposition</h3>
+<p>
+Le mix est calcule a partir du nombre distinct de natures encore actives. Il ne depend
+pas des quantites vendues.
+</p>
+<div class="formula">
+part_groupe = nombre_natures_du_groupe / nombre_natures_total
+</div>
+<p>Les dimensions calculees sont :</p>
+<ul>
+  <li>type</li>
+  <li>gamme</li>
+  <li>categorie</li>
+  <li>marque</li>
+  <li>fournisseur</li>
+</ul>
+
+<h3>7.2 Metres lineaires par nature</h3>
+<p>
+Pour chaque hotel, le metre lineaire moyen d'une nature est calcule a partir de la
+configuration observee.
+</p>
+<div class="formula">
+metres_lineaires_par_nature = metres_lineaires_observes / nombre_natures_observees
+</div>
+
+<h3>7.3 Metres lineaires du scenario</h3>
+<div class="formula">
+metres_lineaires_scenario = metres_lineaires_par_nature × nombre_natures_restantes
+</div>
+<p>
+Le meme produit peut donc correspondre a une surface moyenne differente selon l'hotel.
+</p>
+</section>
+
+<section id="parallelisation">
+<h2>8. Execution parallele des simulations</h2>
+<p>
+Les scenarios sont repartis dans des buckets independants. Chaque bucket utilise une
+base DuckDB worker distincte.
+</p>
+
+<h3>8.1 Repartition</h3>
+<div class="formula">
+bucket_id = entier_base_16(scenario_id) modulo nombre_de_buckets
+</div>
+
+<h3>8.2 Nombre de workers</h3>
+<p>
+Par defaut, le nombre de buckets et de workers est calcule avec deux processeurs logiques
+reserves au systeme.
+</p>
+<div class="formula">
+workers = max(1, nombre_vCPU - 2)
+</div>
+
+<h3>8.3 Frontiere stable</h3>
+<p>
+Le graphe de dependances remonte depuis la cible d'iteration jusqu'aux objets en
+<code>create_if_not_exists</code>. Ces objets sont copies dans les workers.
+Le type logique est preserve : une table reste une table et une vue reste une vue.
+</p>
+
+<h3>8.4 Schema exact de la table resultat</h3>
+<p>
+La table <code>t_dataset_pivot</code> est recreee dans chaque worker a partir du schema DuckDB
+exact de la base partagee. Cette approche evite les erreurs d'inference de type provoquees
+par les DataFrames vides.
+</p>
+
+<h3>8.5 Reprise</h3>
+<p>
+Un scenario deja present dans la table finale n'est pas recalcule. Les resultats locaux
+des workers sont fusionnes dans la base partagee avec controle d'unicite sur :
+</p>
+<pre><code>scenario_id
+hotel_code</code></pre>
+</section>
+
+<section id="dataset">
+<h2>9. Dataset final de modelisation</h2>
+<p>La table finale contient une ligne par hotel et par scenario.</p>
+<table>
+<thead><tr><th>Famille</th><th>Champs principaux</th></tr></thead>
+<tbody>
+<tr><td>Scenario</td><td><code>scenario_id</code>, <code>scenario_removed_natures</code></td></tr>
+<tr><td>Hotel</td><td><code>hotel_code</code>, <code>solution</code></td></tr>
+<tr><td>Contexte</td><td><code>nombre_guests_par_mois</code>, <code>metres_lineaires</code></td></tr>
+<tr><td>Cibles</td><td><code>montant_ventes_par_mois</code>, <code>montant_marge_selon_coef_par_mois</code>, <code>montant_marge_par_mois</code></td></tr>
+<tr><td>Mix</td><td><code>type_*_part_natures</code>, <code>gamme_*_part_natures</code></td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="restitution">
+<h2>10. Generation des simulations de restitution</h2>
+<p>
+La restitution estime les performances mensuelles d'un hotel cible pour chaque solution.
+Elle utilise uniquement :
+</p>
+<ul>
+  <li>les trois champs permettant de calculer les guests mensuels ;</li>
+  <li>les metres lineaires souhaites ;</li>
+  <li>les parts des types ;</li>
+  <li>les parts des gammes ;</li>
+  <li>les trois cibles economiques mensualisees.</li>
+</ul>
+
+<h3>10.1 Input hotel</h3>
+<table>
+<thead><tr><th>Champ</th><th>Signification</th></tr></thead>
+<tbody>
+<tr><td><code>hotel_nb_chambres</code></td><td>Nombre de chambres.</td></tr>
+<tr><td><code>hotel_to_annuel</code></td><td>Taux d'occupation annuel.</td></tr>
+<tr><td><code>hotel_guests_per_chambre</code></td><td>Guests moyens par chambre occupee.</td></tr>
+<tr><td><code>metres_lineaires</code></td><td>Surface lineaire cible du corner.</td></tr>
+</tbody>
+</table>
+
+<h3>10.2 Input mix</h3>
+<p>
+Le mix est fourni au format long avec une ligne par variable :
+</p>
+<pre><code>variable_family | variable_name              | target_part
+type            | type_f_b_part_natures      | 0.70
+type            | type_non_f_b_part_natures  | 0.30
+gamme           | gamme_g1_part_natures      | 0.30
+gamme           | gamme_g2_part_natures      | 0.20</code></pre>
+</section>
+
+<section id="normalisation">
+<h2>11. Normalisation des simulations</h2>
+<p>
+Chaque colonne de part est traitee comme un predicteur independant de la cible totale.
+Pour une variable de mix <code>j</code> :
+</p>
+<div class="formula">
+coefficient_j = cible_mensuelle / (guests_mensuels × metres_lineaires × part_j)
+</div>
+
+<p>Le calcul est effectue separement pour :</p>
+<ul>
+  <li><code>montant_ventes_par_mois</code></li>
+  <li><code>montant_marge_selon_coef_par_mois</code></li>
+  <li><code>montant_marge_par_mois</code></li>
+</ul>
+
+<p>Les coefficients sont ensuite agreges par :</p>
+<pre><code>solution
+variable_family
+variable_name</code></pre>
+
+<div class="formula">
+coefficient_moyen = moyenne des coefficients des hotels et scenarios de la meme solution
+</div>
+
+<h3>11.1 Prediction d'une variable</h3>
+<div class="formula">
+prediction_j = coefficient_moyen_j × guests_cible × metres_lineaires_cibles × part_cible_j
+</div>
+<p>
+Une variable dont la part cible est nulle n'est pas utilisee dans la moyenne finale.
+</p>
+</section>
+
+<section id="methodes">
+<h2>12. Methodes de restitution A et B</h2>
+
+<h3>12.1 Methode A : moyenne globale</h3>
+<p>
+Toutes les predictions issues des variables de types et de gammes sont mises dans une
+seule moyenne.
+</p>
+<div class="formula">
+prediction_A = moyenne de toutes les predictions de variables actives
+</div>
+<p>
+Cette methode donne naturellement plus de poids a la famille contenant le plus de variables.
+</p>
+
+<h3>12.2 Methode B : moyenne equilibree par famille</h3>
+<p>
+La moyenne des types est calculee separement de la moyenne des gammes.
+</p>
+<div class="formula">
+prediction_type = moyenne des predictions de types
+</div>
+<div class="formula">
+prediction_gamme = moyenne des predictions de gammes
+</div>
+<div class="formula">
+prediction_B = moyenne(prediction_type, prediction_gamme)
+</div>
+<p>
+Cette methode attribue un poids equivalent aux familles type et gamme.
+</p>
+
+<h3>12.3 Sortie de restitution</h3>
+<p>La vue finale retourne deux lignes par solution, une pour chaque methode.</p>
+<table>
+<thead><tr><th>Champ</th><th>Role</th></tr></thead>
+<tbody>
+<tr><td><code>solution</code></td><td>Simply, Liberty ou Connected.</td></tr>
+<tr><td><code>methode</code></td><td>A ou B.</td></tr>
+<tr><td><code>montant_ventes_par_mois_predit</code></td><td>Chiffre d'affaires mensuel estime.</td></tr>
+<tr><td><code>montant_marge_selon_coef_par_mois_predite</code></td><td>Marge mensuelle estimee selon coefficient.</td></tr>
+<tr><td><code>montant_marge_par_mois_predite</code></td><td>Marge mensuelle estimee selon prix marche.</td></tr>
+<tr><td><code>nombre_predicteurs</code></td><td>Nombre de variables utilisees.</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="loo">
+<h2>13. Evaluation Leave-One-Out</h2>
+<p>
+Le Leave-One-Out evalue chaque hotel a tour de role.
+</p>
+<ol>
+  <li>Selectionner un hotel a evaluer.</li>
+  <li>Exclure toutes ses simulations de la base d'apprentissage.</li>
+  <li>Conserver uniquement les hotels appartenant a la meme solution.</li>
+  <li>Recalculer les coefficients moyens de restitution.</li>
+  <li>Recuperer le contexte reel et le mix observe de l'hotel exclu.</li>
+  <li>Predire ses trois cibles mensuelles avec les methodes A et B.</li>
+  <li>Comparer les predictions aux valeurs observees du scenario initial.</li>
+</ol>
+
+<h3>13.1 Scenario observe de reference</h3>
+<p>
+La valeur reelle de l'hotel est issue de la ligne dont la liste de natures retirees est vide.
+</p>
+<pre><code>LEN(scenario_removed_natures) = 0</code></pre>
+
+<h3>13.2 Iteration</h3>
+<p>
+L'iteration LOO est sequentielle avec <code>tasks: 1</code>. Elle est rapide et ne necessite
+ni buckets, ni workers, ni reprise complexe.
+</p>
+</section>
+
+<section id="metriques">
+<h2>14. Metriques d'evaluation</h2>
+<p>Les metriques sont calculees globalement et par solution.</p>
+<table>
+<thead><tr><th>Metrique</th><th>Formule</th><th>Interpretation</th></tr></thead>
+<tbody>
+<tr><td>MAE</td><td>Moyenne des erreurs absolues</td><td>Erreur moyenne dans l'unite de la cible.</td></tr>
+<tr><td>RMSE</td><td>Racine de la moyenne des erreurs au carre</td><td>Penalise davantage les grandes erreurs.</td></tr>
+<tr><td>MAPE</td><td>Moyenne des erreurs relatives absolues</td><td>Erreur moyenne en proportion de la valeur reelle.</td></tr>
+<tr><td>Biais</td><td>Moyenne prediction moins observation</td><td>Detecte une sur-estimation ou une sous-estimation systematique.</td></tr>
+</tbody>
+</table>
+
+<p>La comparaison finale porte sur les methodes A et B pour les trois cibles :</p>
+<ul>
+  <li>montant des ventes mensuel ;</li>
+  <li>marge mensuelle selon coefficient ;</li>
+  <li>marge mensuelle selon prix du marche.</li>
+</ul>
+
+<div class="success">
+La methode retenue pour la restitution finale sera celle qui obtient les meilleures performances Leave-One-Out, en priorite sur la marge puis sur le montant des ventes.
+</div>
+</section>
+
+<section id="champs">
+<h2>15. Dictionnaire des champs les plus importants</h2>
+<table>
+<thead><tr><th>Champ</th><th>Definition</th></tr></thead>
+<tbody>
+<tr><td><code>scenario_id</code></td><td>Hash SHA-256 de la liste canonique des natures retirees.</td></tr>
+<tr><td><code>scenario_removed_natures</code></td><td>Liste des natures supprimees dans le scenario.</td></tr>
+<tr><td><code>nombre_guests_par_mois</code></td><td>Guests mensuels estimes a partir des caracteristiques de l'hotel.</td></tr>
+<tr><td><code>nombre_ventes_par_mois</code></td><td>Somme mensuelle de QUANTITE apres simulation.</td></tr>
+<tr><td><code>montant_ventes_par_mois</code></td><td>Montant TTC mensuel simule.</td></tr>
+<tr><td><code>montant_marge_selon_coef_par_mois</code></td><td>Marge mensuelle calculee selon le coefficient de marge.</td></tr>
+<tr><td><code>montant_marge_par_mois</code></td><td>Marge mensuelle calculee avec le prix marche estime.</td></tr>
+<tr><td><code>metres_lineaires</code></td><td>Metres lineaires recalcules selon le nombre de natures restantes.</td></tr>
+<tr><td><code>type_*_part_natures</code></td><td>Part d'exposition d'un type dans le nombre total de natures.</td></tr>
+<tr><td><code>gamme_*_part_natures</code></td><td>Part d'exposition d'une gamme dans le nombre total de natures.</td></tr>
+<tr><td><code>variable_family</code></td><td>Famille du predicteur : type ou gamme.</td></tr>
+<tr><td><code>variable_name</code></td><td>Nom normalise de la colonne de part.</td></tr>
+<tr><td><code>target_part</code></td><td>Part souhaitee par l'utilisateur pour la variable.</td></tr>
+<tr><td><code>nombre_hotels_apprentissage</code></td><td>Nombre d'hotels utilises pour calculer les coefficients.</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="pipeline">
+<h2>16. Organisation des pipelines</h2>
+<table>
+<thead><tr><th>Fichier</th><th>Responsabilite</th></tr></thead>
+<tbody>
+<tr><td><code>0_src_pipeline.yaml</code></td><td>Chargement et filtre qualite de la source.</td></tr>
+<tr><td><code>1_ref_pipeline.yaml</code></td><td>Referentiels hotels, types, gammes, categories, marques et fournisseurs.</td></tr>
+<tr><td><code>2_rank_pipeline.yaml</code></td><td>Classements des natures et groupes par marge.</td></tr>
+<tr><td><code>3_dataset_pipeline.yaml</code></td><td>Agregations, mensualisation, mix, metres lineaires et dataset pivot.</td></tr>
+<tr><td><code>4_simulation_pipeline.yaml</code></td><td>Retrait, redistribution, iteration et insertion des scenarios.</td></tr>
+<tr><td><code>5_restitution_base_pipeline.yaml</code></td><td>Normalisation des simulations et coefficients par solution.</td></tr>
+<tr><td><code>6_restitution_prediction_pipeline.yaml</code></td><td>Input utilisateur et predictions A et B.</td></tr>
+<tr><td><code>7_loo_pipeline.yaml</code></td><td>Leave-One-Out, resultats et metriques.</td></tr>
+</tbody>
+</table>
+
+<h3>16.1 Fonctions principales</h3>
+<pre><code>simulation = main()
+predictions = run_restitution(...)
+loo = run_leave_one_out(...)</code></pre>
+
+<h3>16.2 Sorties principales</h3>
+<ul>
+  <li><code>t_dataset_pivot</code> : dataset de modelisation simule.</li>
+  <li><code>v_restitution_prediction</code> : predictions par solution et methode.</li>
+  <li><code>t_loo_results</code> : detail des predictions LOO par hotel.</li>
+  <li><code>v_loo_metrics</code> : metriques globales et par solution.</li>
+  <li><code>v_loo_method_comparison</code> : comparaison directe des methodes A et B.</li>
+</ul>
+</section>
+
+</main>
+</div>
+
+<footer>
+Document de reference du moteur de simulation, restitution et evaluation Leave-One-Out.
+</footer>
+</body>
+</html>
