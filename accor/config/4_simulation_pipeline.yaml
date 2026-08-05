@@ -9,7 +9,7 @@ t_scenarios:
   - df_scenarios
   sql: |
     SELECT
-        CAST(scenario_id AS INTEGER) AS scenario_id,
+        CAST(scenario_id AS VARCHAR) AS scenario_id,
         FROM_JSON(
             scenario_removed_natures_json,
             '["VARCHAR"]'
@@ -22,20 +22,21 @@ v_scenario_step:
   type: view
   mode: create_if_not_exists
   requires:
-    - t_scenarios
-  sql: |
+  - t_scenarios
+  sql: |-
     SELECT
         scenario_id,
         scenario_removed_natures
     FROM
         t_scenarios
     WHERE
-        scenario_id = 0
+        LEN(scenario_removed_natures) = 0
+    LIMIT 1
 v_scenario_removed_natures:
   type: view
   mode: create_or_replace
-  requires: 
-    - v_scenario_step
+  requires:
+  - v_scenario_step
   sql: |
     SELECT
         scenario_id,
@@ -264,3 +265,5 @@ i_iteration_scenario:
   target: x_insert_dataset_pivot
   order_by:
   - scenario_id
+  completed_table: t_dataset_pivot
+  completed_key: scenario_id
