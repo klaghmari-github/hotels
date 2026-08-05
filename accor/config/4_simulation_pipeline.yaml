@@ -116,6 +116,7 @@ v_sales_current:
       PRIX_HT * quantite_scenario / NULLIF(QUANTITE, 0) AS PRIX_HT,
       PRIX_TTC * quantite_scenario / NULLIF(QUANTITE, 0) AS PRIX_TTC,
       PRIX_TTC_MARCHE * quantite_scenario / NULLIF(QUANTITE, 0) AS PRIX_TTC_MARCHE,
+      MARGE_SELON_COEF * quantite_scenario / NULLIF(QUANTITE, 0) AS MARGE_SELON_COEF,
       MARGE * quantite_scenario / NULLIF(QUANTITE, 0) AS MARGE
     FROM sales_quantite
 v_scenarios_to_process:

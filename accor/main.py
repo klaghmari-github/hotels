@@ -433,6 +433,9 @@ class ConnectionPipeline(ConnectionUtils):
         name: str,
         processed: set[str] | None = None,
     ) -> None:
+
+        logging.info(f"process with requires : {name}")
+        
         if name not in self.pipeline:
             raise KeyError(
                 f"Objet absent du pipeline : {name}"
