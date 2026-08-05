@@ -1167,140 +1167,6 @@ def ensure_varchar_array_column(
         f'USING {using_sql}'
     )
 
-
-def relation_schema(
-    connection: duckdb.DuckDBPyConnection,
-    relation_name: str,
-) -> list[tuple[str, str]]:
-    rows = connection.execute(
-        """
-        SELECT
-            column_name,
-            data_type
-        FROM information_schema.columns
-        WHERE table_schema = current_schema()
-          AND table_name = ?
-        ORDER BY ordinal_position
-        """,
-        [relation_name],
-    ).fetchall()
-
-    if not rows:
-        raise KeyError(
-            f"Schema introuvable pour la relation : {relation_name}"
-        )
-
-    return [
-        (str(column_name), str(data_type))
-        for column_name, data_type in rows
-    ]
-
-
-def normalize_duckdb_type(data_type: str) -> str:
-    return " ".join(
-        str(data_type).upper().replace(" ARRAY", "[]").split()
-    )
-
-
-def schemas_match(
-    left: list[tuple[str, str]],
-    right: list[tuple[str, str]],
-) -> bool:
-    if len(left) != len(right):
-        return False
-
-    return all(
-        left_name == right_name
-        and normalize_duckdb_type(left_type)
-        == normalize_duckdb_type(right_type)
-        for (left_name, left_type), (right_name, right_type)
-        in zip(left, right)
-    )
-
-
-def create_empty_table_from_schema(
-    connection: duckdb.DuckDBPyConnection,
-    table_name: str,
-    schema: list[tuple[str, str]],
-    replace: bool = False,
-) -> None:
-    if replace:
-        drop_relation_if_exists(
-            connection,
-            table_name,
-        )
-
-    columns_sql = ",\n                ".join(
-        f'"{column_name}" {data_type}'
-        for column_name, data_type in schema
-    )
-
-    connection.sql(
-        f"""CREATE TABLE IF NOT EXISTS "{table_name}" (
-                {columns_sql}
-            )"""
-    )
-
-
-def ensure_table_schema(
-    connection: duckdb.DuckDBPyConnection,
-    table_name: str,
-    expected_schema: list[tuple[str, str]],
-) -> None:
-    current_type = relation_type(
-        connection,
-        table_name,
-    )
-
-    if current_type is None:
-        create_empty_table_from_schema(
-            connection,
-            table_name,
-            expected_schema,
-        )
-        return
-
-    if current_type != "table":
-        drop_relation_if_exists(
-            connection,
-            table_name,
-        )
-        create_empty_table_from_schema(
-            connection,
-            table_name,
-            expected_schema,
-        )
-        return
-
-    current_schema = relation_schema(
-        connection,
-        table_name,
-    )
-
-    if schemas_match(
-        current_schema,
-        expected_schema,
-    ):
-        return
-
-    row_count = connection.sql(
-        f'SELECT COUNT(*) FROM "{table_name}"'
-    ).fetchone()[0]
-
-    if int(row_count) != 0:
-        raise RuntimeError(
-            f"Le schema de {table_name} est incompatible avec "
-            "le schema partage et la table contient deja des donnees. "
-            "La base worker doit etre reconstruite."
-        )
-
-    create_empty_table_from_schema(
-        connection,
-        table_name,
-        expected_schema,
-        replace=True,
-    )
-
 def seed_backing_table_name(
     relation_name: str,
 ) -> str:
@@ -1901,9 +1767,11 @@ class ParallelIterationManager:
             )
         )
 
-        result_schema = relation_schema(
-            self.shared_cp.con,
-            self.result_table,
+        empty_result = (
+            self.shared_cp
+            .table_view(self.result_table)
+            .limit(0)
+            .df()
         )
 
         for bucket_id, bucket_df in pending.groupby(
@@ -1958,10 +1826,12 @@ class ParallelIterationManager:
                         replace=True,
                     )
 
-                ensure_table_schema(
+                register_dataframe_as_relation(
                     worker_connection,
                     self.result_table,
-                    result_schema,
+                    empty_result,
+                    "table",
+                    replace=True,
                 )
 
                 write_worker_metadata(
@@ -1991,10 +1861,15 @@ class ParallelIterationManager:
                             replace=True,
                         )
 
-            ensure_table_schema(
+            ensure_varchar_column(
                 worker_connection,
                 self.result_table,
-                result_schema,
+                "scenario_id",
+            )
+            ensure_varchar_array_column(
+                worker_connection,
+                self.result_table,
+                "scenario_removed_natures",
             )
 
             local_scenarios = bucket_df[
