@@ -2,19 +2,17 @@ df_scenarios:
   type: dataframe
   requires: []
   file: data/scenarios.xlsx
-
 t_scenarios:
   type: table
   mode: create_if_not_exists
   requires:
-    - df_scenarios
+  - df_scenarios
   sql: |
     SELECT
       CAST(scenario_id AS VARCHAR) AS scenario_id,
       FROM_JSON(scenario_removed_natures_json, '["VARCHAR"]') AS scenario_removed_natures
     FROM df_scenarios
     ORDER BY scenario_id
-
 v_scenario_removed_natures:
   type: view
   mode: create_or_replace
@@ -22,12 +20,11 @@ v_scenario_removed_natures:
   sql: |
     SELECT scenario_id, UNNEST(scenario_removed_natures) AS nature
     FROM v_scenario_step
-
 v_sales_hotel_baseline:
   type: view
   mode: create_or_replace
   requires:
-    - t_sales
+  - t_sales
   sql: |
     SELECT
       HOTEL_CODE AS hotel_code,
@@ -38,13 +35,12 @@ v_sales_hotel_baseline:
       SUM(QUANTITE) AS nombre_ventes
     FROM t_sales
     GROUP BY HOTEL_CODE
-
 v_sales_nature_baseline:
   type: view
   mode: create_or_replace
   requires:
-    - t_sales
-    - v_sales_hotel_baseline
+  - t_sales
+  - v_sales_hotel_baseline
   sql: |
     SELECT
       s.HOTEL_CODE AS hotel_code,
@@ -55,24 +51,22 @@ v_sales_nature_baseline:
     INNER JOIN v_sales_hotel_baseline AS h ON h.hotel_code = s.HOTEL_CODE
     WHERE s.NATURE_PRODUIT IS NOT NULL
     GROUP BY s.HOTEL_CODE, s.NATURE_PRODUIT
-
 v_sales_removed:
   type: view
   mode: create_or_replace
   requires:
-    - t_sales
-    - v_scenario_removed_natures
+  - t_sales
+  - v_scenario_removed_natures
   sql: |
     SELECT s.*
     FROM t_sales AS s
     INNER JOIN v_scenario_removed_natures AS r ON r.nature = s.NATURE_PRODUIT
-
 v_sales_removed_hotel:
   type: view
   mode: create_or_replace
   requires:
-    - v_sales_removed
-    - v_sales_hotel_baseline
+  - v_sales_removed
+  - v_sales_hotel_baseline
   sql: |
     SELECT
       h.hotel_code,
@@ -81,13 +75,12 @@ v_sales_removed_hotel:
     FROM v_sales_hotel_baseline AS h
     LEFT JOIN v_sales_removed AS r ON r.HOTEL_CODE = h.hotel_code
     GROUP BY h.hotel_code
-
 v_sales_filtered:
   type: view
   mode: create_or_replace
   requires:
-    - t_sales
-    - v_scenario_removed_natures
+  - t_sales
+  - v_scenario_removed_natures
   sql: |
     SELECT s.*
     FROM t_sales AS s
@@ -96,14 +89,13 @@ v_sales_filtered:
       FROM v_scenario_removed_natures AS r
       WHERE r.nature = s.NATURE_PRODUIT
     )
-
 v_sales_current:
   type: view
   mode: create_or_replace
   requires:
-    - v_sales_filtered
-    - v_sales_nature_baseline
-    - v_sales_removed_hotel
+  - v_sales_filtered
+  - v_sales_nature_baseline
+  - v_sales_removed_hotel
   sql: |
     WITH sales_factor AS (
       SELECT
@@ -119,25 +111,49 @@ v_sales_current:
       FROM sales_factor
     )
     SELECT
-      * EXCLUDE (QUANTITE, PRIX_HT, PRIX_TTC, PRIX_TTC_MARCHE, MARGE, nature_nombre_ventes_ajoutees, ligne_part_nature, quantite_scenario),
+      * EXCLUDE (QUANTITE, PRIX_HT, PRIX_TTC, PRIX_TTC_MARCHE, MARGE_SELON_COEF, MARGE, nature_nombre_ventes_ajoutees, ligne_part_nature, quantite_scenario),
       quantite_scenario AS QUANTITE,
       PRIX_HT * quantite_scenario / NULLIF(QUANTITE, 0) AS PRIX_HT,
       PRIX_TTC * quantite_scenario / NULLIF(QUANTITE, 0) AS PRIX_TTC,
       PRIX_TTC_MARCHE * quantite_scenario / NULLIF(QUANTITE, 0) AS PRIX_TTC_MARCHE,
       MARGE * quantite_scenario / NULLIF(QUANTITE, 0) AS MARGE
     FROM sales_quantite
-
+v_scenarios_to_process:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_scenarios
+  - t_dataset_pivot
+  - t_hotel_codes
+  sql: |-
+    WITH completed_scenarios AS (
+      SELECT scenario_id
+      FROM t_dataset_pivot
+      GROUP BY scenario_id
+      HAVING COUNT(DISTINCT hotel_code) =
+             (SELECT COUNT(*) FROM t_hotel_codes)
+    )
+    SELECT s.*
+    FROM t_scenarios AS s
+    LEFT JOIN completed_scenarios AS c
+      USING (scenario_id)
+    WHERE c.scenario_id IS NULL
 i_iteration_scenario:
   type: iteration
+  execution: parallel
+  tasks: auto
+  reserved_cpus: 2
+  duckdb_threads_per_worker: 1
+  worker_database_pattern: duckdb/workers/simulation_task_{task_id:03d}.duckdb
   requires:
-    - t_scenarios
-    - t_hotel_codes
-  scenarios: t_scenarios
+  - v_scenarios_to_process
+  scenarios: v_scenarios_to_process
   step_view: v_scenario_step
   target: x_insert_dataset_pivot
+  result_table: t_dataset_pivot
   completed_table: t_dataset_pivot
   completed_key: scenario_id
   completed_group_key: hotel_code
   expected_count_table: t_hotel_codes
   order_by:
-    - scenario_id
+  - scenario_id

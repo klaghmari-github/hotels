@@ -2,20 +2,41 @@ v_dataset_ref:
   type: view
   mode: create_or_replace
   requires:
-    - t_sales
-  sql: |
+  - t_sales
+  - v_dataset_mix_nombre_global
+  sql: |-
+    WITH hotel_baseline AS (
+      SELECT
+        HOTEL_CODE AS hotel_code,
+        ANY_VALUE(SOLUTION) AS solution,
+        MAX(METRES_LINEAIRES) AS metres_lineaires_observes,
+        COUNT(DISTINCT NATURE_PRODUIT) AS nombre_natures_observees
+      FROM t_sales
+      GROUP BY HOTEL_CODE
+    )
     SELECT
-      HOTEL_CODE AS hotel_code,
-      ANY_VALUE(SOLUTION) AS solution,
-      ANY_VALUE(METRES_LINEAIRES) AS metres_lineaires
-    FROM t_sales
-    GROUP BY HOTEL_CODE
-
+      b.hotel_code,
+      b.solution,
+      b.metres_lineaires_observes,
+      b.nombre_natures_observees,
+      CASE
+        WHEN b.nombre_natures_observees = 0 THEN 0
+        ELSE b.metres_lineaires_observes / b.nombre_natures_observees
+      END AS metres_lineaires_par_nature,
+      CASE
+        WHEN b.nombre_natures_observees = 0 THEN 0
+        ELSE
+          (b.metres_lineaires_observes / b.nombre_natures_observees)
+          * COALESCE(m.nombre_natures, 0)
+      END AS metres_lineaires
+    FROM hotel_baseline AS b
+    LEFT JOIN v_dataset_mix_nombre_global AS m
+      USING (hotel_code)
 v_dataset_observation_context:
   type: view
   mode: create_or_replace
   requires:
-    - t_sales
+  - t_sales
   sql: |
     SELECT
       HOTEL_CODE AS hotel_code,
@@ -28,59 +49,58 @@ v_dataset_observation_context:
         * (DATE_DIFF('month', MIN(DATE), MAX(DATE)) + 1) AS nombre_guests
     FROM t_sales
     GROUP BY HOTEL_CODE
-
 v_dataset_observation_activity:
   type: view
   mode: create_or_replace
   requires:
-    - v_sales_current
-  sql: |
+  - v_sales_current
+  sql: |-
     SELECT
       HOTEL_CODE AS hotel_code,
       SUM(QUANTITE) AS nombre_ventes,
       SUM(PRIX_TTC) AS montant_ventes,
+      SUM(MARGE_SELON_COEF) AS montant_marge_selon_coef,
       SUM(MARGE) AS montant_marge
     FROM v_sales_current
     GROUP BY HOTEL_CODE
-
 v_dataset_observation_total:
   type: view
   mode: create_or_replace
   requires:
-    - v_dataset_observation_context
-    - v_dataset_observation_activity
-  sql: |
+  - v_dataset_observation_context
+  - v_dataset_observation_activity
+  sql: |-
     SELECT
       c.hotel_code,
       c.nombre_mois,
       c.nombre_guests,
       COALESCE(a.nombre_ventes, 0) AS nombre_ventes,
       COALESCE(a.montant_ventes, 0) AS montant_ventes,
+      COALESCE(a.montant_marge_selon_coef, 0) AS montant_marge_selon_coef,
       COALESCE(a.montant_marge, 0) AS montant_marge
     FROM v_dataset_observation_context AS c
     LEFT JOIN v_dataset_observation_activity AS a USING (hotel_code)
-
 v_dataset_observation_par_mois:
   type: view
   mode: create_or_replace
   requires:
-    - v_dataset_observation_total
-  sql: |
+  - v_dataset_observation_total
+  sql: |-
     SELECT
       hotel_code,
       nombre_mois,
       nombre_guests / NULLIF(nombre_mois, 0) AS nombre_guests_par_mois,
       nombre_ventes / NULLIF(nombre_mois, 0) AS nombre_ventes_par_mois,
       montant_ventes / NULLIF(nombre_mois, 0) AS montant_ventes_par_mois,
+      montant_marge_selon_coef / NULLIF(nombre_mois, 0) AS montant_marge_selon_coef_par_mois,
       montant_marge / NULLIF(nombre_mois, 0) AS montant_marge_par_mois
     FROM v_dataset_observation_total
-
 v_dataset_mix_nombre_global:
   type: view
   mode: create_or_replace
   requires:
-    - t_hotel_codes
-    - v_sales_current
+  - t_hotel_codes
+  - v_sales_current
   sql: |
     WITH current_mix AS (
       SELECT
@@ -104,12 +124,11 @@ v_dataset_mix_nombre_global:
       COALESCE(m.nombre_fournisseurs, 0) AS nombre_fournisseurs
     FROM t_hotel_codes AS h
     LEFT JOIN current_mix AS m ON m.hotel_code = h.HOTEL_CODE
-
 v_dataset_mix_metric_names:
   type: view
   mode: create_or_replace
   requires:
-    - t_sales
+  - t_sales
   sql: |
     SELECT DISTINCT 'categorie_' || TRIM(BOTH '_' FROM REGEXP_REPLACE(LOWER(CAST(CATEGORIE AS VARCHAR)), '[^a-z0-9]+', '_', 'g')) || '_nombre_natures' AS metric_name FROM t_sales WHERE CATEGORIE IS NOT NULL
     UNION
@@ -120,12 +139,11 @@ v_dataset_mix_metric_names:
     SELECT DISTINCT 'marque_' || TRIM(BOTH '_' FROM REGEXP_REPLACE(LOWER(CAST(MARQUE AS VARCHAR)), '[^a-z0-9]+', '_', 'g')) || '_nombre_natures' FROM t_sales WHERE MARQUE IS NOT NULL
     UNION
     SELECT DISTINCT 'fournisseur_' || TRIM(BOTH '_' FROM REGEXP_REPLACE(LOWER(CAST(FOURNISSEUR AS VARCHAR)), '[^a-z0-9]+', '_', 'g')) || '_nombre_natures' FROM t_sales WHERE FOURNISSEUR IS NOT NULL
-
 v_dataset_mix_nombre_observed_long:
   type: view
   mode: create_or_replace
   requires:
-    - v_sales_current
+  - v_sales_current
   sql: |
     SELECT HOTEL_CODE AS hotel_code, 'categorie_' || TRIM(BOTH '_' FROM REGEXP_REPLACE(LOWER(CAST(CATEGORIE AS VARCHAR)), '[^a-z0-9]+', '_', 'g')) || '_nombre_natures' AS metric_name, COUNT(DISTINCT NATURE_PRODUIT) AS metric_value FROM v_sales_current WHERE CATEGORIE IS NOT NULL AND NATURE_PRODUIT IS NOT NULL GROUP BY HOTEL_CODE, CATEGORIE
     UNION ALL
@@ -136,49 +154,45 @@ v_dataset_mix_nombre_observed_long:
     SELECT HOTEL_CODE, 'marque_' || TRIM(BOTH '_' FROM REGEXP_REPLACE(LOWER(CAST(MARQUE AS VARCHAR)), '[^a-z0-9]+', '_', 'g')) || '_nombre_natures', COUNT(DISTINCT NATURE_PRODUIT) FROM v_sales_current WHERE MARQUE IS NOT NULL AND NATURE_PRODUIT IS NOT NULL GROUP BY HOTEL_CODE, MARQUE
     UNION ALL
     SELECT HOTEL_CODE, 'fournisseur_' || TRIM(BOTH '_' FROM REGEXP_REPLACE(LOWER(CAST(FOURNISSEUR AS VARCHAR)), '[^a-z0-9]+', '_', 'g')) || '_nombre_natures', COUNT(DISTINCT NATURE_PRODUIT) FROM v_sales_current WHERE FOURNISSEUR IS NOT NULL AND NATURE_PRODUIT IS NOT NULL GROUP BY HOTEL_CODE, FOURNISSEUR
-
 v_dataset_mix_nombre_long:
   type: view
   mode: create_or_replace
   requires:
-    - t_hotel_codes
-    - v_dataset_mix_metric_names
-    - v_dataset_mix_nombre_observed_long
+  - t_hotel_codes
+  - v_dataset_mix_metric_names
+  - v_dataset_mix_nombre_observed_long
   sql: |
     SELECT h.HOTEL_CODE AS hotel_code, m.metric_name, COALESCE(o.metric_value, 0) AS metric_value
     FROM t_hotel_codes AS h
     CROSS JOIN v_dataset_mix_metric_names AS m
     LEFT JOIN v_dataset_mix_nombre_observed_long AS o
       ON o.hotel_code = h.HOTEL_CODE AND o.metric_name = m.metric_name
-
 t_dataset_mix_nombre_detail:
   type: table
   mode: create_or_replace
   requires:
-    - v_dataset_mix_nombre_long
+  - v_dataset_mix_nombre_long
   sql: |
     PIVOT v_dataset_mix_nombre_long
     ON metric_name
     USING MAX(metric_value)
     GROUP BY hotel_code
-
 v_dataset_mix_nombre:
   type: view
   mode: create_or_replace
   requires:
-    - v_dataset_mix_nombre_global
-    - t_dataset_mix_nombre_detail
+  - v_dataset_mix_nombre_global
+  - t_dataset_mix_nombre_detail
   sql: |
     SELECT g.*, d.* EXCLUDE (hotel_code)
     FROM v_dataset_mix_nombre_global AS g
     LEFT JOIN t_dataset_mix_nombre_detail AS d USING (hotel_code)
-
 v_dataset_mix_pourcentage_long:
   type: view
   mode: create_or_replace
   requires:
-    - v_dataset_mix_nombre_long
-    - v_dataset_mix_nombre_global
+  - v_dataset_mix_nombre_long
+  - v_dataset_mix_nombre_global
   sql: |
     SELECT
       l.hotel_code,
@@ -186,37 +200,34 @@ v_dataset_mix_pourcentage_long:
       CASE WHEN g.nombre_natures = 0 THEN 0 ELSE l.metric_value / g.nombre_natures END AS metric_value
     FROM v_dataset_mix_nombre_long AS l
     INNER JOIN v_dataset_mix_nombre_global AS g USING (hotel_code)
-
 t_dataset_mix_pourcentage_detail:
   type: table
   mode: create_or_replace
   requires:
-    - v_dataset_mix_pourcentage_long
+  - v_dataset_mix_pourcentage_long
   sql: |
     PIVOT v_dataset_mix_pourcentage_long
     ON metric_name
     USING MAX(metric_value)
     GROUP BY hotel_code
-
 v_dataset_mix_pourcentage:
   type: view
   mode: create_or_replace
   requires:
-    - v_dataset_mix_nombre_global
-    - t_dataset_mix_pourcentage_detail
+  - v_dataset_mix_nombre_global
+  - t_dataset_mix_pourcentage_detail
   sql: |
     SELECT g.hotel_code, g.nombre_natures, d.* EXCLUDE (hotel_code)
     FROM v_dataset_mix_nombre_global AS g
     LEFT JOIN t_dataset_mix_pourcentage_detail AS d USING (hotel_code)
-
 v_dataset_pivot:
   type: view
   mode: create_or_replace
   requires:
-    - v_dataset_ref
-    - v_dataset_observation_par_mois
-    - v_dataset_mix_nombre
-    - v_dataset_mix_pourcentage
+  - v_dataset_ref
+  - v_dataset_observation_par_mois
+  - v_dataset_mix_nombre
+  - v_dataset_mix_pourcentage
   sql: |
     SELECT
       s.scenario_id,
@@ -232,22 +243,20 @@ v_dataset_pivot:
     LEFT JOIN v_dataset_observation_par_mois AS o USING (hotel_code)
     LEFT JOIN v_dataset_mix_nombre AS mn USING (hotel_code)
     LEFT JOIN v_dataset_mix_pourcentage AS mp USING (hotel_code)
-
 t_dataset_pivot:
   type: table
   mode: create_if_not_exists
   requires:
-    - v_dataset_pivot
+  - v_dataset_pivot
   sql: |
     SELECT *
     FROM v_dataset_pivot
     LIMIT 0
-
 x_insert_dataset_pivot:
   type: execute
   requires:
-    - t_dataset_pivot
-    - v_dataset_pivot
+  - t_dataset_pivot
+  - v_dataset_pivot
   sql: |
     INSERT INTO t_dataset_pivot BY NAME
     SELECT p.*
