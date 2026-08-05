@@ -1012,87 +1012,16 @@ def scenario_bucket(
     )
 
 
-
-def relation_type(
+def register_dataframe_as_table(
     connection: duckdb.DuckDBPyConnection,
-    relation_name: str,
-) -> str | None:
-    row = connection.execute(
-        """
-        SELECT relation_type
-        FROM (
-            SELECT
-                table_name AS relation_name,
-                'table' AS relation_type
-            FROM information_schema.tables
-            WHERE table_type = 'BASE TABLE'
-
-            UNION ALL
-
-            SELECT
-                table_name AS relation_name,
-                'view' AS relation_type
-            FROM information_schema.views
-        )
-        WHERE relation_name = ?
-        LIMIT 1
-        """,
-        [relation_name],
-    ).fetchone()
-
-    if row is None:
-        return None
-
-    return str(row[0])
-
-
-def drop_relation_if_exists(
-    connection: duckdb.DuckDBPyConnection,
-    relation_name: str,
-) -> None:
-    current_type = relation_type(
-        connection,
-        relation_name,
-    )
-
-    if current_type == "view":
-        connection.sql(
-            f'DROP VIEW "{relation_name}"'
-        )
-    elif current_type == "table":
-        connection.sql(
-            f'DROP TABLE "{relation_name}"'
-        )
-
-
-def seed_backing_table_name(
-    relation_name: str,
-) -> str:
-    digest = hashlib.sha1(
-        relation_name.encode("utf-8")
-    ).hexdigest()[:12]
-
-    return f"__seed_data_{digest}"
-
-
-def register_dataframe_as_relation(
-    connection: duckdb.DuckDBPyConnection,
-    relation_name: str,
+    table_name: str,
     dataframe: pd.DataFrame,
-    relation_kind: str,
     replace: bool,
 ) -> None:
-    relation_kind = relation_kind.lower()
-
-    if relation_kind not in {"table", "view"}:
-        raise ValueError(
-            f"Type de relation non supporte : {relation_kind}"
-        )
-
     registered_name = (
-        "__seed_buffer_"
+        "__seed_"
         + hashlib.sha1(
-            relation_name.encode("utf-8")
+            table_name.encode("utf-8")
         ).hexdigest()[:12]
     )
 
@@ -1109,38 +1038,97 @@ def register_dataframe_as_relation(
     )
 
     if replace:
-        drop_relation_if_exists(
-            connection,
-            relation_name,
-        )
-
-    if relation_kind == "table":
         connection.sql(
-            f'CREATE TABLE IF NOT EXISTS '
-            f'"{relation_name}" AS '
-            f'SELECT * FROM "{registered_name}"'
+            f'DROP VIEW IF EXISTS "{table_name}"'
         )
-        return
-
-    backing_table = seed_backing_table_name(
-        relation_name
-    )
-
-    if replace:
         connection.sql(
-            f'DROP TABLE IF EXISTS "{backing_table}"'
+            f'DROP TABLE IF EXISTS "{table_name}"'
         )
 
     connection.sql(
         f'CREATE TABLE IF NOT EXISTS '
-        f'"{backing_table}" AS '
+        f'"{table_name}" AS '
         f'SELECT * FROM "{registered_name}"'
     )
 
+
+def ensure_varchar_column(
+    connection: duckdb.DuckDBPyConnection,
+    table_name: str,
+    column_name: str,
+) -> None:
+    table_exists = connection.sql(
+        f"""
+        SELECT COUNT(*) > 0
+        FROM information_schema.tables
+        WHERE table_name = '{table_name}'
+          AND table_type = 'BASE TABLE'
+        """
+    ).fetchone()[0]
+
+    if not table_exists:
+        return
+
+    columns = connection.sql(
+        f'PRAGMA table_info("{table_name}")'
+    ).df()
+
+    current = columns[
+        columns["name"] == column_name
+    ]
+
+    if current.empty:
+        raise ValueError(
+            f"Colonne absente dans {table_name} : {column_name}"
+        )
+
+    current_type = str(
+        current.iloc[0]["type"]
+    ).upper()
+
+    if current_type in {
+        "VARCHAR",
+        "TEXT",
+        "STRING",
+    }:
+        return
+
+    expressions = []
+
+    for column in columns["name"].tolist():
+        quoted = '"' + str(column).replace('"', '""') + '"'
+
+        if column == column_name:
+            expressions.append(
+                f"CAST({quoted} AS VARCHAR) AS {quoted}"
+            )
+        else:
+            expressions.append(quoted)
+
+    temporary_table = (
+        "__retype_"
+        + hashlib.sha1(
+            f"{table_name}.{column_name}".encode("utf-8")
+        ).hexdigest()[:12]
+    )
+
     connection.sql(
-        f'CREATE OR REPLACE VIEW '
-        f'"{relation_name}" AS '
-        f'SELECT * FROM "{backing_table}"'
+        f'DROP TABLE IF EXISTS "{temporary_table}"'
+    )
+    connection.sql(
+        f"""
+        CREATE TABLE "{temporary_table}" AS
+        SELECT
+            {", ".join(expressions)}
+        FROM "{table_name}"
+        """
+    )
+    connection.sql(
+        f'DROP TABLE "{table_name}"'
+    )
+    connection.sql(
+        f'ALTER TABLE "{temporary_table}" '
+        f'RENAME TO "{table_name}"'
     )
 
 
@@ -1428,6 +1416,11 @@ class ParallelIterationManager:
         if self.shared_cp.table_exists(
             self.result_table
         ):
+            ensure_varchar_column(
+                self.shared_cp.con,
+                self.result_table,
+                "scenario_id",
+            )
             return
 
         step_view = self.config["step_view"]
@@ -1461,6 +1454,12 @@ class ParallelIterationManager:
         self.shared_cp.process_with_requires(
             self.result_table,
             processed=set(),
+        )
+
+        ensure_varchar_column(
+            self.shared_cp.con,
+            self.result_table,
+            "scenario_id",
         )
 
     def merge_existing_worker_results(
@@ -1531,11 +1530,10 @@ class ParallelIterationManager:
             """
         ).fetchone()[0]
 
-        register_dataframe_as_relation(
+        register_dataframe_as_table(
             self.shared_cp.con,
             "__worker_result_buffer",
             dataframe,
-            "table",
             replace=True,
         )
 
@@ -1576,13 +1574,13 @@ class ParallelIterationManager:
 
     def stable_seed_frames(
         self,
-    ) -> dict[str, dict[str, Any]]:
+    ) -> dict[str, pd.DataFrame]:
         target = self.config["target"]
         frontier = self.shared_cp.tree.stable_frontier(
             target
         )
 
-        frames: dict[str, dict[str, Any]] = {}
+        frames: dict[str, pd.DataFrame] = {}
 
         for name in frontier:
             if name in {
@@ -1595,16 +1593,11 @@ class ParallelIterationManager:
                 name,
                 processed=set(),
             )
-            frames[name] = {
-                "dataframe": (
-                    self.shared_cp
-                    .table_view(name)
-                    .df()
-                ),
-                "relation_type": (
-                    self.shared_cp.pipeline[name]["type"]
-                ),
-            }
+            frames[name] = (
+                self.shared_cp
+                .table_view(name)
+                .df()
+            )
 
         return frames
 
@@ -1625,7 +1618,7 @@ class ParallelIterationManager:
     def prepare_worker_databases(
         self,
         pending: pd.DataFrame,
-        seed_frames: dict[str, dict[str, Any]],
+        seed_frames: dict[str, pd.DataFrame],
     ) -> list[dict[str, Any]]:
         workers: list[dict[str, Any]] = []
 
@@ -1694,21 +1687,25 @@ class ParallelIterationManager:
             )
 
             if not metadata_ok:
-                for name, seed in seed_frames.items():
-                    register_dataframe_as_relation(
+                for name, dataframe in seed_frames.items():
+                    register_dataframe_as_table(
                         worker_connection,
                         name,
-                        seed["dataframe"],
-                        seed["relation_type"],
+                        dataframe,
                         replace=True,
                     )
 
-                register_dataframe_as_relation(
+                register_dataframe_as_table(
                     worker_connection,
                     self.result_table,
                     empty_result,
-                    "table",
                     replace=True,
+                )
+
+                ensure_varchar_column(
+                    worker_connection,
+                    self.result_table,
+                    "scenario_id",
                 )
 
                 write_worker_metadata(
@@ -1719,22 +1716,26 @@ class ParallelIterationManager:
                     int(bucket_id),
                 )
             else:
-                for name, seed in seed_frames.items():
-                    current_type = relation_type(
-                        worker_connection,
-                        name,
-                    )
-
-                    expected_type = str(
-                        seed["relation_type"]
-                    ).lower()
-
-                    if current_type != expected_type:
-                        register_dataframe_as_relation(
+                for name, dataframe in seed_frames.items():
+                    if not (
+                        worker_connection.sql(
+                            f"""
+                            SELECT COUNT(*) > 0
+                            FROM (
+                                SELECT table_name
+                                FROM information_schema.tables
+                                UNION ALL
+                                SELECT table_name
+                                FROM information_schema.views
+                            )
+                            WHERE table_name = '{name}'
+                            """
+                        ).fetchone()[0]
+                    ):
+                        register_dataframe_as_table(
                             worker_connection,
                             name,
-                            seed["dataframe"],
-                            expected_type,
+                            dataframe,
                             replace=True,
                         )
 
@@ -1745,12 +1746,27 @@ class ParallelIterationManager:
                 ]
             ].copy()
 
-            register_dataframe_as_relation(
+            local_scenarios["scenario_id"] = (
+                local_scenarios["scenario_id"]
+                .astype(str)
+            )
+
+            register_dataframe_as_table(
                 worker_connection,
                 "t_scenarios",
                 local_scenarios,
-                "table",
                 replace=True,
+            )
+
+            ensure_varchar_column(
+                worker_connection,
+                "t_scenarios",
+                "scenario_id",
+            )
+            ensure_varchar_column(
+                worker_connection,
+                self.result_table,
+                "scenario_id",
             )
 
             worker_connection.close()
@@ -2004,11 +2020,10 @@ def replace_restitution_input_views(
             "target_part",
         ],
     )
-    register_dataframe_as_relation(
+    register_dataframe_as_table(
         cp.con,
         "__restitution_input_mix_buffer",
         input_df,
-        "table",
         replace=True,
     )
     cp.con.sql(
@@ -2125,11 +2140,10 @@ def run_restitution(
             "target_part",
         ],
     )
-    register_dataframe_as_relation(
+    register_dataframe_as_table(
         cp.con,
         "__restitution_input_mix_buffer",
         input_df,
-        "table",
         replace=True,
     )
     cp.con.sql(
