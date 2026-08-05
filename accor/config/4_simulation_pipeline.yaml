@@ -18,10 +18,24 @@ t_scenarios:
         df_scenarios
     ORDER BY
         scenario_id
+v_scenario_step:
+  type: view
+  mode: create_if_not_exists
+  requires:
+    - t_scenarios
+  sql: |
+    SELECT
+        scenario_id,
+        scenario_removed_natures
+    FROM
+        t_scenarios
+    WHERE
+        scenario_id = 0
 v_scenario_removed_natures:
   type: view
   mode: create_or_replace
-  requires: []
+  requires: 
+    - v_scenario_step
   sql: |
     SELECT
         scenario_id,
