@@ -613,8 +613,11 @@ class ConnectionPipeline(ConnectionUtils):
             start=1,
         ):
             scenario_started = time.perf_counter()
+            # LOO hotel : hotel_code ; simulation assortiment : scenario_id
             scenario_id = str(
-                row["scenario_id"]
+                row.get("scenario_id")
+                or row.get("hotel_code")
+                or index
             )
 
             logging.info(

@@ -1,0 +1,51 @@
+{
+  "target": "montant_marge_selon_coef_par_mois",
+  "target_label": "Marge mensuelle selon coefficient fixe",
+  "feature_names": [
+    "gamme_accessoires_part_natures",
+    "gamme_alcool_part_natures",
+    "gamme_cosmetique_part_natures",
+    "gamme_food_salee_part_natures",
+    "gamme_food_sucree_part_natures",
+    "gamme_formule_part_natures",
+    "gamme_jeux_enfants_part_natures",
+    "gamme_pap_part_natures",
+    "gamme_sans_alcool_part_natures",
+    "gamme_sos_part_natures",
+    "gamme_souvenirs_part_natures",
+    "hotel_guests_per_chambre",
+    "hotel_nb_chambres",
+    "hotel_to_annuel",
+    "metres_lineaires",
+    "solution_connected",
+    "solution_liberty",
+    "solution_simply",
+    "type_f_b_part_natures",
+    "type_non_f_b_part_natures"
+  ],
+  "params": {
+    "objective": "reg:squarederror",
+    "booster": "gbtree",
+    "tree_method": "hist",
+    "random_state": 42,
+    "n_jobs": 6,
+    "verbosity": 0,
+    "n_estimators": 258,
+    "learning_rate": 0.1468006595175598,
+    "max_depth": 7,
+    "min_child_weight": 10.76783022204122,
+    "subsample": 0.9893423339815979,
+    "colsample_bytree": 0.6181320282499216,
+    "gamma": 2.3592890132005246,
+    "reg_alpha": 1.8598025306720484e-08,
+    "reg_lambda": 98.12767021884238
+  },
+  "best_cv_score": 0.7534604790849659,
+  "training_rows": 12460,
+  "training_hotels": 7,
+  "solutions": [
+    "connected",
+    "liberty",
+    "simply"
+  ]
+}

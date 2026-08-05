@@ -210,9 +210,34 @@ class MLDatasetBuilder:
 
     def prepare(self) -> PreparedDataset:
         dataframe = self.load()
+        mix_columns = self.mix_columns(dataframe)
+
+        # Completer les parametres hotel incomplets avant validation.
+        for column in self.CONTEXT_FEATURES:
+            if column not in dataframe.columns:
+                continue
+            series = pd.to_numeric(dataframe[column], errors="coerce")
+            median = series.median()
+            if pd.isna(median):
+                median = 0.0
+            dataframe[column] = series.fillna(float(median))
+
+        for column in mix_columns:
+            dataframe[column] = (
+                pd.to_numeric(dataframe[column], errors="coerce")
+                .fillna(0.0)
+            )
+
+        for target in self.config.targets:
+            if target.name in dataframe.columns:
+                dataframe[target.name] = (
+                    pd.to_numeric(
+                        dataframe[target.name], errors="coerce"
+                    ).fillna(0.0)
+                )
+
         self.validate(dataframe)
 
-        mix_columns = self.mix_columns(dataframe)
         features = dataframe[
             [*self.CONTEXT_FEATURES, *mix_columns]
         ].astype(float)

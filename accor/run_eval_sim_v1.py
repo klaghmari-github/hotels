@@ -18,15 +18,14 @@ import sys
 from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parent
-if str(_ROOT / "src") not in sys.path:
-    sys.path.insert(0, str(_ROOT / "src"))
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
 
 import pandas as pd
 from flask import Flask, jsonify, render_template_string, send_file
 
-from accor.data_io import DATA_DIR
-
 DEFAULT_PORT = 5057
+DATA_DIR = _ROOT / "data"
 EXCEL_PATH = DATA_DIR / "eval_sim_v1_loo.xlsx"
 
 app = Flask(__name__)
