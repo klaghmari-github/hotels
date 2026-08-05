@@ -1,118 +1,3 @@
-df_sales:
-  type: dataframe
-  requires: []
-  file: data/hotel_sales_raw_extended_data.xlsx
-
-t_sales:
-  type: table
-  requires: [df_sales]
-  sql: |
-    SELECT
-        *
-    FROM
-        df_sales
-
-t_hotel_codes:
-  type: table
-  requires: 
-    - t_sales
-  sql: |
-    SELECT DISTINCT
-        HOTEL_CODE
-    FROM
-        t_sales
-    ORDER BY
-        HOTEL_CODE
-
-t_types:
-  type: table
-  requires: 
-    - t_sales
-  sql: |
-    SELECT DISTINCT
-        TYPE
-    FROM
-        t_sales
-    ORDER BY
-        TYPE
-
-
-t_gammes:
-  type: table
-  requires: 
-    - t_sales
-  sql: |
-    SELECT DISTINCT
-        GAMME
-    FROM
-        t_sales
-    ORDER BY
-        GAMME
-
-
-t_natures:
-  type: table
-  requires: 
-    - t_sales
-  sql: |
-    SELECT DISTINCT
-        NATURE
-    FROM
-        t_sales
-    ORDER BY
-        NATURE
-
-
-t_machines:
-  type: table
-  requires: 
-    - t_sales
-  sql: |
-    SELECT DISTINCT
-        MACHINE
-    FROM
-        t_sales
-    ORDER BY
-        MACHINE
-
-
-t_marques:
-  type: table
-  requires: 
-    - t_sales
-  sql: |
-    SELECT DISTINCT
-        MARQUE
-    FROM
-        t_sales
-    ORDER BY
-        MARQUE
-
-
-t_fournisseurs:
-  type: table
-  requires: 
-    - t_sales
-  sql: |
-    SELECT DISTINCT
-        FOURNISSEUR
-    FROM
-        t_sales
-    ORDER BY
-        FOURNISSEUR
-
-
-t_categories:
-  type: table
-  requires: 
-    - t_sales
-  sql: |
-    SELECT DISTINCT
-        CATEGORIE
-    FROM
-        t_sales
-    ORDER BY
-        CATEGORIE
 
 
 v_sales:
@@ -472,8 +357,9 @@ v_sales_model_base:
         type_montant_ventes / montant_ventes AS type_part_montant_ventes,
         type_montant_achats / montant_achats AS type_part_montant_achats,
         type_montant_marge / montant_marge AS type_part_montant_marge,
-        -- Part m_lin produit sur assortiment de base (égalitaire 1/N).
-        -- Figée ensuite en sim : ne pas re-répartir après retrait de produits.
+        -- Part m_lin produit (égalitaire 1/N) sur l'assortiment **courant**.
+        -- En simulation, SalesPilSim re-fige ces colonnes depuis t_sales_model_base
+        -- pour que Σ m_lin des produits restants < m_lin hôtel après retraits.
         produit_part_des_produits AS produit_part_metres_lineaires,
         metres_lineaires * produit_part_des_produits AS produit_metres_lineaires
     FROM
@@ -512,13 +398,11 @@ t_produits_ordered:
     - t_sales_model_base
   sql: |
     SELECT DISTINCT
-        hotel_code,
         produit,
         produit_montant_marge
     FROM
         t_sales_model_base
     ORDER BY
-        hotel_code,
         produit_montant_marge,
         produit
 
@@ -529,13 +413,11 @@ t_gamme_ordered:
     - t_sales_model_base
   sql: |
     SELECT DISTINCT
-        hotel_code,
         gamme,
         gamme_montant_marge
     FROM
         t_sales_model_base
     ORDER BY
-        hotel_code,
         gamme_montant_marge,
         gamme
 
@@ -545,12 +427,20 @@ t_types_ordered:
     - t_sales_model_base
   sql: |
     SELECT DISTINCT
-        hotel_code,
         type,
         type_montant_marge
     FROM
         t_sales_model_base
     ORDER BY
-        hotel_code,
         type_montant_marge,
         type
+
+t_sales_model_sim:
+  type: table
+  requires:
+    - t_sales_model_base
+  sql: |
+    SELECT
+        *
+    FROM
+        t_sales_model_base
