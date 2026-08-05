@@ -1,29 +1,8 @@
-# =============================================================================
-# DATASETS DE MODELISATION HOTEL
-#
-# Grain final :
-# - une ligne par HOTEL_CODE ;
-# - valeurs d'activité mensualisées ;
-# - structure et mix d'exposition non mensualisés ;
-# - solution et mètres linéaires issus des valeurs de référence.
-#
-# Hypothèses de la source t_sales :
-# - une ligne correspond à une vente d'une nature de produit ;
-# - NATURE_PRODUIT est la granularité atomique d'exposition ;
-# - NOMBRE_GUESTS est sommable sur la période ;
-# - PRIX_TTC représente le montant TTC à agréger ;
-# - MARGE représente la marge à agréger.
-# =============================================================================
-
-
-# -----------------------------------------------------------------------------
-# 1. Valeurs de référence de l'hôtel
-# -----------------------------------------------------------------------------
-
-t_dataset_ref:
-  type: table
+v_dataset_ref:
+  type: view
+  mode: create_or_replace
   requires:
-    - t_sales
+  - t_sales
   sql: |
     SELECT
         HOTEL_CODE AS hotel_code,
@@ -35,21 +14,12 @@ t_dataset_ref:
         HOTEL_CODE
     ORDER BY
         HOTEL_CODE
-
-
-# -----------------------------------------------------------------------------
-# 2. Observation totale de l'activité avant mensualisation
-#
-# nombre_ventes = nombre de lignes de vente.
-# Une ligne représentant une vente de nature, COUNT(*) est volontairement
-# utilisé à la place de SUM(QUANTITE).
-# -----------------------------------------------------------------------------
-
-t_dataset_observation_total:
-  type: table
+v_dataset_observation_context:
+  type: view
+  mode: create_or_replace
   requires:
-    - t_sales
-  sql: |
+  - t_sales
+  sql: |-
     SELECT
         HOTEL_CODE AS hotel_code,
 
@@ -59,29 +29,81 @@ t_dataset_observation_total:
             MAX(DATE)
         ) + 1 AS nombre_mois,
 
-        SUM(NOMBRE_GUESTS) AS nombre_guests,
-        COUNT(*) AS nombre_ventes,
-        SUM(PRIX_TTC) AS montant_ventes,
-        SUM(MARGE) AS montant_marge
+        MAX(HOTEL_NB_CHAMBRES)
+            AS hotel_nb_chambres,
+
+        MAX(HOTEL_TO_ANNUEL)
+            AS hotel_to_annuel,
+
+        MAX(HOTEL_GUESTS_PER_CHAMBRE)
+            AS hotel_guests_per_chambre,
+
+        MAX(HOTEL_NB_CHAMBRES)
+            * MAX(HOTEL_TO_ANNUEL)
+            * MAX(HOTEL_GUESTS_PER_CHAMBRE)
+            * 30.5
+            AS nombre_guests_par_mois,
+
+        (
+            MAX(HOTEL_NB_CHAMBRES)
+            * MAX(HOTEL_TO_ANNUEL)
+            * MAX(HOTEL_GUESTS_PER_CHAMBRE)
+            * 30.5
+        )
+        * (
+            DATE_DIFF(
+                'month',
+                MIN(DATE),
+                MAX(DATE)
+            ) + 1
+        )
+        AS nombre_guests
     FROM
         t_sales
     GROUP BY
         HOTEL_CODE
-    ORDER BY
-        HOTEL_CODE
-
-
-# -----------------------------------------------------------------------------
-# 3. Observation mensualisée
-#
-# Tous les champs situés après nombre_mois sont divisés par nombre_mois
-# et reçoivent le suffixe _par_mois.
-# -----------------------------------------------------------------------------
-
-t_dataset_observation_par_mois:
-  type: table
+v_dataset_observation_activity:
+  type: view
+  mode: create_or_replace
   requires:
-    - t_dataset_observation_total
+  - v_sales_current
+  sql: |
+    SELECT
+        HOTEL_CODE AS hotel_code,
+        SUM(QUANTITE) AS nombre_ventes,
+        SUM(PRIX_TTC) AS montant_ventes,
+        SUM(MARGE) AS montant_marge
+    FROM
+        v_sales_current
+    GROUP BY
+        HOTEL_CODE
+v_dataset_observation_total:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_dataset_observation_context
+  - v_dataset_observation_activity
+  sql: |-
+    SELECT
+        c.hotel_code,
+        c.nombre_mois,
+        c.nombre_guests,
+        a.nombre_ventes,
+        a.montant_ventes,
+        a.montant_marge
+    FROM
+        v_dataset_observation_context AS c
+    LEFT JOIN
+        v_dataset_observation_activity AS a
+    USING
+        (hotel_code)
+    ORDER BY
+        c.hotel_code
+v_dataset_observation_par_mois:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_dataset_observation_total
   sql: |
     SELECT
         hotel_code,
@@ -103,89 +125,118 @@ t_dataset_observation_par_mois:
             / NULLIF(nombre_mois, 0)
             AS montant_marge_par_mois
     FROM
-        t_dataset_observation_total
+        v_dataset_observation_total
     ORDER BY
         hotel_code
-
-
-# -----------------------------------------------------------------------------
-# 4. Mix d'exposition en nombres
-# -----------------------------------------------------------------------------
-
-
-# 4.1 Comptages globaux et comptages par famille de groupes
-
-t_dataset_mix_nombre_global:
-  type: table
+v_dataset_mix_nombre_global:
+  type: view
+  mode: create_or_replace
   requires:
-    - t_sales
+  - v_sales_current
   sql: |
     SELECT
         HOTEL_CODE AS hotel_code,
-
-        COUNT(DISTINCT NATURE_PRODUIT)
-            AS nombre_natures,
-
-        COUNT(DISTINCT CATEGORIE)
-            AS nombre_categories,
-
-        COUNT(DISTINCT GAMME)
-            AS nombre_gammes,
-
-        COUNT(DISTINCT TYPE)
-            AS nombre_types,
-
-        COUNT(DISTINCT MARQUE)
-            AS nombre_marques,
-
-        COUNT(DISTINCT FOURNISSEUR)
-            AS nombre_fournisseurs,
-
-        COUNT(DISTINCT CASE
-            WHEN CATEGORIE IS NOT NULL
-            THEN NATURE_PRODUIT
-        END) AS categories_nombre_natures,
-
-        COUNT(DISTINCT CASE
-            WHEN GAMME IS NOT NULL
-            THEN NATURE_PRODUIT
-        END) AS gammes_nombre_natures,
-
-        COUNT(DISTINCT CASE
-            WHEN TYPE IS NOT NULL
-            THEN NATURE_PRODUIT
-        END) AS types_nombre_natures,
-
-        COUNT(DISTINCT CASE
-            WHEN MARQUE IS NOT NULL
-            THEN NATURE_PRODUIT
-        END) AS marques_nombre_natures,
-
-        COUNT(DISTINCT CASE
-            WHEN FOURNISSEUR IS NOT NULL
-            THEN NATURE_PRODUIT
-        END) AS fournisseurs_nombre_natures
+        COUNT(DISTINCT NATURE_PRODUIT) AS nombre_natures,
+        COUNT(DISTINCT CATEGORIE) AS nombre_categories,
+        COUNT(DISTINCT GAMME) AS nombre_gammes,
+        COUNT(DISTINCT TYPE) AS nombre_types,
+        COUNT(DISTINCT MARQUE) AS nombre_marques,
+        COUNT(DISTINCT FOURNISSEUR) AS nombre_fournisseurs
     FROM
-        t_sales
+        v_sales_current
     GROUP BY
         HOTEL_CODE
     ORDER BY
         HOTEL_CODE
-
-
-# 4.2 Format long des nombres de natures par élément de groupe
-#
-# La clé metric_name est déjà construite sous la forme finale attendue :
-# categorie_<cat>_nombre_natures
-# gamme_<gamme>_nombre_natures
-# type_<type>_nombre_natures
-# marque_<marque>_nombre_natures
-# fournisseur_<fournisseur>_nombre_natures
-
-t_dataset_mix_nombre_long:
-  type: table
+v_dataset_mix_metric_names:
+  type: view
+  mode: create_or_replace
   requires:
-    - t_sales
+  - t_sales
+  sql: |
+    SELECT DISTINCT
+        'categorie_'
+            || TRIM(BOTH '_' FROM REGEXP_REPLACE(
+                LOWER(CAST(CATEGORIE AS VARCHAR)),
+                '[^a-z0-9]+',
+                '_',
+                'g'
+            ))
+            || '_nombre_natures'
+            AS metric_name
+    FROM
+        t_sales
+    WHERE
+        CATEGORIE IS NOT NULL
+
+    UNION
+
+    SELECT DISTINCT
+        'gamme_'
+            || TRIM(BOTH '_' FROM REGEXP_REPLACE(
+                LOWER(CAST(GAMME AS VARCHAR)),
+                '[^a-z0-9]+',
+                '_',
+                'g'
+            ))
+            || '_nombre_natures'
+    FROM
+        t_sales
+    WHERE
+        GAMME IS NOT NULL
+
+    UNION
+
+    SELECT DISTINCT
+        'type_'
+            || TRIM(BOTH '_' FROM REGEXP_REPLACE(
+                LOWER(CAST(TYPE AS VARCHAR)),
+                '[^a-z0-9]+',
+                '_',
+                'g'
+            ))
+            || '_nombre_natures'
+    FROM
+        t_sales
+    WHERE
+        TYPE IS NOT NULL
+
+    UNION
+
+    SELECT DISTINCT
+        'marque_'
+            || TRIM(BOTH '_' FROM REGEXP_REPLACE(
+                LOWER(CAST(MARQUE AS VARCHAR)),
+                '[^a-z0-9]+',
+                '_',
+                'g'
+            ))
+            || '_nombre_natures'
+    FROM
+        t_sales
+    WHERE
+        MARQUE IS NOT NULL
+
+    UNION
+
+    SELECT DISTINCT
+        'fournisseur_'
+            || TRIM(BOTH '_' FROM REGEXP_REPLACE(
+                LOWER(CAST(FOURNISSEUR AS VARCHAR)),
+                '[^a-z0-9]+',
+                '_',
+                'g'
+            ))
+            || '_nombre_natures'
+    FROM
+        t_sales
+    WHERE
+        FOURNISSEUR IS NOT NULL
+v_dataset_mix_nombre_observed_long:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_sales_current
   sql: |
     SELECT
         HOTEL_CODE AS hotel_code,
@@ -198,10 +249,9 @@ t_dataset_mix_nombre_long:
             ))
             || '_nombre_natures'
             AS metric_name,
-        COUNT(DISTINCT NATURE_PRODUIT)
-            AS metric_value
+        COUNT(DISTINCT NATURE_PRODUIT) AS metric_value
     FROM
-        t_sales
+        v_sales_current
     WHERE
         CATEGORIE IS NOT NULL
         AND NATURE_PRODUIT IS NOT NULL
@@ -212,7 +262,7 @@ t_dataset_mix_nombre_long:
     UNION ALL
 
     SELECT
-        HOTEL_CODE AS hotel_code,
+        HOTEL_CODE,
         'gamme_'
             || TRIM(BOTH '_' FROM REGEXP_REPLACE(
                 LOWER(CAST(GAMME AS VARCHAR)),
@@ -220,12 +270,10 @@ t_dataset_mix_nombre_long:
                 '_',
                 'g'
             ))
-            || '_nombre_natures'
-            AS metric_name,
+            || '_nombre_natures',
         COUNT(DISTINCT NATURE_PRODUIT)
-            AS metric_value
     FROM
-        t_sales
+        v_sales_current
     WHERE
         GAMME IS NOT NULL
         AND NATURE_PRODUIT IS NOT NULL
@@ -236,7 +284,7 @@ t_dataset_mix_nombre_long:
     UNION ALL
 
     SELECT
-        HOTEL_CODE AS hotel_code,
+        HOTEL_CODE,
         'type_'
             || TRIM(BOTH '_' FROM REGEXP_REPLACE(
                 LOWER(CAST(TYPE AS VARCHAR)),
@@ -244,12 +292,10 @@ t_dataset_mix_nombre_long:
                 '_',
                 'g'
             ))
-            || '_nombre_natures'
-            AS metric_name,
+            || '_nombre_natures',
         COUNT(DISTINCT NATURE_PRODUIT)
-            AS metric_value
     FROM
-        t_sales
+        v_sales_current
     WHERE
         TYPE IS NOT NULL
         AND NATURE_PRODUIT IS NOT NULL
@@ -260,7 +306,7 @@ t_dataset_mix_nombre_long:
     UNION ALL
 
     SELECT
-        HOTEL_CODE AS hotel_code,
+        HOTEL_CODE,
         'marque_'
             || TRIM(BOTH '_' FROM REGEXP_REPLACE(
                 LOWER(CAST(MARQUE AS VARCHAR)),
@@ -268,12 +314,10 @@ t_dataset_mix_nombre_long:
                 '_',
                 'g'
             ))
-            || '_nombre_natures'
-            AS metric_name,
+            || '_nombre_natures',
         COUNT(DISTINCT NATURE_PRODUIT)
-            AS metric_value
     FROM
-        t_sales
+        v_sales_current
     WHERE
         MARQUE IS NOT NULL
         AND NATURE_PRODUIT IS NOT NULL
@@ -284,7 +328,7 @@ t_dataset_mix_nombre_long:
     UNION ALL
 
     SELECT
-        HOTEL_CODE AS hotel_code,
+        HOTEL_CODE,
         'fournisseur_'
             || TRIM(BOTH '_' FROM REGEXP_REPLACE(
                 LOWER(CAST(FOURNISSEUR AS VARCHAR)),
@@ -292,102 +336,71 @@ t_dataset_mix_nombre_long:
                 '_',
                 'g'
             ))
-            || '_nombre_natures'
-            AS metric_name,
+            || '_nombre_natures',
         COUNT(DISTINCT NATURE_PRODUIT)
-            AS metric_value
     FROM
-        t_sales
+        v_sales_current
     WHERE
         FOURNISSEUR IS NOT NULL
         AND NATURE_PRODUIT IS NOT NULL
     GROUP BY
         HOTEL_CODE,
         FOURNISSEUR
-
-
-# 4.3 Pivot dynamique des nombres de natures par élément
-
-t_dataset_mix_nombre_detail:
-  type: table
+v_dataset_mix_nombre_long:
+  type: view
+  mode: create_or_replace
   requires:
-    - t_dataset_mix_nombre_long
+  - t_hotel_codes
+  - v_dataset_mix_metric_names
+  - v_dataset_mix_nombre_observed_long
   sql: |
-    PIVOT t_dataset_mix_nombre_long
+    SELECT
+        h.HOTEL_CODE AS hotel_code,
+        m.metric_name,
+        COALESCE(o.metric_value, 0) AS metric_value
+    FROM
+        t_hotel_codes AS h
+    CROSS JOIN
+        v_dataset_mix_metric_names AS m
+    LEFT JOIN
+        v_dataset_mix_nombre_observed_long AS o
+    ON
+        o.hotel_code = h.HOTEL_CODE
+        AND o.metric_name = m.metric_name
+v_dataset_mix_nombre_detail:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_dataset_mix_nombre_long
+  sql: |
+    PIVOT v_dataset_mix_nombre_long
     ON metric_name
     USING MAX(metric_value)
     GROUP BY hotel_code
-
-
-# 4.4 Dataset complet du mix en nombres
-
-t_dataset_mix_nombre:
-  type: table
+v_dataset_mix_nombre:
+  type: view
+  mode: create_or_replace
   requires:
-    - t_dataset_mix_nombre_global
-    - t_dataset_mix_nombre_detail
+  - v_dataset_mix_nombre_global
+  - v_dataset_mix_nombre_detail
   sql: |
     SELECT
         g.*,
         d.* EXCLUDE (hotel_code)
     FROM
-        t_dataset_mix_nombre_global AS g
+        v_dataset_mix_nombre_global AS g
     LEFT JOIN
-        t_dataset_mix_nombre_detail AS d
+        v_dataset_mix_nombre_detail AS d
     USING
         (hotel_code)
     ORDER BY
         hotel_code
-
-
-# -----------------------------------------------------------------------------
-# 5. Mix d'exposition en pourcentages
-# -----------------------------------------------------------------------------
-
-
-# 5.1 Pourcentages globaux par famille de groupes
-
-t_dataset_mix_pourcentage_global:
-  type: table
+v_dataset_mix_pourcentage_long:
+  type: view
+  mode: create_or_replace
   requires:
-    - t_dataset_mix_nombre_global
-  sql: |
-    SELECT
-        hotel_code,
-        nombre_natures,
-
-        categories_nombre_natures
-            / NULLIF(nombre_natures, 0)
-            AS categories_part_natures,
-
-        gammes_nombre_natures
-            / NULLIF(nombre_natures, 0)
-            AS gammes_part_natures,
-
-        types_nombre_natures
-            / NULLIF(nombre_natures, 0)
-            AS types_part_natures,
-
-        marques_nombre_natures
-            / NULLIF(nombre_natures, 0)
-            AS marques_part_natures,
-
-        fournisseurs_nombre_natures
-            / NULLIF(nombre_natures, 0)
-            AS fournisseurs_part_natures
-    FROM
-        t_dataset_mix_nombre_global
-    ORDER BY
-        hotel_code
-
-
-# 5.2 Format long des pourcentages par élément de groupe
-
-t_dataset_mix_pourcentage_long:
-  type: table
-  requires:
-    - t_dataset_mix_nombre_long
-    - t_dataset_mix_nombre_global
+  - v_dataset_mix_nombre_long
+  - v_dataset_mix_nombre_global
   sql: |
     SELECT
         l.hotel_code,
@@ -402,66 +415,53 @@ t_dataset_mix_pourcentage_long:
             / NULLIF(g.nombre_natures, 0)
             AS metric_value
     FROM
-        t_dataset_mix_nombre_long AS l
-    LEFT JOIN
-        t_dataset_mix_nombre_global AS g
+        v_dataset_mix_nombre_long AS l
+    INNER JOIN
+        v_dataset_mix_nombre_global AS g
     USING
         (hotel_code)
-
-
-# 5.3 Pivot dynamique des pourcentages par élément
-
-t_dataset_mix_pourcentage_detail:
-  type: table
+v_dataset_mix_pourcentage_detail:
+  type: view
+  mode: create_or_replace
   requires:
-    - t_dataset_mix_pourcentage_long
+  - v_dataset_mix_pourcentage_long
   sql: |
-    PIVOT t_dataset_mix_pourcentage_long
+    PIVOT v_dataset_mix_pourcentage_long
     ON metric_name
     USING MAX(metric_value)
     GROUP BY hotel_code
-
-
-# 5.4 Dataset complet du mix en pourcentages
-
-t_dataset_mix_pourcentage:
-  type: table
+v_dataset_mix_pourcentage:
+  type: view
+  mode: create_or_replace
   requires:
-    - t_dataset_mix_pourcentage_global
-    - t_dataset_mix_pourcentage_detail
+  - v_dataset_mix_nombre_global
+  - v_dataset_mix_pourcentage_detail
   sql: |
     SELECT
-        g.*,
+        g.hotel_code,
+        g.nombre_natures,
         d.* EXCLUDE (hotel_code)
     FROM
-        t_dataset_mix_pourcentage_global AS g
+        v_dataset_mix_nombre_global AS g
     LEFT JOIN
-        t_dataset_mix_pourcentage_detail AS d
+        v_dataset_mix_pourcentage_detail AS d
     USING
         (hotel_code)
     ORDER BY
-        hotel_code
-
-
-# -----------------------------------------------------------------------------
-# 6. Dataset pivot final pour la modélisation
-#
-# Une ligne par hôtel avec :
-# - solution et mètres linéaires ;
-# - activité mensualisée à prédire ;
-# - mix d'exposition en nombres ;
-# - mix d'exposition en pourcentages.
-# -----------------------------------------------------------------------------
-
-t_dataset_pivot:
-  type: table
+        g.hotel_code
+v_dataset_pivot:
+  type: view
+  mode: create_or_replace
   requires:
-    - t_dataset_ref
-    - t_dataset_observation_par_mois
-    - t_dataset_mix_nombre
-    - t_dataset_mix_pourcentage
+  - v_dataset_ref
+  - v_dataset_observation_par_mois
+  - v_dataset_mix_nombre
+  - v_dataset_mix_pourcentage
   sql: |
     SELECT
+        s.scenario_id,
+        s.scenario_removed_natures,
+
         r.hotel_code,
         r.solution,
         r.metres_lineaires,
@@ -475,18 +475,52 @@ t_dataset_pivot:
             nombre_natures
         )
     FROM
-        t_dataset_ref AS r
+        v_dataset_ref AS r
+    CROSS JOIN
+        v_scenario_step AS s
     LEFT JOIN
-        t_dataset_observation_par_mois AS o
+        v_dataset_observation_par_mois AS o
     USING
         (hotel_code)
     LEFT JOIN
-        t_dataset_mix_nombre AS mn
+        v_dataset_mix_nombre AS mn
     USING
         (hotel_code)
     LEFT JOIN
-        t_dataset_mix_pourcentage AS mp
+        v_dataset_mix_pourcentage AS mp
     USING
         (hotel_code)
     ORDER BY
         r.hotel_code
+t_dataset_pivot:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - v_dataset_pivot
+  sql: |
+    SELECT
+        *
+    FROM
+        v_dataset_pivot
+    LIMIT 0
+x_insert_dataset_pivot:
+  type: execute
+  requires:
+  - t_dataset_pivot
+  - v_dataset_pivot
+  sql: |
+    INSERT INTO
+        t_dataset_pivot BY NAME
+    SELECT
+        p.*
+    FROM
+        v_dataset_pivot AS p
+    WHERE NOT EXISTS (
+        SELECT
+            1
+        FROM
+            t_dataset_pivot AS t
+        WHERE
+            t.scenario_id = p.scenario_id
+            AND t.hotel_code = p.hotel_code
+    )

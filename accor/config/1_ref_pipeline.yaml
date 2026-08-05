@@ -1,7 +1,8 @@
 t_hotel_codes:
-  type: table
-  requires: 
-    - t_sales
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_sales
   sql: |
     SELECT DISTINCT
         HOTEL_CODE
@@ -9,94 +10,101 @@ t_hotel_codes:
         t_sales
     ORDER BY
         HOTEL_CODE
-
+t_machines:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_sales
+  sql: |
+    SELECT DISTINCT
+        MACHINE
+    FROM
+        t_sales
+    WHERE
+        MACHINE IS NOT NULL
+    ORDER BY
+        MACHINE
 t_types:
-  type: table
-  requires: 
-    - t_sales
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_sales
   sql: |
     SELECT DISTINCT
         TYPE
     FROM
         t_sales
+    WHERE
+        TYPE IS NOT NULL
     ORDER BY
         TYPE
-
-
 t_gammes:
-  type: table
-  requires: 
-    - t_sales
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_sales
   sql: |
     SELECT DISTINCT
         GAMME
     FROM
         t_sales
+    WHERE
+        GAMME IS NOT NULL
     ORDER BY
         GAMME
-
-
+t_categories:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_sales
+  sql: |
+    SELECT DISTINCT
+        CATEGORIE
+    FROM
+        t_sales
+    WHERE
+        CATEGORIE IS NOT NULL
+    ORDER BY
+        CATEGORIE
 t_natures:
-  type: table
-  requires: 
-    - t_sales
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_sales
   sql: |
     SELECT DISTINCT
         NATURE_PRODUIT AS NATURE
     FROM
         t_sales
+    WHERE
+        NATURE_PRODUIT IS NOT NULL
     ORDER BY
         NATURE
-
-
-t_machines:
-  type: table
-  requires: 
-    - t_sales
-  sql: |
-    SELECT DISTINCT
-        MACHINE
-    FROM
-        t_sales
-    ORDER BY
-        MACHINE
-
-
 t_marques:
-  type: table
-  requires: 
-    - t_sales
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_sales
   sql: |
     SELECT DISTINCT
         MARQUE
     FROM
         t_sales
+    WHERE
+        MARQUE IS NOT NULL
     ORDER BY
         MARQUE
-
-
 t_fournisseurs:
-  type: table
-  requires: 
-    - t_sales
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_sales
   sql: |
     SELECT DISTINCT
         FOURNISSEUR
     FROM
         t_sales
+    WHERE
+        FOURNISSEUR IS NOT NULL
     ORDER BY
         FOURNISSEUR
-
-
-t_categories:
-  type: table
-  requires: 
-    - t_sales
-  sql: |
-    SELECT DISTINCT
-        CATEGORIE
-    FROM
-        t_sales
-    ORDER BY
-        CATEGORIE
-

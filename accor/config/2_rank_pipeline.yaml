@@ -1,23 +1,7 @@
-# =============================================================================
-# CLASSEMENTS DES NATURES DE PRODUIT ET DES GROUPES
-#
-# Principe :
-# - la nature de produit est la granularité atomique de suppression ;
-# - tous les classements sont calculés par hôtel ;
-# - la marge la plus faible est classée en premier ;
-# - les tables de groupes contiennent directement la liste des natures
-#   correspondantes afin de simplifier la fonction de suppression.
-# =============================================================================
-
-
-# -----------------------------------------------------------------------------
-# 1. Classement global des natures de produit
-# -----------------------------------------------------------------------------
-
 t_rank_nature:
-  type: table
+  type: view
   requires:
-    - t_sales
+  - t_sales
   sql: |
     WITH t_nature_marge AS (
         SELECT
@@ -45,16 +29,11 @@ t_rank_nature:
     ORDER BY
         hotel_code,
         rang_nature
-
-
-# -----------------------------------------------------------------------------
-# 2. Classement des natures à l'intérieur de chaque groupe
-# -----------------------------------------------------------------------------
-
+  mode: create_or_replace
 t_rank_nature_by_categorie:
-  type: table
+  type: view
   requires:
-    - t_sales
+  - t_sales
   sql: |
     WITH t_nature_marge AS (
         SELECT
@@ -87,12 +66,11 @@ t_rank_nature_by_categorie:
         hotel_code,
         categorie,
         rang_nature
-
-
+  mode: create_or_replace
 t_rank_nature_by_marque:
-  type: table
+  type: view
   requires:
-    - t_sales
+  - t_sales
   sql: |
     WITH t_nature_marge AS (
         SELECT
@@ -125,12 +103,11 @@ t_rank_nature_by_marque:
         hotel_code,
         marque,
         rang_nature
-
-
+  mode: create_or_replace
 t_rank_nature_by_fournisseur:
-  type: table
+  type: view
   requires:
-    - t_sales
+  - t_sales
   sql: |
     WITH t_nature_marge AS (
         SELECT
@@ -163,12 +140,11 @@ t_rank_nature_by_fournisseur:
         hotel_code,
         fournisseur,
         rang_nature
-
-
+  mode: create_or_replace
 t_rank_nature_by_gamme:
-  type: table
+  type: view
   requires:
-    - t_sales
+  - t_sales
   sql: |
     WITH t_nature_marge AS (
         SELECT
@@ -201,12 +177,11 @@ t_rank_nature_by_gamme:
         hotel_code,
         gamme,
         rang_nature
-
-
+  mode: create_or_replace
 t_rank_nature_by_type:
-  type: table
+  type: view
   requires:
-    - t_sales
+  - t_sales
   sql: |
     WITH t_nature_marge AS (
         SELECT
@@ -239,22 +214,11 @@ t_rank_nature_by_type:
         hotel_code,
         type,
         rang_nature
-
-
-# -----------------------------------------------------------------------------
-# 3. Classement des éléments de chaque groupe
-#
-# Chaque ligne contient :
-# - la marge totale de l'élément ;
-# - le nombre de natures de l'élément ;
-# - la liste des natures déjà classées par marge croissante ;
-# - le rang de l'élément dans l'hôtel.
-# -----------------------------------------------------------------------------
-
+  mode: create_or_replace
 t_rank_categorie:
-  type: table
+  type: view
   requires:
-    - t_rank_nature_by_categorie
+  - t_rank_nature_by_categorie
   sql: |
     WITH t_categorie AS (
         SELECT
@@ -284,12 +248,11 @@ t_rank_categorie:
     ORDER BY
         hotel_code,
         rang_categorie
-
-
+  mode: create_or_replace
 t_rank_marque:
-  type: table
+  type: view
   requires:
-    - t_rank_nature_by_marque
+  - t_rank_nature_by_marque
   sql: |
     WITH t_marque AS (
         SELECT
@@ -319,12 +282,11 @@ t_rank_marque:
     ORDER BY
         hotel_code,
         rang_marque
-
-
+  mode: create_or_replace
 t_rank_fournisseur:
-  type: table
+  type: view
   requires:
-    - t_rank_nature_by_fournisseur
+  - t_rank_nature_by_fournisseur
   sql: |
     WITH t_fournisseur AS (
         SELECT
@@ -354,12 +316,11 @@ t_rank_fournisseur:
     ORDER BY
         hotel_code,
         rang_fournisseur
-
-
+  mode: create_or_replace
 t_rank_gamme:
-  type: table
+  type: view
   requires:
-    - t_rank_nature_by_gamme
+  - t_rank_nature_by_gamme
   sql: |
     WITH t_gamme AS (
         SELECT
@@ -389,13 +350,12 @@ t_rank_gamme:
     ORDER BY
         hotel_code,
         rang_gamme
-
-
+  mode: create_or_replace
 t_rank_type:
-  type: table
+  type: view
   requires:
-    - t_rank_nature_by_type
-  sql: |
+  - t_rank_nature_by_type
+  sql: |-
     WITH t_type AS (
         SELECT
             hotel_code,
@@ -424,3 +384,4 @@ t_rank_type:
     ORDER BY
         hotel_code,
         rang_type
+  mode: create_or_replace
