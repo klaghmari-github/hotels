@@ -1065,6 +1065,50 @@ def drop_relation_if_exists(
         )
 
 
+def ensure_varchar_column(
+    connection: duckdb.DuckDBPyConnection,
+    table_name: str,
+    column_name: str,
+) -> None:
+    current_type = relation_type(
+        connection,
+        table_name,
+    )
+
+    if current_type != "table":
+        raise TypeError(
+            f"{table_name} doit etre une table pour modifier "
+            f"le type de {column_name}"
+        )
+
+    row = connection.execute(
+        """
+        SELECT data_type
+        FROM information_schema.columns
+        WHERE table_name = ?
+          AND column_name = ?
+        LIMIT 1
+        """,
+        [table_name, column_name],
+    ).fetchone()
+
+    if row is None:
+        raise KeyError(
+            f"Colonne absente : {table_name}.{column_name}"
+        )
+
+    data_type = str(row[0]).upper()
+
+    if data_type in {"VARCHAR", "TEXT", "STRING"}:
+        return
+
+    connection.sql(
+        f'ALTER TABLE "{table_name}" '
+        f'ALTER COLUMN "{column_name}" TYPE VARCHAR '
+        f'USING CAST("{column_name}" AS VARCHAR)'
+    )
+
+
 def seed_backing_table_name(
     relation_name: str,
 ) -> str:
@@ -1428,6 +1472,11 @@ class ParallelIterationManager:
         if self.shared_cp.table_exists(
             self.result_table
         ):
+            ensure_varchar_column(
+                self.shared_cp.con,
+                self.result_table,
+                "scenario_id",
+            )
             return
 
         step_view = self.config["step_view"]
@@ -1461,6 +1510,12 @@ class ParallelIterationManager:
         self.shared_cp.process_with_requires(
             self.result_table,
             processed=set(),
+        )
+
+        ensure_varchar_column(
+            self.shared_cp.con,
+            self.result_table,
+            "scenario_id",
         )
 
     def merge_existing_worker_results(
@@ -1738,12 +1793,22 @@ class ParallelIterationManager:
                             replace=True,
                         )
 
+            ensure_varchar_column(
+                worker_connection,
+                self.result_table,
+                "scenario_id",
+            )
+
             local_scenarios = bucket_df[
                 [
                     "scenario_id",
                     "scenario_removed_natures",
                 ]
             ].copy()
+            local_scenarios["scenario_id"] = (
+                local_scenarios["scenario_id"]
+                .astype(str)
+            )
 
             register_dataframe_as_relation(
                 worker_connection,
