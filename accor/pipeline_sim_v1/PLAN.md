@@ -80,13 +80,49 @@ chaîne de **stages déclaratifs** (YAML + tables DuckDB + formules pures).
 | **3_rules_r1_r4** | `config/3_rules_pipeline.yaml` | Chaîne R1–R4 + marge produit pour (hôtel H, référence active) |
 | **4_metrics** | `config/4_loo_metrics_pipeline.yaml` | Itération LOO, résultats prédits vs réels, MAE/MAPE, export Excel |
 
-Base DuckDB dédiée (à créer au premier run) :
+Base DuckDB dédiée :
 
 ```
 duckdb/pilotes/sim_v1/sim_v1.duckdb
 ```
 
 Ne pas mélanger avec `duckdb/pilotes/sim_v2/`.
+
+### Branchement ConnectionPipeline (fait)
+
+| Élément | Emplacement |
+|---------|-------------|
+| YAML stages | `pipeline_sim_v1/config/0…4_*.yaml` |
+| Préparation sources plates | `prepare_sources.py` → `data/v1_*.xlsx` |
+| Runner DuckDB | `python -m pipeline_sim_v1.run_pipeline` |
+| LOO itéré | `i_v1_loo_evaluation` (type `iteration`, comme v2) |
+| Export | `data/eval_sim_v1_new_loo.xlsx` |
+
+```bash
+# LOO pipeline seul
+python -m pipeline_sim_v1.run_pipeline
+
+# Old (RevenueRules) + pipeline + comparaison
+python -m pipeline_sim_v1.run_all
+
+# UI old vs new
+python pipeline_sim_v1/run_eval_ui.py
+# → http://127.0.0.1:5062/
+```
+
+### Parité ROD (au centime)
+
+Source de vérité : moteur **old** (`RevenueRules` + overrides LOO), fidèle aux formules
+Excel archive (R1→R4 + marge).
+
+| Moteur | vs old |
+|--------|--------|
+| `sim_v1_new` Python | Δ = 0 |
+| Pipeline SQL DuckDB | Δ < 0,01 € (arrondi flottant) |
+
+Point critique SQL : si le pair a un CA N-F&B (ou F&B) **nul**, le `ca_10_*`
+utilisé en **R2** doit retomber sur la **zone gauche Excel** (`t_pilot_defaults`),
+pas sur 0 — sinon le mix ±10 % ne recrée pas le panier N-F&B comme le simulateur ROD.
 
 ---
 

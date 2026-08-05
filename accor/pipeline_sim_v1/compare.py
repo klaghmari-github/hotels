@@ -36,6 +36,25 @@ def _read_excel_engine(path: Path) -> dict[str, pd.DataFrame] | None:
     }
 
 
+def _normalize_metrics(metrics: pd.DataFrame) -> pd.DataFrame:
+    """Unifie scope / perimetre et ALL → GLOBAL."""
+    m = metrics.copy()
+    if "scope" not in m.columns and "perimetre" in m.columns:
+        m = m.rename(columns={"perimetre": "scope"})
+    if "scope" in m.columns:
+        m["scope"] = m["scope"].astype(str).replace({"ALL": "GLOBAL"})
+    if "mape_ca" in m.columns and "mape_ca_pct" not in m.columns:
+        m["mape_ca_pct"] = m["mape_ca"]
+    return m
+
+
+def _normalize_predictions(pred: pd.DataFrame) -> pd.DataFrame:
+    p = pred.copy()
+    if "peers" not in p.columns:
+        p["peers"] = ""
+    return p
+
+
 def compare(
     *,
     rerun: bool = True,
@@ -64,6 +83,11 @@ def compare(
         pred_old, pred_new = o["predictions"], n["predictions"]
         met_old, met_new = o["metrics"], n["metrics"]
 
+    met_old = _normalize_metrics(met_old)
+    met_new = _normalize_metrics(met_new)
+    pred_old = _normalize_predictions(pred_old)
+    pred_new = _normalize_predictions(pred_new)
+
     # metrics cote a cote
     m_old = met_old.set_index("scope") if "scope" in met_old.columns else met_old
     m_new = met_new.set_index("scope") if "scope" in met_new.columns else met_new
@@ -72,6 +96,10 @@ def compare(
     for sc in scopes:
         ro = m_old.loc[sc] if sc in m_old.index else None
         rn = m_new.loc[sc] if sc in m_new.index else None
+        if isinstance(ro, pd.DataFrame):
+            ro = ro.iloc[0]
+        if isinstance(rn, pd.DataFrame):
+            rn = rn.iloc[0]
         mae_ca_o = float(ro["mae_ca"]) if ro is not None else None
         mae_ca_n = float(rn["mae_ca"]) if rn is not None else None
         mae_m_o = float(ro["mae_marge"]) if ro is not None else None
@@ -121,12 +149,16 @@ def compare(
         }
     )
     keep_r = [
-        "hotel_code",
-        "ca_pred_new",
-        "ca_err_new",
-        "marge_pred_new",
-        "marge_err_new",
-        "peers_new",
+        c
+        for c in (
+            "hotel_code",
+            "ca_pred_new",
+            "ca_err_new",
+            "marge_pred_new",
+            "marge_err_new",
+            "peers_new",
+        )
+        if c in right.columns
     ]
     merged = left.merge(right[keep_r], on="hotel_code", how="outer")
     if "ca_err_old" in merged.columns and "ca_err_new" in merged.columns:

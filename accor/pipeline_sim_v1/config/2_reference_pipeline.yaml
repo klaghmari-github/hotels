@@ -68,6 +68,7 @@ v_solution_reference_loo:
       a.loo_hotel_code,
       a.solution,
       a.nombre_peers,
+      -- Reference operationnelle = moyenne pairs (sinon fallback pilote Excel)
       COALESCE(a.ca_fb_peers, d.ca_fb) AS ca_fb_ref,
       COALESCE(a.ca_nfb_peers, d.ca_nfb) AS ca_nfb_ref,
       COALESCE(a.ventes_peers, d.ventes) AS ventes_ref,
@@ -79,8 +80,21 @@ v_solution_reference_loo:
         ELSE 6.0
       END AS ml_ref,
       d.frigo_ref,
-      COALESCE(a.ca_fb_peers, d.ca_fb) / 10.0 AS ca_10_fb,
-      COALESCE(a.ca_nfb_peers, d.ca_nfb) / 10.0 AS ca_10_nfb,
+      -- ca_10 : alignement RevenueRules / build_pilot_overrides
+      -- si CA pair = 0, on garde le ca_10 de la zone gauche Excel (pas 0)
+      CASE
+        WHEN COALESCE(a.ca_fb_peers, d.ca_fb) IS NULL
+          OR COALESCE(a.ca_fb_peers, d.ca_fb) = 0
+        THEN d.ca_10_fb
+        ELSE COALESCE(a.ca_fb_peers, d.ca_fb) / 10.0
+      END AS ca_10_fb,
+      CASE
+        WHEN COALESCE(a.ca_nfb_peers, d.ca_nfb) IS NULL
+          OR COALESCE(a.ca_nfb_peers, d.ca_nfb) = 0
+        THEN d.ca_10_nfb
+        ELSE COALESCE(a.ca_nfb_peers, d.ca_nfb) / 10.0
+      END AS ca_10_nfb,
+      -- ca par ml : 0 si CA pair nul (comme Python ca_nf / ml_ref)
       COALESCE(a.ca_fb_peers, d.ca_fb)
         / NULLIF(
             CASE
@@ -99,6 +113,7 @@ v_solution_reference_loo:
             END,
             0
           ) AS ca_1ml_nfb,
+      -- frigos Connected : CA / 3 (meme si CA pair = 0 → 0)
       COALESCE(a.ca_fb_peers, d.ca_fb) / 3.0 AS ca_1frigo_fb,
       COALESCE(a.ca_nfb_peers, d.ca_nfb) / 3.0 AS ca_1frigo_nfb,
       d.coeff_fb,

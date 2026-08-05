@@ -1,0 +1,40 @@
+{
+  "target": "montant_marge_selon_coef_par_mois",
+  "target_label": "Marge mensuelle selon coefficient fixe",
+  "feature_names": [
+    "gamme_accessoires_part_natures",
+    "gamme_alcool_part_natures",
+    "gamme_cosmetique_part_natures",
+    "gamme_food_salee_part_natures",
+    "gamme_food_sucree_part_natures",
+    "gamme_formule_part_natures",
+    "gamme_jeux_enfants_part_natures",
+    "gamme_pap_part_natures",
+    "gamme_sans_alcool_part_natures",
+    "gamme_sos_part_natures",
+    "gamme_souvenirs_part_natures",
+    "hotel_guests_per_chambre",
+    "hotel_nb_chambres",
+    "hotel_to_annuel",
+    "metres_lineaires",
+    "solution_connected",
+    "solution_liberty",
+    "solution_simply",
+    "type_f_b_part_natures",
+    "type_non_f_b_part_natures"
+  ],
+  "params": {
+    "hidden_width": 64,
+    "residual_blocks": 2,
+    "dropout": 0.1782623055075649,
+    "learning_rate": 0.00021705230885306137,
+    "weight_decay": 3.213502034232874e-06,
+    "batch_size": 32
+  },
+  "recommended_epochs": 1,
+  "best_cv_score": 0.821519168231521,
+  "training_rows": 12460,
+  "training_hotels": 7,
+  "device": "cpu",
+  "scaler_path": "/media/laghmari/ssd-data/dev/hotels/accor/models/dense/montant_marge_selon_coef_par_mois_scalers.joblib"
+}

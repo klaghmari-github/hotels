@@ -21,27 +21,31 @@ if str(_ROOT) not in sys.path:
 def main() -> int:
     from pipeline_sim_v1.compare import run as run_compare
     from pipeline_sim_v1.constants import EVAL_CODES, EXCLUDED_HOTELS
-    from pipeline_sim_v1.sim_v1_new import run as run_new
+    from pipeline_sim_v1.run_pipeline import export_pipeline_excel, run_loo_pipeline
     from pipeline_sim_v1.sim_v1_old import run as run_old
 
-    print("=== sim_v1 LOO — 6 hotels (excl. {}) ===".format(", ".join(sorted(EXCLUDED_HOTELS))))
+    print(
+        "=== sim_v1 LOO — 6 hotels (excl. {}) ===".format(
+            ", ".join(sorted(EXCLUDED_HOTELS))
+        )
+    )
     print("Hotels :", ", ".join(EVAL_CODES))
     print()
 
-    print("--- old (RevenueRules) ---")
+    print("--- old (RevenueRules Python) ---")
     old = run_old()
     print(old["metrics"].to_string(index=False))
     print(f"→ {old['excel_path']}")
     print()
 
-    print("--- new (formules R1-R4) ---")
-    new = run_new()
-    print(new["metrics"].to_string(index=False))
-    print(f"→ {new['excel_path']}")
+    print("--- new (ConnectionPipeline DuckDB + YAML) ---")
+    pipe = run_loo_pipeline(rebuild=True)
+    excel_new = export_pipeline_excel(pipe)
+    print(pipe["metrics"].to_string(index=False))
+    print(f"→ {excel_new}")
     print()
 
-    print("--- comparaison ---")
-    # Excel deja ecrits ; compare sans double recalcul des predict
+    print("--- comparaison old vs pipeline ---")
     cmp = run_compare(rerun=False)
     print(cmp["metrics_side_by_side"].to_string(index=False))
     print()
