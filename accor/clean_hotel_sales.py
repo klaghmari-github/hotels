@@ -529,7 +529,116 @@ def _nature_finalize(s: object) -> str:
     # nettoyage final caractères spéciaux → espaces, multi-espaces
     up = re.sub(r"[^A-Z0-9]+", " ", up)
     up = re.sub(r"\s+", " ", up).strip()
-    return up
+    return simplify_nature(up)
+
+
+# Règles de simplification NATURE (spécifique → générique).
+# Ex. CASQUETTE MH100 → CASQUETTE, VICO CHIPS EXTRA CRAQUANTES → CHIPS
+_NATURE_SIMPLIFY_RULES: list[tuple[re.Pattern[str], str]] = [
+    (re.compile(r"^CASQUETTE|^ADIDAS CASQUETTE"), "CASQUETTE"),
+    (re.compile(r"^MASQUE"), "MASQUE"),
+    (re.compile(r"^LUNETTE?S? DE NATATION"), "LUNETTES DE NATATION"),
+    (re.compile(r"^LUNETTE?S? DE SOLEIL|^KUMQUAT"), "LUNETTES DE SOLEIL"),
+    (re.compile(r"^GOURDE"), "GOURDE"),
+    (re.compile(r"^TONGS?$|^TONGS\b"), "TONGS"),
+    (re.compile(r"^ADAPTATEUR"), "ADAPTATEUR"),
+    (re.compile(r"^CHARGEUR"), "CHARGEUR"),
+    (re.compile(r"^CABLE"), "CABLE"),
+    (re.compile(r"^PARAPLUIE|^MINI PARAPLUIE|^GRAND PARAPLUIE|^PETIT PARAPLUIE"), "PARAPLUIE"),
+    (re.compile(r"^MAILLOT DE BAIN|^BOXER DE BAIN"), "MAILLOT DE BAIN"),
+    (re.compile(r"^CHAUSSURES AQUATIQUES|^AQUASHOES"), "CHAUSSURES AQUATIQUES"),
+    (re.compile(r"^SERVIETTE DE PLAGE|^SERVIETTE DE BAIN|^MF COMPACT TOWEL"), "SERVIETTE"),
+    (re.compile(r"^KIT DENTAIRE"), "KIT DENTAIRE"),
+    (re.compile(r"^KIT RASAGE"), "KIT RASAGE"),
+    (re.compile(r"^DEODORANT|^RESPIRE DEODORANT"), "DEODORANT"),
+    (re.compile(r"^PELUCHE"), "PELUCHE"),
+    (re.compile(r"^T SHIRT|^TSHIRT"), "T SHIRT"),
+    (re.compile(r"^SHORT\b|^BOARDSHORT"), "SHORT"),
+    (re.compile(r"^CHAUSSETTE"), "CHAUSSETTES"),
+    (re.compile(r"^BONNET\b"), "BONNET"),
+    (re.compile(r"^PULL\b|^PULLOVER|^POLAIRE"), "POLAIRE"),
+    (re.compile(r"^SAC A DOS|^SAC DE COURSES|^SAC BANANE|^RAINS |^TOTE BAG|^TOT BAG|^POCHETTE"), "SAC"),
+    (re.compile(r"^MES COLORIAGES|^MON CAHIER|^BLOC A COLORIER|^COLORIAGE|^FEUTRES|^CRAYONS"), "COLORIAGE"),
+    (re.compile(r"^PUZZLE|^LEGO|^RUBIK|^JEU |^UNO|^MIKADO"), "JEU"),
+    (re.compile(r"^PETIT OURS|^LE ROI LION|^LILO ET STITCH|^SPIDERMAN|^STAR WARS|^ENCANTO|^VAIANA|^SPIRIT |^PAT PATROUILLE|^DISNEY |^MES PETITES|^MINUTES POUR|^MES AMIS|^LE CLUB DES|^HEROS ET VILAINS|^OU CE CACHE|^MES P\b"), "LIVRE"),
+    (re.compile(r"^LE BERET|^BERET"), "BERET"),
+    (re.compile(r"CHIP|PRINGLES|DORITOS|LAY.?S|SO ?CHIPS|BRETS "), "CHIPS"),
+    (re.compile(r"^KINDER BUENO|^KINDERBUENO"), "KINDER BUENO"),
+    (re.compile(r"^KINDER\b"), "KINDER"),
+    (re.compile(r"^M AND MS|^M M S"), "M AND MS"),
+    (re.compile(r"^TWIX\b"), "TWIX"),
+    (re.compile(r"^SNICKERS"), "SNICKERS"),
+    (re.compile(r"^MARS\b"), "MARS"),
+    (re.compile(r"^LION\b"), "LION"),
+    (re.compile(r"^BOUNTY"), "BOUNTY"),
+    (re.compile(r"^TOBLERONE"), "TOBLERONE"),
+    (re.compile(r"^DRAGIBUS|^HARIBO DRAGIBUS"), "DRAGIBUS"),
+    (re.compile(r"^FRAISE TAGADA|^FRAISES TAGADA|^TAGADA"), "FRAISE TAGADA"),
+    (re.compile(r"^HARIBO|^CONFISERIE|^BONBON|^SACHETS DE BONBONS|^GUIMAUVE|^OURSONS"), "CONFISERIE"),
+    (re.compile(r"^BARRE CHOCOL|^BARRE DE CEREALE|^BARRES |^BLAST |^NEWTREE|^MONKA "), "BARRE"),
+    (re.compile(r"^TABLETTE|^CARRES DE CHOCOLAT|^CHOCOLAT |^TORTINA |^TOMME EN CHOCOLAT"), "CHOCOLAT"),
+    (re.compile(r"^COOKIE|^BISCUIT|^MADELEINE|^SABLES |^MUFFIN|^BROWNIE|^GAUFRES |^CAKE "), "BISCUIT"),
+    (re.compile(r"^COCA COLA ZERO"), "COCA COLA ZERO"),
+    (re.compile(r"^COCA COLA CHERRY"), "COCA COLA CHERRY"),
+    (re.compile(r"^COCA COLA"), "COCA COLA"),
+    (re.compile(r"^SPRITE"), "SPRITE"),
+    (re.compile(r"^FANTA"), "FANTA"),
+    (re.compile(r"^ORANGINA"), "ORANGINA"),
+    (re.compile(r"^SCHWEPPES"), "SCHWEPPES"),
+    (re.compile(r"^OASIS"), "OASIS"),
+    (re.compile(r"^ICE TEA|^FUZE TEA|^VITAO TEA"), "ICE TEA"),
+    (re.compile(r"^RED BULL"), "RED BULL"),
+    (re.compile(r"^VITTEL"), "VITTEL"),
+    (re.compile(r"^EVIAN"), "EVIAN"),
+    (re.compile(r"^PERRIER"), "PERRIER"),
+    (re.compile(r"^SAN PELLEGRINO"), "SAN PELLEGRINO"),
+    (re.compile(r"^BADOIT"), "BADOIT"),
+    (re.compile(r"^L EAU NEUVE|^EAU NEUVE"), "EAU NEUVE"),
+    (re.compile(r"^HEINEKEN|^BIERE HEINEKEN"), "HEINEKEN"),
+    (re.compile(r"^BIERE |^GALLIA|^CORONA|^DESPERADOS|^TOURTEL|^DUVEL"), "BIERE"),
+    (re.compile(r"^CHAMPAGNE"), "CHAMPAGNE"),
+    (re.compile(r"^VIN\b|^CHABLY|^CHATEAU |^IGP |^MOULIN A VENT"), "VIN"),
+    (re.compile(r"^JUS |^NECTAR |^PLEIN FRUIT|^MARCEL BIO|^LEAMO |^BAHIA |^MINUTE MAID|^PULCO |^KEFIR |^KOMBUCHA"), "JUS"),
+    (re.compile(r"^YAOURT"), "YAOURT"),
+    (re.compile(r"^CLUB |^SANDWICH|^MEGA SANDWICH|^SODEBO|^IL PAGNOTTO|^SUEDOIS "), "SANDWICH"),
+    (re.compile(r"^WRAP "), "WRAP"),
+    (re.compile(r"^BURGER "), "BURGER"),
+    (re.compile(r"^PASTA BOX|^PASTA |^SPAGHETTI |^GNOCHI|^GNOCCHI|^RAVIOLI |^NOUILLES |^PATES |^SACHET PATES|^CROZETS"), "PATES"),
+    (re.compile(r"^RISOTTO|^GOOD BOWL|^POKE BOWL|^SALADE "), "SALADE BOWL"),
+    (re.compile(r"^SOUPE |^GASPACHO|^VELOUTE "), "SOUPE"),
+    (re.compile(r"^POULET |^B UF |^FILET |^SAUMON |^CONFIT |^TARTIFLETTE|^QUICHE "), "PLAT"),
+    (re.compile(r"^BOCAUX |^TERRINE |^RILLETTES |^HOUMMOUS|^TAPENADE|^OLIVES |^PESTO "), "TRAITEUR"),
+    (re.compile(r"^MOUSSE AU CHOCOLAT|^CREME BRULEE|^RIZ AU LAIT|^COMPOTE|^COMP POMME|^PANNA COTTA|^TARTE |^DESSERT"), "DESSERT"),
+    (re.compile(r"^CONFITURE"), "CONFITURE"),
+    (re.compile(r"^RITUALS"), "RITUALS"),
+    (re.compile(r"^NUXE"), "NUXE"),
+    (re.compile(r"^CREME MAINS|^CREME CORPS|^LAIT CORPS|^GOMMAGE|^DENTIFRICE|^BAUME "), "COSMETIQUE"),
+]
+
+
+def simplify_nature(nature: object) -> str:
+    """Regroupe NATURE_PRODUIT vers une famille courte (CASQUETTE, CHIPS…)."""
+    if nature is None or (isinstance(nature, float) and pd.isna(nature)):
+        return ""
+    n = str(nature).strip().upper()
+    n = unicodedata.normalize("NFKD", n)
+    n = "".join(c for c in n if not unicodedata.combining(c))
+    n = re.sub(r"[^A-Z0-9]+", " ", n)
+    n = re.sub(r"\s+", " ", n).strip()
+    if not n:
+        return ""
+    for pat, target in _NATURE_SIMPLIFY_RULES:
+        if pat.search(n):
+            return target
+    words = [w for w in n.split() if not re.fullmatch(r"[A-Z]{0,3}\d{2,4}[A-Z]?", w)]
+    if not words:
+        return n
+    stop = {"DE", "DU", "DES", "LA", "LE", "LES", "A", "AU", "AUX", "EN", "ET", "L", "D"}
+    if len(words) == 1:
+        return words[0]
+    if words[1] in stop and len(words) >= 3:
+        return " ".join(words[:3])
+    return " ".join(words[:2]) if words[1] not in stop else words[0]
 
 
 def nature_produit(name: object) -> str:
@@ -537,12 +646,13 @@ def nature_produit(name: object) -> str:
     Nature de produit (similaires regroupés), **toujours MAJUSCULES**, jamais NaN.
 
     - retire volumes / tailles / couleurs / genre / conditionnement
-    - familles : ADAPTATEUR, YAOURT, CHAMPAGNE, VIN, COCA COLA, TONGS…
+    - familles simplifiées : CASQUETTE, CHIPS, MASQUE, LUNETTES DE NATATION…
 
     Ex. « Adaptateur Europe USB » → ADAPTATEUR
         « Yaourt Fraise » → YAOURT
         « Coca-Cola PET 50cl » → COCA COLA
-        « Tongs Femme 100 Noir » → TONGS
+        « Casquette MH100 » → CASQUETTE
+        « Vico Chips Extra Craquantes » → CHIPS
     """
     if name is None or (isinstance(name, float) and pd.isna(name)):
         return ""
@@ -560,57 +670,57 @@ def nature_produit(name: object) -> str:
         return ""
     low0 = s.lower()
 
-    # --- Familles génériques tôt ---
+    # --- Familles génériques tôt (puis simplify_nature pour regrouper) ---
     if re.search(r"\badaptateur", low0):
-        return "ADAPTATEUR"
+        return simplify_nature("ADAPTATEUR")
     if re.search(r"\byaourt\b|\byogurt\b|\byoghurt\b", low0):
-        return "YAOURT"
+        return simplify_nature("YAOURT")
     if re.search(r"\bchampagne\b", low0):
-        return "CHAMPAGNE"
+        return simplify_nature("CHAMPAGNE")
     if re.search(r"\bvin\b", low0) and not re.search(r"vinaigre|vintage", low0):
-        return "VIN"
+        return simplify_nature("VIN")
     if re.search(r"\btongs?\b|\bthong\b", low0):
-        return "TONGS"
+        return simplify_nature("TONGS")
     if "coca" in low0:
         if re.search(r"\bzero\b", low0):
-            return "COCA COLA ZERO"
+            return simplify_nature("COCA COLA ZERO")
         if re.search(r"\bcherry\b", low0):
-            return "COCA COLA CHERRY"
+            return simplify_nature("COCA COLA CHERRY")
         if re.search(r"\blight\b", low0):
-            return "COCA COLA LIGHT"
-        return "COCA COLA"
+            return simplify_nature("COCA COLA LIGHT")
+        return simplify_nature("COCA COLA")
     if re.search(r"\bred\s*bull\b|\bredbull\b", low0):
-        return "RED BULL"
+        return simplify_nature("RED BULL")
     if re.search(r"\bsprite\b", low0):
-        return "SPRITE"
+        return simplify_nature("SPRITE")
     if re.search(r"\bfanta\b", low0):
-        return "FANTA"
+        return simplify_nature("FANTA")
     if re.search(r"\bperrier\b", low0):
-        return "PERRIER"
+        return simplify_nature("PERRIER")
     if re.search(r"\bvittel\b", low0):
-        return "VITTEL"
+        return simplify_nature("VITTEL")
     if re.search(r"\bevian\b", low0):
-        return "EVIAN"
+        return simplify_nature("EVIAN")
     if re.search(r"\borangina\b", low0):
-        return "ORANGINA"
+        return simplify_nature("ORANGINA")
     if re.search(r"\bice\s*tea\b|\blipton\b|\bfuze\s*tea\b|\bfuse\s*tea\b", low0):
-        return "ICE TEA"
+        return simplify_nature("ICE TEA")
     if re.search(r"\bpringles\b", low0):
-        return "PRINGLES"
+        return simplify_nature("PRINGLES")
     if re.search(r"\bdoritos\b", low0):
-        return "DORITOS"
+        return simplify_nature("DORITOS")
     if re.search(r"\blay'?s\b", low0):
-        return "CHIPS LAYS" if "chip" in low0 else "LAYS"
+        return simplify_nature("CHIPS LAYS" if "chip" in low0 else "LAYS")
     if re.search(r"\bkinder\s+bueno", low0):
         if re.search(r"\bwhite\b|\bblanc\b", low0):
-            return "KINDER BUENO WHITE"
-        return "KINDER BUENO"
+            return simplify_nature("KINDER BUENO WHITE")
+        return simplify_nature("KINDER BUENO")
     if re.search(r"\bm&m", low0):
-        return "M AND MS PEANUT" if "peanut" in low0 else "M AND MS"
+        return simplify_nature("M AND MS PEANUT" if "peanut" in low0 else "M AND MS")
     if re.search(r"\bsan\s*pellegrino\b", low0):
-        return "SAN PELLEGRINO"
+        return simplify_nature("SAN PELLEGRINO")
     if re.search(r"\bschweppes\b", low0):
-        return "SCHWEPPES"
+        return simplify_nature("SCHWEPPES")
 
     # Unités / volumes / dimensions
     s = re.sub(
