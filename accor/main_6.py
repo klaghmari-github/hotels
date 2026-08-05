@@ -1109,64 +1109,6 @@ def ensure_varchar_column(
     )
 
 
-
-
-def ensure_varchar_array_column(
-    connection: duckdb.DuckDBPyConnection,
-    table_name: str,
-    column_name: str,
-) -> None:
-    current_type = relation_type(
-        connection,
-        table_name,
-    )
-
-    if current_type != "table":
-        raise TypeError(
-            f"{table_name} doit etre une table pour modifier "
-            f"le type de {column_name}"
-        )
-
-    row = connection.execute(
-        """
-        SELECT data_type
-        FROM information_schema.columns
-        WHERE table_name = ?
-          AND column_name = ?
-        LIMIT 1
-        """,
-        [table_name, column_name],
-    ).fetchone()
-
-    if row is None:
-        raise KeyError(
-            f"Colonne absente : {table_name}.{column_name}"
-        )
-
-    data_type = str(row[0]).upper()
-
-    if data_type in {"VARCHAR[]", "VARCHAR ARRAY"}:
-        return
-
-    if data_type.endswith("[]") or data_type.endswith(" ARRAY"):
-        using_sql = (
-            f'CASE WHEN "{column_name}" IS NULL '
-            f'THEN []::VARCHAR[] '
-            f'ELSE CAST("{column_name}" AS VARCHAR[]) END'
-        )
-    else:
-        using_sql = (
-            f'CASE WHEN "{column_name}" IS NULL '
-            f'THEN []::VARCHAR[] '
-            f'ELSE [CAST("{column_name}" AS VARCHAR)]::VARCHAR[] END'
-        )
-
-    connection.sql(
-        f'ALTER TABLE "{table_name}" '
-        f'ALTER COLUMN "{column_name}" TYPE VARCHAR[] '
-        f'USING {using_sql}'
-    )
-
 def seed_backing_table_name(
     relation_name: str,
 ) -> str:
@@ -1535,11 +1477,6 @@ class ParallelIterationManager:
                 self.result_table,
                 "scenario_id",
             )
-            ensure_varchar_array_column(
-                self.shared_cp.con,
-                self.result_table,
-                "scenario_removed_natures",
-            )
             return
 
         step_view = self.config["step_view"]
@@ -1579,11 +1516,6 @@ class ParallelIterationManager:
             self.shared_cp.con,
             self.result_table,
             "scenario_id",
-        )
-        ensure_varchar_array_column(
-            self.shared_cp.con,
-            self.result_table,
-            "scenario_removed_natures",
         )
 
     def merge_existing_worker_results(
@@ -1865,11 +1797,6 @@ class ParallelIterationManager:
                 worker_connection,
                 self.result_table,
                 "scenario_id",
-            )
-            ensure_varchar_array_column(
-                worker_connection,
-                self.result_table,
-                "scenario_removed_natures",
             )
 
             local_scenarios = bucket_df[
