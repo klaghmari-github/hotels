@@ -1,5 +1,5 @@
 t_rank_nature:
-  type: view
+  type: table
   requires:
   - t_sales
   sql: |
@@ -31,7 +31,7 @@ t_rank_nature:
         rang_nature
   mode: create_or_replace
 t_rank_nature_by_categorie:
-  type: view
+  type: table
   requires:
   - t_sales
   sql: |
@@ -68,7 +68,7 @@ t_rank_nature_by_categorie:
         rang_nature
   mode: create_or_replace
 t_rank_nature_by_marque:
-  type: view
+  type: table
   requires:
   - t_sales
   sql: |
@@ -105,7 +105,7 @@ t_rank_nature_by_marque:
         rang_nature
   mode: create_or_replace
 t_rank_nature_by_fournisseur:
-  type: view
+  type: table
   requires:
   - t_sales
   sql: |
@@ -142,7 +142,7 @@ t_rank_nature_by_fournisseur:
         rang_nature
   mode: create_or_replace
 t_rank_nature_by_gamme:
-  type: view
+  type: table
   requires:
   - t_sales
   sql: |
@@ -179,7 +179,7 @@ t_rank_nature_by_gamme:
         rang_nature
   mode: create_or_replace
 t_rank_nature_by_type:
-  type: view
+  type: table
   requires:
   - t_sales
   sql: |
@@ -216,7 +216,7 @@ t_rank_nature_by_type:
         rang_nature
   mode: create_or_replace
 t_rank_categorie:
-  type: view
+  type: table
   requires:
   - t_rank_nature_by_categorie
   sql: |
@@ -250,7 +250,7 @@ t_rank_categorie:
         rang_categorie
   mode: create_or_replace
 t_rank_marque:
-  type: view
+  type: table
   requires:
   - t_rank_nature_by_marque
   sql: |
@@ -284,7 +284,7 @@ t_rank_marque:
         rang_marque
   mode: create_or_replace
 t_rank_fournisseur:
-  type: view
+  type: table
   requires:
   - t_rank_nature_by_fournisseur
   sql: |
@@ -318,7 +318,7 @@ t_rank_fournisseur:
         rang_fournisseur
   mode: create_or_replace
 t_rank_gamme:
-  type: view
+  type: table
   requires:
   - t_rank_nature_by_gamme
   sql: |
@@ -352,7 +352,7 @@ t_rank_gamme:
         rang_gamme
   mode: create_or_replace
 t_rank_type:
-  type: view
+  type: table
   requires:
   - t_rank_nature_by_type
   sql: |-

@@ -1,5 +1,5 @@
 t_hotel_codes:
-  type: view
+  type: table
   mode: create_or_replace
   requires:
   - t_sales
@@ -11,7 +11,7 @@ t_hotel_codes:
     ORDER BY
         HOTEL_CODE
 t_machines:
-  type: view
+  type: table
   mode: create_or_replace
   requires:
   - t_sales
@@ -25,7 +25,7 @@ t_machines:
     ORDER BY
         MACHINE
 t_types:
-  type: view
+  type: table
   mode: create_or_replace
   requires:
   - t_sales
@@ -39,7 +39,7 @@ t_types:
     ORDER BY
         TYPE
 t_gammes:
-  type: view
+  type: table
   mode: create_or_replace
   requires:
   - t_sales
@@ -53,7 +53,7 @@ t_gammes:
     ORDER BY
         GAMME
 t_categories:
-  type: view
+  type: table
   mode: create_or_replace
   requires:
   - t_sales
@@ -67,7 +67,7 @@ t_categories:
     ORDER BY
         CATEGORIE
 t_natures:
-  type: view
+  type: table
   mode: create_or_replace
   requires:
   - t_sales
@@ -81,7 +81,7 @@ t_natures:
     ORDER BY
         NATURE
 t_marques:
-  type: view
+  type: table
   mode: create_or_replace
   requires:
   - t_sales
@@ -95,7 +95,7 @@ t_marques:
     ORDER BY
         MARQUE
 t_fournisseurs:
-  type: view
+  type: table
   mode: create_or_replace
   requires:
   - t_sales
