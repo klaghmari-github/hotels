@@ -414,17 +414,32 @@ TEXT_EMPTY_COLS = (
     "HOTEL_CODE",
     "HOTEL_NAME",
     "NOM_BOUTIQUE",
+    "OPERATEUR",
+    "HEURE",
+    "STATUT",
+    "CODE_EAN",
 )
 
 
 def fill_text_empty(df: pd.DataFrame, cols: tuple[str, ...] | None = None) -> pd.DataFrame:
-    """Remplace NaN / None par \"\" sur les colonnes texte (SQL-friendly)."""
-    out = df
-    targets = cols or TEXT_EMPTY_COLS
+    """
+    Remplace NaN / None par \"\" sur les colonnes **non numériques**.
+
+    - Si ``cols`` est fourni : ces colonnes uniquement (nettoyées via clean_text_field).
+    - Sinon : toutes les colonnes object / string / category (+ liste TEXT_EMPTY_COLS).
+    Les colonnes numériques (int/float) ne sont pas touchées.
+    """
+    out = df.copy()
+    if cols is not None:
+        targets = [c for c in cols if c in out.columns]
+    else:
+        non_num = out.select_dtypes(exclude=["number", "datetime", "datetimetz", "timedelta"]).columns.tolist()
+        # inclure explicitement les colonnes texte connues (même si dtype mixte)
+        targets = list(dict.fromkeys(list(non_num) + [c for c in TEXT_EMPTY_COLS if c in out.columns]))
     for c in targets:
         if c not in out.columns:
             continue
-        # object / string
+        # object / string / category / mixed : jamais de NaN texte
         out[c] = out[c].map(clean_text_field)
     return out
 

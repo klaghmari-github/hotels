@@ -256,7 +256,20 @@ def extend(
     # Marge = total vendu − total marché (PRIX_TTC déjà total, pas de × qty)
     out["MARGE"] = (prix_ttc - out["PRIX_TTC_MARCHE"]).astype(float)
 
-    return reorder_columns(out)
+    out = reorder_columns(out)
+    # Colonnes non numériques : NaN → "" (jamais de NaN texte)
+    non_num = out.select_dtypes(
+        exclude=["number", "datetime", "datetimetz", "timedelta"]
+    ).columns
+    for c in non_num:
+        out[c] = out[c].fillna("").map(
+            lambda x: ""
+            if x is None
+            or (isinstance(x, float) and pd.isna(x))
+            or str(x).strip().lower() in {"nan", "none", "<na>", "nat"}
+            else x
+        )
+    return out
 
 
 def main() -> None:
@@ -312,7 +325,7 @@ def main() -> None:
 
     print(f"5. Écriture : {args.out}")
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    extended.to_excel(args.out, index=False, sheet_name="sales_extended")
+    extended.to_excel(args.out, index=False, sheet_name="sales_extended", na_rep="")
     size_mo = args.out.stat().st_size / (1024 * 1024)
     print(f"   → {len(extended):,} lignes | {size_mo:.1f} Mo")
     print("\n✅", args.out.resolve())

@@ -1,26 +1,15 @@
 #!/usr/bin/env python3
 """
-Évaluation leave-one-out du **simulateur ROD v1** (règles Excel).
+Evaluation leave-one-out du simulateur ROD v1 (regles Excel).
 
-Méthode
--------
-* **Toutes** les années de ventes (pas de split 2023–25 / 2026).
-* Indicateurs = moyennes mensuelles par hôtel (Σ / n_mois renseignés).
-* Pour chaque hôtel pilote H de solution S :
-    1. exclure H de la référence
-    2. reconstruire la baseline pilote = moyenne des **autres** pilotes de S
-       (ventes live si dispo, sinon pivots Excel)
-    3. projeter CA HT et marge produit via ``RevenueRules`` (R1→R4)
-    4. comparer au vrai mensuel de H
-* Métrique : **MAE** par hôtel puis moyenne sur les hôtels.
-
-Ne modifie aucun fichier de données ni le comportement de run_admin / run_user.
+- Indicateurs mensuels par hotel (TO, chambres, clients, mix, panier, conversion)
+- Prediction CA / marge en excluant l'hotel de la reference solution
+- Export Excel : data + eval_<code> + eval
 """
 
 from __future__ import annotations
 
 import json
-from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -49,11 +38,7 @@ PILOT_MAP_PATH = DATA_DIR / "rod_pilot_concepts.json"
 SALES_PATH = DATA_DIR / "hotel_sales_data.xlsx"
 HOTEL_PATH = DATA_DIR / "hotel_data.xlsx"
 SIM_DATA_PATH = DATA_DIR / "simulateur_data.xlsx"
-
-
-# ---------------------------------------------------------------------------
-# Loaders
-# ---------------------------------------------------------------------------
+EXCEL_OUT = DATA_DIR / "eval_sim_v1_loo.xlsx"
 
 
 def load_pilot_map() -> dict[str, list[dict[str, str]]]:
@@ -67,7 +52,7 @@ def load_pilot_map() -> dict[str, list[dict[str, str]]]:
         out[c] = [
             {
                 "hotel_code": str(it.get("hotel_code") or "").strip(),
-                "label": str(it.get("label") or it.get("hotel_label") or "").strip(),
+                "label": str(it.get("label") or "").strip(),
                 "name": str(
                     it.get("name_display")
                     or it.get("name_ventes")
@@ -101,17 +86,13 @@ def load_sales() -> pd.DataFrame:
         return df
     df = df.copy()
     df["hotel_code"] = df["hotel_code"].astype(str).str.strip()
-    df["annee"] = pd.to_numeric(df.get("annee"), errors="coerce")
-    df["mois"] = pd.to_numeric(df.get("mois"), errors="coerce")
     df["montant_ventes"] = pd.to_numeric(df.get("montant_ventes"), errors="coerce").fillna(0.0)
-    if "montant_marge" in df.columns:
-        df["montant_marge"] = pd.to_numeric(df["montant_marge"], errors="coerce").fillna(0.0)
+    df["montant_marge"] = pd.to_numeric(df.get("montant_marge"), errors="coerce").fillna(0.0)
+    df["nombre_ventes"] = pd.to_numeric(df.get("nombre_ventes"), errors="coerce").fillna(0.0)
+    if "nombre_paniers" in df.columns:
+        df["nombre_paniers"] = pd.to_numeric(df["nombre_paniers"], errors="coerce").fillna(0.0)
     else:
-        df["montant_marge"] = 0.0
-    if "nombre_ventes" in df.columns:
-        df["nombre_ventes"] = pd.to_numeric(df["nombre_ventes"], errors="coerce").fillna(0.0)
-    else:
-        df["nombre_ventes"] = 0.0
+        df["nombre_paniers"] = df["nombre_ventes"]
     return df
 
 
@@ -127,7 +108,6 @@ def load_hotels() -> pd.DataFrame:
 
 
 def load_simulateur_per_hotel() -> pd.DataFrame:
-    """Lignes hôtel×année de simulateur_data si présent."""
     if not SIM_DATA_PATH.exists():
         return pd.DataFrame()
     try:
@@ -142,83 +122,6 @@ def load_simulateur_per_hotel() -> pd.DataFrame:
     df = df.copy()
     df["hotel_code"] = df["hotel_code"].astype(str).str.strip()
     return df
-
-
-# ---------------------------------------------------------------------------
-# Monthly indicators (all years)
-# ---------------------------------------------------------------------------
-
-
-def compute_monthly_indicators(sales: pd.DataFrame | None = None) -> pd.DataFrame:
-    """
-    Une ligne par hôtel : moyennes mensuelles sur **toutes** les périodes disponibles.
-
-    ca_mensuel   = sum(montant_ventes) / n_mois
-    marge_mensuel = sum(montant_marge) / n_mois
-    nb_ventes_mensuel = sum(nombre_ventes) / n_mois
-    """
-    sales = load_sales() if sales is None else sales
-    if sales is None or sales.empty:
-        return pd.DataFrame(
-            columns=[
-                "hotel_code",
-                "n_mois",
-                "years",
-                "ca_mensuel",
-                "marge_mensuel",
-                "nb_ventes_mensuel",
-                "mix_fb",
-                "mix_nf",
-            ]
-        )
-
-    rows: list[dict[str, Any]] = []
-    for code, g in sales.groupby("hotel_code"):
-        n = int(len(g))
-        if n <= 0:
-            continue
-        ca = float(g["montant_ventes"].sum())
-        marge = float(g["montant_marge"].sum())
-        nv = float(g["nombre_ventes"].sum()) if "nombre_ventes" in g.columns else 0.0
-        years = sorted(
-            int(y) for y in pd.to_numeric(g["annee"], errors="coerce").dropna().unique()
-        )
-        mix_fb = None
-        mix_nf = None
-        for col_fb, col_nf in (
-            ("pct_cat_f_b_montant_ventes", "pct_cat_n_f_b_montant_ventes"),
-            ("pct_cat_f_b_nombre_ventes", "pct_cat_n_f_b_nombre_ventes"),
-        ):
-            if col_fb in g.columns and col_nf in g.columns:
-                mf = pd.to_numeric(g[col_fb], errors="coerce").mean()
-                mn = pd.to_numeric(g[col_nf], errors="coerce").mean()
-                if pd.notna(mf):
-                    mix_fb = float(mf)
-                    if mix_fb > 1.0:
-                        mix_fb /= 100.0
-                if pd.notna(mn):
-                    mix_nf = float(mn)
-                    if mix_nf > 1.0:
-                        mix_nf /= 100.0
-                break
-        if mix_fb is None:
-            mix_fb = 0.5
-        if mix_nf is None:
-            mix_nf = 1.0 - mix_fb
-        rows.append(
-            {
-                "hotel_code": str(code),
-                "n_mois": n,
-                "years": years,
-                "years_label": ",".join(str(y) for y in years),
-                "ca_mensuel": ca / n,
-                "marge_mensuel": marge / n,
-                "nb_ventes_mensuel": nv / n,
-                "mix_fb": mix_fb,
-                "mix_nf": mix_nf,
-            }
-        )
-    return pd.DataFrame(rows)
 
 
 def _hotel_params(hotels: pd.DataFrame, code: str) -> dict[str, Any]:
@@ -243,7 +146,7 @@ def _hotel_params(hotels: pd.DataFrame, code: str) -> dict[str, Any]:
     n = float(n) if pd.notna(n) and float(n) > 0 else 100.0
     to = _as_rate(row.get("hotel_to_annuel"), BRAND_TO_DEFAULT.get(bk, 0.70))
     guests = BRAND_GUESTS_DEFAULT.get(bk, 1.7)
-    m_lin = None
+    m_lin = 6.0
     for col in (
         "hotel_corner_de_vente_actuel_metres_lineaires",
         "hotel_metres_lineaires_dedies_corner",
@@ -255,8 +158,6 @@ def _hotel_params(hotels: pd.DataFrame, code: str) -> dict[str, Any]:
             if pd.notna(v) and float(v) > 0:
                 m_lin = float(v)
                 break
-    if m_lin is None:
-        m_lin = 6.0
     return {
         "hotel_code": code,
         "hotel_name": str(row.get("hotel_name") or ""),
@@ -268,144 +169,185 @@ def _hotel_params(hotels: pd.DataFrame, code: str) -> dict[str, Any]:
     }
 
 
-def _sim_hotel_means(sim: pd.DataFrame, code: str) -> dict[str, float] | None:
-    """Moyenne multi-années d'un hôtel dans simulateur_data."""
+def _sim_means(sim: pd.DataFrame, code: str) -> dict[str, float]:
     if sim is None or sim.empty:
-        return None
+        return {}
     g = sim[sim["hotel_code"] == code]
     if g.empty:
-        return None
-
-    def _m(col: str) -> float | None:
-        if col not in g.columns:
-            return None
-        s = pd.to_numeric(g[col], errors="coerce").dropna()
-        return float(s.mean()) if len(s) else None
-
+        return {}
     out: dict[str, float] = {}
-    mapping = {
+    for k, col in {
         "ca_fb": "ca_ht_fb_mensuel",
         "ca_nf": "ca_ht_nf_mensuel",
         "ca_ht": "ca_ht_total_mensuel",
         "nb_ventes": "nb_ventes_mensuel",
+        "nb_paniers": "nb_paniers_mensuel",
         "mix_fb": "mix_fb",
         "mix_nf": "mix_nf",
         "margin_fb": "margin_fb",
         "margin_nf": "margin_nf",
-        "nb_chambres": "nb_chambres",
-        "taux_occupation": "taux_occupation",
-        "clients_heb": "clients_mois_estimes",
-    }
-    for k, col in mapping.items():
-        v = _m(col)
-        if v is not None:
-            out[k] = v
-    if "mix_fb" in out and out["mix_fb"] > 1.0:
+        "ticket_moyen_ht": "ticket_moyen_ht",
+        "panier_moyen_ht": "panier_moyen_ht",
+        "clients_mois": "clients_mois_estimes",
+        "taux_acheteur": "taux_acheteur",
+    }.items():
+        if col not in g.columns:
+            continue
+        s = pd.to_numeric(g[col], errors="coerce").dropna()
+        if len(s):
+            out[k] = float(s.mean())
+    if "mix_fb" in out and out["mix_fb"] > 1:
         out["mix_fb"] /= 100.0
-    if "mix_nf" in out and out["mix_nf"] > 1.0:
+    if "mix_nf" in out and out["mix_nf"] > 1:
         out["mix_nf"] /= 100.0
-    return out or None
+    return out
+
+
+def build_data_table(
+    sales: pd.DataFrame,
+    hotels: pd.DataFrame,
+    sim: pd.DataFrame,
+    pilot_map: dict[str, list[dict[str, str]]],
+) -> pd.DataFrame:
+    """
+    Onglet data : un hotel = une ligne d'indicateurs utilises par les regles ROD.
+    """
+    c2s = code_to_solution(pilot_map)
+    codes = sorted(c2s.keys())
+    rows: list[dict[str, Any]] = []
+
+    for code in codes:
+        params = _hotel_params(hotels, code)
+        concept = c2s[code]
+        g = sales[sales["hotel_code"] == code] if not sales.empty else pd.DataFrame()
+        n_mois = int(len(g)) if not g.empty else 0
+        ca_sum = float(g["montant_ventes"].sum()) if n_mois else 0.0
+        marge_sum = float(g["montant_marge"].sum()) if n_mois else 0.0
+        ventes_sum = float(g["nombre_ventes"].sum()) if n_mois else 0.0
+        paniers_sum = float(g["nombre_paniers"].sum()) if n_mois else 0.0
+
+        ca_m = ca_sum / n_mois if n_mois else 0.0
+        marge_m = marge_sum / n_mois if n_mois else 0.0
+        ventes_m = ventes_sum / n_mois if n_mois else 0.0
+        paniers_m = paniers_sum / n_mois if n_mois else 0.0
+
+        mix_fb = 0.5
+        if n_mois and "pct_cat_f_b_montant_ventes" in g.columns:
+            mf = pd.to_numeric(g["pct_cat_f_b_montant_ventes"], errors="coerce").mean()
+            if pd.notna(mf):
+                mix_fb = float(mf)
+                if mix_fb > 1:
+                    mix_fb /= 100.0
+        mix_nf = 1.0 - mix_fb
+
+        sm = _sim_means(sim, code)
+        if sm.get("mix_fb") is not None:
+            mix_fb = float(sm["mix_fb"])
+            mix_nf = float(sm.get("mix_nf", 1.0 - mix_fb))
+        if sm.get("ca_ht") is not None:
+            ca_m = float(sm["ca_ht"])
+        if sm.get("nb_ventes") is not None:
+            ventes_m = float(sm["nb_ventes"])
+        if sm.get("nb_paniers") is not None:
+            paniers_m = float(sm["nb_paniers"])
+
+        clients_jour = (
+            params["nb_chambres"] * params["taux_occupation"] * params["guests_per_chambre"]
+        )
+        clients_mois = clients_jour * JOURS_MOIS
+        # Taux conversion clients heberges -> acheteurs (R1)
+        taux_conversion = (ventes_m / clients_mois) if clients_mois > 0 else 0.0
+        # Panier moyen HT par vente / par client heberge
+        panier_moyen_ht = (ca_m / ventes_m) if ventes_m > 0 else 0.0
+        ca_par_client = (ca_m / clients_mois) if clients_mois > 0 else 0.0
+        ca_fb_m = ca_m * mix_fb
+        ca_nf_m = ca_m * mix_nf
+
+        years = sorted(
+            int(y)
+            for y in pd.to_numeric(g.get("annee"), errors="coerce").dropna().unique()
+        ) if n_mois else []
+
+        label = ""
+        for it in pilot_map.get(concept) or []:
+            if it["hotel_code"] == code:
+                label = it.get("label") or ""
+                break
+
+        rows.append(
+            {
+                "hotel_code": code,
+                "hotel_label": label,
+                "hotel_name": params["hotel_name"],
+                "hotel_brand": params["hotel_brand"],
+                "solution": concept,
+                "nb_chambres": round(params["nb_chambres"], 1),
+                "taux_occupation": round(params["taux_occupation"], 4),
+                "guests_per_chambre": round(params["guests_per_chambre"], 3),
+                "m_lin": round(params["m_lin"], 2),
+                "clients_jour": round(clients_jour, 2),
+                "clients_mois": round(clients_mois, 2),
+                "n_mois": n_mois,
+                "annees": ",".join(str(y) for y in years),
+                "ca_ht_mensuel": round(ca_m, 2),
+                "ca_fb_mensuel": round(ca_fb_m, 2),
+                "ca_nf_mensuel": round(ca_nf_m, 2),
+                "marge_mensuel": round(marge_m, 2),
+                "nb_ventes_mensuel": round(ventes_m, 2),
+                "nb_paniers_mensuel": round(paniers_m, 2),
+                "mix_fb": round(mix_fb, 4),
+                "mix_nf": round(mix_nf, 4),
+                "taux_conversion_acheteur": round(taux_conversion, 6),
+                "panier_moyen_ht": round(panier_moyen_ht, 4),
+                "ca_par_client_heberge": round(ca_par_client, 4),
+            }
+        )
+    return pd.DataFrame(rows)
 
 
 def build_pilot_overrides(
     peer_codes: list[str],
     *,
     concept: str,
-    indicators: pd.DataFrame,
-    sim: pd.DataFrame | None,
-    hotels: pd.DataFrame,
+    data: pd.DataFrame,
 ) -> dict[str, float]:
-    """
-    Baseline pilote = moyenne des hôtels ``peer_codes`` (sans le left-out).
-    Fallback : pivots Excel ``get_pilot(concept)``.
-    """
-    concept = concept.upper()
     pilot = dict(get_pilot(concept))
-    ca_fbs: list[float] = []
-    ca_nfs: list[float] = []
-    ventes: list[float] = []
-    mixes: list[float] = []
-    clients: list[float] = []
-    rooms: list[float] = []
-    tos: list[float] = []
-    guests: list[float] = []
-    mlins: list[float] = []
-    m_fb: list[float] = []
-    m_nf: list[float] = []
+    if data is None or data.empty or not peer_codes:
+        return {
+            "ca_fb": float(pilot["ca_fb"]),
+            "ca_nf": float(pilot["ca_nfb"]),
+            "nb_ventes": float(pilot["ventes"]),
+            "mix_fb": float(pilot["mix_fb"]),
+            "m_lin": float(pilot.get("ml_ref") or 6.0),
+            "clients_heb": float(
+                pilot.get("clients_heb")
+                or pilot["nb_chambres"] * pilot["guests"] * pilot["to"] * JOURS_MOIS
+            ),
+            "margin_fb": float(pilot["coeff_fb"]),
+            "margin_nf": float(pilot["coeff_nfb"]),
+            "ca_10_fb": float(pilot["ca_10_fb"]),
+            "ca_10_nfb": float(pilot["ca_10_nfb"]),
+            "ca_1ml_fb": float(pilot.get("ca_1ml_fb") or 0),
+            "ca_1ml_nfb": float(pilot.get("ca_1ml_nfb") or 0),
+            "n_peers": 0.0,
+        }
 
-    ind_by = (
-        indicators.set_index("hotel_code")
-        if indicators is not None and not indicators.empty
-        else None
-    )
+    sub = data[data["hotel_code"].isin(peer_codes)]
+    if sub.empty:
+        return build_pilot_overrides([], concept=concept, data=data)
 
-    for code in peer_codes:
-        params = _hotel_params(hotels, code)
-        rooms.append(float(params["nb_chambres"]))
-        tos.append(float(params["taux_occupation"]))
-        guests.append(float(params["guests_per_chambre"]))
-        mlins.append(float(params["m_lin"]))
-        clients.append(
-            float(params["nb_chambres"])
-            * float(params["taux_occupation"])
-            * float(params["guests_per_chambre"])
-            * JOURS_MOIS
-        )
+    def mean(col: str, default: float) -> float:
+        s = pd.to_numeric(sub[col], errors="coerce").dropna()
+        return float(s.mean()) if len(s) else float(default)
 
-        sm = _sim_hotel_means(sim, code) if sim is not None else None
-        if sm:
-            if "ca_fb" in sm:
-                ca_fbs.append(sm["ca_fb"])
-            if "ca_nf" in sm:
-                ca_nfs.append(sm["ca_nf"])
-            if "nb_ventes" in sm:
-                ventes.append(sm["nb_ventes"])
-            if "mix_fb" in sm:
-                mixes.append(sm["mix_fb"])
-            if "margin_fb" in sm:
-                m_fb.append(sm["margin_fb"])
-            if "margin_nf" in sm:
-                m_nf.append(sm["margin_nf"])
-            if "clients_heb" in sm and sm["clients_heb"] > 0:
-                clients[-1] = sm["clients_heb"]
-            continue
-
-        # fallback ventes agrégées (pas de split F&B) → mix 50/50 ou mix sales
-        if ind_by is not None and code in ind_by.index:
-            r = ind_by.loc[code]
-            ca = float(r["ca_mensuel"] or 0)
-            mix = float(r["mix_fb"] if pd.notna(r.get("mix_fb")) else 0.5)
-            mix = mix if mix <= 1.0 else mix / 100.0
-            ca_fbs.append(ca * mix)
-            ca_nfs.append(ca * (1.0 - mix))
-            ventes.append(float(r["nb_ventes_mensuel"] or 0))
-            mixes.append(mix)
-
-    def _mean(xs: list[float], default: float) -> float:
-        return float(np.mean(xs)) if xs else float(default)
-
-    ca_fb = _mean(ca_fbs, float(pilot["ca_fb"]))
-    ca_nf = _mean(ca_nfs, float(pilot["ca_nfb"]))
-    nb_ventes = _mean(ventes, float(pilot["ventes"]))
-    mix_fb = _mean(mixes, float(pilot["mix_fb"]))
-    if mix_fb > 1.0:
-        mix_fb /= 100.0
-    ml_ref = _mean(mlins, float(pilot.get("ml_ref") or 6.0))
-    clients_heb = _mean(
-        clients,
-        float(
-            pilot.get("clients_heb")
-            or pilot["nb_chambres"] * pilot["guests"] * pilot["to"] * JOURS_MOIS
-        ),
-    )
-    margin_fb = _mean(m_fb, float(pilot["coeff_fb"]))
-    margin_nf = _mean(m_nf, float(pilot["coeff_nfb"]))
-
-    # dérivés R2 / R4 cohérents avec la baseline
-    ca_10_fb = ca_fb / 10.0 if ca_fb else float(pilot["ca_10_fb"])
-    ca_10_nfb = ca_nf / 10.0 if ca_nf else float(pilot["ca_10_nfb"])
-    ca_1ml_fb = ca_fb / ml_ref if ml_ref else float(pilot.get("ca_1ml_fb") or 0)
-    ca_1ml_nfb = ca_nf / ml_ref if ml_ref else float(pilot.get("ca_1ml_nfb") or 0)
+    ca_fb = mean("ca_fb_mensuel", float(pilot["ca_fb"]))
+    ca_nf = mean("ca_nf_mensuel", float(pilot["ca_nfb"]))
+    nb_ventes = mean("nb_ventes_mensuel", float(pilot["ventes"]))
+    mix_fb = mean("mix_fb", float(pilot["mix_fb"]))
+    ml_ref = mean("m_lin", float(pilot.get("ml_ref") or 6.0))
+    clients_heb = mean("clients_mois", float(pilot.get("clients_heb") or 5000))
+    if ml_ref <= 0:
+        ml_ref = 6.0
 
     return {
         "ca_fb": ca_fb,
@@ -414,16 +356,18 @@ def build_pilot_overrides(
         "mix_fb": mix_fb,
         "m_lin": ml_ref,
         "clients_heb": clients_heb,
-        "nb_chambres": _mean(rooms, float(pilot["nb_chambres"])),
-        "taux_occupation": _mean(tos, float(pilot["to"])),
-        "guests_per_chambre": _mean(guests, float(pilot["guests"])),
-        "margin_fb": margin_fb,
-        "margin_nf": margin_nf,
-        "ca_10_fb": ca_10_fb,
-        "ca_10_nfb": ca_10_nfb,
-        "ca_1ml_fb": ca_1ml_fb,
-        "ca_1ml_nfb": ca_1ml_nfb,
+        "nb_chambres": mean("nb_chambres", float(pilot["nb_chambres"])),
+        "taux_occupation": mean("taux_occupation", float(pilot["to"])),
+        "guests_per_chambre": mean("guests_per_chambre", float(pilot["guests"])),
+        "margin_fb": float(pilot["coeff_fb"]),
+        "margin_nf": float(pilot["coeff_nfb"]),
+        "ca_10_fb": ca_fb / 10.0 if ca_fb else float(pilot["ca_10_fb"]),
+        "ca_10_nfb": ca_nf / 10.0 if ca_nf else float(pilot["ca_10_nfb"]),
+        "ca_1ml_fb": ca_fb / ml_ref,
+        "ca_1ml_nfb": ca_nf / ml_ref,
         "n_peers": float(len(peer_codes)),
+        "taux_conversion_ref": (nb_ventes / clients_heb) if clients_heb else 0.0,
+        "panier_moyen_ref": ((ca_fb + ca_nf) / nb_ventes) if nb_ventes else 0.0,
     }
 
 
@@ -433,286 +377,322 @@ def all_needs_open() -> dict[str, bool]:
     return {k: True for k in DEFAULT_CLIENT_NEEDS}
 
 
-def build_request(
-    params: dict[str, Any], mix_fb: float, *, concept: str = "SIMPLY"
-) -> SimulationRequest:
-    mix = float(mix_fb)
-    if mix > 1.0:
+def predict_one(
+    hotel_row: pd.Series,
+    *,
+    peers: list[str],
+    data: pd.DataFrame,
+) -> dict[str, Any]:
+    code = str(hotel_row["hotel_code"])
+    concept = str(hotel_row["solution"])
+    overrides = build_pilot_overrides(peers, concept=concept, data=data)
+
+    op = HotelOperating(
+        nb_chambres=int(float(hotel_row["nb_chambres"])),
+        taux_occupation=float(hotel_row["taux_occupation"]),
+        guests_per_chambre=float(hotel_row["guests_per_chambre"]),
+    )
+    mix = float(hotel_row["mix_fb"])
+    if mix > 1:
         mix /= 100.0
     mix = min(max(mix, 0.0), 1.0)
-    op = HotelOperating(
-        nb_chambres=int(params["nb_chambres"]),
-        taux_occupation=float(params["taux_occupation"]),
-        guests_per_chambre=float(params["guests_per_chambre"]),
-    )
-    return SimulationRequest(
+    req = SimulationRequest(
         identity=HotelIdentity(
-            hotel_code=str(params.get("hotel_code") or ""),
-            hotel_name=str(params.get("hotel_name") or ""),
-            hotel_brand=str(params.get("hotel_brand") or ""),
+            hotel_code=code,
+            hotel_name=str(hotel_row.get("hotel_name") or ""),
+            hotel_brand=str(hotel_row.get("hotel_brand") or ""),
         ),
         operating=op,
         client_profile=ClientProfile(client_needs=all_needs_open()),
         store=StoreConfig(
-            concept=concept.upper(),
-            m_lin=float(params.get("m_lin") or 6.0),
+            concept=concept,
+            m_lin=float(hotel_row["m_lin"]),
             mix_fb=mix,
             mix_nf=1.0 - mix,
             nb_frigos_froid=3,
         ),
     )
-
-
-def predict_hotel_loo(
-    hotel_code: str,
-    *,
-    concept: str | None = None,
-    indicators: pd.DataFrame | None = None,
-    sales: pd.DataFrame | None = None,
-    hotels: pd.DataFrame | None = None,
-    sim: pd.DataFrame | None = None,
-    pilot_map: dict[str, list[dict[str, str]]] | None = None,
-) -> dict[str, Any]:
-    """
-    Exclut ``hotel_code`` de la référence solution, projette CA + marge produit.
-
-    Si ``concept`` est None → solution installée (rod_pilot_concepts).
-    """
-    pilot_map = pilot_map or load_pilot_map()
-    c2s = code_to_solution(pilot_map)
-    hotels = load_hotels() if hotels is None else hotels
-    sales = load_sales() if sales is None else sales
-    indicators = compute_monthly_indicators(sales) if indicators is None else indicators
-    sim = load_simulateur_per_hotel() if sim is None else sim
-
-    code = str(hotel_code).strip()
-    concept = (concept or c2s.get(code) or "SIMPLY").upper()
-    peers = [
-        it["hotel_code"]
-        for it in (pilot_map.get(concept) or [])
-        if it["hotel_code"] != code
-    ]
-    # si solution mono-pilote : peers = tous les autres pilotes toutes solutions
-    if not peers:
-        peers = [c for c in c2s if c != code]
-
-    overrides = build_pilot_overrides(
-        peers,
-        concept=concept,
-        indicators=indicators,
-        sim=sim,
-        hotels=hotels,
-    )
-    params = _hotel_params(hotels, code)
-    # mix cible = mix historique de l'hôtel (indicateurs)
-    mix_fb = 0.5
-    if indicators is not None and not indicators.empty:
-        row = indicators[indicators["hotel_code"] == code]
-        if not row.empty and pd.notna(row.iloc[0].get("mix_fb")):
-            mix_fb = float(row.iloc[0]["mix_fb"])
-
-    req = build_request(params, mix_fb, concept=concept)
     rev = RevenueRules().compute(req, concept, pilot_overrides=overrides)
+    bd = rev.breakdown or {}
 
-    true_ca = true_marge = true_ventes = None
-    n_mois = 0
-    years: list[int] = []
-    if indicators is not None and not indicators.empty:
-        row = indicators[indicators["hotel_code"] == code]
-        if not row.empty:
-            r0 = row.iloc[0]
-            true_ca = float(r0["ca_mensuel"])
-            true_marge = float(r0["marge_mensuel"])
-            true_ventes = float(r0["nb_ventes_mensuel"])
-            n_mois = int(r0["n_mois"])
-            years = list(r0.get("years") or [])
-
+    true_ca = float(hotel_row["ca_ht_mensuel"])
+    true_marge = float(hotel_row["marge_mensuel"])
     pred_ca = float(rev.ca_ht_mensuel or 0.0)
     pred_marge = float(rev.marge_produit_mensuelle or 0.0)
-    pred_ventes = float(rev.nbr_ventes_mensuel or 0.0)
 
-    err_ca = abs(pred_ca - true_ca) if true_ca is not None else None
-    err_marge = abs(pred_marge - true_marge) if true_marge is not None else None
+    # Table des entrees utilisees pour la prediction (lisibles metier)
+    inputs = [
+        {"etape": "Hotel evalue", "variable": "hotel_code", "valeur": code, "source": "pilote"},
+        {"etape": "Hotel evalue", "variable": "solution", "valeur": concept, "source": "rod_pilot_concepts"},
+        {"etape": "Hotel evalue", "variable": "nb_chambres", "valeur": round(float(hotel_row["nb_chambres"]), 2), "source": "hotel_data"},
+        {"etape": "Hotel evalue", "variable": "taux_occupation", "valeur": round(float(hotel_row["taux_occupation"]), 4), "source": "hotel_data"},
+        {"etape": "Hotel evalue", "variable": "guests_per_chambre", "valeur": round(float(hotel_row["guests_per_chambre"]), 3), "source": "defaut marque"},
+        {"etape": "Hotel evalue", "variable": "clients_mois", "valeur": round(float(op.clients_mois), 2), "source": "n x TO x guests x 30.5"},
+        {"etape": "Hotel evalue", "variable": "m_lin", "valeur": round(float(hotel_row["m_lin"]), 2), "source": "hotel_data corner"},
+        {"etape": "Hotel evalue", "variable": "mix_fb", "valeur": round(mix, 4), "source": "ventes / simulateur_data"},
+        {"etape": "Hotel evalue", "variable": "mix_nf", "valeur": round(1.0 - mix, 4), "source": "1 - mix_fb"},
+        {"etape": "Reference pairs (leave-one-out)", "variable": "pairs_exclus", "valeur": code, "source": "exclu de la moyenne"},
+        {"etape": "Reference pairs (leave-one-out)", "variable": "pairs_utilises", "valeur": ", ".join(peers) if peers else "(aucun)", "source": "meme solution"},
+        {"etape": "Reference pairs (leave-one-out)", "variable": "ca_fb_ref", "valeur": round(overrides["ca_fb"], 2), "source": "moyenne pairs"},
+        {"etape": "Reference pairs (leave-one-out)", "variable": "ca_nf_ref", "valeur": round(overrides["ca_nf"], 2), "source": "moyenne pairs"},
+        {"etape": "Reference pairs (leave-one-out)", "variable": "nb_ventes_ref", "valeur": round(overrides["nb_ventes"], 2), "source": "moyenne pairs"},
+        {"etape": "Reference pairs (leave-one-out)", "variable": "clients_ref", "valeur": round(overrides["clients_heb"], 2), "source": "moyenne pairs"},
+        {"etape": "Reference pairs (leave-one-out)", "variable": "mix_fb_ref", "valeur": round(overrides["mix_fb"], 4), "source": "moyenne pairs"},
+        {"etape": "Reference pairs (leave-one-out)", "variable": "m_lin_ref", "valeur": round(overrides["m_lin"], 2), "source": "moyenne pairs"},
+        {"etape": "Reference pairs (leave-one-out)", "variable": "taux_conversion_ref", "valeur": round(float(overrides.get("taux_conversion_ref") or 0), 6), "source": "ventes_ref / clients_ref"},
+        {"etape": "Reference pairs (leave-one-out)", "variable": "panier_moyen_ref", "valeur": round(float(overrides.get("panier_moyen_ref") or 0), 4), "source": "CA_ref / ventes_ref"},
+        {"etape": "R1 clients acheteurs", "variable": "taux_acheteur", "valeur": round(float(bd.get("taux_acheteur") or 0), 6), "source": "ventes_ref / clients_ref"},
+        {"etape": "R1 clients acheteurs", "variable": "nb_acheteurs", "valeur": round(float(bd.get("nb_acheteurs") or 0), 2), "source": "clients_hotel x taux"},
+        {"etape": "R1 clients acheteurs", "variable": "facteur_clients", "valeur": round(float(bd.get("client_factor") or 0), 4), "source": "clients_hotel / clients_ref"},
+        {"etape": "R1 clients acheteurs", "variable": "ca_r1_fb", "valeur": round(float(bd.get("ca_r1_fb") or 0), 2), "source": "regle 1"},
+        {"etape": "R1 clients acheteurs", "variable": "ca_r1_nf", "valeur": round(float(bd.get("ca_r1_nfb") or 0), 2), "source": "regle 1"},
+        {"etape": "R2 mix", "variable": "mix_steps", "valeur": round(float(bd.get("mix_steps_fb") or 0), 4), "source": "(mix_hotel - mix_ref) x 10"},
+        {"etape": "R2 mix", "variable": "ca_r2_fb", "valeur": round(float(bd.get("ca_r2_fb") or 0), 2), "source": "regle 2"},
+        {"etape": "R2 mix", "variable": "ca_r2_nf", "valeur": round(float(bd.get("ca_r2_nfb") or 0), 2), "source": "regle 2"},
+        {"etape": "R3 categories", "variable": "mult_fb", "valeur": round(float(bd.get("mult_rule3_fb") or 0), 4), "source": "besoins clients"},
+        {"etape": "R3 categories", "variable": "mult_nf", "valeur": round(float(bd.get("mult_rule3_nfb") or 0), 4), "source": "besoins clients"},
+        {"etape": "R3 categories", "variable": "ca_r3_fb", "valeur": round(float(bd.get("ca_r3_fb") or 0), 2), "source": "regle 3"},
+        {"etape": "R3 categories", "variable": "ca_r3_nf", "valeur": round(float(bd.get("ca_r3_nfb") or 0), 2), "source": "regle 3"},
+        {"etape": "R4 surface", "variable": "mode", "valeur": str(bd.get("r4_mode") or ""), "source": "m_lin ou frigos"},
+        {"etape": "R4 surface", "variable": "diff", "valeur": round(float(bd.get("r4_diff") or 0), 4), "source": "hotel - ref"},
+        {"etape": "Sortie", "variable": "ca_fb_pred", "valeur": round(float(rev.ca_fb_mensuel or 0), 2), "source": "apres R1-R4"},
+        {"etape": "Sortie", "variable": "ca_nf_pred", "valeur": round(float(rev.ca_nf_mensuel or 0), 2), "source": "apres R1-R4"},
+        {"etape": "Sortie", "variable": "ca_ht_pred", "valeur": round(pred_ca, 2), "source": "CA FB + CA NF"},
+        {"etape": "Sortie", "variable": "marge_pred", "valeur": round(pred_marge, 2), "source": "CA - CA/coef"},
+        {"etape": "Controle", "variable": "ca_ht_reel", "valeur": round(true_ca, 2), "source": "ventes (moy. mensuelle)"},
+        {"etape": "Controle", "variable": "marge_reel", "valeur": round(true_marge, 2), "source": "ventes (moy. mensuelle)"},
+        {"etape": "Controle", "variable": "erreur_abs_ca", "valeur": round(abs(pred_ca - true_ca), 2), "source": "|pred - reel|"},
+        {"etape": "Controle", "variable": "erreur_abs_marge", "valeur": round(abs(pred_marge - true_marge), 2), "source": "|pred - reel|"},
+    ]
 
     return {
         "hotel_code": code,
-        "hotel_name": params.get("hotel_name") or "",
-        "hotel_brand": params.get("hotel_brand") or "",
+        "hotel_name": str(hotel_row.get("hotel_name") or ""),
+        "hotel_brand": str(hotel_row.get("hotel_brand") or ""),
+        "hotel_label": str(hotel_row.get("hotel_label") or ""),
         "concept": concept,
         "peers": peers,
-        "n_peers": len(peers),
-        "n_mois": n_mois,
-        "years": years,
-        "params": {
-            "nb_chambres": params["nb_chambres"],
-            "taux_occupation": params["taux_occupation"],
-            "guests_per_chambre": params["guests_per_chambre"],
-            "m_lin": params["m_lin"],
-            "mix_fb": mix_fb,
-            "clients_mois": float(req.operating.clients_mois),
+        "inputs": inputs,
+        "true_ca": true_ca,
+        "pred_ca": pred_ca,
+        "err_ca": abs(pred_ca - true_ca),
+        "true_marge": true_marge,
+        "pred_marge": pred_marge,
+        "err_marge": abs(pred_marge - true_marge),
+        "n_mois": int(hotel_row.get("n_mois") or 0),
+        "summary": {
+            "nb_chambres": float(hotel_row["nb_chambres"]),
+            "taux_occupation": float(hotel_row["taux_occupation"]),
+            "guests_per_chambre": float(hotel_row["guests_per_chambre"]),
+            "clients_mois": float(op.clients_mois),
+            "m_lin": float(hotel_row["m_lin"]),
+            "mix_fb": mix,
+            "taux_conversion_hotel": float(hotel_row.get("taux_conversion_acheteur") or 0),
+            "panier_moyen_hotel": float(hotel_row.get("panier_moyen_ht") or 0),
+            "ca_par_client_hotel": float(hotel_row.get("ca_par_client_heberge") or 0),
+            "taux_conversion_ref": float(overrides.get("taux_conversion_ref") or 0),
+            "panier_moyen_ref": float(overrides.get("panier_moyen_ref") or 0),
         },
-        "pilot_overrides": {k: round(float(v), 4) for k, v in overrides.items()},
-        "true": {
-            "ca_mensuel": round(true_ca, 2) if true_ca is not None else None,
-            "marge_mensuel": round(true_marge, 2) if true_marge is not None else None,
-            "nb_ventes_mensuel": round(true_ventes, 2) if true_ventes is not None else None,
-        },
-        "pred": {
-            "ca_mensuel": round(pred_ca, 2),
-            "marge_mensuel": round(pred_marge, 2),
-            "nb_ventes_mensuel": round(pred_ventes, 2),
-            "ca_fb": round(float(rev.ca_fb_mensuel or 0), 2),
-            "ca_nf": round(float(rev.ca_nf_mensuel or 0), 2),
-        },
-        "abs_error": {
-            "ca": round(err_ca, 2) if err_ca is not None else None,
-            "marge": round(err_marge, 2) if err_marge is not None else None,
-        },
-        "warnings": list(rev.warnings or []),
     }
 
 
-def _mae(values: list[float]) -> float | None:
-    if not values:
-        return None
-    return float(np.mean(values))
-
-
-def evaluate_loo_sim_v1(
-    *,
-    sales: pd.DataFrame | None = None,
-    hotels: pd.DataFrame | None = None,
-) -> dict[str, Any]:
-    """
-    Leave-one-out sur tous les hôtels pilotes.
-
-    Returns JSON-serializable dict with per-hotel rows + aggregate MAE.
-    """
+def evaluate_loo_sim_v1() -> dict[str, Any]:
     pilot_map = load_pilot_map()
     c2s = code_to_solution(pilot_map)
-    sales = load_sales() if sales is None else sales
-    hotels = load_hotels() if hotels is None else hotels
-    indicators = compute_monthly_indicators(sales)
+    sales = load_sales()
+    hotels = load_hotels()
     sim = load_simulateur_per_hotel()
+    data = build_data_table(sales, hotels, sim, pilot_map)
 
-    hotels_eval = sorted(c2s.keys())
-    # restreindre à ceux qui ont des ventes
-    if indicators is not None and not indicators.empty:
-        with_sales = set(indicators["hotel_code"].astype(str))
-        hotels_eval = [h for h in hotels_eval if h in with_sales]
+    per_hotel: list[dict[str, Any]] = []
+    for _, row in data.iterrows():
+        code = str(row["hotel_code"])
+        concept = str(row["solution"])
+        peers = [
+            it["hotel_code"]
+            for it in (pilot_map.get(concept) or [])
+            if it["hotel_code"] != code
+        ]
+        if not peers:
+            peers = [c for c in c2s if c != code]
+        per_hotel.append(predict_one(row, peers=peers, data=data))
 
-    rows: list[dict[str, Any]] = []
-    for code in hotels_eval:
-        try:
-            rows.append(
-                predict_hotel_loo(
-                    code,
-                    indicators=indicators,
-                    sales=sales,
-                    hotels=hotels,
-                    sim=sim,
-                    pilot_map=pilot_map,
-                )
-            )
-        except Exception as exc:  # noqa: BLE001 — on isole un hôtel raté
-            rows.append(
-                {
-                    "hotel_code": code,
-                    "concept": c2s.get(code),
-                    "error": str(exc),
-                    "abs_error": {"ca": None, "marge": None},
-                }
-            )
+    err_ca = [h["err_ca"] for h in per_hotel]
+    err_marge = [h["err_marge"] for h in per_hotel]
+    mae_ca = float(np.mean(err_ca)) if err_ca else None
+    mae_marge = float(np.mean(err_marge)) if err_marge else None
 
-    ae_ca = [r["abs_error"]["ca"] for r in rows if r.get("abs_error", {}).get("ca") is not None]
-    ae_marge = [
-        r["abs_error"]["marge"] for r in rows if r.get("abs_error", {}).get("marge") is not None
-    ]
-
-    # MAE par solution
     by_sol: dict[str, dict[str, Any]] = {}
     for sol in CONCEPTS:
-        sub = [r for r in rows if r.get("concept") == sol]
+        sub = [h for h in per_hotel if h["concept"] == sol]
         by_sol[sol] = {
             "n": len(sub),
-            "mae_ca": _mae(
-                [r["abs_error"]["ca"] for r in sub if r.get("abs_error", {}).get("ca") is not None]
-            ),
-            "mae_marge": _mae(
-                [
-                    r["abs_error"]["marge"]
-                    for r in sub
-                    if r.get("abs_error", {}).get("marge") is not None
-                ]
-            ),
+            "mae_ca": float(np.mean([h["err_ca"] for h in sub])) if sub else None,
+            "mae_marge": float(np.mean([h["err_marge"] for h in sub])) if sub else None,
         }
 
-    mae_ca = _mae(ae_ca)
-    mae_marge = _mae(ae_marge)
-
-    # MAPE optionnel (info)
-    mape_ca_vals: list[float] = []
-    for r in rows:
-        t = (r.get("true") or {}).get("ca_mensuel")
-        e = (r.get("abs_error") or {}).get("ca")
-        if t and e is not None and abs(t) > 1e-6:
-            mape_ca_vals.append(100.0 * e / abs(t))
+    mape_vals = [
+        100.0 * h["err_ca"] / abs(h["true_ca"])
+        for h in per_hotel
+        if h["true_ca"] and abs(h["true_ca"]) > 1e-6
+    ]
 
     return {
         "ok": True,
-        "method": "leave-one-out",
-        "simulator": "v1_excel_rules",
-        "description": (
-            "Toutes les années de ventes → moyenne mensuelle par hôtel. "
-            "Pour chaque pilote, la référence solution exclut l'hôtel (peers restants), "
-            "puis RevenueRules R1→R4 projette CA HT et marge produit. "
-            "MAE = moyenne des |pred − true| sur les hôtels."
-        ),
-        "n_hotels": len(rows),
-        "years_all": sorted(
-            {
-                int(y)
-                for ys in indicators["years"]
-                for y in (ys if isinstance(ys, list) else [])
-            }
-        )
-        if indicators is not None and not indicators.empty
-        else [],
+        "data": data,
+        "per_hotel": per_hotel,
         "metrics": {
             "mae_ca_mensuel": round(mae_ca, 2) if mae_ca is not None else None,
             "mae_marge_mensuel": round(mae_marge, 2) if mae_marge is not None else None,
-            "mape_ca_pct": round(float(np.mean(mape_ca_vals)), 1) if mape_ca_vals else None,
-            "n_with_ca": len(ae_ca),
-            "n_with_marge": len(ae_marge),
+            "mape_ca_pct": round(float(np.mean(mape_vals)), 1) if mape_vals else None,
+            "n_hotels": len(per_hotel),
         },
-        "by_solution": {
-            k: {
-                "n": v["n"],
-                "mae_ca_mensuel": round(v["mae_ca"], 2) if v["mae_ca"] is not None else None,
-                "mae_marge_mensuel": round(v["mae_marge"], 2)
-                if v["mae_marge"] is not None
-                else None,
-            }
-            for k, v in by_sol.items()
-        },
-        "hotels": rows,
-        "indicators": indicators.to_dict(orient="records")
-        if indicators is not None and not indicators.empty
-        else [],
+        "by_solution": by_sol,
     }
+
+
+def write_eval_excel(result: dict[str, Any] | None = None, path: Path | None = None) -> Path:
+    """Ecrit data + eval_<code> + eval dans un classeur unique."""
+    path = path or EXCEL_OUT
+    result = result or evaluate_loo_sim_v1()
+    data: pd.DataFrame = result["data"]
+    per_hotel: list[dict[str, Any]] = result["per_hotel"]
+    metrics = result["metrics"]
+    by_sol = result["by_solution"]
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with pd.ExcelWriter(path, engine="openpyxl") as w:
+        data.to_excel(w, index=False, sheet_name="data")
+
+        for h in per_hotel:
+            code = h["hotel_code"]
+            sheet = f"eval_{code}"[:31]
+            # resume prediction
+            resume = pd.DataFrame(
+                [
+                    {"indicateur": "hotel_code", "valeur": h["hotel_code"]},
+                    {"indicateur": "hotel_name", "valeur": h["hotel_name"]},
+                    {"indicateur": "solution", "valeur": h["concept"]},
+                    {"indicateur": "pairs", "valeur": ", ".join(h["peers"])},
+                    {"indicateur": "ca_ht_reel_mensuel", "valeur": round(h["true_ca"], 2)},
+                    {"indicateur": "ca_ht_pred_mensuel", "valeur": round(h["pred_ca"], 2)},
+                    {"indicateur": "erreur_abs_ca", "valeur": round(h["err_ca"], 2)},
+                    {"indicateur": "marge_reel_mensuel", "valeur": round(h["true_marge"], 2)},
+                    {"indicateur": "marge_pred_mensuel", "valeur": round(h["pred_marge"], 2)},
+                    {"indicateur": "erreur_abs_marge", "valeur": round(h["err_marge"], 2)},
+                    {"indicateur": "n_mois", "valeur": h["n_mois"]},
+                ]
+            )
+            detail = pd.DataFrame(h["inputs"])
+            # two blocks on same sheet: write resume then detail with blank row via concat
+            block = pd.concat(
+                [
+                    pd.DataFrame([{"etape": "RESUME", "variable": "", "valeur": "", "source": ""}]),
+                    resume.rename(
+                        columns={
+                            "indicateur": "variable",
+                            "valeur": "valeur",
+                        }
+                    ).assign(etape="RESUME", source=""),
+                    pd.DataFrame([{"etape": "", "variable": "", "valeur": "", "source": ""}]),
+                    pd.DataFrame(
+                        [{"etape": "DETAIL REGLES", "variable": "", "valeur": "", "source": ""}]
+                    ),
+                    detail,
+                ],
+                ignore_index=True,
+            )
+            # simpler: two sheets is cleaner but user asked eval_HCODE one tab
+            # Put resume cols + detail
+            out_sheet = pd.DataFrame(h["inputs"])
+            # prepend summary as first rows with etape RESUME
+            head = pd.DataFrame(
+                [
+                    {"etape": "RESUME", "variable": k, "valeur": v, "source": ""}
+                    for k, v in {
+                        "hotel_code": h["hotel_code"],
+                        "hotel_name": h["hotel_name"],
+                        "solution": h["concept"],
+                        "pairs": ", ".join(h["peers"]),
+                        "ca_ht_reel": round(h["true_ca"], 2),
+                        "ca_ht_pred": round(h["pred_ca"], 2),
+                        "erreur_abs_ca": round(h["err_ca"], 2),
+                        "marge_reel": round(h["true_marge"], 2),
+                        "marge_pred": round(h["pred_marge"], 2),
+                        "erreur_abs_marge": round(h["err_marge"], 2),
+                    }.items()
+                ]
+            )
+            pd.concat([head, out_sheet], ignore_index=True).to_excel(
+                w, index=False, sheet_name=sheet
+            )
+
+        # eval global
+        eval_rows = []
+        for h in per_hotel:
+            eval_rows.append(
+                {
+                    "hotel_code": h["hotel_code"],
+                    "hotel_name": h["hotel_name"],
+                    "solution": h["concept"],
+                    "pairs": ", ".join(h["peers"]),
+                    "ca_ht_reel": round(h["true_ca"], 2),
+                    "ca_ht_pred": round(h["pred_ca"], 2),
+                    "erreur_abs_ca": round(h["err_ca"], 2),
+                    "marge_reel": round(h["true_marge"], 2),
+                    "marge_pred": round(h["pred_marge"], 2),
+                    "erreur_abs_marge": round(h["err_marge"], 2),
+                    "n_mois": h["n_mois"],
+                }
+            )
+        df_eval = pd.DataFrame(eval_rows)
+        # metrics footer
+        metrics_df = pd.DataFrame(
+            [
+                {"hotel_code": "MAE_GLOBAL", "erreur_abs_ca": metrics.get("mae_ca_mensuel"), "erreur_abs_marge": metrics.get("mae_marge_mensuel")},
+                {"hotel_code": "MAPE_CA_PCT", "erreur_abs_ca": metrics.get("mape_ca_pct"), "erreur_abs_marge": None},
+            ]
+        )
+        for sol, v in by_sol.items():
+            metrics_df = pd.concat(
+                [
+                    metrics_df,
+                    pd.DataFrame(
+                        [
+                            {
+                                "hotel_code": f"MAE_{sol}",
+                                "erreur_abs_ca": None
+                                if v.get("mae_ca") is None
+                                else round(v["mae_ca"], 2),
+                                "erreur_abs_marge": None
+                                if v.get("mae_marge") is None
+                                else round(v["mae_marge"], 2),
+                                "solution": sol,
+                                "n_mois": v.get("n"),
+                            }
+                        ]
+                    ),
+                ],
+                ignore_index=True,
+            )
+        pd.concat([df_eval, metrics_df], ignore_index=True).to_excel(
+            w, index=False, sheet_name="eval"
+        )
+
+    return path
 
 
 def metrics_summary(result: dict[str, Any]) -> str:
     m = result.get("metrics") or {}
     lines = [
-        f"Simulateur v1 — leave-one-out sur {result.get('n_hotels')} hôtels",
-        f"  MAE CA mensuel    : {m.get('mae_ca_mensuel')} €",
-        f"  MAE marge mensuel : {m.get('mae_marge_mensuel')} €",
-        f"  MAPE CA          : {m.get('mape_ca_pct')} %",
+        f"Simulateur v1 leave-one-out — {m.get('n_hotels')} hotels",
+        f"  MAE CA mensuel    : {m.get('mae_ca_mensuel')} EUR",
+        f"  MAE marge mensuel : {m.get('mae_marge_mensuel')} EUR",
+        f"  MAPE CA           : {m.get('mape_ca_pct')} %",
     ]
     for sol, v in (result.get("by_solution") or {}).items():
         lines.append(
-            f"  [{sol}] n={v.get('n')}  MAE_CA={v.get('mae_ca_mensuel')}  "
-            f"MAE_marge={v.get('mae_marge_mensuel')}"
+            f"  [{sol}] n={v.get('n')} MAE_CA={None if v.get('mae_ca') is None else round(v['mae_ca'], 2)} "
+            f"MAE_marge={None if v.get('mae_marge') is None else round(v['mae_marge'], 2)}"
         )
     return "\n".join(lines)
