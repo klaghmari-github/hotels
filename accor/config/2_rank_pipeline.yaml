@@ -1,387 +1,181 @@
 t_rank_nature:
   type: table
+  mode: create_if_not_exists
   requires:
   - t_sales
-  sql: |
+  sql: |-
     WITH t_nature_marge AS (
-        SELECT
-            HOTEL_CODE AS hotel_code,
-            NATURE_PRODUIT AS nature,
-            SUM(MARGE) AS montant_marge
-        FROM
-            t_sales
-        WHERE
-            NATURE_PRODUIT IS NOT NULL
-        GROUP BY
-            HOTEL_CODE,
-            NATURE_PRODUIT
+        SELECT HOTEL_CODE AS hotel_code, NATURE_PRODUIT AS nature, SUM(MARGE) AS montant_marge
+        FROM t_sales
+        WHERE NATURE_PRODUIT IS NOT NULL
+        GROUP BY HOTEL_CODE, NATURE_PRODUIT
     )
-    SELECT
-        hotel_code,
-        nature,
-        montant_marge,
-        ROW_NUMBER() OVER (
-            PARTITION BY hotel_code
-            ORDER BY montant_marge, nature
-        ) AS rang_nature
-    FROM
-        t_nature_marge
-    ORDER BY
-        hotel_code,
-        rang_nature
-  mode: create_or_replace
+    SELECT hotel_code, nature, montant_marge,
+           ROW_NUMBER() OVER (PARTITION BY hotel_code ORDER BY montant_marge, nature) AS rang_nature
+    FROM t_nature_marge
+    ORDER BY hotel_code, rang_nature
 t_rank_nature_by_categorie:
   type: table
+  mode: create_if_not_exists
   requires:
   - t_sales
-  sql: |
+  sql: |-
     WITH t_nature_marge AS (
-        SELECT
-            HOTEL_CODE AS hotel_code,
-            CATEGORIE AS categorie,
-            NATURE_PRODUIT AS nature,
-            SUM(MARGE) AS montant_marge
-        FROM
-            t_sales
-        WHERE
-            CATEGORIE IS NOT NULL
-            AND NATURE_PRODUIT IS NOT NULL
-        GROUP BY
-            HOTEL_CODE,
-            CATEGORIE,
-            NATURE_PRODUIT
+        SELECT HOTEL_CODE AS hotel_code, CATEGORIE AS categorie, NATURE_PRODUIT AS nature, SUM(MARGE) AS montant_marge
+        FROM t_sales
+        WHERE CATEGORIE IS NOT NULL AND NATURE_PRODUIT IS NOT NULL
+        GROUP BY HOTEL_CODE, CATEGORIE, NATURE_PRODUIT
     )
-    SELECT
-        hotel_code,
-        categorie,
-        nature,
-        montant_marge,
-        ROW_NUMBER() OVER (
-            PARTITION BY hotel_code, categorie
-            ORDER BY montant_marge, nature
-        ) AS rang_nature
-    FROM
-        t_nature_marge
-    ORDER BY
-        hotel_code,
-        categorie,
-        rang_nature
-  mode: create_or_replace
-t_rank_nature_by_marque:
-  type: table
-  requires:
-  - t_sales
-  sql: |
-    WITH t_nature_marge AS (
-        SELECT
-            HOTEL_CODE AS hotel_code,
-            MARQUE AS marque,
-            NATURE_PRODUIT AS nature,
-            SUM(MARGE) AS montant_marge
-        FROM
-            t_sales
-        WHERE
-            MARQUE IS NOT NULL
-            AND NATURE_PRODUIT IS NOT NULL
-        GROUP BY
-            HOTEL_CODE,
-            MARQUE,
-            NATURE_PRODUIT
-    )
-    SELECT
-        hotel_code,
-        marque,
-        nature,
-        montant_marge,
-        ROW_NUMBER() OVER (
-            PARTITION BY hotel_code, marque
-            ORDER BY montant_marge, nature
-        ) AS rang_nature
-    FROM
-        t_nature_marge
-    ORDER BY
-        hotel_code,
-        marque,
-        rang_nature
-  mode: create_or_replace
-t_rank_nature_by_fournisseur:
-  type: table
-  requires:
-  - t_sales
-  sql: |
-    WITH t_nature_marge AS (
-        SELECT
-            HOTEL_CODE AS hotel_code,
-            FOURNISSEUR AS fournisseur,
-            NATURE_PRODUIT AS nature,
-            SUM(MARGE) AS montant_marge
-        FROM
-            t_sales
-        WHERE
-            FOURNISSEUR IS NOT NULL
-            AND NATURE_PRODUIT IS NOT NULL
-        GROUP BY
-            HOTEL_CODE,
-            FOURNISSEUR,
-            NATURE_PRODUIT
-    )
-    SELECT
-        hotel_code,
-        fournisseur,
-        nature,
-        montant_marge,
-        ROW_NUMBER() OVER (
-            PARTITION BY hotel_code, fournisseur
-            ORDER BY montant_marge, nature
-        ) AS rang_nature
-    FROM
-        t_nature_marge
-    ORDER BY
-        hotel_code,
-        fournisseur,
-        rang_nature
-  mode: create_or_replace
-t_rank_nature_by_gamme:
-  type: table
-  requires:
-  - t_sales
-  sql: |
-    WITH t_nature_marge AS (
-        SELECT
-            HOTEL_CODE AS hotel_code,
-            GAMME AS gamme,
-            NATURE_PRODUIT AS nature,
-            SUM(MARGE) AS montant_marge
-        FROM
-            t_sales
-        WHERE
-            GAMME IS NOT NULL
-            AND NATURE_PRODUIT IS NOT NULL
-        GROUP BY
-            HOTEL_CODE,
-            GAMME,
-            NATURE_PRODUIT
-    )
-    SELECT
-        hotel_code,
-        gamme,
-        nature,
-        montant_marge,
-        ROW_NUMBER() OVER (
-            PARTITION BY hotel_code, gamme
-            ORDER BY montant_marge, nature
-        ) AS rang_nature
-    FROM
-        t_nature_marge
-    ORDER BY
-        hotel_code,
-        gamme,
-        rang_nature
-  mode: create_or_replace
-t_rank_nature_by_type:
-  type: table
-  requires:
-  - t_sales
-  sql: |
-    WITH t_nature_marge AS (
-        SELECT
-            HOTEL_CODE AS hotel_code,
-            TYPE AS type,
-            NATURE_PRODUIT AS nature,
-            SUM(MARGE) AS montant_marge
-        FROM
-            t_sales
-        WHERE
-            TYPE IS NOT NULL
-            AND NATURE_PRODUIT IS NOT NULL
-        GROUP BY
-            HOTEL_CODE,
-            TYPE,
-            NATURE_PRODUIT
-    )
-    SELECT
-        hotel_code,
-        type,
-        nature,
-        montant_marge,
-        ROW_NUMBER() OVER (
-            PARTITION BY hotel_code, type
-            ORDER BY montant_marge, nature
-        ) AS rang_nature
-    FROM
-        t_nature_marge
-    ORDER BY
-        hotel_code,
-        type,
-        rang_nature
-  mode: create_or_replace
+    SELECT hotel_code, categorie, nature, montant_marge,
+           ROW_NUMBER() OVER (PARTITION BY hotel_code, categorie ORDER BY montant_marge, nature) AS rang_nature
+    FROM t_nature_marge
+    ORDER BY hotel_code, categorie, rang_nature
 t_rank_categorie:
   type: table
+  mode: create_if_not_exists
   requires:
   - t_rank_nature_by_categorie
-  sql: |
-    WITH t_categorie AS (
-        SELECT
-            hotel_code,
-            categorie,
-            SUM(montant_marge) AS montant_marge,
-            COUNT(*) AS nombre_natures,
-            LIST(nature ORDER BY rang_nature) AS natures
-        FROM
-            t_rank_nature_by_categorie
-        GROUP BY
-            hotel_code,
-            categorie
+  sql: |-
+    WITH t_group AS (
+        SELECT hotel_code, categorie, SUM(montant_marge) AS montant_marge,
+               COUNT(*) AS nombre_natures,
+               LIST(nature ORDER BY rang_nature) AS natures
+        FROM t_rank_nature_by_categorie
+        GROUP BY hotel_code, categorie
     )
-    SELECT
-        hotel_code,
-        categorie,
-        montant_marge,
-        nombre_natures,
-        natures,
-        ROW_NUMBER() OVER (
-            PARTITION BY hotel_code
-            ORDER BY montant_marge, categorie
-        ) AS rang_categorie
-    FROM
-        t_categorie
-    ORDER BY
-        hotel_code,
-        rang_categorie
-  mode: create_or_replace
+    SELECT hotel_code, categorie, montant_marge, nombre_natures, natures,
+           ROW_NUMBER() OVER (PARTITION BY hotel_code ORDER BY montant_marge, categorie) AS rang_categorie
+    FROM t_group
+    ORDER BY hotel_code, rang_categorie
+t_rank_nature_by_marque:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - t_sales
+  sql: |-
+    WITH t_nature_marge AS (
+        SELECT HOTEL_CODE AS hotel_code, MARQUE AS marque, NATURE_PRODUIT AS nature, SUM(MARGE) AS montant_marge
+        FROM t_sales
+        WHERE MARQUE IS NOT NULL AND NATURE_PRODUIT IS NOT NULL
+        GROUP BY HOTEL_CODE, MARQUE, NATURE_PRODUIT
+    )
+    SELECT hotel_code, marque, nature, montant_marge,
+           ROW_NUMBER() OVER (PARTITION BY hotel_code, marque ORDER BY montant_marge, nature) AS rang_nature
+    FROM t_nature_marge
+    ORDER BY hotel_code, marque, rang_nature
 t_rank_marque:
   type: table
+  mode: create_if_not_exists
   requires:
   - t_rank_nature_by_marque
-  sql: |
-    WITH t_marque AS (
-        SELECT
-            hotel_code,
-            marque,
-            SUM(montant_marge) AS montant_marge,
-            COUNT(*) AS nombre_natures,
-            LIST(nature ORDER BY rang_nature) AS natures
-        FROM
-            t_rank_nature_by_marque
-        GROUP BY
-            hotel_code,
-            marque
+  sql: |-
+    WITH t_group AS (
+        SELECT hotel_code, marque, SUM(montant_marge) AS montant_marge,
+               COUNT(*) AS nombre_natures,
+               LIST(nature ORDER BY rang_nature) AS natures
+        FROM t_rank_nature_by_marque
+        GROUP BY hotel_code, marque
     )
-    SELECT
-        hotel_code,
-        marque,
-        montant_marge,
-        nombre_natures,
-        natures,
-        ROW_NUMBER() OVER (
-            PARTITION BY hotel_code
-            ORDER BY montant_marge, marque
-        ) AS rang_marque
-    FROM
-        t_marque
-    ORDER BY
-        hotel_code,
-        rang_marque
-  mode: create_or_replace
+    SELECT hotel_code, marque, montant_marge, nombre_natures, natures,
+           ROW_NUMBER() OVER (PARTITION BY hotel_code ORDER BY montant_marge, marque) AS rang_marque
+    FROM t_group
+    ORDER BY hotel_code, rang_marque
+t_rank_nature_by_fournisseur:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - t_sales
+  sql: |-
+    WITH t_nature_marge AS (
+        SELECT HOTEL_CODE AS hotel_code, FOURNISSEUR AS fournisseur, NATURE_PRODUIT AS nature, SUM(MARGE) AS montant_marge
+        FROM t_sales
+        WHERE FOURNISSEUR IS NOT NULL AND NATURE_PRODUIT IS NOT NULL
+        GROUP BY HOTEL_CODE, FOURNISSEUR, NATURE_PRODUIT
+    )
+    SELECT hotel_code, fournisseur, nature, montant_marge,
+           ROW_NUMBER() OVER (PARTITION BY hotel_code, fournisseur ORDER BY montant_marge, nature) AS rang_nature
+    FROM t_nature_marge
+    ORDER BY hotel_code, fournisseur, rang_nature
 t_rank_fournisseur:
   type: table
+  mode: create_if_not_exists
   requires:
   - t_rank_nature_by_fournisseur
-  sql: |
-    WITH t_fournisseur AS (
-        SELECT
-            hotel_code,
-            fournisseur,
-            SUM(montant_marge) AS montant_marge,
-            COUNT(*) AS nombre_natures,
-            LIST(nature ORDER BY rang_nature) AS natures
-        FROM
-            t_rank_nature_by_fournisseur
-        GROUP BY
-            hotel_code,
-            fournisseur
+  sql: |-
+    WITH t_group AS (
+        SELECT hotel_code, fournisseur, SUM(montant_marge) AS montant_marge,
+               COUNT(*) AS nombre_natures,
+               LIST(nature ORDER BY rang_nature) AS natures
+        FROM t_rank_nature_by_fournisseur
+        GROUP BY hotel_code, fournisseur
     )
-    SELECT
-        hotel_code,
-        fournisseur,
-        montant_marge,
-        nombre_natures,
-        natures,
-        ROW_NUMBER() OVER (
-            PARTITION BY hotel_code
-            ORDER BY montant_marge, fournisseur
-        ) AS rang_fournisseur
-    FROM
-        t_fournisseur
-    ORDER BY
-        hotel_code,
-        rang_fournisseur
-  mode: create_or_replace
+    SELECT hotel_code, fournisseur, montant_marge, nombre_natures, natures,
+           ROW_NUMBER() OVER (PARTITION BY hotel_code ORDER BY montant_marge, fournisseur) AS rang_fournisseur
+    FROM t_group
+    ORDER BY hotel_code, rang_fournisseur
+t_rank_nature_by_gamme:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - t_sales
+  sql: |-
+    WITH t_nature_marge AS (
+        SELECT HOTEL_CODE AS hotel_code, GAMME AS gamme, NATURE_PRODUIT AS nature, SUM(MARGE) AS montant_marge
+        FROM t_sales
+        WHERE GAMME IS NOT NULL AND NATURE_PRODUIT IS NOT NULL
+        GROUP BY HOTEL_CODE, GAMME, NATURE_PRODUIT
+    )
+    SELECT hotel_code, gamme, nature, montant_marge,
+           ROW_NUMBER() OVER (PARTITION BY hotel_code, gamme ORDER BY montant_marge, nature) AS rang_nature
+    FROM t_nature_marge
+    ORDER BY hotel_code, gamme, rang_nature
 t_rank_gamme:
   type: table
+  mode: create_if_not_exists
   requires:
   - t_rank_nature_by_gamme
-  sql: |
-    WITH t_gamme AS (
-        SELECT
-            hotel_code,
-            gamme,
-            SUM(montant_marge) AS montant_marge,
-            COUNT(*) AS nombre_natures,
-            LIST(nature ORDER BY rang_nature) AS natures
-        FROM
-            t_rank_nature_by_gamme
-        GROUP BY
-            hotel_code,
-            gamme
+  sql: |-
+    WITH t_group AS (
+        SELECT hotel_code, gamme, SUM(montant_marge) AS montant_marge,
+               COUNT(*) AS nombre_natures,
+               LIST(nature ORDER BY rang_nature) AS natures
+        FROM t_rank_nature_by_gamme
+        GROUP BY hotel_code, gamme
     )
-    SELECT
-        hotel_code,
-        gamme,
-        montant_marge,
-        nombre_natures,
-        natures,
-        ROW_NUMBER() OVER (
-            PARTITION BY hotel_code
-            ORDER BY montant_marge, gamme
-        ) AS rang_gamme
-    FROM
-        t_gamme
-    ORDER BY
-        hotel_code,
-        rang_gamme
-  mode: create_or_replace
+    SELECT hotel_code, gamme, montant_marge, nombre_natures, natures,
+           ROW_NUMBER() OVER (PARTITION BY hotel_code ORDER BY montant_marge, gamme) AS rang_gamme
+    FROM t_group
+    ORDER BY hotel_code, rang_gamme
+t_rank_nature_by_type:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - t_sales
+  sql: |-
+    WITH t_nature_marge AS (
+        SELECT HOTEL_CODE AS hotel_code, TYPE AS type, NATURE_PRODUIT AS nature, SUM(MARGE) AS montant_marge
+        FROM t_sales
+        WHERE TYPE IS NOT NULL AND NATURE_PRODUIT IS NOT NULL
+        GROUP BY HOTEL_CODE, TYPE, NATURE_PRODUIT
+    )
+    SELECT hotel_code, type, nature, montant_marge,
+           ROW_NUMBER() OVER (PARTITION BY hotel_code, type ORDER BY montant_marge, nature) AS rang_nature
+    FROM t_nature_marge
+    ORDER BY hotel_code, type, rang_nature
 t_rank_type:
   type: table
+  mode: create_if_not_exists
   requires:
   - t_rank_nature_by_type
   sql: |-
-    WITH t_type AS (
-        SELECT
-            hotel_code,
-            type,
-            SUM(montant_marge) AS montant_marge,
-            COUNT(*) AS nombre_natures,
-            LIST(nature ORDER BY rang_nature) AS natures
-        FROM
-            t_rank_nature_by_type
-        GROUP BY
-            hotel_code,
-            type
+    WITH t_group AS (
+        SELECT hotel_code, type, SUM(montant_marge) AS montant_marge,
+               COUNT(*) AS nombre_natures,
+               LIST(nature ORDER BY rang_nature) AS natures
+        FROM t_rank_nature_by_type
+        GROUP BY hotel_code, type
     )
-    SELECT
-        hotel_code,
-        type,
-        montant_marge,
-        nombre_natures,
-        natures,
-        ROW_NUMBER() OVER (
-            PARTITION BY hotel_code
-            ORDER BY montant_marge, type
-        ) AS rang_type
-    FROM
-        t_type
-    ORDER BY
-        hotel_code,
-        rang_type
-  mode: create_or_replace
+    SELECT hotel_code, type, montant_marge, nombre_natures, natures,
+           ROW_NUMBER() OVER (PARTITION BY hotel_code ORDER BY montant_marge, type) AS rang_type
+    FROM t_group
+    ORDER BY hotel_code, rang_type

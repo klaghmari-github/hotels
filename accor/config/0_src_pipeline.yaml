@@ -2,13 +2,12 @@ df_sales:
   type: dataframe
   requires: []
   file: data/hotel_sales_raw_extended_data.xlsx
+
 t_sales:
   type: table
   mode: create_if_not_exists
   requires:
-  - df_sales
+    - df_sales
   sql: |
-    SELECT
-        *
-    FROM
-        df_sales
+    SELECT *
+    FROM df_sales
