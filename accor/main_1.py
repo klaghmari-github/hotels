@@ -1052,86 +1052,6 @@ def register_dataframe_as_table(
     )
 
 
-def ensure_varchar_column(
-    connection: duckdb.DuckDBPyConnection,
-    table_name: str,
-    column_name: str,
-) -> None:
-    table_exists = connection.sql(
-        f"""
-        SELECT COUNT(*) > 0
-        FROM information_schema.tables
-        WHERE table_name = '{table_name}'
-          AND table_type = 'BASE TABLE'
-        """
-    ).fetchone()[0]
-
-    if not table_exists:
-        return
-
-    columns = connection.sql(
-        f'PRAGMA table_info("{table_name}")'
-    ).df()
-
-    current = columns[
-        columns["name"] == column_name
-    ]
-
-    if current.empty:
-        raise ValueError(
-            f"Colonne absente dans {table_name} : {column_name}"
-        )
-
-    current_type = str(
-        current.iloc[0]["type"]
-    ).upper()
-
-    if current_type in {
-        "VARCHAR",
-        "TEXT",
-        "STRING",
-    }:
-        return
-
-    expressions = []
-
-    for column in columns["name"].tolist():
-        quoted = '"' + str(column).replace('"', '""') + '"'
-
-        if column == column_name:
-            expressions.append(
-                f"CAST({quoted} AS VARCHAR) AS {quoted}"
-            )
-        else:
-            expressions.append(quoted)
-
-    temporary_table = (
-        "__retype_"
-        + hashlib.sha1(
-            f"{table_name}.{column_name}".encode("utf-8")
-        ).hexdigest()[:12]
-    )
-
-    connection.sql(
-        f'DROP TABLE IF EXISTS "{temporary_table}"'
-    )
-    connection.sql(
-        f"""
-        CREATE TABLE "{temporary_table}" AS
-        SELECT
-            {", ".join(expressions)}
-        FROM "{table_name}"
-        """
-    )
-    connection.sql(
-        f'DROP TABLE "{table_name}"'
-    )
-    connection.sql(
-        f'ALTER TABLE "{temporary_table}" '
-        f'RENAME TO "{table_name}"'
-    )
-
-
 def pipeline_fingerprint(
     pipeline_path: str | Path,
 ) -> str:
@@ -1416,11 +1336,6 @@ class ParallelIterationManager:
         if self.shared_cp.table_exists(
             self.result_table
         ):
-            ensure_varchar_column(
-                self.shared_cp.con,
-                self.result_table,
-                "scenario_id",
-            )
             return
 
         step_view = self.config["step_view"]
@@ -1454,12 +1369,6 @@ class ParallelIterationManager:
         self.shared_cp.process_with_requires(
             self.result_table,
             processed=set(),
-        )
-
-        ensure_varchar_column(
-            self.shared_cp.con,
-            self.result_table,
-            "scenario_id",
         )
 
     def merge_existing_worker_results(
@@ -1702,12 +1611,6 @@ class ParallelIterationManager:
                     replace=True,
                 )
 
-                ensure_varchar_column(
-                    worker_connection,
-                    self.result_table,
-                    "scenario_id",
-                )
-
                 write_worker_metadata(
                     worker_connection,
                     self.source_hash,
@@ -1746,27 +1649,11 @@ class ParallelIterationManager:
                 ]
             ].copy()
 
-            local_scenarios["scenario_id"] = (
-                local_scenarios["scenario_id"]
-                .astype(str)
-            )
-
             register_dataframe_as_table(
                 worker_connection,
                 "t_scenarios",
                 local_scenarios,
                 replace=True,
-            )
-
-            ensure_varchar_column(
-                worker_connection,
-                "t_scenarios",
-                "scenario_id",
-            )
-            ensure_varchar_column(
-                worker_connection,
-                self.result_table,
-                "scenario_id",
             )
 
             worker_connection.close()
