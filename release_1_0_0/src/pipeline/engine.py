@@ -835,6 +835,115 @@ class ScenarioGenerator:
                 values[:size]
             )
 
+    def add_balanced_group_scenarios(
+        self,
+        nature_table: str,
+        group_column: str,
+        include_full_removal: bool = True,
+    ) -> None:
+        """
+        Genere des retraits equilibres entre les sous-groupes d'une dimension.
+
+        Pour chaque hotel, le niveau 1 retire la nature la moins rentable
+        de chaque sous-groupe. Le niveau 2 retire les deux natures les moins
+        rentables de chaque sous-groupe, puis ainsi de suite.
+
+        Lorsqu'un sous-groupe contient moins de natures que le niveau courant,
+        toutes ses natures deja disponibles restent dans le scenario.
+        """
+        dataframe = self.cp.p_table_view(
+            nature_table
+        ).df()
+
+        required_columns = {
+            "hotel_code",
+            group_column,
+            "nature",
+            "rang_nature",
+        }
+
+        missing_columns = (
+            required_columns
+            - set(dataframe.columns)
+        )
+
+        if missing_columns:
+            raise ValueError(
+                f"Colonnes manquantes dans {nature_table} : "
+                f"{sorted(missing_columns)}"
+            )
+
+        for _, hotel_dataframe in dataframe.groupby(
+            "hotel_code",
+            sort=True,
+        ):
+            hotel_dataframe = (
+                hotel_dataframe
+                .dropna(
+                    subset=[
+                        group_column,
+                        "nature",
+                        "rang_nature",
+                    ]
+                )
+                .copy()
+            )
+
+            if hotel_dataframe.empty:
+                continue
+
+            hotel_dataframe["rang_nature"] = (
+                hotel_dataframe["rang_nature"]
+                .astype(int)
+            )
+
+            max_rank = int(
+                hotel_dataframe["rang_nature"].max()
+            )
+
+            if not include_full_removal:
+                total_natures = (
+                    hotel_dataframe["nature"]
+                    .nunique()
+                )
+            else:
+                total_natures = None
+
+            previous_scenario: tuple[str, ...] = ()
+
+            for rank_level in range(
+                1,
+                max_rank + 1,
+            ):
+                selected_natures = (
+                    hotel_dataframe.loc[
+                        hotel_dataframe["rang_nature"]
+                        <= rank_level,
+                        "nature",
+                    ]
+                    .tolist()
+                )
+
+                scenario = self.canonical_natures(
+                    selected_natures
+                )
+
+                if not scenario:
+                    continue
+
+                if scenario == previous_scenario:
+                    continue
+
+                if (
+                    not include_full_removal
+                    and total_natures is not None
+                    and len(scenario) >= total_natures
+                ):
+                    break
+
+                self.add(scenario)
+                previous_scenario = scenario
+
     def generate_rank_scenarios(
         self,
         include_full_removal: bool = True,
@@ -899,6 +1008,15 @@ class ScenarioGenerator:
                     include_full_removal,
                 )
 
+            # Retraits equilibres entre tous les sous-groupes
+            self.add_balanced_group_scenarios(
+                nature_table=nature_table,
+                group_column=group_column,
+                include_full_removal=(
+                    include_full_removal
+                ),
+            )
+
             ranked_groups = self.cp.p_table_view(
                 group_table
             ).df()
@@ -908,6 +1026,7 @@ class ScenarioGenerator:
                 sort=True,
             ):
                 cumulative: list[str] = []
+
                 rows = (
                     hotel_df
                     .sort_values(
