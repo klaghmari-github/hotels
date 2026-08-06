@@ -9,11 +9,11 @@ from typing import Any
 import pandas as pd
 from flask import Flask, jsonify, request
 
-from release_1_0_0.src.ml.catboost_model import CatBoostService
-from release_1_0_0.src.pipeline.connection import PipelineFactory
-from release_1_0_0.src.pipeline.paths import Paths
-from release_1_0_0.src.sim_v1.service import SimV1Service
-from release_1_0_0.src.sim_v2.service import SimV2Service
+from src.ml.catboost_model import CatBoostService
+from src.pipeline.connection import PipelineFactory
+from src.pipeline.paths import Paths
+from src.sim_v1.service import SimV1Service
+from src.sim_v2.service import SimV2Service
 
 
 def _clean_records(df: pd.DataFrame) -> list[dict[str, Any]]:
@@ -218,7 +218,7 @@ def create_api_app(paths: Paths | None = None) -> Flask:
                 ("type", body.get("type_mix") or {}),
                 ("gamme", body.get("gamme_mix") or {}),
             ):
-                from release_1_0_0.src.sim_v2.service import normalized_mix_name
+                from src.sim_v2.restitution import normalized_mix_name
 
                 for label, part in mix.items():
                     features[normalized_mix_name(family, str(label))] = float(part)

@@ -66,3 +66,20 @@ class Paths:
 
     def out_ml(self, name: str) -> Path:
         return self.output_ml / name
+
+
+def release_root() -> Path:
+    """
+    Racine release_1_0_0 (dossier qui contient data/ et pipeline/).
+
+    Fonctionne depuis src/pipeline/*.py ou depuis main.py a la racine.
+    """
+    here = Path(__file__).resolve().parent
+    # src/pipeline → parents[2]
+    candidate = here.parent.parent
+    if (candidate / "data").is_dir() and (candidate / "pipeline").is_dir():
+        return candidate
+    if (here / "data").is_dir() and (here / "pipeline").is_dir():
+        return here
+    return candidate
+

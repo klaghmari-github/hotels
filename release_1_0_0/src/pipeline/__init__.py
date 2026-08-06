@@ -1,35 +1,28 @@
 """
-Bibliotheque de gestion des pipelines (copie exacte de archive/accor_1_0_6/main.py).
+Runtime pipeline : connexion DuckDB, prerequis, parallelisation.
 
-Toutes les classes et fonctions publiques de main.py sont reexportees ici.
-Le fichier source complet est engine.py (byte-identique a main.py d'origine).
+La logique metier sim_v2 (scenarios, restitution, LOO) vit dans src.sim_v2.
 """
 
-from .engine import (  # noqa: F401
+from .connection import PipelineFactory
+from .engine import (
     ConnectionPipeline,
     ConnectionUtils,
     DependencyTree,
     ParallelismConfig,
     ParallelIterationManager,
-    ScenarioGenerator,
-    release_root,
     create_empty_table_from_schema,
     drop_relation_if_exists,
     ensure_table_schema,
     ensure_varchar_array_column,
     ensure_varchar_column,
-    main,
     normalize_duckdb_type,
-    normalized_mix_name,
     pipeline_fingerprint,
     register_dataframe_as_relation,
     relation_schema,
     relation_type,
-    replace_restitution_input_views,
     resolve_parallelism,
     run_iteration_bucket,
-    run_leave_one_out,
-    run_restitution,
     scenario_bucket,
     schemas_match,
     seed_backing_table_name,
@@ -37,16 +30,16 @@ from .engine import (  # noqa: F401
     worker_metadata_matches,
     write_worker_metadata,
 )
-from .paths import Paths  # noqa: F401
+from .paths import Paths, release_root
 
 __all__ = [
     "Paths",
     "release_root",
+    "PipelineFactory",
     "ParallelismConfig",
     "ConnectionUtils",
     "DependencyTree",
     "ConnectionPipeline",
-    "ScenarioGenerator",
     "ParallelIterationManager",
     "resolve_parallelism",
     "scenario_bucket",
@@ -66,9 +59,4 @@ __all__ = [
     "worker_metadata_matches",
     "write_worker_metadata",
     "run_iteration_bucket",
-    "normalized_mix_name",
-    "replace_restitution_input_views",
-    "run_restitution",
-    "run_leave_one_out",
-    "main",
 ]

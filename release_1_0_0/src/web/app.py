@@ -6,9 +6,9 @@ from __future__ import annotations
 
 from flask import Flask, render_template_string
 
-from release_1_0_0.src.api.app import create_api_app
-from release_1_0_0.src.pipeline.paths import Paths
-from release_1_0_0.src.web.styles import COMMON_CSS
+from src.api.app import create_api_app
+from src.pipeline.paths import Paths
+from src.web.styles import COMMON_CSS
 
 NAV = """
 <nav>

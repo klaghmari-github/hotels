@@ -10,9 +10,9 @@ from typing import Any
 
 import pandas as pd
 
-from release_1_0_0.src.pipeline.connection import PipelineFactory
-from release_1_0_0.src.pipeline.engine import ConnectionPipeline
-from release_1_0_0.src.pipeline.paths import Paths
+from src.pipeline.connection import PipelineFactory
+from src.pipeline.engine import ConnectionPipeline
+from src.pipeline.paths import Paths
 
 
 class SimV1Service:

@@ -1,5 +1,5 @@
 """
-Service sim_v2 — restitution coefficients + LOO (pipeline YAML).
+Facade haut niveau sim_v2 — orchestre sans reimplementer le moteur.
 """
 
 from __future__ import annotations
@@ -10,25 +10,13 @@ from typing import Any
 
 import pandas as pd
 
-from release_1_0_0.src.pipeline.connection import PipelineFactory
-from release_1_0_0.src.pipeline.engine import ConnectionPipeline
-from release_1_0_0.src.pipeline.paths import Paths
-
-
-def normalized_mix_name(family: str, label: str) -> str:
-    """Meme convention que main.py pour les colonnes de parts."""
-    import re
-    import unicodedata
-
-    raw = f"{family}_{label}_part_natures"
-    text = (
-        unicodedata.normalize("NFKD", str(raw))
-        .encode("ascii", "ignore")
-        .decode("ascii")
-    )
-    text = text.lower().replace("&", " et ")
-    text = re.sub(r"[^a-z0-9]+", "_", text)
-    return re.sub(r"_+", "_", text).strip("_")
+from src.pipeline.connection import PipelineFactory
+from src.pipeline.engine import ConnectionPipeline
+from src.pipeline.paths import Paths
+from src.sim_v2.loo import run_leave_one_out
+from src.sim_v2.modeling import run_modeling_simulation
+from src.sim_v2.restitution import normalized_mix_name, run_restitution
+from src.sim_v2.scenarios import ScenarioGenerator
 
 
 class SimV2Service:
@@ -43,32 +31,73 @@ class SimV2Service:
     def open(self, *, rebuild: bool = False) -> ConnectionPipeline:
         return self.factory.open(rebuild=rebuild)
 
+    def build_modeling(
+        self,
+        *,
+        include_full_removal: bool = True,
+    ) -> dict[str, Any]:
+        """
+        Pipeline complet modelisation : ranks → scenarios → simulation.
+        Equivalent de l'ancien main() de main.py.
+        """
+        return run_modeling_simulation(
+            db_con_str=self.paths.main_db,
+            pipeline_path=self.paths.pipeline,
+            scenarios_excel_path=self.paths.input / "scenarios.xlsx",
+            include_full_removal=include_full_removal,
+        )
+
+    def generate_scenarios(
+        self,
+        *,
+        include_full_removal: bool = True,
+        write_excel: bool = True,
+    ) -> pd.DataFrame:
+        """Genere le catalogue de scenarios (set + Excel optionnel)."""
+        cp = self.open(rebuild=False)
+        try:
+            generator = ScenarioGenerator(
+                cp,
+                self.paths.input / "scenarios.xlsx",
+            )
+            generator.generate_rank_scenarios(
+                include_full_removal=include_full_removal
+            )
+            if write_excel:
+                return generator.write_excel()
+            rows = []
+            for values in sorted(
+                generator._scenarios,
+                key=lambda item: (len(item), item),
+            ):
+                rows.append(
+                    {
+                        "scenario_id": generator.scenario_hash(values),
+                        "scenario_removed_natures": list(values),
+                    }
+                )
+            return pd.DataFrame(rows)
+        finally:
+            cp.close()
+
     def run_loo(self, *, rebuild: bool = True) -> dict[str, pd.DataFrame]:
         cp = self.open(rebuild=False)
         try:
-            if rebuild:
-                try:
-                    cp.con.sql("DROP TABLE IF EXISTS t_loo_results")
-                except Exception:
-                    pass
-            cp.p_iteration("i_loo_evaluation")
-            results = cp.table_view("t_loo_results").df()
-            metrics = cp.p_table_view("v_loo_metrics").df()
-            comparison = cp.p_table_view("v_loo_method_comparison").df()
-            return {
-                "predictions": results,
-                "metrics": metrics,
-                "method_comparison": comparison,
-            }
+            return run_leave_one_out(cp, rebuild=rebuild)
         finally:
-            cp.close()
+            # run_leave_one_out leaves connection open intentionally in old API;
+            # we own cp here so close after reading dataframes.
+            try:
+                cp.close()
+            except Exception:
+                pass
 
     def export_loo(self, result: dict[str, pd.DataFrame] | None = None):
         result = result or self.run_loo(rebuild=True)
         path = self.paths.out_sim_v2("eval_sim_v2_loo.xlsx")
         path.parent.mkdir(parents=True, exist_ok=True)
         with pd.ExcelWriter(path, engine="openpyxl") as writer:
-            result["predictions"].to_excel(
+            result["results"].to_excel(
                 writer, sheet_name="predictions", index=False
             )
             result["metrics"].to_excel(writer, sheet_name="metrics", index=False)
@@ -88,86 +117,22 @@ class SimV2Service:
         type_mix: dict[str, float] | None = None,
         gamme_mix: dict[str, float] | None = None,
     ) -> pd.DataFrame:
-        """Restitution A/B pour les 3 solutions (API prediction)."""
-        # Import local pour garder le service leger
-        from release_1_0_0.src.pipeline.engine import register_dataframe_as_relation
-
-        cp = self.open(read_only=False)
+        cp = self.open(rebuild=False)
         try:
-            default_mix = cp.p_table_view(
-                "v_restitution_default_input_mix"
-            ).df()
-
-            def family_rows(
-                family: str,
-                supplied: dict[str, float] | None,
-            ) -> list[tuple[str, str, float]]:
-                if supplied is None:
-                    family_default = default_mix[
-                        default_mix["variable_family"] == family
-                    ]
-                    return [
-                        (
-                            family,
-                            str(row.variable_name),
-                            float(row.target_part),
-                        )
-                        for row in family_default.itertuples(index=False)
-                    ]
-                if not supplied:
-                    raise ValueError(f"Le mix {family} ne peut pas etre vide")
-                if any(v < 0 for v in supplied.values()):
-                    raise ValueError(f"Le mix {family} contient une part negative")
-                if not math.isclose(
-                    sum(supplied.values()), 1.0, rel_tol=1e-6, abs_tol=1e-6
-                ):
-                    raise ValueError(f"La somme du mix {family} doit etre egale a 1")
-                return [
-                    (family, normalized_mix_name(family, label), float(part))
-                    for label, part in supplied.items()
-                ]
-
-            cp.con.sql(
-                f"""
-                CREATE OR REPLACE TEMP VIEW v_restitution_input_hotel AS
-                SELECT
-                    {float(hotel_nb_chambres)}::DOUBLE AS hotel_nb_chambres,
-                    {float(hotel_to_annuel)}::DOUBLE AS hotel_to_annuel,
-                    {float(hotel_guests_per_chambre)}::DOUBLE
-                        AS hotel_guests_per_chambre,
-                    {float(metres_lineaires)}::DOUBLE AS metres_lineaires
-                """
+            return run_restitution(
+                cp,
+                hotel_nb_chambres=hotel_nb_chambres,
+                hotel_to_annuel=hotel_to_annuel,
+                hotel_guests_per_chambre=hotel_guests_per_chambre,
+                metres_lineaires=metres_lineaires,
+                type_mix=type_mix,
+                gamme_mix=gamme_mix,
             )
-            rows = [
-                *family_rows("type", type_mix),
-                *family_rows("gamme", gamme_mix),
-            ]
-            input_df = pd.DataFrame(
-                rows,
-                columns=["variable_family", "variable_name", "target_part"],
-            )
-            register_dataframe_as_relation(
-                cp.con,
-                "__restitution_input_mix_buffer",
-                input_df,
-                "table",
-                replace=True,
-            )
-            cp.con.sql(
-                """
-                CREATE OR REPLACE TEMP VIEW v_restitution_input_mix AS
-                SELECT * FROM __restitution_input_mix_buffer
-                """
-            )
-            cp.process_with_requires(
-                "v_restitution_prediction", processed=set()
-            )
-            return cp.table_view("v_restitution_prediction").df()
         finally:
             cp.close()
 
     def list_pilot_hotels(self) -> pd.DataFrame:
-        cp = self.open(read_only=False)
+        cp = self.open(rebuild=False)
         try:
             return cp.con.execute(
                 """

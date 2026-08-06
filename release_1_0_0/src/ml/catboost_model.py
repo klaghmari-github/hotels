@@ -20,8 +20,8 @@ from catboost import CatBoostRegressor, Pool
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.model_selection import GroupKFold
 
-from release_1_0_0.src.pipeline.connection import PipelineFactory
-from release_1_0_0.src.pipeline.paths import Paths
+from src.pipeline.connection import PipelineFactory
+from src.pipeline.paths import Paths
 
 logger = logging.getLogger(__name__)
 
