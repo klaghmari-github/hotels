@@ -1,0 +1,270 @@
+t_loo_hotels:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - t_sales
+  sql: |-
+    SELECT
+      HOTEL_CODE AS hotel_code,
+      ANY_VALUE(SOLUTION) AS solution
+    FROM t_sales
+    GROUP BY HOTEL_CODE
+    ORDER BY HOTEL_CODE
+v_loo_training_source:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_restitution_simulation_long
+  sql: |-
+    SELECT source.*
+    FROM v_restitution_simulation_long AS source
+    CROSS JOIN v_loo_step AS step
+    WHERE source.hotel_code <> step.hotel_code
+v_loo_solution_coefficients:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_loo_training_source
+  sql: |-
+    SELECT
+      solution,
+      variable_family,
+      variable_name,
+      AVG(montant_ventes_coefficient) AS montant_ventes_coefficient,
+      AVG(montant_marge_selon_coef_coefficient) AS montant_marge_selon_coef_coefficient,
+      AVG(montant_marge_coefficient) AS montant_marge_coefficient,
+      COUNT(*) AS nombre_observations,
+      COUNT(DISTINCT hotel_code) AS nombre_hotels
+    FROM v_loo_training_source
+    GROUP BY solution, variable_family, variable_name
+v_loo_observed_row:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_dataset_pivot
+  sql: |-
+    SELECT p.*
+    FROM t_dataset_pivot AS p
+    CROSS JOIN v_loo_step AS step
+    WHERE p.hotel_code = step.hotel_code
+      AND COALESCE(LEN(p.scenario_removed_natures), 0) = 0
+    LIMIT 1
+v_loo_input_mix:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_loo_observed_row
+  sql: |-
+    WITH source AS (
+      SELECT COLUMNS('^(type|gamme)_.*_part_natures$')
+      FROM v_loo_observed_row
+    ), long_mix AS (
+      UNPIVOT source
+      ON COLUMNS('^(type|gamme)_.*_part_natures$')
+      INTO NAME variable_name VALUE target_part
+    )
+    SELECT
+      CASE
+        WHEN variable_name LIKE 'type_%' THEN 'type'
+        WHEN variable_name LIKE 'gamme_%' THEN 'gamme'
+      END AS variable_family,
+      variable_name,
+      target_part
+    FROM long_mix
+    WHERE target_part > 0
+v_loo_prediction_by_variable:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_loo_solution_coefficients
+  - v_loo_observed_row
+  - v_loo_input_mix
+  sql: |-
+    SELECT
+      o.hotel_code,
+      o.solution,
+      c.variable_family,
+      c.variable_name,
+      m.target_part,
+      c.montant_ventes_coefficient
+        * o.nombre_guests_par_mois * o.metres_lineaires * m.target_part
+          AS montant_ventes_par_mois_predit,
+      c.montant_marge_selon_coef_coefficient
+        * o.nombre_guests_par_mois * o.metres_lineaires * m.target_part
+          AS montant_marge_selon_coef_par_mois_predite,
+      c.montant_marge_coefficient
+        * o.nombre_guests_par_mois * o.metres_lineaires * m.target_part
+          AS montant_marge_par_mois_predite,
+      c.nombre_observations,
+      c.nombre_hotels
+    FROM v_loo_observed_row AS o
+    INNER JOIN v_loo_solution_coefficients AS c
+      ON c.solution = o.solution
+    INNER JOIN v_loo_input_mix AS m
+      USING (variable_family, variable_name)
+v_loo_prediction_method_a:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_loo_prediction_by_variable
+  sql: |-
+    SELECT
+      hotel_code,
+      solution,
+      'A' AS methode,
+      AVG(montant_ventes_par_mois_predit) AS montant_ventes_par_mois_predit,
+      AVG(montant_marge_selon_coef_par_mois_predite) AS montant_marge_selon_coef_par_mois_predite,
+      AVG(montant_marge_par_mois_predite) AS montant_marge_par_mois_predite,
+      COUNT(*) AS nombre_predicteurs,
+      COUNT(DISTINCT variable_family) AS nombre_familles,
+      MAX(nombre_hotels) AS nombre_hotels_apprentissage
+    FROM v_loo_prediction_by_variable
+    GROUP BY hotel_code, solution
+v_loo_prediction_method_b:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_loo_prediction_by_variable
+  sql: |-
+    WITH family_prediction AS (
+      SELECT
+        hotel_code,
+        solution,
+        variable_family,
+        AVG(montant_ventes_par_mois_predit) AS montant_ventes_par_mois_predit,
+        AVG(montant_marge_selon_coef_par_mois_predite) AS montant_marge_selon_coef_par_mois_predite,
+        AVG(montant_marge_par_mois_predite) AS montant_marge_par_mois_predite,
+        COUNT(*) AS nombre_predicteurs,
+        MAX(nombre_hotels) AS nombre_hotels_apprentissage
+      FROM v_loo_prediction_by_variable
+      GROUP BY hotel_code, solution, variable_family
+    )
+    SELECT
+      hotel_code,
+      solution,
+      'B' AS methode,
+      AVG(montant_ventes_par_mois_predit) AS montant_ventes_par_mois_predit,
+      AVG(montant_marge_selon_coef_par_mois_predite) AS montant_marge_selon_coef_par_mois_predite,
+      AVG(montant_marge_par_mois_predite) AS montant_marge_par_mois_predite,
+      SUM(nombre_predicteurs) AS nombre_predicteurs,
+      COUNT(*) AS nombre_familles,
+      MAX(nombre_hotels_apprentissage) AS nombre_hotels_apprentissage
+    FROM family_prediction
+    GROUP BY hotel_code, solution
+v_loo_result:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_loo_observed_row
+  - v_loo_prediction_method_a
+  - v_loo_prediction_method_b
+  sql: |-
+    SELECT
+      p.hotel_code,
+      p.solution,
+      p.methode,
+      o.nombre_guests_par_mois,
+      o.metres_lineaires,
+      o.montant_ventes_par_mois AS montant_ventes_par_mois_reel,
+      p.montant_ventes_par_mois_predit,
+      p.montant_ventes_par_mois_predit - o.montant_ventes_par_mois AS montant_ventes_erreur,
+      ABS(p.montant_ventes_par_mois_predit - o.montant_ventes_par_mois) AS montant_ventes_erreur_absolue,
+      ABS(p.montant_ventes_par_mois_predit - o.montant_ventes_par_mois)
+        / NULLIF(ABS(o.montant_ventes_par_mois), 0) AS montant_ventes_erreur_relative,
+      o.montant_marge_selon_coef_par_mois AS montant_marge_selon_coef_par_mois_reel,
+      p.montant_marge_selon_coef_par_mois_predite,
+      p.montant_marge_selon_coef_par_mois_predite - o.montant_marge_selon_coef_par_mois AS montant_marge_selon_coef_erreur,
+      ABS(p.montant_marge_selon_coef_par_mois_predite - o.montant_marge_selon_coef_par_mois) AS montant_marge_selon_coef_erreur_absolue,
+      ABS(p.montant_marge_selon_coef_par_mois_predite - o.montant_marge_selon_coef_par_mois)
+        / NULLIF(ABS(o.montant_marge_selon_coef_par_mois), 0) AS montant_marge_selon_coef_erreur_relative,
+      o.montant_marge_par_mois AS montant_marge_par_mois_reel,
+      p.montant_marge_par_mois_predite,
+      p.montant_marge_par_mois_predite - o.montant_marge_par_mois AS montant_marge_erreur,
+      ABS(p.montant_marge_par_mois_predite - o.montant_marge_par_mois) AS montant_marge_erreur_absolue,
+      ABS(p.montant_marge_par_mois_predite - o.montant_marge_par_mois)
+        / NULLIF(ABS(o.montant_marge_par_mois), 0) AS montant_marge_erreur_relative,
+      p.nombre_predicteurs,
+      p.nombre_familles,
+      p.nombre_hotels_apprentissage
+    FROM v_loo_observed_row AS o
+    INNER JOIN (
+      SELECT * FROM v_loo_prediction_method_a
+      UNION ALL
+      SELECT * FROM v_loo_prediction_method_b
+    ) AS p
+    USING (hotel_code, solution)
+t_loo_results:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - v_loo_result
+  sql: SELECT * FROM v_loo_result LIMIT 0
+x_insert_loo_result:
+  type: execute
+  requires:
+  - t_loo_results
+  - v_loo_result
+  sql: |-
+    INSERT INTO t_loo_results BY NAME
+    SELECT r.*
+    FROM v_loo_result AS r
+    WHERE NOT EXISTS (
+      SELECT 1 FROM t_loo_results AS t
+      WHERE t.hotel_code = r.hotel_code AND t.methode = r.methode
+    )
+i_loo_evaluation:
+  type: iteration
+  execution: sequential
+  tasks: 1
+  requires:
+  - t_loo_hotels
+  scenarios: t_loo_hotels
+  step_view: v_loo_step
+  target: x_insert_loo_result
+  order_by:
+  - hotel_code
+v_loo_metrics:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_loo_results
+  sql: |-
+    SELECT
+      methode,
+      solution,
+      COUNT(*) AS nombre_hotels,
+      AVG(montant_ventes_erreur_absolue) AS montant_ventes_mae,
+      SQRT(AVG(POWER(montant_ventes_erreur, 2))) AS montant_ventes_rmse,
+      AVG(montant_ventes_erreur_relative) AS montant_ventes_mape,
+      AVG(montant_ventes_erreur) AS montant_ventes_biais,
+      AVG(montant_marge_selon_coef_erreur_absolue) AS marge_selon_coef_mae,
+      SQRT(AVG(POWER(montant_marge_selon_coef_erreur, 2))) AS marge_selon_coef_rmse,
+      AVG(montant_marge_selon_coef_erreur_relative) AS marge_selon_coef_mape,
+      AVG(montant_marge_erreur_absolue) AS marge_mae,
+      SQRT(AVG(POWER(montant_marge_erreur, 2))) AS marge_rmse,
+      AVG(montant_marge_erreur_relative) AS marge_mape
+    FROM t_loo_results
+    GROUP BY GROUPING SETS ((methode, solution), (methode))
+v_loo_method_comparison:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_loo_metrics
+  sql: |-
+    SELECT
+      methode,
+      montant_ventes_mae,
+      montant_ventes_rmse,
+      montant_ventes_mape,
+      marge_selon_coef_mae,
+      marge_selon_coef_rmse,
+      marge_selon_coef_mape,
+      marge_mae,
+      marge_rmse,
+      marge_mape,
+      RANK() OVER (ORDER BY montant_ventes_mae) AS rang_ca,
+      RANK() OVER (ORDER BY marge_selon_coef_mae) AS rang_marge_selon_coef,
+      RANK() OVER (ORDER BY marge_mae) AS rang_marge
+    FROM v_loo_metrics
+    WHERE solution IS NULL
+    ORDER BY rang_ca, rang_marge
