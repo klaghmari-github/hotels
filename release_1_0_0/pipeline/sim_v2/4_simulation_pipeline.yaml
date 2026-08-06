@@ -145,7 +145,7 @@ i_iteration_scenario:
   tasks: auto
   reserved_cpus: 2
   duckdb_threads_per_worker: 1
-  worker_database_pattern: duckdb/workers/simulation_task_{task_id:03d}.duckdb
+  worker_database_pattern: data/duckdb/workers/simulation_task_{task_id:03d}.duckdb
   requires:
   - v_scenarios_to_process
   scenarios: v_scenarios_to_process

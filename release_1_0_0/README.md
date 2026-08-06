@@ -63,3 +63,19 @@ CatBoost uniquement (pas XGBoost, pas reseau). LOO hotel + export `data/files/ou
 
 La base `main.duckdb` est initialisee a partir du dataset sim_v2 deja calcule.  
 Les tables sim_v1 se rajoutent dans la meme base. Reconstruire le catalogue scenarios complet reste un job pipeline sim_v2 long (hors GUI).
+
+## Bibliotheque pipeline (`main.py`)
+
+Copie de la lib historique. Chemins par defaut branches sur la release :
+
+| Parametre | Defaut |
+|-----------|--------|
+| `db_con_str` | `data/duckdb/main/main.duckdb` |
+| `pipeline_path` | `pipeline/` |
+| `scenarios_excel_path` | `data/files/input/scenarios.xlsx` |
+| workers parallel | `data/duckdb/workers/simulation_task_{id}.duckdb` |
+
+```python
+from main import main, ConnectionPipeline, release_root
+simulation = main()  # utilise les chemins release ci-dessus
+```
