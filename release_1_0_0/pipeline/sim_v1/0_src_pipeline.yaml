@@ -65,12 +65,94 @@ t_pilot_defaults:
       'SIMPLY', 'LIBERTY', 'CONNECTED'
     )
 
+# CA / marge REELS : meme base tickets que sim_v2/ML (t_sales + observation pivot).
+# v1_hotel_params.xlsx ne sert plus que pour l'identite hotel (label, brand, frigos).
+# Coefficients de simulation (R1–R4) restent dans v1_pilot_defaults.xlsx / .json.
+v_v1_sales_observation:
+  type: view
+  mode: create_or_replace
+  requires:
+    - t_sales
+  sql: |-
+    WITH base AS (
+      SELECT
+        CAST(HOTEL_CODE AS VARCHAR) AS hotel_code,
+        DATE_DIFF('month', MIN(DATE), MAX(DATE)) + 1 AS n_mois,
+        SUM(PRIX_TTC) AS montant_ventes,
+        SUM(MARGE) AS montant_marge,
+        SUM(MARGE_SELON_COEF) AS montant_marge_selon_coef,
+        SUM(QUANTITE) AS nombre_ventes,
+        COUNT(DISTINCT ORDER_ID) AS nombre_paniers,
+        SUM(
+          CASE
+            WHEN UPPER(TRIM(CAST(CATEGORIE AS VARCHAR))) IN ('NON_F_B', 'SOUVENIRS')
+            THEN PRIX_TTC
+            ELSE 0.0
+          END
+        ) AS montant_ventes_nfb,
+        SUM(
+          CASE
+            WHEN UPPER(TRIM(CAST(CATEGORIE AS VARCHAR))) IN ('NON_F_B', 'SOUVENIRS')
+            THEN 0.0
+            ELSE PRIX_TTC
+          END
+        ) AS montant_ventes_fb,
+        MAX(HOTEL_NB_CHAMBRES) AS hotel_nb_chambres,
+        MAX(HOTEL_TO_ANNUEL) AS hotel_to_annuel,
+        MAX(HOTEL_GUESTS_PER_CHAMBRE) AS hotel_guests_per_chambre,
+        MAX(METRES_LINEAIRES) AS metres_lineaires
+      FROM t_sales
+      GROUP BY CAST(HOTEL_CODE AS VARCHAR)
+    )
+    SELECT
+      hotel_code,
+      n_mois,
+      montant_ventes / NULLIF(n_mois, 0) AS ca_ttc_mensuel,
+      montant_ventes_fb / NULLIF(n_mois, 0) AS ca_fb_mensuel,
+      montant_ventes_nfb / NULLIF(n_mois, 0) AS ca_nf_mensuel,
+      montant_marge_selon_coef / NULLIF(n_mois, 0) AS marge_selon_coef_mensuelle,
+      montant_marge / NULLIF(n_mois, 0) AS marge_marche_mensuelle,
+      nombre_ventes / NULLIF(n_mois, 0) AS nb_ventes_mensuel,
+      nombre_paniers / NULLIF(n_mois, 0) AS nb_paniers_mensuel,
+      montant_ventes_fb / NULLIF(montant_ventes, 0) AS mix_fb,
+      hotel_nb_chambres
+        * hotel_to_annuel
+        * hotel_guests_per_chambre
+        * 30.5 AS clients_mois,
+      hotel_nb_chambres,
+      hotel_to_annuel,
+      hotel_guests_per_chambre,
+      metres_lineaires
+    FROM base
+
+# Observation officielle sim_v2/ML (scenario sans retrait) pour CA/marge reel exacts
+v_v1_pivot_observation:
+  type: view
+  mode: create_or_replace
+  requires:
+    - t_dataset_pivot
+  sql: |-
+    SELECT
+      CAST(hotel_code AS VARCHAR) AS hotel_code,
+      LOWER(TRIM(CAST(solution AS VARCHAR))) AS solution,
+      ANY_VALUE(montant_ventes_par_mois) AS ca_reel_mensuel,
+      ANY_VALUE(montant_marge_selon_coef_par_mois) AS marge_reelle_mensuelle,
+      ANY_VALUE(montant_marge_par_mois) AS marge_marche_mensuelle,
+      ANY_VALUE(nombre_guests_par_mois) AS clients_mois,
+      ANY_VALUE(metres_lineaires) AS metres_lineaires,
+      ANY_VALUE(nombre_mois) AS n_mois
+    FROM t_dataset_pivot
+    WHERE COALESCE(LEN(scenario_removed_natures), 0) = 0
+    GROUP BY CAST(hotel_code AS VARCHAR), LOWER(TRIM(CAST(solution AS VARCHAR)))
+
 t_hotel_params:
   type: table
   mode: create_or_replace
   requires:
     - df_hotel_params
     - t_pilot_concepts
+    - v_v1_sales_observation
+    - v_v1_pivot_observation
   sql: |-
     SELECT
       CAST(h.hotel_code AS VARCHAR) AS hotel_code,
@@ -78,23 +160,39 @@ t_hotel_params:
       CAST(h.label AS VARCHAR) AS label,
       CAST(h.hotel_name AS VARCHAR) AS hotel_name,
       CAST(h.hotel_brand AS VARCHAR) AS hotel_brand,
-      TRY_CAST(h.nb_chambres AS DOUBLE) AS nb_chambres,
-      TRY_CAST(h.taux_occupation AS DOUBLE) AS taux_occupation,
-      TRY_CAST(h.guests_per_chambre AS DOUBLE) AS guests_per_chambre,
-      TRY_CAST(h.m_lin AS DOUBLE) AS m_lin,
+      COALESCE(s.hotel_nb_chambres, TRY_CAST(h.nb_chambres AS DOUBLE)) AS nb_chambres,
+      COALESCE(s.hotel_to_annuel, TRY_CAST(h.taux_occupation AS DOUBLE)) AS taux_occupation,
+      COALESCE(s.hotel_guests_per_chambre, TRY_CAST(h.guests_per_chambre AS DOUBLE))
+        AS guests_per_chambre,
+      COALESCE(o.metres_lineaires, s.metres_lineaires, TRY_CAST(h.m_lin AS DOUBLE))
+        AS m_lin,
       COALESCE(TRY_CAST(h.nb_frigos_froid AS DOUBLE), 3.0) AS nb_frigos_froid,
-      TRY_CAST(h.clients_mois AS DOUBLE) AS clients_mois,
-      TRY_CAST(h.mix_fb AS DOUBLE) AS mix_fb,
-      TRY_CAST(h.ca_reel_mensuel AS DOUBLE) AS ca_reel_mensuel,
-      TRY_CAST(h.ca_fb_mensuel AS DOUBLE) AS ca_fb_mensuel,
-      TRY_CAST(h.ca_nf_mensuel AS DOUBLE) AS ca_nf_mensuel,
-      TRY_CAST(h.marge_reelle_mensuelle AS DOUBLE) AS marge_reelle_mensuelle,
-      TRY_CAST(h.nb_ventes_mensuel AS DOUBLE) AS nb_ventes_mensuel,
-      TRY_CAST(h.nb_paniers_mensuel AS DOUBLE) AS nb_paniers_mensuel,
-      TRY_CAST(h.n_mois AS DOUBLE) AS n_mois
+      -- clients : meme formule que sim_v2 (chambres x TO x guests x 30.5)
+      COALESCE(o.clients_mois, s.clients_mois, TRY_CAST(h.clients_mois AS DOUBLE))
+        AS clients_mois,
+      COALESCE(s.mix_fb, TRY_CAST(h.mix_fb AS DOUBLE)) AS mix_fb,
+      -- REEL aligne sim_v2/ML (pivot observation, fallback t_sales)
+      COALESCE(o.ca_reel_mensuel, s.ca_ttc_mensuel, TRY_CAST(h.ca_reel_mensuel AS DOUBLE))
+        AS ca_reel_mensuel,
+      COALESCE(s.ca_fb_mensuel, TRY_CAST(h.ca_fb_mensuel AS DOUBLE)) AS ca_fb_mensuel,
+      COALESCE(s.ca_nf_mensuel, TRY_CAST(h.ca_nf_mensuel AS DOUBLE)) AS ca_nf_mensuel,
+      COALESCE(
+        o.marge_reelle_mensuelle,
+        s.marge_selon_coef_mensuelle,
+        TRY_CAST(h.marge_reelle_mensuelle AS DOUBLE)
+      ) AS marge_reelle_mensuelle,
+      COALESCE(s.nb_ventes_mensuel, TRY_CAST(h.nb_ventes_mensuel AS DOUBLE))
+        AS nb_ventes_mensuel,
+      COALESCE(s.nb_paniers_mensuel, TRY_CAST(h.nb_paniers_mensuel AS DOUBLE))
+        AS nb_paniers_mensuel,
+      COALESCE(o.n_mois, s.n_mois, TRY_CAST(h.n_mois AS DOUBLE)) AS n_mois
     FROM df_hotel_params AS h
     INNER JOIN t_pilot_concepts AS p
       ON CAST(h.hotel_code AS VARCHAR) = p.hotel_code
+    LEFT JOIN v_v1_sales_observation AS s
+      ON s.hotel_code = CAST(h.hotel_code AS VARCHAR)
+    LEFT JOIN v_v1_pivot_observation AS o
+      ON o.hotel_code = CAST(h.hotel_code AS VARCHAR)
     WHERE CAST(h.hotel_code AS VARCHAR) NOT IN ('H5586')
 
 t_scope_hotels:

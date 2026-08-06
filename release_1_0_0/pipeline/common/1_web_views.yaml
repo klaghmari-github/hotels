@@ -1,0 +1,170 @@
+# Vues web (affichage uniquement) — ne modifient pas les tables metier.
+# Convention : v_web_* = projection legere pour l'UI admin / eval.
+
+# LOO sim_v1 : CA reel (base tickets = sim_v2) + CA/marge estimes (regles R1-R4)
+# ca_pred / marge_pred = estimations (simulation) ; marge_reel = selon coef (aligne ML/v2)
+v_web_v1_loo_results:
+  type: view
+  mode: create_or_replace
+  requires:
+    - t_v1_loo_results
+  sql: |-
+    SELECT
+      hotel_code,
+      solution,
+      ca_reel_mensuel AS ca_reel,
+      ca_ht_predit AS ca_pred,
+      abs_erreur_ca AS ca_err_abs,
+      marge_reelle_mensuelle AS marge_reel,
+      marge_produit_predite AS marge_pred,
+      abs_erreur_marge AS marge_err_abs,
+      n_mois
+    FROM t_v1_loo_results
+    WHERE hotel_code IS NOT NULL
+    ORDER BY solution, hotel_code
+
+# LOO sim_v2 : CA + marge selon coef uniquement (pas la marge marche brute)
+v_web_loo_results:
+  type: view
+  mode: create_or_replace
+  requires:
+    - t_loo_results
+  sql: |-
+    SELECT
+      hotel_code,
+      solution,
+      methode,
+      montant_ventes_par_mois_reel AS ca_reel,
+      montant_ventes_par_mois_predit AS ca_pred,
+      montant_ventes_erreur_absolue AS ca_err_abs,
+      montant_marge_selon_coef_par_mois_reel AS marge_reel,
+      montant_marge_selon_coef_par_mois_predite AS marge_pred,
+      montant_marge_selon_coef_erreur_absolue AS marge_err_abs
+    FROM t_loo_results
+    WHERE hotel_code IS NOT NULL
+    ORDER BY solution, hotel_code
+
+# Metriques sim_v2 global (CA + marge selon coef)
+v_web_loo_metrics:
+  type: view
+  mode: create_or_replace
+  requires:
+    - t_loo_results
+  sql: |-
+    SELECT
+      methode,
+      solution,
+      COUNT(*) AS n_hotels,
+      AVG(montant_ventes_erreur_absolue) AS mae_ca,
+      AVG(montant_marge_selon_coef_erreur_absolue) AS mae_marge
+    FROM t_loo_results
+    WHERE methode = 'sim_v2'
+    GROUP BY GROUPING SETS ((methode, solution), (methode))
+
+# ----------------------------------------------------------------------
+# Admin studio — datasets sim_v2 (observation de base vs scenarios simules)
+# sales_raw = t_sales (tickets) ; sales_obs = baseline ; sales_sim = scenarios
+# ----------------------------------------------------------------------
+
+# Observation utilisee comme point de depart des simulations sim_v2
+# (scenario sans retrait de natures) : 1 ligne / hotel pilote
+v_web_sales_obs:
+  type: view
+  mode: create_or_replace
+  requires:
+    - t_dataset_pivot
+  sql: |-
+    SELECT
+      hotel_code,
+      solution,
+      scenario_id,
+      scenario_removed_natures,
+      'observation' AS row_kind,
+      nombre_guests_par_mois,
+      metres_lineaires,
+      nombre_mois,
+      nombre_natures,
+      nombre_categories,
+      nombre_gammes,
+      nombre_types,
+      nombre_marques,
+      nombre_fournisseurs,
+      nombre_ventes_par_mois,
+      montant_ventes_par_mois,
+      montant_marge_par_mois,
+      montant_marge_selon_coef_par_mois,
+      type_f_b_part_natures,
+      type_non_f_b_part_natures,
+      gamme_alcool_part_natures,
+      gamme_sans_alcool_part_natures,
+      gamme_food_salee_part_natures,
+      gamme_food_sucree_part_natures,
+      gamme_formule_part_natures,
+      gamme_accessoires_part_natures,
+      gamme_sos_part_natures,
+      gamme_cosmetique_part_natures,
+      gamme_pap_part_natures,
+      gamme_jeux_enfants_part_natures,
+      gamme_souvenirs_part_natures
+    FROM t_dataset_pivot
+    WHERE COALESCE(LEN(scenario_removed_natures), 0) = 0
+    ORDER BY solution, hotel_code
+
+# Resultats simules sim_v2 : un scenario de retrait natures × hotel
+# (~6 hotels × ~1780 scenarios hors baseline)
+v_web_sales_sim:
+  type: view
+  mode: create_or_replace
+  requires:
+    - t_dataset_pivot
+  sql: |-
+    SELECT
+      hotel_code,
+      solution,
+      scenario_id,
+      scenario_removed_natures,
+      'simulation' AS row_kind,
+      LEN(scenario_removed_natures) AS n_natures_retirees,
+      nombre_guests_par_mois,
+      metres_lineaires,
+      nombre_mois,
+      nombre_natures,
+      nombre_categories,
+      nombre_gammes,
+      nombre_types,
+      nombre_marques,
+      nombre_fournisseurs,
+      nombre_ventes_par_mois,
+      montant_ventes_par_mois,
+      montant_marge_par_mois,
+      montant_marge_selon_coef_par_mois,
+      type_f_b_part_natures,
+      type_non_f_b_part_natures,
+      gamme_alcool_part_natures,
+      gamme_sans_alcool_part_natures,
+      gamme_food_salee_part_natures,
+      gamme_food_sucree_part_natures,
+      gamme_formule_part_natures,
+      gamme_accessoires_part_natures,
+      gamme_sos_part_natures,
+      gamme_cosmetique_part_natures,
+      gamme_pap_part_natures,
+      gamme_jeux_enfants_part_natures,
+      gamme_souvenirs_part_natures
+    FROM t_dataset_pivot
+    WHERE COALESCE(LEN(scenario_removed_natures), 0) > 0
+    ORDER BY hotel_code, scenario_id
+
+# Liste des scenarios de retrait (definitions, ~1780 lignes)
+v_web_sales_sim_scenarios:
+  type: view
+  mode: create_or_replace
+  requires:
+    - t_scenarios
+  sql: |-
+    SELECT
+      scenario_id,
+      scenario_removed_natures,
+      LEN(scenario_removed_natures) AS n_natures_retirees
+    FROM t_scenarios
+    ORDER BY scenario_id

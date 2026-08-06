@@ -38,6 +38,10 @@ class Paths:
 
         self.models = self.root / "models"
         self.models_catboost = self.models / "catboost"
+        self.models_xgboost = self.models / "xgboost"
+        self.models_ml1 = self.models / "ml1"
+        self.models_ml2 = self.models / "ml2"
+        self.models_super = self.models / "super"
         self.doc = self.root / "doc"
         self.src = self.root / "src"
 
@@ -51,6 +55,10 @@ class Paths:
             self.duckdb_main,
             self.duckdb_workers,
             self.models_catboost,
+            self.models_xgboost,
+            self.models_ml1,
+            self.models_ml2,
+            self.models_super,
         ):
             path.mkdir(parents=True, exist_ok=True)
         return self

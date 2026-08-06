@@ -30,7 +30,6 @@ NAV_ADMIN = """
 <nav>
   <a class="link" href="/user">User</a>
   <a class="link" href="/admin">Studio</a>
-  <a class="link" href="/predict">Prediction</a>
 </nav>
 """
 
@@ -123,6 +122,17 @@ function table(cols,rows,nums=[]){
   }
   return h+'</tbody></table></div>';
 }
+const EVAL_COLS=[
+  {k:'hotel_code',l:'Hotel'},{k:'solution',l:'Solution'},
+  {k:'ca_reel',l:'CA reel / mois',kind:'reel'},{k:'ca_pred',l:'CA estime / mois',kind:'pred'},{k:'ca_err_abs',l:'|err| CA / mois',kind:'err'},
+  {k:'marge_reel',l:'Marge reel / mois',kind:'reel'},{k:'marge_pred',l:'Marge estimee / mois',kind:'pred'},{k:'marge_err_abs',l:'|err| Marge / mois',kind:'err'},
+];
+function pickM(metrics,key){
+  if(!metrics||!metrics.length) return null;
+  const o=[...metrics].sort((a,b)=>(String(a.scope||'').toUpperCase()==='ALL'?0:1)-(String(b.scope||'').toUpperCase()==='ALL'?0:1));
+  for(const m of o){ if(m[key]!=null) return Number(m[key]); }
+  return null;
+}
 async function load(src){
   const main=document.getElementById('main');
   main.innerHTML='<p class="muted">Chargement…</p>';
@@ -131,19 +141,23 @@ async function load(src){
     const res=await fetch('/api/eval/'+src);
     const data=await res.json();
     if(!data.ok) throw new Error(data.error||'erreur');
-    let html='';
-    if((data.metrics||[]).length){
-      html+='<div class="grid">'+(data.metrics||[]).map(m=>{
-        const title=m.target_label||m.target||m.methode||m.perimetre||m.scope||'';
-        const mae=m.mae??m.montant_ventes_mae??m.mae_ca;
-        return `<div class="card"><div class="lbl">${title}</div><div class="val">${fmt(mae)}</div>
-          <div class="sub">MAE</div></div>`;
-      }).join('')+'</div>';
+    const n=new Set((data.predictions||[]).map(p=>p.hotel_code).filter(Boolean)).size;
+    let html=`<div class="grid">
+      <div class="card"><div class="lbl">${tag(src)} · MAE CA</div><div class="val">${fmt(pickM(data.metrics,'mae_ca'))}</div><div class="sub">n=${n}</div></div>
+      <div class="card"><div class="lbl">${tag(src)} · MAE marge</div><div class="val">${fmt(pickM(data.metrics,'mae_marge'))}</div><div class="sub">selon coef</div></div>
+    </div>`;
+    html+='<p class="muted" style="margin:.75rem 0 .4rem">Bleu reel · Violet estime · Orange erreur · <strong>mensuel (€ / mois)</strong></p>';
+    html+='<div class="scroll"><table><thead><tr>';
+    html+=EVAL_COLS.map(c=>`<th class="${c.kind?('col-'+c.kind):''}">${c.l}</th>`).join('');
+    html+='</tr></thead><tbody>';
+    for(const r of (data.predictions||[])){
+      html+='<tr>'+EVAL_COLS.map(c=>{
+        if(c.k==='solution') return `<td>${tag(r[c.k])}</td>`;
+        if(c.k==='hotel_code') return `<td><strong>${r[c.k]??'—'}</strong></td>`;
+        return `<td class="num ${c.kind?('col-'+c.kind):''}">${r[c.k]==null?'—':fmt(r[c.k])}</td>`;
+      }).join('')+'</tr>';
     }
-    html+='<h2>Predictions</h2>';
-    const preds=data.predictions||[];
-    const keys=preds[0]?Object.keys(preds[0]).slice(0,12):[];
-    html+=table(keys.map(k=>({k,l:k})), preds, keys.filter(k=>/mae|err|reel|pred|ca_|marge_/i.test(k)));
+    html+='</tbody></table></div>';
     main.innerHTML=html;
   }catch(e){
     main.innerHTML=`<div class="errbox">${e.message}</div>`;
@@ -161,207 +175,79 @@ COMPARE_SCRIPT = r"""
 const fmt=(n,d=2)=>{if(n==null||n===''||Number.isNaN(Number(n)))return '—';return Number(n).toLocaleString('fr-FR',{maximumFractionDigits:d});};
 const tag=s=>`<span class="tag ${(s||'').toString().toLowerCase().replace(/[^a-z0-9_]/g,'')}">${s??''}</span>`;
 const SOURCES=['sim_v1','sim_v2','ml'];
-
-function isGlobalMetric(m){
-  // ligne globale (pas de solution) — preferer pour les KPI
-  return m.solution==null || m.solution==='' || m.perimetre==='ALL' || m.scope==='ALL';
-}
-function pickMaeCa(metrics){
+function pick(metrics,key){
   if(!metrics||!metrics.length) return null;
-  const ordered=[...metrics].sort((a,b)=>Number(isGlobalMetric(b))-Number(isGlobalMetric(a)));
-  for(const m of ordered){
-    if(m.mae_ca!=null) return Number(m.mae_ca);
-    if(m.montant_ventes_mae!=null) return Number(m.montant_ventes_mae);
-    if(m.target==='montant_ventes_par_mois' && m.mae!=null) return Number(m.mae);
-  }
-  const mae=metrics.map(m=>m.mae).filter(v=>v!=null);
-  if(mae.length) return mae.reduce((a,b)=>a+Number(b),0)/mae.length;
+  const ordered=[...metrics].sort((a,b)=>(String(a.scope||'').toUpperCase()==='ALL'?0:1)-(String(b.scope||'').toUpperCase()==='ALL'?0:1));
+  for(const m of ordered){ if(m[key]!=null) return Number(m[key]); }
   return null;
 }
-function pickMaeMarge(metrics){
-  if(!metrics||!metrics.length) return null;
-  const ordered=[...metrics].sort((a,b)=>Number(isGlobalMetric(b))-Number(isGlobalMetric(a)));
-  for(const m of ordered){
-    if(m.mae_marge!=null) return Number(m.mae_marge);
-    if(m.marge_mae!=null) return Number(m.marge_mae);
-    if(m.target==='montant_marge_par_mois' && m.mae!=null) return Number(m.mae);
-  }
-  return null;
-}
-function pickMapeCa(metrics){
-  if(!metrics||!metrics.length) return null;
-  const ordered=[...metrics].sort((a,b)=>Number(isGlobalMetric(b))-Number(isGlobalMetric(a)));
-  for(const m of ordered){
-    if(m.mape_ca_pct!=null) return Number(m.mape_ca_pct);
-    if(m.montant_ventes_mape!=null) return Number(m.montant_ventes_mape);
-    if(m.target==='montant_ventes_par_mois' && m.mape!=null) return Number(m.mape);
-  }
-  return null;
-}
-
-function hotelCa(pred){
-  // unify predicted / actual CA fields across sources
-  return {
-    hotel: pred.hotel_code,
-    solution: pred.solution,
-    methode: pred.methode||null,
-    ca_pred: pred.ca_pred??pred.montant_ventes_par_mois_predit??pred.montant_ventes_par_mois_pred??null,
-    ca_reel: pred.ca_reel??pred.montant_ventes_par_mois_reel??null,
-    ca_err: pred.ca_err_abs??pred.montant_ventes_erreur_absolue??pred.montant_ventes_par_mois_erreur_absolue??null,
-    marge_pred: pred.marge_pred??pred.montant_marge_par_mois_predite??pred.montant_marge_par_mois_predit??null,
-    marge_reel: pred.marge_reel??pred.montant_marge_par_mois_reel??null,
-  };
-}
-
-async function fetchEval(src){
-  try{
-    const res=await fetch('/api/eval/'+src);
-    const data=await res.json();
-    if(!data.ok) return {src, ok:false, error:data.error||'erreur'};
-    return {src, ok:true, metrics:data.metrics||[], predictions:data.predictions||[]};
-  }catch(e){
-    return {src, ok:false, error:e.message};
-  }
-}
-
-function bestSrc(rows, key){
-  let best=null, bestVal=Infinity;
-  for(const r of rows){
-    const v=r[key];
-    if(v==null||Number.isNaN(v)) continue;
-    if(v<bestVal){ bestVal=v; best=r.src; }
-  }
-  return best;
-}
-
 async function render(){
   const main=document.getElementById('main');
   main.innerHTML='<p class="muted">Chargement…</p>';
-  const results=await Promise.all(SOURCES.map(fetchEval));
-  const ok=results.filter(r=>r.ok);
-  const fail=results.filter(r=>!r.ok);
-
-  // KPI cards
+  const results=await Promise.all(SOURCES.map(async src=>{
+    try{
+      const res=await fetch('/api/eval/'+src); const data=await res.json();
+      if(!data.ok) return {src, ok:false, error:data.error};
+      return {src, ok:true, metrics:data.metrics||[], predictions:data.predictions||[]};
+    }catch(e){ return {src, ok:false, error:e.message}; }
+  }));
   const kpis=results.map(r=>{
-    if(!r.ok) return {src:r.src, mae_ca:null, mae_marge:null, mape_ca:null, n:null, n_rows:null, err:r.error};
-    const preds=r.predictions||[];
-    const hotels=new Set(preds.map(p=>p.hotel_code).filter(Boolean));
+    if(!r.ok) return {src:r.src, mae_ca:null, mae_marge:null, n:null, err:r.error};
     return {
       src:r.src,
-      mae_ca: pickMaeCa(r.metrics),
-      mae_marge: pickMaeMarge(r.metrics),
-      mape_ca: pickMapeCa(r.metrics),
-      n: hotels.size,           // hotels uniques (comparable)
-      n_rows: preds.length,    // lignes brutes (sim_v2 = 2 methodes)
+      mae_ca: pick(r.metrics,'mae_ca'),
+      mae_marge: pick(r.metrics,'mae_marge'),
+      n: new Set((r.predictions||[]).map(p=>p.hotel_code).filter(Boolean)).size,
       err:null,
     };
   });
-  const bestCa=bestSrc(kpis,'mae_ca');
-  const bestMarge=bestSrc(kpis,'mae_marge');
-
-  let html='';
-  if(fail.length){
-    html+=`<div class="errbox">Donnees manquantes : ${fail.map(r=>r.src).join(', ')}</div>`;
-  }
-  html+='<h2>Metriques globales (LOO)</h2><div class="grid">';
+  const best=(key)=>{ let b=null,v=Infinity; for(const k of kpis){ if(k[key]!=null&&k[key]<v){v=k[key];b=k.src;} } return b; };
+  const bestCa=best('mae_ca'), bestM=best('mae_marge');
+  let html='<p class="muted">Comparaison sur <strong>MAE CA</strong> et <strong>MAE marge selon coef</strong> uniquement.</p><div class="grid">';
   for(const k of kpis){
-    const winCa=k.src===bestCa?' · meilleur CA':'';
-    const winM=k.src===bestMarge?' · meilleure marge':'';
-    html+=`<div class="card">
-      <div class="lbl">${tag(k.src)}</div>
-      <div class="val">${fmt(k.mae_ca)}</div>
-      <div class="sub">MAE CA${winCa}</div>
-      <div class="sub" style="margin-top:.35rem">MAE marge : <strong>${fmt(k.mae_marge)}</strong>${winM}</div>
-      <div class="sub">MAPE CA : ${fmt(k.mape_ca)} % · hotels=${k.n??'—'}${k.n_rows!=null && k.n_rows!==k.n?` · lignes=${k.n_rows}`:''}</div>
-      ${k.err?`<div class="errbox" style="margin-top:.5rem;padding:.4rem .55rem;font-size:.78rem">${k.err}</div>`:''}
-    </div>`;
+    html+=`<div class="card"><div class="lbl">${tag(k.src)}</div>
+      <div class="val">${fmt(k.mae_ca)}</div><div class="sub">MAE CA${k.src===bestCa?' · meilleur':''}</div>
+      <div class="sub">MAE marge coef : <strong style="${k.src===bestM?'color:var(--ok)':''}">${fmt(k.mae_marge)}</strong></div>
+      <div class="sub">hotels=${k.n??'—'}</div></div>`;
   }
-  html+='</div>';
-
-  // Side-by-side metrics table
-  html+='<h2>Tableau comparatif</h2><div class="scroll"><table><thead><tr>';
-  html+='<th>Metrique</th>'+SOURCES.map(s=>`<th class="num">${s}</th>`).join('')+'</tr></thead><tbody>';
-  const rows=[
-    ['MAE CA', 'mae_ca'],
-    ['MAE marge', 'mae_marge'],
-    ['MAPE CA (%)', 'mape_ca'],
-    ['Nb hotels', 'n'],
-  ];
-  for(const [label,key] of rows){
-    html+=`<tr><td>${label}</td>`;
+  html+='</div><h2>Tableau</h2><div class="scroll"><table><thead><tr><th>Metrique</th>';
+  html+=SOURCES.map(s=>`<th class="num">${s}</th>`).join('')+'</tr></thead><tbody>';
+  for(const [lab,key] of [['MAE CA','mae_ca'],['MAE marge coef','mae_marge'],['Nb hotels','n']]){
+    html+=`<tr><td>${lab}</td>`;
     for(const s of SOURCES){
-      const k=kpis.find(x=>x.src===s);
-      const v=k?k[key]:null;
-      const isBest=(key==='mae_ca'&&s===bestCa)||(key==='mae_marge'&&s===bestMarge);
-      html+=`<td class="num"${isBest?' style="color:var(--ok);font-weight:700"':''}>${fmt(v, key==='n'?0:2)}</td>`;
+      const k=kpis.find(x=>x.src===s); const v=k?k[key]:null;
+      const win=(key==='mae_ca'&&s===bestCa)||(key==='mae_marge'&&s===bestM);
+      html+=`<td class="num"${win?' style="color:var(--ok);font-weight:700"':''}>${fmt(v,key==='n'?0:2)}</td>`;
     }
     html+='</tr>';
   }
   html+='</tbody></table></div>';
-
-  // Per-hotel comparison (CA pred / err)
-  const byHotel={};
-  for(const r of ok){
-    for(const p of r.predictions){
-      const u=hotelCa(p);
-      if(!u.hotel) continue;
-      // sim_v2 may have several methodes — keep best (lowest abs err) per hotel
-      const key=u.hotel;
-      if(!byHotel[key]) byHotel[key]={hotel:key, solution:u.solution};
-      const slot=byHotel[key];
-      const prev=slot[r.src];
-      if(!prev || (u.ca_err!=null && (prev.ca_err==null || u.ca_err<prev.ca_err))){
-        slot[r.src]=u;
-        if(u.solution) slot.solution=u.solution;
-      }
+  // par hotel — err marge coef
+  const byH={};
+  for(const r of results.filter(x=>x.ok)){
+    for(const p of r.predictions||[]){
+      if(!p.hotel_code) continue;
+      if(!byH[p.hotel_code]) byH[p.hotel_code]={hotel:p.hotel_code, solution:p.solution};
+      byH[p.hotel_code][r.src]=p;
     }
   }
-  const hotels=Object.values(byHotel).sort((a,b)=>String(a.hotel).localeCompare(String(b.hotel)));
+  const hotels=Object.values(byH).sort((a,b)=>String(a.hotel).localeCompare(String(b.hotel)));
   if(hotels.length){
-    html+='<h2>Par hotel (CA predit / erreur abs.)</h2><div class="scroll"><table><thead><tr>';
-    html+='<th>Hotel</th><th>Solution</th>';
-    for(const s of SOURCES){
-      html+=`<th class="num">${s} CA</th><th class="num">${s} err</th>`;
-    }
+    html+='<h2>Par hotel (|err| marge coef)</h2><div class="scroll"><table><thead><tr><th>Hotel</th><th>Solution</th>';
+    for(const s of SOURCES) html+=`<th class="num col-err">${s}</th>`;
     html+='</tr></thead><tbody>';
     for(const h of hotels){
-      html+=`<tr><td>${h.hotel}</td><td>${h.solution?tag(h.solution):'—'}</td>`;
-      // best err among sources for this hotel
-      let bestE=Infinity, bestS=null;
+      html+=`<tr><td><strong>${h.hotel}</strong></td><td>${tag(h.solution)}</td>`;
+      let bestE=Infinity,bestS=null;
+      for(const s of SOURCES){ const e=h[s]?.marge_err_abs; if(e!=null&&e<bestE){bestE=e;bestS=s;} }
       for(const s of SOURCES){
-        const e=h[s]?.ca_err;
-        if(e!=null && e<bestE){ bestE=e; bestS=s; }
-      }
-      for(const s of SOURCES){
-        const u=h[s];
-        const win=s===bestS;
-        html+=`<td class="num">${fmt(u?.ca_pred)}</td>`;
-        html+=`<td class="num"${win?' style="color:var(--ok);font-weight:700"':''}>${fmt(u?.ca_err)}</td>`;
+        const e=h[s]?.marge_err_abs;
+        html+=`<td class="num col-err"${s===bestS?' style="font-weight:700;color:var(--ok)"':''}>${fmt(e)}</td>`;
       }
       html+='</tr>';
     }
     html+='</tbody></table></div>';
   }
-
-  // Detail sim_v2 par solution (global = solution null)
-  const v2=results.find(r=>r.src==='sim_v2'&&r.ok);
-  if(v2){
-    const bySol=(v2.metrics||[]).filter(m=>m.solution!=null && m.solution!=='');
-    if(bySol.length){
-      html+='<h2>sim_v2 par solution</h2><div class="scroll"><table><thead><tr>';
-      html+='<th>Solution</th><th class="num">MAE CA</th><th class="num">MAE marge</th><th class="num">MAPE CA</th></tr></thead><tbody>';
-      for(const m of bySol){
-        html+=`<tr>
-          <td>${tag(m.solution)}</td>
-          <td class="num">${fmt(m.montant_ventes_mae)}</td>
-          <td class="num">${fmt(m.marge_mae)}</td>
-          <td class="num">${fmt(m.montant_ventes_mape)}</td>
-        </tr>`;
-      }
-      html+='</tbody></table></div>';
-    }
-  }
-
   main.innerHTML=html;
 }
 render();
@@ -701,7 +587,7 @@ function renderOne(data, {title=null, showLabel=false, label=''}={}){
     const sol=data.solution?` ${tag(data.solution)}`:'';
     return (title?`<h2>${title}${sol}</h2>`:(showLabel&&label?`<h2>${tag(label)}${sol}</h2>`:(sol?`<h2>${sol}</h2>`:'')))+
       `<div class="grid">
-        <div class="card"><div class="lbl">CA predit</div><div class="val">${fmt(data.montant_ventes_par_mois)}</div></div>
+        <div class="card"><div class="lbl">CA estime</div><div class="val">${fmt(data.montant_ventes_par_mois)}</div></div>
         <div class="card"><div class="lbl">Marge predite</div><div class="val">${fmt(data.montant_marge_par_mois)}</div></div>
       </div>`;
   }

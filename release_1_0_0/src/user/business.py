@@ -140,19 +140,62 @@ def enrich_prediction_with_costs(
     engine: str = "",
     extra: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Applique les couts sur une prediction CA / marge marche."""
+    """
+    Applique les couts sur une prediction / simulation.
+
+    Les moteurs (sim_v1/v2/ml) sortent du **mensuel**
+    (montant_*_par_mois). On conserve le mensuel pour l'amortissement
+    et on expose l'**annuel** (= mensuel × 12) pour l'UI estimation.
+    """
     costs = compute_costs(solution, metres_lineaires=metres_lineaires)
-    ca = float(ca_monthly or 0)
-    marge = float(marge_monthly or 0)
-    marge_nette_m = marge - costs["monthly_cost"]
+    ca_m = float(ca_monthly or 0)
+    marge_m = float(marge_monthly or 0)
+    cout_m = float(costs["monthly_cost"] or 0)
+    marge_nette_m = marge_m - cout_m
+    capex = float(costs.get("capex") or 0)
+    # Delai d'amortissement estime (mois) si marge nette positive
+    if marge_nette_m > 1e-6 and capex > 0:
+        payback_months = capex / marge_nette_m
+    elif marge_nette_m <= 0:
+        payback_months = None  # non amortissable sur marge nette
+    else:
+        payback_months = 0.0
+
+    ca_a = ca_m * 12.0
+    marge_a = marge_m * 12.0
+    marge_nette_a = marge_nette_m * 12.0
+    cout_a = cout_m * 12.0
+
+    costs_annual = {
+        **costs,
+        "monthly_cost": round(cout_m, 4),
+        "annual_cost": round(cout_a, 4),
+    }
+
     out = {
         "engine": engine,
         "solution": costs["solution"],
-        "ca_monthly": round(ca, 4),
-        "marge_monthly": round(marge, 4),
+        # mensuel (source moteurs)
+        "ca_monthly": round(ca_m, 4),
+        "marge_monthly": round(marge_m, 4),
         "marge_nette_monthly": round(marge_nette_m, 4),
-        "marge_nette_annuelle": round(marge_nette_m * 12, 4),
-        "costs": costs,
+        "cout_monthly": round(cout_m, 4),
+        # annuel (affichage estimation = × 12)
+        "ca_annual": round(ca_a, 4),
+        "marge_annual": round(marge_a, 4),
+        "marge_nette_annual": round(marge_nette_a, 4),
+        "marge_nette_annuelle": round(marge_nette_a, 4),  # alias FR
+        "cout_annual": round(cout_a, 4),
+        "period": "annual",
+        "period_label": "€ / an",
+        "conversion": "monthly_x12",
+        "payback_months": (
+            round(payback_months, 1) if payback_months is not None else None
+        ),
+        "payback_years": (
+            round(payback_months / 12.0, 2) if payback_months is not None else None
+        ),
+        "costs": costs_annual,
     }
     if extra:
         out["detail"] = extra

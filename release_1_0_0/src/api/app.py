@@ -4,29 +4,161 @@ API REST unifiee : tables pipeline, LOO, predictions sim_v1 / sim_v2 / CatBoost.
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
+import numpy as np
 import pandas as pd
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file
 
-from src.ml.catboost_model import CatBoostService
+from src.ml.super_model import SuperModelService
+from src.ml.xgboost_model import XGBoostService
 from src.pipeline.connection import PipelineFactory
 from src.pipeline.paths import Paths
 from src.sim_v1.service import SimV1Service
 from src.sim_v2.service import SimV2Service
 
 
+def _marque_bases(paths: Paths) -> list[Path]:
+    """Dossiers candidats pour les logos (data/marques puis static/marques)."""
+    return [
+        (paths.root / "data" / "marques").resolve(),
+        (paths.root / "static" / "marques").resolve(),
+        (paths.input / "marques").resolve(),
+    ]
+
+
+def resolve_marque_logo(paths: Paths, relpath: str) -> Path | None:
+    """
+    Resout logo_path Excel vers un fichier image.
+
+    Accepte : economy/ibis.png, marques/..., data/marques/..., chemin absolu sous base.
+    """
+    if not relpath:
+        return None
+    raw = str(relpath).strip().replace("\\", "/")
+    if not raw or raw.lower() in {"nan", "none", "null"}:
+        return None
+
+    bases = [b for b in _marque_bases(paths) if b.is_dir()]
+    if not bases:
+        return None
+
+    p = Path(raw)
+    if p.is_absolute():
+        try:
+            target = p.resolve()
+            for base in bases:
+                try:
+                    target.relative_to(base)
+                    return target if target.is_file() else None
+                except ValueError:
+                    continue
+        except OSError:
+            return None
+        return None
+
+    clean = raw.lstrip("/")
+    for prefix in (
+        "data/marques/",
+        "static/marques/",
+        "marques/",
+        "./data/marques/",
+        "./static/marques/",
+        "./marques/",
+    ):
+        if clean.lower().startswith(prefix):
+            clean = clean[len(prefix) :]
+            break
+    if ".." in clean.split("/"):
+        return None
+
+    for base in bases:
+        target = (base / clean).resolve()
+        try:
+            target.relative_to(base)
+        except ValueError:
+            continue
+        if target.is_file():
+            return target
+    return None
+
+
+def logo_mimetype(path: Path) -> str:
+    """
+    Content-Type selon le contenu reel.
+
+    Beaucoup de fichiers *.png Accor sont en fait du SVG — image/png casse l'affichage.
+    """
+    try:
+        head = path.read_bytes()[:512]
+    except OSError:
+        return "application/octet-stream"
+    low = head.lstrip().lower()
+    if low.startswith(b"<svg") or b"<svg" in low or low.startswith(b"<?xml"):
+        return "image/svg+xml"
+    if head.startswith(b"\x89PNG\r\n\x1a\n"):
+        return "image/png"
+    if head[:3] == b"\xff\xd8\xff":
+        return "image/jpeg"
+    if head[:6] in (b"GIF87a", b"GIF89a"):
+        return "image/gif"
+    if head[:4] == b"RIFF" and head[8:12] == b"WEBP":
+        return "image/webp"
+    ext = path.suffix.lower()
+    return {
+        ".svg": "image/svg+xml",
+        ".png": "image/png",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".gif": "image/gif",
+        ".webp": "image/webp",
+    }.get(ext, "application/octet-stream")
+
+
+def _clean_value(value: Any) -> Any:
+    """Normalise valeurs pandas/numpy pour JSON (pas de NaN / Timestamps bizarres)."""
+    if value is None:
+        return None
+    # listes / arrays (ex. scenario_removed_natures DuckDB LIST)
+    if isinstance(value, (list, tuple)):
+        return [_clean_value(v) for v in value]
+    if isinstance(value, np.ndarray):
+        return [_clean_value(v) for v in value.tolist()]
+    try:
+        # pd.isna sur array renvoie un array → ne pas l'utiliser comme bool
+        if not isinstance(value, (list, tuple, dict, np.ndarray)) and pd.isna(value):
+            return None
+    except (TypeError, ValueError):
+        pass
+    # numpy / pandas scalaires
+    if hasattr(value, "item") and not isinstance(value, (bytes, str, dict, list)):
+        try:
+            value = value.item()
+        except Exception:
+            pass
+    if isinstance(value, float) and pd.isna(value):
+        return None
+    # dates
+    if hasattr(value, "isoformat") and not isinstance(value, str):
+        try:
+            return value.isoformat()
+        except Exception:
+            return str(value)
+    if isinstance(value, (bytes, bytearray)):
+        return value.decode("utf-8", errors="replace")
+    return value
+
+
 def _clean_records(df: pd.DataFrame) -> list[dict[str, Any]]:
     if df is None or df.empty:
         return []
+    # colonnes en str stables (evite cles non-string)
+    df = df.copy()
+    df.columns = [str(c) for c in df.columns]
     records = []
     for rec in df.to_dict(orient="records"):
-        cleaned = {}
-        for key, value in rec.items():
-            if value is None or (isinstance(value, float) and pd.isna(value)):
-                cleaned[key] = None
-            else:
-                cleaned[key] = value
+        cleaned = {str(key): _clean_value(value) for key, value in rec.items()}
         records.append(cleaned)
     return records
 
@@ -45,7 +177,10 @@ def create_api_app(paths: Paths | None = None) -> Flask:
     factory = PipelineFactory(paths)
     sim_v1 = SimV1Service(paths, factory)
     sim_v2 = SimV2Service(paths, factory)
-    ml = CatBoostService(paths, factory=factory)
+    # « ml » affiche = super-modele (sim_v2 + xgboost sur simulations)
+    ml_super = SuperModelService(paths, factory=factory)
+    ml = ml_super  # alias UI / predict
+    ml_xgb = XGBoostService(paths, factory=factory, variant="ml1")  # couche base
 
     @app.get("/api/health")
     def health():
@@ -57,6 +192,28 @@ def create_api_app(paths: Paths | None = None) -> Flask:
                 "db_exists": paths.main_db.exists(),
             }
         )
+
+    @app.get("/api/marques/logos/<path:relpath>")
+    def marque_logo(relpath: str):
+        """
+        Sert un logo marque.
+
+        URL : /api/marques/logos/economy/ibis_budget.png
+        logo_path Excel : economy/ibis_budget.png
+
+        Content-Type detecte sur le contenu (SVG souvent stocke en .png).
+        """
+        target = resolve_marque_logo(paths, relpath)
+        if target is None:
+            return jsonify(
+                {
+                    "ok": False,
+                    "error": "logo introuvable",
+                    "path": relpath,
+                }
+            ), 404
+        mime = logo_mimetype(target)
+        return send_file(target, mimetype=mime, conditional=True, max_age=86400)
 
     @app.get("/api/tables/<name>")
     def table_view(name: str):
@@ -111,6 +268,160 @@ def create_api_app(paths: Paths | None = None) -> Flask:
         except Exception as exc:  # noqa: BLE001
             return jsonify({"ok": False, "error": str(exc)}), 500
 
+    def _eval_web_payload(engine: str, pred: pd.DataFrame, metrics: pd.DataFrame) -> dict:
+        """
+        Projection web unifiee (v_web_*) pour l'UI.
+
+        - CA reel / estime / err  (estime = simulation ou prediction)
+        - Marge = marge selon coef quand dispo (comparaison commune)
+        Champs API : ca_pred / marge_pred = valeurs estimees (nom historique).
+        """
+        p = pred.copy()
+        web_rows: list[dict[str, Any]] = []
+
+        def _f(row, *keys, default=None):
+            for k in keys:
+                if k in row and pd.notna(row[k]):
+                    return row[k]
+            return default
+
+        for _, row in p.iterrows():
+            r = row.to_dict()
+            if engine == "sim_v1":
+                ca_r = _f(r, "ca_reel")
+                ca_p = _f(r, "ca_pred")
+                ca_e = _f(r, "ca_err_abs")
+                # v1 n'a qu'une marge produit — exposee comme marge (comparaison)
+                m_r = _f(r, "marge_reel")
+                m_p = _f(r, "marge_pred")
+                m_e = _f(r, "marge_err_abs")
+            elif engine == "sim_v2":
+                ca_r = _f(r, "montant_ventes_par_mois_reel", "ca_reel")
+                ca_p = _f(r, "montant_ventes_par_mois_predit", "ca_pred")
+                ca_e = _f(r, "montant_ventes_erreur_absolue", "ca_err_abs")
+                m_r = _f(r, "montant_marge_selon_coef_par_mois_reel", "marge_reel")
+                m_p = _f(
+                    r,
+                    "montant_marge_selon_coef_par_mois_predite",
+                    "marge_pred",
+                )
+                m_e = _f(
+                    r,
+                    "montant_marge_selon_coef_erreur_absolue",
+                    "marge_err_abs",
+                )
+            else:  # ml / ml-xgb / ml-super (schema LOO unifie)
+                ca_r = _f(r, "montant_ventes_par_mois_reel", "ca_reel")
+                ca_p = _f(r, "montant_ventes_par_mois_predit", "ca_pred")
+                ca_e = _f(
+                    r,
+                    "montant_ventes_par_mois_erreur_absolue",
+                    "ca_err_abs",
+                )
+                m_r = _f(r, "montant_marge_selon_coef_par_mois_reel", "marge_reel")
+                m_p = _f(
+                    r,
+                    "montant_marge_selon_coef_par_mois_predit",
+                    "montant_marge_selon_coef_par_mois_predite",
+                    "marge_pred",
+                )
+                m_e = _f(
+                    r,
+                    "montant_marge_selon_coef_par_mois_erreur_absolue",
+                    "marge_err_abs",
+                )
+                if m_e is None and m_r is not None and m_p is not None:
+                    m_e = abs(float(m_p) - float(m_r))
+                if ca_e is None and ca_r is not None and ca_p is not None:
+                    ca_e = abs(float(ca_p) - float(ca_r))
+
+            web_rows.append(
+                {
+                    "hotel_code": _f(r, "hotel_code"),
+                    "solution": _f(r, "solution"),
+                    "ca_reel": ca_r,
+                    "ca_pred": ca_p,
+                    "ca_err_abs": ca_e,
+                    "marge_reel": m_r,
+                    "marge_pred": m_p,
+                    "marge_err_abs": m_e,
+                }
+            )
+
+        web_pred = pd.DataFrame(web_rows)
+        # Metriques web : MAE CA + MAE marge (selon coef)
+        metric_rows: list[dict[str, Any]] = []
+        if engine == "sim_v1":
+            for _, m in metrics.iterrows():
+                metric_rows.append(
+                    {
+                        "scope": m.get("perimetre") or m.get("solution") or "ALL",
+                        "n_hotels": m.get("n_hotels"),
+                        "mae_ca": m.get("mae_ca"),
+                        "mae_marge": m.get("mae_marge"),
+                    }
+                )
+        elif engine == "sim_v2":
+            for _, m in metrics.iterrows():
+                # ignorer lignes par-solution detail si on veut global only —
+                # on garde solution pour detail admin
+                metric_rows.append(
+                    {
+                        "scope": m.get("solution")
+                        if pd.notna(m.get("solution"))
+                        else "ALL",
+                        "n_hotels": m.get("nombre_hotels"),
+                        "mae_ca": m.get("montant_ventes_mae"),
+                        "mae_marge": m.get("marge_selon_coef_mae"),
+                    }
+                )
+        else:
+            # ml : une ligne par target → extraire CA + marge selon coef
+            mae_ca = mae_m = n_h = None
+            for _, m in metrics.iterrows():
+                t = str(m.get("target") or "")
+                if t == "montant_ventes_par_mois":
+                    mae_ca = m.get("mae")
+                    n_h = m.get("nombre_hotels")
+                elif t == "montant_marge_selon_coef_par_mois":
+                    mae_m = m.get("mae")
+                    n_h = m.get("nombre_hotels")
+            metric_rows.append(
+                {
+                    "scope": "ALL",
+                    "n_hotels": n_h,
+                    "mae_ca": mae_ca,
+                    "mae_marge": mae_m,
+                }
+            )
+
+        return {
+            "predictions": _clean_records(web_pred),
+            "metrics": metric_rows,
+            "columns": [
+                "hotel_code",
+                "solution",
+                "ca_reel",
+                "ca_pred",
+                "ca_err_abs",
+                "marge_reel",
+                "marge_pred",
+                "marge_err_abs",
+            ],
+            # reel toujours selon_coef (base tickets) ; estime v1 = marge produit R1-R4
+            "margin_kind": "selon_coef_reel"
+            if engine == "sim_v1"
+            else "selon_coef",
+            "estimate_kind": (
+                "simulation"
+                if engine in ("sim_v1", "sim_v2")
+                else "prediction"
+            ),
+            # LOO admin : cibles modeles = mensuelles
+            "period": "monthly",
+            "period_label": "€ / mois",
+        }
+
     @app.get("/api/eval/sim_v1")
     def eval_v1():
         path = paths.out_sim_v1("eval_sim_v1_loo.xlsx")
@@ -123,12 +434,15 @@ def create_api_app(paths: Paths | None = None) -> Flask:
             ), 404
         pred = pd.read_excel(path, sheet_name="predictions")
         metrics = pd.read_excel(path, sheet_name="metrics")
+        web = _eval_web_payload("sim_v1", pred, metrics)
         return jsonify(
             {
                 "ok": True,
-                "source": path.name,
-                "predictions": _clean_records(pred),
-                "metrics": _clean_records(metrics),
+                "source": "sim_v1",
+                "engine": "sim_v1",
+                **web,
+                "raw_predictions": _clean_records(pred),
+                "raw_metrics": _clean_records(metrics),
             }
         )
 
@@ -144,43 +458,272 @@ def create_api_app(paths: Paths | None = None) -> Flask:
             ), 404
         pred = pd.read_excel(path, sheet_name="predictions")
         metrics = pd.read_excel(path, sheet_name="metrics")
+        web = _eval_web_payload("sim_v2", pred, metrics)
         return jsonify(
             {
                 "ok": True,
-                "source": path.name,
-                "predictions": _clean_records(pred),
-                "metrics": _clean_records(metrics),
+                "source": "sim_v2",
+                "engine": "sim_v2",
+                **web,
+                "raw_predictions": _clean_records(pred),
+                "raw_metrics": _clean_records(metrics),
+            }
+        )
+
+    def _eval_ml_file(engine: str, filename: str, rebuild_hint: str):
+        path = paths.out_ml(filename)
+        if not path.exists():
+            return jsonify(
+                {
+                    "ok": False,
+                    "error": f"Evaluation {engine} introuvable. Lancer : {rebuild_hint}",
+                }
+            ), 404
+        pred = pd.read_excel(path, sheet_name="predictions")
+        metrics = pd.read_excel(path, sheet_name="metrics")
+        web = _eval_web_payload(engine, pred, metrics)
+        return jsonify(
+            {
+                "ok": True,
+                "source": engine,
+                "engine": engine,
+                **web,
+                "raw_predictions": _clean_records(pred),
+                "raw_metrics": _clean_records(metrics),
             }
         )
 
     @app.get("/api/eval/ml")
     def eval_ml():
-        path = paths.out_ml("eval_catboost_loo.xlsx")
-        if not path.exists():
+        """LOO du super-modele (seul modele ML expose)."""
+        # prefer eval_ml_loo, fallback super / catboost legacy
+        for name in ("eval_ml_loo.xlsx", "eval_super_loo.xlsx", "eval_catboost_loo.xlsx"):
+            path = paths.out_ml(name)
+            if path.exists():
+                return _eval_ml_file(
+                    "ml", name, "python run.py ml --rebuild"
+                )
+        return _eval_ml_file(
+            "ml", "eval_ml_loo.xlsx", "python run.py ml --rebuild"
+        )
+
+    def _load_eval_web_engine(engine: str) -> dict[str, Any] | None:
+        """Charge predictions web normalisees pour un moteur LOO."""
+        if engine == "sim_v1":
+            path = paths.out_sim_v1("eval_sim_v1_loo.xlsx")
+            if not path.exists():
+                return None
+            pred = pd.read_excel(path, sheet_name="predictions")
+            metrics = pd.read_excel(path, sheet_name="metrics")
+            return {
+                "engine": "sim_v1",
+                **_eval_web_payload("sim_v1", pred, metrics),
+            }
+        if engine == "sim_v2":
+            path = paths.out_sim_v2("eval_sim_v2_loo.xlsx")
+            if not path.exists():
+                return None
+            pred = pd.read_excel(path, sheet_name="predictions")
+            metrics = pd.read_excel(path, sheet_name="metrics")
+            return {
+                "engine": "sim_v2",
+                **_eval_web_payload("sim_v2", pred, metrics),
+            }
+        # ml
+        for name in ("eval_ml_loo.xlsx", "eval_super_loo.xlsx", "eval_catboost_loo.xlsx"):
+            path = paths.out_ml(name)
+            if path.exists():
+                pred = pd.read_excel(path, sheet_name="predictions")
+                metrics = pd.read_excel(path, sheet_name="metrics")
+                return {
+                    "engine": "ml",
+                    **_eval_web_payload("ml", pred, metrics),
+                }
+        return None
+
+    @app.get("/api/eval/compare")
+    def eval_compare():
+        """
+        Comparaison LOO par hotel : sim_v1 vs sim_v2 vs ml.
+        CA reel aligne (ventes) + CA estime / err par moteur (mensuel).
+        """
+        engines = ("sim_v1", "sim_v2", "ml")
+        by_hotel: dict[str, dict[str, Any]] = {}
+        missing: list[str] = []
+        global_metrics: dict[str, Any] = {}
+
+        for eng in engines:
+            payload = _load_eval_web_engine(eng)
+            if not payload:
+                missing.append(eng)
+                continue
+            # metrics ALL
+            mrows = payload.get("metrics") or []
+            mae_ca = mae_m = n_h = None
+            for m in mrows:
+                scope = str(m.get("scope") or "").upper()
+                if scope in ("ALL", "NAN", "") or m.get("scope") is None:
+                    if m.get("mae_ca") is not None:
+                        mae_ca = m.get("mae_ca")
+                        n_h = m.get("n_hotels")
+                    if m.get("mae_marge") is not None:
+                        mae_m = m.get("mae_marge")
+            if mae_ca is None and mrows:
+                mae_ca = mrows[0].get("mae_ca")
+                mae_m = mrows[0].get("mae_marge")
+                n_h = mrows[0].get("n_hotels")
+            global_metrics[eng] = {
+                "mae_ca": mae_ca,
+                "mae_marge": mae_m,
+                "n_hotels": n_h,
+            }
+            for rec in payload.get("predictions") or []:
+                code = str(rec.get("hotel_code") or "").strip()
+                if not code:
+                    continue
+                row = by_hotel.setdefault(
+                    code,
+                    {
+                        "hotel_code": code,
+                        "solution": rec.get("solution"),
+                        "ca_reel": rec.get("ca_reel"),
+                        "marge_reel": rec.get("marge_reel"),
+                    },
+                )
+                # garder solution / reel si manquants
+                if not row.get("solution") and rec.get("solution"):
+                    row["solution"] = rec.get("solution")
+                if row.get("ca_reel") is None and rec.get("ca_reel") is not None:
+                    row["ca_reel"] = rec.get("ca_reel")
+                if row.get("marge_reel") is None and rec.get("marge_reel") is not None:
+                    row["marge_reel"] = rec.get("marge_reel")
+                ca_p = rec.get("ca_pred")
+                ca_e = rec.get("ca_err_abs")
+                if ca_e is None and ca_p is not None and row.get("ca_reel") is not None:
+                    try:
+                        ca_e = abs(float(ca_p) - float(row["ca_reel"]))
+                    except (TypeError, ValueError):
+                        ca_e = None
+                m_p = rec.get("marge_pred")
+                m_e = rec.get("marge_err_abs")
+                if m_e is None and m_p is not None and row.get("marge_reel") is not None:
+                    try:
+                        m_e = abs(float(m_p) - float(row["marge_reel"]))
+                    except (TypeError, ValueError):
+                        m_e = None
+                row[f"ca_pred_{eng}"] = ca_p
+                row[f"ca_err_{eng}"] = ca_e
+                row[f"marge_pred_{eng}"] = m_p
+                row[f"marge_err_{eng}"] = m_e
+
+        # meilleur moteur par hotel (plus faible |err| CA)
+        rows_out: list[dict[str, Any]] = []
+        for code in sorted(by_hotel.keys()):
+            row = by_hotel[code]
+            best_eng = None
+            best_err = None
+            for eng in engines:
+                err = row.get(f"ca_err_{eng}")
+                if err is None:
+                    continue
+                try:
+                    e = float(err)
+                except (TypeError, ValueError):
+                    continue
+                if best_err is None or e < best_err:
+                    best_err = e
+                    best_eng = eng
+            row["best_ca_engine"] = best_eng
+            rows_out.append(row)
+
+        if not rows_out and missing == list(engines):
             return jsonify(
                 {
                     "ok": False,
-                    "error": "Evaluation ml introuvable. Lancer : python run.py ml --rebuild",
+                    "error": "Aucune eval LOO trouvee. Lancer sim-v1, sim-v2 et ml.",
+                    "missing": missing,
                 }
             ), 404
-        pred = pd.read_excel(path, sheet_name="predictions")
-        metrics = pd.read_excel(path, sheet_name="metrics")
+
         return jsonify(
             {
                 "ok": True,
-                "source": "ml",
-                "predictions": _clean_records(pred),
-                "metrics": _clean_records(metrics),
+                "source": "compare",
+                "engines": list(engines),
+                "missing": missing,
+                "period": "monthly",
+                "period_label": "€ / mois",
+                "global_metrics": global_metrics,
+                "rows": _clean_records(pd.DataFrame(rows_out))
+                if rows_out
+                else [],
+                "n_hotels": len(rows_out),
             }
         )
 
+    @app.get("/api/eval/ml-xgb")
+    def eval_ml_xgb():
+        """Couche intermediaire XGB (non affichee UI) — debug."""
+        return _eval_ml_file(
+            "ml-xgb",
+            "eval_ml1_loo.xlsx",
+            "python run.py ml1 --rebuild",
+        )
+
+    @app.get("/api/eval/ml-super")
+    def eval_ml_super():
+        """Alias de /api/eval/ml."""
+        return eval_ml()
+
     @app.post("/api/predict/sim_v1")
     def predict_v1():
+        """
+        sim_v1 :
+        - avec leviers (chambres/TO/guests/m_lin/mix) → regles Excel pour 1..3 solutions
+        - sinon hotel_code pilote → LOO SQL historique
+        """
         body = request.get_json(force=True) or {}
         code = str(body.get("hotel_code") or "").strip()
-        if not code:
-            return jsonify({"ok": False, "error": "hotel_code requis"}), 400
+        has_levers = any(
+            k in body
+            for k in (
+                "hotel_nb_chambres",
+                "hotel_to_annuel",
+                "hotel_guests_per_chambre",
+                "metres_lineaires",
+                "type_mix",
+                "mix_fb",
+            )
+        )
         try:
+            if has_levers or not code:
+                sols = body.get("solutions") or body.get("solution")
+                if isinstance(sols, str):
+                    sols = [sols]
+                rows = sim_v1.predict_from_levers(
+                    hotel_nb_chambres=float(body.get("hotel_nb_chambres") or 100),
+                    hotel_to_annuel=float(body.get("hotel_to_annuel") or 0.70),
+                    hotel_guests_per_chambre=float(
+                        body.get("hotel_guests_per_chambre") or 1.7
+                    ),
+                    metres_lineaires=float(body.get("metres_lineaires") or 6),
+                    type_mix=body.get("type_mix"),
+                    gamme_mix=body.get("gamme_mix"),
+                    nb_frigos_froid=float(
+                        body.get("nb_frigos_froid") or body.get("nb_frigos") or 3
+                    ),
+                    solutions=sols,
+                    hotel_code=code or None,
+                    mix_fb=body.get("mix_fb"),
+                )
+                return jsonify(
+                    {
+                        "ok": True,
+                        "model": "sim_v1",
+                        "predictions": rows,
+                        "prediction": rows[0] if len(rows) == 1 else None,
+                    }
+                )
             return jsonify(sim_v1.predict_hotel(code))
         except Exception as exc:  # noqa: BLE001
             return jsonify({"ok": False, "error": str(exc)}), 400
@@ -203,39 +746,63 @@ def create_api_app(paths: Paths | None = None) -> Flask:
         except Exception as exc:  # noqa: BLE001
             return jsonify({"ok": False, "error": str(exc)}), 400
 
+    def _features_from_body(body: dict) -> tuple[str, dict[str, float]]:
+        solution = str(body.get("solution") or "simply").lower()
+        features = {
+            "hotel_nb_chambres": float(body.get("hotel_nb_chambres", 100)),
+            "hotel_to_annuel": float(body.get("hotel_to_annuel", 0.70)),
+            "hotel_guests_per_chambre": float(
+                body.get("hotel_guests_per_chambre", 1.7)
+            ),
+            "metres_lineaires": float(body.get("metres_lineaires", 6)),
+        }
+        for key, value in (body.get("features") or {}).items():
+            features[str(key)] = float(value)
+        from src.sim_v2.restitution import normalized_mix_name
+
+        for family, mix in (
+            ("type", body.get("type_mix") or {}),
+            ("gamme", body.get("gamme_mix") or {}),
+        ):
+            for label, part in (mix or {}).items():
+                features[normalized_mix_name(family, str(label))] = float(part)
+        return solution, features
+
     @app.post("/api/predict/ml")
     def predict_ml():
+        """Prediction = super-modele (sim_v2 + xgb base)."""
         body = request.get_json(force=True) or {}
         try:
-            solution = str(body.get("solution") or "simply").lower()
-            features = {
-                "hotel_nb_chambres": float(body.get("hotel_nb_chambres", 100)),
-                "hotel_to_annuel": float(body.get("hotel_to_annuel", 0.70)),
-                "hotel_guests_per_chambre": float(
-                    body.get("hotel_guests_per_chambre", 1.7)
-                ),
-                "metres_lineaires": float(body.get("metres_lineaires", 6)),
-            }
-            # mix optionnel : cles deja normalisees type_xxx_part_natures
-            for key, value in (body.get("features") or {}).items():
-                features[str(key)] = float(value)
-            for family, mix in (
-                ("type", body.get("type_mix") or {}),
-                ("gamme", body.get("gamme_mix") or {}),
-            ):
-                from src.sim_v2.restitution import normalized_mix_name
-
-                for label, part in mix.items():
-                    features[normalized_mix_name(family, str(label))] = float(part)
-
-            pred = ml.predict_row(features, solution)
+            solution, features = _features_from_body(body)
+            pred = ml_super.predict_row(
+                features,
+                solution,
+                hotel_code=str(body.get("hotel_code") or "").strip() or None,
+                type_mix=body.get("type_mix"),
+                gamme_mix=body.get("gamme_mix"),
+            )
             return jsonify({"ok": True, "model": "ml", "prediction": pred})
         except Exception as exc:  # noqa: BLE001
             msg = str(exc)
-            # Ne pas exposer le type de modele ML dans l'UI
-            for secret in ("CatBoost", "catboost", "XGBoost", "xgboost"):
+            for secret in ("CatBoost", "catboost", "XGBoost", "xgboost", "super"):
                 msg = msg.replace(secret, "ml")
             return jsonify({"ok": False, "error": msg}), 400
+
+    @app.post("/api/predict/ml-xgb")
+    def predict_ml_xgb():
+        """Couche XGB intermediaire (debug, non affichee)."""
+        body = request.get_json(force=True) or {}
+        try:
+            solution, features = _features_from_body(body)
+            pred = ml_xgb.predict_row(features, solution)
+            return jsonify({"ok": True, "model": "ml-xgb", "prediction": pred})
+        except Exception as exc:  # noqa: BLE001
+            return jsonify({"ok": False, "error": str(exc)}), 400
+
+    @app.post("/api/predict/ml-super")
+    def predict_ml_super():
+        """Alias de /api/predict/ml."""
+        return predict_ml()
 
     # ------------------------------------------------------------------ admin datasets
     DATASET_CATALOG = [
@@ -279,7 +846,28 @@ def create_api_app(paths: Paths | None = None) -> Flask:
             "table": "t_sales",
             "group": "PILOTE",
             "label": "sales_raw",
-            "description": "Ventes pilotes (t_sales)",
+            "description": "Ventes pilotes tickets (t_sales)",
+        },
+        {
+            "id": "sales_obs",
+            "table": "v_web_sales_obs",
+            "group": "PILOTE",
+            "label": "sales_obs",
+            "description": "Observation sim_v2 — CA/marge mensuels (baseline)",
+        },
+        {
+            "id": "sim_scenarios",
+            "table": "v_web_sales_sim_scenarios",
+            "group": "PILOTE",
+            "label": "sim_scenarios",
+            "description": "Definitions scenarios retrait (~1780)",
+        },
+        {
+            "id": "sales_sim",
+            "table": "v_web_sales_sim",
+            "group": "PILOTE",
+            "label": "sales_sim",
+            "description": "Simulations sim_v2 — CA/marge mensuels (scenarios)",
         },
     ]
 
@@ -289,43 +877,121 @@ def create_api_app(paths: Paths | None = None) -> Flask:
 
     @app.get("/api/admin/datasets/<dataset_id>")
     def admin_dataset_page(dataset_id: str):
+        """
+        Page de dataset admin — pagination SQL (evite de charger toute la table
+        en RAM, source frequente de timeouts / Failed to fetch).
+        """
         meta = next((d for d in DATASET_CATALOG if d["id"] == dataset_id), None)
         if not meta:
             return jsonify({"ok": False, "error": f"Dataset inconnu : {dataset_id}"}), 404
         page = max(int(request.args.get("page", 1)), 1)
-        page_size = min(max(int(request.args.get("page_size", 50)), 1), 500)
-        q = (request.args.get("q") or "").strip().lower()
-        cp = factory.open(read_only=False)
+        page_size = min(max(int(request.args.get("page_size", 50)), 1), 200)
+        q = (request.args.get("q") or "").strip()
+        table = str(meta["table"])
+
+        # preferer lecture seule (moins de contention DuckDB)
+        cp = None
+        last_err: Exception | None = None
+        for read_only in (True, False):
+            try:
+                cp = factory.open(read_only=read_only)
+                break
+            except Exception as exc:  # noqa: BLE001
+                last_err = exc
+                cp = None
+        if cp is None:
+            return jsonify(
+                {
+                    "ok": False,
+                    "error": f"Connexion DuckDB impossible : {last_err}",
+                }
+            ), 503
+
         try:
-            df = cp.p_table_view(meta["table"]).df()
-            total_all = len(df)
-            if q and not df.empty:
-                mask = pd.Series(False, index=df.index)
-                for col in df.columns:
-                    mask = mask | df[col].astype(str).str.lower().str.contains(
-                        q, na=False, regex=False
+            # materialise vue/table via pipeline si absente
+            try:
+                cp.p_table_view(table)
+            except Exception:
+                # table de base deja presente (create_if_not_exists)
+                pass
+
+            # colonnes
+            try:
+                desc = cp.con.execute(f'DESCRIBE "{table}"').fetchall()
+                cols = [str(r[0]) for r in desc]
+            except Exception:
+                cols = [
+                    str(r[0])
+                    for r in cp.con.execute(
+                        """
+                        SELECT column_name FROM information_schema.columns
+                        WHERE table_name = ?
+                        ORDER BY ordinal_position
+                        """,
+                        [table],
+                    ).fetchall()
+                ]
+            if not cols:
+                return jsonify(
+                    {"ok": False, "error": f"Relation introuvable : {table}"}
+                ), 404
+
+            total_all = int(
+                cp.con.execute(f'SELECT COUNT(*) FROM "{table}"').fetchone()[0]
+            )
+
+            where_sql = ""
+            params: list[Any] = []
+            if q:
+                # filtre ILIKE sur colonnes (max 40 pour limiter la requete)
+                esc = q.replace("'", "''")
+                clauses = []
+                for c in cols[:40]:
+                    clauses.append(
+                        f'CAST("{c}" AS VARCHAR) ILIKE ?'
                     )
-                df = df.loc[mask]
-            total = len(df)
-            start = (page - 1) * page_size
-            chunk = df.iloc[start : start + page_size]
-            cols = [str(c) for c in df.columns.tolist()] if total_all else []
+                    params.append(f"%{q}%")
+                where_sql = " WHERE (" + " OR ".join(clauses) + ")"
+
+            count_sql = f'SELECT COUNT(*) FROM "{table}"{where_sql}'
+            total = int(cp.con.execute(count_sql, params).fetchone()[0])
+
+            offset = (page - 1) * page_size
+            # ORDER BY 1 pour pagination stable
+            order_col = cols[0]
+            data_sql = (
+                f'SELECT * FROM "{table}"{where_sql} '
+                f'ORDER BY "{order_col}" '
+                f"LIMIT ? OFFSET ?"
+            )
+            chunk = cp.con.execute(
+                data_sql, [*params, page_size, offset]
+            ).df()
+            chunk.columns = [str(c) for c in chunk.columns]
+            rows = _clean_records(chunk)
+            for rec in rows:
+                for c in cols:
+                    rec.setdefault(c, None)
+
             return jsonify(
                 {
                     "ok": True,
                     "dataset": meta,
                     "columns": cols,
-                    "rows": _clean_records(chunk),
+                    "rows": rows,
                     "page": page,
                     "page_size": page_size,
-                    "total": total,
-                    "total_all": total_all,
+                    "total": int(total),
+                    "total_all": int(total_all),
                 }
             )
         except Exception as exc:  # noqa: BLE001
             return jsonify({"ok": False, "error": str(exc)}), 400
         finally:
-            cp.close()
+            try:
+                cp.close()
+            except Exception:
+                pass
 
     # ------------------------------------------------------------------ user hotels
     @app.get("/api/user/hotels/search")
@@ -393,8 +1059,31 @@ def create_api_app(paths: Paths | None = None) -> Flask:
         finally:
             cp.close()
 
+    def _as_float(v: Any, default: float | None = None) -> float | None:
+        if v is None:
+            return default
+        try:
+            if isinstance(v, float) and pd.isna(v):
+                return default
+            x = float(v)
+            if pd.isna(x):
+                return default
+            return x
+        except (TypeError, ValueError):
+            return default
+
+    def _normalize_to(v: Any, default: float = 0.70) -> float:
+        """TO annuel en ratio 0-1 (accepte aussi % 1-100)."""
+        x = _as_float(v, default)
+        if x is None:
+            return default
+        if x > 1.5:  # stocke en pourcentage
+            x = x / 100.0
+        return max(0.01, min(1.0, x))
+
     @app.get("/api/user/hotels/<hotel_code>")
     def user_hotel_get(hotel_code: str):
+        """Hotel enrichi (brand + proximity) + leviers pre-remplis (defaults si manquants)."""
         code = str(hotel_code or "").strip()
         cp = factory.open(read_only=False)
         try:
@@ -403,37 +1092,357 @@ def create_api_app(paths: Paths | None = None) -> Flask:
             if row.empty:
                 return jsonify({"ok": False, "error": f"Hotel inconnu : {code}"}), 404
             hotel = _clean_records(row)[0]
-            # enrich brand logo if possible
+
+            # brand
+            brand_meta = None
             try:
                 brands = cp.p_table_view("t_hotel_brand_data").df()
                 brand = str(hotel.get("hotel_brand") or "")
-                if not brands.empty and "Marque" in brands.columns:
+                if not brands.empty and "Marque" in brands.columns and brand:
                     b = brands.loc[
                         brands["Marque"].astype(str).str.upper() == brand.upper()
                     ]
+                    if b.empty:
+                        b = brands.loc[
+                            brands["Marque"]
+                            .astype(str)
+                            .str.upper()
+                            .str.contains(brand.upper()[:8], na=False)
+                        ]
                     if not b.empty:
-                        hotel["brand_meta"] = _clean_records(b)[0]
+                        brand_meta = _clean_records(b)[0]
+                        hotel["brand_meta"] = brand_meta
             except Exception:
                 pass
-            # guests default
-            if hotel.get("hotel_guests_per_chambre") is None:
-                hotel["hotel_guests_per_chambre"] = 1.7
-            if hotel.get("hotel_metres_lineaires_dedies_corner") is None:
-                hotel["hotel_metres_lineaires_dedies_corner"] = 6.0
-            return jsonify({"ok": True, "hotel": hotel})
+
+            # proximity (resume utile)
+            proximity = None
+            try:
+                px = cp.p_table_view("t_hotel_proximity_data").df()
+                if "hotel_code" in px.columns:
+                    p = px.loc[px["hotel_code"].astype(str) == code]
+                    if not p.empty:
+                        proximity = _clean_records(p)[0]
+                        hotel["proximity"] = proximity
+            except Exception:
+                pass
+
+            # leviers simulation (defaults si NaN en base — cas frequent hors pilotes)
+            nb = _as_float(hotel.get("hotel_nb_chambres"), 100.0) or 100.0
+            to = _normalize_to(hotel.get("hotel_to_annuel"), 0.70)
+            guests = _as_float(hotel.get("hotel_guests_per_chambre"), 1.7) or 1.7
+            m_lin = (
+                _as_float(hotel.get("hotel_metres_lineaires_dedies_corner"), 6.0) or 6.0
+            )
+            defaults_used = {
+                "hotel_nb_chambres": hotel.get("hotel_nb_chambres") is None,
+                "hotel_to_annuel": hotel.get("hotel_to_annuel") is None,
+                "hotel_guests_per_chambre": hotel.get("hotel_guests_per_chambre")
+                is None,
+                "metres_lineaires": hotel.get("hotel_metres_lineaires_dedies_corner")
+                is None,
+            }
+            hotel["hotel_nb_chambres"] = nb
+            hotel["hotel_to_annuel"] = to
+            hotel["hotel_guests_per_chambre"] = guests
+            hotel["hotel_metres_lineaires_dedies_corner"] = m_lin
+            hotel["metres_lineaires"] = m_lin
+
+            # sections pour l'UI (lecture / edition legere)
+            identity = {
+                "hotel_code": hotel.get("hotel_code"),
+                "hotel_name": hotel.get("hotel_name"),
+                "hotel_brand": hotel.get("hotel_brand"),
+                "hotel_adresse_postale_1": hotel.get("hotel_adresse_postale_1"),
+                "hotel_adresse_postale_2": hotel.get("hotel_adresse_postale_2"),
+                "hotel_code_postal": hotel.get("hotel_code_postal"),
+                "hotel_city": hotel.get("hotel_city"),
+                "hotel_country": hotel.get("hotel_country"),
+                "hotel_lat": hotel.get("hotel_lat"),
+                "hotel_lon": hotel.get("hotel_lon"),
+                "logo_path": (brand_meta or {}).get("logo_path"),
+            }
+            exploitation = {
+                "hotel_nb_chambres": nb,
+                "hotel_to_annuel": to,
+                "hotel_guests_per_chambre": guests,
+                "hotel_to_le_plus_bas_taux": _as_float(
+                    hotel.get("hotel_to_le_plus_bas_taux")
+                ),
+                "hotel_to_le_plus_haut_taux": _as_float(
+                    hotel.get("hotel_to_le_plus_haut_taux")
+                ),
+                "hotel_contrat_signe_annee": hotel.get("hotel_contrat_signe_annee"),
+                "hotel_derniere_reno": hotel.get("hotel_derniere_reno"),
+            }
+            services = {
+                "hotel_f_b_restaurant": hotel.get("hotel_f_b_restaurant"),
+                "hotel_f_b_bar": hotel.get("hotel_f_b_bar"),
+                "hotel_f_b_minibar": hotel.get("hotel_f_b_minibar"),
+                "hotel_f_b_room_service": hotel.get("hotel_f_b_room_service"),
+                "hotel_non_f_b_piscine": hotel.get("hotel_non_f_b_piscine"),
+                "hotel_non_f_b_salle_de_sport": hotel.get(
+                    "hotel_non_f_b_salle_de_sport"
+                ),
+                "hotel_non_f_b_salles_de_reunion": hotel.get(
+                    "hotel_non_f_b_salles_de_reunion"
+                ),
+                "hotel_non_f_b_spa": hotel.get("hotel_non_f_b_spa"),
+                "hotel_has_parking": hotel.get("hotel_has_parking"),
+                "hotel_has_wifi": hotel.get("hotel_has_wifi"),
+                "hotel_has_clim": hotel.get("hotel_has_clim"),
+                "hotel_has_petit_dejeuner": hotel.get("hotel_has_petit_dejeuner"),
+            }
+            # resume prox editable (compteurs 500m + plage 500m)
+            prox_summary: dict[str, Any] = {
+                "commerce_supermarket_500m": 0,
+                "commerce_bakery_500m": 0,
+                "commerce_fast_food_500m": 0,
+                "plage_500m": 0,
+            }
+            if proximity:
+                for k in (
+                    "commerce_supermarket_500m",
+                    "commerce_bakery_500m",
+                    "commerce_fast_food_500m",
+                ):
+                    if k in proximity and proximity[k] is not None:
+                        try:
+                            prox_summary[k] = max(0, int(float(proximity[k])))
+                        except (TypeError, ValueError):
+                            prox_summary[k] = 0
+                dist = proximity.get("plage_distance_km")
+                plage_500 = 0
+                try:
+                    if dist is not None and float(dist) <= 0.5:
+                        # 0 km ou <= 500 m = plage a proximite
+                        plage_500 = 1
+                except (TypeError, ValueError):
+                    plage_500 = 0
+                prox_summary["plage_500m"] = plage_500
+                if dist is not None:
+                    try:
+                        prox_summary["plage_distance_km"] = float(dist)
+                    except (TypeError, ValueError):
+                        pass
+
+            # Mix hierarchique : type F&B/Non F&B + gammes par famille (UI user)
+            gamme_mix_fb = {
+                "sans alcool": 0.40,
+                "food salee": 0.28,
+                "food sucree": 0.18,
+                "alcool": 0.10,
+                "formule": 0.04,
+            }
+            gamme_mix_nfb = {
+                "accessoires": 0.35,
+                "sos": 0.30,
+                "cosmetique": 0.12,
+                "pap": 0.10,
+                "jeux enfants": 0.08,
+                "souvenirs": 0.05,
+            }
+            type_mix = {"F&B": 0.7, "NON F&B": 0.3}
+            # plat pour moteurs (somme ~1) : poids type x mix famille
+            gamme_mix = {
+                **{k: 0.7 * v for k, v in gamme_mix_fb.items()},
+                **{k: 0.3 * v for k, v in gamme_mix_nfb.items()},
+            }
+            levers = {
+                "hotel_nb_chambres": nb,
+                "hotel_to_annuel": to,
+                "hotel_guests_per_chambre": guests,
+                "metres_lineaires": m_lin,
+                "type_mix": type_mix,
+                "gamme_mix_fb": gamme_mix_fb,
+                "gamme_mix_nfb": gamme_mix_nfb,
+                "gamme_mix": gamme_mix,
+            }
+
+            return jsonify(
+                {
+                    "ok": True,
+                    "hotel": hotel,
+                    "identity": identity,
+                    "exploitation": exploitation,
+                    "services": services,
+                    "proximity_summary": prox_summary,
+                    "levers": levers,
+                    "defaults_used": defaults_used,
+                }
+            )
         except Exception as exc:  # noqa: BLE001
             return jsonify({"ok": False, "error": str(exc)}), 400
         finally:
             cp.close()
 
+    def _ram_feature_overrides(
+        services: dict[str, Any] | None,
+        proximity: dict[str, Any] | None,
+    ) -> dict[str, float]:
+        """
+        Mappe services / proximite UI → features modeles (hd_ / px_).
+        Modifications RAM uniquement (jamais ecrites en base).
+        """
+        out: dict[str, float] = {}
+        for k, v in (services or {}).items():
+            key = str(k)
+            try:
+                val = 1.0 if v in (True, 1, "1") or (
+                    isinstance(v, (int, float)) and float(v) > 0
+                ) else 0.0
+            except (TypeError, ValueError):
+                val = 0.0
+            out[key] = val
+            out[f"hd_{key}"] = val
+        for k, v in (proximity or {}).items():
+            key = str(k)
+            try:
+                val = float(v)
+            except (TypeError, ValueError):
+                continue
+            out[key] = val
+            if key.startswith("commerce_"):
+                out[f"px_{key}"] = val
+            if key == "plage_500m":
+                # pas de colonne native 500m : oriente plage_1km / distance
+                out["px_plage_1km"] = 1.0 if val > 0 else 0.0
+                if val > 0:
+                    out["px_plage_distance_km"] = min(
+                        float(out.get("px_plage_distance_km") or 0.5), 0.5
+                    )
+            if key == "plage_distance_km":
+                out["px_plage_distance_km"] = val
+        return out
+
+    def _evaluate_engines(
+        *,
+        nb: float,
+        to: float,
+        guests: float,
+        m_lin: float,
+        type_mix: dict[str, Any],
+        gamme_mix: dict[str, Any],
+        solutions: list[str],
+        hotel_code: str | None = None,
+        frigos: float = 3.0,
+        services: dict[str, Any] | None = None,
+        proximity: dict[str, Any] | None = None,
+    ) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
+        """Evalue sim_v1 + sim_v2 + ml pour un jeu de leviers / mix (+ overrides RAM)."""
+        from src.user.business import enrich_prediction_with_costs
+        from src.sim_v2.restitution import normalized_mix_name
+
+        results: list[dict[str, Any]] = []
+        errors: list[dict[str, str]] = []
+        ram_overrides = _ram_feature_overrides(services, proximity)
+
+        try:
+            df = sim_v2.predict(
+                hotel_nb_chambres=nb,
+                hotel_to_annuel=to,
+                hotel_guests_per_chambre=guests,
+                metres_lineaires=m_lin,
+                type_mix=type_mix,
+                gamme_mix=gamme_mix,
+            )
+            for rec in _clean_records(df):
+                sol = str(rec.get("solution") or "").lower()
+                if solutions and sol not in solutions:
+                    continue
+                results.append(
+                    enrich_prediction_with_costs(
+                        solution=sol,
+                        ca_monthly=rec.get("montant_ventes_par_mois_predit"),
+                        marge_monthly=rec.get(
+                            "montant_marge_selon_coef_par_mois_predite"
+                        )
+                        or rec.get("montant_marge_par_mois_predite"),
+                        metres_lineaires=m_lin,
+                        engine="sim_v2",
+                        extra=rec,
+                    )
+                )
+        except Exception as exc:  # noqa: BLE001
+            errors.append({"engine": "sim_v2", "error": str(exc)})
+
+        def _mix_features() -> dict[str, float]:
+            features: dict[str, float] = {
+                "hotel_nb_chambres": nb,
+                "hotel_to_annuel": to,
+                "hotel_guests_per_chambre": guests,
+                "metres_lineaires": m_lin,
+            }
+            for family, mix in (("type", type_mix), ("gamme", gamme_mix)):
+                for label, part in (mix or {}).items():
+                    features[normalized_mix_name(family, str(label))] = float(part)
+            # overrides services / prox (RAM) — prioritaires sur defaults
+            features.update(ram_overrides)
+            return features
+
+        # ml = super-modele uniquement (sim_v2 + xgb base) — pas ml1/ml2 en UI
+        for sol in solutions:
+            try:
+                pred = ml_super.predict_row(
+                    _mix_features(),
+                    sol,
+                    hotel_code=hotel_code,
+                    type_mix=type_mix,
+                    gamme_mix=gamme_mix,
+                )
+                results.append(
+                    enrich_prediction_with_costs(
+                        solution=sol,
+                        ca_monthly=pred.get("montant_ventes_par_mois"),
+                        marge_monthly=pred.get("montant_marge_selon_coef_par_mois")
+                        or pred.get("montant_marge_par_mois"),
+                        metres_lineaires=m_lin,
+                        engine="ml",
+                        extra=pred,
+                    )
+                )
+            except Exception as exc:  # noqa: BLE001
+                msg = str(exc)
+                for secret in ("CatBoost", "catboost", "XGBoost", "xgboost", "super"):
+                    msg = msg.replace(secret, "ml")
+                errors.append({"engine": "ml", "solution": sol, "error": msg})
+
+        try:
+            v1_rows = sim_v1.predict_from_levers(
+                hotel_nb_chambres=nb,
+                hotel_to_annuel=to,
+                hotel_guests_per_chambre=guests,
+                metres_lineaires=m_lin,
+                type_mix=type_mix,
+                gamme_mix=gamme_mix,
+                nb_frigos_froid=frigos,
+                solutions=solutions,
+                hotel_code=hotel_code or None,
+            )
+            for pred in v1_rows:
+                results.append(
+                    enrich_prediction_with_costs(
+                        solution=str(pred.get("solution") or "simply"),
+                        ca_monthly=pred.get("montant_ventes_par_mois"),
+                        marge_monthly=pred.get("montant_marge_par_mois"),
+                        metres_lineaires=m_lin,
+                        engine="sim_v1",
+                        extra=pred.get("detail") or pred,
+                    )
+                )
+        except Exception as exc:  # noqa: BLE001
+            errors.append({"engine": "sim_v1", "error": str(exc)})
+
+        return results, errors
+
     @app.post("/api/user/simulate")
     def user_simulate():
         """
-        Simulation multi-moteurs pour un etat hotel en memoire (payload client).
+        Estimation multi-moteurs pour un etat hotel en memoire (payload client).
 
         Body: hotel fields + type_mix + gamme_mix + solutions[] optionnel
         """
-        from src.user.business import enrich_prediction_with_costs, recommend
+        from src.user.business import recommend
 
         body = request.get_json(force=True) or {}
         hotel_code = str(body.get("hotel_code") or "").strip()
@@ -455,87 +1464,40 @@ def create_api_app(paths: Paths | None = None) -> Flask:
         }
         solutions = body.get("solutions") or ["simply", "liberty", "connected"]
         solutions = [str(s).lower() for s in solutions]
+        frigos = float(body.get("nb_frigos_froid") or body.get("nb_frigos") or 3)
+        services = body.get("services") if isinstance(body.get("services"), dict) else {}
+        proximity = (
+            body.get("proximity") if isinstance(body.get("proximity"), dict) else {}
+        )
 
-        results: list[dict[str, Any]] = []
-        errors: list[dict[str, str]] = []
+        results, errors = _evaluate_engines(
+            nb=nb,
+            to=to,
+            guests=guests,
+            m_lin=m_lin,
+            type_mix=type_mix,
+            gamme_mix=gamme_mix,
+            solutions=solutions,
+            hotel_code=hotel_code or None,
+            frigos=frigos,
+            services=services,
+            proximity=proximity,
+        )
 
-        # --- sim_v2 : une restitution multi-solutions ---
-        try:
-            df = sim_v2.predict(
-                hotel_nb_chambres=nb,
-                hotel_to_annuel=to,
-                hotel_guests_per_chambre=guests,
-                metres_lineaires=m_lin,
-                type_mix=type_mix,
-                gamme_mix=gamme_mix,
-            )
-            for rec in _clean_records(df):
-                sol = str(rec.get("solution") or "").lower()
-                if solutions and sol not in solutions:
-                    continue
-                results.append(
-                    enrich_prediction_with_costs(
-                        solution=sol,
-                        ca_monthly=rec.get("montant_ventes_par_mois_predit"),
-                        marge_monthly=rec.get("montant_marge_par_mois_predite"),
-                        metres_lineaires=m_lin,
-                        engine="sim_v2",
-                        extra=rec,
-                    )
-                )
-        except Exception as exc:  # noqa: BLE001
-            errors.append({"engine": "sim_v2", "error": str(exc)})
+        by_engine: dict[str, Any] = {}
+        for eng in ("sim_v1", "sim_v2", "ml"):
+            eng_rows = [r for r in results if r.get("engine") == eng]
+            by_engine[eng] = {
+                "results": eng_rows,
+                "recommendation": recommend(eng_rows, nb_chambres=nb)
+                if eng_rows
+                else {
+                    "recommended": None,
+                    "reason": "Pas de prediction pour ce moteur.",
+                    "warnings": [],
+                },
+            }
 
-        # --- ml : une prediction par solution ---
-        for sol in solutions:
-            try:
-                features = {
-                    "hotel_nb_chambres": nb,
-                    "hotel_to_annuel": to,
-                    "hotel_guests_per_chambre": guests,
-                    "metres_lineaires": m_lin,
-                }
-                from src.sim_v2.restitution import normalized_mix_name
-
-                for family, mix in (("type", type_mix), ("gamme", gamme_mix)):
-                    for label, part in (mix or {}).items():
-                        features[normalized_mix_name(family, str(label))] = float(part)
-                pred = ml.predict_row(features, sol)
-                results.append(
-                    enrich_prediction_with_costs(
-                        solution=sol,
-                        ca_monthly=pred.get("montant_ventes_par_mois"),
-                        marge_monthly=pred.get("montant_marge_par_mois"),
-                        metres_lineaires=m_lin,
-                        engine="ml",
-                        extra=pred,
-                    )
-                )
-            except Exception as exc:  # noqa: BLE001
-                msg = str(exc)
-                for secret in ("CatBoost", "catboost"):
-                    msg = msg.replace(secret, "ml")
-                errors.append({"engine": "ml", "solution": sol, "error": msg})
-
-        # --- sim_v1 : LOO hotel_code (pilotes uniquement) ---
-        if hotel_code:
-            try:
-                pred = sim_v1.predict_hotel(hotel_code)
-                if pred.get("ok"):
-                    results.append(
-                        enrich_prediction_with_costs(
-                            solution=str(pred.get("solution") or "simply"),
-                            ca_monthly=pred.get("montant_ventes_par_mois"),
-                            marge_monthly=pred.get("montant_marge_par_mois"),
-                            metres_lineaires=m_lin,
-                            engine="sim_v1",
-                            extra=pred.get("detail") or pred,
-                        )
-                    )
-            except Exception as exc:  # noqa: BLE001
-                errors.append({"engine": "sim_v1", "error": str(exc)})
-
-        reco = recommend(results, nb_chambres=nb)
         return jsonify(
             {
                 "ok": True,
@@ -549,9 +1511,82 @@ def create_api_app(paths: Paths | None = None) -> Flask:
                     "gamme_mix": gamme_mix,
                 },
                 "results": results,
-                "recommendation": reco,
+                "by_engine": by_engine,
                 "errors": errors,
             }
         )
+
+    @app.post("/api/user/optimize")
+    def user_optimize():
+        """
+        Optimisation mix : balayage 10 % type + gammes F&B / Non F&B.
+        Retourne le meilleur CA (sim_v1 / sim_v2 / ml × solutions) + reco.
+        """
+        from src.user.optimize import run_mix_optimization
+
+        body = request.get_json(force=True) or {}
+        hotel_code = str(body.get("hotel_code") or "").strip()
+        nb = float(body.get("hotel_nb_chambres") or 100)
+        to = float(body.get("hotel_to_annuel") or 0.7)
+        guests = float(body.get("hotel_guests_per_chambre") or 1.7)
+        m_lin = float(body.get("metres_lineaires") or 6)
+        type_mix = body.get("type_mix") or {"F&B": 0.7, "NON F&B": 0.3}
+        gamme_mix_fb = body.get("gamme_mix_fb") or {
+            "sans alcool": 0.40,
+            "food salee": 0.28,
+            "food sucree": 0.18,
+            "alcool": 0.10,
+            "formule": 0.04,
+        }
+        gamme_mix_nfb = body.get("gamme_mix_nfb") or {
+            "accessoires": 0.35,
+            "sos": 0.30,
+            "cosmetique": 0.12,
+            "pap": 0.10,
+            "jeux enfants": 0.08,
+            "souvenirs": 0.05,
+        }
+        solutions = body.get("solutions") or ["simply", "liberty", "connected"]
+        solutions = [str(s).lower() for s in solutions]
+        frigos = float(body.get("nb_frigos_froid") or body.get("nb_frigos") or 3)
+        step = float(body.get("step") or 0.1)
+        services = body.get("services") if isinstance(body.get("services"), dict) else {}
+        proximity = (
+            body.get("proximity") if isinstance(body.get("proximity"), dict) else {}
+        )
+
+        def evaluate_fn(**kw):
+            rows, _errs = _evaluate_engines(
+                nb=nb,
+                to=to,
+                guests=guests,
+                m_lin=m_lin,
+                type_mix=kw["type_mix"],
+                gamme_mix=kw["gamme_mix"],
+                solutions=solutions,
+                hotel_code=hotel_code or None,
+                frigos=frigos,
+                services=services,
+                proximity=proximity,
+            )
+            return rows
+
+        try:
+            out = run_mix_optimization(
+                hotel_nb_chambres=nb,
+                hotel_to_annuel=to,
+                hotel_guests_per_chambre=guests,
+                metres_lineaires=m_lin,
+                type_mix=type_mix,
+                gamme_mix_fb=gamme_mix_fb,
+                gamme_mix_nfb=gamme_mix_nfb,
+                hotel_code=hotel_code or None,
+                solutions=solutions,
+                evaluate_fn=evaluate_fn,
+                step=step,
+            )
+            return jsonify(out)
+        except Exception as exc:  # noqa: BLE001
+            return jsonify({"ok": False, "error": str(exc)}), 400
 
     return app

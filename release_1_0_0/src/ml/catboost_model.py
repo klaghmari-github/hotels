@@ -1,8 +1,8 @@
 """
 Modele CatBoost multi-cibles + leave-one-hotel-out.
 
-Dataset : v_ml_training_dataset (pipeline ml).
-Pas de XGBoost / reseau de neurones.
+Dataset : t_rich_data (sim_v2 + hotel_data/proximity/weather/holidays)
+          fallback v_ml_training_dataset.
 """
 
 from __future__ import annotations
@@ -20,23 +20,19 @@ from catboost import CatBoostRegressor, Pool
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.model_selection import GroupKFold
 
+from src.ml.common import (
+    CONTEXT_FEATURES,
+    TARGETS,
+    feature_matrix as common_feature_matrix,
+    load_ml_dataset,
+    metrics_frame as common_metrics_frame,
+    mix_columns,
+)
 from src.pipeline.connection import PipelineFactory
 from src.pipeline.paths import Paths
+from src.pipeline.scope import is_excluded
 
 logger = logging.getLogger(__name__)
-
-CONTEXT_FEATURES = [
-    "hotel_nb_chambres",
-    "hotel_to_annuel",
-    "hotel_guests_per_chambre",
-    "metres_lineaires",
-]
-
-TARGETS = (
-    ("montant_ventes_par_mois", "Montant des ventes mensuel"),
-    ("montant_marge_par_mois", "Marge mensuelle selon prix marche"),
-    ("montant_marge_selon_coef_par_mois", "Marge mensuelle selon coefficient fixe"),
-)
 
 
 @dataclass(frozen=True)
@@ -76,54 +72,15 @@ class CatBoostService:
 
     # ------------------------------------------------------------------ data
     def load_dataset(self) -> pd.DataFrame:
-        cp = self.factory.open(read_only=False)
-        try:
-            df = cp.p_table_view("v_ml_training_dataset").df()
-        finally:
-            cp.close()
-
-        if df.empty:
-            raise ValueError(
-                "v_ml_training_dataset vide — construire le dataset pivot sim_v2."
-            )
-
-        df = df.copy()
-        df["hotel_code"] = df["hotel_code"].astype(str)
-        df["solution"] = df["solution"].astype(str)
-        df["is_observation"] = df["is_observation"].astype(bool)
-
-        for col in CONTEXT_FEATURES:
-            if col in df.columns:
-                series = pd.to_numeric(df[col], errors="coerce")
-                med = series.median()
-                df[col] = series.fillna(0.0 if pd.isna(med) else float(med))
-
-        mix_cols = self.mix_columns(df)
-        for col in mix_cols:
-            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0.0)
-
-        for name, _ in TARGETS:
-            if name in df.columns:
-                df[name] = pd.to_numeric(df[name], errors="coerce").fillna(0.0)
-
-        return df
+        """t_rich_data si dispo (features hotel enrichies), sinon v_ml_training_dataset."""
+        return load_ml_dataset(self.paths, self.factory, prefer_rich=True)
 
     @staticmethod
     def mix_columns(df: pd.DataFrame) -> list[str]:
-        return sorted(
-            c
-            for c in df.columns
-            if (c.startswith("type_") or c.startswith("gamme_"))
-            and c.endswith("_part_natures")
-        )
+        return mix_columns(df)
 
     def feature_matrix(self, df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
-        mix_cols = self.mix_columns(df)
-        base = df[[*CONTEXT_FEATURES, *mix_cols]].astype(float)
-        dummies = pd.get_dummies(df["solution"], prefix="solution", dtype=float)
-        features = pd.concat([base, dummies], axis=1)
-        features = features.reindex(sorted(features.columns), axis=1)
-        return features, features.columns.tolist()
+        return common_feature_matrix(df)
 
     def _model_params(self) -> dict[str, Any]:
         cfg = self.config
@@ -183,12 +140,10 @@ class CatBoostService:
         """
         Pour chaque hotel : train sur les autres, predire l'observation reelle.
         """
-        from src.pipeline.scope import is_excluded
-
         df = df if df is not None else self.load_dataset()
         df = df.copy()
         df["hotel_code"] = df["hotel_code"].astype(str)
-        # Perimetre 6 hotels (exclure H5586 etc.)
+        # Perimetre 6 hotels (exclure H5586 etc.) — load_ml_dataset filtre deja
         df = df.loc[~df["hotel_code"].map(is_excluded)].reset_index(drop=True)
         features, _ = self.feature_matrix(df)
         groups = df["hotel_code"].astype(str)
@@ -243,32 +198,11 @@ class CatBoostService:
             rows.append(row)
 
         predictions = pd.DataFrame(rows)
-        metrics = self._metrics_frame(predictions)
+        metrics = common_metrics_frame(predictions)
         return predictions, metrics
 
     def _metrics_frame(self, predictions: pd.DataFrame) -> pd.DataFrame:
-        metric_rows = []
-        for target, label in TARGETS:
-            y_true = predictions[f"{target}_reel"].to_numpy(dtype=float)
-            y_pred = predictions[f"{target}_predit"].to_numpy(dtype=float)
-            err = y_pred - y_true
-            nz = np.abs(y_true) > 1e-9
-            metric_rows.append(
-                {
-                    "target": target,
-                    "target_label": label,
-                    "nombre_hotels": len(predictions),
-                    "mae": float(mean_absolute_error(y_true, y_pred)),
-                    "rmse": float(math.sqrt(mean_squared_error(y_true, y_pred))),
-                    "mape": (
-                        float(np.mean(np.abs(err[nz] / y_true[nz])) * 100.0)
-                        if nz.any()
-                        else float("nan")
-                    ),
-                    "biais": float(np.mean(err)),
-                }
-            )
-        return pd.DataFrame(metric_rows)
+        return common_metrics_frame(predictions)
 
     def export_loo(
         self,

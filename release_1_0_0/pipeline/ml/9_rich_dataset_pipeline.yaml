@@ -1,0 +1,277 @@
+# Dataset ML enrichi : simulations v2 + hotel_data + proximity + weather + holidays
+# Jointure uniquement sur hotel_code. Sources multi-lignes (weather/holidays) moyennes par hotel.
+# Colonnes externes prefixees (hd_/px_/wx_/hol_) pour eviter collisions.
+
+v_hotel_data_features:
+  type: view
+  mode: create_or_replace
+  requires:
+    - t_hotel_data
+  sql: |-
+    SELECT
+      CAST(hotel_code AS VARCHAR) AS hotel_code,
+      TRY_CAST(hotel_solution_simply AS DOUBLE) AS hd_hotel_solution_simply,
+      TRY_CAST(hotel_solution_liberty AS DOUBLE) AS hd_hotel_solution_liberty,
+      TRY_CAST(hotel_solution_connected AS DOUBLE) AS hd_hotel_solution_connected,
+      TRY_CAST(hotel_lat AS DOUBLE) AS hd_hotel_lat,
+      TRY_CAST(hotel_lon AS DOUBLE) AS hd_hotel_lon,
+      TRY_CAST(hotel_contrat_signe_annee AS DOUBLE) AS hd_hotel_contrat_signe_annee,
+      TRY_CAST(hotel_derniere_reno AS DOUBLE) AS hd_hotel_derniere_reno,
+      TRY_CAST(hotel_lobby_derniere_reno AS DOUBLE) AS hd_hotel_lobby_derniere_reno,
+      TRY_CAST(hotel_nb_chambres AS DOUBLE) AS hd_hotel_nb_chambres,
+      TRY_CAST(hotel_to_annuel AS DOUBLE) AS hd_hotel_to_annuel,
+      TRY_CAST(hotel_to_le_plus_bas_taux AS DOUBLE) AS hd_hotel_to_le_plus_bas_taux,
+      TRY_CAST(hotel_to_le_plus_haut_taux AS DOUBLE) AS hd_hotel_to_le_plus_haut_taux,
+      TRY_CAST(hotel_dispo_dans_lobby_assises AS DOUBLE) AS hd_hotel_dispo_dans_lobby_assises,
+      TRY_CAST(hotel_dispo_dans_lobby_bouilloire AS DOUBLE) AS hd_hotel_dispo_dans_lobby_bouilloire,
+      TRY_CAST(hotel_dispo_dans_lobby_fontaine_a_eau AS DOUBLE) AS hd_hotel_dispo_dans_lobby_fontaine_a_eau,
+      TRY_CAST(hotel_dispo_dans_lobby_machine_a_cafe AS DOUBLE) AS hd_hotel_dispo_dans_lobby_machine_a_cafe,
+      TRY_CAST(hotel_dispo_dans_lobby_micro_ondes AS DOUBLE) AS hd_hotel_dispo_dans_lobby_micro_ondes,
+      TRY_CAST(hotel_dispo_dans_lobby_vitrine_refrigeree AS DOUBLE) AS hd_hotel_dispo_dans_lobby_vitrine_refrigeree,
+      TRY_CAST(hotel_f_b_bar AS DOUBLE) AS hd_hotel_f_b_bar,
+      TRY_CAST(hotel_f_b_minibar AS DOUBLE) AS hd_hotel_f_b_minibar,
+      TRY_CAST(hotel_f_b_restaurant AS DOUBLE) AS hd_hotel_f_b_restaurant,
+      TRY_CAST(hotel_f_b_room_service AS DOUBLE) AS hd_hotel_f_b_room_service,
+      TRY_CAST(hotel_non_f_b_piscine AS DOUBLE) AS hd_hotel_non_f_b_piscine,
+      TRY_CAST(hotel_non_f_b_salle_de_sport AS DOUBLE) AS hd_hotel_non_f_b_salle_de_sport,
+      TRY_CAST(hotel_non_f_b_salles_de_reunion AS DOUBLE) AS hd_hotel_non_f_b_salles_de_reunion,
+      TRY_CAST(hotel_non_f_b_spa AS DOUBLE) AS hd_hotel_non_f_b_spa,
+      TRY_CAST(hotel_has_parking AS DOUBLE) AS hd_hotel_has_parking,
+      TRY_CAST(hotel_has_wifi AS DOUBLE) AS hd_hotel_has_wifi,
+      TRY_CAST(hotel_has_clim AS DOUBLE) AS hd_hotel_has_clim,
+      TRY_CAST(hotel_has_petit_dejeuner AS DOUBLE) AS hd_hotel_has_petit_dejeuner,
+      TRY_CAST(hotel_has_accessible AS DOUBLE) AS hd_hotel_has_accessible,
+      TRY_CAST(hotel_has_animaux AS DOUBLE) AS hd_hotel_has_animaux,
+      TRY_CAST(hotel_has_non_fumeur AS DOUBLE) AS hd_hotel_has_non_fumeur,
+      TRY_CAST(hotel_has_navette AS DOUBLE) AS hd_hotel_has_navette,
+      TRY_CAST(hotel_has_reunion AS DOUBLE) AS hd_hotel_has_reunion,
+      TRY_CAST(hotel_affaires_pct AS DOUBLE) AS hd_hotel_affaires_pct,
+      TRY_CAST(hotel_loisirs_pct AS DOUBLE) AS hd_hotel_loisirs_pct,
+      TRY_CAST(hotel_loisirs_top_1_amis AS DOUBLE) AS hd_hotel_loisirs_top_1_amis,
+      TRY_CAST(hotel_loisirs_top_1_couples AS DOUBLE) AS hd_hotel_loisirs_top_1_couples,
+      TRY_CAST(hotel_loisirs_top_1_familles AS DOUBLE) AS hd_hotel_loisirs_top_1_familles,
+      TRY_CAST(hotel_international_pct AS DOUBLE) AS hd_hotel_international_pct,
+      TRY_CAST(hotel_national_pct AS DOUBLE) AS hd_hotel_national_pct,
+      TRY_CAST(hotel_corner_actuel_existe_deja AS DOUBLE) AS hd_hotel_corner_actuel_existe_deja,
+      TRY_CAST(hotel_corner_de_vente_actuel_metres_lineaires AS DOUBLE) AS hd_hotel_corner_de_vente_actuel_metres_lineaires,
+      TRY_CAST(hotel_corner_actuel_offre_f_b_caisse_code_barres AS DOUBLE) AS hd_hotel_corner_actuel_offre_f_b_caisse_code_barres,
+      TRY_CAST(hotel_corner_actuel_offre_f_b_distributeur_auto AS DOUBLE) AS hd_hotel_corner_actuel_offre_f_b_distributeur_auto,
+      TRY_CAST(hotel_corner_actuel_offre_f_b_frigo_connecte AS DOUBLE) AS hd_hotel_corner_actuel_offre_f_b_frigo_connecte,
+      TRY_CAST(hotel_corner_actuel_offre_f_b_reception AS DOUBLE) AS hd_hotel_corner_actuel_offre_f_b_reception,
+      TRY_CAST(hotel_corner_actuel_offre_f_b_snacking_comptoir AS DOUBLE) AS hd_hotel_corner_actuel_offre_f_b_snacking_comptoir,
+      TRY_CAST(hotel_corner_actuel_offre_non_f_b_armoire_connectee AS DOUBLE) AS hd_hotel_corner_actuel_offre_non_f_b_armoire_connectee,
+      TRY_CAST(hotel_corner_actuel_offre_non_f_b_caisse_code_barres AS DOUBLE) AS hd_hotel_corner_actuel_offre_non_f_b_caisse_code_barres,
+      TRY_CAST(hotel_corner_actuel_offre_non_f_b_distributeur_auto AS DOUBLE) AS hd_hotel_corner_actuel_offre_non_f_b_distributeur_auto,
+      TRY_CAST(hotel_corner_actuel_offre_non_f_b_reception AS DOUBLE) AS hd_hotel_corner_actuel_offre_non_f_b_reception,
+      TRY_CAST(hotel_metres_lineaires_dedies_corner AS DOUBLE) AS hd_hotel_metres_lineaires_dedies_corner,
+      TRY_CAST(hotel_contrat_type_franchise AS DOUBLE) AS hd_hotel_contrat_type_franchise,
+      TRY_CAST(hotel_contrat_type_manage AS DOUBLE) AS hd_hotel_contrat_type_manage
+    FROM t_hotel_data
+    WHERE hotel_code IS NOT NULL
+
+v_hotel_proximity_features:
+  type: view
+  mode: create_or_replace
+  requires:
+    - t_hotel_proximity_data
+  sql: |-
+    SELECT
+      CAST(hotel_code AS VARCHAR) AS hotel_code,
+      TRY_CAST(commerce_convenience_100m AS DOUBLE) AS px_commerce_convenience_100m,
+      TRY_CAST(commerce_bakery_100m AS DOUBLE) AS px_commerce_bakery_100m,
+      TRY_CAST(commerce_supermarket_100m AS DOUBLE) AS px_commerce_supermarket_100m,
+      TRY_CAST(commerce_alcohol_100m AS DOUBLE) AS px_commerce_alcohol_100m,
+      TRY_CAST(commerce_confectionery_100m AS DOUBLE) AS px_commerce_confectionery_100m,
+      TRY_CAST(commerce_beverages_100m AS DOUBLE) AS px_commerce_beverages_100m,
+      TRY_CAST(commerce_grocery_100m AS DOUBLE) AS px_commerce_grocery_100m,
+      TRY_CAST(commerce_ice_cream_100m AS DOUBLE) AS px_commerce_ice_cream_100m,
+      TRY_CAST(commerce_fast_food_100m AS DOUBLE) AS px_commerce_fast_food_100m,
+      TRY_CAST(commerce_cosmetics_100m AS DOUBLE) AS px_commerce_cosmetics_100m,
+      TRY_CAST(commerce_gift_100m AS DOUBLE) AS px_commerce_gift_100m,
+      TRY_CAST(commerce_tobacco_100m AS DOUBLE) AS px_commerce_tobacco_100m,
+      TRY_CAST(commerce_kiosk_100m AS DOUBLE) AS px_commerce_kiosk_100m,
+      TRY_CAST(commerce_pharmacy_100m AS DOUBLE) AS px_commerce_pharmacy_100m,
+      TRY_CAST(commerce_chemist_100m AS DOUBLE) AS px_commerce_chemist_100m,
+      TRY_CAST(commerce_fb_100m AS DOUBLE) AS px_commerce_fb_100m,
+      TRY_CAST(commerce_non_fb_100m AS DOUBLE) AS px_commerce_non_fb_100m,
+      TRY_CAST(commerce_convenience_200m AS DOUBLE) AS px_commerce_convenience_200m,
+      TRY_CAST(commerce_bakery_200m AS DOUBLE) AS px_commerce_bakery_200m,
+      TRY_CAST(commerce_supermarket_200m AS DOUBLE) AS px_commerce_supermarket_200m,
+      TRY_CAST(commerce_alcohol_200m AS DOUBLE) AS px_commerce_alcohol_200m,
+      TRY_CAST(commerce_confectionery_200m AS DOUBLE) AS px_commerce_confectionery_200m,
+      TRY_CAST(commerce_beverages_200m AS DOUBLE) AS px_commerce_beverages_200m,
+      TRY_CAST(commerce_grocery_200m AS DOUBLE) AS px_commerce_grocery_200m,
+      TRY_CAST(commerce_ice_cream_200m AS DOUBLE) AS px_commerce_ice_cream_200m,
+      TRY_CAST(commerce_fast_food_200m AS DOUBLE) AS px_commerce_fast_food_200m,
+      TRY_CAST(commerce_cosmetics_200m AS DOUBLE) AS px_commerce_cosmetics_200m,
+      TRY_CAST(commerce_gift_200m AS DOUBLE) AS px_commerce_gift_200m,
+      TRY_CAST(commerce_tobacco_200m AS DOUBLE) AS px_commerce_tobacco_200m,
+      TRY_CAST(commerce_kiosk_200m AS DOUBLE) AS px_commerce_kiosk_200m,
+      TRY_CAST(commerce_pharmacy_200m AS DOUBLE) AS px_commerce_pharmacy_200m,
+      TRY_CAST(commerce_chemist_200m AS DOUBLE) AS px_commerce_chemist_200m,
+      TRY_CAST(commerce_fb_200m AS DOUBLE) AS px_commerce_fb_200m,
+      TRY_CAST(commerce_non_fb_200m AS DOUBLE) AS px_commerce_non_fb_200m,
+      TRY_CAST(commerce_convenience_300m AS DOUBLE) AS px_commerce_convenience_300m,
+      TRY_CAST(commerce_bakery_300m AS DOUBLE) AS px_commerce_bakery_300m,
+      TRY_CAST(commerce_supermarket_300m AS DOUBLE) AS px_commerce_supermarket_300m,
+      TRY_CAST(commerce_alcohol_300m AS DOUBLE) AS px_commerce_alcohol_300m,
+      TRY_CAST(commerce_confectionery_300m AS DOUBLE) AS px_commerce_confectionery_300m,
+      TRY_CAST(commerce_beverages_300m AS DOUBLE) AS px_commerce_beverages_300m,
+      TRY_CAST(commerce_grocery_300m AS DOUBLE) AS px_commerce_grocery_300m,
+      TRY_CAST(commerce_ice_cream_300m AS DOUBLE) AS px_commerce_ice_cream_300m,
+      TRY_CAST(commerce_fast_food_300m AS DOUBLE) AS px_commerce_fast_food_300m,
+      TRY_CAST(commerce_cosmetics_300m AS DOUBLE) AS px_commerce_cosmetics_300m,
+      TRY_CAST(commerce_gift_300m AS DOUBLE) AS px_commerce_gift_300m,
+      TRY_CAST(commerce_tobacco_300m AS DOUBLE) AS px_commerce_tobacco_300m,
+      TRY_CAST(commerce_kiosk_300m AS DOUBLE) AS px_commerce_kiosk_300m,
+      TRY_CAST(commerce_pharmacy_300m AS DOUBLE) AS px_commerce_pharmacy_300m,
+      TRY_CAST(commerce_chemist_300m AS DOUBLE) AS px_commerce_chemist_300m,
+      TRY_CAST(commerce_fb_300m AS DOUBLE) AS px_commerce_fb_300m,
+      TRY_CAST(commerce_non_fb_300m AS DOUBLE) AS px_commerce_non_fb_300m,
+      TRY_CAST(commerce_convenience_400m AS DOUBLE) AS px_commerce_convenience_400m,
+      TRY_CAST(commerce_bakery_400m AS DOUBLE) AS px_commerce_bakery_400m,
+      TRY_CAST(commerce_supermarket_400m AS DOUBLE) AS px_commerce_supermarket_400m,
+      TRY_CAST(commerce_alcohol_400m AS DOUBLE) AS px_commerce_alcohol_400m,
+      TRY_CAST(commerce_confectionery_400m AS DOUBLE) AS px_commerce_confectionery_400m,
+      TRY_CAST(commerce_beverages_400m AS DOUBLE) AS px_commerce_beverages_400m,
+      TRY_CAST(commerce_grocery_400m AS DOUBLE) AS px_commerce_grocery_400m,
+      TRY_CAST(commerce_ice_cream_400m AS DOUBLE) AS px_commerce_ice_cream_400m,
+      TRY_CAST(commerce_fast_food_400m AS DOUBLE) AS px_commerce_fast_food_400m,
+      TRY_CAST(commerce_cosmetics_400m AS DOUBLE) AS px_commerce_cosmetics_400m,
+      TRY_CAST(commerce_gift_400m AS DOUBLE) AS px_commerce_gift_400m,
+      TRY_CAST(commerce_tobacco_400m AS DOUBLE) AS px_commerce_tobacco_400m,
+      TRY_CAST(commerce_kiosk_400m AS DOUBLE) AS px_commerce_kiosk_400m,
+      TRY_CAST(commerce_pharmacy_400m AS DOUBLE) AS px_commerce_pharmacy_400m,
+      TRY_CAST(commerce_chemist_400m AS DOUBLE) AS px_commerce_chemist_400m,
+      TRY_CAST(commerce_fb_400m AS DOUBLE) AS px_commerce_fb_400m,
+      TRY_CAST(commerce_non_fb_400m AS DOUBLE) AS px_commerce_non_fb_400m,
+      TRY_CAST(commerce_convenience_500m AS DOUBLE) AS px_commerce_convenience_500m,
+      TRY_CAST(commerce_bakery_500m AS DOUBLE) AS px_commerce_bakery_500m,
+      TRY_CAST(commerce_supermarket_500m AS DOUBLE) AS px_commerce_supermarket_500m,
+      TRY_CAST(commerce_alcohol_500m AS DOUBLE) AS px_commerce_alcohol_500m,
+      TRY_CAST(commerce_confectionery_500m AS DOUBLE) AS px_commerce_confectionery_500m,
+      TRY_CAST(commerce_beverages_500m AS DOUBLE) AS px_commerce_beverages_500m,
+      TRY_CAST(commerce_grocery_500m AS DOUBLE) AS px_commerce_grocery_500m,
+      TRY_CAST(commerce_ice_cream_500m AS DOUBLE) AS px_commerce_ice_cream_500m,
+      TRY_CAST(commerce_fast_food_500m AS DOUBLE) AS px_commerce_fast_food_500m,
+      TRY_CAST(commerce_cosmetics_500m AS DOUBLE) AS px_commerce_cosmetics_500m,
+      TRY_CAST(commerce_gift_500m AS DOUBLE) AS px_commerce_gift_500m,
+      TRY_CAST(commerce_tobacco_500m AS DOUBLE) AS px_commerce_tobacco_500m,
+      TRY_CAST(commerce_kiosk_500m AS DOUBLE) AS px_commerce_kiosk_500m,
+      TRY_CAST(commerce_pharmacy_500m AS DOUBLE) AS px_commerce_pharmacy_500m,
+      TRY_CAST(commerce_chemist_500m AS DOUBLE) AS px_commerce_chemist_500m,
+      TRY_CAST(commerce_fb_500m AS DOUBLE) AS px_commerce_fb_500m,
+      TRY_CAST(commerce_non_fb_500m AS DOUBLE) AS px_commerce_non_fb_500m,
+      TRY_CAST(plage_1km AS DOUBLE) AS px_plage_1km,
+      TRY_CAST(plage_2km AS DOUBLE) AS px_plage_2km,
+      TRY_CAST(plage_3km AS DOUBLE) AS px_plage_3km,
+      TRY_CAST(plage_4km AS DOUBLE) AS px_plage_4km,
+      TRY_CAST(plage_5km AS DOUBLE) AS px_plage_5km,
+      TRY_CAST(plage_distance_km AS DOUBLE) AS px_plage_distance_km,
+      TRY_CAST(proximity_ok AS DOUBLE) AS px_proximity_ok
+    FROM t_hotel_proximity_data
+    WHERE hotel_code IS NOT NULL
+
+v_hotel_weather_features:
+  type: view
+  mode: create_or_replace
+  requires:
+    - t_hotel_weather_data
+  sql: |-
+    SELECT
+      CAST(hotel_code AS VARCHAR) AS hotel_code,
+      AVG(TRY_CAST(meteo_temperature_c_mean AS DOUBLE)) AS wx_meteo_temperature_c_mean,
+      AVG(TRY_CAST(meteo_temperature_c_min AS DOUBLE)) AS wx_meteo_temperature_c_min,
+      AVG(TRY_CAST(meteo_temperature_c_max AS DOUBLE)) AS wx_meteo_temperature_c_max,
+      AVG(TRY_CAST(meteo_point_rosee_c_mean AS DOUBLE)) AS wx_meteo_point_rosee_c_mean,
+      AVG(TRY_CAST(meteo_point_rosee_c_min AS DOUBLE)) AS wx_meteo_point_rosee_c_min,
+      AVG(TRY_CAST(meteo_point_rosee_c_max AS DOUBLE)) AS wx_meteo_point_rosee_c_max,
+      AVG(TRY_CAST(meteo_humidite_pct_mean AS DOUBLE)) AS wx_meteo_humidite_pct_mean,
+      AVG(TRY_CAST(meteo_humidite_pct_min AS DOUBLE)) AS wx_meteo_humidite_pct_min,
+      AVG(TRY_CAST(meteo_humidite_pct_max AS DOUBLE)) AS wx_meteo_humidite_pct_max,
+      AVG(TRY_CAST(meteo_precipitations_mm_mean AS DOUBLE)) AS wx_meteo_precipitations_mm_mean,
+      AVG(TRY_CAST(meteo_precipitations_mm_min AS DOUBLE)) AS wx_meteo_precipitations_mm_min,
+      AVG(TRY_CAST(meteo_precipitations_mm_max AS DOUBLE)) AS wx_meteo_precipitations_mm_max,
+      AVG(TRY_CAST(meteo_neige_mm_mean AS DOUBLE)) AS wx_meteo_neige_mm_mean,
+      AVG(TRY_CAST(meteo_neige_mm_min AS DOUBLE)) AS wx_meteo_neige_mm_min,
+      AVG(TRY_CAST(meteo_neige_mm_max AS DOUBLE)) AS wx_meteo_neige_mm_max,
+      AVG(TRY_CAST(meteo_vent_kmh_mean AS DOUBLE)) AS wx_meteo_vent_kmh_mean,
+      AVG(TRY_CAST(meteo_vent_kmh_min AS DOUBLE)) AS wx_meteo_vent_kmh_min,
+      AVG(TRY_CAST(meteo_vent_kmh_max AS DOUBLE)) AS wx_meteo_vent_kmh_max,
+      AVG(TRY_CAST(meteo_pression_hpa_mean AS DOUBLE)) AS wx_meteo_pression_hpa_mean,
+      AVG(TRY_CAST(meteo_pression_hpa_min AS DOUBLE)) AS wx_meteo_pression_hpa_min,
+      AVG(TRY_CAST(meteo_pression_hpa_max AS DOUBLE)) AS wx_meteo_pression_hpa_max,
+      AVG(TRY_CAST(meteo_ensoleillement_min_mean AS DOUBLE)) AS wx_meteo_ensoleillement_min_mean,
+      AVG(TRY_CAST(meteo_ensoleillement_min_min AS DOUBLE)) AS wx_meteo_ensoleillement_min_min,
+      AVG(TRY_CAST(meteo_ensoleillement_min_max AS DOUBLE)) AS wx_meteo_ensoleillement_min_max
+    FROM t_hotel_weather_data
+    WHERE hotel_code IS NOT NULL
+    GROUP BY CAST(hotel_code AS VARCHAR)
+
+v_hotel_holidays_features:
+  type: view
+  mode: create_or_replace
+  requires:
+    - t_hotel_holidays_data
+  sql: |-
+    SELECT
+      CAST(hotel_code AS VARCHAR) AS hotel_code,
+      AVG(TRY_CAST(zone_scolaire_a AS DOUBLE)) AS hol_zone_scolaire_a,
+      AVG(TRY_CAST(zone_scolaire_b AS DOUBLE)) AS hol_zone_scolaire_b,
+      AVG(TRY_CAST(zone_scolaire_c AS DOUBLE)) AS hol_zone_scolaire_c,
+      AVG(TRY_CAST(nb_jours_dans_mois AS DOUBLE)) AS hol_nb_jours_dans_mois,
+      AVG(TRY_CAST(nb_jours_feries AS DOUBLE)) AS hol_nb_jours_feries,
+      AVG(TRY_CAST(nb_jours_weekend AS DOUBLE)) AS hol_nb_jours_weekend,
+      AVG(TRY_CAST(nb_jours_vacances_scolaires AS DOUBLE)) AS hol_nb_jours_vacances_scolaires,
+      AVG(TRY_CAST(nb_jours_vacances_hors_feries AS DOUBLE)) AS hol_nb_jours_vacances_hors_feries,
+      AVG(TRY_CAST(nb_jours_holidays AS DOUBLE)) AS hol_nb_jours_holidays,
+      AVG(TRY_CAST(pct_jours_holidays AS DOUBLE)) AS hol_pct_jours_holidays
+    FROM t_hotel_holidays_data
+    WHERE hotel_code IS NOT NULL
+    GROUP BY CAST(hotel_code AS VARCHAR)
+
+# create_if_not_exists : materialise une fois (run.py warm), puis le web lit direct.
+# Pour forcer le rebuild : python run.py warm --rebuild
+t_rich_data:
+  type: table
+  mode: create_if_not_exists
+  requires:
+    - v_ml_training_dataset
+    - v_hotel_data_features
+    - v_hotel_proximity_features
+    - v_hotel_weather_features
+    - v_hotel_holidays_features
+  sql: |-
+    SELECT
+      m.*,
+      hd.* EXCLUDE (hotel_code),
+      px.* EXCLUDE (hotel_code),
+      wx.* EXCLUDE (hotel_code),
+      hol.* EXCLUDE (hotel_code)
+    FROM v_ml_training_dataset AS m
+    LEFT JOIN v_hotel_data_features AS hd
+      ON CAST(m.hotel_code AS VARCHAR) = hd.hotel_code
+    LEFT JOIN v_hotel_proximity_features AS px
+      ON CAST(m.hotel_code AS VARCHAR) = px.hotel_code
+    LEFT JOIN v_hotel_weather_features AS wx
+      ON CAST(m.hotel_code AS VARCHAR) = wx.hotel_code
+    LEFT JOIN v_hotel_holidays_features AS hol
+      ON CAST(m.hotel_code AS VARCHAR) = hol.hotel_code
+
+v_web_rich_data:
+  type: view
+  mode: create_or_replace
+  requires:
+    - t_rich_data
+  sql: |-
+    SELECT
+      hotel_code,
+      solution,
+      is_observation,
+      hotel_nb_chambres,
+      hotel_to_annuel,
+      hotel_guests_per_chambre,
+      metres_lineaires,
+      montant_ventes_par_mois,
+      montant_marge_selon_coef_par_mois
+    FROM t_rich_data
