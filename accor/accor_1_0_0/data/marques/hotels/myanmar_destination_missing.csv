@@ -1,4 +1,0 @@
-hotel_code_accor,hotel_code_norm,hotel_name,hotel_brand_code,hotel_brand,hotel_city,hotel_country,hotel_adresse,hotel_code_postal,url_hotel,source,source_query,hotel_name_norm,city_norm,country_slug,country_label,region,match_type
-A095,A095,Sofitel Inle Lake Myat Min,SOF,SOFITEL,NYAUNG SHWE,Myanmar,"Thalae Oo Village, Inle Lake",140102,https://all.accor.com/hotel/A095/index.fr.shtml,catalog_api,myanmar,SOFITEL INLE LAKE MYAT MIN,NYAUNG SHWE,myanmar,Myanmar,asia,missing
-A3N7,A3N7,Mercure Yangon Kaba Aye,MER,MERCURE,YANGON,Myanmar,"17 Kaba Aye Pagoda Road, Yankin Township",11081,https://all.accor.com/hotel/A3N7/index.fr.shtml,catalog_api,myanmar,MERCURE YANGON KABA AYE,YANGON,myanmar,Myanmar,asia,missing
-B0M3,B0M3,Pullman Yangon Centrepoint,PUL,PULLMAN,YANGON,Myanmar,"65 Corner Of Sule Pagoda Rd, And Merchant St, Kyauktada Township",11182,https://all.accor.com/hotel/B0M3/index.fr.shtml,catalog_api,myanmar,PULLMAN YANGON CENTREPOINT,YANGON,myanmar,Myanmar,asia,missing

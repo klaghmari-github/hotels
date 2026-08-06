@@ -1,0 +1,19 @@
+{
+  "_source": "archive/sources/raw/ROD - Simulateurs + détail des coûts.xlsx + ROD_Audit + 001.queryVentes.csv + hotel_identity_registry.json",
+  "_note": "Tous les hôtels présents dans les ventes bornes sont des pilotes. Mapping nom caisse → code Accor via registry archive (Tour Eiffel = H3546 Centre, pas H1978 Vaugirard).",
+  "concepts": {
+    "SIMPLY": [
+      { "hotel_code": "H2075", "label": "IBB NICE", "name_ventes": "Ibis budget Nice" },
+      { "hotel_code": "HB6A3", "label": "IBB STRA", "name_ventes": "Ibis budget Strasbourg Centre République" }
+    ],
+    "LIBERTY": [
+      { "hotel_code": "H6188", "label": "MER BOUL", "name_ventes": "Mercure Paris Boulogne" },
+      { "hotel_code": "HB5I0", "label": "NOV MEG", "name_ventes": "Novotel Megève Mont-Blanc" }
+    ],
+    "CONNECTED": [
+      { "hotel_code": "H0373", "label": "MER MONT", "name_ventes": "Mercure Paris Montmartre Sacré-Cœur" },
+      { "hotel_code": "H3546", "label": "NOV TE", "name_ventes": "Novotel Paris Tour Eiffel", "name_display": "Novotel Paris Centre Tour Eiffel" },
+      { "hotel_code": "H5586", "label": "NOV ITAL", "name_ventes": "Novotel Porte d'Italie", "name_display": "Novotel Paris 13 Porte d'Italie" }
+    ]
+  }
+}

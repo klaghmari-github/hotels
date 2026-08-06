@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spécification détaillée du moteur de simulation des corners hôteliers</title>
+<style>
+:root{
+  --navy:#18324f;
+  --blue:#245c8f;
+  --cyan:#2e88a7;
+  --green:#2f7d62;
+  --orange:#b46a2c;
+  --red:#a24646;
+  --ink:#25313d;
+  --muted:#667482;
+  --line:#d8e0e7;
+  --panel:#f5f8fb;
+  --soft:#eef4f8;
+  --white:#ffffff;
+  --shadow:0 8px 28px rgba(23,50,79,.09);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  color:var(--ink);
+  background:#edf2f6;
+  font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;
+  line-height:1.62;
+}
+header{
+  background:linear-gradient(135deg,#142b45,#245c8f 62%,#2e88a7);
+  color:white;
+  padding:58px 28px 48px;
+}
+.header-inner{max-width:1180px;margin:auto}
+.eyebrow{
+  display:inline-block;
+  padding:6px 12px;
+  border:1px solid rgba(255,255,255,.38);
+  border-radius:999px;
+  font-size:.78rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+h1{font-size:clamp(2rem,4vw,3.4rem);line-height:1.08;margin:18px 0 14px}
+.subtitle{max-width:880px;font-size:1.12rem;color:#e3edf6;margin:0}
+.meta{margin-top:24px;display:flex;flex-wrap:wrap;gap:10px}
+.meta span{
+  background:rgba(255,255,255,.12);
+  padding:7px 11px;
+  border-radius:8px;
+  font-size:.88rem;
+}
+.layout{max-width:1320px;margin:0 auto;display:grid;grid-template-columns:280px minmax(0,1fr);gap:28px;padding:28px}
+nav{
+  position:sticky;top:20px;align-self:start;
+  background:white;border:1px solid var(--line);border-radius:16px;
+  padding:18px;box-shadow:var(--shadow);max-height:calc(100vh - 40px);overflow:auto;
+}
+nav strong{display:block;color:var(--navy);margin-bottom:10px}
+nav a{
+  display:block;text-decoration:none;color:#425364;
+  padding:6px 9px;border-radius:7px;font-size:.9rem
+}
+nav a:hover{background:var(--soft);color:var(--blue)}
+main{min-width:0}
+section{
+  background:white;border:1px solid var(--line);border-radius:18px;
+  padding:34px;margin-bottom:26px;box-shadow:var(--shadow)
+}
+h2{color:var(--navy);font-size:1.65rem;margin:0 0 18px;padding-bottom:10px;border-bottom:2px solid #e4ebf1}
+h3{color:var(--blue);font-size:1.2rem;margin:27px 0 10px}
+h4{color:var(--ink);font-size:1rem;margin:22px 0 8px}
+p{margin:10px 0}
+ul,ol{padding-left:22px}
+li{margin:6px 0}
+code{
+  font-family:Consolas,Monaco,monospace;background:#eef3f7;color:#183d60;
+  padding:2px 5px;border-radius:4px;font-size:.9em
+}
+pre{
+  overflow:auto;background:#132332;color:#edf7ff;border-radius:12px;
+  padding:18px;line-height:1.48;font-size:.86rem;border:1px solid #28445d
+}
+pre code{background:transparent;color:inherit;padding:0}
+.note,.warning,.success{
+  border-left:5px solid;padding:15px 18px;border-radius:8px;margin:18px 0
+}
+.note{background:#eef6fb;border-color:var(--cyan)}
+.warning{background:#fff4e8;border-color:var(--orange)}
+.success{background:#edf8f3;border-color:var(--green)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:18px 0}
+.card{
+  border:1px solid var(--line);border-radius:13px;padding:18px;background:var(--panel)
+}
+.card h3,.card h4{margin-top:0}
+.flow{
+  display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;margin:22px 0
+}
+.flow .step{
+  flex:1 1 150px;min-width:145px;padding:14px;border-radius:12px;
+  background:#f0f5f9;border:1px solid #cad7e2;text-align:center;font-weight:600;color:var(--navy)
+}
+.flow .arrow{align-self:center;color:var(--blue);font-size:1.4rem;font-weight:bold}
+table{width:100%;border-collapse:collapse;margin:18px 0;font-size:.91rem}
+th{background:var(--navy);color:white;text-align:left;padding:10px;border:1px solid #2c4964}
+td{padding:9px 10px;border:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even){background:#f7f9fb}
+.formula{
+  background:#f5f8fb;border:1px solid #cfdae4;border-radius:12px;
+  padding:16px;text-align:center;font-family:Cambria,Georgia,serif;font-size:1.12rem;margin:14px 0
+}
+.kpi{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0
+}
+.kpi div{background:linear-gradient(180deg,#f9fbfd,#eef4f8);border:1px solid var(--line);border-radius:12px;padding:15px}
+.kpi strong{display:block;color:var(--blue);font-size:1.25rem}
+.small{font-size:.88rem;color:var(--muted)}
+.tag{display:inline-block;border-radius:999px;padding:4px 9px;background:#e9f0f6;color:#264d70;font-size:.78rem;margin:2px}
+hr{border:0;border-top:1px solid var(--line);margin:28px 0}
+footer{max-width:1180px;margin:0 auto 40px;padding:20px;color:#5d6b77;text-align:center}
+@media(max-width:960px){
+  .layout{grid-template-columns:1fr;padding:16px}
+  nav{position:relative;top:0;max-height:none}
+  .grid,.kpi{grid-template-columns:1fr}
+  section{padding:23px}
+}
+@media print{
+  body{background:white}
+  nav{display:none}
+  .layout{display:block;max-width:none;padding:0}
+  section{box-shadow:none;break-inside:avoid;border-radius:0;border-left:0;border-right:0}
+  header{print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <span class="eyebrow">Spécification fonctionnelle et technique</span>
+    <h1>Moteur de simulation des assortiments de corners hôteliers</h1>
+    <p class="subtitle">
+      Description complète du processus de préparation, de génération des scénarios,
+      de simulation des retraits de natures de produits, de recalcul de l’activité,
+      de reconstruction des mix d’exposition et de constitution du dataset final.
+    </p>
+    <div class="meta">
+      <span>Granularité atomique : nature de produit</span>
+      <span>Moteur : Python + DuckDB + YAML</span>
+      <span>Sortie : une ligne par hôtel et par scénario</span>
+      <span>Exécution incrémentale par hash</span>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+<nav>
+  <strong>Sommaire</strong>
+  <a href="#objectif">1. Objectif</a>
+  <a href="#principes">2. Principes structurants</a>
+  <a href="#source">3. Données source</a>
+  <a href="#pipeline">4. Gestionnaire de pipeline</a>
+  <a href="#rankings">5. Tables de classement</a>
+  <a href="#generation">6. Génération des scénarios</a>
+  <a href="#identifiant">7. Identifiant par hash</a>
+  <a href="#iteration">8. Itération et reprise</a>
+  <a href="#simulation">9. Calcul de simulation</a>
+  <a href="#guests">10. Guests et taux de conversion</a>
+  <a href="#redistribution">11. Redistribution des ventes</a>
+  <a href="#montants">12. Montants et marges</a>
+  <a href="#mix">13. Mix d’exposition</a>
+  <a href="#pivot">14. Dataset pivot final</a>
+  <a href="#main">15. Fonction main</a>
+  <a href="#logs">16. Logs et progression</a>
+  <a href="#idempotence">17. Idempotence</a>
+  <a href="#controles">18. Contrôles de cohérence</a>
+  <a href="#catalogue">19. Catalogue des objets</a>
+  <a href="#exemple">20. Exemple numérique</a>
+</nav>
+
+<main>
+<section id="objectif">
+<h2>1. Objectif général</h2>
+<p>
+Le moteur construit des variantes simulées des hôtels pilotes en modifiant uniquement
+la configuration du corner. Les caractéristiques structurelles de l’hôtel restent fixes
+pendant cette phase : solution, capacité hôtelière, taux d’occupation, nombre de guests
+par chambre et période d’exposition.
+</p>
+<p>
+Chaque scénario est défini uniquement par une liste de natures de produits à retirer.
+La même liste est appliquée à tous les hôtels. Si une nature existe dans un hôtel, elle est
+retirée. Si elle n’existe pas, le scénario n’a aucun effet sur cette nature pour cet hôtel.
+</p>
+<div class="flow">
+  <div class="step">Ventes observées</div><div class="arrow">→</div>
+  <div class="step">Liste de natures retirées</div><div class="arrow">→</div>
+  <div class="step">Simulation par hôtel</div><div class="arrow">→</div>
+  <div class="step">Recalcul des indicateurs</div><div class="arrow">→</div>
+  <div class="step">Dataset hôtel × scénario</div>
+</div>
+</section>
+
+<section id="principes">
+<h2>2. Principes structurants</h2>
+<div class="grid">
+  <div class="card"><h3>Nature de produit</h3><p>Unité atomique de suppression. Une nature peut regrouper plusieurs produits ou formats physiques.</p></div>
+  <div class="card"><h3>Quantité vendue</h3><p>Le nombre de ventes métier est toujours calculé avec <code>SUM(QUANTITE)</code>. <code>COUNT(*)</code> n’est pas utilisé pour mesurer les ventes.</p></div>
+  <div class="card"><h3>Exposition</h3><p>La présence dans le corner est mesurée par des comptages distincts de natures, catégories, gammes, types, marques et fournisseurs.</p></div>
+  <div class="card"><h3>Scénario commun</h3><p>Une liste de natures est simulée simultanément sur tous les hôtels, sans dimension <code>hotel_code</code> dans l’identité du scénario.</p></div>
+  <div class="card"><h3>Référence immuable</h3><p><code>t_sales</code> reste la baseline. Chaque simulation repart des données observées et ne dépend pas du scénario précédent.</p></div>
+  <div class="card"><h3>Recalcul déclaratif</h3><p>Les vues en <code>create_or_replace</code> sont recalculées à chaque scénario. Les tables persistantes sont conservées.</p></div>
+</div>
+</section>
+
+<section id="source">
+<h2>3. Données source et rôle des colonnes principales</h2>
+<p>La table source contient notamment les familles de champs suivantes :</p>
+<table>
+<thead><tr><th>Famille</th><th>Champs</th><th>Rôle dans le moteur</th></tr></thead>
+<tbody>
+<tr><td>Hôtel</td><td><code>SOLUTION</code>, <code>HOTEL_CODE</code>, <code>HOTEL_NAME</code>, <code>METRES_LINEAIRES</code></td><td>Références fixes de l’hôtel et de la solution.</td></tr>
+<tr><td>Capacité</td><td><code>HOTEL_NB_CHAMBRES</code>, <code>HOTEL_TO_ANNUEL</code>, <code>HOTEL_GUESTS_PER_CHAMBRE</code></td><td>Calcul du nombre moyen de guests mensuels.</td></tr>
+<tr><td>Assortiment</td><td><code>TYPE</code>, <code>GAMME</code>, <code>CATEGORIE</code>, <code>NATURE_PRODUIT</code>, <code>MARQUE</code>, <code>FOURNISSEUR</code></td><td>Construction des groupes, rankings et mix d’exposition.</td></tr>
+<tr><td>Temps</td><td><code>DATE</code></td><td>Calcul de la période d’exposition entre la première et la dernière vente.</td></tr>
+<tr><td>Volume</td><td><code>QUANTITE</code></td><td>Mesure des ventes observées et simulées.</td></tr>
+<tr><td>Valeur</td><td><code>PRIX_HT</code>, <code>PRIX_TTC</code>, <code>PRIX_TTC_MARCHE</code>, <code>MARGE</code></td><td>Montants et marge recalculés proportionnellement à la quantité simulée.</td></tr>
+</tbody>
+</table>
+<div class="note">
+La date n’est pas utilisée à ce stade pour modéliser une saisonnalité. Elle sert uniquement
+à identifier <code>MIN(DATE)</code>, <code>MAX(DATE)</code> et le nombre de mois d’exposition.
+Les mois sans vente compris entre ces deux bornes font partie de la période d’activité.
+</div>
+</section>
+
+<section id="pipeline">
+<h2>4. Fonctionnement du gestionnaire de pipeline</h2>
+<p>
+Le dossier de configuration peut contenir plusieurs fichiers YAML. Ils sont chargés
+récursivement et fusionnés dans un seul dictionnaire logique. Chaque objet est décrit
+par un type, un mode, ses dépendances et éventuellement une requête SQL.
+</p>
+<table>
+<thead><tr><th>Type</th><th>Comportement</th></tr></thead>
+<tbody>
+<tr><td><code>dataframe</code></td><td>Charge un fichier en DataFrame puis l’enregistre dans DuckDB.</td></tr>
+<tr><td><code>table</code></td><td>Crée une table physique à partir d’une requête.</td></tr>
+<tr><td><code>view</code></td><td>Crée ou remplace une vue logique.</td></tr>
+<tr><td><code>execute</code></td><td>Exécute une requête sans créer d’objet portant le nom du nœud.</td></tr>
+<tr><td><code>iteration</code></td><td>Parcourt une table de scénarios, remplace une vue d’étape et lance une cible pour chaque ligne.</td></tr>
+</tbody>
+</table>
+<h3>Modes de création</h3>
+<table>
+<thead><tr><th>Mode</th><th>Décision</th><th>Traitement des dépendances</th></tr></thead>
+<tbody>
+<tr><td><code>create_if_not_exists</code></td><td>L’objet est créé seulement s’il n’existe pas.</td><td>Les dépendances ne sont traitées que si la création est nécessaire.</td></tr>
+<tr><td><code>create_or_replace</code></td><td>L’objet est systématiquement recalculé.</td><td>Les dépendances sont recalculées avant lui.</td></tr>
+</tbody>
+</table>
+<p>
+Cette logique évite de relire le fichier Excel à chaque scénario tout en garantissant
+que toutes les vues dépendant du scénario courant sont actualisées.
+</p>
+</section>
+
+<section id="rankings">
+<h2>5. Construction des classements</h2>
+<p>
+Les tables de ranking ordonnent les natures et les groupes par marge croissante.
+Les éléments les moins intéressants économiquement sont donc placés en premier.
+</p>
+<h3>5.1 Classement global des natures</h3>
+<p>Pour chaque hôtel :</p>
+<div class="formula">marge(nature) = Σ MARGE des lignes appartenant à la nature</div>
+<p>Le rang est calculé avec :</p>
+<pre><code>ROW_NUMBER() OVER (
+    PARTITION BY hotel_code
+    ORDER BY montant_marge, nature
+)</code></pre>
+<h3>5.2 Classement des natures dans chaque groupe</h3>
+<p>
+Le même principe est appliqué à l’intérieur de chaque catégorie, gamme, type,
+marque et fournisseur.
+</p>
+<h3>5.3 Classement des groupes</h3>
+<p>
+La marge d’un groupe est la somme des marges de ses natures. La table de groupe
+contient également la liste des natures déjà ordonnée, ce qui permet de convertir
+directement la suppression d’un groupe en liste atomique de natures.
+</p>
+</section>
+
+<section id="generation">
+<h2>6. Génération des scénarios</h2>
+<p>La classe <code>ScenarioGenerator</code> construit plusieurs familles de scénarios :</p>
+<ol>
+<li>scénario vide : aucune nature retirée ;</li>
+<li>retraits cumulatifs des natures globales les moins rentables ;</li>
+<li>retraits cumulatifs des natures les moins rentables à l’intérieur de chaque groupe ;</li>
+<li>retraits cumulatifs des groupes les moins rentables ;</li>
+<li>scénarios de modification de mix ;</li>
+<li>scénarios de réduction des mètres linéaires.</li>
+</ol>
+<h3>6.1 Canonicalisation</h3>
+<p>Avant enregistrement, chaque liste est :</p>
+<ul>
+<li>nettoyée des valeurs nulles et vides ;</li>
+<li>dédupliquée ;</li>
+<li>triée de façon stable et insensible à la casse pour l’ordre principal.</li>
+</ul>
+<p>Ainsi, les listes suivantes représentent le même scénario :</p>
+<pre><code>["Coca", "Eau"]
+["Eau", "Coca"]
+["Coca", "Eau", "Coca"]</code></pre>
+<h3>6.2 Scénarios cumulatifs</h3>
+<p>Si le ranking est <code>N1, N2, N3, N4</code>, les scénarios produits sont :</p>
+<pre><code>[]
+[N1]
+[N1, N2]
+[N1, N2, N3]
+[N1, N2, N3, N4]</code></pre>
+<p>
+La suppression complète est autorisée lorsque <code>include_full_removal=True</code>.
+Un hôtel peut donc obtenir zéro vente et zéro marge si toutes ses natures sont retirées.
+</p>
+</section>
+
+<section id="identifiant">
+<h2>7. Identifiant stable du scénario</h2>
+<p>
+L’identifiant n’est pas un numéro séquentiel. Il est calculé à partir de la liste
+canonique, sérialisée en JSON compact, puis passée dans SHA-256.
+</p>
+<pre><code>canonical = ["Coca", "Eau"]
+payload = '["Coca","Eau"]'
+scenario_id = SHA256(payload)</code></pre>
+<p>Ce choix apporte quatre garanties :</p>
+<ul>
+<li>une même liste possède toujours le même identifiant ;</li>
+<li>l’ordre d’entrée n’a aucun impact ;</li>
+<li>les doublons sont automatiquement neutralisés ;</li>
+<li>les exécutions futures peuvent reconnaître un scénario déjà calculé.</li>
+</ul>
+</section>
+
+<section id="iteration">
+<h2>8. Exécution itérative des scénarios</h2>
+<p>
+La table <code>t_scenarios</code> contient une ligne par liste canonique. L’étape
+<code>i_iteration_scenario</code> la parcourt dans l’ordre défini.
+</p>
+<div class="flow">
+  <div class="step">t_scenarios</div><div class="arrow">→</div>
+  <div class="step">v_scenario_step</div><div class="arrow">→</div>
+  <div class="step">v_sales_current</div><div class="arrow">→</div>
+  <div class="step">v_dataset_pivot</div><div class="arrow">→</div>
+  <div class="step">INSERT</div>
+</div>
+<p>
+À chaque itération, une table temporaire d’une ligne est créée, puis exposée par
+<code>v_scenario_step</code>. Toutes les vues dépendantes sont ensuite recalculées.
+</p>
+<h3>8.1 Reprise automatique</h3>
+<p>
+L’itération peut déclarer une table de résultats déjà calculés. Les scénarios dont
+le hash existe déjà sont exclus de la liste à exécuter.
+</p>
+<pre><code>WHERE NOT EXISTS (
+    SELECT 1
+    FROM t_dataset_pivot AS completed
+    WHERE completed.scenario_id = scenarios.scenario_id
+)</code></pre>
+</section>
+
+<section id="simulation">
+<h2>9. Chaîne de calcul d’un scénario</h2>
+<table>
+<thead><tr><th>Étape</th><th>Objet</th><th>Rôle</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><code>v_scenario_removed_natures</code></td><td>Déplie l’array des natures retirées avec <code>UNNEST</code>.</td></tr>
+<tr><td>2</td><td><code>v_sales_hotel_baseline</code></td><td>Calcule période, guests, ventes et conversion de référence.</td></tr>
+<tr><td>3</td><td><code>v_sales_nature_baseline</code></td><td>Calcule le poids pilote de chaque nature.</td></tr>
+<tr><td>4</td><td><code>v_sales_removed</code></td><td>Récupère les lignes correspondant aux natures retirées.</td></tr>
+<tr><td>5</td><td><code>v_sales_removed_hotel</code></td><td>Calcule ventes retirées et taux de conversion par hôtel.</td></tr>
+<tr><td>6</td><td><code>v_sales_filtered</code></td><td>Conserve toutes les lignes dont la nature n’est pas retirée.</td></tr>
+<tr><td>7</td><td><code>v_sales_current</code></td><td>Ajoute les ventes récupérées aux lignes restantes.</td></tr>
+<tr><td>8</td><td><code>v_dataset_*</code></td><td>Recalcule activité, mensualisation, mix et pivot.</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="guests">
+<h2>10. Calcul des guests et du taux de conversion</h2>
+<p>Le nombre moyen de guests mensuels est une propriété de l’hôtel :</p>
+<div class="formula">
+Guests mensuels = Chambres × Taux d’occupation annuel × Guests par chambre × 30,5
+</div>
+<p>Le nombre de mois d’exposition est :</p>
+<div class="formula">
+Nombre de mois = DATE_DIFF('month', MIN(DATE), MAX(DATE)) + 1
+</div>
+<p>Le nombre total de guests sur la période est :</p>
+<div class="formula">
+Guests période = Guests mensuels × Nombre de mois
+</div>
+<p>Le taux de conversion observé est :</p>
+<div class="formula">
+Taux de conversion = Σ QUANTITE / Guests période
+</div>
+<div class="note">
+Ces valeurs restent fixes pour tous les scénarios de retrait ou de mix. Elles sont lues
+depuis <code>t_sales</code>, et non depuis la vue filtrée du scénario.
+</div>
+</section>
+
+<section id="redistribution">
+<h2>11. Redistribution des ventes après retrait</h2>
+<p>
+La suppression d’une nature retire d’abord ses ventes observées. Les acheteurs
+correspondants redeviennent des clients potentiels. Une partie seulement reconvertit,
+selon le taux de conversion de l’hôtel.
+</p>
+<h3>11.1 Volume potentiel récupéré</h3>
+<div class="formula">
+D = Ventes retirées × Taux de conversion
+</div>
+<h3>11.2 Modèle de préférence pilote</h3>
+<p>Pour chaque nature <em>i</em> :</p>
+<div class="formula">
+Part pilote(i) = Ventes observées de i / Ventes observées totales
+</div>
+<p>La quantité ajoutée à une nature restante est :</p>
+<div class="formula">
+Ajout(i) = D × Part pilote(i)
+</div>
+<p>
+Les parts ne sont pas renormalisées sur les seules natures restantes. La fraction
+de <em>D</em> correspondant aux natures supprimées est donc perdue.
+</p>
+<h3>11.3 Répartition dans les lignes historiques</h3>
+<p>
+Une nature peut être représentée par plusieurs lignes. L’ajout attribué à la nature
+est réparti entre ses lignes proportionnellement à leur quantité historique :
+</p>
+<div class="formula">
+Part ligne = QUANTITE ligne / Ventes observées de la nature
+</div>
+<div class="formula">
+QUANTITE scénario = QUANTITE ligne + Ajout(nature) × Part ligne
+</div>
+</section>
+
+<section id="montants">
+<h2>12. Recalcul des montants et des marges</h2>
+<p>
+Le prix unitaire implicite de chaque ligne est conservé. Les montants sont ajustés
+au prorata de la nouvelle quantité.
+</p>
+<div class="formula">
+PRIX_TTC scénario = PRIX_TTC observé × QUANTITE scénario / QUANTITE observée
+</div>
+<div class="formula">
+MARGE scénario = MARGE observée × QUANTITE scénario / QUANTITE observée
+</div>
+<p>Le même mécanisme s’applique à :</p>
+<ul>
+<li><code>PRIX_HT</code> ;</li>
+<li><code>PRIX_TTC</code> ;</li>
+<li><code>PRIX_TTC_MARCHE</code> ;</li>
+<li><code>MARGE</code>.</li>
+</ul>
+<div class="warning">
+Les lignes ayant une quantité observée nulle ne doivent pas être présentes dans le jeu
+de modélisation, car les formules utilisent <code>NULLIF(QUANTITE, 0)</code>.
+</div>
+</section>
+
+<section id="mix">
+<h2>13. Reconstruction du mix d’exposition</h2>
+<p>
+Le mix est calculé à partir des natures encore présentes dans <code>v_sales_current</code>.
+Il ne dépend ni du nombre de lignes ni des quantités vendues.
+</p>
+<h3>13.1 Comptages globaux</h3>
+<ul>
+<li><code>nombre_natures</code> = nombre distinct de <code>NATURE_PRODUIT</code> ;</li>
+<li><code>nombre_categories</code> = nombre distinct de catégories ;</li>
+<li><code>nombre_gammes</code> = nombre distinct de gammes ;</li>
+<li><code>nombre_types</code> = nombre distinct de types ;</li>
+<li><code>nombre_marques</code> = nombre distinct de marques ;</li>
+<li><code>nombre_fournisseurs</code> = nombre distinct de fournisseurs.</li>
+</ul>
+<h3>13.2 Colonnes dynamiques</h3>
+<p>Les noms sont normalisés puis pivotés, par exemple :</p>
+<pre><code>categorie_boissons_nombre_natures
+gamme_snacking_nombre_natures
+type_f_b_nombre_natures
+marque_coca_cola_nombre_natures
+fournisseur_x_nombre_natures</code></pre>
+<p>Le pourcentage associé est :</p>
+<div class="formula">
+Part du groupe = Nombre de natures du groupe / Nombre total de natures
+</div>
+<p>
+Les pivots dynamiques sont matérialisés en tables <code>create_or_replace</code>,
+car DuckDB n’autorise pas un pivot dynamique directement dans une vue.
+</p>
+</section>
+
+<section id="pivot">
+<h2>14. Dataset pivot final</h2>
+<p>
+Le dataset final contient une ligne par couple <code>scenario_id × hotel_code</code>.
+Il réunit :
+</p>
+<div class="grid">
+<div class="card"><h3>Identité</h3><p>Hash du scénario, liste des natures retirées, code hôtel.</p></div>
+<div class="card"><h3>Contexte</h3><p>Solution, mètres linéaires, nombre de mois, guests mensuels.</p></div>
+<div class="card"><h3>Cibles</h3><p>Ventes mensuelles, montant des ventes mensuel, marge mensuelle.</p></div>
+<div class="card"><h3>Configuration</h3><p>Effectifs et pourcentages du mix par catégorie, gamme, type, marque et fournisseur.</p></div>
+</div>
+<p>
+L’insertion est idempotente grâce à un contrôle sur
+<code>scenario_id</code> et <code>hotel_code</code>.
+</p>
+</section>
+
+<section id="main">
+<h2>15. Fonction principale d’orchestration</h2>
+<p>La fonction <code>main()</code> exécute le processus complet :</p>
+<ol>
+<li>ouvre la base DuckDB ;</li>
+<li>charge et fusionne les pipelines YAML ;</li>
+<li>construit les scénarios à partir des rankings ;</li>
+<li>écrit <code>data/scenarios.xlsx</code> ;</li>
+<li>rafraîchit <code>t_scenarios</code> ;</li>
+<li>vérifie la compatibilité du schéma de <code>t_dataset_pivot</code> ;</li>
+<li>compte les résultats déjà présents ;</li>
+<li>lance l’itération uniquement sur les scénarios manquants ;</li>
+<li>retourne le dataset final et les statistiques d’exécution.</li>
+</ol>
+<pre><code>simulation = main()
+
+display(simulation["scenarios"])
+display(simulation["result"])
+print(simulation["stats"])</code></pre>
+</section>
+
+<section id="logs">
+<h2>16. Suivi de progression</h2>
+<p>Avant le lancement, les logs indiquent :</p>
+<pre><code>Scenarios total : 1250 | deja calcules : 800 | a simuler : 450</code></pre>
+<p>Puis, pour chaque scénario :</p>
+<pre><code>Scenario 37/450 | id=4e51... | debut
+Scenario 37/450 | id=4e51... | duree=3.8s | ecoule=141.2s | reste_estime=1577.3s</code></pre>
+<p>L’estimation restante est calculée sur la durée moyenne observée depuis le début :</p>
+<div class="formula">
+Temps restant estimé = Durée moyenne par scénario × Nombre de scénarios restants
+</div>
+</section>
+
+<section id="idempotence">
+<h2>17. Idempotence et reprise après interruption</h2>
+<p>
+Le moteur ne vide plus systématiquement la table finale. À chaque lancement :
+</p>
+<ol>
+<li>la liste complète des scénarios est régénérée ;</li>
+<li>les hashes sont recalculés de façon déterministe ;</li>
+<li>les scénarios dont le hash existe déjà dans la table cible sont ignorés ;</li>
+<li>seuls les scénarios absents sont simulés.</li>
+</ol>
+<div class="success">
+Une interruption du notebook ne fait pas perdre le travail déjà réalisé. Le prochain
+lancement reprend automatiquement sur les scénarios non calculés.
+</div>
+</section>
+
+<section id="controles">
+<h2>18. Contrôles de cohérence recommandés</h2>
+<table>
+<thead><tr><th>Contrôle</th><th>Résultat attendu</th></tr></thead>
+<tbody>
+<tr><td>Unicité des propriétés hôtel</td><td>Une solution, un nombre de chambres, un taux d’occupation et une valeur guests/chambre par hôtel.</td></tr>
+<tr><td>Quantités source</td><td><code>QUANTITE &gt; 0</code> dans le jeu de modélisation.</td></tr>
+<tr><td>Scénario vide</td><td>Résultats identiques aux observations de référence.</td></tr>
+<tr><td>Liste canonique</td><td>Deux listes équivalentes donnent le même SHA-256.</td></tr>
+<tr><td>Suppression totale</td><td>Zéro vente, zéro CA et zéro marge pour l’hôtel concerné.</td></tr>
+<tr><td>Guests</td><td>Identiques pour tous les scénarios d’un même hôtel.</td></tr>
+<tr><td>Mix</td><td>Somme des parts d’une dimension égale à 1 lorsque des natures restent présentes.</td></tr>
+<tr><td>Reprise</td><td>Un second lancement sans nouveau scénario n’ajoute aucune ligne.</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="catalogue">
+<h2>19. Catalogue des objets du pipeline</h2>
+<table>
+<thead><tr><th>Objet</th><th>Type</th><th>Mode</th><th>Dépendances</th><th>Famille</th></tr></thead>
+<tbody>
+<tr><td><code>df_sales</code></td><td>dataframe</td><td>—</td><td>—</td><td>Source</td></tr>
+<tr><td><code>t_sales</code></td><td>table</td><td>create_if_not_exists</td><td>df_sales</td><td>Source</td></tr>
+<tr><td><code>t_hotel_codes</code></td><td>table</td><td>create_or_replace</td><td>t_sales</td><td>Référentiels</td></tr>
+<tr><td><code>t_machines</code></td><td>table</td><td>create_or_replace</td><td>t_sales</td><td>Référentiels</td></tr>
+<tr><td><code>t_types</code></td><td>table</td><td>create_or_replace</td><td>t_sales</td><td>Référentiels</td></tr>
+<tr><td><code>t_gammes</code></td><td>table</td><td>create_or_replace</td><td>t_sales</td><td>Référentiels</td></tr>
+<tr><td><code>t_categories</code></td><td>table</td><td>create_or_replace</td><td>t_sales</td><td>Référentiels</td></tr>
+<tr><td><code>t_natures</code></td><td>table</td><td>create_or_replace</td><td>t_sales</td><td>Référentiels</td></tr>
+<tr><td><code>t_marques</code></td><td>table</td><td>create_or_replace</td><td>t_sales</td><td>Référentiels</td></tr>
+<tr><td><code>t_fournisseurs</code></td><td>table</td><td>create_or_replace</td><td>t_sales</td><td>Référentiels</td></tr>
+<tr><td><code>t_rank_nature</code></td><td>table</td><td>create_or_replace</td><td>t_sales</td><td>Classements</td></tr>
+<tr><td><code>t_rank_nature_by_categorie</code></td><td>table</td><td>create_or_replace</td><td>t_sales</td><td>Classements</td></tr>
+<tr><td><code>t_rank_nature_by_marque</code></td><td>table</td><td>create_or_replace</td><td>t_sales</td><td>Classements</td></tr>
+<tr><td><code>t_rank_nature_by_fournisseur</code></td><td>table</td><td>create_or_replace</td><td>t_sales</td><td>Classements</td></tr>
+<tr><td><code>t_rank_nature_by_gamme</code></td><td>table</td><td>create_or_replace</td><td>t_sales</td><td>Classements</td></tr>
+<tr><td><code>t_rank_nature_by_type</code></td><td>table</td><td>create_or_replace</td><td>t_sales</td><td>Classements</td></tr>
+<tr><td><code>t_rank_categorie</code></td><td>table</td><td>create_or_replace</td><td>t_rank_nature_by_categorie</td><td>Classements</td></tr>
+<tr><td><code>t_rank_marque</code></td><td>table</td><td>create_or_replace</td><td>t_rank_nature_by_marque</td><td>Classements</td></tr>
+<tr><td><code>t_rank_fournisseur</code></td><td>table</td><td>create_or_replace</td><td>t_rank_nature_by_fournisseur</td><td>Classements</td></tr>
+<tr><td><code>t_rank_gamme</code></td><td>table</td><td>create_or_replace</td><td>t_rank_nature_by_gamme</td><td>Classements</td></tr>
+<tr><td><code>t_rank_type</code></td><td>table</td><td>create_or_replace</td><td>t_rank_nature_by_type</td><td>Classements</td></tr>
+<tr><td><code>v_dataset_ref</code></td><td>view</td><td>create_or_replace</td><td>t_sales</td><td>Dataset</td></tr>
+<tr><td><code>v_dataset_observation_context</code></td><td>view</td><td>create_or_replace</td><td>t_sales</td><td>Dataset</td></tr>
+<tr><td><code>v_dataset_observation_activity</code></td><td>view</td><td>create_or_replace</td><td>v_sales_current</td><td>Dataset</td></tr>
+<tr><td><code>v_dataset_observation_total</code></td><td>view</td><td>create_or_replace</td><td>v_dataset_observation_context, v_dataset_observation_activity</td><td>Dataset</td></tr>
+<tr><td><code>v_dataset_observation_par_mois</code></td><td>view</td><td>create_or_replace</td><td>v_dataset_observation_total</td><td>Dataset</td></tr>
+<tr><td><code>v_dataset_mix_nombre_global</code></td><td>view</td><td>create_or_replace</td><td>v_sales_current</td><td>Dataset</td></tr>
+<tr><td><code>v_dataset_mix_metric_names</code></td><td>view</td><td>create_or_replace</td><td>t_sales</td><td>Dataset</td></tr>
+<tr><td><code>v_dataset_mix_nombre_observed_long</code></td><td>view</td><td>create_or_replace</td><td>v_sales_current</td><td>Dataset</td></tr>
+<tr><td><code>v_dataset_mix_nombre_long</code></td><td>view</td><td>create_or_replace</td><td>t_hotel_codes, v_dataset_mix_metric_names, v_dataset_mix_nombre_observed_long</td><td>Dataset</td></tr>
+<tr><td><code>v_dataset_mix_nombre</code></td><td>view</td><td>create_or_replace</td><td>v_dataset_mix_nombre_global, t_dataset_mix_nombre_detail</td><td>Dataset</td></tr>
+<tr><td><code>v_dataset_mix_pourcentage_long</code></td><td>view</td><td>create_or_replace</td><td>v_dataset_mix_nombre_long, v_dataset_mix_nombre_global</td><td>Dataset</td></tr>
+<tr><td><code>v_dataset_mix_pourcentage</code></td><td>view</td><td>create_or_replace</td><td>v_dataset_mix_nombre_global, t_dataset_mix_pourcentage_detail</td><td>Dataset</td></tr>
+<tr><td><code>v_dataset_pivot</code></td><td>view</td><td>create_or_replace</td><td>v_dataset_ref, v_dataset_observation_par_mois, v_dataset_mix_nombre, v_dataset_mix_pourcentage</td><td>Dataset</td></tr>
+<tr><td><code>t_dataset_pivot</code></td><td>table</td><td>create_if_not_exists</td><td>v_dataset_pivot</td><td>Dataset</td></tr>
+<tr><td><code>x_insert_dataset_pivot</code></td><td>execute</td><td>—</td><td>t_dataset_pivot, v_dataset_pivot</td><td>Dataset</td></tr>
+<tr><td><code>t_dataset_mix_nombre_detail</code></td><td>table</td><td>create_or_replace</td><td>v_dataset_mix_nombre_long</td><td>Dataset</td></tr>
+<tr><td><code>t_dataset_mix_pourcentage_detail</code></td><td>table</td><td>create_or_replace</td><td>v_dataset_mix_pourcentage_long</td><td>Dataset</td></tr>
+<tr><td><code>df_scenarios</code></td><td>dataframe</td><td>—</td><td>—</td><td>Simulation</td></tr>
+<tr><td><code>t_scenarios</code></td><td>table</td><td>create_if_not_exists</td><td>df_scenarios</td><td>Simulation</td></tr>
+<tr><td><code>v_scenario_step</code></td><td>view</td><td>create_if_not_exists</td><td>t_scenarios</td><td>Simulation</td></tr>
+<tr><td><code>v_scenario_removed_natures</code></td><td>view</td><td>create_or_replace</td><td>v_scenario_step</td><td>Simulation</td></tr>
+<tr><td><code>v_sales_hotel_baseline</code></td><td>view</td><td>create_or_replace</td><td>t_sales</td><td>Simulation</td></tr>
+<tr><td><code>v_sales_nature_baseline</code></td><td>view</td><td>create_or_replace</td><td>t_sales, v_sales_hotel_baseline</td><td>Simulation</td></tr>
+<tr><td><code>v_sales_removed</code></td><td>view</td><td>create_or_replace</td><td>t_sales, v_scenario_removed_natures</td><td>Simulation</td></tr>
+<tr><td><code>v_sales_removed_hotel</code></td><td>view</td><td>create_or_replace</td><td>v_sales_removed, v_sales_hotel_baseline</td><td>Simulation</td></tr>
+<tr><td><code>v_sales_filtered</code></td><td>view</td><td>create_or_replace</td><td>t_sales, v_scenario_removed_natures</td><td>Simulation</td></tr>
+<tr><td><code>v_sales_current</code></td><td>view</td><td>create_or_replace</td><td>v_sales_filtered, v_sales_hotel_baseline, v_sales_nature_baseline, v_sales_removed_hotel</td><td>Simulation</td></tr>
+<tr><td><code>i_iteration_scenario</code></td><td>iteration</td><td>—</td><td>t_scenarios</td><td>Simulation</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="exemple">
+<h2>20. Exemple numérique complet</h2>
+<p>Supposons un hôtel avec :</p>
+<ul>
+<li>1 000 guests sur la période ;</li>
+<li>200 ventes observées ;</li>
+<li>20 ventes portées par les natures retirées ;</li>
+<li>une part pilote totale de 10 % pour les natures retirées.</li>
+</ul>
+<h3>Étape 1 — taux de conversion</h3>
+<div class="formula">200 / 1 000 = 20 %</div>
+<h3>Étape 2 — ventes potentielles récupérées</h3>
+<div class="formula">20 × 20 % = 4 ventes potentielles</div>
+<h3>Étape 3 — application des préférences</h3>
+<p>
+Les parts pilotes sont appliquées sans renormalisation. Les natures restantes
+reçoivent 90 % de ces 4 ventes :
+</p>
+<div class="formula">4 × 90 % = 3,6 ventes redistribuées</div>
+<p>La part correspondant aux natures retirées est perdue :</p>
+<div class="formula">4 × 10 % = 0,4 vente perdue</div>
+<h3>Étape 4 — total final</h3>
+<div class="formula">200 − 20 + 3,6 = 183,6 ventes</div>
+<p>
+Les quantités, montants et marges des lignes restantes sont ensuite recalculés
+proportionnellement, puis agrégés et mensualisés.
+</p>
+</section>
+</main>
+</div>
+
+<footer>
+Document de référence du moteur de simulation des assortiments de corners hôteliers.
+</footer>
+</body>
+</html>

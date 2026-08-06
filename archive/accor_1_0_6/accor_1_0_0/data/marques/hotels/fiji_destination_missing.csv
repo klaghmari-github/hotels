@@ -1,0 +1,3 @@
+hotel_code_accor,hotel_code_norm,hotel_name,hotel_brand_code,hotel_brand,hotel_city,hotel_country,hotel_adresse,hotel_code_postal,url_hotel,source,source_query,hotel_name_norm,city_norm,country_slug,country_label,region,match_type
+C5Z3,C5Z3,The Sebel Nuku Loaloa,SEB,SEBEL,NADI,Fidji,"Cnr Nadi Bay Rd Wailoaloa Rd, Nadi, Fiji",679,https://all.accor.com/hotel/C5Z3/index.fr.shtml,catalog_api,fiji,THE SEBEL NUKU LOALOA,NADI,fiji,Fidji,oceania,missing
+C5Z4,C5Z4,Tribe Na Tomba,TRI,TRIBE,NADI,Fidji,"Denarau Island, Nadi, Fiji",679,https://all.accor.com/hotel/C5Z4/index.fr.shtml,catalog_api,fiji,TRIBE NA TOMBA,NADI,fiji,Fidji,oceania,missing

@@ -1,0 +1,20 @@
+{
+  "ok": true,
+  "slug": "algeria",
+  "label": "Algérie",
+  "query": "algeria",
+  "dest_url": "https://all.accor.com/a/fr/destination/country/hotels-algeria-pdz.html",
+  "n_catalog_api": 9,
+  "n_destination_html": 0,
+  "n_merged": 9,
+  "n_existing_scraped": 3486,
+  "n_matched": 8,
+  "n_missing": 1,
+  "all_xlsx": "/media/laghmari/ssd-data/dev/hotels/accord/data/marques/hotels/algeria_destination_all.xlsx",
+  "missing_xlsx": "/media/laghmari/ssd-data/dev/hotels/accord/data/marques/hotels/algeria_destination_missing.xlsx",
+  "missing_csv": "/media/laghmari/ssd-data/dev/hotels/accord/data/marques/hotels/algeria_destination_missing.csv",
+  "matched_xlsx": "/media/laghmari/ssd-data/dev/hotels/accord/data/marques/hotels/algeria_destination_matched.xlsx",
+  "sample_missing_codes": [
+    "B8L9"
+  ]
+}

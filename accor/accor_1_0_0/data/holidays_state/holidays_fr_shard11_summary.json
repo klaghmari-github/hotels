@@ -1,9 +1,0 @@
-{
-  "ok": true,
-  "shard_id": 11,
-  "path": "/media/laghmari/ssd-data/dev/hotels/accord/data/holidays_shards/holidays_fr_shard11.xlsx",
-  "n_rows": 5964,
-  "n_hotels": 142,
-  "elapsed_s": 8.5,
-  "resumed": false
-}

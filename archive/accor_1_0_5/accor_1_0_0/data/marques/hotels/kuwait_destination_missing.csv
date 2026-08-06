@@ -1,0 +1,2 @@
+hotel_code_accor,hotel_code_norm,hotel_name,hotel_brand_code,hotel_brand,hotel_city,hotel_country,hotel_adresse,hotel_code_postal,url_hotel,source,source_query,hotel_name_norm,city_norm,country_slug,country_label,region,match_type
+B4Q6,B4Q6,Mövenpick Kuwait Al Bidaa,MOV,MÖVENPICK,KOWEÏT,Koweït,"Salmiya 22084, Al Ta'awen Street, Po Box 7306",13008,https://all.accor.com/hotel/B4Q6/index.fr.shtml,catalog_api,kuwait,MOVENPICK KUWAIT AL BIDAA,KOWEIT,kuwait,Koweït,africa_me,missing

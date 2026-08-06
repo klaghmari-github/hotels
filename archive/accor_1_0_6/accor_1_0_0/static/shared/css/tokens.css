@@ -1,0 +1,15 @@
+/*
+ * Tokens design partages Accor (admin sombre / user clair).
+ * Chaque app garde ses variables de theme ; ce fichier documente
+ * les constantes communes (fonts, accent or, rayons).
+ */
+
+:root {
+  --accor-font: "DM Sans", system-ui, sans-serif;
+  --accor-serif: "Instrument Serif", Georgia, serif;
+  --accor-gold: #c9a227;
+  --accor-gold-hover: #dbb43a;
+  --accor-primary: #3d7eff;
+  --accor-radius: 14px;
+  --accor-radius-sm: 8px;
+}

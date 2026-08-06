@@ -1,3 +1,0 @@
-hotel_code_accor,hotel_code_norm,hotel_name,hotel_brand_code,hotel_brand,hotel_city,hotel_country,hotel_adresse,hotel_code_postal,url_hotel,source,source_query,hotel_name_norm,city_norm,country_slug,country_label,region,match_type
-B824,B824,Raffles at Galaxy Macau,RAF,RAFFLES,MACAO,"Macao, Chine","Galaxy Macau Estrada Da Baia, Da Nossa Senhora, Da Esperance Cotai",0,https://all.accor.com/hotel/B824/index.fr.shtml,catalog_api,macau,RAFFLES AT GALAXY MACAU,MACAO,macau,Macao,asia,missing
-B1U0,B1U0,Banyan Tree Macau,BAN,BANYAN TREE,MACAO,"Macao, Chine","Avenida Marginal Flor de Lotus, Cotai, Macau, China",0,https://all.accor.com/hotel/B1U0/index.fr.shtml,catalog_api,macau,BANYAN TREE MACAU,MACAO,macau,Macao,asia,missing

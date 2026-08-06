@@ -1,0 +1,443 @@
+
+
+
+
+v_sales:
+  type: view
+  requires:
+    - t_sales
+  sql: |
+    SELECT
+        *
+    FROM
+        t_sales
+
+v_sales_model:
+  type: view
+  requires:
+    - v_sales
+  sql: |
+    SELECT
+        *
+    FROM
+        v_sales
+    WHERE
+        (YEAR(DATE) < (SELECT YEAR(MAX(DATE)) FROM v_sales))
+        AND (STATUT = 'DONE')
+        AND (QUANTITE > 0)
+        AND (TYPE IS NOT NULL)
+        AND (GAMME IS NOT NULL)
+        AND (NOM_PRODUIT IS NOT NULL)
+
+t_sales_model:
+  type: table
+  requires:
+    - v_sales_model
+  sql: |
+    SELECT
+        *
+    FROM
+        v_sales_model    
+
+v_refs:
+  type: view
+  requires:
+    - v_sales_model
+  sql: |
+    SELECT DISTINCT
+        HOTEL_CODE AS hotel_code,
+        NOM_BOUTIQUE AS hotel_name,
+        SOLUTION AS solution,
+        METRES_LINEAIRES AS metres_lineaires
+    FROM
+        v_sales_model
+    ORDER BY
+        hotel_code,
+        hotel_name,
+        solution,
+        metres_lineaires
+
+v_nombre_mois:
+  type: view
+  requires:
+    - v_sales_model
+  sql: |
+    SELECT
+        HOTEL_CODE AS hotel_code,
+        DATE_DIFF('month', MIN(DATE), MAX(DATE)) + 1 AS nombre_mois
+    FROM
+        v_sales_model
+    GROUP BY
+        HOTEL_CODE
+    ORDER BY
+        hotel_code
+
+v_produits:
+  type: view
+  requires:
+    - v_sales_model
+  sql: |
+    SELECT DISTINCT
+        HOTEL_CODE AS hotel_code,
+        NOM_PRODUIT AS produit
+    FROM
+        v_sales_model
+    ORDER BY
+        hotel_code,
+        produit
+
+v_gammes:
+  type: view
+  requires:
+    - v_sales_model
+  sql: |
+    SELECT DISTINCT
+        HOTEL_CODE AS hotel_code,
+        GAMME AS gamme
+    FROM
+        v_sales_model
+    ORDER BY
+        hotel_code,
+        gamme
+
+v_types:
+  type: view
+  requires:
+    - v_sales_model
+  sql: |
+    SELECT DISTINCT
+        HOTEL_CODE AS hotel_code,
+        TYPE AS type
+    FROM
+        v_sales_model
+    ORDER BY
+        hotel_code,
+        type
+
+v_produit_ventes:
+  type: view
+  requires:
+    - v_sales_model
+  sql: |
+    SELECT
+        HOTEL_CODE AS hotel_code,
+        TYPE AS type,
+        GAMME AS gamme,
+        NOM_PRODUIT AS produit,
+        SUM(QUANTITE) AS produit_nombre_ventes,
+        SUM(PRIX_TTC) AS produit_montant_ventes,
+        SUM(PRIX_TTC_MARCHE) AS produit_montant_achats,
+        SUM(MARGE) AS produit_montant_marge,
+        SUM(PRIX_TTC) / SUM(QUANTITE) AS produit_montant_par_vente,
+        SUM(PRIX_TTC_MARCHE) / SUM(QUANTITE) AS produit_montant_achats_par_vente,
+        SUM(MARGE) / SUM(QUANTITE) AS produit_montant_marge_par_vente
+    FROM
+        v_sales_model
+    GROUP BY
+        HOTEL_CODE,
+        TYPE,
+        GAMME,
+        NOM_PRODUIT
+    ORDER BY
+        hotel_code,
+        type,
+        gamme,
+        produit
+
+v_produit_ventes_mois:
+  type: view
+  requires:
+    - v_produit_ventes
+    - v_nombre_mois
+  sql: |
+    SELECT
+        v_produit_ventes.*,
+        nombre_mois,
+        produit_nombre_ventes / nombre_mois AS produit_nombre_ventes_par_mois,
+        produit_montant_ventes / nombre_mois AS produit_montant_ventes_par_mois,
+        produit_montant_achats / nombre_mois AS produit_montant_achats_par_mois,
+        produit_montant_marge / nombre_mois AS produit_montant_marge_par_mois
+    FROM
+        v_produit_ventes
+    LEFT JOIN
+        v_nombre_mois
+    ON
+        v_produit_ventes.hotel_code = v_nombre_mois.hotel_code
+
+v_gamme_ventes:
+  type: view
+  requires:
+    - v_sales_model
+  sql: |
+    SELECT
+        HOTEL_CODE AS hotel_code,
+        TYPE AS type,
+        GAMME AS gamme,
+        SUM(QUANTITE) AS gamme_nombre_ventes,
+        COUNT(DISTINCT NOM_PRODUIT) AS gamme_nombre_produits,
+        SUM(PRIX_TTC) AS gamme_montant_ventes,
+        SUM(PRIX_TTC_MARCHE) AS gamme_montant_achats,
+        SUM(MARGE) AS gamme_montant_marge,
+        SUM(PRIX_TTC) / SUM(QUANTITE) AS gamme_montant_par_vente,
+        SUM(PRIX_TTC_MARCHE) / SUM(QUANTITE) AS gamme_montant_achats_par_vente,
+        SUM(MARGE) / SUM(QUANTITE) AS gamme_montant_marge_par_vente,
+        SUM(QUANTITE) / COUNT(DISTINCT NOM_PRODUIT) AS gamme_nombre_ventes_par_produit,
+        SUM(PRIX_TTC) / COUNT(DISTINCT NOM_PRODUIT) AS gamme_montant_ventes_par_produit,
+        SUM(PRIX_TTC_MARCHE) / COUNT(DISTINCT NOM_PRODUIT) AS gamme_montant_achats_par_produit,
+        SUM(MARGE) / COUNT(DISTINCT NOM_PRODUIT) AS gamme_montant_marge_par_produit
+    FROM
+        v_sales_model
+    GROUP BY
+        HOTEL_CODE,
+        TYPE,
+        GAMME
+    ORDER BY
+        hotel_code,
+        type,
+        gamme
+
+v_gamme_ventes_mois:
+  type: view
+  requires:
+    - v_gamme_ventes
+    - v_nombre_mois
+  sql: |
+    SELECT
+        v_gamme_ventes.*,
+        nombre_mois,
+        gamme_nombre_ventes / nombre_mois AS gamme_nombre_ventes_par_mois,
+        gamme_montant_ventes / nombre_mois AS gamme_montant_ventes_par_mois,
+        gamme_montant_achats / nombre_mois AS gamme_montant_achats_par_mois,
+        gamme_montant_marge / nombre_mois AS gamme_montant_marge_par_mois
+    FROM
+        v_gamme_ventes
+    LEFT JOIN
+        v_nombre_mois
+    ON
+        v_gamme_ventes.hotel_code = v_nombre_mois.hotel_code
+
+v_type_ventes:
+  type: view
+  requires:
+    - v_sales_model
+  sql: |
+    SELECT
+        HOTEL_CODE AS hotel_code,
+        TYPE AS type,
+        SUM(QUANTITE) AS type_nombre_ventes,
+        COUNT(DISTINCT NOM_PRODUIT) AS type_nombre_produits,
+        COUNT(DISTINCT GAMME) AS type_nombre_gammes,
+        SUM(PRIX_TTC) AS type_montant_ventes,
+        SUM(PRIX_TTC_MARCHE) AS type_montant_achats,
+        SUM(MARGE) AS type_montant_marge,
+        SUM(PRIX_TTC) / SUM(QUANTITE) AS type_montant_par_vente,
+        SUM(PRIX_TTC_MARCHE) / SUM(QUANTITE) AS type_montant_achats_par_vente,
+        SUM(MARGE) / SUM(QUANTITE) AS type_montant_marge_par_vente,
+        SUM(QUANTITE) / COUNT(DISTINCT NOM_PRODUIT) AS type_nombre_ventes_par_produit,
+        SUM(PRIX_TTC) / COUNT(DISTINCT NOM_PRODUIT) AS type_montant_ventes_par_produit,
+        SUM(PRIX_TTC_MARCHE) / COUNT(DISTINCT NOM_PRODUIT) AS type_montant_achats_par_produit,
+        SUM(MARGE) / COUNT(DISTINCT NOM_PRODUIT) AS type_montant_marge_par_produit,
+        SUM(QUANTITE) / COUNT(DISTINCT GAMME) AS type_nombre_ventes_par_gamme,
+        SUM(PRIX_TTC) / COUNT(DISTINCT GAMME) AS type_montant_ventes_par_gamme,
+        SUM(PRIX_TTC_MARCHE) / COUNT(DISTINCT GAMME) AS type_montant_achats_par_gamme,
+        SUM(MARGE) / COUNT(DISTINCT GAMME) AS type_montant_marge_par_gamme
+    FROM
+        v_sales_model
+    GROUP BY
+        HOTEL_CODE,
+        TYPE
+    ORDER BY
+        hotel_code,
+        type
+
+v_type_ventes_mois:
+  type: view
+  requires:
+    - v_type_ventes
+    - v_nombre_mois
+  sql: |
+    SELECT
+        v_type_ventes.*,
+        nombre_mois,
+        type_nombre_ventes / nombre_mois AS type_nombre_ventes_par_mois,
+        type_montant_ventes / nombre_mois AS type_montant_ventes_par_mois,
+        type_montant_achats / nombre_mois AS type_montant_achats_par_mois,
+        type_montant_marge / nombre_mois AS type_montant_marge_par_mois
+    FROM
+        v_type_ventes
+    LEFT JOIN
+        v_nombre_mois
+    ON
+        v_type_ventes.hotel_code = v_nombre_mois.hotel_code
+
+v_ventes:
+  type: view
+  requires:
+    - v_sales_model
+  sql: |
+    SELECT
+        HOTEL_CODE AS hotel_code,
+        SUM(QUANTITE) AS nombre_ventes,
+        COUNT(DISTINCT NOM_PRODUIT) AS nombre_produits,
+        COUNT(DISTINCT GAMME) AS nombre_gammes,
+        COUNT(DISTINCT TYPE) AS nombre_types,
+        SUM(PRIX_TTC) AS montant_ventes,
+        SUM(PRIX_TTC_MARCHE) AS montant_achats,
+        SUM(MARGE) AS montant_marge,
+        SUM(PRIX_TTC) / SUM(QUANTITE) AS montant_par_vente,
+        SUM(PRIX_TTC_MARCHE) / SUM(QUANTITE) AS montant_achat_par_vente,
+        SUM(MARGE) / SUM(QUANTITE) AS montant_marge_par_vente,
+        SUM(QUANTITE) / COUNT(DISTINCT NOM_PRODUIT) AS nombre_ventes_par_produit,
+        SUM(PRIX_TTC) / COUNT(DISTINCT NOM_PRODUIT) AS montant_ventes_par_produit,
+        SUM(PRIX_TTC_MARCHE) / COUNT(DISTINCT NOM_PRODUIT) AS montant_achats_par_produit,
+        SUM(MARGE) / COUNT(DISTINCT NOM_PRODUIT) AS montant_marge_par_produit,
+        SUM(QUANTITE) / COUNT(DISTINCT GAMME) AS nombre_ventes_par_gamme,
+        SUM(PRIX_TTC) / COUNT(DISTINCT GAMME) AS montant_ventes_par_gamme,
+        SUM(PRIX_TTC_MARCHE) / COUNT(DISTINCT GAMME) AS montant_achats_par_gamme,
+        SUM(MARGE) / COUNT(DISTINCT GAMME) AS montant_marge_par_gamme,
+        SUM(QUANTITE) / COUNT(DISTINCT TYPE) AS nombre_ventes_par_type,
+        SUM(PRIX_TTC) / COUNT(DISTINCT TYPE) AS montant_ventes_par_type,
+        SUM(PRIX_TTC_MARCHE) / COUNT(DISTINCT TYPE) AS montant_achats_par_type,
+        SUM(MARGE) / COUNT(DISTINCT TYPE) AS montant_marge_par_type,
+        METRES_LINEAIRES / COUNT(DISTINCT NOM_PRODUIT) AS nombre_metres_lineaires_par_produit,
+        COUNT(DISTINCT NOM_PRODUIT) / METRES_LINEAIRES AS nombre_produits_par_metre_lineaire,
+        SUM(QUANTITE) / METRES_LINEAIRES AS nombre_ventes_par_metre_lineaire,
+        SUM(PRIX_TTC) / METRES_LINEAIRES AS montant_ventes_par_metre_lineaire,
+        SUM(PRIX_TTC_MARCHE) / METRES_LINEAIRES AS montant_achats_par_metre_lineaire,
+        SUM(MARGE) / METRES_LINEAIRES AS montant_marge_par_metre_lineaire,
+        1 / COUNT(DISTINCT NOM_PRODUIT) AS produit_part_des_produits
+    FROM
+        v_sales_model
+    GROUP BY
+        HOTEL_CODE,
+        METRES_LINEAIRES
+    ORDER BY
+        hotel_code
+
+v_ventes_mois:
+  type: view
+  requires:
+    - v_ventes
+    - v_nombre_mois
+  sql: |
+    SELECT
+        v_ventes.*,
+        nombre_mois,
+        nombre_ventes / nombre_mois AS nombre_ventes_par_mois,
+        montant_ventes / nombre_mois AS montant_ventes_par_mois,
+        montant_achats / nombre_mois AS montant_achats_par_mois,
+        montant_marge / nombre_mois AS montant_marge_par_mois
+    FROM
+        v_ventes
+    LEFT JOIN
+        v_nombre_mois
+    ON
+        v_ventes.hotel_code = v_nombre_mois.hotel_code
+
+v_sales_model_base:
+  type: view
+  requires:
+    - v_refs
+    - v_produit_ventes_mois
+    - v_gamme_ventes_mois
+    - v_type_ventes_mois
+    - v_ventes_mois
+  sql: |
+    SELECT
+        *,
+        gamme_nombre_produits / nombre_produits AS gamme_part_des_produits,
+        type_nombre_produits / nombre_produits AS type_part_des_produits,
+        produit_nombre_ventes / nombre_ventes AS produit_part_nombre_ventes,
+        produit_montant_ventes / montant_ventes AS produit_part_montant_ventes,
+        produit_montant_achats / montant_achats AS produit_part_montant_achats,
+        produit_montant_marge / montant_marge AS produit_part_montant_marge,
+        gamme_nombre_ventes / nombre_ventes AS gamme_part_nombre_ventes,
+        gamme_montant_ventes / montant_ventes AS gamme_part_montant_ventes,
+        gamme_montant_achats / montant_achats AS gamme_part_montant_achats,
+        gamme_montant_marge / montant_marge AS gamme_part_montant_marge,
+        type_nombre_ventes / nombre_ventes AS type_part_nombre_ventes,
+        type_montant_ventes / montant_ventes AS type_part_montant_ventes,
+        type_montant_achats / montant_achats AS type_part_montant_achats,
+        type_montant_marge / montant_marge AS type_part_montant_marge,
+        -- Part m_lin produit sur assortiment de base (égalitaire 1/N).
+        -- Figée ensuite en sim : ne pas re-répartir après retrait de produits.
+        produit_part_des_produits AS produit_part_metres_lineaires,
+        metres_lineaires * produit_part_des_produits AS produit_metres_lineaires
+    FROM
+        v_refs
+    INNER JOIN
+        v_produit_ventes_mois
+    USING
+        (hotel_code)
+    INNER JOIN
+        v_gamme_ventes_mois
+    USING
+        (hotel_code, nombre_mois, type, gamme)
+    INNER JOIN
+        v_type_ventes_mois
+    USING
+        (hotel_code, nombre_mois, type)
+    INNER JOIN
+        v_ventes_mois
+    USING
+        (hotel_code, nombre_mois)
+
+t_sales_model_base:
+  type: table
+  requires:
+    - v_sales_model_base
+  sql: |
+    SELECT
+        *
+    FROM
+        v_sales_model_base
+
+
+t_produits_ordered:
+  type: table
+  requires:
+    - t_sales_model_base
+  sql: |
+    SELECT DISTINCT
+        hotel_code,
+        produit,
+        produit_montant_marge
+    FROM
+        t_sales_model_base
+    ORDER BY
+        hotel_code,
+        produit_montant_marge,
+        produit
+
+
+t_gamme_ordered:
+  type: table
+  requires:
+    - t_sales_model_base
+  sql: |
+    SELECT DISTINCT
+        hotel_code,
+        gamme,
+        gamme_montant_marge
+    FROM
+        t_sales_model_base
+    ORDER BY
+        hotel_code,
+        gamme_montant_marge,
+        gamme
+
+t_types_ordered:
+  type: table
+  requires:
+    - t_sales_model_base
+  sql: |
+    SELECT DISTINCT
+        hotel_code,
+        type,
+        type_montant_marge
+    FROM
+        t_sales_model_base
+    ORDER BY
+        hotel_code,
+        type_montant_marge,
+        type

@@ -1,2 +1,0 @@
-hotel_code_accor,hotel_code_norm,hotel_name,hotel_brand_code,hotel_brand,hotel_city,hotel_country,hotel_adresse,hotel_code_postal,url_hotel,source,source_query,hotel_name_norm,city_norm,country_slug,country_label,region,match_type
-B1D8,B1D8,Novotel Ulaanbaatar,NOV,NOVOTEL,ULAANBAATAR,Mongolie,"Baga toiruu 6th khoroo, Sukhbaatar District",14201,https://all.accor.com/hotel/B1D8/index.fr.shtml,catalog_api,mongolia,NOVOTEL ULAANBAATAR,ULAANBAATAR,mongolia,Mongolie,asia,missing

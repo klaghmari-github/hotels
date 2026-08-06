@@ -1,0 +1,79 @@
+t_hotel_codes:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - t_sales
+  sql: |
+    SELECT DISTINCT HOTEL_CODE
+    FROM t_sales
+    ORDER BY HOTEL_CODE
+t_machines:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - t_sales
+  sql: |
+    SELECT DISTINCT MACHINE
+    FROM t_sales
+    WHERE MACHINE IS NOT NULL
+    ORDER BY MACHINE
+t_types:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - t_sales
+  sql: |
+    SELECT DISTINCT TYPE
+    FROM t_sales
+    WHERE TYPE IS NOT NULL
+    ORDER BY TYPE
+t_gammes:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - t_sales
+  sql: |
+    SELECT DISTINCT GAMME
+    FROM t_sales
+    WHERE GAMME IS NOT NULL
+    ORDER BY GAMME
+t_categories:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - t_sales
+  sql: |
+    SELECT DISTINCT CATEGORIE
+    FROM t_sales
+    WHERE CATEGORIE IS NOT NULL
+    ORDER BY CATEGORIE
+t_natures:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - t_sales
+  sql: |
+    SELECT DISTINCT NATURE_PRODUIT AS NATURE
+    FROM t_sales
+    WHERE NATURE_PRODUIT IS NOT NULL
+    ORDER BY NATURE
+t_marques:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - t_sales
+  sql: |
+    SELECT DISTINCT MARQUE
+    FROM t_sales
+    WHERE MARQUE IS NOT NULL
+    ORDER BY MARQUE
+t_fournisseurs:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - t_sales
+  sql: |
+    SELECT DISTINCT FOURNISSEUR
+    FROM t_sales
+    WHERE FOURNISSEUR IS NOT NULL
+    ORDER BY FOURNISSEUR

@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "shard_id": 7,
+  "path": "/media/laghmari/ssd-data/dev/hotels/accord/data/weather_shards/weather_fr_shard07.xlsx",
+  "n_rows": 6132,
+  "n_hotels": 146,
+  "n_ok": 140,
+  "n_err": 6,
+  "expected_rows_hint": 6132,
+  "elapsed_s": 176.5
+}

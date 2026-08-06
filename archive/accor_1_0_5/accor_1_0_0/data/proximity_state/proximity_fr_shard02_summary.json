@@ -1,0 +1,10 @@
+{
+  "ok": true,
+  "shard_id": 2,
+  "path": "/media/laghmari/ssd-data/dev/hotels/accord/data/proximity_shards/proximity_fr_shard02.xlsx",
+  "n_rows": 144,
+  "n_ok": 144,
+  "n_err": 0,
+  "elapsed_s": 183.6,
+  "endpoint": "https://overpass-api.de/api/interpreter"
+}

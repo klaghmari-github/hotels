@@ -1,0 +1,749 @@
+hotel_code_accor,hotel_code_norm,hotel_name,hotel_brand_code,hotel_brand,hotel_city,hotel_country,url_hotel,source_query,hotel_name_norm,city_norm,match_type
+0785,785,Novotel Paris Les Halles,NOV,NOVOTEL,PARIS,France,https://all.accor.com/hotel/0785/index.fr.shtml,france,NOVOTEL PARIS LES HALLES,PARIS,missing
+A7L5,A7L5,SO/ Paris Hotel,SO,SO/,PARIS,France,https://all.accor.com/hotel/A7L5/index.fr.shtml,france,SO PARIS HOTEL,PARIS,missing
+A013,A013,ibis Paris Avenue de la République,IBH,IBIS,PARIS,France,https://all.accor.com/hotel/A013/index.fr.shtml,france,IBIS PARIS AVENUE DE LA REPUBLIQUE,PARIS,missing
+0751,751,ibis Styles Paris République Le Marais,IBS,IBIS STYLES,PARIS,France,https://all.accor.com/hotel/0751/index.fr.shtml,france,IBIS STYLES PARIS REPUBLIQUE LE MARAIS,PARIS,missing
+B625,B625,Ibis Styles Paris Gare De Lyon Bastille,IBS,IBIS STYLES,PARIS,France,https://all.accor.com/hotel/B625/index.fr.shtml,france,IBIS STYLES PARIS GARE DE LYON BASTILLE,PARIS,missing
+B6F9,B6F9,Mercure Paris Gare de Lyon Opéra Bastille,MER,MERCURE,PARIS,France,https://all.accor.com/hotel/B6F9/index.fr.shtml,france,MERCURE PARIS GARE DE LYON OPERA BASTILLE,PARIS,missing
+B8G7,B8G7,Ibis Styles Paris Opéra Lafayette,IBS,IBIS STYLES,PARIS,France,https://all.accor.com/hotel/B8G7/index.fr.shtml,france,IBIS STYLES PARIS OPERA LAFAYETTE,PARIS,missing
+B8G5,B8G5,Mercure Paris Opéra Lafayette,MER,MERCURE,PARIS,France,https://all.accor.com/hotel/B8G5/index.fr.shtml,france,MERCURE PARIS OPERA LAFAYETTE,PARIS,missing
+0981,981,Hôtel Mercure Paris Opéra Faubourg Montmartre,MER,MERCURE,PARIS,France,https://all.accor.com/hotel/0981/index.fr.shtml,france,HOTEL MERCURE PARIS OPERA FAUBOURG MONTMARTRE,PARIS,missing
+B6W6,B6W6,ibis Styles Paris Gare de Lyon TGV,IBS,IBIS STYLES,PARIS,France,https://all.accor.com/hotel/B6W6/index.fr.shtml,france,IBIS STYLES PARIS GARE DE LYON TGV,PARIS,missing
+B5D8,B5D8,ibis Styles Paris Gare de l'Est Magenta,IBS,IBIS STYLES,PARIS,France,https://all.accor.com/hotel/B5D8/index.fr.shtml,france,IBIS STYLES PARIS GARE DE L EST MAGENTA,PARIS,missing
+A9V3,A9V3,ibis Paris Gare de L'Est 10ème,IBH,IBIS,PARIS,France,https://all.accor.com/hotel/A9V3/index.fr.shtml,france,IBIS PARIS GARE DE L EST 10EME,PARIS,missing
+0663,663,Sofitel Le Scribe Paris Opéra,SOF,SOFITEL,PARIS,France,https://all.accor.com/hotel/0663/index.fr.shtml,france,SOFITEL LE SCRIBE PARIS OPERA,PARIS,missing
+0351,351,Hôtel Mercure Paris Montparnasse Raspail,MER,MERCURE,PARIS,France,https://all.accor.com/hotel/0351/index.fr.shtml,france,HOTEL MERCURE PARIS MONTPARNASSE RASPAIL,PARIS,missing
+A064,A064,Boutet Bastille Hotel Paris - MGallery Collection,MGA,MGALLERY,PARIS,France,https://all.accor.com/hotel/A064/index.fr.shtml,france,BOUTET BASTILLE HOTEL PARIS MGALLERY COLLECTION,PARIS,missing
+0863,863,ibis Paris Gare du Nord La Fayette 10ème,IBH,IBIS,PARIS,France,https://all.accor.com/hotel/0863/index.fr.shtml,france,IBIS PARIS GARE DU NORD LA FAYETTE 10EME,PARIS,missing
+B4F3,B4F3,Novotel Paris 20 Belleville,NOV,NOVOTEL,PARIS,France,https://all.accor.com/hotel/B4F3/index.fr.shtml,france,NOVOTEL PARIS 20 BELLEVILLE,PARIS,missing
+B385,B385,25hours Hotel Paris Terminus Nord,TWF,25HOURS,PARIS,France,https://all.accor.com/hotel/B385/index.fr.shtml,france,25HOURS HOTEL PARIS TERMINUS NORD,PARIS,missing
+0934,934,Hôtel Mercure Paris Bercy Bibliothèque,MER,MERCURE,PARIS,France,https://all.accor.com/hotel/0934/index.fr.shtml,france,HOTEL MERCURE PARIS BERCY BIBLIOTHEQUE,PARIS,missing
+B8R1,B8R1,Maison Delano Paris,DEL,DELANO,PARIS,France,https://all.accor.com/hotel/B8R1/index.fr.shtml,france,MAISON DELANO PARIS,PARIS,missing
+0900,900,ibis Paris Canal Saint-Martin,IBH,IBIS,PARIS,France,https://all.accor.com/hotel/0900/index.fr.shtml,france,IBIS PARIS CANAL SAINT MARTIN,PARIS,missing
+0905,905,Mercure Paris Centre Gare Montparnasse,MER,MERCURE,PARIS,France,https://all.accor.com/hotel/0905/index.fr.shtml,france,MERCURE PARIS CENTRE GARE MONTPARNASSE,PARIS,missing
+0935,935,Novotel Paris Centre Bercy,NOV,NOVOTEL,PARIS,France,https://all.accor.com/hotel/0935/index.fr.shtml,france,NOVOTEL PARIS CENTRE BERCY,PARIS,missing
+0941,941,ibis Styles Paris Bercy,IBS,IBIS STYLES,PARIS,France,https://all.accor.com/hotel/0941/index.fr.shtml,france,IBIS STYLES PARIS BERCY,PARIS,missing
+1191,1191,Hôtel Mercure Paris Place d'Italie,MER,MERCURE,PARIS,France,https://all.accor.com/hotel/1191/index.fr.shtml,france,HOTEL MERCURE PARIS PLACE D ITALIE,PARIS,missing
+0694,694,Mercure Paris Butte Montmartre Basilique,MER,MERCURE,PARIS,France,https://all.accor.com/hotel/0694/index.fr.shtml,france,MERCURE PARIS BUTTE MONTMARTRE BASILIQUE,PARIS,missing
+A025,A025,Mercure Paris Pigalle Sacre Coeur,MER,MERCURE,PARIS,France,https://all.accor.com/hotel/A025/index.fr.shtml,france,MERCURE PARIS PIGALLE SACRE COEUR,PARIS,missing
+A4A6,A4A6,ibis Styles Paris Place d'Italie Butte-aux-Cailles,IBS,IBIS STYLES,PARIS,France,https://all.accor.com/hotel/A4A6/index.fr.shtml,france,IBIS STYLES PARIS PLACE D ITALIE BUTTE AUX CAILLES,PARIS,missing
+B2Q8,B2Q8,ibis Paris Gare Montparnasse Catalogne,IBH,IBIS,PARIS,France,https://all.accor.com/hotel/B2Q8/index.fr.shtml,france,IBIS PARIS GARE MONTPARNASSE CATALOGNE,PARIS,missing
+B8H6,B8H6,Hotel Mercure Paris Gare Montparnasse TGV,MER,MERCURE,PARIS,France,https://all.accor.com/hotel/B8H6/index.fr.shtml,france,HOTEL MERCURE PARIS GARE MONTPARNASSE TGV,PARIS,missing
+0803,803,ibis Paris Maine Montparnasse 14ème,IBH,IBIS,PARIS,France,https://all.accor.com/hotel/0803/index.fr.shtml,france,IBIS PARIS MAINE MONTPARNASSE 14EME,PARIS,missing
+0923,923,ibis Paris Italie Tolbiac 13ème,IBH,IBIS,PARIS,France,https://all.accor.com/hotel/0923/index.fr.shtml,france,IBIS PARIS ITALIE TOLBIAC 13EME,PARIS,missing
+A8R1,A8R1,ibis Styles Paris Gare Saint-Lazare,IBS,IBIS STYLES,PARIS,France,https://all.accor.com/hotel/A8R1/index.fr.shtml,france,IBIS STYLES PARIS GARE SAINT LAZARE,PARIS,missing
+0373,373,Hôtel Mercure Paris Montmartre Sacré-Coeur,MER,MERCURE,PARIS,France,https://all.accor.com/hotel/0373/index.fr.shtml,france,HOTEL MERCURE PARIS MONTMARTRE SACRE COEUR,PARIS,missing
+C0T4,C0T4,ibis Styles Paris Montmartre Batignolles,IBS,IBIS STYLES,PARIS,France,https://all.accor.com/hotel/C0T4/index.fr.shtml,france,IBIS STYLES PARIS MONTMARTRE BATIGNOLLES,PARIS,missing
+B431,B431,JO&JOE Paris Nation,JOE,JO&JOE,PARIS,France,https://all.accor.com/hotel/B431/index.fr.shtml,france,JO JOE PARIS NATION,PARIS,missing
+A0X1,A0X1,Aparthotel Adagio Paris Nation,ADG,ADAGIO,PARIS,France,https://all.accor.com/hotel/A0X1/index.fr.shtml,france,APARTHOTEL ADAGIO PARIS NATION,PARIS,missing
+A028,A028,ibis Styles Paris Eiffel Cambronne,IBS,IBIS STYLES,PARIS,France,https://all.accor.com/hotel/A028/index.fr.shtml,france,IBIS STYLES PARIS EIFFEL CAMBRONNE,PARIS,missing
+0959,959,ibis Paris Alésia Montparnasse 14ème,IBH,IBIS,PARIS,France,https://all.accor.com/hotel/0959/index.fr.shtml,france,IBIS PARIS ALESIA MONTPARNASSE 14EME,PARIS,missing
+B7S9,B7S9,Mercure Paris Montparnasse Pasteur,MER,MERCURE,PARIS,France,https://all.accor.com/hotel/B7S9/index.fr.shtml,france,MERCURE PARIS MONTPARNASSE PASTEUR,PARIS,missing
+A0Y0,A0Y0,ibis Styles Paris Nation Porte de Montreuil,IBS,IBIS STYLES,PARIS,France,https://all.accor.com/hotel/A0Y0/index.fr.shtml,france,IBIS STYLES PARIS NATION PORTE DE MONTREUIL,PARIS,missing
+B870,B870,Too Hotel & Spa Paris - MGallery Collection,MGA,MGALLERY,PARIS,France,https://all.accor.com/hotel/B870/index.fr.shtml,france,TOO HOTEL SPA PARIS MGALLERY COLLECTION,PARIS,missing
+C099,C099,ibis Paris Nation Davout,IBH,IBIS,PARIS,France,https://all.accor.com/hotel/C099/index.fr.shtml,france,IBIS PARIS NATION DAVOUT,PARIS,missing
+B1P0,B1P0,ibis Styles Paris Nation Cours de Vincennes,IBS,IBIS STYLES,PARIS,France,https://all.accor.com/hotel/B1P0/index.fr.shtml,france,IBIS STYLES PARIS NATION COURS DE VINCENNES,PARIS,missing
+0634,634,ibis Paris Porte d'Italie,IBH,IBIS,GENTILLY,France,https://all.accor.com/hotel/0634/index.fr.shtml,france,IBIS PARIS PORTE D ITALIE,GENTILLY,missing
+B9M1,B9M1,ibis Styles Paris Batignolles,IBS,IBIS STYLES,PARIS,France,https://all.accor.com/hotel/B9M1/index.fr.shtml,france,IBIS STYLES PARIS BATIGNOLLES,PARIS,missing
+A5D5,A5D5,Le Royal Monceau - Raffles Paris,RAF,RAFFLES,PARIS,France,https://all.accor.com/hotel/A5D5/index.fr.shtml,france,LE ROYAL MONCEAU RAFFLES PARIS,PARIS,missing
+B2U6,B2U6,ibis Styles Paris Météor Avenue d'Italie,IBS,IBIS STYLES,PARIS,France,https://all.accor.com/hotel/B2U6/index.fr.shtml,france,IBIS STYLES PARIS METEOR AVENUE D ITALIE,PARIS,missing
+C2L2,C2L2,Hotel Maison Hamelin Paris - Handwritten Collection,SOU,SOU,PARIS,France,https://all.accor.com/hotel/C2L2/index.fr.shtml,france,HOTEL MAISON HAMELIN PARIS HANDWRITTEN COLLECTION,PARIS,missing
+B6S4,B6S4,TRIBE Paris Batignolles,TRI,TRIBE,PARIS,France,https://all.accor.com/hotel/B6S4/index.fr.shtml,france,TRIBE PARIS BATIGNOLLES,PARIS,missing
+3239,3239,Novotel Suites Paris Montreuil Vincennes,SUI,NOVOTEL SUITES,PARIS,France,https://all.accor.com/hotel/3239/index.fr.shtml,france,NOVOTEL SUITES PARIS MONTREUIL VINCENNES,PARIS,missing
+C289,C289,greet Hotel Paris 13 Porte d'Italie,GRE,GREET,LE KREMLIN BICETRE,France,https://all.accor.com/hotel/C289/index.fr.shtml,france,GREET HOTEL PARIS 13 PORTE D ITALIE,LE KREMLIN BICETRE,missing
+B2R6,B2R6,Aparthotel Adagio Paris 19eme Cité de la Musique,ADG,ADAGIO,PARIS,France,https://all.accor.com/hotel/B2R6/index.fr.shtml,france,APARTHOTEL ADAGIO PARIS 19EME CITE DE LA MUSIQUE,PARIS,missing
+0374,374,Hôtel Mercure Paris Porte d'Orléans,MER,MERCURE,MONTROUGE,France,https://all.accor.com/hotel/0374/index.fr.shtml,france,HOTEL MERCURE PARIS PORTE D ORLEANS,MONTROUGE,missing
+0380,380,Novotel Paris Est Centre de Conference,NOV,NOVOTEL,BAGNOLET,France,https://all.accor.com/hotel/0380/index.fr.shtml,france,NOVOTEL PARIS EST CENTRE DE CONFERENCE,BAGNOLET,missing
+B0D0,B0D0,JO&JOE Paris Gentilly,JOE,JO&JOE,GENTILLY,France,https://all.accor.com/hotel/B0D0/index.fr.shtml,france,JO JOE PARIS GENTILLY,GENTILLY,missing
+0635,635,ibis Paris Porte d'Orléans,IBH,IBIS,MONTROUGE,France,https://all.accor.com/hotel/0635/index.fr.shtml,france,IBIS PARIS PORTE D ORLEANS,MONTROUGE,missing
+1936,1936,ibis Paris Brancion Parc des Expositions 15ème,IBH,IBIS,PARIS,France,https://all.accor.com/hotel/1936/index.fr.shtml,france,IBIS PARIS BRANCION PARC DES EXPOSITIONS 15EME,PARIS,missing
+A6S7,A6S7,Hôtel Mercure Paris 17 Batignolles,MER,MERCURE,PARIS,France,https://all.accor.com/hotel/A6S7/index.fr.shtml,france,HOTEL MERCURE PARIS 17 BATIGNOLLES,PARIS,missing
+0372,372,Hôtel Mercure Paris Arc de Triomphe Étoile,MER,MERCURE,PARIS,France,https://all.accor.com/hotel/0372/index.fr.shtml,france,HOTEL MERCURE PARIS ARC DE TRIOMPHE ETOILE,PARIS,missing
+0633,633,ibis Paris Porte de Bagnolet,IBH,IBIS,BAGNOLET,France,https://all.accor.com/hotel/0633/index.fr.shtml,france,IBIS PARIS PORTE DE BAGNOLET,BAGNOLET,missing
+0903,903,Hôtel Mercure Paris 15 Porte de Versailles,MER,MERCURE,PARIS,France,https://all.accor.com/hotel/0903/index.fr.shtml,france,HOTEL MERCURE PARIS 15 PORTE DE VERSAILLES,PARIS,missing
+B9H3,B9H3,ibis Budget Paris porte de la Chapelle - Aréna,IBB,IBIS BUDGET,PARIS,France,https://all.accor.com/hotel/B9H3/index.fr.shtml,france,IBIS BUDGET PARIS PORTE DE LA CHAPELLE ARENA,PARIS,missing
+C2M6,C2M6,ibis Styles Paris Porte de Pantin Philharmonie,IBS,IBIS STYLES,PANTIN,France,https://all.accor.com/hotel/C2M6/index.fr.shtml,france,IBIS STYLES PARIS PORTE DE PANTIN PHILHARMONIE,PANTIN,missing
+A242,A242,Aparthotel Adagio Paris Malakoff Châtillon,ADG,ADAGIO,MALAKOFF,France,https://all.accor.com/hotel/A242/index.fr.shtml,france,APARTHOTEL ADAGIO PARIS MALAKOFF CHATILLON,MALAKOFF,missing
+A7L6,A7L6,Novotel Paris Porte de Versailles,NOV,NOVOTEL,PARIS,France,https://all.accor.com/hotel/A7L6/index.fr.shtml,france,NOVOTEL PARIS PORTE DE VERSAILLES,PARIS,missing
+C419,C419,ibis Paris Nord Porte de Saint Ouen,IBH,IBIS,SAINT OUEN,France,https://all.accor.com/hotel/C419/index.fr.shtml,france,IBIS PARIS NORD PORTE DE SAINT OUEN,SAINT OUEN,missing
+B1C3,B1C3,Mama Shelter Paris West,MSH,MAMA SHELTER,PARIS,France,https://all.accor.com/hotel/B1C3/index.fr.shtml,france,MAMA SHELTER PARIS WEST,PARIS,missing
+A780,A780,Hôtel Mercure Paris Saint-Ouen,MER,MERCURE,SAINT OUEN,France,https://all.accor.com/hotel/A780/index.fr.shtml,france,HOTEL MERCURE PARIS SAINT OUEN,SAINT OUEN,missing
+0375,375,Hôtel Mercure Paris Porte de Versailles Expo,MER,MERCURE,VANVES,France,https://all.accor.com/hotel/0375/index.fr.shtml,france,HOTEL MERCURE PARIS PORTE DE VERSAILLES EXPO,VANVES,missing
+B856,B856,TRIBE Paris Pantin,TRI,TRIBE,PANTIN,France,https://all.accor.com/hotel/B856/index.fr.shtml,france,TRIBE PARIS PANTIN,PANTIN,missing
+A026,A026,Hôtel Mercure Paris Malakoff Parc des Expositions,MER,MERCURE,MALAKOFF,France,https://all.accor.com/hotel/A026/index.fr.shtml,france,HOTEL MERCURE PARIS MALAKOFF PARC DES EXPOSITIONS,MALAKOFF,missing
+B0E4,B0E4,ibis budget Paris Clichy Mairie,IBB,IBIS BUDGET,CLICHY,France,https://all.accor.com/hotel/B0E4/index.fr.shtml,france,IBIS BUDGET PARIS CLICHY MAIRIE,CLICHY,missing
+C5H9,C5H9,ibis Styles Paris Pont d'Ivry,IBS,IBIS STYLES,IVRY SUR SEINE,France,https://all.accor.com/hotel/C5H9/index.fr.shtml,france,IBIS STYLES PARIS PONT D IVRY,IVRY SUR SEINE,missing
+C5J3,C5J3,Aparthotel Adagio Access Paris Pont D'Ivry,ADA,ADAGIO ACCESS,IVRY SUR SEINE,France,https://all.accor.com/hotel/C5J3/index.fr.shtml,france,APARTHOTEL ADAGIO ACCESS PARIS PONT D IVRY,IVRY SUR SEINE,missing
+A3C7,A3C7,ibis Styles Paris Mairie de Clichy,IBS,IBIS STYLES,CLICHY,France,https://all.accor.com/hotel/A3C7/index.fr.shtml,france,IBIS STYLES PARIS MAIRIE DE CLICHY,CLICHY,missing
+B2E6,B2E6,ibis Clichy Centre Mairie,IBH,IBIS,CLICHY,France,https://all.accor.com/hotel/B2E6/index.fr.shtml,france,IBIS CLICHY CENTRE MAIRIE,CLICHY,missing
+B854,B854,TRIBE Paris Clichy,TRI,TRIBE,CLICHY,France,https://all.accor.com/hotel/B854/index.fr.shtml,france,TRIBE PARIS CLICHY,CLICHY,missing
+B717,B717,TRIBE Paris Saint Ouen,TRI,TRIBE,SAINT OUEN,France,https://all.accor.com/hotel/B717/index.fr.shtml,france,TRIBE PARIS SAINT OUEN,SAINT OUEN,missing
+B599,B599,Domaine Reine Margot Paris - Issy - MGallery Collection,MGA,MGALLERY,ISSY LES MOULINEAUX,France,https://all.accor.com/hotel/B599/index.fr.shtml,france,DOMAINE REINE MARGOT PARIS ISSY MGALLERY COLLECTION,ISSY LES MOULINEAUX,missing
+B132,B132,Hôtel Mercure Paris Pont de Levallois Neuilly,MER,MERCURE,LEVALLOIS PERRET,France,https://all.accor.com/hotel/B132/index.fr.shtml,france,HOTEL MERCURE PARIS PONT DE LEVALLOIS NEUILLY,LEVALLOIS PERRET,missing
+B5U8,B5U8,ibis Styles Paris Romainville,IBS,IBIS STYLES,ROMAINVILLE,France,https://all.accor.com/hotel/B5U8/index.fr.shtml,france,IBIS STYLES PARIS ROMAINVILLE,ROMAINVILLE,missing
+C5H8,C5H8,Résidence Mercure Paris Sud Villejuif,MER,MERCURE,VILLEJUIF,France,https://all.accor.com/hotel/C5H8/index.fr.shtml,france,RESIDENCE MERCURE PARIS SUD VILLEJUIF,VILLEJUIF,missing
+C5J1,C5J1,Aparthotel Adagio Access Paris Sud Villejuif,ADA,ADAGIO ACCESS,VILLEJUIF,France,https://all.accor.com/hotel/C5J1/index.fr.shtml,france,APARTHOTEL ADAGIO ACCESS PARIS SUD VILLEJUIF,VILLEJUIF,missing
+A6Q1,A6Q1,ibis Styles Clamart Gare Grand Paris,IBS,IBIS STYLES,CLAMART,France,https://all.accor.com/hotel/A6Q1/index.fr.shtml,france,IBIS STYLES CLAMART GARE GRAND PARIS,CLAMART,missing
+A5H4,A5H4,ibis budget Bobigny Pantin,IBB,IBIS BUDGET,BOBIGNY,France,https://all.accor.com/hotel/A5H4/index.fr.shtml,france,IBIS BUDGET BOBIGNY PANTIN,BOBIGNY,missing
+B045,B045,ibis Styles Paris 16 Boulogne,IBS,IBIS STYLES,PARIS,France,https://all.accor.com/hotel/B045/index.fr.shtml,france,IBIS STYLES PARIS 16 BOULOGNE,PARIS,missing
+B9Q7,B9Q7,ibis Styles Paris Villejuif,IBS,IBIS STYLES,VILLEJUIF,France,https://all.accor.com/hotel/B9Q7/index.fr.shtml,france,IBIS STYLES PARIS VILLEJUIF,VILLEJUIF,missing
+0747,747,Novotel Paris la Défense Esplanade,NOV,NOVOTEL,PARIS LA DEFENSE,France,https://all.accor.com/hotel/0747/index.fr.shtml,france,NOVOTEL PARIS LA DEFENSE ESPLANADE,PARIS LA DEFENSE,missing
+B879,B879,TRIBE Paris La Défense Esplanade,TRI,TRIBE,COURBEVOIE,France,https://all.accor.com/hotel/B879/index.fr.shtml,france,TRIBE PARIS LA DEFENSE ESPLANADE,COURBEVOIE,missing
+C1V8,C1V8,ibis Styles Paris Saint Denis Pleyel,IBS,IBIS STYLES,SAINT DENIS,France,https://all.accor.com/hotel/C1V8/index.fr.shtml,france,IBIS STYLES PARIS SAINT DENIS PLEYEL,SAINT DENIS,missing
+0771,771,ibis Paris La Défense Esplanade,IBH,IBIS,PARIS LA DEFENSE,France,https://all.accor.com/hotel/0771/index.fr.shtml,france,IBIS PARIS LA DEFENSE ESPLANADE,PARIS LA DEFENSE,missing
+B5K2,B5K2,Mama Shelter Paris La Défense,MSH,MAMA SHELTER,PUTEAUX,France,https://all.accor.com/hotel/B5K2/index.fr.shtml,france,MAMA SHELTER PARIS LA DEFENSE,PUTEAUX,missing
+A039,A039,ibis Styles Paris Boulogne Marcel Sembat,IBS,IBIS STYLES,BOULOGNE BILLANCOURT,France,https://all.accor.com/hotel/A039/index.fr.shtml,france,IBIS STYLES PARIS BOULOGNE MARCEL SEMBAT,BOULOGNE BILLANCOURT,missing
+B917,B917,greet Hotel Boulogne Billancourt Paris,GRE,GREET,BOULOGNE BILLANCOURT,France,https://all.accor.com/hotel/B917/index.fr.shtml,france,GREET HOTEL BOULOGNE BILLANCOURT PARIS,BOULOGNE BILLANCOURT,missing
+0912,912,Nest Hotel Paris la Défense - MGallery Collection,MGA,MGALLERY,PARIS LA DEFENSE,France,https://all.accor.com/hotel/0912/index.fr.shtml,france,NEST HOTEL PARIS LA DEFENSE MGALLERY COLLECTION,PARIS LA DEFENSE,missing
+1546,1546,Hôtel Mercure Paris La Defense,MER,MERCURE,COURBEVOIE,France,https://all.accor.com/hotel/1546/index.fr.shtml,france,HOTEL MERCURE PARIS LA DEFENSE,COURBEVOIE,missing
+C191,C191,TRIBE Paris Suresnes (ouverture prochaine),TRI,TRIBE,SURESNES,France,https://all.accor.com/hotel/C191/index.fr.shtml,france,TRIBE PARIS SURESNES OUVERTURE PROCHAINE,SURESNES,missing
+C034,C034,ibis Styles Bourg La Reine,IBS,IBIS STYLES,BOURG LA REINE,France,https://all.accor.com/hotel/C034/index.fr.shtml,france,IBIS STYLES BOURG LA REINE,BOURG LA REINE,missing
+B8K9,B8K9,Aparthotel Adagio Paris Boulogne,ADG,ADAGIO,BOULOGNE BILLANCOURT,France,https://all.accor.com/hotel/B8K9/index.fr.shtml,france,APARTHOTEL ADAGIO PARIS BOULOGNE,BOULOGNE BILLANCOURT,missing
+B2W4,B2W4,Aparthotel Adagio Paris Suresnes Longchamp,ADG,ADAGIO,SURESNES,France,https://all.accor.com/hotel/B2W4/index.fr.shtml,france,APARTHOTEL ADAGIO PARIS SURESNES LONGCHAMP,SURESNES,missing
+C3Y5,C3Y5,Hôtel Mercure Paris Boulogne Pont de Saint Cloud,MER,MERCURE,BOULOGNE BILLANCOURT,France,https://all.accor.com/hotel/C3Y5/index.fr.shtml,france,HOTEL MERCURE PARIS BOULOGNE PONT DE SAINT CLOUD,BOULOGNE BILLANCOURT,missing
+B7A3,B7A3,ibis Styles Paris Hippodrome de Vincennes,IBS,IBIS STYLES,JOINVILLE LE PONT,France,https://all.accor.com/hotel/B7A3/index.fr.shtml,france,IBIS STYLES PARIS HIPPODROME DE VINCENNES,JOINVILLE LE PONT,missing
+B5Z6,B5Z6,ibis Styles Paris Gennevilliers,IBS,IBIS STYLES,GENNEVILLIERS,France,https://all.accor.com/hotel/B5Z6/index.fr.shtml,france,IBIS STYLES PARIS GENNEVILLIERS,GENNEVILLIERS,missing
+0716,716,ibis Paris Pont de Suresnes,IBH,IBIS,SURESNES,France,https://all.accor.com/hotel/0716/index.fr.shtml,france,IBIS PARIS PONT DE SURESNES,SURESNES,missing
+B5Z7,B5Z7,ibis Styles Bobigny Centre Préfecture,IBS,IBIS STYLES,BOBIGNY,France,https://all.accor.com/hotel/B5Z7/index.fr.shtml,france,IBIS STYLES BOBIGNY CENTRE PREFECTURE,BOBIGNY,missing
+B096,B096,Hôtel Mercure Paris Suresnes Longchamp,MER,MERCURE,SURESNES,France,https://all.accor.com/hotel/B096/index.fr.shtml,france,HOTEL MERCURE PARIS SURESNES LONGCHAMP,SURESNES,missing
+A9I7,A9I7,ibis Styles Puteaux Paris La Défense,IBS,IBIS STYLES,PUTEAUX,France,https://all.accor.com/hotel/A9I7/index.fr.shtml,france,IBIS STYLES PUTEAUX PARIS LA DEFENSE,PUTEAUX,missing
+B9N6,B9N6,greet Hotel Villeneuve La Garenne,GRE,GREET,VILLENEUVE LA GARENNE,France,https://all.accor.com/hotel/B9N6/index.fr.shtml,france,GREET HOTEL VILLENEUVE LA GARENNE,VILLENEUVE LA GARENNE,missing
+B2X1,B2X1,ibis Styles Sceaux Paris Sud,IBS,IBIS STYLES,SCEAUX,France,https://all.accor.com/hotel/B2X1/index.fr.shtml,france,IBIS STYLES SCEAUX PARIS SUD,SCEAUX,missing
+B6S6,B6S6,Novotel Paris Val de Fontenay,NOV,NOVOTEL,FONTENAY SOUS BOIS,France,https://all.accor.com/hotel/B6S6/index.fr.shtml,france,NOVOTEL PARIS VAL DE FONTENAY,FONTENAY SOUS BOIS,missing
+A5T2,A5T2,Hôtel Mercure Paris Gennevilliers,MER,MERCURE,GENNEVILLIERS,France,https://all.accor.com/hotel/A5T2/index.fr.shtml,france,HOTEL MERCURE PARIS GENNEVILLIERS,GENNEVILLIERS,missing
+A5T5,A5T5,ibis budget Paris Gennevilliers,IBB,IBIS BUDGET,GENNEVILLIERS,France,https://all.accor.com/hotel/A5T5/index.fr.shtml,france,IBIS BUDGET PARIS GENNEVILLIERS,GENNEVILLIERS,missing
+B4A3,B4A3,Résidence Mercure Paris La Défense Grande Arche,MER,MERCURE,NANTERRE,France,https://all.accor.com/hotel/B4A3/index.fr.shtml,france,RESIDENCE MERCURE PARIS LA DEFENSE GRANDE ARCHE,NANTERRE,missing
+A027,A027,Hôtel Mercure Paris Saint Cloud Hippodrome,MER,MERCURE,SAINT CLOUD,France,https://all.accor.com/hotel/A027/index.fr.shtml,france,HOTEL MERCURE PARIS SAINT CLOUD HIPPODROME,SAINT CLOUD,missing
+B6T8,B6T8,Novotel Paris La Défense Nanterre,NOV,NOVOTEL,NANTERRE,France,https://all.accor.com/hotel/B6T8/index.fr.shtml,france,NOVOTEL PARIS LA DEFENSE NANTERRE,NANTERRE,missing
+0382,382,Novotel Paris Créteil Le Lac,NOV,NOVOTEL,CRETEIL,France,https://all.accor.com/hotel/0382/index.fr.shtml,france,NOVOTEL PARIS CRETEIL LE LAC,CRETEIL,missing
+C3U4,C3U4,ibis Styles Colombes Paris Ouest,IBS,IBIS STYLES,COLOMBES,France,https://all.accor.com/hotel/C3U4/index.fr.shtml,france,IBIS STYLES COLOMBES PARIS OUEST,COLOMBES,missing
+B3A8,B3A8,ibis budget Fresnes,IBB,IBIS BUDGET,FRESNES,France,https://all.accor.com/hotel/B3A8/index.fr.shtml,france,IBIS BUDGET FRESNES,FRESNES,missing
+1298,1298,Mercure Paris Orly Rungis Aéroport,MER,MERCURE,RUNGIS,France,https://all.accor.com/hotel/1298/index.fr.shtml,france,MERCURE PARIS ORLY RUNGIS AEROPORT,RUNGIS,missing
+0851,851,ibis Créteil,IBH,IBIS,CRETEIL,France,https://all.accor.com/hotel/0851/index.fr.shtml,france,IBIS CRETEIL,CRETEIL,missing
+C5M7,C5M7,Mercure Le Plessis Robinson (Ouverture Septembre 2026),MER,MERCURE,LE PLESSIS ROBINSON,France,https://all.accor.com/hotel/C5M7/index.fr.shtml,france,MERCURE LE PLESSIS ROBINSON OUVERTURE SEPTEMBRE 2026,LE PLESSIS ROBINSON,missing
+0733,733,ibis Epinay sur seine Gennevilliers,IBH,IBIS,EPINAY SUR SEINE,France,https://all.accor.com/hotel/0733/index.fr.shtml,france,IBIS EPINAY SUR SEINE GENNEVILLIERS,EPINAY SUR SEINE,missing
+B7B5,B7B5,Ibis Clamart Paris Vélizy,IBH,IBIS,CLAMART,France,https://all.accor.com/hotel/B7B5/index.fr.shtml,france,IBIS CLAMART PARIS VELIZY,CLAMART,missing
+C422,C422,Ibis Rungis Aéroport Paris Orly,IBH,IBIS,RUNGIS,France,https://all.accor.com/hotel/C422/index.fr.shtml,france,IBIS RUNGIS AEROPORT PARIS ORLY,RUNGIS,missing
+0948,948,ibis Paris Meudon Vélizy,IBH,IBIS,MEUDON LA FORET,France,https://all.accor.com/hotel/0948/index.fr.shtml,france,IBIS PARIS MEUDON VELIZY,MEUDON LA FORET,missing
+B9Q3,B9Q3,ibis Styles Chatenay Malabry Paris Sud,IBS,IBIS STYLES,CHATENAY MALABRY,France,https://all.accor.com/hotel/B9Q3/index.fr.shtml,france,IBIS STYLES CHATENAY MALABRY PARIS SUD,CHATENAY MALABRY,missing
+C033,C033,Mercure Paris Nanterre,MER,MERCURE,NANTERRE,France,https://all.accor.com/hotel/C033/index.fr.shtml,france,MERCURE PARIS NANTERRE,NANTERRE,missing
+B0X8,B0X8,ibis Styles Bezons Paris La Défense,IBS,IBIS STYLES,BEZONS,France,https://all.accor.com/hotel/B0X8/index.fr.shtml,france,IBIS STYLES BEZONS PARIS LA DEFENSE,BEZONS,missing
+C5J6,C5J6,Aparthotel Adagio Access Paris Nanterre La Défense,ADA,ADAGIO ACCESS,NANTERRE,France,https://all.accor.com/hotel/C5J6/index.fr.shtml,france,APARTHOTEL ADAGIO ACCESS PARIS NANTERRE LA DEFENSE,NANTERRE,missing
+B0N0,B0N0,ibis Styles Paris Orly Airport,IBS,IBIS STYLES,PARAY VIEILLE POSTE,France,https://all.accor.com/hotel/B0N0/index.fr.shtml,france,IBIS STYLES PARIS ORLY AIRPORT,PARAY VIEILLE POSTE,missing
+1246,1246,Mercure Paris Orly Airport,MER,MERCURE,PARAY-VIEILLE-POSTE,France,https://all.accor.com/hotel/1246/index.fr.shtml,france,MERCURE PARIS ORLY AIRPORT,PARAY VIEILLE POSTE,missing
+0388,388,Hôtel Mercure Paris Le Bourget,MER,MERCURE,LE BLANC MESNIL,France,https://all.accor.com/hotel/0388/index.fr.shtml,france,HOTEL MERCURE PARIS LE BOURGET,LE BLANC MESNIL,missing
+2538,2538,ibis budget Marne-la-Vallée Bry-sur-Marne,IBB,IBIS BUDGET,BRY SUR MARNE,France,https://all.accor.com/hotel/2538/index.fr.shtml,france,IBIS BUDGET MARNE LA VALLEE BRY SUR MARNE,BRY SUR MARNE,missing
+A087,A087,ibis Styles Antony Paris Sud,IBS,IBIS STYLES,ANTONY,France,https://all.accor.com/hotel/A087/index.fr.shtml,france,IBIS STYLES ANTONY PARIS SUD,ANTONY,missing
+0776,776,ibis Aulnay Paris Nord Expo,IBH,IBIS,AULNAY SOUS BOIS,France,https://all.accor.com/hotel/0776/index.fr.shtml,france,IBIS AULNAY PARIS NORD EXPO,AULNAY SOUS BOIS,missing
+0387,387,Novotel Paris Nord Expo Aulnay,NOV,NOVOTEL,AULNAY SOUS BOIS,France,https://all.accor.com/hotel/0387/index.fr.shtml,france,NOVOTEL PARIS NORD EXPO AULNAY,AULNAY SOUS BOIS,missing
+B3A2,B3A2,ibis Styles Massy Opéra,IBS,IBIS STYLES,MASSY,France,https://all.accor.com/hotel/B3A2/index.fr.shtml,france,IBIS STYLES MASSY OPERA,MASSY,missing
+B1B8,B1B8,ibis budget Marne-la-Vallée Noisy-le-Grand,IBB,IBIS BUDGET,NOISY LE GRAND,France,https://all.accor.com/hotel/B1B8/index.fr.shtml,france,IBIS BUDGET MARNE LA VALLEE NOISY LE GRAND,NOISY LE GRAND,missing
+B0X2,B0X2,ibis budget Gonesse Le Bourget,IBB,IBIS BUDGET,GONESSE,France,https://all.accor.com/hotel/B0X2/index.fr.shtml,france,IBIS BUDGET GONESSE LE BOURGET,GONESSE,missing
+B0X3,B0X3,ibis Gonesse Le Bourget,IBH,IBIS,GONESSE,France,https://all.accor.com/hotel/B0X3/index.fr.shtml,france,IBIS GONESSE LE BOURGET,GONESSE,missing
+B3A3,B3A3,hotelF1 Igny Massy TGV Rénové,HOF,HOTELF1,IGNY,France,https://all.accor.com/hotel/B3A3/index.fr.shtml,france,HOTELF1 IGNY MASSY TGV RENOVE,IGNY,missing
+0386,386,Novotel Massy Palaiseau,NOV,NOVOTEL,PALAISEAU,France,https://all.accor.com/hotel/0386/index.fr.shtml,france,NOVOTEL MASSY PALAISEAU,PALAISEAU,missing
+B3A4,B3A4,ibis budget Chilly-Mazarin Les Champarts,IBB,IBIS BUDGET,CHILLY MAZARIN,France,https://all.accor.com/hotel/B3A4/index.fr.shtml,france,IBIS BUDGET CHILLY MAZARIN LES CHAMPARTS,CHILLY MAZARIN,missing
+C5J2,C5J2,Aparthotel Adagio Access Massy Palaiseau,ADA,ADAGIO ACCESS,PALAISEAU,France,https://all.accor.com/hotel/C5J2/index.fr.shtml,france,APARTHOTEL ADAGIO ACCESS MASSY PALAISEAU,PALAISEAU,missing
+1909,1909,Hôtel Mercure Versailles Chateau,MER,MERCURE,VERSAILLES,France,https://all.accor.com/hotel/1909/index.fr.shtml,france,HOTEL MERCURE VERSAILLES CHATEAU,VERSAILLES,missing
+0976,976,ibis Villepinte Parc Expos,IBH,IBIS,ROISSY CDG CEDEX,France,https://all.accor.com/hotel/0976/index.fr.shtml,france,IBIS VILLEPINTE PARC EXPOS,ROISSY CDG CEDEX,missing
+0379,379,Mercure Versailles Paris Ouest,MER,MERCURE,LE CHESNAY,France,https://all.accor.com/hotel/0379/index.fr.shtml,france,MERCURE VERSAILLES PARIS OUEST,LE CHESNAY,missing
+0392,392,Novotel Paris Saclay,NOV,NOVOTEL,SACLAY,France,https://all.accor.com/hotel/0392/index.fr.shtml,france,NOVOTEL PARIS SACLAY,SACLAY,missing
+A0X3,A0X3,Aparthotel Adagio Access Palaiseau Saclay,ADA,ADAGIO ACCESS,PALAISEAU,France,https://all.accor.com/hotel/A0X3/index.fr.shtml,france,APARTHOTEL ADAGIO ACCESS PALAISEAU SACLAY,PALAISEAU,missing
+A072,A072,Hôtel Mercure Paris Ouest Saint-Germain,MER,MERCURE,SAINT GERMAIN EN LAYE,France,https://all.accor.com/hotel/A072/index.fr.shtml,france,HOTEL MERCURE PARIS OUEST SAINT GERMAIN,SAINT GERMAIN EN LAYE,missing
+A1R5,A1R5,ibis Saint-Germain-en-Laye Centre,IBH,IBIS,SAINT GERMAIN EN LAYE,France,https://all.accor.com/hotel/A1R5/index.fr.shtml,france,IBIS SAINT GERMAIN EN LAYE CENTRE,SAINT GERMAIN EN LAYE,missing
+C0P7,C0P7,ibis Styles Saint Germain en Laye (Ouverture septembre 2026),IBS,IBIS STYLES,SAINT GERMAIN EN LAYE,France,https://all.accor.com/hotel/C0P7/index.fr.shtml,france,IBIS STYLES SAINT GERMAIN EN LAYE OUVERTURE SEPTEMBRE 2026,SAINT GERMAIN EN LAYE,missing
+0815,815,ibis Styles Paris Roissy-CDG,IBS,IBIS STYLES,ROISSY EN FRANCE,France,https://all.accor.com/hotel/0815/index.fr.shtml,france,IBIS STYLES PARIS ROISSY CDG,ROISSY EN FRANCE,missing
+2347,2347,ibis budget Santeny,IBB,IBIS BUDGET,SANTENY,France,https://all.accor.com/hotel/2347/index.fr.shtml,france,IBIS BUDGET SANTENY,SANTENY,missing
+0577,577,Mercure Paris CDG Airport,MER,MERCURE,ROISSY CDG CEDEX,France,https://all.accor.com/hotel/0577/index.fr.shtml,france,MERCURE PARIS CDG AIRPORT,ROISSY CDG CEDEX,missing
+A548,A548,ibis Styles Versailles Guyancourt,IBS,IBIS STYLES,GUYANCOURT,France,https://all.accor.com/hotel/A548/index.fr.shtml,france,IBIS STYLES VERSAILLES GUYANCOURT,GUYANCOURT,missing
+B9H9,B9H9,ibis Styles Versailles Saint Quentin en Yvelines,IBS,IBIS STYLES,SAINT CYR L'ECOLE,France,https://all.accor.com/hotel/B9H9/index.fr.shtml,france,IBIS STYLES VERSAILLES SAINT QUENTIN EN YVELINES,SAINT CYR L ECOLE,missing
+0376,376,Hôtel Mercure Paris Sud Les Ulis Courtaboeuf,MER,MERCURE,LES ULIS,France,https://all.accor.com/hotel/0376/index.fr.shtml,france,HOTEL MERCURE PARIS SUD LES ULIS COURTABOEUF,LES ULIS,missing
+A048,A048,ibis budget Grigny Centre,IBB,IBIS BUDGET,GRIGNY,France,https://all.accor.com/hotel/A048/index.fr.shtml,france,IBIS BUDGET GRIGNY CENTRE,GRIGNY,missing
+C128,C128,ibis Acheres St Germain en Laye,IBH,IBIS,ACHERES,France,https://all.accor.com/hotel/C128/index.fr.shtml,france,IBIS ACHERES ST GERMAIN EN LAYE,ACHERES,missing
+C127,C127,Mercure Achères St Germain en Laye,MER,MERCURE,ACHERES,France,https://all.accor.com/hotel/C127/index.fr.shtml,france,MERCURE ACHERES ST GERMAIN EN LAYE,ACHERES,missing
+0385,385,Novotel Marne-la-Vallée Collégien,NOV,NOVOTEL,COLLEGIEN,France,https://all.accor.com/hotel/0385/index.fr.shtml,france,NOVOTEL MARNE LA VALLEE COLLEGIEN,COLLEGIEN,missing
+A345,A345,ibis Montlhéry Paris Sud,IBH,IBIS,MONTLHERY,France,https://all.accor.com/hotel/A345/index.fr.shtml,france,IBIS MONTLHERY PARIS SUD,MONTLHERY,missing
+B9I0,B9I0,greet  Hotel Versailles - Voisins Le Bretonneux,GRE,GREET,VOISINS LE BRETONNEUX,France,https://all.accor.com/hotel/B9I0/index.fr.shtml,france,GREET HOTEL VERSAILLES VOISINS LE BRETONNEUX,VOISINS LE BRETONNEUX,missing
+0383,383,Novotel Domaine De Maffliers - Demeures De Campagne,NOV,NOVOTEL,MAFFLIERS,France,https://all.accor.com/hotel/0383/index.fr.shtml,france,NOVOTEL DOMAINE DE MAFFLIERS DEMEURES DE CAMPAGNE,MAFFLIERS,missing
+A211,A211,Hôtel Mercure Marne-la-Vallée Bussy-Saint-Georges,MER,MERCURE,BUSSY SAINT GEORGES,France,https://all.accor.com/hotel/A211/index.fr.shtml,france,HOTEL MERCURE MARNE LA VALLEE BUSSY SAINT GEORGES,BUSSY SAINT GEORGES,missing
+B392,B392,ibis budget Saint-Ouen-l'Aumône,IBB,IBIS BUDGET,SAINT OUEN L AUMONE,France,https://all.accor.com/hotel/B392/index.fr.shtml,france,IBIS BUDGET SAINT OUEN L AUMONE,SAINT OUEN L AUMONE,missing
+0752,752,Ibis Évry-Courcouronnes,IBH,IBIS,EVRY,France,https://all.accor.com/hotel/0752/index.fr.shtml,france,IBIS EVRY COURCOURONNES,EVRY,missing
+0390,390,Novotel Poissy Orgeval,NOV,NOVOTEL,ORGEVAL,France,https://all.accor.com/hotel/0390/index.fr.shtml,france,NOVOTEL POISSY ORGEVAL,ORGEVAL,missing
+0389,389,Novotel Évry-Courcouronnes,NOV,NOVOTEL,COURCOURONNES,France,https://all.accor.com/hotel/0389/index.fr.shtml,france,NOVOTEL EVRY COURCOURONNES,COURCOURONNES,missing
+0928,928,ibis Cergy-Pontoise Le Port,IBH,IBIS,CERGY PONTOISE,France,https://all.accor.com/hotel/0928/index.fr.shtml,france,IBIS CERGY PONTOISE LE PORT,CERGY PONTOISE,missing
+B3B4,B3B4,hotelF1 Cergy,HOF,HOTELF1,CERGY,France,https://all.accor.com/hotel/B3B4/index.fr.shtml,france,HOTELF1 CERGY,CERGY,missing
+0459,459,Novotel Roissy Saint-Witz,NOV,NOVOTEL,SAINT-WITZ,France,https://all.accor.com/hotel/0459/index.fr.shtml,france,NOVOTEL ROISSY SAINT WITZ,SAINT WITZ,missing
+2278,2278,hotelF1 Saint-Witz A1 Paris Nord,HOF,HOTELF1,SAINT WITZ,France,https://all.accor.com/hotel/2278/index.fr.shtml,france,HOTELF1 SAINT WITZ A1 PARIS NORD,SAINT WITZ,missing
+B4D0,B4D0,Domaine des Vanneaux Golf & Spa - MGallery Collection,MGA,MGALLERY,PRESLES,France,https://all.accor.com/hotel/B4D0/index.fr.shtml,france,DOMAINE DES VANNEAUX GOLF SPA MGALLERY COLLECTION,PRESLES,missing
+B2R7,B2R7,Aparthotel Adagio Serris - Val d'Europe,ADG,ADAGIO,SERRIS,France,https://all.accor.com/hotel/B2R7/index.fr.shtml,france,APARTHOTEL ADAGIO SERRIS VAL D EUROPE,SERRIS,missing
+B3B7,B3B7,hotelF1 Maurepas,HOF,HOTELF1,MAUREPAS,France,https://all.accor.com/hotel/B3B7/index.fr.shtml,france,HOTELF1 MAUREPAS,MAUREPAS,missing
+0977,977,Mercure Parc du Coudray Demeures de Campagne,MER,MERCURE,LE COUDRAY MONTCEAUX,France,https://all.accor.com/hotel/0977/index.fr.shtml,france,MERCURE PARC DU COUDRAY DEMEURES DE CAMPAGNE,LE COUDRAY MONTCEAUX,missing
+C1R5,C1R5,"Abbaye des Vaux De Cernay, un hôtel Paris Society Collection",PSC,PSC,CERNAY-LA-VILLE,France,https://all.accor.com/hotel/C1R5/index.fr.shtml,france,ABBAYE DES VAUX DE CERNAY UN HOTEL PARIS SOCIETY COLLECTION,CERNAY LA VILLE,missing
+B4C3,B4C3,Hôtel Mercure Chantilly Resort & Conventions,MER,MERCURE,VINEUIL SAINT FIRMIN,France,https://all.accor.com/hotel/B4C3/index.fr.shtml,france,HOTEL MERCURE CHANTILLY RESORT CONVENTIONS,VINEUIL SAINT FIRMIN,missing
+0620,620,ibis Melun,IBH,IBIS,MELUN,France,https://all.accor.com/hotel/0620/index.fr.shtml,france,IBIS MELUN,MELUN,missing
+0709,709,ibis Senlis,IBH,IBIS,SENLIS,France,https://all.accor.com/hotel/0709/index.fr.shtml,france,IBIS SENLIS,SENLIS,missing
+0687,687,ibis Rambouillet,IBH,IBIS,RAMBOUILLET,France,https://all.accor.com/hotel/0687/index.fr.shtml,france,IBIS RAMBOUILLET,RAMBOUILLET,missing
+B7Q1,B7Q1,Aigle Noir Fontainebleau - MGallery Collection,MGA,MGALLERY,FONTAINEBLEAU,France,https://all.accor.com/hotel/B7Q1/index.fr.shtml,france,AIGLE NOIR FONTAINEBLEAU MGALLERY COLLECTION,FONTAINEBLEAU,missing
+0384,384,Novotel Fontainebleau Ury,NOV,NOVOTEL,URY,France,https://all.accor.com/hotel/0384/index.fr.shtml,france,NOVOTEL FONTAINEBLEAU URY,URY,missing
+0350,350,ibis Styles Beauvais,IBS,IBIS STYLES,BEAUVAIS,France,https://all.accor.com/hotel/0350/index.fr.shtml,france,IBIS STYLES BEAUVAIS,BEAUVAIS,missing
+C284,C284,Mercure Maintenon,MER,MERCURE,MAINTENON,France,https://all.accor.com/hotel/C284/index.fr.shtml,france,MERCURE MAINTENON,MAINTENON,missing
+B0Y0,B0Y0,Hôtel Mercure Beauvais Centre Cathédrale,MER,MERCURE,BEAUVAIS,France,https://all.accor.com/hotel/B0Y0/index.fr.shtml,france,HOTEL MERCURE BEAUVAIS CENTRE CATHEDRALE,BEAUVAIS,missing
+0691,691,ibis Compiègne,IBH,IBIS,COMPIEGNE,France,https://all.accor.com/hotel/0691/index.fr.shtml,france,IBIS COMPIEGNE,COMPIEGNE,missing
+B632,B632,ibis budget Beauvais Aeroport,IBB,IBIS BUDGET,TILLE,France,https://all.accor.com/hotel/B632/index.fr.shtml,france,IBIS BUDGET BEAUVAIS AEROPORT,TILLE,missing
+B3A5,B3A5,hotelF1 Nemours,HOF,HOTELF1,NEMOURS,France,https://all.accor.com/hotel/B3A5/index.fr.shtml,france,HOTELF1 NEMOURS,NEMOURS,missing
+0628,628,ibis Nemours,IBH,IBIS,NEMOURS,France,https://all.accor.com/hotel/0628/index.fr.shtml,france,IBIS NEMOURS,NEMOURS,missing
+B5E8,B5E8,ibis Styles Dreux Centre Gare,IBS,IBIS STYLES,DREUX,France,https://all.accor.com/hotel/B5E8/index.fr.shtml,france,IBIS STYLES DREUX CENTRE GARE,DREUX,missing
+C3P5,C3P5,Mercure Chartres Est,MER,MERCURE,CHARTRES,France,https://all.accor.com/hotel/C3P5/index.fr.shtml,france,MERCURE CHARTRES EST,CHARTRES,missing
+0413,413,Novotel Chartres,NOV,NOVOTEL,CHARTRES,France,https://all.accor.com/hotel/0413/index.fr.shtml,france,NOVOTEL CHARTRES,CHARTRES,missing
+C0V4,C0V4,greet Chartres Est,GRE,GREET,CHARTRES,France,https://all.accor.com/hotel/C0V4/index.fr.shtml,france,GREET CHARTRES EST,CHARTRES,missing
+0856,856,ibis Provins,IBH,IBIS,PROVINS,France,https://all.accor.com/hotel/0856/index.fr.shtml,france,IBIS PROVINS,PROVINS,missing
+B2N8,B2N8,ibis budget Château-Thierry,IBB,IBIS BUDGET,ESSOMES SUR MARNE,France,https://all.accor.com/hotel/B2N8/index.fr.shtml,france,IBIS BUDGET CHATEAU THIERRY,ESSOMES SUR MARNE,missing
+0688,688,ibis Chartres Ouest Lucé,IBH,IBIS,LUCE,France,https://all.accor.com/hotel/0688/index.fr.shtml,france,IBIS CHARTRES OUEST LUCE,LUCE,missing
+C2G9,C2G9,ibis Styles Chartres Sud Barjouville,IBS,IBIS STYLES,BARJOUVILLE,France,https://all.accor.com/hotel/C2G9/index.fr.shtml,france,IBIS STYLES CHARTRES SUD BARJOUVILLE,BARJOUVILLE,missing
+A3N2,A3N2,ibis Styles Rouen Val-de-Reuil,IBS,IBIS STYLES,VAL DE REUIL,France,https://all.accor.com/hotel/A3N2/index.fr.shtml,france,IBIS STYLES ROUEN VAL DE REUIL,VAL DE REUIL,missing
+B4A1,B4A1,ibis Styles Montargis Arboria,IBS,IBIS STYLES,PANNES,France,https://all.accor.com/hotel/B4A1/index.fr.shtml,france,IBIS STYLES MONTARGIS ARBORIA,PANNES,missing
+0861,861,ibis Montargis,IBH,IBIS,MONTARGIS,France,https://all.accor.com/hotel/0861/index.fr.shtml,france,IBIS MONTARGIS,MONTARGIS,missing
+0862,862,ibis Orléans Centre Gare,IBH,IBIS,ORLEANS,France,https://all.accor.com/hotel/0862/index.fr.shtml,france,IBIS ORLEANS CENTRE GARE,ORLEANS,missing
+B6T9,B6T9,Novotel Orléans Centre Gare,NOV,NOVOTEL,ORLEANS,France,https://all.accor.com/hotel/B6T9/index.fr.shtml,france,NOVOTEL ORLEANS CENTRE GARE,ORLEANS,missing
+0432,432,Novotel Rouen Sud Zenith Parc Expo,NOV,NOVOTEL,SAINT ETIENNE DU ROUVRAY,France,https://all.accor.com/hotel/0432/index.fr.shtml,france,NOVOTEL ROUEN SUD ZENITH PARC EXPO,SAINT ETIENNE DU ROUVRAY,missing
+0742,742,ibis Styles Rouen Parc expo zenith,IBS,IBIS STYLES,SAINT ETIENNE DU ROUVRAY,France,https://all.accor.com/hotel/0742/index.fr.shtml,france,IBIS STYLES ROUEN PARC EXPO ZENITH,SAINT ETIENNE DU ROUVRAY,missing
+5690,5690,ibis Rouen Centre Champ-de-Mars,IBH,IBIS,ROUEN,France,https://all.accor.com/hotel/5690/index.fr.shtml,france,IBIS ROUEN CENTRE CHAMP DE MARS,ROUEN,missing
+0581,581,Hôtel Mercure Orléans Centre Bords de Loire,MER,MERCURE,ORLEANS,France,https://all.accor.com/hotel/0581/index.fr.shtml,france,HOTEL MERCURE ORLEANS CENTRE BORDS DE LOIRE,ORLEANS,missing
+A0X8,A0X8,ibis Styles Rouen Centre Cathédrale,IBS,IBIS STYLES,ROUEN,France,https://all.accor.com/hotel/A0X8/index.fr.shtml,france,IBIS STYLES ROUEN CENTRE CATHEDRALE,ROUEN,missing
+0396,396,Novotel Amiens Pôle Jules Verne,NOV,NOVOTEL,BOVES,France,https://all.accor.com/hotel/0396/index.fr.shtml,france,NOVOTEL AMIENS POLE JULES VERNE,BOVES,missing
+B919,B919,Novotel Rouen Centre Cathédrale,NOV,NOVOTEL,ROUEN,France,https://all.accor.com/hotel/B919/index.fr.shtml,france,NOVOTEL ROUEN CENTRE CATHEDRALE,ROUEN,missing
+B7M1,B7M1,Aparthotel Adagio Access Rouen Centre Cathédrale,ADA,ADAGIO ACCESS,ROUEN,France,https://all.accor.com/hotel/B7M1/index.fr.shtml,france,APARTHOTEL ADAGIO ACCESS ROUEN CENTRE CATHEDRALE,ROUEN,missing
+B6G1,B6G1,ibis Styles Rouen Centre Rive Gauche,IBS,IBIS STYLES,ROUEN,France,https://all.accor.com/hotel/B6G1/index.fr.shtml,france,IBIS STYLES ROUEN CENTRE RIVE GAUCHE,ROUEN,missing
+B6G2,B6G2,ibis Budget Rouen Centre Rive Gauche,IBB,IBIS BUDGET,ROUEN,France,https://all.accor.com/hotel/B6G2/index.fr.shtml,france,IBIS BUDGET ROUEN CENTRE RIVE GAUCHE,ROUEN,missing
+C0I0,C0I0,Ibis Rouen Centre Rive Gauche Mermoz,IBH,IBIS,ROUEN,France,https://all.accor.com/hotel/C0I0/index.fr.shtml,france,IBIS ROUEN CENTRE RIVE GAUCHE MERMOZ,ROUEN,missing
+B9K3,B9K3,ibis Rouen Centre Rive Droite Pasteur,IBH,IBIS,ROUEN,France,https://all.accor.com/hotel/B9K3/index.fr.shtml,france,IBIS ROUEN CENTRE RIVE DROITE PASTEUR,ROUEN,missing
+C5H7,C5H7,ibis Styles Amiens Sud,IBS,IBIS STYLES,AMIENS,France,https://all.accor.com/hotel/C5H7/index.fr.shtml,france,IBIS STYLES AMIENS SUD,AMIENS,missing
+C5P6,C5P6,You Hotel Amiens - Handwritten Collection,SOU,SOU,AMIENS,France,https://all.accor.com/hotel/C5P6/index.fr.shtml,france,YOU HOTEL AMIENS HANDWRITTEN COLLECTION,AMIENS,missing
+B5R0,B5R0,ibis Styles Amiens Centre,IBS,IBIS STYLES,AMIENS,France,https://all.accor.com/hotel/B5R0/index.fr.shtml,france,IBIS STYLES AMIENS CENTRE,AMIENS,missing
+A3P0,A3P0,ibis budget Amiens Centre Gare,IBB,IBIS BUDGET,AMIENS,France,https://all.accor.com/hotel/A3P0/index.fr.shtml,france,IBIS BUDGET AMIENS CENTRE GARE,AMIENS,missing
+0852,852,ibis Épernay Centre-Ville,IBH,IBIS,EPERNAY,France,https://all.accor.com/hotel/0852/index.fr.shtml,france,IBIS EPERNAY CENTRE VILLE,EPERNAY,missing
+B1F0,B1F0,Hôtel Mercure Orléans Portes de Sologne,MER,MERCURE,ARDON ORLEANS,France,https://all.accor.com/hotel/B1F0/index.fr.shtml,france,HOTEL MERCURE ORLEANS PORTES DE SOLOGNE,ARDON ORLEANS,missing
+0419,419,Novotel Orleans Chemins De Sologne Demeures De Campagne,NOV,NOVOTEL,ORLEANS,France,https://all.accor.com/hotel/0419/index.fr.shtml,france,NOVOTEL ORLEANS CHEMINS DE SOLOGNE DEMEURES DE CAMPAGNE,ORLEANS,missing
+0703,703,ibis Styles Rouen Nord Barentin,IBS,IBIS STYLES,BARENTIN,France,https://all.accor.com/hotel/0703/index.fr.shtml,france,IBIS STYLES ROUEN NORD BARENTIN,BARENTIN,missing
+B3B3,B3B3,Hôtel F1 Reims Tinqueux,HOF,HOTELF1,TINQUEUX,France,https://all.accor.com/hotel/B3B3/index.fr.shtml,france,HOTEL F1 REIMS TINQUEUX,TINQUEUX,missing
+C1U6,C1U6,greet Hotel Reims Tinqueux,GRE,GREET,TINQUEUX,France,https://all.accor.com/hotel/C1U6/index.fr.shtml,france,GREET HOTEL REIMS TINQUEUX,TINQUEUX,missing
+0811,811,ibis Reims Tinqueux,IBH,IBIS,TINQUEUX,France,https://all.accor.com/hotel/0811/index.fr.shtml,france,IBIS REIMS TINQUEUX,TINQUEUX,missing
+0428,428,Novotel Reims Tinqueux,NOV,NOVOTEL,TINQUEUX,France,https://all.accor.com/hotel/0428/index.fr.shtml,france,NOVOTEL REIMS TINQUEUX,TINQUEUX,missing
+C079,C079,ibis Styles Saint-Quentin,IBS,IBIS STYLES,SAINT QUENTIN,France,https://all.accor.com/hotel/C079/index.fr.shtml,france,IBIS STYLES SAINT QUENTIN,SAINT QUENTIN,missing
+C1B6,C1B6,TRIBE Reims Centre (Ouverture automne 2026),TRI,TRIBE,REIMS,France,https://all.accor.com/hotel/C1B6/index.fr.shtml,france,TRIBE REIMS CENTRE OUVERTURE AUTOMNE 2026,REIMS,missing
+B678,B678,ibis budget Reims Parc Des Expositions,IBB,IBIS BUDGET,REIMS,France,https://all.accor.com/hotel/B678/index.fr.shtml,france,IBIS BUDGET REIMS PARC DES EXPOSITIONS,REIMS,missing
+0363,363,Hôtel Mercure Reims Parc des Expositions,MER,MERCURE,REIMS,France,https://all.accor.com/hotel/0363/index.fr.shtml,france,HOTEL MERCURE REIMS PARC DES EXPOSITIONS,REIMS,missing
+B388,B388,La Licorne Hotel & Spa Troyes - MGallery Collection,MGA,MGALLERY,TROYES,France,https://all.accor.com/hotel/B388/index.fr.shtml,france,LA LICORNE HOTEL SPA TROYES MGALLERY COLLECTION,TROYES,missing
+0348,348,Hôtel Mercure Auxerre Autoroute Du Soleil,MER,MERCURE,APPOIGNY,France,https://all.accor.com/hotel/0348/index.fr.shtml,france,HOTEL MERCURE AUXERRE AUTOROUTE DU SOLEIL,APPOIGNY,missing
+0741,741,ibis Abbeville,IBH,IBIS,ABBEVILLE,France,https://all.accor.com/hotel/0741/index.fr.shtml,france,IBIS ABBEVILLE,ABBEVILLE,missing
+A068,A068,ibis budget Troyes Est,IBB,IBIS BUDGET,SAINT PARRES AUX TERTRES,France,https://all.accor.com/hotel/A068/index.fr.shtml,france,IBIS BUDGET TROYES EST,SAINT PARRES AUX TERTRES,missing
+A1B9,A1B9,ibis Styles Auxerre Nord,IBS,IBIS STYLES,AUXERRE,France,https://all.accor.com/hotel/A1B9/index.fr.shtml,france,IBIS STYLES AUXERRE NORD,AUXERRE,missing
+C116,C116,ibis budget Auxerre Nord,IBB,IBIS BUDGET,AUXERRE,France,https://all.accor.com/hotel/C116/index.fr.shtml,france,IBIS BUDGET AUXERRE NORD,AUXERRE,missing
+A212,A212,ibis Styles Châlons-en-Champagne Centre,IBS,IBIS STYLES,CHALONS EN CHAMPAGNE,France,https://all.accor.com/hotel/A212/index.fr.shtml,france,IBIS STYLES CHALONS EN CHAMPAGNE CENTRE,CHALONS EN CHAMPAGNE,missing
+A1R3,A1R3,ibis budget Auxerre Centre,IBB,IBIS BUDGET,AUXERRE,France,https://all.accor.com/hotel/A1R3/index.fr.shtml,france,IBIS BUDGET AUXERRE CENTRE,AUXERRE,missing
+0611,611,ibis Dieppe Val Druel,IBH,IBIS,DIEPPE,France,https://all.accor.com/hotel/0611/index.fr.shtml,france,IBIS DIEPPE VAL DRUEL,DIEPPE,missing
+0699,699,ibis Châlons-en-Champagne,IBH,IBIS,CHALONS EN CHAMPAGNE,France,https://all.accor.com/hotel/0699/index.fr.shtml,france,IBIS CHALONS EN CHAMPAGNE,CHALONS EN CHAMPAGNE,missing
+A285,A285,ibis budget Dieppe Centre Port,IBB,IBIS BUDGET,DIEPPE,France,https://all.accor.com/hotel/A285/index.fr.shtml,france,IBIS BUDGET DIEPPE CENTRE PORT,DIEPPE,missing
+B6G5,B6G5,ibis Styles Le Treport Mers Les Bains,IBS,IBIS STYLES,MERS LES BAINS,France,https://all.accor.com/hotel/B6G5/index.fr.shtml,france,IBIS STYLES LE TREPORT MERS LES BAINS,MERS LES BAINS,missing
+0700,700,ibis Cambrai,IBH,IBIS,FONTAINE-NOTRE-DAME,France,https://all.accor.com/hotel/0700/index.fr.shtml,france,IBIS CAMBRAI,FONTAINE NOTRE DAME,missing
+B2W9,B2W9,Novotel Blois Centre Val de Loire,NOV,NOVOTEL,BLOIS,France,https://all.accor.com/hotel/B2W9/index.fr.shtml,france,NOVOTEL BLOIS CENTRE VAL DE LOIRE,BLOIS,missing
+1621,1621,Hôtel Mercure Blois Centre,MER,MERCURE,BLOIS,France,https://all.accor.com/hotel/1621/index.fr.shtml,france,HOTEL MERCURE BLOIS CENTRE,BLOIS,missing
+0920,920,ibis Blois Centre Château,IBH,IBIS,BLOIS,France,https://all.accor.com/hotel/0920/index.fr.shtml,france,IBIS BLOIS CENTRE CHATEAU,BLOIS,missing
+B5E7,B5E7,ibis Styles Arras Centre,IBS,IBIS STYLES,ARRAS,France,https://all.accor.com/hotel/B5E7/index.fr.shtml,france,IBIS STYLES ARRAS CENTRE,ARRAS,missing
+2716,2716,ibis budget Honfleur Centre-Ville,IBB,IBIS BUDGET,HONFLEUR,France,https://all.accor.com/hotel/2716/index.fr.shtml,france,IBIS BUDGET HONFLEUR CENTRE VILLE,HONFLEUR,missing
+0986,986,Hôtel Mercure Honfleur,MER,MERCURE,HONFLEUR,France,https://all.accor.com/hotel/0986/index.fr.shtml,france,HOTEL MERCURE HONFLEUR,HONFLEUR,missing
+B8E1,B8E1,ibis Styles Contres Cheverny,IBS,IBIS STYLES,LE CONTROIS EN SOLOGNE,France,https://all.accor.com/hotel/B8E1/index.fr.shtml,france,IBIS STYLES CONTRES CHEVERNY,LE CONTROIS EN SOLOGNE,missing
+0951,951,ibis Le Havre Sud Harfleur,IBH,IBIS,HARFLEUR,France,https://all.accor.com/hotel/0951/index.fr.shtml,france,IBIS LE HAVRE SUD HARFLEUR,HARFLEUR,missing
+0982,982,ibis Alençon,IBH,IBIS,ALENCON,France,https://all.accor.com/hotel/0982/index.fr.shtml,france,IBIS ALENCON,ALENCON,missing
+C1N9,C1N9,ibis Douai Dechy,IBH,IBIS,DECHY,France,https://all.accor.com/hotel/C1N9/index.fr.shtml,france,IBIS DOUAI DECHY,DECHY,missing
+0795,795,ibis Deauville Centre,IBH,IBIS,DEAUVILLE,France,https://all.accor.com/hotel/0795/index.fr.shtml,france,IBIS DEAUVILLE CENTRE,DEAUVILLE,missing
+C4Z4,C4Z4,You Hotel Deauville - Handwritten Collection,SOU,SOU,DEAUVILLE,France,https://all.accor.com/hotel/C4Z4/index.fr.shtml,france,YOU HOTEL DEAUVILLE HANDWRITTEN COLLECTION,DEAUVILLE,missing
+A0B4,A0B4,ibis Styles Deauville Centre,IBS,IBIS STYLES,DEAUVILLE,France,https://all.accor.com/hotel/A0B4/index.fr.shtml,france,IBIS STYLES DEAUVILLE CENTRE,DEAUVILLE,missing
+B4Q8,B4Q8,Novotel Deauville Plage,NOV,NOVOTEL,DEAUVILLE,France,https://all.accor.com/hotel/B4Q8/index.fr.shtml,france,NOVOTEL DEAUVILLE PLAGE,DEAUVILLE,missing
+0956,956,ibis Douai Centre,IBH,IBIS,DOUAI,France,https://all.accor.com/hotel/0956/index.fr.shtml,france,IBIS DOUAI CENTRE,DOUAI,missing
+0341,341,Hôtel Mercure Le Havre Centre Bassin du Commerce,MER,MERCURE,LE HAVRE,France,https://all.accor.com/hotel/0341/index.fr.shtml,france,HOTEL MERCURE LE HAVRE CENTRE BASSIN DU COMMERCE,LE HAVRE,missing
+B2J3,B2J3,ibis Styles Douai Gare Gayant Expo,IBS,IBIS STYLES,DOUAI,France,https://all.accor.com/hotel/B2J3/index.fr.shtml,france,IBIS STYLES DOUAI GARE GAYANT EXPO,DOUAI,missing
+B8R0,B8R0,ibis Styles Lens Centre Gare,IBS,IBIS STYLES,LENS,France,https://all.accor.com/hotel/B8R0/index.fr.shtml,france,IBIS STYLES LENS CENTRE GARE,LENS,missing
+0707,707,ibis Fourmies,IBH,IBIS,FOURMIES,France,https://all.accor.com/hotel/0707/index.fr.shtml,france,IBIS FOURMIES,FOURMIES,missing
+0426,426,Novotel Lens Noyelles,NOV,NOVOTEL,NOYELLES-GODAULT,France,https://all.accor.com/hotel/0426/index.fr.shtml,france,NOVOTEL LENS NOYELLES,NOYELLES GODAULT,missing
+0456,456,Novotel Valenciennes,NOV,NOVOTEL,ROUVIGNIES,France,https://all.accor.com/hotel/0456/index.fr.shtml,france,NOVOTEL VALENCIENNES,ROUVIGNIES,missing
+0440,440,Novotel Le Mans,NOV,NOVOTEL,LE MANS,France,https://all.accor.com/hotel/0440/index.fr.shtml,france,NOVOTEL LE MANS,LE MANS,missing
+0704,704,ibis Le Mans Est Pontlieue,IBH,IBIS,LE MANS,France,https://all.accor.com/hotel/0704/index.fr.shtml,france,IBIS LE MANS EST PONTLIEUE,LE MANS,missing
+A9P2,A9P2,Ibis le Mans Centre Gare Nord,IBH,IBIS,LE MANS,France,https://all.accor.com/hotel/A9P2/index.fr.shtml,france,IBIS LE MANS CENTRE GARE NORD,LE MANS,missing
+C1U8,C1U8,TRIBE Cabourg (Ouverture Mars 2027),TRI,TRIBE,CABOURG,France,https://all.accor.com/hotel/C1U8/index.fr.shtml,france,TRIBE CABOURG OUVERTURE MARS 2027,CABOURG,missing
+B8Q0,B8Q0,ibis Bethune Centre Gare,IBH,IBIS,BETHUNE,France,https://all.accor.com/hotel/B8Q0/index.fr.shtml,france,IBIS BETHUNE CENTRE GARE,BETHUNE,missing
+0344,344,Mercure Le Mans Batignolles - Hôtel & Spa,MER,MERCURE,LE MANS,France,https://all.accor.com/hotel/0344/index.fr.shtml,france,MERCURE LE MANS BATIGNOLLES HOTEL SPA,LE MANS,missing
+B3A0,B3A0,ibis budget Le Mans Université,IBB,IBIS BUDGET,LE MANS,France,https://all.accor.com/hotel/B3A0/index.fr.shtml,france,IBIS BUDGET LE MANS UNIVERSITE,LE MANS,missing
+B6A1,B6A1,ibis Styles Valenciennes Petite Forêt,IBS,IBIS STYLES,PETITE FORET,France,https://all.accor.com/hotel/B6A1/index.fr.shtml,france,IBIS STYLES VALENCIENNES PETITE FORET,PETITE FORET,missing
+A8Q1,A8Q1,ibis Styles Le Mans Sud Mulsanne,IBS,IBIS STYLES,MULSANNE,France,https://all.accor.com/hotel/A8Q1/index.fr.shtml,france,IBIS STYLES LE MANS SUD MULSANNE,MULSANNE,missing
+0908,908,ibis Amboise,IBH,IBIS,AMBOISE,France,https://all.accor.com/hotel/0908/index.fr.shtml,france,IBIS AMBOISE,AMBOISE,missing
+0395,395,Novotel Amboise,NOV,NOVOTEL,AMBOISE,France,https://all.accor.com/hotel/0395/index.fr.shtml,france,NOVOTEL AMBOISE,AMBOISE,missing
+B6E3,B6E3,Mercure Le Touquet,MER,MERCURE,LE TOUQUET,France,https://all.accor.com/hotel/B6E3/index.fr.shtml,france,MERCURE LE TOUQUET,LE TOUQUET,missing
+B6E2,B6E2,ibis Styles Le Touquet,IBS,IBIS STYLES,LE TOUQUET,France,https://all.accor.com/hotel/B6E2/index.fr.shtml,france,IBIS STYLES LE TOUQUET,LE TOUQUET,missing
+B8Z4,B8Z4,TRIBE  Le Touquet,TRI,TRIBE,LE TOUQUET,France,https://all.accor.com/hotel/B8Z4/index.fr.shtml,france,TRIBE LE TOUQUET,LE TOUQUET,missing
+0668,668,ibis Le Touquet Thalassa,IBH,IBIS,LE TOUQUET,France,https://all.accor.com/hotel/0668/index.fr.shtml,france,IBIS LE TOUQUET THALASSA,LE TOUQUET,missing
+0449,449,Novotel Thalassa Le Touquet,NOV,NOVOTEL,LE TOUQUET,France,https://all.accor.com/hotel/0449/index.fr.shtml,france,NOVOTEL THALASSA LE TOUQUET,LE TOUQUET,missing
+0819,819,ibis Bourges,IBH,IBIS,BOURGES,France,https://all.accor.com/hotel/0819/index.fr.shtml,france,IBIS BOURGES,BOURGES,missing
+0364,364,ibis Charleville-Mézières,IBH,IBIS,VILLERS-SEMEUSE,France,https://all.accor.com/hotel/0364/index.fr.shtml,france,IBIS CHARLEVILLE MEZIERES,VILLERS SEMEUSE,missing
+0427,427,Novotel Lille Aéroport,NOV,NOVOTEL,LESQUIN,France,https://all.accor.com/hotel/0427/index.fr.shtml,france,NOVOTEL LILLE AEROPORT,LESQUIN,missing
+1572,1572,Hôtel Mercure Tours Nord,MER,MERCURE,TOURS,France,https://all.accor.com/hotel/1572/index.fr.shtml,france,HOTEL MERCURE TOURS NORD,TOURS,missing
+0605,605,ibis Caen Porte d'Angleterre,IBH,IBIS,HEROUVILLE SAINT CLAIR,France,https://all.accor.com/hotel/0605/index.fr.shtml,france,IBIS CAEN PORTE D ANGLETERRE,HEROUVILLE SAINT CLAIR,missing
+0684,684,ibis Tours Nord,IBH,IBIS,TOURS,France,https://all.accor.com/hotel/0684/index.fr.shtml,france,IBIS TOURS NORD,TOURS,missing
+0869,869,Hôtel Mercure Caen Centre Port de Plaisance,MER,MERCURE,CAEN,France,https://all.accor.com/hotel/0869/index.fr.shtml,france,HOTEL MERCURE CAEN CENTRE PORT DE PLAISANCE,CAEN,missing
+B3A7,B3A7,hotelF1 Bourges Le Subdray,HOF,HOTELF1,LE SUBDRAY,France,https://all.accor.com/hotel/B3A7/index.fr.shtml,france,HOTELF1 BOURGES LE SUBDRAY,LE SUBDRAY,missing
+0405,405,Novotel Caen Côte de Nacre,NOV,NOVOTEL,CAEN,France,https://all.accor.com/hotel/0405/index.fr.shtml,france,NOVOTEL CAEN COTE DE NACRE,CAEN,missing
+A0W9,A0W9,Aparthotel Adagio Lille Centre Grand Place,ADG,ADAGIO,LILLE,France,https://all.accor.com/hotel/A0W9/index.fr.shtml,france,APARTHOTEL ADAGIO LILLE CENTRE GRAND PLACE,LILLE,missing
+0901,901,Hôtel Ibis Lille Centre Gares,IBH,IBIS,LILLE,France,https://all.accor.com/hotel/0901/index.fr.shtml,france,HOTEL IBIS LILLE CENTRE GARES,LILLE,missing
+A312,A312,Novotel Tours Centre Gare,NOV,NOVOTEL,TOURS,France,https://all.accor.com/hotel/A312/index.fr.shtml,france,NOVOTEL TOURS CENTRE GARE,TOURS,missing
+0918,918,Novotel Lille Centre Grand-Place,NOV,NOVOTEL,LILLE,France,https://all.accor.com/hotel/0918/index.fr.shtml,france,NOVOTEL LILLE CENTRE GRAND PLACE,LILLE,missing
+B943,B943,greet hotel Lille Gare Flandres,GRE,GREET,LILLE,France,https://all.accor.com/hotel/B943/index.fr.shtml,france,GREET HOTEL LILLE GARE FLANDRES,LILLE,missing
+0902,902,ibis Lille Centre Grand-Place,IBH,IBIS,LILLE,France,https://all.accor.com/hotel/0902/index.fr.shtml,france,IBIS LILLE CENTRE GRAND PLACE,LILLE,missing
+0802,802,Hôtel Mercure Lille Centre Grand-Place,MER,MERCURE,LILLE,France,https://all.accor.com/hotel/0802/index.fr.shtml,france,HOTEL MERCURE LILLE CENTRE GRAND PLACE,LILLE,missing
+B1C1,B1C1,Mama Shelter Lille,MSH,MAMA SHELTER,LILLE,France,https://all.accor.com/hotel/B1C1/index.fr.shtml,france,MAMA SHELTER LILLE,LILLE,missing
+B736,B736,ibis Tours Centre Giraudeau,IBH,IBIS,TOURS,France,https://all.accor.com/hotel/B736/index.fr.shtml,france,IBIS TOURS CENTRE GIRAUDEAU,TOURS,missing
+C2M8,C2M8,ibis Styles Lille Villeneuve d'Ascq,IBS,IBIS STYLES,VILLENEUVE D ASCQ,France,https://all.accor.com/hotel/C2M8/index.fr.shtml,france,IBIS STYLES LILLE VILLENEUVE D ASCQ,VILLENEUVE D ASCQ,missing
+0643,643,ibis Tours Sud,IBH,IBIS,CHAMBRAY LES TOURS,France,https://all.accor.com/hotel/0643/index.fr.shtml,france,IBIS TOURS SUD,CHAMBRAY LES TOURS,missing
+C0W0,C0W0,ibis budget Tours Sud,IBB,IBIS BUDGET,CHAMBRAY LES TOURS,France,https://all.accor.com/hotel/C0W0/index.fr.shtml,france,IBIS BUDGET TOURS SUD,CHAMBRAY LES TOURS,missing
+0453,453,ibis Styles Tours Sud,IBS,IBIS STYLES,CHAMBRAY LES TOURS,France,https://all.accor.com/hotel/0453/index.fr.shtml,france,IBIS STYLES TOURS SUD,CHAMBRAY LES TOURS,missing
+A3N4,A3N4,ibis budget Lille Marcq-en-Baroeul,IBB,IBIS BUDGET,MARCQ EN BAROEUL,France,https://all.accor.com/hotel/A3N4/index.fr.shtml,france,IBIS BUDGET LILLE MARCQ EN BAROEUL,MARCQ EN BAROEUL,missing
+C5J7,C5J7,Aparthotel Adagio Access Lille Villeneuve-d'Ascq,ADA,ADAGIO ACCESS,VILLENEUVE D ASCQ,France,https://all.accor.com/hotel/C5J7/index.fr.shtml,france,APARTHOTEL ADAGIO ACCESS LILLE VILLENEUVE D ASCQ,VILLENEUVE D ASCQ,missing
+1788,1788,Hôtel Mercure Tours Sud,MER,MERCURE,JOUE LES TOURS,France,https://all.accor.com/hotel/1788/index.fr.shtml,france,HOTEL MERCURE TOURS SUD,JOUE LES TOURS,missing
+0723,723,ibis Saint-Omer Centre,IBH,IBIS,SAINT OMER,France,https://all.accor.com/hotel/0723/index.fr.shtml,france,IBIS SAINT OMER CENTRE,SAINT OMER,missing
+B561,B561,Mercure Saint-Omer Centre Gare,MER,MERCURE,SAINT OMER,France,https://all.accor.com/hotel/B561/index.fr.shtml,france,MERCURE SAINT OMER CENTRE GARE,SAINT OMER,missing
+0947,947,ibis Nevers,IBH,IBIS,NEVERS,France,https://all.accor.com/hotel/0947/index.fr.shtml,france,IBIS NEVERS,NEVERS,missing
+B8Q6,B8Q6,ibis Styles Lille Neuville en Ferrain,IBS,IBIS STYLES,NEUVILLE EN FERRAIN,France,https://all.accor.com/hotel/B8Q6/index.fr.shtml,france,IBIS STYLES LILLE NEUVILLE EN FERRAIN,NEUVILLE EN FERRAIN,missing
+0964,964,Novotel Bayeux,NOV,NOVOTEL,BAYEUX,France,https://all.accor.com/hotel/0964/index.fr.shtml,france,NOVOTEL BAYEUX,BAYEUX,missing
+6865,6865,ibis Bayeux Port-en-Bessin,IBH,IBIS,PORT EN BESSIN,France,https://all.accor.com/hotel/6865/index.fr.shtml,france,IBIS BAYEUX PORT EN BESSIN,PORT EN BESSIN,missing
+1080,1080,ibis Châteauroux,IBH,IBIS,CHATEAUROUX,France,https://all.accor.com/hotel/1080/index.fr.shtml,france,IBIS CHATEAUROUX,CHATEAUROUX,missing
+0715,715,ibis Calais Car Ferry,IBH,IBIS,CALAIS,France,https://all.accor.com/hotel/0715/index.fr.shtml,france,IBIS CALAIS CAR FERRY,CALAIS,missing
+B6X6,B6X6,Mercure Dunkerque Centre Gare,MER,MERCURE,DUNKERQUE,France,https://all.accor.com/hotel/B6X6/index.fr.shtml,france,MERCURE DUNKERQUE CENTRE GARE,DUNKERQUE,missing
+0613,613,ibis Laval Le Relais d'Armor,IBH,IBIS,CHANGE,France,https://all.accor.com/hotel/0613/index.fr.shtml,france,IBIS LAVAL LE RELAIS D ARMOR,CHANGE,missing
+B0L9,B0L9,ibis Styles Laval Centre Gare,IBS,IBIS STYLES,LAVAL,France,https://all.accor.com/hotel/B0L9/index.fr.shtml,france,IBIS STYLES LAVAL CENTRE GARE,LAVAL,missing
+B1B9,B1B9,ibis budget Langres,IBB,IBIS BUDGET,LANGRES,France,https://all.accor.com/hotel/B1B9/index.fr.shtml,france,IBIS BUDGET LANGRES,LANGRES,missing
+0930,930,ibis Saint-Lô La Chevalerie,IBH,IBIS,SAINT LO,France,https://all.accor.com/hotel/0930/index.fr.shtml,france,IBIS SAINT LO LA CHEVALERIE,SAINT LO,missing
+B425,B425,hotelF1 Longwy,HOF,HOTELF1,LONGWY,France,https://all.accor.com/hotel/B425/index.fr.shtml,france,HOTELF1 LONGWY,LONGWY,missing
+C1U5,C1U5,ibis Styles Dijon Nord Valmy,IBS,IBIS STYLES,DIJON,France,https://all.accor.com/hotel/C1U5/index.fr.shtml,france,IBIS STYLES DIJON NORD VALMY,DIJON,missing
+C237,C237,greet Hotel Chatellerault,GRE,GREET,CHATELLERAULT,France,https://all.accor.com/hotel/C237/index.fr.shtml,france,GREET HOTEL CHATELLERAULT,CHATELLERAULT,missing
+B8W6,B8W6,Mama Shelter Dijon,MSH,MAMA SHELTER,DIJON,France,https://all.accor.com/hotel/B8W6/index.fr.shtml,france,MAMA SHELTER DIJON,DIJON,missing
+0654,654,ibis Styles Dijon Central,IBS,IBIS STYLES,DIJON,France,https://all.accor.com/hotel/0654/index.fr.shtml,france,IBIS STYLES DIJON CENTRAL,DIJON,missing
+B1R3,B1R3,Ibis Budget Dijon Centre Clemenceau,IBB,IBIS BUDGET,DIJON,France,https://all.accor.com/hotel/B1R3/index.fr.shtml,france,IBIS BUDGET DIJON CENTRE CLEMENCEAU,DIJON,missing
+0418,418,Novotel Dijon Sud,NOV,NOVOTEL,MARSANNAY LA COTE,France,https://all.accor.com/hotel/0418/index.fr.shtml,france,NOVOTEL DIJON SUD,MARSANNAY LA COTE,missing
+0540,540,Mercure Angers Centre De Congres,MER,MERCURE,ANGERS,France,https://all.accor.com/hotel/0540/index.fr.shtml,france,MERCURE ANGERS CENTRE DE CONGRES,ANGERS,missing
+0698,698,ibis Dijon Sud,IBH,IBIS,PERRIGNY LES DIJON,France,https://all.accor.com/hotel/0698/index.fr.shtml,france,IBIS DIJON SUD,PERRIGNY LES DIJON,missing
+A9F1,A9F1,Mercure Moulins Centre - Hôtel de Paris,MER,MERCURE,MOULINS,France,https://all.accor.com/hotel/A9F1/index.fr.shtml,france,MERCURE MOULINS CENTRE HOTEL DE PARIS,MOULINS,missing
+0848,848,Ibis Angers Centre Château,IBH,IBIS,ANGERS,France,https://all.accor.com/hotel/0848/index.fr.shtml,france,IBIS ANGERS CENTRE CHATEAU,ANGERS,missing
+A0B0,A0B0,ibis Styles Moulins Centre,IBS,IBIS STYLES,MOULINS,France,https://all.accor.com/hotel/A0B0/index.fr.shtml,france,IBIS STYLES MOULINS CENTRE,MOULINS,missing
+B816,B816,ibis Styles Fougères,IBS,IBIS STYLES,BEAUCE,France,https://all.accor.com/hotel/B816/index.fr.shtml,france,IBIS STYLES FOUGERES,BEAUCE,missing
+B5Q6,B5Q6,Novotel Angers Centre Gare,NOV,NOVOTEL,ANGERS,France,https://all.accor.com/hotel/B5Q6/index.fr.shtml,france,NOVOTEL ANGERS CENTRE GARE,ANGERS,missing
+0610,610,ibis Châtellerault,IBH,IBIS,CHATELLERAULT,France,https://all.accor.com/hotel/0610/index.fr.shtml,france,IBIS CHATELLERAULT,CHATELLERAULT,missing
+B7R6,B7R6,ibis Styles Dijon Sud Domaine de Beauregard,IBS,IBIS STYLES,LONGVIC,France,https://all.accor.com/hotel/B7R6/index.fr.shtml,france,IBIS STYLES DIJON SUD DOMAINE DE BEAUREGARD,LONGVIC,missing
+C0T5,C0T5,greet Hotel Dijon Sud Longvic,GRE,GREET,LONGVIC,France,https://all.accor.com/hotel/C0T5/index.fr.shtml,france,GREET HOTEL DIJON SUD LONGVIC,LONGVIC,missing
+0625,625,ibis Moulins Sud,IBH,IBIS,MOULINS,France,https://all.accor.com/hotel/0625/index.fr.shtml,france,IBIS MOULINS SUD,MOULINS,missing
+0882,882,ibis Avranches Baie du Mont-Saint-Michel,IBH,IBIS,SAINT-QUENTIN-SUR-LE-HOMME,France,https://all.accor.com/hotel/0882/index.fr.shtml,france,IBIS AVRANCHES BAIE DU MONT SAINT MICHEL,SAINT QUENTIN SUR LE HOMME,missing
+0971,971,ibis Beaune - La Ferme aux Vins,IBH,IBIS,BEAUNE,France,https://all.accor.com/hotel/0971/index.fr.shtml,france,IBIS BEAUNE LA FERME AUX VINS,BEAUNE,missing
+B6J2,B6J2,ibis budget Nancy Laxou,IBB,IBIS BUDGET,LAXOU,France,https://all.accor.com/hotel/B6J2/index.fr.shtml,france,IBIS BUDGET NANCY LAXOU,LAXOU,missing
+0407,407,Novotel Nancy,NOV,NOVOTEL,LAXOU,France,https://all.accor.com/hotel/0407/index.fr.shtml,france,NOVOTEL NANCY,LAXOU,missing
+B5V7,B5V7,greet Hotel Beaune,GRE,GREET,BEAUNE,France,https://all.accor.com/hotel/B5V7/index.fr.shtml,france,GREET HOTEL BEAUNE,BEAUNE,missing
+B4Y4,B4Y4,Ibis Styles Nancy Ouest Laxou,IBS,IBIS STYLES,LAXOU,France,https://all.accor.com/hotel/B4Y4/index.fr.shtml,france,IBIS STYLES NANCY OUEST LAXOU,LAXOU,missing
+C6G9,C6G9,greet Hotel Nancy Frouard (Ouverture septembre 2026),GRE,GREET,FROUARD,France,https://all.accor.com/hotel/C6G9/index.fr.shtml,france,GREET HOTEL NANCY FROUARD OUVERTURE SEPTEMBRE 2026,FROUARD,missing
+2320,2320,hotelF1 Metz Centre Devant les Ponts,HOF,HOTELF1,METZ,France,https://all.accor.com/hotel/2320/index.fr.shtml,france,HOTELF1 METZ CENTRE DEVANT LES PONTS,METZ,missing
+B6Z0,B6Z0,Mercure Grand Hotel Metz Centre Cathédrale,MER,MERCURE,METZ,France,https://all.accor.com/hotel/B6Z0/index.fr.shtml,france,MERCURE GRAND HOTEL METZ CENTRE CATHEDRALE,METZ,missing
+0756,756,ibis Metz Centre Gare,IBH,IBIS,METZ,France,https://all.accor.com/hotel/0756/index.fr.shtml,france,IBIS METZ CENTRE GARE,METZ,missing
+A038,A038,Hôtel Mercure Nancy Centre Gare,MER,MERCURE,NANCY,France,https://all.accor.com/hotel/A038/index.fr.shtml,france,HOTEL MERCURE NANCY CENTRE GARE,NANCY,missing
+0589,589,Novotel Metz Centre,NOV,NOVOTEL,METZ,France,https://all.accor.com/hotel/0589/index.fr.shtml,france,NOVOTEL METZ CENTRE,METZ,missing
+0973,973,ibis Nancy Centre Gare et Congrès,IBH,IBIS,NANCY,France,https://all.accor.com/hotel/0973/index.fr.shtml,france,IBIS NANCY CENTRE GARE ET CONGRES,NANCY,missing
+0621,621,ibis Metz Centre Cathédrale,IBH,IBIS,METZ,France,https://all.accor.com/hotel/0621/index.fr.shtml,france,IBIS METZ CENTRE CATHEDRALE,METZ,missing
+C276,C276,ibis Styles Metz Centre,IBS,IBIS STYLES,METZ,France,https://all.accor.com/hotel/C276/index.fr.shtml,france,IBIS STYLES METZ CENTRE,METZ,missing
+0354,354,ibis Metz Woippy,IBH,IBIS,WOIPPY,France,https://all.accor.com/hotel/0354/index.fr.shtml,france,IBIS METZ WOIPPY,WOIPPY,missing
+0446,446,Novotel Metz Amnéville,NOV,NOVOTEL,HAUCONCOURT,France,https://all.accor.com/hotel/0446/index.fr.shtml,france,NOVOTEL METZ AMNEVILLE,HAUCONCOURT,missing
+B7B0,B7B0,greet Hotel Nancy Sud,GRE,GREET,HOUDEMONT,France,https://all.accor.com/hotel/B7B0/index.fr.shtml,france,GREET HOTEL NANCY SUD,HOUDEMONT,missing
+0408,408,ibis Styles Nancy Sud,IBS,IBIS STYLES,HOUDEMONT,France,https://all.accor.com/hotel/0408/index.fr.shtml,france,IBIS STYLES NANCY SUD,HOUDEMONT,missing
+5317,5317,ibis budget Granville,IBB,IBIS BUDGET,GRANVILLE,France,https://all.accor.com/hotel/5317/index.fr.shtml,france,IBIS BUDGET GRANVILLE,GRANVILLE,missing
+B261,B261,ibis Pontorson Baie du Mont-Saint-Michel,IBH,IBIS,SAINT GEORGES DE GREHAIGNE,France,https://all.accor.com/hotel/B261/index.fr.shtml,france,IBIS PONTORSON BAIE DU MONT SAINT MICHEL,SAINT GEORGES DE GREHAIGNE,missing
+C3U1,C3U1,ibis budget Pontorson Baie du Mont-Saint-Michel,IBB,IBIS BUDGET,SAINT GEORGES DE GREHAIGNE,France,https://all.accor.com/hotel/C3U1/index.fr.shtml,france,IBIS BUDGET PONTORSON BAIE DU MONT SAINT MICHEL,SAINT GEORGES DE GREHAIGNE,missing
+B032,B032,ibis Styles Poitiers Nord,IBS,IBIS STYLES,POITIERS,France,https://all.accor.com/hotel/B032/index.fr.shtml,france,IBIS STYLES POITIERS NORD,POITIERS,missing
+0695,695,IBIS POITIERS BEAULIEU,IBH,IBIS,POITIERS,France,https://all.accor.com/hotel/0695/index.fr.shtml,france,IBIS POITIERS BEAULIEU,POITIERS,missing
+0368,368,ibis Styles Chalon-sur-Saône,IBS,IBIS STYLES,CHALON SUR SAONE,France,https://all.accor.com/hotel/0368/index.fr.shtml,france,IBIS STYLES CHALON SUR SAONE,CHALON SUR SAONE,missing
+0608,608,ibis Chalon-sur-Saône Nord (Hôtel rénové),IBH,IBIS,CHALON SUR SAONE,France,https://all.accor.com/hotel/0608/index.fr.shtml,france,IBIS CHALON SUR SAONE NORD HOTEL RENOVE,CHALON SUR SAONE,missing
+0659,659,ibis Poitiers Sud,IBH,IBIS,POITIERS,France,https://all.accor.com/hotel/0659/index.fr.shtml,france,IBIS POITIERS SUD,POITIERS,missing
+C254,C254,ibis Styles Gueret,IBS,IBIS STYLES,GUERET,France,https://all.accor.com/hotel/C254/index.fr.shtml,france,IBIS STYLES GUERET,GUERET,missing
+0471,471,ibis Rennes Cesson,IBH,IBIS,CESSON SEVIGNE,France,https://all.accor.com/hotel/0471/index.fr.shtml,france,IBIS RENNES CESSON,CESSON SEVIGNE,missing
+0689,689,ibis Rennes Beaulieu,IBH,IBIS,CESSON SEVIGNE,France,https://all.accor.com/hotel/0689/index.fr.shtml,france,IBIS RENNES BEAULIEU,CESSON SEVIGNE,missing
+2340,2340,hotelF1 Dole Jura,HOF,HOTELF1,DOLE,France,https://all.accor.com/hotel/2340/index.fr.shtml,france,HOTELF1 DOLE JURA,DOLE,missing
+B7P3,B7P3,ibis Styles Rennes Cesson,IBS,IBIS STYLES,CESSON SEVIGNE,France,https://all.accor.com/hotel/B7P3/index.fr.shtml,france,IBIS STYLES RENNES CESSON,CESSON SEVIGNE,missing
+1759,1759,ibis Dole Sud Choisey,IBH,IBIS,CHOISEY,France,https://all.accor.com/hotel/1759/index.fr.shtml,france,IBIS DOLE SUD CHOISEY,CHOISEY,missing
+0731,731,ibis Styles Rennes Centre Gare Nord,IBS,IBIS STYLES,RENNES,France,https://all.accor.com/hotel/0731/index.fr.shtml,france,IBIS STYLES RENNES CENTRE GARE NORD,RENNES,missing
+B9P3,B9P3,Mama Shelter Rennes,MSH,MAMA SHELTER,RENNES,France,https://all.accor.com/hotel/B9P3/index.fr.shtml,france,MAMA SHELTER RENNES,RENNES,missing
+0430,430,Novotel Rennes Alma,NOV,NOVOTEL,RENNES,France,https://all.accor.com/hotel/0430/index.fr.shtml,france,NOVOTEL RENNES ALMA,RENNES,missing
+B5Z9,B5Z9,ibis Styles Ancenis Centre,IBS,IBIS STYLES,ANCENIS,France,https://all.accor.com/hotel/B5Z9/index.fr.shtml,france,IBIS STYLES ANCENIS CENTRE,ANCENIS,missing
+C3P2,C3P2,Hôtel de L'Abbaye Le Tronchet - Handwritten Collection,SOU,SOU,LE TRONCHET- SAINT-MALO,France,https://all.accor.com/hotel/C3P2/index.fr.shtml,france,HOTEL DE L ABBAYE LE TRONCHET HANDWRITTEN COLLECTION,LE TRONCHET SAINT MALO,missing
+0831,831,Hôtel Mercure Épinal Centre,MER,MERCURE,EPINAL,France,https://all.accor.com/hotel/0831/index.fr.shtml,france,HOTEL MERCURE EPINAL CENTRE,EPINAL,missing
+0890,890,ibis Épinal Centre-Ville,IBH,IBIS,EPINAL,France,https://all.accor.com/hotel/0890/index.fr.shtml,france,IBIS EPINAL CENTRE VILLE,EPINAL,missing
+A331,A331,ibis budget Rennes Route de Lorient,IBB,IBIS BUDGET,RENNES,France,https://all.accor.com/hotel/A331/index.fr.shtml,france,IBIS BUDGET RENNES ROUTE DE LORIENT,RENNES,missing
+B7B2,B7B2,greet Hotel Rennes Pacé,GRE,GREET,PACE,France,https://all.accor.com/hotel/B7B2/index.fr.shtml,france,GREET HOTEL RENNES PACE,PACE,missing
+A6Q5,A6Q5,ibis Styles Vichy Centre,IBS,IBIS STYLES,VICHY,France,https://all.accor.com/hotel/A6Q5/index.fr.shtml,france,IBIS STYLES VICHY CENTRE,VICHY,missing
+1514,1514,ibis Vichy,IBH,IBIS,VICHY,France,https://all.accor.com/hotel/1514/index.fr.shtml,france,IBIS VICHY,VICHY,missing
+0460,460,Hôtel Mercure Vichy,MER,MERCURE,VICHY,France,https://all.accor.com/hotel/0460/index.fr.shtml,france,HOTEL MERCURE VICHY,VICHY,missing
+0728,728,ibis Saint-Malo La Madeleine,IBH,IBIS,SAINT MALO,France,https://all.accor.com/hotel/0728/index.fr.shtml,france,IBIS SAINT MALO LA MADELEINE,SAINT MALO,missing
+0433,433,Novotel Saint-Avold,NOV,NOVOTEL,SAINT AVOLD,France,https://all.accor.com/hotel/0433/index.fr.shtml,france,NOVOTEL SAINT AVOLD,SAINT AVOLD,missing
+A1B8,A1B8,Mercure Saint Malo Balmoral,MER,MERCURE,SAINT MALO,France,https://all.accor.com/hotel/A1B8/index.fr.shtml,france,MERCURE SAINT MALO BALMORAL,SAINT MALO,missing
+A011,A011,Hôtel Mercure Dinan Port Le Jerzual,MER,MERCURE,LANVALLAY,France,https://all.accor.com/hotel/A011/index.fr.shtml,france,HOTEL MERCURE DINAN PORT LE JERZUAL,LANVALLAY,missing
+2266,2266,hotelF1 Besançon Micropolis,HOF,HOTELF1,BESANCON,France,https://all.accor.com/hotel/2266/index.fr.shtml,france,HOTELF1 BESANCON MICROPOLIS,BESANCON,missing
+0400,400,ibis Styles Besançon,IBS,IBIS STYLES,BESANCON,France,https://all.accor.com/hotel/0400/index.fr.shtml,france,IBIS STYLES BESANCON,BESANCON,missing
+0410,410,Novotel Nantes Carquefou,NOV,NOVOTEL,CARQUEFOU,France,https://all.accor.com/hotel/0410/index.fr.shtml,france,NOVOTEL NANTES CARQUEFOU,CARQUEFOU,missing
+0438,438,Novotel Mâcon Nord - Porte de Bourgogne,NOV,NOVOTEL,SENNECE-LES-MACON,France,https://all.accor.com/hotel/0438/index.fr.shtml,france,NOVOTEL MACON NORD PORTE DE BOURGOGNE,SENNECE LES MACON,missing
+B9Q6,B9Q6,ibis budget Forbach Centre,IBB,IBIS BUDGET,FORBACH,France,https://all.accor.com/hotel/B9Q6/index.fr.shtml,france,IBIS BUDGET FORBACH CENTRE,FORBACH,missing
+0855,855,ibis Nantes La Beaujoire Parc Expo,IBH,IBIS,NANTES,France,https://all.accor.com/hotel/0855/index.fr.shtml,france,IBIS NANTES LA BEAUJOIRE PARC EXPO,NANTES,missing
+C343,C343,greet hotel Limoges Nord,GRE,GREET,LIMOGES,France,https://all.accor.com/hotel/C343/index.fr.shtml,france,GREET HOTEL LIMOGES NORD,LIMOGES,missing
+A475,A475,ibis budget Limoges Nord,IBB,IBIS BUDGET,LIMOGES,France,https://all.accor.com/hotel/A475/index.fr.shtml,france,IBIS BUDGET LIMOGES NORD,LIMOGES,missing
+B9P1,B9P1,ibis budget Nantes Nord Treillières,IBB,IBIS BUDGET,TREILLIERES,France,https://all.accor.com/hotel/B9P1/index.fr.shtml,france,IBIS BUDGET NANTES NORD TREILLIERES,TREILLIERES,missing
+B2G8,B2G8,ibis budget Mâcon Crêches,IBB,IBIS BUDGET,CHAINTRE - CRECHES SUR SAONE,France,https://all.accor.com/hotel/B2G8/index.fr.shtml,france,IBIS BUDGET MACON CRECHES,CHAINTRE CRECHES SUR SAONE,missing
+A8V4,A8V4,ibis Styles Nantes Centre Gare,IBS,IBIS STYLES,NANTES,France,https://all.accor.com/hotel/A8V4/index.fr.shtml,france,IBIS STYLES NANTES CENTRE GARE,NANTES,missing
+0431,431,Novotel Limoges Le Lac,NOV,NOVOTEL,LIMOGES,France,https://all.accor.com/hotel/0431/index.fr.shtml,france,NOVOTEL LIMOGES LE LAC,LIMOGES,missing
+0670,670,ibis Mâcon Sud Crêches,IBH,IBIS,CHAINTRE - CRECHES SUR SAONE,France,https://all.accor.com/hotel/0670/index.fr.shtml,france,IBIS MACON SUD CRECHES,CHAINTRE CRECHES SUR SAONE,missing
+0892,892,ibis Nantes Centre Gare Sud,IBH,IBIS,NANTES,France,https://all.accor.com/hotel/0892/index.fr.shtml,france,IBIS NANTES CENTRE GARE SUD,NANTES,missing
+0708,708,ibis Roanne,IBH,IBIS,LE COTEAU,France,https://all.accor.com/hotel/0708/index.fr.shtml,france,IBIS ROANNE,LE COTEAU,missing
+B094,B094,Hôtel Mercure Nantes Centre Passage Pommeraye,MER,MERCURE,NANTES,France,https://all.accor.com/hotel/B094/index.fr.shtml,france,HOTEL MERCURE NANTES CENTRE PASSAGE POMMERAYE,NANTES,missing
+0929,929,ibis Clermont-Ferrand Montferrand,IBH,IBIS,CLERMONT FERRAND,France,https://all.accor.com/hotel/0929/index.fr.shtml,france,IBIS CLERMONT FERRAND MONTFERRAND,CLERMONT FERRAND,missing
+B2L8,B2L8,ibis Styles Clermont-Ferrand République,IBS,IBIS STYLES,CLERMONT FERRAND,France,https://all.accor.com/hotel/B2L8/index.fr.shtml,france,IBIS STYLES CLERMONT FERRAND REPUBLIQUE,CLERMONT FERRAND,missing
+C4X7,C4X7,ibis Clermont Ferrand Centre Stade,IBH,IBIS,CLERMONT-FERRAND,France,https://all.accor.com/hotel/C4X7/index.fr.shtml,france,IBIS CLERMONT FERRAND CENTRE STADE,CLERMONT FERRAND,missing
+0881,881,ibis Limoges Centre,IBH,IBIS,LIMOGES,France,https://all.accor.com/hotel/0881/index.fr.shtml,france,IBIS LIMOGES CENTRE,LIMOGES,missing
+A0Y2,A0Y2,ibis budget Sarrebourg Buhl,IBB,IBIS BUDGET,BUHL LORRAINE,France,https://all.accor.com/hotel/A0Y2/index.fr.shtml,france,IBIS BUDGET SARREBOURG BUHL,BUHL LORRAINE,missing
+B262,B262,Hôtel Mercure Zénith Nantes Saint-Herblain,MER,MERCURE,SAINT HERBLAIN,France,https://all.accor.com/hotel/B262/index.fr.shtml,france,HOTEL MERCURE ZENITH NANTES SAINT HERBLAIN,SAINT HERBLAIN,missing
+B2W8,B2W8,ibis Styles Clermont-Ferrand Gare,IBS,IBIS STYLES,CLERMONT FERRAND,France,https://all.accor.com/hotel/B2W8/index.fr.shtml,france,IBIS STYLES CLERMONT FERRAND GARE,CLERMONT FERRAND,missing
+B5Y1,B5Y1,ibis Styles Limoges Centre,IBS,IBIS STYLES,LIMOGES,France,https://all.accor.com/hotel/B5Y1/index.fr.shtml,france,IBIS STYLES LIMOGES CENTRE,LIMOGES,missing
+C3U3,C3U3,ibis Styles Nantes Saint Herblain,IBS,IBIS STYLES,SAINT-HERBLAIN,France,https://all.accor.com/hotel/C3U3/index.fr.shtml,france,IBIS STYLES NANTES SAINT HERBLAIN,SAINT HERBLAIN,missing
+C5Z8,C5Z8,ibis Styles Clermont Ferrand Sud La Pardieu,IBS,IBIS STYLES,CLERMONT FERRAND,France,https://all.accor.com/hotel/C5Z8/index.fr.shtml,france,IBIS STYLES CLERMONT FERRAND SUD LA PARDIEU,CLERMONT FERRAND,missing
+C1I0,C1I0,greet Hotel Belleville en Beaujolais A6,GRE,GREET,BELLEVILLE EN BEAUJOLAIS,France,https://all.accor.com/hotel/C1I0/index.fr.shtml,france,GREET HOTEL BELLEVILLE EN BEAUJOLAIS A6,BELLEVILLE EN BEAUJOLAIS,missing
+B825,B825,Mercure Belfort Centre,MER,MERCURE,BELFORT,France,https://all.accor.com/hotel/B825/index.fr.shtml,france,MERCURE BELFORT CENTRE,BELFORT,missing
+0355,355,ibis Belfort Danjoutin,IBH,IBIS,DANJOUTIN,France,https://all.accor.com/hotel/0355/index.fr.shtml,france,IBIS BELFORT DANJOUTIN,DANJOUTIN,missing
+C0I5,C0I5,greet Hotel Montbeliard,GRE,GREET,MONTBELIARD,France,https://all.accor.com/hotel/C0I5/index.fr.shtml,france,GREET HOTEL MONTBELIARD,MONTBELIARD,missing
+0622,622,ibis Montbéliard,IBH,IBIS,MONTBELIARD,France,https://all.accor.com/hotel/0622/index.fr.shtml,france,IBIS MONTBELIARD,MONTBELIARD,missing
+6765,6765,ibis budget Bourg-en-Bresse,IBB,IBIS BUDGET,BOURG EN BRESSE,France,https://all.accor.com/hotel/6765/index.fr.shtml,france,IBIS BUDGET BOURG EN BRESSE,BOURG EN BRESSE,missing
+0603,603,ibis Bourg-en-Bresse,IBH,IBIS,BOURG EN BRESSE,France,https://all.accor.com/hotel/0603/index.fr.shtml,france,IBIS BOURG EN BRESSE,BOURG EN BRESSE,missing
+0646,646,ibis Lyon Villefranche-sur-Saône,IBH,IBIS,LIMAS,France,https://all.accor.com/hotel/0646/index.fr.shtml,france,IBIS LYON VILLEFRANCHE SUR SAONE,LIMAS,missing
+7418,7418,ibis budget Pontarlier,IBB,IBIS BUDGET,PONTARLIER,France,https://all.accor.com/hotel/7418/index.fr.shtml,france,IBIS BUDGET PONTARLIER,PONTARLIER,missing
+B815,B815,ibis Styles La Roche-sur-Yon,IBS,IBIS STYLES,MOUILLERON LE CAPTIF,France,https://all.accor.com/hotel/B815/index.fr.shtml,france,IBIS STYLES LA ROCHE SUR YON,MOUILLERON LE CAPTIF,missing
+5686,5686,ibis budget Saint-Brieuc Yffiniac,IBB,IBIS BUDGET,YFFINIAC,France,https://all.accor.com/hotel/5686/index.fr.shtml,france,IBIS BUDGET SAINT BRIEUC YFFINIAC,YFFINIAC,missing
+B9N0,B9N0,Greet Hotel Bourg-en-Bresse Sud Montagnat,GRE,GREET,MONTAGNAT,France,https://all.accor.com/hotel/B9N0/index.fr.shtml,france,GREET HOTEL BOURG EN BRESSE SUD MONTAGNAT,MONTAGNAT,missing
+C1B8,C1B8,Square Lodge Hotel La Roche sur Yon - Handwritten Collection,SOU,SOU,LA ROCHE SUR YON,France,https://all.accor.com/hotel/C1B8/index.fr.shtml,france,SQUARE LODGE HOTEL LA ROCHE SUR YON HANDWRITTEN COLLECTION,LA ROCHE SUR YON,missing
+B939,B939,greet hotel Cernay Mulhouse,GRE,GREET,CERNAY,France,https://all.accor.com/hotel/B939/index.fr.shtml,france,GREET HOTEL CERNAY MULHOUSE,CERNAY,missing
+B6W5,B6W5,ibis Styles Saint Brieuc Plerin,IBS,IBIS STYLES,PLERIN,France,https://all.accor.com/hotel/B6W5/index.fr.shtml,france,IBIS STYLES SAINT BRIEUC PLERIN,PLERIN,missing
+B3B8,B3B8,hotelF1 Massieux,HOF,HOTELF1,MASSIEUX,France,https://all.accor.com/hotel/B3B8/index.fr.shtml,france,HOTELF1 MASSIEUX,MASSIEUX,missing
+C275,C275,greet Hotel Massieux Lyon Nord,GRE,GREET,MASSIEUX,France,https://all.accor.com/hotel/C275/index.fr.shtml,france,GREET HOTEL MASSIEUX LYON NORD,MASSIEUX,missing
+B0L8,B0L8,Novotel Saint Brieuc Centre Gare,NOV,NOVOTEL,SAINT BRIEUC,France,https://all.accor.com/hotel/B0L8/index.fr.shtml,france,NOVOTEL SAINT BRIEUC CENTRE GARE,SAINT BRIEUC,missing
+C6G0,C6G0,greet hôtel Saint-Brieuc - Trégueux (Ouverture 09/2026),GRE,GREET,TREGUEUX,France,https://all.accor.com/hotel/C6G0/index.fr.shtml,france,GREET HOTEL SAINT BRIEUC TREGUEUX OUVERTURE 09 2026,TREGUEUX,missing
+A7F3,A7F3,5 Terres Hôtel & Spa - MGallery Collection,MGA,MGALLERY,BARR,France,https://all.accor.com/hotel/A7F3/index.fr.shtml,france,5 TERRES HOTEL SPA MGALLERY COLLECTION,BARR,missing
+0416,416,ibis Styles Colmar Nord,IBS,IBIS STYLES,COLMAR,France,https://all.accor.com/hotel/0416/index.fr.shtml,france,IBIS STYLES COLMAR NORD,COLMAR,missing
+B7T4,B7T4,L'Esquisse Hotel and Spa Colmar - MGallery,MGA,MGALLERY,COLMAR,France,https://all.accor.com/hotel/B7T4/index.fr.shtml,france,L ESQUISSE HOTEL AND SPA COLMAR MGALLERY,COLMAR,missing
+0978,978,Hôtel Mercure Colmar Centre Unterlinden,MER,MERCURE,COLMAR,France,https://all.accor.com/hotel/0978/index.fr.shtml,france,HOTEL MERCURE COLMAR CENTRE UNTERLINDEN,COLMAR,missing
+A9P3,A9P3,Novotel Suites Colmar Centre,SUI,NOVOTEL SUITES,COLMAR,France,https://all.accor.com/hotel/A9P3/index.fr.shtml,france,NOVOTEL SUITES COLMAR CENTRE,COLMAR,missing
+B9Z7,B9Z7,greet Hotel Colmar,GRE,GREET,COLMAR,France,https://all.accor.com/hotel/B9Z7/index.fr.shtml,france,GREET HOTEL COLMAR,COLMAR,missing
+0858,858,ibis Saint-Nazaire Trignac,IBH,IBIS,TRIGNAC,France,https://all.accor.com/hotel/0858/index.fr.shtml,france,IBIS SAINT NAZAIRE TRIGNAC,TRIGNAC,missing
+C342,C342,greet hotel Saint Nazaire Trignac,GRE,GREET,TRIGNAC,France,https://all.accor.com/hotel/C342/index.fr.shtml,france,GREET HOTEL SAINT NAZAIRE TRIGNAC,TRIGNAC,missing
+B8A5,B8A5,ibis budget Saint Nazaire Centre Gare,IBB,IBIS BUDGET,SAINT NAZAIRE,France,https://all.accor.com/hotel/B8A5/index.fr.shtml,france,IBIS BUDGET SAINT NAZAIRE CENTRE GARE,SAINT NAZAIRE,missing
+B899,B899,ibis Styles Saint Nazaire Centre Gare,IBS,IBIS STYLES,SAINT NAZAIRE,France,https://all.accor.com/hotel/B899/index.fr.shtml,france,IBIS STYLES SAINT NAZAIRE CENTRE GARE,SAINT NAZAIRE,missing
+C098,C098,ibis budget Loudéac Vélodrome,IBB,IBIS BUDGET,LOUDEAC,France,https://all.accor.com/hotel/C098/index.fr.shtml,france,IBIS BUDGET LOUDEAC VELODROME,LOUDEAC,missing
+0816,816,ibis Égletons,IBH,IBIS,EGLETONS,France,https://all.accor.com/hotel/0816/index.fr.shtml,france,IBIS EGLETONS,EGLETONS,missing
+0779,779,ibis Lyon Nord,IBH,IBIS,DARDILLY,France,https://all.accor.com/hotel/0779/index.fr.shtml,france,IBIS LYON NORD,DARDILLY,missing
+0345,345,Hôtel Mercure Lyon Charbonnières,MER,MERCURE,CHARBONNIERES LES BAINS,France,https://all.accor.com/hotel/0345/index.fr.shtml,france,HOTEL MERCURE LYON CHARBONNIERES,CHARBONNIERES LES BAINS,missing
+B8P6,B8P6,Aparthotel Adagio Access Saint-Nazaire,ADA,ADAGIO ACCESS,SAINT NAZAIRE,France,https://all.accor.com/hotel/B8P6/index.fr.shtml,france,APARTHOTEL ADAGIO ACCESS SAINT NAZAIRE,SAINT NAZAIRE,missing
+0397,397,ibis Styles Angoulême Nord,IBS,IBIS STYLES,CHAMPNIERS,France,https://all.accor.com/hotel/0397/index.fr.shtml,france,IBIS STYLES ANGOULEME NORD,CHAMPNIERS,missing
+A069,A069,ibis Styles Mulhouse Centre Gare,IBS,IBIS STYLES,MULHOUSE,France,https://all.accor.com/hotel/A069/index.fr.shtml,france,IBIS STYLES MULHOUSE CENTRE GARE,MULHOUSE,missing
+A063,A063,ibis budget Mulhouse Centre Gare,IBB,IBIS BUDGET,MULHOUSE,France,https://all.accor.com/hotel/A063/index.fr.shtml,france,IBIS BUDGET MULHOUSE CENTRE GARE,MULHOUSE,missing
+B9R3,B9R3,TRIBE Lyon Croix Rousse,TRI,TRIBE,CALUIRE ET CUIRE,France,https://all.accor.com/hotel/B9R3/index.fr.shtml,france,TRIBE LYON CROIX ROUSSE,CALUIRE ET CUIRE,missing
+B3A6,B3A6,ibis Styles Lyon Croix Rousse,IBS,IBIS STYLES,LYON,France,https://all.accor.com/hotel/B3A6/index.fr.shtml,france,IBIS STYLES LYON CROIX ROUSSE,LYON,missing
+C3P7,C3P7,ibis Styles Lyon Gorge de Loup Saphir,IBS,IBIS STYLES,LYON,France,https://all.accor.com/hotel/C3P7/index.fr.shtml,france,IBIS STYLES LYON GORGE DE LOUP SAPHIR,LYON,missing
+C1U0,C1U0,Hôtel Fort St Laurent Lyon - Handwritten Collection,SOU,SOU,LYON,France,https://all.accor.com/hotel/C1U0/index.fr.shtml,france,HOTEL FORT ST LAURENT LYON HANDWRITTEN COLLECTION,LYON,missing
+0627,627,ibis Mulhouse Île Napoléon,IBH,IBIS,SAUSHEIM,France,https://all.accor.com/hotel/0627/index.fr.shtml,france,IBIS MULHOUSE ILE NAPOLEON,SAUSHEIM,missing
+0452,452,Novotel Mulhouse Bâle Fribourg,NOV,NOVOTEL,SAUSHEIM,France,https://all.accor.com/hotel/0452/index.fr.shtml,france,NOVOTEL MULHOUSE BALE FRIBOURG,SAUSHEIM,missing
+0740,740,ibis Lyon Est Beynost A42,IBH,IBIS,BEYNOST,France,https://all.accor.com/hotel/0740/index.fr.shtml,france,IBIS LYON EST BEYNOST A42,BEYNOST,missing
+B523,B523,ibis budget Lyon Est Beynost,IBB,IBIS BUDGET,BEYNOST,France,https://all.accor.com/hotel/B523/index.fr.shtml,france,IBIS BUDGET LYON EST BEYNOST,BEYNOST,missing
+0553,553,Sofitel Lyon Bellecour,SOF,SOFITEL,LYON,France,https://all.accor.com/hotel/0553/index.fr.shtml,france,SOFITEL LYON BELLECOUR,LYON,missing
+C3P0,C3P0,ibis Styles Angoulême Centre,IBS,IBIS STYLES,ANGOULEME,France,https://all.accor.com/hotel/C3P0/index.fr.shtml,france,IBIS STYLES ANGOULEME CENTRE,ANGOULEME,missing
+B918,B918,greet hôtel Angoulême Ouest,GRE,GREET,SAINT YRIEIX SUR CHARENTE,France,https://all.accor.com/hotel/B918/index.fr.shtml,france,GREET HOTEL ANGOULEME OUEST,SAINT YRIEIX SUR CHARENTE,missing
+C177,C177,Pullman Lyon,PUL,PULLMAN,LYON,France,https://all.accor.com/hotel/C177/index.fr.shtml,france,PULLMAN LYON,LYON,missing
+B6G4,B6G4,greet hotel Lyon Confluence,GRE,GREET,LYON,France,https://all.accor.com/hotel/B6G4/index.fr.shtml,france,GREET HOTEL LYON CONFLUENCE,LYON,missing
+B903,B903,Aparthotel Adagio Lyon Patio Confluence,ADG,ADAGIO,LYON,France,https://all.accor.com/hotel/B903/index.fr.shtml,france,APARTHOTEL ADAGIO LYON PATIO CONFLUENCE,LYON,missing
+0618,618,ibis Lyon Gare La Part-Dieu,IBH,IBIS,LYON,France,https://all.accor.com/hotel/0618/index.fr.shtml,france,IBIS LYON GARE LA PART DIEU,LYON,missing
+C176,C176,Aparthotel Adagio Access Lyon Centre Université,ADA,ADAGIO ACCESS,LYON,France,https://all.accor.com/hotel/C176/index.fr.shtml,france,APARTHOTEL ADAGIO ACCESS LYON CENTRE UNIVERSITE,LYON,missing
+C5L3,C5L3,Keystone Hotel & Spa Lyon - Handwritten Collection,SOU,SOU,LYON,France,https://all.accor.com/hotel/C5L3/index.fr.shtml,france,KEYSTONE HOTEL SPA LYON HANDWRITTEN COLLECTION,LYON,missing
+0786,786,ibis Lyon Centre,IBH,IBIS,LYON,France,https://all.accor.com/hotel/0786/index.fr.shtml,france,IBIS LYON CENTRE,LYON,missing
+B3B2,B3B2,hotelF1 Strasbourg La Vigie,HOF,HOTELF1,OSTWALD,France,https://all.accor.com/hotel/B3B2/index.fr.shtml,france,HOTELF1 STRASBOURG LA VIGIE,OSTWALD,missing
+0778,778,ibis Styles Lyon Gerland,IBS,IBIS STYLES,LYON,France,https://all.accor.com/hotel/0778/index.fr.shtml,france,IBIS STYLES LYON GERLAND,LYON,missing
+0736,736,Novotel Lyon Gerland Musée des Confluences,NOV,NOVOTEL,LYON,France,https://all.accor.com/hotel/0736/index.fr.shtml,france,NOVOTEL LYON GERLAND MUSEE DES CONFLUENCES,LYON,missing
+0369,369,Hôtel Mercure Strasbourg Aéroport,MER,MERCURE,OSTWALD,France,https://all.accor.com/hotel/0369/index.fr.shtml,france,HOTEL MERCURE STRASBOURG AEROPORT,OSTWALD,missing
+0477,477,ibis Lyon Gerland Rue Mérieux,IBH,IBIS,LYON,France,https://all.accor.com/hotel/0477/index.fr.shtml,france,IBIS LYON GERLAND RUE MERIEUX,LYON,missing
+A0D8,A0D8,ibis Lyon Carré de Soie,IBH,IBIS,VAULX EN VELIN,France,https://all.accor.com/hotel/A0D8/index.fr.shtml,france,IBIS LYON CARRE DE SOIE,VAULX EN VELIN,missing
+C175,C175,ibis budget La Rochelle Puilboreau,IBB,IBIS BUDGET,PUILBOREAU,France,https://all.accor.com/hotel/C175/index.fr.shtml,france,IBIS BUDGET LA ROCHELLE PUILBOREAU,PUILBOREAU,missing
+0617,617,ibis Lyon Est Bron,IBH,IBIS,BRON,France,https://all.accor.com/hotel/0617/index.fr.shtml,france,IBIS LYON EST BRON,BRON,missing
+B940,B940,ibis Lyon Sud Oullins,IBH,IBIS,OULLINS,France,https://all.accor.com/hotel/B940/index.fr.shtml,france,IBIS LYON SUD OULLINS,OULLINS,missing
+2255,2255,hotelF1 Lyon Sud Oullins,HOF,HOTELF1,OULLINS,France,https://all.accor.com/hotel/2255/index.fr.shtml,france,HOTELF1 LYON SUD OULLINS,OULLINS,missing
+0943,943,ibis Strasbourg Centre Petite France,IBH,IBIS,STRASBOURG,France,https://all.accor.com/hotel/0943/index.fr.shtml,france,IBIS STRASBOURG CENTRE PETITE FRANCE,STRASBOURG,missing
+1813,1813,Hôtel Mercure Strasbourg Centre Petite France,MER,MERCURE,STRASBOURG,France,https://all.accor.com/hotel/1813/index.fr.shtml,france,HOTEL MERCURE STRASBOURG CENTRE PETITE FRANCE,STRASBOURG,missing
+B440,B440,ibis Styles Lyon Meyzieu Arena Stadium,IBS,IBIS STYLES,MEYZIEU,France,https://all.accor.com/hotel/B440/index.fr.shtml,france,IBIS STYLES LYON MEYZIEU ARENA STADIUM,MEYZIEU,missing
+0439,439,Novotel Strasbourg Centre Halles,NOV,NOVOTEL,STRASBOURG,France,https://all.accor.com/hotel/0439/index.fr.shtml,france,NOVOTEL STRASBOURG CENTRE HALLES,STRASBOURG,missing
+0640,640,ibis Strasbourg Centre Halles,IBH,IBIS,STRASBOURG,France,https://all.accor.com/hotel/0640/index.fr.shtml,france,IBIS STRASBOURG CENTRE HALLES,STRASBOURG,missing
+0568,568,Sofitel Strasbourg Grande Île,SOF,SOFITEL,STRASBOURG,France,https://all.accor.com/hotel/0568/index.fr.shtml,france,SOFITEL STRASBOURG GRANDE ILE,STRASBOURG,missing
+C0H9,C0H9,ibis Styles Strasbourg Centre République,IBS,IBIS STYLES,STRASBOURG,France,https://all.accor.com/hotel/C0H9/index.fr.shtml,france,IBIS STYLES STRASBOURG CENTRE REPUBLIQUE,STRASBOURG,missing
+B6A3,B6A3,ibis budget Strasbourg Centre Republique,IBB,IBIS BUDGET,STRASBOURG,France,https://all.accor.com/hotel/B6A3/index.fr.shtml,france,IBIS BUDGET STRASBOURG CENTRE REPUBLIQUE,STRASBOURG,missing
+C0F8,C0F8,ibis Styles Strasbourg Nord Palais des Congrès,IBS,IBIS STYLES,SCHILTIGHEIM,France,https://all.accor.com/hotel/C0F8/index.fr.shtml,france,IBIS STYLES STRASBOURG NORD PALAIS DES CONGRES,SCHILTIGHEIM,missing
+C5L4,C5L4,ibis Styles Lyon Sud Brignais,IBS,IBIS STYLES,BRIGNAIS,France,https://all.accor.com/hotel/C5L4/index.fr.shtml,france,IBIS STYLES LYON SUD BRIGNAIS,BRIGNAIS,missing
+C078,C078,ibis Lyon Est Meyzieu,IBH,IBIS,JONAGE,France,https://all.accor.com/hotel/C078/index.fr.shtml,france,IBIS LYON EST MEYZIEU,JONAGE,missing
+B8C7,B8C7,ibis Styles La Rochelle Centre Gare,IBS,IBIS STYLES,LA ROCHELLE,France,https://all.accor.com/hotel/B8C7/index.fr.shtml,france,IBIS STYLES LA ROCHELLE CENTRE GARE,LA ROCHELLE,missing
+B8C4,B8C4,ibis budget La Rochelle Centre Gare,IBB,IBIS BUDGET,LA ROCHELLE,France,https://all.accor.com/hotel/B8C4/index.fr.shtml,france,IBIS BUDGET LA ROCHELLE CENTRE GARE,LA ROCHELLE,missing
+C1U7,C1U7,Domaine du Liziec Vannes - MGallery Collection,MGA,MGALLERY,VANNES,France,https://all.accor.com/hotel/C1U7/index.fr.shtml,france,DOMAINE DU LIZIEC VANNES MGALLERY COLLECTION,VANNES,missing
+B2R0,B2R0,ibis Styles Lyon Bron Eurexpo,IBS,IBIS STYLES,BRON,France,https://all.accor.com/hotel/B2R0/index.fr.shtml,france,IBIS STYLES LYON BRON EUREXPO,BRON,missing
+0436,436,Novotel Lyon Bron Meeting & Events,NOV,NOVOTEL,BRON,France,https://all.accor.com/hotel/0436/index.fr.shtml,france,NOVOTEL LYON BRON MEETING EVENTS,BRON,missing
+0638,638,Ibis La Rochelle Centre Vieux Port,IBH,IBIS,LA ROCHELLE,France,https://all.accor.com/hotel/0638/index.fr.shtml,france,IBIS LA ROCHELLE CENTRE VIEUX PORT,LA ROCHELLE,missing
+0965,965,Novotel La Rochelle Centre,NOV,NOVOTEL,LA ROCHELLE,France,https://all.accor.com/hotel/0965/index.fr.shtml,france,NOVOTEL LA ROCHELLE CENTRE,LA ROCHELLE,missing
+0914,914,Ibis Styles La Rochelle Centre Vieux Port,IBS,IBIS STYLES,LA ROCHELLE,France,https://all.accor.com/hotel/0914/index.fr.shtml,france,IBIS STYLES LA ROCHELLE CENTRE VIEUX PORT,LA ROCHELLE,missing
+0569,569,Hôtel Mercure La Rochelle Vieux-Port,MER,MERCURE,LA ROCHELLE,France,https://all.accor.com/hotel/0569/index.fr.shtml,france,HOTEL MERCURE LA ROCHELLE VIEUX PORT,LA ROCHELLE,missing
+C4F8,C4F8,ibis budget La Rochelle Centre les Minimes,IBB,IBIS BUDGET,LA ROCHELLE,France,https://all.accor.com/hotel/C4F8/index.fr.shtml,france,IBIS BUDGET LA ROCHELLE CENTRE LES MINIMES,LA ROCHELLE,missing
+C3X3,C3X3,ibis Styles La Rochelle Centre les Minimes,IBS,IBIS STYLES,LA ROCHELLE,France,https://all.accor.com/hotel/C3X3/index.fr.shtml,france,IBIS STYLES LA ROCHELLE CENTRE LES MINIMES,LA ROCHELLE,missing
+2248,2248,hotelF1 Strasbourg Pont de l'Europe,HOF,HOTELF1,STRASBOURG,France,https://all.accor.com/hotel/2248/index.fr.shtml,france,HOTELF1 STRASBOURG PONT DE L EUROPE,STRASBOURG,missing
+B0M9,B0M9,Hôtel Mercure Lyon Genas Eurexpo,MER,MERCURE,GENAS,France,https://all.accor.com/hotel/B0M9/index.fr.shtml,france,HOTEL MERCURE LYON GENAS EUREXPO,GENAS,missing
+A9U8,A9U8,ibis budget Saint-Genis-Pouilly Genève,IBB,IBIS BUDGET,SAINT GENIS POUILLY,France,https://all.accor.com/hotel/A9U8/index.fr.shtml,france,IBIS BUDGET SAINT GENIS POUILLY GENEVE,SAINT GENIS POUILLY,missing
+0650,650,ibis Vannes,IBH,IBIS,VANNES,France,https://all.accor.com/hotel/0650/index.fr.shtml,france,IBIS VANNES,VANNES,missing
+C565,C565,ibis Styles Vannes Porte du Golfe,IBS,IBIS STYLES,VANNES,France,https://all.accor.com/hotel/C565/index.fr.shtml,france,IBIS STYLES VANNES PORTE DU GOLFE,VANNES,missing
+C2F6,C2F6,greet Hôtel Prévessin Genève Aéroport,GRE,GREET,PREVESSIN-GENEVE,France,https://all.accor.com/hotel/C2F6/index.fr.shtml,france,GREET HOTEL PREVESSIN GENEVE AEROPORT,PREVESSIN GENEVE,missing
+C2F5,C2F5,ibis Styles Prévessin Genève Aéroport,IBS,IBIS STYLES,PREVESSIN-MOENS,France,https://all.accor.com/hotel/C2F5/index.fr.shtml,france,IBIS STYLES PREVESSIN GENEVE AEROPORT,PREVESSIN MOENS,missing
+B795,B795,Aparthotel Adagio & Spa Vannes,ADG,ADAGIO,PLESCOP,France,https://all.accor.com/hotel/B795/index.fr.shtml,france,APARTHOTEL ADAGIO SPA VANNES,PLESCOP,missing
+C421,C421,ibis Budget Guingamp - Coeur de Bretagne (Septembre 2026),IBB,IBIS BUDGET,PLOUMAGOAR,France,https://all.accor.com/hotel/C421/index.fr.shtml,france,IBIS BUDGET GUINGAMP COEUR DE BRETAGNE SEPTEMBRE 2026,PLOUMAGOAR,missing
+B428,B428,ibis Budget Cognac,IBB,IBIS BUDGET,COGNAC CHATEAUBERNARD,France,https://all.accor.com/hotel/B428/index.fr.shtml,france,IBIS BUDGET COGNAC,COGNAC CHATEAUBERNARD,missing
+B524,B524,ibis Styles Bâle-Mulhouse Aéroport,IBS,IBIS STYLES,BLOTZHEIM,France,https://all.accor.com/hotel/B524/index.fr.shtml,france,IBIS STYLES BALE MULHOUSE AEROPORT,BLOTZHEIM,missing
+B7A8,B7A8,Mercure Bale Mulhouse Aeroport,MER,MERCURE,BLOTZHEIM,France,https://all.accor.com/hotel/B7A8/index.fr.shtml,france,MERCURE BALE MULHOUSE AEROPORT,BLOTZHEIM,missing
+B7M5,B7M5,Aparthotel Adagio Bâle Mulhouse Aéroport,ADG,ADAGIO,BLOTZHEIM,France,https://all.accor.com/hotel/B7M5/index.fr.shtml,france,APARTHOTEL ADAGIO BALE MULHOUSE AEROPORT,BLOTZHEIM,missing
+1108,1108,ibis Cognac Centre,IBH,IBIS,COGNAC,France,https://all.accor.com/hotel/1108/index.fr.shtml,france,IBIS COGNAC CENTRE,COGNAC,missing
+0801,801,ibis Saint-Étienne - La Terrasse,IBH,IBIS,SAINT ETIENNE,France,https://all.accor.com/hotel/0801/index.fr.shtml,france,IBIS SAINT ETIENNE LA TERRASSE,SAINT ETIENNE,missing
+B2Q7,B2Q7,Mercure Rochefort La Corderie Royale,MER,MERCURE,ROCHEFORT,France,https://all.accor.com/hotel/B2Q7/index.fr.shtml,france,MERCURE ROCHEFORT LA CORDERIE ROYALE,ROCHEFORT,missing
+0349,349,ibis Styles Lyon Sud Vienne,IBS,IBIS STYLES,CHASSE SUR RHONE,France,https://all.accor.com/hotel/0349/index.fr.shtml,france,IBIS STYLES LYON SUD VIENNE,CHASSE SUR RHONE,missing
+B2Q4,B2Q4,Novotel Saint-Étienne Centre Gare Châteaucreux,NOV,NOVOTEL,SAINT ETIENNE,France,https://all.accor.com/hotel/B2Q4/index.fr.shtml,france,NOVOTEL SAINT ETIENNE CENTRE GARE CHATEAUCREUX,SAINT ETIENNE,missing
+B2Q6,B2Q6,ibis budget Saint-Étienne Centre Gare Châteaucreux,IBB,IBIS BUDGET,SAINT ETIENNE,France,https://all.accor.com/hotel/B2Q6/index.fr.shtml,france,IBIS BUDGET SAINT ETIENNE CENTRE GARE CHATEAUCREUX,SAINT ETIENNE,missing
+0750,750,ibis Saintes,IBH,IBIS,SAINTES,France,https://all.accor.com/hotel/0750/index.fr.shtml,france,IBIS SAINTES,SAINTES,missing
+7269,7269,ibis budget Lyon Est Saint Quentin Fallavier,IBB,IBIS BUDGET,SAINT QUENTIN FALLAVIER,France,https://all.accor.com/hotel/7269/index.fr.shtml,france,IBIS BUDGET LYON EST SAINT QUENTIN FALLAVIER,SAINT QUENTIN FALLAVIER,missing
+0927,927,ibis Thonon Centre,IBH,IBIS,THONON LES BAINS,France,https://all.accor.com/hotel/0927/index.fr.shtml,france,IBIS THONON CENTRE,THONON LES BAINS,missing
+B5X9,B5X9,ibis Styles Thonon Les Bains,IBS,IBIS STYLES,THONON LES BAINS,France,https://all.accor.com/hotel/B5X9/index.fr.shtml,france,IBIS STYLES THONON LES BAINS,THONON LES BAINS,missing
+6232,6232,ibis Annemasse,IBH,IBIS,AMBILLY,France,https://all.accor.com/hotel/6232/index.fr.shtml,france,IBIS ANNEMASSE,AMBILLY,missing
+B442,B442,Novotel Annemasse Centre - Porte de Genève,NOV,NOVOTEL,ANNEMASSE,France,https://all.accor.com/hotel/B442/index.fr.shtml,france,NOVOTEL ANNEMASSE CENTRE PORTE DE GENEVE,ANNEMASSE,missing
+0814,814,ibis Brive Centre,IBH,IBIS,BRIVE,France,https://all.accor.com/hotel/0814/index.fr.shtml,france,IBIS BRIVE CENTRE,BRIVE,missing
+0358,358,Hôtel Mercure Brive,MER,MERCURE,USSAC,France,https://all.accor.com/hotel/0358/index.fr.shtml,france,HOTEL MERCURE BRIVE,USSAC,missing
+0343,343,Hôtel Mercure Annemasse Porte de Genève,MER,MERCURE,GAILLARD,France,https://all.accor.com/hotel/0343/index.fr.shtml,france,HOTEL MERCURE ANNEMASSE PORTE DE GENEVE,GAILLARD,missing
+B3A9,B3A9,hotelF1 Lyon Bourgoin-Jallieu,HOF,HOTELF1,LISLE D ABEAU,France,https://all.accor.com/hotel/B3A9/index.fr.shtml,france,HOTELF1 LYON BOURGOIN JALLIEU,LISLE D ABEAU,missing
+B742,B742,ibis Bourgoin Jallieu Medipole,IBH,IBIS,BOURGOIN JALLIEU,France,https://all.accor.com/hotel/B742/index.fr.shtml,france,IBIS BOURGOIN JALLIEU MEDIPOLE,BOURGOIN JALLIEU,missing
+B7N0,B7N0,ibis budget Nangy Annemasse,IBB,IBIS BUDGET,NANGY,France,https://all.accor.com/hotel/B7N0/index.fr.shtml,france,IBIS BUDGET NANGY ANNEMASSE,NANGY,missing
+B3B5,B3B5,ibis budget Bourgoin Jallieu Centre,IBB,IBIS BUDGET,BOURGOIN JALLIEU,France,https://all.accor.com/hotel/B3B5/index.fr.shtml,france,IBIS BUDGET BOURGOIN JALLIEU CENTRE,BOURGOIN JALLIEU,missing
+B668,B668,Ibis Budget Perigueux Boulazac,IBB,IBIS BUDGET,BOULAZAC,France,https://all.accor.com/hotel/B668/index.fr.shtml,france,IBIS BUDGET PERIGUEUX BOULAZAC,BOULAZAC,missing
+0636,636,ibis Périgueux Centre,IBH,IBIS,PERIGUEUX,France,https://all.accor.com/hotel/0636/index.fr.shtml,france,IBIS PERIGUEUX CENTRE,PERIGUEUX,missing
+B1H7,B1H7,ibis budget Annecy Poisy,IBB,IBIS BUDGET,POISY,France,https://all.accor.com/hotel/B1H7/index.fr.shtml,france,IBIS BUDGET ANNECY POISY,POISY,missing
+C3J4,C3J4,Bel Hôtel Oléron Thalasso & Spa - MGallery Collection,MGA,MGALLERY,SAINT TROJAN LES BAINS,France,https://all.accor.com/hotel/C3J4/index.fr.shtml,france,BEL HOTEL OLERON THALASSO SPA MGALLERY COLLECTION,SAINT TROJAN LES BAINS,missing
+0909,909,Mercure Quiberon Hotel and Spa,MER,MERCURE,QUIBERON,France,https://all.accor.com/hotel/0909/index.fr.shtml,france,MERCURE QUIBERON HOTEL AND SPA,QUIBERON,missing
+0557,557,Sofitel Quiberon Thalassa sea & spa,SOF,SOFITEL,QUIBERON,France,https://all.accor.com/hotel/0557/index.fr.shtml,france,SOFITEL QUIBERON THALASSA SEA SPA,QUIBERON,missing
+B6I9,B6I9,ibis Annecy Cran Gevrier,IBH,IBIS,ANNECY,France,https://all.accor.com/hotel/B6I9/index.fr.shtml,france,IBIS ANNECY CRAN GEVRIER,ANNECY,missing
+C4Q9,C4Q9,ibis Styles Annecy Le Vieux,IBS,IBIS STYLES,ANNECY,France,https://all.accor.com/hotel/C4Q9/index.fr.shtml,france,IBIS STYLES ANNECY LE VIEUX,ANNECY,missing
+0538,538,ibis Annecy Centre Vieille Ville,IBH,IBIS,ANNECY,France,https://all.accor.com/hotel/0538/index.fr.shtml,france,IBIS ANNECY CENTRE VIEILLE VILLE,ANNECY,missing
+C013,C013,Le Splendid Hotel Lac d'Annecy - Handwritten Collection,SOU,SOU,ANNECY,France,https://all.accor.com/hotel/C013/index.fr.shtml,france,LE SPLENDID HOTEL LAC D ANNECY HANDWRITTEN COLLECTION,ANNECY,missing
+0340,340,Hôtel Mercure Annecy Sud,MER,MERCURE,SEYNOD,France,https://all.accor.com/hotel/0340/index.fr.shtml,france,HOTEL MERCURE ANNECY SUD,SEYNOD,missing
+0434,434,ibis Styles Lorient Caudan,IBS,IBIS STYLES,CAUDAN,France,https://all.accor.com/hotel/0434/index.fr.shtml,france,IBIS STYLES LORIENT CAUDAN,CAUDAN,missing
+0616,616,Ibis Lorient-Caudan,IBH,IBIS,CAUDAN,France,https://all.accor.com/hotel/0616/index.fr.shtml,france,IBIS LORIENT CAUDAN,CAUDAN,missing
+0972,972,ibis Le Puy-en-Velay Centre,IBH,IBIS,LE PUY EN VELAY,France,https://all.accor.com/hotel/0972/index.fr.shtml,france,IBIS LE PUY EN VELAY CENTRE,LE PUY EN VELAY,missing
+0873,873,Hôtel Mercure Lorient Centre,MER,MERCURE,LORIENT,France,https://all.accor.com/hotel/0873/index.fr.shtml,france,HOTEL MERCURE LORIENT CENTRE,LORIENT,missing
+0725,725,ibis Lyon Sud Saint-Rambert-d'Albon,IBH,IBIS,SAINT RAMBERT D ALBON,France,https://all.accor.com/hotel/0725/index.fr.shtml,france,IBIS LYON SUD SAINT RAMBERT D ALBON,SAINT RAMBERT D ALBON,missing
+C518,C518,Domaine des Grands Sables île Groix - Handwritten Collection,SOU,SOU,GROIX,France,https://all.accor.com/hotel/C518/index.fr.shtml,france,DOMAINE DES GRANDS SABLES ILE GROIX HANDWRITTEN COLLECTION,GROIX,missing
+0609,609,ibis Chambéry,IBH,IBIS,CHAMBERY,France,https://all.accor.com/hotel/0609/index.fr.shtml,france,IBIS CHAMBERY,CHAMBERY,missing
+B5Y0,B5Y0,ibis Styles Morlaix,IBS,IBIS STYLES,MORLAIX,France,https://all.accor.com/hotel/B5Y0/index.fr.shtml,france,IBIS STYLES MORLAIX,MORLAIX,missing
+C0M6,C0M6,ibis budget Morlaix,IBB,IBIS BUDGET,MORLAIX,France,https://all.accor.com/hotel/C0M6/index.fr.shtml,france,IBIS BUDGET MORLAIX,MORLAIX,missing
+B2Q5,B2Q5,ibis Styles Sallanches Pays du Mont-Blanc,IBS,IBIS STYLES,SALLANCHES,France,https://all.accor.com/hotel/B2Q5/index.fr.shtml,france,IBIS STYLES SALLANCHES PAYS DU MONT BLANC,SALLANCHES,missing
+0639,639,ibis Sallanches Porte du Mont-Blanc,IBH,IBIS,SALLANCHES,France,https://all.accor.com/hotel/0639/index.fr.shtml,france,IBIS SALLANCHES PORTE DU MONT BLANC,SALLANCHES,missing
+B5I0,B5I0,Novotel Megève Mont-Blanc,NOV,NOVOTEL,MEGEVE,France,https://all.accor.com/hotel/B5I0/index.fr.shtml,france,NOVOTEL MEGEVE MONT BLANC,MEGEVE,missing
+B535,B535,Hôtel Mercure Roscoff Bord de Mer,MER,MERCURE,ROSCOFF,France,https://all.accor.com/hotel/B535/index.fr.shtml,france,HOTEL MERCURE ROSCOFF BORD DE MER,ROSCOFF,missing
+B9F3,B9F3,Le Saint Gervais Hotel & Spa - Handwritten Collection,SOU,SOU,SAINT GERVAIS LES BAINS,France,https://all.accor.com/hotel/B9F3/index.fr.shtml,france,LE SAINT GERVAIS HOTEL SPA HANDWRITTEN COLLECTION,SAINT GERVAIS LES BAINS,missing
+B808,B808,ibis Styles Albertville,IBS,IBIS STYLES,ALBERTVILLE,France,https://all.accor.com/hotel/B808/index.fr.shtml,france,IBIS STYLES ALBERTVILLE,ALBERTVILLE,missing
+0423,423,Novotel Grenoble Nord Voreppe,NOV,NOVOTEL,VOREPPE,France,https://all.accor.com/hotel/0423/index.fr.shtml,france,NOVOTEL GRENOBLE NORD VOREPPE,VOREPPE,missing
+B9P8,B9P8,ibis Styles Les Houches Chamonix,IBS,IBIS STYLES,LES HOUCHES,France,https://all.accor.com/hotel/B9P8/index.fr.shtml,france,IBIS STYLES LES HOUCHES CHAMONIX,LES HOUCHES,missing
+5695,5695,ibis budget Bergerac,IBB,IBIS BUDGET,BERGERAC,France,https://all.accor.com/hotel/5695/index.fr.shtml,france,IBIS BUDGET BERGERAC,BERGERAC,missing
+B5V9,B5V9,Hôtel Mercure Figeac Viguier du Roy,MER,MERCURE,FIGEAC,France,https://all.accor.com/hotel/B5V9/index.fr.shtml,france,HOTEL MERCURE FIGEAC VIGUIER DU ROY,FIGEAC,missing
+C4X8,C4X8,ibis budget Valence Nord Plateau des Couleures,IBB,IBIS BUDGET,SAINT MARCEL LES VALENCE,France,https://all.accor.com/hotel/C4X8/index.fr.shtml,france,IBIS BUDGET VALENCE NORD PLATEAU DES COULEURES,SAINT MARCEL LES VALENCE,missing
+C5P7,C5P7,You Hotel de France Valence - Handwritten Collection,SOU,SOU,VALENCE,France,https://all.accor.com/hotel/C5P7/index.fr.shtml,france,YOU HOTEL DE FRANCE VALENCE HANDWRITTEN COLLECTION,VALENCE,missing
+0455,455,Novotel Valence Sud,NOV,NOVOTEL,VALENCE,France,https://all.accor.com/hotel/0455/index.fr.shtml,france,NOVOTEL VALENCE SUD,VALENCE,missing
+0644,644,ibis Valence Sud,IBH,IBIS,VALENCE,France,https://all.accor.com/hotel/0644/index.fr.shtml,france,IBIS VALENCE SUD,VALENCE,missing
+C3J5,C3J5,ibis Styles Valence (Ouverture automne 2026),IBS,IBIS STYLES,VALENCE,France,https://all.accor.com/hotel/C3J5/index.fr.shtml,france,IBIS STYLES VALENCE OUVERTURE AUTOMNE 2026,VALENCE,missing
+B1N0,B1N0,ibis Styles Crolles Grenoble A41,IBS,IBIS STYLES,CROLLES,France,https://all.accor.com/hotel/B1N0/index.fr.shtml,france,IBIS STYLES CROLLES GRENOBLE A41,CROLLES,missing
+B2R8,B2R8,Aparthotel Adagio Grenoble Centre,ADG,ADAGIO,GRENOBLE,France,https://all.accor.com/hotel/B2R8/index.fr.shtml,france,APARTHOTEL ADAGIO GRENOBLE CENTRE,GRENOBLE,missing
+C066,C066,greet hotel Grenoble Centre Gare,GRE,GREET,GRENOBLE,France,https://all.accor.com/hotel/C066/index.fr.shtml,france,GREET HOTEL GRENOBLE CENTRE GARE,GRENOBLE,missing
+0612,612,ibis Grenoble Centre Bastille,IBH,IBIS,GRENOBLE,France,https://all.accor.com/hotel/0612/index.fr.shtml,france,IBIS GRENOBLE CENTRE BASTILLE,GRENOBLE,missing
+0652,652,Hôtel Mercure Grenoble Centre Alpotel,MER,MERCURE,GRENOBLE,France,https://all.accor.com/hotel/0652/index.fr.shtml,france,HOTEL MERCURE GRENOBLE CENTRE ALPOTEL,GRENOBLE,missing
+C5J4,C5J4,Adagio Access Grenoble Université,ADA,ADAGIO ACCESS,SAINT-MARTIN-D'HERES,France,https://all.accor.com/hotel/C5J4/index.fr.shtml,france,ADAGIO ACCESS GRENOBLE UNIVERSITE,SAINT MARTIN D HERES,missing
+C138,C138,Mercure Quimper Kerlic,MER,MERCURE,QUIMPER,France,https://all.accor.com/hotel/C138/index.fr.shtml,france,MERCURE QUIMPER KERLIC,QUIMPER,missing
+0637,637,ibis Quimper,IBH,IBIS,QUIMPER,France,https://all.accor.com/hotel/0637/index.fr.shtml,france,IBIS QUIMPER,QUIMPER,missing
+C2N0,C2N0,ibis Bordeaux Nord Carbon Blanc,IBH,IBIS,CARBON BLANC,France,https://all.accor.com/hotel/C2N0/index.fr.shtml,france,IBIS BORDEAUX NORD CARBON BLANC,CARBON BLANC,missing
+B1H6,B1H6,ibis budget Bordeaux Lormont,IBB,IBIS BUDGET,LORMONT,France,https://all.accor.com/hotel/B1H6/index.fr.shtml,france,IBIS BUDGET BORDEAUX LORMONT,LORMONT,missing
+B2C9,B2C9,ibis budget Cahors,IBB,IBIS BUDGET,CAHORS,France,https://all.accor.com/hotel/B2C9/index.fr.shtml,france,IBIS BUDGET CAHORS,CAHORS,missing
+B2C7,B2C7,ibis Cahors,IBH,IBIS,CAHORS,France,https://all.accor.com/hotel/B2C7/index.fr.shtml,france,IBIS CAHORS,CAHORS,missing
+C3U7,C3U7,ibis Styles Bordeaux Lormont,IBS,IBIS STYLES,LORMONT,France,https://all.accor.com/hotel/C3U7/index.fr.shtml,france,IBIS STYLES BORDEAUX LORMONT,LORMONT,missing
+0403,403,Novotel Bordeaux Lac,NOV,NOVOTEL,BORDEAUX,France,https://all.accor.com/hotel/0403/index.fr.shtml,france,NOVOTEL BORDEAUX LAC,BORDEAUX,missing
+0551,551,Hôtel Mercure Bordeaux Lac,MER,MERCURE,BORDEAUX,France,https://all.accor.com/hotel/0551/index.fr.shtml,france,HOTEL MERCURE BORDEAUX LAC,BORDEAUX,missing
+0356,356,ibis Bordeaux Lac,IBH,IBIS,BORDEAUX,France,https://all.accor.com/hotel/0356/index.fr.shtml,france,IBIS BORDEAUX LAC,BORDEAUX,missing
+0669,669,Pullman Bordeaux Lac,PUL,PULLMAN,BORDEAUX LE LAC,France,https://all.accor.com/hotel/0669/index.fr.shtml,france,PULLMAN BORDEAUX LAC,BORDEAUX LE LAC,missing
+C513,C513,ibis Styles Bordeaux Lac Bruges,IBS,IBIS STYLES,BRUGES,France,https://all.accor.com/hotel/C513/index.fr.shtml,france,IBIS STYLES BORDEAUX LAC BRUGES,BRUGES,missing
+B7G5,B7G5,Mondrian Bordeaux Les Carmes,MOD,MOD,BORDEAUX,France,https://all.accor.com/hotel/B7G5/index.fr.shtml,france,MONDRIAN BORDEAUX LES CARMES,BORDEAUX,missing
+B9F2,B9F2,greet Hotel Bordeaux Floirac Arena,GRE,GREET,FLOIRAC,France,https://all.accor.com/hotel/B9F2/index.fr.shtml,france,GREET HOTEL BORDEAUX FLOIRAC ARENA,FLOIRAC,missing
+1561,1561,ibis Bordeaux Centre Gare Saint-Jean,IBH,IBIS,BORDEAUX,France,https://all.accor.com/hotel/1561/index.fr.shtml,france,IBIS BORDEAUX CENTRE GARE SAINT JEAN,BORDEAUX,missing
+C6L0,C6L0,Hôtel 56 Bordeaux - Handwritten Collection (Septembre 2026),SOU,SOU,BORDEAUX,France,https://all.accor.com/hotel/C6L0/index.fr.shtml,france,HOTEL 56 BORDEAUX HANDWRITTEN COLLECTION SEPTEMBRE 2026,BORDEAUX,missing
+C1R6,C1R6,ibis Styles Bordeaux Centre Gare,IBS,IBIS STYLES,BORDEAUX,France,https://all.accor.com/hotel/C1R6/index.fr.shtml,france,IBIS STYLES BORDEAUX CENTRE GARE,BORDEAUX,missing
+0950,950,ibis Bordeaux Centre Mériadeck,IBH,IBIS,BORDEAUX,France,https://all.accor.com/hotel/0950/index.fr.shtml,france,IBIS BORDEAUX CENTRE MERIADECK,BORDEAUX,missing
+A547,A547,ibis Bordeaux Centre Gare Saint-Jean Euratlantique,IBH,IBIS,BORDEAUX,France,https://all.accor.com/hotel/A547/index.fr.shtml,france,IBIS BORDEAUX CENTRE GARE SAINT JEAN EURATLANTIQUE,BORDEAUX,missing
+B3F7,B3F7,Mercure Bordeaux Centre Gare Atlantic,MER,MERCURE,BORDEAUX,France,https://all.accor.com/hotel/B3F7/index.fr.shtml,france,MERCURE BORDEAUX CENTRE GARE ATLANTIC,BORDEAUX,missing
+B9L1,B9L1,ibis Styles Bordeaux Beglès Arena,IBS,IBIS STYLES,BEGLES,France,https://all.accor.com/hotel/B9L1/index.fr.shtml,france,IBIS STYLES BORDEAUX BEGLES ARENA,BEGLES,missing
+0623,623,Hôtel ibis Montélimar Nord,IBH,IBIS,SAULCE-SUR-RHONE,France,https://all.accor.com/hotel/0623/index.fr.shtml,france,HOTEL IBIS MONTELIMAR NORD,SAULCE SUR RHONE,missing
+C0C7,C0C7,greet Hotel Brest Aéroport,GRE,GREET,GUIPAVAS,France,https://all.accor.com/hotel/C0C7/index.fr.shtml,france,GREET HOTEL BREST AEROPORT,GUIPAVAS,missing
+0402,402,Novotel Bordeaux Merignac,NOV,NOVOTEL,MERIGNAC,France,https://all.accor.com/hotel/0402/index.fr.shtml,france,NOVOTEL BORDEAUX MERIGNAC,MERIGNAC,missing
+B7B1,B7B1,greet Hotel Bordeaux Aéroport,GRE,GREET,MERIGNAC,France,https://all.accor.com/hotel/B7B1/index.fr.shtml,france,GREET HOTEL BORDEAUX AEROPORT,MERIGNAC,missing
+B8E4,B8E4,Mercure Brest Centre Port,MER,MERCURE,BREST,France,https://all.accor.com/hotel/B8E4/index.fr.shtml,france,MERCURE BREST CENTRE PORT,BREST,missing
+A4A5,A4A5,Hôtel Mercure Brest Centre Les Voyageurs,MER,MERCURE,BREST,France,https://all.accor.com/hotel/A4A5/index.fr.shtml,france,HOTEL MERCURE BREST CENTRE LES VOYAGEURS,BREST,missing
+C5E0,C5E0,Aparthotel Adagio Access Bordeaux Sud Pessac,ADA,ADAGIO ACCESS,PESSAC,France,https://all.accor.com/hotel/C5E0/index.fr.shtml,france,APARTHOTEL ADAGIO ACCESS BORDEAUX SUD PESSAC,PESSAC,missing
+0850,850,ibis Bordeaux Pessac Route des Vins,IBH,IBIS,PESSAC,France,https://all.accor.com/hotel/0850/index.fr.shtml,france,IBIS BORDEAUX PESSAC ROUTE DES VINS,PESSAC,missing
+A6Q0,A6Q0,Hôtel Mercure Villeneuve-sur-Lot - Le Moulin de Madame,MER,MERCURE,VILLENEUVE SUR LOT,France,https://all.accor.com/hotel/A6Q0/index.fr.shtml,france,HOTEL MERCURE VILLENEUVE SUR LOT LE MOULIN DE MADAME,VILLENEUVE SUR LOT,missing
+B1K8,B1K8,Sainte-Barbe Hotel & Spa Le Conquet - MGallery Collection,MGA,MGALLERY,LE CONQUET,France,https://all.accor.com/hotel/B1K8/index.fr.shtml,france,SAINTE BARBE HOTEL SPA LE CONQUET MGALLERY COLLECTION,LE CONQUET,missing
+B9F4,B9F4,ibis budget Millau Viaduc,IBB,IBIS BUDGET,MILLAU,France,https://all.accor.com/hotel/B9F4/index.fr.shtml,france,IBIS BUDGET MILLAU VIADUC,MILLAU,missing
+C091,C091,ibis Saint Paul Trois Chateaux,IBH,IBIS,SAINT PAUL TROIS CHATEAUX,France,https://all.accor.com/hotel/C091/index.fr.shtml,france,IBIS SAINT PAUL TROIS CHATEAUX,SAINT PAUL TROIS CHATEAUX,missing
+B9G2,B9G2,Mercure Agen Centre,MER,MERCURE,AGEN,France,https://all.accor.com/hotel/B9G2/index.fr.shtml,france,MERCURE AGEN CENTRE,AGEN,missing
+C517,C517,greet hôtel Le Teich Bassin d'Arcachon,GRE,GREET,LE TEICH,France,https://all.accor.com/hotel/C517/index.fr.shtml,france,GREET HOTEL LE TEICH BASSIN D ARCACHON,LE TEICH,missing
+B9J0,B9J0,greet hotel La Teste Bassin d' Arcachon,GRE,GREET,LA TESTE DE BUCH,France,https://all.accor.com/hotel/B9J0/index.fr.shtml,france,GREET HOTEL LA TESTE BASSIN D ARCACHON,LA TESTE DE BUCH,missing
+A9V5,A9V5,ibis Styles Arcachon Gujan-Mestras,IBS,IBIS STYLES,GUJAN MESTRAS,France,https://all.accor.com/hotel/A9V5/index.fr.shtml,france,IBIS STYLES ARCACHON GUJAN MESTRAS,GUJAN MESTRAS,missing
+B9J1,B9J1,ibis Budget La Teste Bassin d'Arcachon,IBB,IBIS BUDGET,LA TESTE DE BUCH,France,https://all.accor.com/hotel/B9J1/index.fr.shtml,france,IBIS BUDGET LA TESTE BASSIN D ARCACHON,LA TESTE DE BUCH,missing
+C4P7,C4P7,ibis Styles Alès Centre Cévennes,IBS,IBIS STYLES,ALES,France,https://all.accor.com/hotel/C4P7/index.fr.shtml,france,IBIS STYLES ALES CENTRE CEVENNES,ALES,missing
+0338,338,ibis Alès Centre-Ville,IBH,IBIS,ALES,France,https://all.accor.com/hotel/0338/index.fr.shtml,france,IBIS ALES CENTRE VILLE,ALES,missing
+B8Y9,B8Y9,ibis Styles Montauban,IBS,IBIS STYLES,MONTAUBAN,France,https://all.accor.com/hotel/B8Y9/index.fr.shtml,france,IBIS STYLES MONTAUBAN,MONTAUBAN,missing
+0925,925,ibis Orange Centre Échangeur A7 A9,IBH,IBIS,ORANGE,France,https://all.accor.com/hotel/0925/index.fr.shtml,france,IBIS ORANGE CENTRE ECHANGEUR A7 A9,ORANGE,missing
+B814,B814,ibis Styles Pont du Gard Route d'Avignon,IBS,IBIS STYLES,ESTEZARGUES,France,https://all.accor.com/hotel/B814/index.fr.shtml,france,IBIS STYLES PONT DU GARD ROUTE D AVIGNON,ESTEZARGUES,missing
+C5U4,C5U4,Château de Mazan - Handwritten Collection,SOU,SOU,MAZAN,France,https://all.accor.com/hotel/C5U4/index.fr.shtml,france,CHATEAU DE MAZAN HANDWRITTEN COLLECTION,MAZAN,missing
+0550,550,Novotel Avignon Nord,NOV,NOVOTEL,SORGUES,France,https://all.accor.com/hotel/0550/index.fr.shtml,france,NOVOTEL AVIGNON NORD,SORGUES,missing
+0549,549,Hôtel Mercure Pont d'Avignon Centre,MER,MERCURE,AVIGNON,France,https://all.accor.com/hotel/0549/index.fr.shtml,france,HOTEL MERCURE PONT D AVIGNON CENTRE,AVIGNON,missing
+0944,944,ibis Avignon Centre Gare,IBH,IBIS,AVIGNON,France,https://all.accor.com/hotel/0944/index.fr.shtml,france,IBIS AVIGNON CENTRE GARE,AVIGNON,missing
+B6F6,B6F6,Mercure Avignon TGV Hotel et Spa,MER,MERCURE,AVIGNON,France,https://all.accor.com/hotel/B6F6/index.fr.shtml,france,MERCURE AVIGNON TGV HOTEL ET SPA,AVIGNON,missing
+0985,985,Novotel Atria Nîmes Centre,NOV,NOVOTEL,NIMES,France,https://all.accor.com/hotel/0985/index.fr.shtml,france,NOVOTEL ATRIA NIMES CENTRE,NIMES,missing
+C6J9,C6J9,Mercure Nîmes Centre Arènes,MER,MERCURE,NIMES,France,https://all.accor.com/hotel/C6J9/index.fr.shtml,france,MERCURE NIMES CENTRE ARENES,NIMES,missing
+0399,399,ibis Styles Avignon Sud,IBS,IBIS STYLES,AVIGNON,France,https://all.accor.com/hotel/0399/index.fr.shtml,france,IBIS STYLES AVIGNON SUD,AVIGNON,missing
+0686,686,ibis Avignon Sud,IBH,IBIS,AVIGNON,France,https://all.accor.com/hotel/0686/index.fr.shtml,france,IBIS AVIGNON SUD,AVIGNON,missing
+0629,629,ibis Nîmes Ouest,IBH,IBIS,NIMES,France,https://all.accor.com/hotel/0629/index.fr.shtml,france,IBIS NIMES OUEST,NIMES,missing
+1199,1199,Hôtel ibis Sisteron,IBH,IBIS,SISTERON,France,https://all.accor.com/hotel/1199/index.fr.shtml,france,HOTEL IBIS SISTERON,SISTERON,missing
+A314,A314,ibis Styles Toulouse Nord Sesquières,IBS,IBIS STYLES,TOULOUSE,France,https://all.accor.com/hotel/A314/index.fr.shtml,france,IBIS STYLES TOULOUSE NORD SESQUIERES,TOULOUSE,missing
+A4C2,A4C2,Hôtel Mercure Castres L'Occitan,MER,MERCURE,CASTRES,France,https://all.accor.com/hotel/A4C2/index.fr.shtml,france,HOTEL MERCURE CASTRES L OCCITAN,CASTRES,missing
+A5I1,A5I1,ibis Styles Toulouse-Blagnac Aéroport,IBS,IBIS STYLES,BLAGNAC,France,https://all.accor.com/hotel/A5I1/index.fr.shtml,france,IBIS STYLES TOULOUSE BLAGNAC AEROPORT,BLAGNAC,missing
+A4C1,A4C1,ibis Styles Castres,IBS,IBIS STYLES,CASTRES,France,https://all.accor.com/hotel/A4C1/index.fr.shtml,france,IBIS STYLES CASTRES,CASTRES,missing
+B9J4,B9J4,Mercure Toulouse Aéroport Blagnac,MER,MERCURE,BLAGNAC,France,https://all.accor.com/hotel/B9J4/index.fr.shtml,france,MERCURE TOULOUSE AEROPORT BLAGNAC,BLAGNAC,missing
+B8D8,B8D8,greet Hotel Castres Saix,GRE,GREET,SAIX,France,https://all.accor.com/hotel/B8D8/index.fr.shtml,france,GREET HOTEL CASTRES SAIX,SAIX,missing
+0798,798,ibis Toulouse Blagnac Aéroport,IBH,IBIS,BLAGNAC,France,https://all.accor.com/hotel/0798/index.fr.shtml,france,IBIS TOULOUSE BLAGNAC AEROPORT,BLAGNAC,missing
+0565,565,Pullman Toulouse Airport,PUL,PULLMAN,BLAGNAC,France,https://all.accor.com/hotel/0565/index.fr.shtml,france,PULLMAN TOULOUSE AIRPORT,BLAGNAC,missing
+B853,B853,L'Isle de Leos Hotel & Spa - MGallery Collection,MGA,MGALLERY,L'ISLE SUR LA SORGUE,France,https://all.accor.com/hotel/B853/index.fr.shtml,france,L ISLE DE LEOS HOTEL SPA MGALLERY COLLECTION,L ISLE SUR LA SORGUE,missing
+0906,906,Novotel Toulouse Centre Compans Caffarelli,NOV,NOVOTEL,TOULOUSE,France,https://all.accor.com/hotel/0906/index.fr.shtml,france,NOVOTEL TOULOUSE CENTRE COMPANS CAFFARELLI,TOULOUSE,missing
+A9V4,A9V4,ibis Toulouse Purpan,IBH,IBIS,TOULOUSE,France,https://all.accor.com/hotel/A9V4/index.fr.shtml,france,IBIS TOULOUSE PURPAN,TOULOUSE,missing
+C139,C139,Hotel Les Capitouls Toulouse Centre - Handwritten Collection,SOU,SOU,TOULOUSE,France,https://all.accor.com/hotel/C139/index.fr.shtml,france,HOTEL LES CAPITOULS TOULOUSE CENTRE HANDWRITTEN COLLECTION,TOULOUSE,missing
+B395,B395,Mama Shelter Toulouse,MSH,MAMA SHELTER,TOULOUSE,France,https://all.accor.com/hotel/B395/index.fr.shtml,france,MAMA SHELTER TOULOUSE,TOULOUSE,missing
+0370,370,Hôtel Mercure Toulouse Centre Saint-Georges,MER,MERCURE,TOULOUSE,France,https://all.accor.com/hotel/0370/index.fr.shtml,france,HOTEL MERCURE TOULOUSE CENTRE SAINT GEORGES,TOULOUSE,missing
+B3A1,B3A1,ibis Styles Toulouse Centre Canal du Midi,IBS,IBIS STYLES,TOULOUSE,France,https://all.accor.com/hotel/B3A1/index.fr.shtml,france,IBIS STYLES TOULOUSE CENTRE CANAL DU MIDI,TOULOUSE,missing
+0445,445,Novotel Toulouse Purpan Aéroport,NOV,NOVOTEL,TOULOUSE,France,https://all.accor.com/hotel/0445/index.fr.shtml,france,NOVOTEL TOULOUSE PURPAN AEROPORT,TOULOUSE,missing
+A086,A086,La Cour des Consuls Hotel & Spa Toulouse - MGallery Collection,MGA,MGALLERY,TOULOUSE,France,https://all.accor.com/hotel/A086/index.fr.shtml,france,LA COUR DES CONSULS HOTEL SPA TOULOUSE MGALLERY COLLECTION,TOULOUSE,missing
+B6Z1,B6Z1,Aparthotel Adagio Toulouse Centre La Grave,ADG,ADAGIO,TOULOUSE,France,https://all.accor.com/hotel/B6Z1/index.fr.shtml,france,APARTHOTEL ADAGIO TOULOUSE CENTRE LA GRAVE,TOULOUSE,missing
+C0T6,C0T6,ibis budget Lunel Porte de Camargue,IBB,IBIS BUDGET,AIMARGUES,France,https://all.accor.com/hotel/C0T6/index.fr.shtml,france,IBIS BUDGET LUNEL PORTE DE CAMARGUE,AIMARGUES,missing
+B743,B743,Ibis Lunel Petite Camargue,IBH,IBIS,LUNEL,France,https://all.accor.com/hotel/B743/index.fr.shtml,france,IBIS LUNEL PETITE CAMARGUE,LUNEL,missing
+B2J6,B2J6,ibis budget Montpellier Nord,IBB,IBIS BUDGET,MONTPELLIER,France,https://all.accor.com/hotel/B2J6/index.fr.shtml,france,IBIS BUDGET MONTPELLIER NORD,MONTPELLIER,missing
+B718,B718,ibis budget Mont de Marsan,IBB,IBIS BUDGET,MONT DE MARSAN,France,https://all.accor.com/hotel/B718/index.fr.shtml,france,IBIS BUDGET MONT DE MARSAN,MONT DE MARSAN,missing
+B9I1,B9I1,ibis budget Toulouse Labège,IBB,IBIS BUDGET,LABEGE,France,https://all.accor.com/hotel/B9I1/index.fr.shtml,france,IBIS BUDGET TOULOUSE LABEGE,LABEGE,missing
+A0A2,A0A2,ibis Styles Toulouse Labège,IBS,IBIS STYLES,LABEGE,France,https://all.accor.com/hotel/A0A2/index.fr.shtml,france,IBIS STYLES TOULOUSE LABEGE,LABEGE,missing
+B1R5,B1R5,Hôtel Mercure Toulouse Sud,MER,MERCURE,TOULOUSE,France,https://all.accor.com/hotel/B1R5/index.fr.shtml,france,HOTEL MERCURE TOULOUSE SUD,TOULOUSE,missing
+0592,592,ibis Montpellier Centre Comédie,IBH,IBIS,MONTPELLIER,France,https://all.accor.com/hotel/0592/index.fr.shtml,france,IBIS MONTPELLIER CENTRE COMEDIE,MONTPELLIER,missing
+C0S9,C0S9,Aparthotel Adagio Montpellier Centre Comedie,ADG,ADAGIO,MONTPELLIER,France,https://all.accor.com/hotel/C0S9/index.fr.shtml,france,APARTHOTEL ADAGIO MONTPELLIER CENTRE COMEDIE,MONTPELLIER,missing
+A0X2,A0X2,Aparthotel Adagio Access Montpellier Centre,ADA,ADAGIO ACCESS,MONTPELLIER,France,https://all.accor.com/hotel/A0X2/index.fr.shtml,france,APARTHOTEL ADAGIO ACCESS MONTPELLIER CENTRE,MONTPELLIER,missing
+C179,C179,TRIBE Montpellier Gare Sud de France (Ouverture prochaine),TRI,TRIBE,MONTPELLIER,France,https://all.accor.com/hotel/C179/index.fr.shtml,france,TRIBE MONTPELLIER GARE SUD DE FRANCE OUVERTURE PROCHAINE,MONTPELLIER,missing
+0624,624,ibis Montpellier Sud,IBH,IBIS,MONTPELLIER,France,https://all.accor.com/hotel/0624/index.fr.shtml,france,IBIS MONTPELLIER SUD,MONTPELLIER,missing
+0450,450,Novotel Montpellier,NOV,NOVOTEL,MONTPELLIER,France,https://all.accor.com/hotel/0450/index.fr.shtml,france,NOVOTEL MONTPELLIER,MONTPELLIER,missing
+B9N4,B9N4,greet hotel Montpellier Aéroport Parc des Expos,GRE,GREET,MAUGUIO,France,https://all.accor.com/hotel/B9N4/index.fr.shtml,france,GREET HOTEL MONTPELLIER AEROPORT PARC DES EXPOS,MAUGUIO,missing
+B4T2,B4T2,ibis Styles Montpellier Aeroport Parc Des Expos,IBS,IBIS STYLES,MAUGUIO,France,https://all.accor.com/hotel/B4T2/index.fr.shtml,france,IBIS STYLES MONTPELLIER AEROPORT PARC DES EXPOS,MAUGUIO,missing
+B4T1,B4T1,ibis budget Montpellier Aéroport Parc Des Expos,IBB,IBIS BUDGET,MAUGUIO,France,https://all.accor.com/hotel/B4T1/index.fr.shtml,france,IBIS BUDGET MONTPELLIER AEROPORT PARC DES EXPOS,MAUGUIO,missing
+C3P3,C3P3,Mercure Arles Centre Arènes,MER,MERCURE,ARLES,France,https://all.accor.com/hotel/C3P3/index.fr.shtml,france,MERCURE ARLES CENTRE ARENES,ARLES,missing
+0692,692,ibis Arles,IBH,IBIS,ARLES,France,https://all.accor.com/hotel/0692/index.fr.shtml,france,IBIS ARLES,ARLES,missing
+B7M4,B7M4,Aparthotel Adagio Access Porte de Camargue,ADA,ADAGIO ACCESS,SAINT-MARTIN-DE-CRAU,France,https://all.accor.com/hotel/B7M4/index.fr.shtml,france,APARTHOTEL ADAGIO ACCESS PORTE DE CAMARGUE,SAINT MARTIN DE CRAU,missing
+B744,B744,greet hotel Castets Coeur des Landes,GRE,GREET,CASTETS,France,https://all.accor.com/hotel/B744/index.fr.shtml,france,GREET HOTEL CASTETS COEUR DES LANDES,CASTETS,missing
+A0J3,A0J3,Ibis Budget Béziers Est La Giniesse,IBB,IBIS BUDGET,BEZIERS,France,https://all.accor.com/hotel/A0J3/index.fr.shtml,france,IBIS BUDGET BEZIERS EST LA GINIESSE,BEZIERS,missing
+0683,683,ibis Béziers Est Méditerranée,IBH,IBIS,BEZIERS,France,https://all.accor.com/hotel/0683/index.fr.shtml,france,IBIS BEZIERS EST MEDITERRANEE,BEZIERS,missing
+0797,797,ibis Salon-de-Provence Sud,IBH,IBIS,SALON DE PROVENCE,France,https://all.accor.com/hotel/0797/index.fr.shtml,france,IBIS SALON DE PROVENCE SUD,SALON DE PROVENCE,missing
+B6X3,B6X3,ibis Styles Salon de Provence,IBS,IBIS STYLES,SALON DE PROVENCE,France,https://all.accor.com/hotel/B6X3/index.fr.shtml,france,IBIS STYLES SALON DE PROVENCE,SALON DE PROVENCE,missing
+B6J1,B6J1,ibis Styles Castelnaudary,IBS,IBIS STYLES,CASTELNAUDARY,France,https://all.accor.com/hotel/B6J1/index.fr.shtml,france,IBIS STYLES CASTELNAUDARY,CASTELNAUDARY,missing
+C0D8,C0D8,ibis Styles Miramas - Provence,IBS,IBIS STYLES,MIRAMAS,France,https://all.accor.com/hotel/C0D8/index.fr.shtml,france,IBIS STYLES MIRAMAS PROVENCE,MIRAMAS,missing
+B897,B897,TRIBE Carcassonne,TRI,TRIBE,CARCASSONNE,France,https://all.accor.com/hotel/B897/index.fr.shtml,france,TRIBE CARCASSONNE,CARCASSONNE,missing
+0607,607,ibis Carcassonne Est La Cité,IBH,IBIS,CARCASSONNE,France,https://all.accor.com/hotel/0607/index.fr.shtml,france,IBIS CARCASSONNE EST LA CITE,CARCASSONNE,missing
+A480,A480,ibis Styles Carcassonne La Cité,IBS,IBIS STYLES,CARCASSONNE,France,https://all.accor.com/hotel/A480/index.fr.shtml,france,IBIS STYLES CARCASSONNE LA CITE,CARCASSONNE,missing
+0412,412,Novotel Narbonne Sud,NOV,NOVOTEL,NARBONNE,France,https://all.accor.com/hotel/0412/index.fr.shtml,france,NOVOTEL NARBONNE SUD,NARBONNE,missing
+0671,671,ibis Narbonne,IBH,IBIS,NARBONNE,France,https://all.accor.com/hotel/0671/index.fr.shtml,france,IBIS NARBONNE,NARBONNE,missing
+C5I0,C5I0,ibis Styles Aix-en-Provence Université,IBS,IBIS STYLES,AIX EN PROVENCE,France,https://all.accor.com/hotel/C5I0/index.fr.shtml,france,IBIS STYLES AIX EN PROVENCE UNIVERSITE,AIX EN PROVENCE,missing
+C5J5,C5J5,Aparthotel Adagio Access Aix-en-Provence Université,ADA,ADAGIO ACCESS,AIX EN PROVENCE,France,https://all.accor.com/hotel/C5J5/index.fr.shtml,france,APARTHOTEL ADAGIO ACCESS AIX EN PROVENCE UNIVERSITE,AIX EN PROVENCE,missing
+C133,C133,Mercure Aix-en-Provence La Duranne Gare TGV,MER,MERCURE,AIX-EN-PROVENCE,France,https://all.accor.com/hotel/C133/index.fr.shtml,france,MERCURE AIX EN PROVENCE LA DURANNE GARE TGV,AIX EN PROVENCE,missing
+0394,394,Novotel Aix-en-Provence Pont-de-l'Arc Fenouillères,NOV,NOVOTEL,AIX EN PROVENCE,France,https://all.accor.com/hotel/0394/index.fr.shtml,france,NOVOTEL AIX EN PROVENCE PONT DE L ARC FENOUILLERES,AIX EN PROVENCE,missing
+0393,393,Mercure Aix en Provence Beaumanoir,MER,MERCURE,AIX EN PROVENCE,France,https://all.accor.com/hotel/0393/index.fr.shtml,france,MERCURE AIX EN PROVENCE BEAUMANOIR,AIX EN PROVENCE,missing
+0714,714,ibis Aix-en-Provence,IBH,IBIS,AIX EN PROVENCE,France,https://all.accor.com/hotel/0714/index.fr.shtml,france,IBIS AIX EN PROVENCE,AIX EN PROVENCE,missing
+B6G0,B6G0,greet Hotel Marseille Provence Aéroport,GRE,GREET,VITROLLES,France,https://all.accor.com/hotel/B6G0/index.fr.shtml,france,GREET HOTEL MARSEILLE PROVENCE AEROPORT,VITROLLES,missing
+C238,C238,ibis Styles Cabriès Aix-en-Provence TGV,IBS,IBIS STYLES,CABRIES,France,https://all.accor.com/hotel/C238/index.fr.shtml,france,IBIS STYLES CABRIES AIX EN PROVENCE TGV,CABRIES,missing
+0442,442,ibis Styles Marseille Provence Aéroport,IBS,IBIS STYLES,VITROLLES,France,https://all.accor.com/hotel/0442/index.fr.shtml,france,IBIS STYLES MARSEILLE PROVENCE AEROPORT,VITROLLES,missing
+B8B1,B8B1,Ibis Marseille Marignane Technopole,IBH,IBIS,MARIGNANE,France,https://all.accor.com/hotel/B8B1/index.fr.shtml,france,IBIS MARSEILLE MARIGNANE TECHNOPOLE,MARIGNANE,missing
+B8C5,B8C5,greet hotel Orthez Bearn,GRE,GREET,BIRON,France,https://all.accor.com/hotel/B8C5/index.fr.shtml,france,GREET HOTEL ORTHEZ BEARN,BIRON,missing
+B2C6,B2C6,ibis Styles Marseille Plan de Campagne,IBS,IBIS STYLES,LES PENNES-MIRABEAU,France,https://all.accor.com/hotel/B2C6/index.fr.shtml,france,IBIS STYLES MARSEILLE PLAN DE CAMPAGNE,LES PENNES MIRABEAU,missing
+B0R3,B0R3,JO&JOE Hossegor,JOE,JO&JOE,HOSSEGOR,France,https://all.accor.com/hotel/B0R3/index.fr.shtml,france,JO JOE HOSSEGOR,HOSSEGOR,missing
+0952,952,Hôtel Mercure Pau Palais des Sports,MER,MERCURE,PAU,France,https://all.accor.com/hotel/0952/index.fr.shtml,france,HOTEL MERCURE PAU PALAIS DES SPORTS,PAU,missing
+0421,421,Novotel Pau Pyrénées,NOV,NOVOTEL,LESCAR,France,https://all.accor.com/hotel/0421/index.fr.shtml,france,NOVOTEL PAU PYRENEES,LESCAR,missing
+C461,C461,Novotel Marseille Centre Gare,NOV,NOVOTEL,MARSEILLE,France,https://all.accor.com/hotel/C461/index.fr.shtml,france,NOVOTEL MARSEILLE CENTRE GARE,MARSEILLE,missing
+A1J8,A1J8,ibis Styles Marseille Gare Saint-Charles,IBS,IBIS STYLES,MARSEILLE,France,https://all.accor.com/hotel/A1J8/index.fr.shtml,france,IBIS STYLES MARSEILLE GARE SAINT CHARLES,MARSEILLE,missing
+B675,B675,greet Hotel Marseille Centre Saint Charles,GRE,GREET,MARSEILLE,France,https://all.accor.com/hotel/B675/index.fr.shtml,france,GREET HOTEL MARSEILLE CENTRE SAINT CHARLES,MARSEILLE,missing
+0911,911,Novotel Marseille Vieux-Port,NOV,NOVOTEL,MARSEILLE,France,https://all.accor.com/hotel/0911/index.fr.shtml,france,NOVOTEL MARSEILLE VIEUX PORT,MARSEILLE,missing
+0542,542,Sofitel Marseille Vieux Port,SOF,SOFITEL,MARSEILLE,France,https://all.accor.com/hotel/0542/index.fr.shtml,france,SOFITEL MARSEILLE VIEUX PORT,MARSEILLE,missing
+A0D3,A0D3,Hôtel Mercure Marseille Canebière Vieux-Port,MER,MERCURE,MARSEILLE,France,https://all.accor.com/hotel/A0D3/index.fr.shtml,france,HOTEL MERCURE MARSEILLE CANEBIERE VIEUX PORT,MARSEILLE,missing
+A0X9,A0X9,ibis Styles Marseille Vieux Port,IBS,IBIS STYLES,MARSEILLE,France,https://all.accor.com/hotel/A0X9/index.fr.shtml,france,IBIS STYLES MARSEILLE VIEUX PORT,MARSEILLE,missing
+B3B1,B3B1,Ibis Marseille Centre Prefecture,IBH,IBIS,MARSEILLE,France,https://all.accor.com/hotel/B3B1/index.fr.shtml,france,IBIS MARSEILLE CENTRE PREFECTURE,MARSEILLE,missing
+B5Z5,B5Z5,Mercure Marseille Centre Bompard La Corniche,MER,MERCURE,MARSEILLE,France,https://all.accor.com/hotel/B5Z5/index.fr.shtml,france,MERCURE MARSEILLE CENTRE BOMPARD LA CORNICHE,MARSEILLE,missing
+B2R9,B2R9,Aparthotel Adagio Marseille Timone,ADG,ADAGIO,MARSEILLE,France,https://all.accor.com/hotel/B2R9/index.fr.shtml,france,APARTHOTEL ADAGIO MARSEILLE TIMONE,MARSEILLE,missing
+C3C7,C3C7,ibis Styles Marseille Palais des Congrès Vélodrome,IBS,IBIS STYLES,MARSEILLE,France,https://all.accor.com/hotel/C3C7/index.fr.shtml,france,IBIS STYLES MARSEILLE PALAIS DES CONGRES VELODROME,MARSEILLE,missing
+C032,C032,greet hotel Marseille Parc Chanot Vélodrome by Accor,GRE,GREET,MARSEILLE,France,https://all.accor.com/hotel/C032/index.fr.shtml,france,GREET HOTEL MARSEILLE PARC CHANOT VELODROME BY ACCOR,MARSEILLE,missing
+A0Y1,A0Y1,Mercure Bayonne Centre - Le Grand Hôtel,MER,MERCURE,BAYONNE,France,https://all.accor.com/hotel/A0Y1/index.fr.shtml,france,MERCURE BAYONNE CENTRE LE GRAND HOTEL,BAYONNE,missing
+0444,444,Novotel Marseille Est Porte d'Aubagne,NOV,NOVOTEL,MARSEILLE,France,https://all.accor.com/hotel/0444/index.fr.shtml,france,NOVOTEL MARSEILLE EST PORTE D AUBAGNE,MARSEILLE,missing
+C5X6,C5X6,Hotel Saint Georges Lourdes Pyrenees,SAM,SAM,LOURDES,France,https://all.accor.com/hotel/C5X6/index.fr.shtml,france,HOTEL SAINT GEORGES LOURDES PYRENEES,LOURDES,missing
+C5X5,C5X5,greet hotel Lourdes Centre Pyrénées,GRE,GREET,LOURDES,France,https://all.accor.com/hotel/C5X5/index.fr.shtml,france,GREET HOTEL LOURDES CENTRE PYRENEES,LOURDES,missing
+0822,822,ibis Biarritz-Anglet Aéroport,IBH,IBIS,ANGLET,France,https://all.accor.com/hotel/0822/index.fr.shtml,france,IBIS BIARRITZ ANGLET AEROPORT,ANGLET,missing
+0994,994,Novotel Resort & Spa Biarritz Anglet,NOV,NOVOTEL,ANGLET,France,https://all.accor.com/hotel/0994/index.fr.shtml,france,NOVOTEL RESORT SPA BIARRITZ ANGLET,ANGLET,missing
+C4X9,C4X9,ibis Styles Aubagne Gemenos,IBS,IBIS STYLES,GEMENOS,France,https://all.accor.com/hotel/C4X9/index.fr.shtml,france,IBIS STYLES AUBAGNE GEMENOS,GEMENOS,missing
+C2U9,C2U9,Le Talaia Hotel & Spa Biarritz - MGallery Collection,MGA,MGALLERY,BIARRITZ,France,https://all.accor.com/hotel/C2U9/index.fr.shtml,france,LE TALAIA HOTEL SPA BIARRITZ MGALLERY COLLECTION,BIARRITZ,missing
+C2Q0,C2Q0,ibis Styles Biarritz Plage,IBS,IBIS STYLES,BIARRITZ,France,https://all.accor.com/hotel/C2Q0/index.fr.shtml,france,IBIS STYLES BIARRITZ PLAGE,BIARRITZ,missing
+0424,424,Novotel Perpignan Rivesaltes,NOV,NOVOTEL,RIVESALTES,France,https://all.accor.com/hotel/0424/index.fr.shtml,france,NOVOTEL PERPIGNAN RIVESALTES,RIVESALTES,missing
+C2I9,C2I9,ibis Styles Saint Jean de Luz Donibane,IBS,IBIS STYLES,SAINT JEAN DE LUZ,France,https://all.accor.com/hotel/C2I9/index.fr.shtml,france,IBIS STYLES SAINT JEAN DE LUZ DONIBANE,SAINT JEAN DE LUZ,missing
+C3Y8,C3Y8,MADISON Saint Jean de Luz - Handwritten Collection,SOU,SOU,SAINT-JEAN-DE-LUZ,France,https://all.accor.com/hotel/C3Y8/index.fr.shtml,france,MADISON SAINT JEAN DE LUZ HANDWRITTEN COLLECTION,SAINT JEAN DE LUZ,missing
+C0V2,C0V2,Mercure Ax Les Thermes,MER,MERCURE,AX LES THERMES,France,https://all.accor.com/hotel/C0V2/index.fr.shtml,france,MERCURE AX LES THERMES,AX LES THERMES,missing
+1122,1122,Hôtel Mercure Antibes Sophia Antipolis,MER,MERCURE,VALBONNE,France,https://all.accor.com/hotel/1122/index.fr.shtml,france,HOTEL MERCURE ANTIBES SOPHIA ANTIPOLIS,VALBONNE,missing
+0711,711,ibis Antibes Sophia Antipolis,IBH,IBIS,VALBONNE,France,https://all.accor.com/hotel/0711/index.fr.shtml,france,IBIS ANTIBES SOPHIA ANTIPOLIS,VALBONNE,missing
+0398,398,Novotel Antibes Sophia Antipolis,NOV,NOVOTEL,VALBONNE,France,https://all.accor.com/hotel/0398/index.fr.shtml,france,NOVOTEL ANTIBES SOPHIA ANTIPOLIS,VALBONNE,missing
+B0X6,B0X6,ibis Styles Perpignan Canet-en-Roussillon,IBS,IBIS STYLES,CANET EN ROUSSILLON,France,https://all.accor.com/hotel/B0X6/index.fr.shtml,france,IBIS STYLES PERPIGNAN CANET EN ROUSSILLON,CANET EN ROUSSILLON,missing
+B2H8,B2H8,Aparthotel Adagio Nice Centre,ADG,ADAGIO,NICE,France,https://all.accor.com/hotel/B2H8/index.fr.shtml,france,APARTHOTEL ADAGIO NICE CENTRE,NICE,missing
+0360,360,Hôtel Mercure Nice Promenade des Anglais,MER,MERCURE,NICE,France,https://all.accor.com/hotel/0360/index.fr.shtml,france,HOTEL MERCURE NICE PROMENADE DES ANGLAIS,NICE,missing
+B950,B950,Mama Shelter Nice,MSH,MAMA SHELTER,NICE,France,https://all.accor.com/hotel/B950/index.fr.shtml,france,MAMA SHELTER NICE,NICE,missing
+A9A2,A9A2,Hôtel Mercure Villeneuve-Loubet Plage,MER,MERCURE,VILLENEUVE-LOUBET,France,https://all.accor.com/hotel/A9A2/index.fr.shtml,france,HOTEL MERCURE VILLENEUVE LOUBET PLAGE,VILLENEUVE LOUBET,missing
+0962,962,Hôtel Mercure Nice Marché aux Fleurs,MER,MERCURE,NICE,France,https://all.accor.com/hotel/0962/index.fr.shtml,france,HOTEL MERCURE NICE MARCHE AUX FLEURS,NICE,missing
+0414,414,Novotel Nice Aéroport Cap 3000,NOV,NOVOTEL,SAINT LAURENT DU VAR,France,https://all.accor.com/hotel/0414/index.fr.shtml,france,NOVOTEL NICE AEROPORT CAP 3000,SAINT LAURENT DU VAR,missing
+0478,478,Novotel Nice Arénas Aéroport,NOV,NOVOTEL,NICE CEDEX 03,France,https://all.accor.com/hotel/0478/index.fr.shtml,france,NOVOTEL NICE ARENAS AEROPORT,NICE CEDEX 03,missing
+0749,749,ibis Nice Aéroport Promenade des Anglais,IBH,IBIS,NICE,France,https://all.accor.com/hotel/0749/index.fr.shtml,france,IBIS NICE AEROPORT PROMENADE DES ANGLAIS,NICE,missing
+C229,C229,greet Hotel Nice Aéroport Promenade des Anglais,GRE,GREET,NICE,France,https://all.accor.com/hotel/C229/index.fr.shtml,france,GREET HOTEL NICE AEROPORT PROMENADE DES ANGLAIS,NICE,missing
+1170,1170,ibis Cannes Plage La Bocca,IBH,IBIS,CANNES,France,https://all.accor.com/hotel/1170/index.fr.shtml,france,IBIS CANNES PLAGE LA BOCCA,CANNES,missing
+C2F4,C2F4,Ibis Roquebrune Cap Martin Menton,IBH,IBIS,ROQUEBRUNE CAP MARTIN,France,https://all.accor.com/hotel/C2F4/index.fr.shtml,france,IBIS ROQUEBRUNE CAP MARTIN MENTON,ROQUEBRUNE CAP MARTIN,missing
+B803,B803,Mercure Peyragudes Loudenvielle Pyrenees,MER,MERCURE,LOUDENVIELLE,France,https://all.accor.com/hotel/B803/index.fr.shtml,france,MERCURE PEYRAGUDES LOUDENVIELLE PYRENEES,LOUDENVIELLE,missing
+B6V5,B6V5,Mondrian Cannes,MOD,MOD,CANNES,France,https://all.accor.com/hotel/B6V5/index.fr.shtml,france,MONDRIAN CANNES,CANNES,missing
+B2C8,B2C8,ibis Styles Fréjus Saint-Raphaël,IBS,IBIS STYLES,FREJUS,France,https://all.accor.com/hotel/B2C8/index.fr.shtml,france,IBIS STYLES FREJUS SAINT RAPHAEL,FREJUS,missing
+3185,3185,ibis budget Fréjus Saint-Raphaël Centre et Plage,IBB,IBIS BUDGET,FREJUS,France,https://all.accor.com/hotel/3185/index.fr.shtml,france,IBIS BUDGET FREJUS SAINT RAPHAEL CENTRE ET PLAGE,FREJUS,missing
+0828,828,ibis Toulon La-Seyne,IBH,IBIS,LA SEYNE SUR MER,France,https://all.accor.com/hotel/0828/index.fr.shtml,france,IBIS TOULON LA SEYNE,LA SEYNE SUR MER,missing
+0443,443,ibis Styles Toulon La Seyne-sur-Mer,IBS,IBIS STYLES,LA SEYNE SUR MER,France,https://all.accor.com/hotel/0443/index.fr.shtml,france,IBIS STYLES TOULON LA SEYNE SUR MER,LA SEYNE SUR MER,missing
+B9Q4,B9Q4,The 1932 Hotel & spa Cap d'Antibes - MGallery Collection,MGA,MGALLERY,ANTIBES,France,https://all.accor.com/hotel/B9Q4/index.fr.shtml,france,THE 1932 HOTEL SPA CAP D ANTIBES MGALLERY COLLECTION,ANTIBES,missing
+C1F8,C1F8,Mercure Saint Raphael Centre Plage,MER,MERCURE,SAINT RAPHAEL,France,https://all.accor.com/hotel/C1F8/index.fr.shtml,france,MERCURE SAINT RAPHAEL CENTRE PLAGE,SAINT RAPHAEL,missing
+B3F9,B3F9,Hôtel Mercure Toulon La Seyne-Sur-Mer,MER,MERCURE,LA SEYNE SUR MER,France,https://all.accor.com/hotel/B3F9/index.fr.shtml,france,HOTEL MERCURE TOULON LA SEYNE SUR MER,LA SEYNE SUR MER,missing
+A0A9,A0A9,Ibis Styles Hyères Rooftop & Spa,IBS,IBIS STYLES,HYERES,France,https://all.accor.com/hotel/A0A9/index.fr.shtml,france,IBIS STYLES HYERES ROOFTOP SPA,HYERES,missing
+C6L1,C6L1,Grand Hôtel l'Ermitage Font-Romeu - Handwritten Collection,SOU,SOU,FONT-ROMEU,France,https://all.accor.com/hotel/C6L1/index.fr.shtml,france,GRAND HOTEL L ERMITAGE FONT ROMEU HANDWRITTEN COLLECTION,FONT ROMEU,missing
+A0D4,A0D4,ibis Styles Collioure Port-Vendres,IBS,IBIS STYLES,PORT-VENDRES,France,https://all.accor.com/hotel/A0D4/index.fr.shtml,france,IBIS STYLES COLLIOURE PORT VENDRES,PORT VENDRES,missing
+C1V2,C1V2,Hôtel & Spa Kasano Calvi - Handwritten Collection,SOU,SOU,CALVI,France,https://all.accor.com/hotel/C1V2/index.fr.shtml,france,HOTEL SPA KASANO CALVI HANDWRITTEN COLLECTION,CALVI,missing
+0587,587,Sofitel Golfe d'Ajaccio Thalassa sea & spa,SOF,SOFITEL,PORTICCIO,France,https://all.accor.com/hotel/0587/index.fr.shtml,france,SOFITEL GOLFE D AJACCIO THALASSA SEA SPA,PORTICCIO,missing
+B7M0,B7M0,ibis Styles Porto Vecchio,IBS,IBIS STYLES,PORTO VECCHIO,France,https://all.accor.com/hotel/B7M0/index.fr.shtml,france,IBIS STYLES PORTO VECCHIO,PORTO VECCHIO,missing

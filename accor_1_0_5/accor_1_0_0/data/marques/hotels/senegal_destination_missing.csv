@@ -1,2 +1,0 @@
-hotel_code_accor,hotel_code_norm,hotel_name,hotel_brand_code,hotel_brand,hotel_city,hotel_country,hotel_adresse,hotel_code_postal,url_hotel,source,source_query,hotel_name_norm,city_norm,country_slug,country_label,region,match_type
-C0N2,C0N2,Mövenpick Resort Lamantin Saly,MOV,MÖVENPICK,SALY,Sénégal,"Saly Nord, Mbour, Thiès",2383,https://all.accor.com/hotel/C0N2/index.fr.shtml,catalog_api,senegal,MOVENPICK RESORT LAMANTIN SALY,SALY,senegal,Sénégal,africa_me,missing
