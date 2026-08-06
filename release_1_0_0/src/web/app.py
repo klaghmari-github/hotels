@@ -1,5 +1,5 @@
 """
-GUI web : evaluation LOO, prediction hotel, comparaison sim_v1 / sim_v2 / ml.
+GUI web : accueil, /user, /admin (+ outils avances).
 """
 
 from __future__ import annotations
@@ -8,72 +8,95 @@ from flask import Flask, render_template_string
 
 from src.api.app import create_api_app
 from src.pipeline.paths import Paths
+from src.web.pages_admin import ADMIN_BODY, ADMIN_CSS, ADMIN_SCRIPT
+from src.web.pages_user import USER_BODY, USER_CSS, USER_SCRIPT
 from src.web.styles import COMMON_CSS
 
-NAV = """
+NAV_HOME = """
 <nav>
-  <a class="link" href="/eval">Evaluation LOO</a>
-  <a class="link" href="/compare">Comparaison</a>
-  <a class="link" href="/predict">Prediction</a>
-  <a class="link" href="/hotels">Hotels</a>
+  <a class="link" href="/user">User</a>
+  <a class="link" href="/admin">Admin</a>
 </nav>
 """
 
-SHELL = """
+NAV_USER = """
+<nav>
+  <a class="link" href="/user">Parcours</a>
+  <a class="link" href="/admin">Admin</a>
+</nav>
+"""
+
+NAV_ADMIN = """
+<nav>
+  <a class="link" href="/user">User</a>
+  <a class="link" href="/admin">Studio</a>
+  <a class="link" href="/predict">Prediction</a>
+</nav>
+"""
+
+
+def _shell(extra_css: str = "", nav: str = NAV_HOME) -> str:
+    css = COMMON_CSS + extra_css
+    return f"""
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>__TITLE__</title>
-  <style>__CSS__</style>
+  <style>{css}</style>
 </head>
 <body>
   <header>
     <h1><a class="brand" href="/" title="Accueil">Accor ROD</a> <span>release 1.0.0</span></h1>
-    __NAV__
+    {nav}
   </header>
   <main>__BODY__</main>
   <script>__SCRIPT__</script>
 </body>
 </html>
-""".replace("__CSS__", COMMON_CSS).replace("__NAV__", NAV)
+"""
 
 
-def _page(title: str, h1: str, body: str, script: str = "") -> str:
+def _page(
+    title: str,
+    body: str,
+    script: str = "",
+    *,
+    extra_css: str = "",
+    nav: str = NAV_HOME,
+) -> str:
     return (
-        SHELL.replace("__TITLE__", title)
-        .replace("__H1__", h1)
+        _shell(extra_css=extra_css, nav=nav)
+        .replace("__TITLE__", title)
         .replace("__BODY__", body)
         .replace("__SCRIPT__", script)
     )
 
 
 HOME_BODY = """
-<div class="grid">
-  <a class="card" href="/eval" style="text-decoration:none;color:inherit">
-    <div class="lbl">Evaluation</div>
-    <div class="val" style="font-size:1rem">LOO hotels pilotes</div>
-    <div class="sub">sim_v1 · sim_v2 · ml</div>
-  </a>
-  <a class="card" href="/compare" style="text-decoration:none;color:inherit">
-    <div class="lbl">Comparaison</div>
-    <div class="val" style="font-size:1rem">sim_v1 vs sim_v2 vs ml</div>
-    <div class="sub">Metriques cote a cote</div>
-  </a>
-  <a class="card" href="/predict" style="text-decoration:none;color:inherit">
-    <div class="lbl">Prediction</div>
-    <div class="val" style="font-size:1rem">Hotel cible</div>
-    <div class="sub">sim_v1 · sim_v2 · ml</div>
-  </a>
-  <a class="card" href="/hotels" style="text-decoration:none;color:inherit">
-    <div class="lbl">Hotels</div>
-    <div class="val" style="font-size:1rem">Parametres</div>
-    <div class="sub">Pre-remplir la prediction</div>
-  </a>
+<div style="max-width:820px;margin:0 auto">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem">
+    <img src="/static/img/accor-logo.svg" alt="Accor" style="height:40px"/>
+    <div>
+      <h2 style="margin:0">Accor ROD</h2>
+      <p class="muted" style="margin:.2rem 0 0">Choisir une interface</p>
+    </div>
+  </div>
+  <div class="grid">
+    <a class="card" href="/user" style="text-decoration:none;color:inherit">
+      <div class="lbl">User</div>
+      <div class="val" style="font-size:1.05rem">Interface directeur</div>
+      <div class="sub">Recherche hotel · parametres · simulation · recommandation</div>
+    </a>
+    <a class="card" href="/admin" style="text-decoration:none;color:inherit">
+      <div class="lbl">Admin</div>
+      <div class="val" style="font-size:1.05rem">Studio donnees</div>
+      <div class="sub">ALL · PILOTE · evaluation LOO</div>
+    </a>
+  </div>
 </div>
 """
-
 EVAL_BODY = """
 <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem">
   <button class="btn primary" data-src="sim_v1" type="button">sim_v1</button>
@@ -808,36 +831,56 @@ def create_web_app(paths: Paths | None = None) -> Flask:
     @app.get("/")
     def home():
         return render_template_string(
-            _page("Accor ROD", "Accor ROD", HOME_BODY)
+            _page("Accor ROD", HOME_BODY, nav=NAV_HOME)
         )
 
+    @app.get("/user")
+    def user_page():
+        return render_template_string(
+            _page(
+                "ROD User",
+                USER_BODY,
+                USER_SCRIPT,
+                extra_css=USER_CSS,
+                nav=NAV_USER,
+            )
+        )
+
+    @app.get("/admin")
+    def admin_page():
+        return render_template_string(
+            _page(
+                "ROD Admin",
+                ADMIN_BODY,
+                ADMIN_SCRIPT,
+                extra_css=ADMIN_CSS,
+                nav=NAV_ADMIN,
+            )
+        )
+
+    # Outils avances (admin)
     @app.get("/eval")
     def eval_page():
         return render_template_string(
-            _page("Evaluation LOO", "Evaluation LOO", EVAL_BODY, EVAL_SCRIPT)
+            _page("Evaluation LOO", EVAL_BODY, EVAL_SCRIPT, nav=NAV_ADMIN)
         )
 
     @app.get("/compare")
     def compare_page():
         return render_template_string(
-            _page(
-                "Comparaison",
-                "Comparaison",
-                COMPARE_BODY,
-                COMPARE_SCRIPT,
-            )
+            _page("Comparaison", COMPARE_BODY, COMPARE_SCRIPT, nav=NAV_ADMIN)
         )
 
     @app.get("/predict")
     def predict_page():
         return render_template_string(
-            _page("Prediction", "Prediction", PREDICT_BODY, PREDICT_SCRIPT)
+            _page("Prediction", PREDICT_BODY, PREDICT_SCRIPT, nav=NAV_ADMIN)
         )
 
     @app.get("/hotels")
     def hotels_page():
         return render_template_string(
-            _page("Hotels", "Hotels pilotes", HOTELS_BODY, HOTELS_SCRIPT)
+            _page("Hotels", HOTELS_BODY, HOTELS_SCRIPT, nav=NAV_ADMIN)
         )
 
     return app

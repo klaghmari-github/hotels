@@ -1,0 +1,67 @@
+# Sources group ALL — Excel → tables DuckDB (create_if_not_exists)
+# p_table_view("t_hotel_brand_data") charge le fichier la 1re fois, puis la table.
+
+df_hotel_brand_data:
+  type: dataframe
+  requires: []
+  file: data/files/input/hotel_brand_data.xlsx
+
+t_hotel_brand_data:
+  type: table
+  mode: create_if_not_exists
+  requires:
+    - df_hotel_brand_data
+  sql: |-
+    SELECT * FROM df_hotel_brand_data
+
+df_hotel_data:
+  type: dataframe
+  requires: []
+  file: data/files/input/hotel_data.xlsx
+
+t_hotel_data:
+  type: table
+  mode: create_if_not_exists
+  requires:
+    - df_hotel_data
+  sql: |-
+    SELECT * FROM df_hotel_data
+
+df_hotel_proximity_data:
+  type: dataframe
+  requires: []
+  file: data/files/input/hotel_proximity_data.xlsx
+
+t_hotel_proximity_data:
+  type: table
+  mode: create_if_not_exists
+  requires:
+    - df_hotel_proximity_data
+  sql: |-
+    SELECT * FROM df_hotel_proximity_data
+
+df_hotel_holidays_data:
+  type: dataframe
+  requires: []
+  file: data/files/input/hotel_holidays_data.xlsx
+
+t_hotel_holidays_data:
+  type: table
+  mode: create_if_not_exists
+  requires:
+    - df_hotel_holidays_data
+  sql: |-
+    SELECT * FROM df_hotel_holidays_data
+
+df_hotel_weather_data:
+  type: dataframe
+  requires: []
+  file: data/files/input/hotel_weather_data.xlsx
+
+t_hotel_weather_data:
+  type: table
+  mode: create_if_not_exists
+  requires:
+    - df_hotel_weather_data
+  sql: |-
+    SELECT * FROM df_hotel_weather_data
