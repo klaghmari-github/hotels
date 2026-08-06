@@ -6,6 +6,7 @@ t_hotel_codes:
   sql: |
     SELECT DISTINCT HOTEL_CODE
     FROM t_sales
+    WHERE CAST(HOTEL_CODE AS VARCHAR) NOT IN ('H5586')
     ORDER BY HOTEL_CODE
 t_machines:
   type: table

@@ -155,7 +155,7 @@ def create_api_app(paths: Paths | None = None) -> Flask:
             return jsonify(
                 {
                     "ok": False,
-                    "error": "Excel introuvable. Lancer : python run.py ml --rebuild",
+                    "error": "Evaluation ml introuvable. Lancer : python run.py ml --rebuild",
                 }
             ), 404
         pred = pd.read_excel(path, sheet_name="predictions")
@@ -163,7 +163,7 @@ def create_api_app(paths: Paths | None = None) -> Flask:
         return jsonify(
             {
                 "ok": True,
-                "source": path.name,
+                "source": "ml",
                 "predictions": _clean_records(pred),
                 "metrics": _clean_records(metrics),
             }
@@ -224,8 +224,12 @@ def create_api_app(paths: Paths | None = None) -> Flask:
                     features[normalized_mix_name(family, str(label))] = float(part)
 
             pred = ml.predict_row(features, solution)
-            return jsonify({"ok": True, "model": "catboost", "prediction": pred})
+            return jsonify({"ok": True, "model": "ml", "prediction": pred})
         except Exception as exc:  # noqa: BLE001
-            return jsonify({"ok": False, "error": str(exc)}), 400
+            msg = str(exc)
+            # Ne pas exposer le type de modele ML dans l'UI
+            for secret in ("CatBoost", "catboost", "XGBoost", "xgboost"):
+                msg = msg.replace(secret, "ml")
+            return jsonify({"ok": False, "error": msg}), 400
 
     return app

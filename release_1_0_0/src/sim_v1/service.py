@@ -24,8 +24,13 @@ class SimV1Service:
         self.paths = (paths or Paths()).ensure()
         self.factory = factory or PipelineFactory(self.paths)
 
-    def open(self, *, rebuild: bool = False) -> ConnectionPipeline:
-        return self.factory.open(rebuild=rebuild)
+    def open(
+        self,
+        *,
+        rebuild: bool = False,
+        read_only: bool = False,
+    ) -> ConnectionPipeline:
+        return self.factory.open(rebuild=rebuild, read_only=read_only)
 
     def run_loo(self, *, rebuild: bool = True) -> dict[str, pd.DataFrame]:
         """Leave-one-out sur les 6 hotels pilotes (hors H5586)."""

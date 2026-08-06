@@ -51,7 +51,9 @@ tr:hover td { background: rgba(61,139,253,.05); }
 }
 .tag.simply, .tag.A { color: #7dd3fc; }
 .tag.liberty, .tag.B { color: #c4b5fd; }
-.tag.connected, .tag.ML, .tag.catboost { color: #86efac; }
+.tag.connected, .tag.ml, .tag.ML { color: #86efac; }
+.tag.sim_v1 { color: #7dd3fc; }
+.tag.sim_v2 { color: #c4b5fd; }
 .muted { color: var(--muted); font-size: .85rem; }
 .errbox {
   margin: 1rem 0; padding: .8rem 1rem; border: 1px solid #5a2a35;

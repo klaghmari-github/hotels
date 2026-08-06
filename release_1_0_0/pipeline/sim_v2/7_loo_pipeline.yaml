@@ -8,6 +8,7 @@ t_loo_hotels:
       HOTEL_CODE AS hotel_code,
       ANY_VALUE(SOLUTION) AS solution
     FROM t_sales
+    WHERE CAST(HOTEL_CODE AS VARCHAR) NOT IN ('H5586')
     GROUP BY HOTEL_CODE
     ORDER BY HOTEL_CODE
 v_loo_training_source:
@@ -102,25 +103,8 @@ v_loo_prediction_by_variable:
       ON c.solution = o.solution
     INNER JOIN v_loo_input_mix AS m
       USING (variable_family, variable_name)
-v_loo_prediction_method_a:
-  type: view
-  mode: create_or_replace
-  requires:
-  - v_loo_prediction_by_variable
-  sql: |-
-    SELECT
-      hotel_code,
-      solution,
-      'A' AS methode,
-      AVG(montant_ventes_par_mois_predit) AS montant_ventes_par_mois_predit,
-      AVG(montant_marge_selon_coef_par_mois_predite) AS montant_marge_selon_coef_par_mois_predite,
-      AVG(montant_marge_par_mois_predite) AS montant_marge_par_mois_predite,
-      COUNT(*) AS nombre_predicteurs,
-      COUNT(DISTINCT variable_family) AS nombre_familles,
-      MAX(nombre_hotels) AS nombre_hotels_apprentissage
-    FROM v_loo_prediction_by_variable
-    GROUP BY hotel_code, solution
-v_loo_prediction_method_b:
+# Agregation par famille de variables (ex-methode B), label public : sim_v2
+v_loo_prediction:
   type: view
   mode: create_or_replace
   requires:
@@ -142,7 +126,7 @@ v_loo_prediction_method_b:
     SELECT
       hotel_code,
       solution,
-      'B' AS methode,
+      'sim_v2' AS methode,
       AVG(montant_ventes_par_mois_predit) AS montant_ventes_par_mois_predit,
       AVG(montant_marge_selon_coef_par_mois_predite) AS montant_marge_selon_coef_par_mois_predite,
       AVG(montant_marge_par_mois_predite) AS montant_marge_par_mois_predite,
@@ -156,8 +140,7 @@ v_loo_result:
   mode: create_or_replace
   requires:
   - v_loo_observed_row
-  - v_loo_prediction_method_a
-  - v_loo_prediction_method_b
+  - v_loo_prediction
   sql: |-
     SELECT
       p.hotel_code,
@@ -187,11 +170,7 @@ v_loo_result:
       p.nombre_familles,
       p.nombre_hotels_apprentissage
     FROM v_loo_observed_row AS o
-    INNER JOIN (
-      SELECT * FROM v_loo_prediction_method_a
-      UNION ALL
-      SELECT * FROM v_loo_prediction_method_b
-    ) AS p
+    INNER JOIN v_loo_prediction AS p
     USING (hotel_code, solution)
 t_loo_results:
   type: table
@@ -244,6 +223,7 @@ v_loo_metrics:
       SQRT(AVG(POWER(montant_marge_erreur, 2))) AS marge_rmse,
       AVG(montant_marge_erreur_relative) AS marge_mape
     FROM t_loo_results
+    WHERE methode = 'sim_v2'
     GROUP BY GROUPING SETS ((methode, solution), (methode))
 v_loo_method_comparison:
   type: view
@@ -261,10 +241,7 @@ v_loo_method_comparison:
       marge_selon_coef_mape,
       marge_mae,
       marge_rmse,
-      marge_mape,
-      RANK() OVER (ORDER BY montant_ventes_mae) AS rang_ca,
-      RANK() OVER (ORDER BY marge_selon_coef_mae) AS rang_marge_selon_coef,
-      RANK() OVER (ORDER BY marge_mae) AS rang_marge
+      marge_mape
     FROM v_loo_metrics
     WHERE solution IS NULL
-    ORDER BY rang_ca, rang_marge
+    ORDER BY montant_ventes_mae

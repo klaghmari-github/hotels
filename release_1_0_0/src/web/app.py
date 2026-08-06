@@ -1,5 +1,5 @@
 """
-GUI web : evaluation LOO, prediction hotel, exploration datasets.
+GUI web : evaluation LOO, prediction hotel, comparaison sim_v1 / sim_v2 / ml.
 """
 
 from __future__ import annotations
@@ -14,6 +14,7 @@ NAV = """
 <nav>
   <a class="link" href="/">Accueil</a>
   <a class="link" href="/eval">Evaluation LOO</a>
+  <a class="link" href="/compare">Comparaison</a>
   <a class="link" href="/predict">Prediction</a>
   <a class="link" href="/hotels">Hotels</a>
 </nav>
@@ -50,22 +51,26 @@ def _page(title: str, h1: str, body: str, script: str = "") -> str:
 
 
 HOME_BODY = """
-<p class="muted">Simulateurs ROD v1 / v2 et modele CatBoost — evaluation leave-one-out et prediction hotel.</p>
 <div class="grid">
   <a class="card" href="/eval" style="text-decoration:none;color:inherit">
     <div class="lbl">Evaluation</div>
     <div class="val" style="font-size:1rem">LOO hotels pilotes</div>
-    <div class="sub">sim_v1 · sim_v2 · CatBoost</div>
+    <div class="sub">sim_v1 · sim_v2 · ml</div>
+  </a>
+  <a class="card" href="/compare" style="text-decoration:none;color:inherit">
+    <div class="lbl">Comparaison</div>
+    <div class="val" style="font-size:1rem">sim_v1 vs sim_v2 vs ml</div>
+    <div class="sub">Metriques cote a cote</div>
   </a>
   <a class="card" href="/predict" style="text-decoration:none;color:inherit">
     <div class="lbl">Prediction</div>
     <div class="val" style="font-size:1rem">Hotel cible</div>
-    <div class="sub">Restitution et ML</div>
+    <div class="sub">sim_v1 · sim_v2 · ml</div>
   </a>
   <a class="card" href="/hotels" style="text-decoration:none;color:inherit">
     <div class="lbl">Hotels</div>
     <div class="val" style="font-size:1rem">Parametres</div>
-    <div class="sub">Charger un pilote pour predire</div>
+    <div class="sub">Pre-remplir la prediction</div>
   </a>
 </div>
 """
@@ -74,10 +79,9 @@ EVAL_BODY = """
 <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem">
   <button class="btn primary" data-src="sim_v1" type="button">sim_v1</button>
   <button class="btn" data-src="sim_v2" type="button">sim_v2</button>
-  <button class="btn" data-src="ml" type="button">CatBoost</button>
-  <span id="status" class="muted"></span>
+  <button class="btn" data-src="ml" type="button">ml</button>
 </div>
-<div id="main"><p class="muted">Choisir une source d evaluation.</p></div>
+<div id="main"><p class="muted">Chargement…</p></div>
 """
 
 EVAL_SCRIPT = r"""
@@ -98,7 +102,8 @@ function table(cols,rows,nums=[]){
   return h+'</tbody></table></div>';
 }
 async function load(src){
-  document.getElementById('status').textContent='Chargement…';
+  const main=document.getElementById('main');
+  main.innerHTML='<p class="muted">Chargement…</p>';
   document.querySelectorAll('button[data-src]').forEach(b=>b.classList.toggle('primary', b.dataset.src===src));
   try{
     const res=await fetch('/api/eval/'+src);
@@ -117,15 +122,227 @@ async function load(src){
     const preds=data.predictions||[];
     const keys=preds[0]?Object.keys(preds[0]).slice(0,12):[];
     html+=table(keys.map(k=>({k,l:k})), preds, keys.filter(k=>/mae|err|reel|pred|ca_|marge_/i.test(k)));
-    document.getElementById('main').innerHTML=html;
-    document.getElementById('status').textContent=data.source||'';
+    main.innerHTML=html;
   }catch(e){
-    document.getElementById('main').innerHTML=`<div class="errbox">${e.message}</div>`;
-    document.getElementById('status').textContent='Erreur';
+    main.innerHTML=`<div class="errbox">${e.message}</div>`;
   }
 }
 document.querySelectorAll('button[data-src]').forEach(b=>b.onclick=()=>load(b.dataset.src));
 load('sim_v1');
+"""
+
+COMPARE_BODY = """
+<div id="main"><p class="muted">Chargement…</p></div>
+"""
+
+COMPARE_SCRIPT = r"""
+const fmt=(n,d=2)=>{if(n==null||n===''||Number.isNaN(Number(n)))return '—';return Number(n).toLocaleString('fr-FR',{maximumFractionDigits:d});};
+const tag=s=>`<span class="tag ${(s||'').toString().toLowerCase().replace(/[^a-z0-9_]/g,'')}">${s??''}</span>`;
+const SOURCES=['sim_v1','sim_v2','ml'];
+
+function isGlobalMetric(m){
+  // ligne globale (pas de solution) — preferer pour les KPI
+  return m.solution==null || m.solution==='' || m.perimetre==='ALL' || m.scope==='ALL';
+}
+function pickMaeCa(metrics){
+  if(!metrics||!metrics.length) return null;
+  const ordered=[...metrics].sort((a,b)=>Number(isGlobalMetric(b))-Number(isGlobalMetric(a)));
+  for(const m of ordered){
+    if(m.mae_ca!=null) return Number(m.mae_ca);
+    if(m.montant_ventes_mae!=null) return Number(m.montant_ventes_mae);
+    if(m.target==='montant_ventes_par_mois' && m.mae!=null) return Number(m.mae);
+  }
+  const mae=metrics.map(m=>m.mae).filter(v=>v!=null);
+  if(mae.length) return mae.reduce((a,b)=>a+Number(b),0)/mae.length;
+  return null;
+}
+function pickMaeMarge(metrics){
+  if(!metrics||!metrics.length) return null;
+  const ordered=[...metrics].sort((a,b)=>Number(isGlobalMetric(b))-Number(isGlobalMetric(a)));
+  for(const m of ordered){
+    if(m.mae_marge!=null) return Number(m.mae_marge);
+    if(m.marge_mae!=null) return Number(m.marge_mae);
+    if(m.target==='montant_marge_par_mois' && m.mae!=null) return Number(m.mae);
+  }
+  return null;
+}
+function pickMapeCa(metrics){
+  if(!metrics||!metrics.length) return null;
+  const ordered=[...metrics].sort((a,b)=>Number(isGlobalMetric(b))-Number(isGlobalMetric(a)));
+  for(const m of ordered){
+    if(m.mape_ca_pct!=null) return Number(m.mape_ca_pct);
+    if(m.montant_ventes_mape!=null) return Number(m.montant_ventes_mape);
+    if(m.target==='montant_ventes_par_mois' && m.mape!=null) return Number(m.mape);
+  }
+  return null;
+}
+
+function hotelCa(pred){
+  // unify predicted / actual CA fields across sources
+  return {
+    hotel: pred.hotel_code,
+    solution: pred.solution,
+    methode: pred.methode||null,
+    ca_pred: pred.ca_pred??pred.montant_ventes_par_mois_predit??pred.montant_ventes_par_mois_pred??null,
+    ca_reel: pred.ca_reel??pred.montant_ventes_par_mois_reel??null,
+    ca_err: pred.ca_err_abs??pred.montant_ventes_erreur_absolue??pred.montant_ventes_par_mois_erreur_absolue??null,
+    marge_pred: pred.marge_pred??pred.montant_marge_par_mois_predite??pred.montant_marge_par_mois_predit??null,
+    marge_reel: pred.marge_reel??pred.montant_marge_par_mois_reel??null,
+  };
+}
+
+async function fetchEval(src){
+  try{
+    const res=await fetch('/api/eval/'+src);
+    const data=await res.json();
+    if(!data.ok) return {src, ok:false, error:data.error||'erreur'};
+    return {src, ok:true, metrics:data.metrics||[], predictions:data.predictions||[]};
+  }catch(e){
+    return {src, ok:false, error:e.message};
+  }
+}
+
+function bestSrc(rows, key){
+  let best=null, bestVal=Infinity;
+  for(const r of rows){
+    const v=r[key];
+    if(v==null||Number.isNaN(v)) continue;
+    if(v<bestVal){ bestVal=v; best=r.src; }
+  }
+  return best;
+}
+
+async function render(){
+  const main=document.getElementById('main');
+  main.innerHTML='<p class="muted">Chargement…</p>';
+  const results=await Promise.all(SOURCES.map(fetchEval));
+  const ok=results.filter(r=>r.ok);
+  const fail=results.filter(r=>!r.ok);
+
+  // KPI cards
+  const kpis=results.map(r=>{
+    if(!r.ok) return {src:r.src, mae_ca:null, mae_marge:null, mape_ca:null, n:null, n_rows:null, err:r.error};
+    const preds=r.predictions||[];
+    const hotels=new Set(preds.map(p=>p.hotel_code).filter(Boolean));
+    return {
+      src:r.src,
+      mae_ca: pickMaeCa(r.metrics),
+      mae_marge: pickMaeMarge(r.metrics),
+      mape_ca: pickMapeCa(r.metrics),
+      n: hotels.size,           // hotels uniques (comparable)
+      n_rows: preds.length,    // lignes brutes (sim_v2 = 2 methodes)
+      err:null,
+    };
+  });
+  const bestCa=bestSrc(kpis,'mae_ca');
+  const bestMarge=bestSrc(kpis,'mae_marge');
+
+  let html='';
+  if(fail.length){
+    html+=`<div class="errbox">Donnees manquantes : ${fail.map(r=>r.src).join(', ')}</div>`;
+  }
+  html+='<h2>Metriques globales (LOO)</h2><div class="grid">';
+  for(const k of kpis){
+    const winCa=k.src===bestCa?' · meilleur CA':'';
+    const winM=k.src===bestMarge?' · meilleure marge':'';
+    html+=`<div class="card">
+      <div class="lbl">${tag(k.src)}</div>
+      <div class="val">${fmt(k.mae_ca)}</div>
+      <div class="sub">MAE CA${winCa}</div>
+      <div class="sub" style="margin-top:.35rem">MAE marge : <strong>${fmt(k.mae_marge)}</strong>${winM}</div>
+      <div class="sub">MAPE CA : ${fmt(k.mape_ca)} % · hotels=${k.n??'—'}${k.n_rows!=null && k.n_rows!==k.n?` · lignes=${k.n_rows}`:''}</div>
+      ${k.err?`<div class="errbox" style="margin-top:.5rem;padding:.4rem .55rem;font-size:.78rem">${k.err}</div>`:''}
+    </div>`;
+  }
+  html+='</div>';
+
+  // Side-by-side metrics table
+  html+='<h2>Tableau comparatif</h2><div class="scroll"><table><thead><tr>';
+  html+='<th>Metrique</th>'+SOURCES.map(s=>`<th class="num">${s}</th>`).join('')+'</tr></thead><tbody>';
+  const rows=[
+    ['MAE CA', 'mae_ca'],
+    ['MAE marge', 'mae_marge'],
+    ['MAPE CA (%)', 'mape_ca'],
+    ['Nb hotels', 'n'],
+  ];
+  for(const [label,key] of rows){
+    html+=`<tr><td>${label}</td>`;
+    for(const s of SOURCES){
+      const k=kpis.find(x=>x.src===s);
+      const v=k?k[key]:null;
+      const isBest=(key==='mae_ca'&&s===bestCa)||(key==='mae_marge'&&s===bestMarge);
+      html+=`<td class="num"${isBest?' style="color:var(--ok);font-weight:700"':''}>${fmt(v, key==='n'?0:2)}</td>`;
+    }
+    html+='</tr>';
+  }
+  html+='</tbody></table></div>';
+
+  // Per-hotel comparison (CA pred / err)
+  const byHotel={};
+  for(const r of ok){
+    for(const p of r.predictions){
+      const u=hotelCa(p);
+      if(!u.hotel) continue;
+      // sim_v2 may have several methodes — keep best (lowest abs err) per hotel
+      const key=u.hotel;
+      if(!byHotel[key]) byHotel[key]={hotel:key, solution:u.solution};
+      const slot=byHotel[key];
+      const prev=slot[r.src];
+      if(!prev || (u.ca_err!=null && (prev.ca_err==null || u.ca_err<prev.ca_err))){
+        slot[r.src]=u;
+        if(u.solution) slot.solution=u.solution;
+      }
+    }
+  }
+  const hotels=Object.values(byHotel).sort((a,b)=>String(a.hotel).localeCompare(String(b.hotel)));
+  if(hotels.length){
+    html+='<h2>Par hotel (CA predit / erreur abs.)</h2><div class="scroll"><table><thead><tr>';
+    html+='<th>Hotel</th><th>Solution</th>';
+    for(const s of SOURCES){
+      html+=`<th class="num">${s} CA</th><th class="num">${s} err</th>`;
+    }
+    html+='</tr></thead><tbody>';
+    for(const h of hotels){
+      html+=`<tr><td>${h.hotel}</td><td>${h.solution?tag(h.solution):'—'}</td>`;
+      // best err among sources for this hotel
+      let bestE=Infinity, bestS=null;
+      for(const s of SOURCES){
+        const e=h[s]?.ca_err;
+        if(e!=null && e<bestE){ bestE=e; bestS=s; }
+      }
+      for(const s of SOURCES){
+        const u=h[s];
+        const win=s===bestS;
+        html+=`<td class="num">${fmt(u?.ca_pred)}</td>`;
+        html+=`<td class="num"${win?' style="color:var(--ok);font-weight:700"':''}>${fmt(u?.ca_err)}</td>`;
+      }
+      html+='</tr>';
+    }
+    html+='</tbody></table></div>';
+  }
+
+  // Detail sim_v2 par solution (global = solution null)
+  const v2=results.find(r=>r.src==='sim_v2'&&r.ok);
+  if(v2){
+    const bySol=(v2.metrics||[]).filter(m=>m.solution!=null && m.solution!=='');
+    if(bySol.length){
+      html+='<h2>sim_v2 par solution</h2><div class="scroll"><table><thead><tr>';
+      html+='<th>Solution</th><th class="num">MAE CA</th><th class="num">MAE marge</th><th class="num">MAPE CA</th></tr></thead><tbody>';
+      for(const m of bySol){
+        html+=`<tr>
+          <td>${tag(m.solution)}</td>
+          <td class="num">${fmt(m.montant_ventes_mae)}</td>
+          <td class="num">${fmt(m.marge_mae)}</td>
+          <td class="num">${fmt(m.montant_ventes_mape)}</td>
+        </tr>`;
+      }
+      html+='</tbody></table></div>';
+    }
+  }
+
+  main.innerHTML=html;
+}
+render();
 """
 
 PREDICT_BODY = """
@@ -148,7 +365,7 @@ PREDICT_BODY = """
       <option value="liberty">liberty</option>
       <option value="connected">connected</option>
     </select>
-    <label>hotel_code (sim_v1 LOO)</label>
+    <label>hotel_code (sim_v1)</label>
     <input name="hotel_code" type="text" placeholder="ex. H2075"/>
     <label>Mix type (JSON)</label>
     <textarea name="type_mix" rows="2">{"F&B": 0.7, "NON F&B": 0.3}</textarea>
@@ -156,12 +373,13 @@ PREDICT_BODY = """
     <textarea name="gamme_mix" rows="3">{"sans alcool": 0.35, "food salee": 0.25, "food sucree": 0.15, "accessoires": 0.15, "sos": 0.10}</textarea>
     <div style="margin-top:1rem;display:flex;gap:.5rem;flex-wrap:wrap">
       <button class="btn primary" id="btnV2" type="button">sim_v2</button>
-      <button class="btn" id="btnML" type="button">CatBoost</button>
+      <button class="btn" id="btnML" type="button">ml</button>
       <button class="btn" id="btnV1" type="button">sim_v1</button>
+      <button class="btn" id="btnAll" type="button">Comparer les 3</button>
     </div>
   </form>
   <div>
-    <div id="hotel_info" class="card muted">Selectionner un hotel pour pre-remplir les champs (modifiables pour simulation).</div>
+    <div id="hotel_info" class="card muted">Selectionner un hotel pour pre-remplir les champs.</div>
     <div id="out" style="margin-top:1rem"></div>
   </div>
 </div>
@@ -183,6 +401,68 @@ function bodyFromForm(){
     gamme_mix: JSON.parse(fd.get('gamme_mix')||'{}'),
   };
 }
+function extractCa(data){
+  if(data.predictions && data.predictions.length){
+    // sim_v2: une seule agregation (ex-methode B), une ligne par solution
+    const rows=data.predictions;
+    const r=rows[0];
+    return {
+      ca: r.montant_ventes_par_mois_predit,
+      marge: r.montant_marge_par_mois_predite,
+      marge_coef: r.montant_marge_selon_coef_par_mois_predite,
+      detail: rows,
+    };
+  }
+  if(data.prediction){
+    const p=data.prediction;
+    return {
+      ca: p.montant_ventes_par_mois,
+      marge: p.montant_marge_par_mois,
+      marge_coef: p.montant_marge_selon_coef_par_mois,
+      detail:null,
+    };
+  }
+  if(data.montant_ventes_par_mois!=null){
+    return {
+      ca: data.montant_ventes_par_mois,
+      marge: data.montant_marge_par_mois,
+      marge_coef: null,
+      detail:null,
+    };
+  }
+  return null;
+}
+function renderOne(data, {title=null, showLabel=false, label=''}={}){
+  if(!data.ok) return `<div class="errbox">${showLabel&&label?label+' : ':''}${data.error||'echec'}</div>`;
+  const head=title?`<h2>${title}</h2>`:(showLabel&&label?`<h2>${tag(label)}</h2>`:'');
+  if(data.predictions){
+    let h=head+`<div class="scroll"><table><thead><tr><th>Solution</th><th class="num">CA</th><th class="num">Marge marche</th><th class="num">Marge coef</th></tr></thead><tbody>`;
+    for(const r of data.predictions){
+      h+=`<tr><td>${tag(r.solution)}</td>
+        <td class="num">${fmt(r.montant_ventes_par_mois_predit)}</td>
+        <td class="num">${fmt(r.montant_marge_par_mois_predite)}</td>
+        <td class="num">${fmt(r.montant_marge_selon_coef_par_mois_predite)}</td></tr>`;
+    }
+    return h+'</tbody></table></div>';
+  }
+  if(data.prediction){
+    const p=data.prediction;
+    return head+`<div class="grid">
+        <div class="card"><div class="lbl">CA mensuel</div><div class="val">${fmt(p.montant_ventes_par_mois)}</div></div>
+        <div class="card"><div class="lbl">Marge marche</div><div class="val">${fmt(p.montant_marge_par_mois)}</div></div>
+        <div class="card"><div class="lbl">Marge coef</div><div class="val">${fmt(p.montant_marge_selon_coef_par_mois)}</div></div>
+      </div>`;
+  }
+  if(data.montant_ventes_par_mois!=null){
+    const sol=data.solution?` ${tag(data.solution)}`:'';
+    return (title?`<h2>${title}${sol}</h2>`:(showLabel&&label?`<h2>${tag(label)}${sol}</h2>`:(sol?`<h2>${sol}</h2>`:'')))+
+      `<div class="grid">
+        <div class="card"><div class="lbl">CA predit</div><div class="val">${fmt(data.montant_ventes_par_mois)}</div></div>
+        <div class="card"><div class="lbl">Marge predite</div><div class="val">${fmt(data.montant_marge_par_mois)}</div></div>
+      </div>`;
+  }
+  return `<div class="errbox">Reponse inattendue</div>`;
+}
 async function call(url){
   const out=document.getElementById('out');
   out.innerHTML='<p class="muted">Calcul…</p>';
@@ -190,35 +470,57 @@ async function call(url){
     const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(bodyFromForm())});
     const data=await res.json();
     if(!data.ok) throw new Error(data.error||'echec');
-    if(data.predictions){
-      let h='<h2>Restitution sim_v2</h2><div class="scroll"><table><thead><tr><th>Solution</th><th>Methode</th><th>CA</th><th>Marge marche</th><th>Marge coef</th></tr></thead><tbody>';
-      for(const r of data.predictions){
-        h+=`<tr><td>${tag(r.solution)}</td><td>${tag(r.methode)}</td>
-          <td class="num">${fmt(r.montant_ventes_par_mois_predit)}</td>
-          <td class="num">${fmt(r.montant_marge_par_mois_predite)}</td>
-          <td class="num">${fmt(r.montant_marge_selon_coef_par_mois_predite)}</td></tr>`;
-      }
-      out.innerHTML=h+'</tbody></table></div>';
-    } else if(data.prediction){
-      const p=data.prediction;
-      out.innerHTML=`<h2>Prediction ${tag(data.model||'ml')}</h2>
-        <div class="grid">
-          <div class="card"><div class="lbl">CA mensuel</div><div class="val">${fmt(p.montant_ventes_par_mois)}</div></div>
-          <div class="card"><div class="lbl">Marge marche</div><div class="val">${fmt(p.montant_marge_par_mois)}</div></div>
-          <div class="card"><div class="lbl">Marge coef</div><div class="val">${fmt(p.montant_marge_selon_coef_par_mois)}</div></div>
-        </div>`;
-    } else if(data.montant_ventes_par_mois!=null){
-      out.innerHTML=`<h2>Prediction sim_v1 ${tag(data.solution)}</h2>
-        <div class="grid">
-          <div class="card"><div class="lbl">CA predit</div><div class="val">${fmt(data.montant_ventes_par_mois)}</div></div>
-          <div class="card"><div class="lbl">Marge predite</div><div class="val">${fmt(data.montant_marge_par_mois)}</div></div>
-        </div>`;
-    }
+    // Source deja visible via le bouton primary — pas de titre redondant
+    out.innerHTML=renderOne(data);
   }catch(e){ out.innerHTML=`<div class="errbox">${e.message}</div>`; }
 }
-document.getElementById('btnV2').onclick=()=>call('/api/predict/sim_v2');
-document.getElementById('btnML').onclick=()=>call('/api/predict/ml');
-document.getElementById('btnV1').onclick=()=>call('/api/predict/sim_v1');
+async function callAll(){
+  const out=document.getElementById('out');
+  out.innerHTML='<p class="muted">Calcul…</p>';
+  const body=bodyFromForm();
+  const jobs=[
+    {src:'sim_v1', url:'/api/predict/sim_v1'},
+    {src:'sim_v2', url:'/api/predict/sim_v2'},
+    {src:'ml', url:'/api/predict/ml'},
+  ];
+  const results=await Promise.all(jobs.map(async j=>{
+    try{
+      const res=await fetch(j.url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      const data=await res.json();
+      return {src:j.src, data};
+    }catch(e){
+      return {src:j.src, data:{ok:false, error:e.message}};
+    }
+  }));
+  let html='<div class="grid">';
+  for(const r of results){
+    const x=r.data.ok?extractCa(r.data):null;
+    html+=`<div class="card">
+      <div class="lbl">${tag(r.src)}</div>
+      <div class="val">${x?fmt(x.ca):'—'}</div>
+      <div class="sub">CA mensuel</div>
+      <div class="sub" style="margin-top:.35rem">Marge : <strong>${x?fmt(x.marge):'—'}</strong></div>
+      ${!r.data.ok?`<div class="errbox" style="margin-top:.5rem;padding:.4rem .55rem;font-size:.78rem">${r.data.error||'echec'}</div>`:''}
+    </div>`;
+  }
+  html+='</div>';
+  // Detail par solution (sim_v2) si plusieurs solutions
+  const v2=results.find(r=>r.src==='sim_v2');
+  if(v2 && v2.data.ok && v2.data.predictions && v2.data.predictions.length>1){
+    html+=renderOne(v2.data, {title:'Detail par solution'});
+  }
+  out.innerHTML=html;
+}
+function markBtn(id){
+  ['btnV1','btnV2','btnML','btnAll'].forEach(x=>{
+    const el=document.getElementById(x);
+    if(el) el.classList.toggle('primary', x===id);
+  });
+}
+document.getElementById('btnV2').onclick=()=>{ markBtn('btnV2'); call('/api/predict/sim_v2'); };
+document.getElementById('btnML').onclick=()=>{ markBtn('btnML'); call('/api/predict/ml'); };
+document.getElementById('btnV1').onclick=()=>{ markBtn('btnV1'); call('/api/predict/sim_v1'); };
+document.getElementById('btnAll').onclick=()=>{ markBtn('btnAll'); callAll(); };
 
 fetch('/api/hotels').then(r=>r.json()).then(data=>{
   if(!data.ok) return;
@@ -230,10 +532,7 @@ fetch('/api/hotels').then(r=>r.json()).then(data=>{
     o.dataset.payload=JSON.stringify(h);
     sel.appendChild(o);
   }
-  sel.onchange=()=>{
-    const opt=sel.selectedOptions[0];
-    if(!opt||!opt.dataset.payload) return;
-    const h=JSON.parse(opt.dataset.payload);
+  const applyHotel=(h)=>{
     const form=document.getElementById('form');
     form.hotel_code.value=h.hotel_code||'';
     if(h.hotel_nb_chambres) form.hotel_nb_chambres.value=h.hotel_nb_chambres;
@@ -242,14 +541,23 @@ fetch('/api/hotels').then(r=>r.json()).then(data=>{
     if(h.solution) form.solution.value=String(h.solution).toLowerCase();
     document.getElementById('hotel_info').innerHTML=
       `<strong>${h.hotel_code}</strong> ${tag(h.solution)}
-       <div class="sub">chambres ${fmt(h.hotel_nb_chambres,0)} · TO ${fmt(h.hotel_to_annuel,2)} · guests ${fmt(h.hotel_guests_per_chambre,2)}</div>
-       <p class="muted" style="margin:.4rem 0 0">Champs modifiables pour simuler (certains non consommes par tous les modeles).</p>`;
+       <div class="sub">chambres ${fmt(h.hotel_nb_chambres,0)} · TO ${fmt(h.hotel_to_annuel,2)} · guests ${fmt(h.hotel_guests_per_chambre,2)}</div>`;
   };
+  sel.onchange=()=>{
+    const opt=sel.selectedOptions[0];
+    if(!opt||!opt.dataset.payload) return;
+    applyHotel(JSON.parse(opt.dataset.payload));
+  };
+  // ?hotel=CODE preselect
+  const q=new URLSearchParams(location.search).get('hotel');
+  if(q){
+    const opt=[...sel.options].find(o=>o.value===q);
+    if(opt){ sel.value=q; if(opt.dataset.payload) applyHotel(JSON.parse(opt.dataset.payload)); }
+  }
 }).catch(()=>{});
 """
 
 HOTELS_BODY = """
-<p class="muted">Hotels pilotes charges depuis la base (t_sales / v_hotel_params). Cliquer pour ouvrir la prediction pre-remplie.</p>
 <div id="list"><p class="muted">Chargement…</p></div>
 """
 
@@ -289,6 +597,17 @@ def create_web_app(paths: Paths | None = None) -> Flask:
     def eval_page():
         return render_template_string(
             _page("Evaluation LOO", "Evaluation LOO", EVAL_BODY, EVAL_SCRIPT)
+        )
+
+    @app.get("/compare")
+    def compare_page():
+        return render_template_string(
+            _page(
+                "Comparaison",
+                "Comparaison",
+                COMPARE_BODY,
+                COMPARE_SCRIPT,
+            )
         )
 
     @app.get("/predict")

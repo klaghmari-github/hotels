@@ -47,23 +47,8 @@ v_restitution_prediction_by_variable:
       USING (variable_family, variable_name)
     CROSS JOIN hotel AS h
     WHERE m.target_part > 0
-v_restitution_prediction_method_a:
-  type: view
-  mode: create_or_replace
-  requires:
-  - v_restitution_prediction_by_variable
-  sql: |-
-    SELECT
-      solution,
-      'A' AS methode,
-      AVG(montant_ventes_par_mois_predit) AS montant_ventes_par_mois_predit,
-      AVG(montant_marge_selon_coef_par_mois_predite) AS montant_marge_selon_coef_par_mois_predite,
-      AVG(montant_marge_par_mois_predite) AS montant_marge_par_mois_predite,
-      COUNT(*) AS nombre_predicteurs,
-      COUNT(DISTINCT variable_family) AS nombre_familles
-    FROM v_restitution_prediction_by_variable
-    GROUP BY solution
-v_restitution_prediction_method_b:
+# Agregation par famille (ex-methode B) — label public sim_v2
+v_restitution_prediction_core:
   type: view
   mode: create_or_replace
   requires:
@@ -82,7 +67,7 @@ v_restitution_prediction_method_b:
     )
     SELECT
       solution,
-      'B' AS methode,
+      'sim_v2' AS methode,
       AVG(montant_ventes_par_mois_predit) AS montant_ventes_par_mois_predit,
       AVG(montant_marge_selon_coef_par_mois_predite) AS montant_marge_selon_coef_par_mois_predite,
       AVG(montant_marge_par_mois_predite) AS montant_marge_par_mois_predite,
@@ -94,15 +79,14 @@ v_restitution_prediction:
   type: view
   mode: create_or_replace
   requires:
-  - v_restitution_prediction_method_a
-  - v_restitution_prediction_method_b
+  - v_restitution_prediction_core
   - v_solution_conversion_rate
   sql: |-
-    SELECT p.*, c.taux_conversion_moyen, c.taux_conversion_pondere, c.nombre_hotels AS nombre_hotels_conversion
-    FROM (
-      SELECT * FROM v_restitution_prediction_method_a
-      UNION ALL
-      SELECT * FROM v_restitution_prediction_method_b
-    ) AS p
+    SELECT
+      p.*,
+      c.taux_conversion_moyen,
+      c.taux_conversion_pondere,
+      c.nombre_hotels AS nombre_hotels_conversion
+    FROM v_restitution_prediction_core AS p
     LEFT JOIN v_solution_conversion_rate AS c USING (solution)
-    ORDER BY solution, methode
+    ORDER BY solution

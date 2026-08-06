@@ -183,7 +183,13 @@ class CatBoostService:
         """
         Pour chaque hotel : train sur les autres, predire l'observation reelle.
         """
+        from src.pipeline.scope import is_excluded
+
         df = df if df is not None else self.load_dataset()
+        df = df.copy()
+        df["hotel_code"] = df["hotel_code"].astype(str)
+        # Perimetre 6 hotels (exclure H5586 etc.)
+        df = df.loc[~df["hotel_code"].map(is_excluded)].reset_index(drop=True)
         features, _ = self.feature_matrix(df)
         groups = df["hotel_code"].astype(str)
         observation = df["is_observation"]

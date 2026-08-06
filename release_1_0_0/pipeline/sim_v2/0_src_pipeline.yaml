@@ -15,3 +15,4 @@ t_sales:
     WHERE
         PRIX_TTC > 0
         AND MARGE > 0
+        AND CAST(HOTEL_CODE AS VARCHAR) NOT IN ('H5586')
