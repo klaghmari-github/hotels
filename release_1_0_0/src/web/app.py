@@ -12,7 +12,6 @@ from src.web.styles import COMMON_CSS
 
 NAV = """
 <nav>
-  <a class="link" href="/">Accueil</a>
   <a class="link" href="/eval">Evaluation LOO</a>
   <a class="link" href="/compare">Comparaison</a>
   <a class="link" href="/predict">Prediction</a>
@@ -31,7 +30,7 @@ SHELL = """
 </head>
 <body>
   <header>
-    <h1>__H1__ <span>release 1.0.0</span></h1>
+    <h1><a class="brand" href="/" title="Accueil">Accor ROD</a> <span>release 1.0.0</span></h1>
     __NAV__
   </header>
   <main>__BODY__</main>
@@ -349,7 +348,7 @@ PREDICT_BODY = """
 <div class="layout">
   <form class="card" id="form" onsubmit="return false;">
     <h2 style="margin-top:0">Parametres hotel</h2>
-    <label>Hotel pilote (optionnel)</label>
+    <label>Hotel pilote</label>
     <select id="hotel_select"><option value="">— manuel —</option></select>
     <div class="row">
       <div><label>Chambres</label><input name="hotel_nb_chambres" type="number" step="1" value="100"/></div>
@@ -367,20 +366,21 @@ PREDICT_BODY = """
     </select>
     <label>hotel_code (sim_v1)</label>
     <input name="hotel_code" type="text" placeholder="ex. H2075"/>
-    <label>Mix type (JSON)</label>
-    <textarea name="type_mix" rows="2">{"F&B": 0.7, "NON F&B": 0.3}</textarea>
-    <label>Mix gamme (JSON)</label>
-    <textarea name="gamme_mix" rows="3">{"sans alcool": 0.35, "food salee": 0.25, "food sucree": 0.15, "accessoires": 0.15, "sos": 0.10}</textarea>
-    <div style="margin-top:1rem;display:flex;gap:.5rem;flex-wrap:wrap">
-      <button class="btn primary" id="btnV2" type="button">sim_v2</button>
-      <button class="btn" id="btnML" type="button">ml</button>
-      <button class="btn" id="btnV1" type="button">sim_v1</button>
-      <button class="btn" id="btnAll" type="button">Comparer les 3</button>
-    </div>
+
+    <div id="mix_type" class="mix-block"></div>
+    <div id="mix_gamme" class="mix-block"></div>
   </form>
-  <div>
+  <div class="predict-right">
+    <div class="predict-actions card">
+      <div class="btn-row" style="margin-top:0">
+        <button class="btn primary" id="btnV2" type="button">sim_v2</button>
+        <button class="btn" id="btnML" type="button">ml</button>
+        <button class="btn" id="btnV1" type="button">sim_v1</button>
+        <button class="btn" id="btnAll" type="button">Comparer les 3</button>
+      </div>
+    </div>
     <div id="hotel_info" class="card muted">Selectionner un hotel pour pre-remplir les champs.</div>
-    <div id="out" style="margin-top:1rem"></div>
+    <div id="out"></div>
   </div>
 </div>
 """
@@ -388,6 +388,228 @@ PREDICT_BODY = """
 PREDICT_SCRIPT = r"""
 const fmt=(n,d=2)=>{if(n==null||n===''||Number.isNaN(Number(n)))return '—';return Number(n).toLocaleString('fr-FR',{maximumFractionDigits:d});};
 const tag=s=>`<span class="tag ${(s||'').toString().toLowerCase()}">${s??''}</span>`;
+const pctLabel=v=>`${Math.round(v*1000)/10} %`.replace('.0 %',' %');
+const EPS=1e-9;
+
+/** Panneau mix : sliders 0-100%, switch bleu = libre, somme = 1. */
+class MixPanel {
+  constructor(rootId, title, entries){
+    this.root=document.getElementById(rootId);
+    this.title=title;
+    this.items=entries.map(e=>({
+      key:e.key,
+      value:Math.max(0, Number(e.value)||0),
+      locked:false,
+      autoLocked:false,
+    }));
+    this._normalizeAll();
+    this.render();
+  }
+  lockedSum(exceptKey=null){
+    return this.items
+      .filter(i=>i.locked && i.key!==exceptKey)
+      .reduce((s,i)=>s+i.value,0);
+  }
+  freeItems(exceptKey=null){
+    return this.items.filter(i=>!i.locked && i.key!==exceptKey);
+  }
+  /** Bornes logiques pour un slider libre (en %). Affichage range toujours 0-100. */
+  freeMaxPct(key){
+    const locked=this.lockedSum(key);
+    return Math.max(0, (1-locked)*100);
+  }
+  setValue(key, pct, {soft=true}={}){
+    const it=this.items.find(i=>i.key===key);
+    if(!it || it.locked) return;
+    const locked=this.lockedSum();
+    const max=Math.max(0, 1-locked);
+    let v=Math.min(max, Math.max(0, Number(pct)/100));
+    // evite les artefacts flottants
+    v=Math.round(v*1000)/1000;
+    const others=this.freeItems(key);
+    if(others.length===0){
+      it.value=max;
+      this._fixFloat();
+      soft?this._paint():this.render();
+      return;
+    }
+    it.value=v;
+    const remaining=Math.max(0, 1-locked-v);
+    const each=remaining/others.length;
+    others.forEach(o=>{ o.value=each; });
+    this._fixFloat();
+    soft?this._paint():this.render();
+  }
+  /**
+   * free=true  → switch bleu allumé, slider maniable
+   * free=false → figé, valeur conservee, slider desactive
+   */
+  setFree(key, free){
+    const it=this.items.find(i=>i.key===key);
+    if(!it) return;
+    if(it.autoLocked && free){
+      // liberer le reste auto : liberer tous les auto-locks
+      this.items.forEach(i=>{ if(i.autoLocked){ i.locked=false; i.autoLocked=false; }});
+      this.render();
+      return;
+    }
+    if(free){
+      // liberer ce groupe (valeur inchangee)
+      it.locked=false;
+      it.autoLocked=false;
+      this.items.forEach(i=>{ if(i.autoLocked){ i.locked=false; i.autoLocked=false; }});
+    } else {
+      // figer a la valeur actuelle (ne pas reinitialiser)
+      const keep=it.value;
+      it.locked=true;
+      it.autoLocked=false;
+      it.value=keep;
+      this._autoLockResidual();
+    }
+    this.render();
+  }
+  _autoLockResidual(){
+    this.items.forEach(i=>{
+      if(i.autoLocked){ i.locked=false; i.autoLocked=false; }
+    });
+    const free=this.items.filter(i=>!i.locked);
+    if(free.length===1){
+      const only=free[0];
+      // conserve la valeur residuelle exacte, sans la remettre a 0
+      only.value=Math.max(0, 1-this.lockedSum(only.key));
+      only.locked=true;
+      only.autoLocked=true;
+    }
+  }
+  _normalizeAll(){
+    const s=this.items.reduce((a,i)=>a+i.value,0);
+    if(s<=EPS){
+      const each=1/this.items.length;
+      this.items.forEach(i=>{ i.value=each; });
+    } else {
+      this.items.forEach(i=>{ i.value=i.value/s; });
+    }
+  }
+  _fixFloat(){
+    const s=this.items.reduce((a,i)=>a+i.value,0);
+    const delta=1-s;
+    if(Math.abs(delta)<1e-12) return;
+    const free=this.items.filter(i=>!i.locked);
+    const target=free.length?free[free.length-1]:this.items[this.items.length-1];
+    target.value=Math.max(0, target.value+delta);
+  }
+  toObject(){
+    const o={};
+    this.items.forEach(i=>{ o[i.key]=Math.round(i.value*1e6)/1e6; });
+    return o;
+  }
+  _paint(){
+    const sum=this.items.reduce((a,i)=>a+i.value,0);
+    const sumEl=this.root.querySelector('.mix-sum');
+    if(sumEl){
+      sumEl.textContent=`Σ ${pctLabel(sum)}`;
+      sumEl.classList.toggle('warn', Math.abs(sum-1)>=1e-6);
+    }
+    for(const it of this.items){
+      const row=this.root.querySelector(`.mix-row[data-key="${CSS.escape(it.key)}"]`);
+      if(!row) continue;
+      const pct=Math.round(it.value*1000)/10;
+      const pctEl=row.querySelector('.mix-pct');
+      if(pctEl) pctEl.textContent=pctLabel(it.value);
+      const range=row.querySelector('input[type=range]');
+      if(range){
+        // toujours 0-100 pour garder la position visuelle correcte
+        range.min=0;
+        range.max=100;
+        range.value=String(pct);
+        range.style.setProperty('--pct', `${pct}%`);
+        range.disabled=!!it.locked;
+      }
+      row.classList.toggle('locked', !!it.locked);
+      row.classList.toggle('residual', !!it.autoLocked);
+      const sw=row.querySelector('input[data-lock]');
+      if(sw){
+        // bleu = libre
+        sw.checked=!it.locked;
+        sw.disabled=!!it.autoLocked;
+      }
+    }
+  }
+  render(){
+    const sum=this.items.reduce((a,i)=>a+i.value,0);
+    const sumOk=Math.abs(sum-1)<1e-6;
+    let html=`<div class="mix-head">
+      <p class="mix-title">${this.title}</p>
+      <span class="mix-sum${sumOk?'':' warn'}">Σ ${pctLabel(sum)}</span>
+    </div>`;
+    for(const it of this.items){
+      const pct=Math.round(it.value*1000)/10;
+      const free=!it.locked;
+      const residual=it.autoLocked?' residual':'';
+      const lockedCls=it.locked?' locked':'';
+      const lockTitle=it.autoLocked
+        ? 'Reste automatique (fige) — allumez un autre groupe pour ajuster'
+        : (free ? 'Libre — cliquer pour figer' : 'Figé — cliquer pour liberer');
+      html+=`<div class="mix-row${lockedCls}${residual}" data-key="${this._escAttr(it.key)}">
+        <div class="mix-label" title="${this._escAttr(it.key)}">${this._escHtml(it.key)}</div>
+        <div class="mix-pct">${pctLabel(it.value)}</div>
+        <label class="sw" title="${lockTitle}">
+          <input type="checkbox" data-lock="${this._escAttr(it.key)}" ${free?'checked':''} ${it.autoLocked?'disabled':''}/>
+          <span class="slider"></span>
+        </label>
+        <div class="mix-slider-wrap">
+          <input type="range" min="0" max="100" step="0.1" value="${pct}"
+            data-key="${this._escAttr(it.key)}" ${it.locked?'disabled':''}
+            style="--pct:${pct}%"/>
+        </div>
+      </div>`;
+    }
+    this.root.innerHTML=html;
+    this.root.querySelectorAll('input[type=range]').forEach(el=>{
+      el.addEventListener('input', e=>{
+        const key=e.target.getAttribute('data-key');
+        let pct=Number(e.target.value);
+        // clamp au max disponible (part des groupes figes)
+        const max=this.freeMaxPct(key);
+        if(pct>max){ pct=max; e.target.value=String(max); }
+        this.setValue(key, pct, {soft:true});
+      });
+      el.addEventListener('change', e=>{
+        const key=e.target.getAttribute('data-key');
+        let pct=Number(e.target.value);
+        const max=this.freeMaxPct(key);
+        if(pct>max) pct=max;
+        this.setValue(key, pct, {soft:false});
+      });
+    });
+    this.root.querySelectorAll('input[data-lock]').forEach(el=>{
+      el.addEventListener('change', e=>{
+        const key=e.target.getAttribute('data-lock');
+        // checked (bleu) = libre
+        this.setFree(key, !!e.target.checked);
+      });
+    });
+  }
+  _escAttr(s){
+    return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  }
+  _escHtml(s){
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+}
+
+const typeMix=new MixPanel('mix_type', 'Mix type', [
+  {key:'F&B', value:0.7},
+  {key:'NON F&B', value:0.3},
+]);
+const gammeMix=new MixPanel('mix_gamme', 'Mix gamme', [
+  {key:'sans alcool', value:0.35},
+  {key:'food salee', value:0.25},
+  {key:'food sucree', value:0.15},
+  {key:'accessoires', value:0.15},
+  {key:'sos', value:0.10},
+]);
+
 function bodyFromForm(){
   const fd=new FormData(document.getElementById('form'));
   return {
@@ -397,13 +619,12 @@ function bodyFromForm(){
     metres_lineaires: Number(fd.get('metres_lineaires')),
     solution: fd.get('solution'),
     hotel_code: (fd.get('hotel_code')||'').trim(),
-    type_mix: JSON.parse(fd.get('type_mix')||'{}'),
-    gamme_mix: JSON.parse(fd.get('gamme_mix')||'{}'),
+    type_mix: typeMix.toObject(),
+    gamme_mix: gammeMix.toObject(),
   };
 }
 function extractCa(data){
   if(data.predictions && data.predictions.length){
-    // sim_v2: une seule agregation (ex-methode B), une ligne par solution
     const rows=data.predictions;
     const r=rows[0];
     return {
@@ -470,7 +691,6 @@ async function call(url){
     const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(bodyFromForm())});
     const data=await res.json();
     if(!data.ok) throw new Error(data.error||'echec');
-    // Source deja visible via le bouton primary — pas de titre redondant
     out.innerHTML=renderOne(data);
   }catch(e){ out.innerHTML=`<div class="errbox">${e.message}</div>`; }
 }
@@ -500,11 +720,10 @@ async function callAll(){
       <div class="val">${x?fmt(x.ca):'—'}</div>
       <div class="sub">CA mensuel</div>
       <div class="sub" style="margin-top:.35rem">Marge : <strong>${x?fmt(x.marge):'—'}</strong></div>
-      ${!r.data.ok?`<div class="errbox" style="margin-top:.5rem;padding:.4rem .55rem;font-size:.78rem">${r.data.error||'echec'}</div>`:''}
+      ${!r.data.ok?`<div class="errbox" style="margin-top:.5rem;padding:.4rem .55rem;font-size:.85rem">${r.data.error||'echec'}</div>`:''}
     </div>`;
   }
   html+='</div>';
-  // Detail par solution (sim_v2) si plusieurs solutions
   const v2=results.find(r=>r.src==='sim_v2');
   if(v2 && v2.data.ok && v2.data.predictions && v2.data.predictions.length>1){
     html+=renderOne(v2.data, {title:'Detail par solution'});
@@ -548,7 +767,6 @@ fetch('/api/hotels').then(r=>r.json()).then(data=>{
     if(!opt||!opt.dataset.payload) return;
     applyHotel(JSON.parse(opt.dataset.payload));
   };
-  // ?hotel=CODE preselect
   const q=new URLSearchParams(location.search).get('hotel');
   if(q){
     const opt=[...sel.options].find(o=>o.value===q);
