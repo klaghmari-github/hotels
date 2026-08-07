@@ -27,6 +27,41 @@ t_hotel_data:
   sql: |-
     SELECT * FROM df_hotel_data
 
+# Hotels pilotes : chambres, TO annuel, guests/chambre (input Excel)
+df_hotel_clients:
+  type: dataframe
+  requires: []
+  file: data/files/input/hotel_clients.xlsx
+
+t_hotel_clients:
+  type: table
+  mode: create_if_not_exists
+  requires:
+    - df_hotel_clients
+  sql: |-
+    SELECT
+      CAST(hotel_code AS VARCHAR) AS hotel_code,
+      CAST(hotel_name AS VARCHAR) AS hotel_name,
+      TRY_CAST(hotel_nb_chambres AS DOUBLE) AS hotel_nb_chambres,
+      TRY_CAST(hotel_to_annuel AS DOUBLE) AS hotel_to_annuel,
+      TRY_CAST(hotel_guests_per_chambre AS DOUBLE) AS hotel_guests_per_chambre
+    FROM df_hotel_clients
+
+v_hotel_clients:
+  type: view
+  mode: create_or_replace
+  requires:
+    - t_hotel_clients
+  sql: |-
+    SELECT
+      hotel_code,
+      hotel_name,
+      hotel_nb_chambres,
+      hotel_to_annuel,
+      hotel_guests_per_chambre,
+      hotel_nb_chambres * hotel_to_annuel * hotel_guests_per_chambre * 365.25 / 12.0 AS hotel_clients_mensuel
+    FROM t_hotel_clients
+
 df_hotel_proximity_data:
   type: dataframe
   requires: []
