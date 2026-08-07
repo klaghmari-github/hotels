@@ -49,7 +49,7 @@ t_hotel_clients:
 
 v_hotel_clients:
   type: view
-  mode: create_or_replace
+  mode: create_if_not_exists
   requires:
     - t_hotel_clients
   sql: |-
