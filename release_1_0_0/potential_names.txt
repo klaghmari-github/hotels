@@ -1,0 +1,340 @@
+# Noms potentiels — package / projet open (ou interne)
+# Outil : pipelines SQL déclaratifs multi-connexions (DuckDB d'abord)
+#         + matérialisation à la demande (équivalent p_table_view)
+#         + UI graphique arborescente (exploration, sample, build, remontée des depends)
+#
+# Contexte produit
+# ----------------
+# Core (déjà dans ce projet Accor) :
+#   - graphe de dépendances (requires)
+#   - types table / view / dataframe / iteration / execute
+#   - modes create_if_not_exists | create_or_replace | …
+#   - process_with_requires + frontier
+#   - p_table_view(name) : build à la demande + remontée auto
+#   - YAML pipeline + ConnectionPipeline
+#
+# Nouveau :
+#   - package découplé métier Accor
+#   - backends SQL quelconques (DuckDB, Postgres, …)
+#   - UI : arbre / DAG, click nœud → sample, build si absent
+#
+# Critères de nommage retenus
+# ---------------------------
+# 1. Dit le "quoi" sans coller à Accor / hôtels
+# 2. Court, pip-installable (minuscules, tirets OK)
+# 3. Espace mental : arbre / graphe / matérialisation lazy / SQL
+# 4. Laisse de la place pour le duo core + UI (ex. foo + foo-ui)
+# 5. Pas déjà un outil SQL très connu (éviter sqlflow, sqlglot, dbt, dagster, …)
+# 6. Prononçable FR + EN
+#
+# Légende des scores (subjectifs) : ★★★★★ = meilleur fit produit
+
+
+# =============================================================================
+# A. SHORTLIST PRIORITAIRE (réflexion profonde → top recommandations)
+# =============================================================================
+
+1. demandql
+   Score: ★★★★★
+   Idée: "demand-driven SQL" — le cœur de p_table_view : on demande un nœud,
+         le graphe se matérialise en remontant les depends.
+   Core: demandql   UI: demandql-ui / demandql studio
+   + très fidèle au modèle mental ; unique ; moderne
+   − moins explicite sur "pipeline" pour un lecteur pressé
+
+2. arborsql
+   Score: ★★★★★
+   Idée: arbre (arbor) de relations SQL — UI = arborescence native.
+   Core: arborsql   UI: arborsql-ui / Arbor Studio
+   + métaphore visuelle parfaite pour le click-on-node
+   − "arbor" un peu savant ; vérifier dispo PyPI/npm
+
+3. sqlloom
+   Score: ★★★★☆
+   Idée: on tisse (loom) des dépendances SQL en un tissu de tables/vues.
+   Core: sqlloom   UI: sqlloom-studio
+   + beau, mémorable, product-like
+   − métaphore un cran plus abstraite que "tree/build"
+
+4. sproutsql
+   Score: ★★★★☆
+   Idée: les tables "poussent" (sprout) à la demande quand on ouvre un nœud.
+   Core: sproutsql / sprout-sql
+   + excellent pour lazy create_if_not_exists + UX build-on-click
+   − un peu "cute" pour un outil data enterprise (peut être un plus open-source)
+
+5. frontierql
+   Score: ★★★★☆
+   Idée: reprend votre concept interne stable_frontier — la frontière de build.
+   Core: frontierql / sqlfrontier
+   + ancré dans l'algo déjà développé ; différenciant tech
+   − moins intuitif hors de votre équipe
+
+6. viewgraph
+   Score: ★★★★☆
+   Idée: graphe de vues/tables SQL explorables.
+   Core: viewgraph   UI: viewgraph-ui
+   + clair, direct
+   − "view" masque un peu tables / iterations / executes
+
+7. pullsql
+   Score: ★★★★☆
+   Idée: pull-based materialization (on tire un nœud → dépendances suivent).
+   Core: pullsql
+   + simple, technique exacte (vs push ETL)
+   − peut évoquer CDC / replication "pull"
+
+8. reltree
+   Score: ★★★☆☆
+   Idée: arbre de relations (tables/vues).
+   Core: reltree
+   + ultra-court, collé à l'UI arborescente
+   − générique ; collision possible avec d'autres "rel*"
+
+
+# =============================================================================
+# B. FAMILLE « ARBRE / FORÊT / UI ARBORESCENTE »
+# =============================================================================
+# Fit fort avec : pipeline s'affiche comme une arborescence, click nœud.
+
+arborsql          # recommandé (voir shortlist)
+reltree           # relation tree
+sqltree           # ⚠ déjà pris sur PyPI (parser SQL) → éviter
+dendrosql         # dendro = arbre (savant)
+canopysql         # canopée : vue d'ensemble du graphe
+taprootsql        # racine pivot, build qui remonte
+branchql          # branches de depends
+rootql            # racine du graphe / entrypoint p_table_view
+treepipe          # tree + pipeline
+pipearbor         # pipeline arboré
+sylvasql          # sylva = forêt
+trunksql          # tronc commun / shared DB
+leafql            # focus sample des feuilles (moins bien pour le graphe entier)
+
+
+# =============================================================================
+# C. FAMILLE « MATÉRIALISATION À LA DEMANDE / LAZY / PULL »
+# =============================================================================
+# Fit fort avec : si la table n'existe pas → build = p_table_view.
+
+demandql          # recommandé
+pullsql           # recommandé
+lazysql           # clair mais très générique
+lazydag           # lazy + DAG
+lazyrel           # lazy relations
+matdag            # materialize DAG
+matpipe           # materialize pipeline
+sqlmat            # court, un peu opaque
+jitql             # just-in-time tables/views
+onview            # "on view / on demand" (jeu de mots view SQL)
+buildnode         # build d'un nœud au click
+buildtree         # build de l'arbre
+growsql           # le graphe grandit en se matérialisant
+sproutsql         # recommandé
+seedql            # on sème des définitions YAML, ça germe en tables
+materialine       # materialize + pipeline (marque)
+resolvesql        # resolve des depends
+needql            # "I need this table" → build
+wantql            # trop familier
+asksql            # ask for a node → sample/build
+
+
+# =============================================================================
+# D. FAMILLE « GRAPHE / DAG / DÉPENDANCES »
+# =============================================================================
+# Fit fort avec : requires, DependencyTree, process_with_requires.
+
+viewgraph         # recommandé
+sqldag            # simple ; beaucoup de collisions conceptuelles
+dagview           # DAG de vues
+dagtable          # DAG de tables
+pipegraph         # ⚠ existe déjà (sklearn) → éviter
+sqlgraph          # clair, un peu saturé comme nom
+relgraph          # relation graph
+depdag            # dependency DAG (laid)
+requiregraph      # ancré sur le mot-clé requires de vos YAML
+requiresql        # requires + SQL
+linksql           # liens entre nœuds
+netsql            # filet de dépendances
+latticeql         # treillis de dépendances
+webql             # toile (collision web)
+nodalql           # nœuds cliquables
+nodeql            # court ; collisions possibles
+edgectl           # edge control (trop infra)
+
+
+# =============================================================================
+# E. FAMILLE « MÉTIER OUTIL : PIPELINE SQL + STUDIO »
+# =============================================================================
+# Fit fort avec : package core + future UI graphique type studio.
+
+sqlcanvas         # canvas graphique des nœuds
+pipeboard         # tableau de bord pipeline
+dagboard          # board de DAG
+sqlstudio-lite    # trop générique / collision "studio"
+pipexplorer       # explorer de pipelines
+dagexplore        # exploration de DAG
+sqlworkbench      # trop générique (beaucoup d'existants)
+tablebench        # sample + inspect
+sampletree        # sample au click sur l'arbre
+probeql           # sonder un nœud (sample)
+lensql / lenssql  # loupe sur un nœud
+inspectql         # inspection
+sqlscout          # explorer / découvrir
+atlasql           # carte du patrimoine tables/vues
+mapsql            # carte
+pipelinekit       # kit générique (faible personnalité)
+yamlpipe          # trop centré format, pas produit
+declarapipe       # declarative pipelines (lourd)
+sqldef            # définitions SQL d'objets
+objpipe           # object pipeline (tables as objects)
+
+
+# =============================================================================
+# F. FAMILLE « TISSER / FORGER / CONSTRUIRE » (product brand)
+# =============================================================================
+
+sqlloom           # recommandé
+weavesql          # tissage des depends
+loomsql           # variante
+tapesql           # tapestry court
+forgesql          # forge de tables/vues
+viewforge         # forge de vues
+tableforge        # un peu ETL-old-school
+anvilql           # enclume (marque)
+scaffoldsql       # échafaudage de pipelines
+framesql          # cadre structurel
+craftsql          # artisanat SQL
+masonql           # maçonnerie de couches SQL
+
+
+# =============================================================================
+# G. FAMILLE ANCRÉE DANS VOTRE CODE ACTUEL (héritage conceptuel)
+# =============================================================================
+# Utile si vous voulez un nom "honnête" par rapport à l'implémentation.
+
+frontierql        # stable_frontier
+sqlfrontier
+ptv               # p_table_view — trop cryptique pour open-source
+ptableview        # trop long / collé à l'API interne
+connectionpipe    # ConnectionPipeline — trop verbeux
+conpipe           # court mais opaque
+cpipeline         # collision "C pipeline"
+requires-first    # mauvais nom package
+createif          # create_if_not_exists — moche
+cifne             # non
+processrequires   # non
+tableviewkit      # table_view + p_table_view
+
+
+# =============================================================================
+# H. NOMS TRÈS COURTS (marque / meme-able)
+# =============================================================================
+# Risque collision élevé ; à checker PyPI + domaine + GitHub.
+
+loom
+arbor
+sprout
+canopy
+frontier
+lattice
+pulley            # pull-based
+dendron
+relly             # relations (jeu)
+sqlix
+qraft
+vined             # vine = liane de depends
+tendril
+twig
+bough
+radix             # racine
+stemma            # arbre généalogique (savant)
+
+
+# =============================================================================
+# I. STRUCTURE DE PRODUIT SUGGÉRÉE (quel que soit le nom N)
+# =============================================================================
+#
+#   N                 # package core Python
+#                     #   - PipelineSpec (YAML/dict)
+#                     #   - DependencyTree / frontier
+#                     #   - Connection backend protocol (DuckDB, SQLAlchemy, …)
+#                     #   - materialize(name)  ≈ p_table_view
+#                     #   - sample(name, n=…)
+#   N-ui / N-studio   # app graphique
+#                     #   - arbre / DAG
+#                     #   - click → preview
+#                     #   - bouton Build → materialize + refresh état
+#   N-cli             # optionnel : N materialize v_hotel_clients
+#
+# Exemples d'API mentale (indépendants du nom) :
+#
+#   from demandql import Pipeline
+#   p = Pipeline.from_yaml("pipeline/", conn=duckdb_conn)
+#   p.materialize("v_hotel_clients")   # remontée auto des requires
+#   p.sample("v_hotel_clients", n=20)
+#   p.status("v_hotel_clients")        # missing | ready | stale
+#
+#   demandql-studio ./pipeline --db main.duckdb
+#
+
+
+# =============================================================================
+# J. RECOMMANDATION FINALE (si un seul nom à retenir demain)
+# =============================================================================
+#
+#   1) demandql     → si vous voulez que le concept "à la demande" soit le pitch
+#   2) arborsql     → si vous voulez que l'UI arborescente soit le pitch
+#   3) sqlloom      → si vous voulez une marque plus "produit / jolie"
+#   4) sproutsql    → si open-source friendly, storytelling "ça pousse au click"
+#   5) frontierql   → si vous assumez l'algo frontier comme signature technique
+#
+# Positionnement one-liner (valable pour les 5) :
+#   "Declarative SQL object graphs with on-demand materialization
+#    and a visual tree to explore, sample, and build nodes."
+#
+# Anti-recommandations (à éviter) :
+#   - sqltree, pipegraph, sqlflow, dbt-*, dagster-*, airflow-*, sqlglot
+#     (déjà pris / confusion écosystème)
+#   - duckpipe / duck* (réduit le scope à DuckDB alors que la cible est multi-connexion)
+#   - acpipe / rodpipe / accor* (trop métier projet actuel)
+#
+
+
+# =============================================================================
+# K. VARIANTES ORTHOGRAPHIQUES / PyPI
+# =============================================================================
+# Convention proposée : package PyPI en minuscules sans underscore si possible.
+#
+#   demandql, demand-ql, demand_ql
+#   arborsql, arbor-sql, arbor_sql
+#   sqlloom, sql-loom
+#   sproutsql, sprout-sql
+#   frontierql, sql-frontier, sqlfrontier
+#   viewgraph, view-graph
+#   pullsql, pull-sql
+#
+# Binôme core/UI (exemples) :
+#   demandql + demandql-ui
+#   arborsql + arborsql-studio
+#   sqlloom  + sqlloom-app
+#
+
+
+# =============================================================================
+# L. CHECKLIST AVANT CHOIX DÉFINITIF
+# =============================================================================
+# [ ] dispo https://pypi.org/project/<name>/
+# [ ] dispo GitHub org/user/<name>
+# [ ] domaine .dev / .io si besoin
+# [ ] collision npm si UI web un jour
+# [ ] trademark grossier (Google, marques data)
+# [ ] se dit bien à l'oral en FR : "on matérialise avec …"
+# [ ] ne collabore pas mal avec "pipeline", "DuckDB", "YAML" dans une phrase
+#
+# Phrase test orale :
+#   "J'ai ouvert <NOM>, j'ai cliqué sur v_hotel_clients, la vue n'existait pas,
+#    ça a rebuild toute la branche requires, et j'ai eu le sample."
+#
+# Si la phrase sonne naturelle → bon nom.
+#

@@ -80,19 +80,27 @@ v_solution_reference_loo:
         ELSE 6.0
       END AS ml_ref,
       d.frigo_ref,
-      -- ca_10 : alignement RevenueRules / build_pilot_overrides
-      -- si CA pair = 0, on garde le ca_10 de la zone gauche Excel (pas 0)
+      -- ca_10 Excel : (CA * 10%) / mix_ref   (E51 = (E34*10%)/I9)
+      -- si CA pair = 0, fallback pivots Excel d.ca_10_*
       CASE
         WHEN COALESCE(a.ca_fb_peers, d.ca_fb) IS NULL
           OR COALESCE(a.ca_fb_peers, d.ca_fb) = 0
         THEN d.ca_10_fb
-        ELSE COALESCE(a.ca_fb_peers, d.ca_fb) / 10.0
+        WHEN COALESCE(a.mix_fb_peers, d.mix_fb) > 0
+        THEN COALESCE(a.ca_fb_peers, d.ca_fb)
+          * 0.1
+          / COALESCE(a.mix_fb_peers, d.mix_fb)
+        ELSE d.ca_10_fb
       END AS ca_10_fb,
       CASE
         WHEN COALESCE(a.ca_nfb_peers, d.ca_nfb) IS NULL
           OR COALESCE(a.ca_nfb_peers, d.ca_nfb) = 0
         THEN d.ca_10_nfb
-        ELSE COALESCE(a.ca_nfb_peers, d.ca_nfb) / 10.0
+        WHEN (1.0 - COALESCE(a.mix_fb_peers, d.mix_fb)) > 0
+        THEN COALESCE(a.ca_nfb_peers, d.ca_nfb)
+          * 0.1
+          / (1.0 - COALESCE(a.mix_fb_peers, d.mix_fb))
+        ELSE d.ca_10_nfb
       END AS ca_10_nfb,
       -- ca par ml : 0 si CA pair nul (comme Python ca_nf / ml_ref)
       COALESCE(a.ca_fb_peers, d.ca_fb)

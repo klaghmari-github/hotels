@@ -90,7 +90,8 @@ v_v1_r2_mix:
         AS ca_nfb_r2
     FROM v_v1_r1_buyers AS r1
 
-# R3 — toutes categories ON (mult 1.48 / 1.33)
+# R3 — toutes categories ON (cumul F&B 0.48 / N-F&B 0.33)
+# Excel O94/O95 : si CA < 0 → ×(1-cumul)  sinon ×(1+cumul)
 v_v1_r3_categories:
   type: view
   mode: create_or_replace
@@ -99,10 +100,24 @@ v_v1_r3_categories:
   sql: |-
     SELECT
       r2.*,
-      1.48 AS mult_fb,
-      1.33 AS mult_nfb,
-      r2.ca_fb_r2 * 1.48 AS ca_fb_r3,
-      r2.ca_nfb_r2 * 1.33 AS ca_nfb_r3
+      0.48 AS cumul_fb,
+      0.33 AS cumul_nfb,
+      CASE
+        WHEN r2.ca_fb_r2 < 0 THEN (1.0 - 0.48)
+        ELSE (1.0 + 0.48)
+      END AS mult_fb,
+      CASE
+        WHEN r2.ca_nfb_r2 < 0 THEN (1.0 - 0.33)
+        ELSE (1.0 + 0.33)
+      END AS mult_nfb,
+      r2.ca_fb_r2 * CASE
+        WHEN r2.ca_fb_r2 < 0 THEN (1.0 - 0.48)
+        ELSE (1.0 + 0.48)
+      END AS ca_fb_r3,
+      r2.ca_nfb_r2 * CASE
+        WHEN r2.ca_nfb_r2 < 0 THEN (1.0 - 0.33)
+        ELSE (1.0 + 0.33)
+      END AS ca_nfb_r3
     FROM v_v1_r2_mix AS r2
 
 # R4 — m_lin (S/L) ou frigos (Connected)

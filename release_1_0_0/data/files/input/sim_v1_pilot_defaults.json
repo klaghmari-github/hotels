@@ -38,7 +38,7 @@
       "ca_1ml_fb": 131.875,
       "ca_1ml_nfb": 53.0,
       "coeff_fb": 2.6,
-      "coeff_nfb": 1.45,
+      "coeff_nfb": 2.0,
       "clients_heb": 6669.74,
       "ca_1frigo_fb": null,
       "ca_1frigo_nfb": null
@@ -59,7 +59,7 @@
       "ca_1ml_fb": 500.4285714285714,
       "ca_1ml_nfb": 18.71428571428572,
       "coeff_fb": 2.6,
-      "coeff_nfb": 1.45,
+      "coeff_nfb": 1.8,
       "clients_heb": 12558.375,
       "ca_1frigo_fb": 1167.666666666667,
       "ca_1frigo_nfb": 43.66666666666666
@@ -67,10 +67,10 @@
   },
   "rules": {
     "R1": "nb_acheteurs = clients_hotel * (ventes_ref / clients_ref); CA_fb/nfb proportionnels",
-    "R2": "mix ±10% : ca_10_fb / ca_10_nfb par pas de 10% de mix",
-    "R3": "categories ON : mult_fb=1.48, mult_nfb=1.33",
+    "R2": "mix ±10% : ca_10 = (CA * 10%) / mix_ref par pas de 10% de mix",
+    "R3": "categories ON (cumul 0.48/0.33) : CA>=0 → ×(1+c), CA<0 → ×(1-c)",
     "R4": "surface m_lin (S/L) ou frigos (Connected)",
-    "marge_produit": "ca - ca/coeff (coeff_fb / coeff_nfb)",
+    "marge_produit": "ca - ca/coeff (coeff_fb / coeff_nfb Excel J9/J10)",
     "ca_reel": "SUM(PRIX_TTC)/n_mois depuis tickets (aligne sim_v2)",
     "marge_reelle": "SUM(MARGE_SELON_COEF)/n_mois (aligne sim_v2/ML UI)"
   }

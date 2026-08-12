@@ -24,9 +24,13 @@ logger = logging.getLogger(__name__)
 
 SOLUTIONS_V1 = ("SIMPLY", "LIBERTY", "CONNECTED")
 
-# Multiplicateurs R3 (categories ON) — regles revenue v1
-MULT_FB = 1.48
-MULT_NFB = 1.33
+# R3 Excel — cumul categories toutes ON (H75 / P75)
+# Si CA >= 0 : × (1 + cumul) ; si CA < 0 : × (1 - cumul)  [réduit la perte]
+CUMUL_FB = 0.48
+CUMUL_NFB = 0.33
+# Alias historiques (facteur si CA >= 0)
+MULT_FB = 1.0 + CUMUL_FB  # 1.48
+MULT_NFB = 1.0 + CUMUL_NFB  # 1.33
 
 
 def _f(x: Any, default: float = 0.0) -> float:
@@ -140,8 +144,16 @@ def run_rules_r1_r4(
         isinstance(frigo_ref, float) and math.isnan(frigo_ref)
     ) else _f(frigo_ref)
 
-    ca_10_fb = _f(ref.get("ca_10_fb"), ca_fb_ref / 10.0 if ca_fb_ref else 0.0)
-    ca_10_nfb = _f(ref.get("ca_10_nfb"), ca_nfb_ref / 10.0 if ca_nfb_ref else 0.0)
+    # Excel R2 : ca_10 = (CA_pilote * 10%) / mix_ref
+    mix_nfb_ref = max(0.0, 1.0 - mix_fb_ref) if 0.0 <= mix_fb_ref <= 1.0 else 0.0
+    ca_10_fb_default = (
+        (ca_fb_ref * 0.1 / mix_fb_ref) if ca_fb_ref and mix_fb_ref > 0 else 0.0
+    )
+    ca_10_nfb_default = (
+        (ca_nfb_ref * 0.1 / mix_nfb_ref) if ca_nfb_ref and mix_nfb_ref > 0 else 0.0
+    )
+    ca_10_fb = _f(ref.get("ca_10_fb"), ca_10_fb_default)
+    ca_10_nfb = _f(ref.get("ca_10_nfb"), ca_10_nfb_default)
     ca_1ml_fb = _f(
         ref.get("ca_1ml_fb"),
         ca_fb_ref / ml_ref if ml_ref else 0.0,
@@ -155,7 +167,11 @@ def run_rules_r1_r4(
         ref.get("ca_1frigo_nfb"), ca_nfb_ref / 3.0 if ca_nfb_ref else 0.0
     )
     coeff_fb = _f(ref.get("coeff_fb"), 2.6) or 2.6
-    coeff_nfb = _f(ref.get("coeff_nfb"), 1.45) or 1.45
+    # Excel J10 : SIMPLY 1.45 / LIBERTY 2.0 / CONNECTED 1.8
+    coeff_nfb_default = {"SIMPLY": 1.45, "LIBERTY": 2.0, "CONNECTED": 1.8}.get(
+        sol, 1.45
+    )
+    coeff_nfb = _f(ref.get("coeff_nfb"), coeff_nfb_default) or coeff_nfb_default
 
     # R1 — clients acheteurs
     taux_acheteurs = (ventes_ref / clients_ref) if clients_ref > 0 else 0.0
@@ -171,9 +187,12 @@ def run_rules_r1_r4(
     ca_fb_r2 = ca_fb_r1 + ca_10_fb * mix_steps
     ca_nfb_r2 = ca_nfb_r1 + ca_10_nfb * (-mix_steps)
 
-    # R3 — categories ON
-    ca_fb_r3 = ca_fb_r2 * MULT_FB
-    ca_nfb_r3 = ca_nfb_r2 * MULT_NFB
+    # R3 — categories ON (Excel O94/O95)
+    # SI CA < 0 → CA * (1 - cumul)  sinon CA * (1 + cumul)
+    factor_fb = (1.0 - CUMUL_FB) if ca_fb_r2 < 0 else (1.0 + CUMUL_FB)
+    factor_nfb = (1.0 - CUMUL_NFB) if ca_nfb_r2 < 0 else (1.0 + CUMUL_NFB)
+    ca_fb_r3 = ca_fb_r2 * factor_fb
+    ca_nfb_r3 = ca_nfb_r2 * factor_nfb
 
     # R4 — surface m_lin ou frigos Connected
     use_frigo = sol == "CONNECTED" and frigo_ref_f is not None
@@ -205,8 +224,10 @@ def run_rules_r1_r4(
         "mix_fb_hotel": mix_fb,
         "mix_fb_ref": mix_fb_ref,
         "mix_steps": mix_steps,
-        "mult_fb": MULT_FB,
-        "mult_nfb": MULT_NFB,
+        "cumul_fb": CUMUL_FB,
+        "cumul_nfb": CUMUL_NFB,
+        "mult_fb": factor_fb,
+        "mult_nfb": factor_nfb,
         "r4_mode": r4_mode,
         "r4_diff": r4_diff,
         "ca_fb_r4": ca_fb_r4,

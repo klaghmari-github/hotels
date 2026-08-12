@@ -42,12 +42,24 @@ class PipelineFactory:
         except Exception as first_error:
             if read_only:
                 raise first_error
-            # Copie de travail si lock concurrent
+            # Copie de travail si lock concurrent (UI, serve, autre process).
+            # Attention : les écritures partent alors dans main_work.duckdb,
+            # pas dans main.duckdb (que l'UI attache par défaut).
             work = self.paths.duckdb_main / "main_work.duckdb"
             if db.exists():
                 shutil.copy2(db, work)
             else:
                 raise first_error
+            import sys
+
+            print(
+                f"WARN PipelineFactory: {db.name} verrouillée "
+                f"→ fallback {work.name}\n"
+                f"  (les créations de tables/vues n'apparaîtront PAS dans "
+                f"main.duckdb / DuckDB UI tant que le lock reste actif)\n"
+                f"  cause: {first_error}",
+                file=sys.stderr,
+            )
             return ConnectionPipeline(
                 work,
                 self.paths.pipeline,
