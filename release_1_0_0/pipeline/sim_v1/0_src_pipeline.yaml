@@ -25,13 +25,14 @@ t_pilot_concepts:
     SELECT
       CAST(hotel_code AS VARCHAR) AS hotel_code,
       UPPER(TRIM(CAST(solution AS VARCHAR))) AS solution,
+      CAST(partenaire AS VARCHAR) AS partenaire,
       CAST(label AS VARCHAR) AS label,
       CAST(name AS VARCHAR) AS name
     FROM df_pilot_concepts
     WHERE CAST(hotel_code AS VARCHAR) IN (
-      'H2075', 'HB6A3', 'H6188', 'HB5I0', 'H0373', 'H3546'
+      'H2075', 'HB6A3', 'H0373', 'H1249', 'HB5I0', 'H3546'
     )
-      AND CAST(hotel_code AS VARCHAR) NOT IN ('H5586')
+      AND CAST(hotel_code AS VARCHAR) NOT IN ('H5586', 'H6188')
     ORDER BY solution, hotel_code
 
 t_pilot_defaults:

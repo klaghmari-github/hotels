@@ -41,11 +41,17 @@ Soit un groupe de parts qui somment à 1 (hors items **verrouillés**).
 
 ## UI
 
+Deux modes (`memory.mixMode`) :
+
+| Mode | Quand | Comportement |
+|------|--------|--------------|
+| **`select`** | avant estimation | switch **ON/OFF** types & gammes uniquement (pas de sliders) |
+| **`edit`** | après reco mix | sliders de proportions + redistribution proportionnelle |
+
 - Composant **`MixPanel`** (`src/web/pages_user.py`)
-  - curseur / slider d’une ligne → `setValue(key, pct)`
-  - switch « libre / verrouillé » : les lignes verrouillées ne participent
-    **pas** à la redistribution
-- S’applique dès l’édition manuelle des mix (après reco assortiment ou saisie libre)
+  - mode `edit` : curseur → `setValue(key, pct)` (prorata)
+  - switch : en `select` = activer/désactiver ; en `edit` = libre/verrouillé
+- Les items désactivés ou verrouillés ne participent pas à la redistribution
 
 ## Backend (cohérence optimisation grid)
 

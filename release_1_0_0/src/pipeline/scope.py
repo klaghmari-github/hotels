@@ -7,15 +7,25 @@ H5586 est exclu : donnees insuffisantes pour le LOO / la comparaison.
 from __future__ import annotations
 
 # Hotels exclus du perimetre d'evaluation et des tables de modelisation.
-EXCLUDED_HOTEL_CODES: tuple[str, ...] = ("H5586",)
+# H5586 : donnees insuffisantes. H6188 Boulogne : plus dans la liste metier (remplace par H1249 Rennes).
+EXCLUDED_HOTEL_CODES: tuple[str, ...] = ("H5586", "H6188")
 
-# 6 hotels pilotes (alignes sim_v1).
+# Pilotes concepts (mapping solution) — H1249 Rennes inclus (ventes pas encore en t_sales).
 PILOT_HOTEL_CODES: tuple[str, ...] = (
+    "H2075",   # SIMPLY / Adixon
+    "HB6A3",   # CONNECTED / Selfly
+    "H0373",   # CONNECTED / Selfly
+    "H1249",   # CONNECTED / Boost (Rennes)
+    "HB5I0",   # LIBERTY / Adixon
+    "H3546",   # CONNECTED / Digitizme
+)
+
+# Sous-ensemble avec tickets dans t_sales (LOO / modelisation).
+PILOT_HOTEL_CODES_WITH_SALES: tuple[str, ...] = (
     "H2075",
     "HB6A3",
-    "H6188",
-    "HB5I0",
     "H0373",
+    "HB5I0",
     "H3546",
 )
 

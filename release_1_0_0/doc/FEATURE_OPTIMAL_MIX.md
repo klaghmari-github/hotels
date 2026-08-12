@@ -48,20 +48,31 @@ Body optimize : leviers hotel + `type_mix` / gammes (servent de **filtres** acti
 
 Reponse : `apply_mix` pour recharger l’UI Configuration ; `assortments` + top produits.
 
-## UI
+## UI (parcours utilisateur)
 
-Etape Optimisation → **Lancer l’optimisation** :
+### Phase 1 — Périmètre (avant estimation)
 
-1. calcule assortiment product_rank pour chaque solution ;
-2. evalue CA sim_v1 / sim_v2 / ml ;
-3. pre-charge les mix reco dans Configuration (modifiables ensuite).
+À l’étape **Leviers**, mode `select` :
 
-Les ajustements manuels de mix (type / gammes) après la reco suivent la
-**redistribution proportionnelle** (pas d’éclatement égal) — voir
-[FEATURE_MIX_REDISTRIBUTION.md](FEATURE_MIX_REDISTRIBUTION.md).
+- l’utilisateur **active / désactive** uniquement types (F&B, Non F&B) et gammes ;
+- **pas d’édition des proportions** (pas de sliders).
 
-Fallback historique : `method=grid` (balayage 10 %, même règle de prorata
-dans `vary_one`).
+### Phase 2 — Estimation / optimisation
+
+Bouton **Estimer le meilleur mix + CA** (ou Optimisation) :
+
+1. calcule assortiment `product_rank` (top produits / m_lin / rangs marge) dans le périmètre actif ;
+2. en déduit les parts type + gammes ;
+3. évalue CA sim_v1 / sim_v2 / ml ;
+4. **pré-charge** les proportions et passe en mode `edit`.
+
+### Phase 3 — Ajustement
+
+- sliders visibles ; redistribution **proportionnelle** (voir
+  [FEATURE_MIX_REDISTRIBUTION.md](FEATURE_MIX_REDISTRIBUTION.md)) ;
+- relancer l’estimation pour recalculer le CA.
+
+Fallback API : `method=grid` (balayage 10 %, même prorata dans `vary_one`).
 
 ## Code
 

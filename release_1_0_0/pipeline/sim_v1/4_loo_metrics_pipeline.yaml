@@ -13,9 +13,9 @@ t_v1_loo_hotels:
       name
     FROM t_scope_hotels
     WHERE hotel_code IN (
-      'H2075', 'HB6A3', 'H6188', 'HB5I0', 'H0373', 'H3546'
+      'H2075', 'HB6A3', 'H0373', 'HB5I0', 'H3546'
     )
-      AND hotel_code NOT IN ('H5586')
+      AND hotel_code NOT IN ('H5586', 'H6188')
     ORDER BY solution, hotel_code
 
 t_v1_loo_results:

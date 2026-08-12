@@ -1,19 +1,54 @@
 {
-  "_source": "archive/sources/raw/ROD - Simulateurs + détail des coûts.xlsx + ROD_Audit + 001.queryVentes.csv + hotel_identity_registry.json",
-  "_note": "Tous les hôtels présents dans les ventes bornes sont des pilotes. Mapping nom caisse → code Accor via registry archive (Tour Eiffel = H3546 Centre, pas H1978 Vaugirard).",
+  "_source": "mapping metier user 2026-08 (Simply/Liberty/Connected + partenaire)",
+  "_note": "HB6A3=CONNECTED/Selfly (corrige ancien SIMPLY). H1249 Mercure Rennes Centre Gare=CONNECTED/Boost (remplace H6188 Boulogne hors liste). H6188 reste eventuellement dans t_sales historique mais plus pilote concept. H1249: pas encore de tickets dans t_sales.",
   "concepts": {
     "SIMPLY": [
-      { "hotel_code": "H2075", "label": "IBB NICE", "name_ventes": "Ibis budget Nice" },
-      { "hotel_code": "HB6A3", "label": "IBB STRA", "name_ventes": "Ibis budget Strasbourg Centre République" }
+      {
+        "hotel_code": "H2075",
+        "label": "IBB NICE",
+        "name_ventes": "Ibis budget Nice",
+        "name_display": "Ibis budget Nice Californie",
+        "partenaire": "Adixon"
+      }
     ],
     "LIBERTY": [
-      { "hotel_code": "H6188", "label": "MER BOUL", "name_ventes": "Mercure Paris Boulogne" },
-      { "hotel_code": "HB5I0", "label": "NOV MEG", "name_ventes": "Novotel Megève Mont-Blanc" }
+      {
+        "hotel_code": "HB5I0",
+        "label": "NOV MEG",
+        "name_ventes": "Novotel Megève Mont-Blanc",
+        "name_display": "Novotel Megève Mont-Blanc",
+        "partenaire": "Adixon"
+      }
     ],
     "CONNECTED": [
-      { "hotel_code": "H0373", "label": "MER MONT", "name_ventes": "Mercure Paris Montmartre Sacré-Cœur" },
-      { "hotel_code": "H3546", "label": "NOV TE", "name_ventes": "Novotel Paris Tour Eiffel", "name_display": "Novotel Paris Centre Tour Eiffel" },
-      { "hotel_code": "H5586", "label": "NOV ITAL", "name_ventes": "Novotel Porte d'Italie", "name_display": "Novotel Paris 13 Porte d'Italie" }
+      {
+        "hotel_code": "HB6A3",
+        "label": "IBB STRA",
+        "name_ventes": "Ibis budget Strasbourg Centre République",
+        "name_display": "Ibis budget Strasbourg Centre République",
+        "partenaire": "Selfly"
+      },
+      {
+        "hotel_code": "H0373",
+        "label": "MER MONT",
+        "name_ventes": "Mercure Paris Montmartre Sacré-Cœur",
+        "name_display": "Mercure Paris Montmartre Sacré-Cœur",
+        "partenaire": "Selfly"
+      },
+      {
+        "hotel_code": "H1249",
+        "label": "MER RENNES",
+        "name_ventes": "Mercure Rennes Centre Gare",
+        "name_display": "Hôtel 4 étoiles Rennes - Mercure Rennes Centre Gare - ALL - ALL",
+        "partenaire": "Boost"
+      },
+      {
+        "hotel_code": "H3546",
+        "label": "NOV TE",
+        "name_ventes": "Novotel Paris Tour Eiffel",
+        "name_display": "Novotel Paris Centre Tour Eiffel",
+        "partenaire": "Digitizme"
+      }
     ]
   }
 }

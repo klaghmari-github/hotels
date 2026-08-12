@@ -66,6 +66,8 @@ USER_CSS = """
   object-fit:contain;
 }
 .bool-pills { display:flex; flex-wrap:wrap; gap:.35rem; }
+.mix-row.mix-off { opacity:.45; }
+.mix-row.mix-off .mix-label { text-decoration: line-through; }
 .bool-pill {
   font-size:.78rem; padding:.35rem .7rem; border-radius:999px; border:1px solid var(--line);
   color:var(--muted); background:#141c28; cursor:pointer; user-select:none;
@@ -182,18 +184,19 @@ USER_BODY = """
       <p class="muted">Exploitation reprise de l'etape precedente (non modifiable ici). Ajustez uniquement le mix type / gammes.</p>
       <div class="section-title">Exploitation (fixe)</div>
       <div class="kpi-grid" id="kpi-levers"></div>
-      <div class="section-title">Mix</div>
+      <div class="section-title">Mix — perimetre</div>
+      <p class="muted" id="mix-mode-hint">Etape 1 : activez / desactivez uniquement les <strong>types</strong> et <strong>gammes</strong> que vous voulez autoriser. Les proportions optimales seront calculees a l'estimation ; vous pourrez les ajuster ensuite.</p>
       <div id="mix_type" class="mix-block"></div>
       <div class="mix-family-grid">
         <div id="mix_gamme_fb" class="mix-block mix-block-fb"></div>
         <div id="mix_gamme_nfb" class="mix-block mix-block-nfb"></div>
       </div>
-      <p class="muted mix-hint">UI : chaque famille de gammes somme a 100&nbsp;% (facile a ajuster). <strong>sim_v2 / ML</strong> attendent des parts de gammes sur le <em>total natures</em> (comme en base). A l'envoi : part_globale(gamme) = part_type(F&amp;B ou Non) × part_dans_la_famille — le mix type pondere donc le total transmis.</p>
+      <p class="muted mix-hint">Apres estimation / optimisation assortiment : les parts recommandees sont pre-chargees (somme 100&nbsp;% par famille). Modification manuelle = redistribution <strong>proportionnelle</strong> entre les items actifs. Envoi sim_v2/ML : part_globale(gamme) = part_type × part_famille.</p>
       <div class="nav-row">
         <button class="btn" type="button" data-go="2">Retour</button>
         <div class="right">
           <button class="btn" type="button" data-go="5">Aller a l'optimisation</button>
-          <button class="btn primary" type="button" id="btn-run">Lancer l'estimation</button>
+          <button class="btn primary" type="button" id="btn-run">Estimer le meilleur mix + CA</button>
         </div>
       </div>
     </div>
@@ -221,7 +224,7 @@ USER_BODY = """
       </div>
 
       <div class="opt-panel on" id="opt-params">
-        <p class="muted">Point de depart = mix des leviers (etape 3). Pour chaque element d'un groupe (type, gammes F&amp;B, gammes Non F&amp;B), on teste 0&nbsp;%…100&nbsp;% par pas de 10&nbsp;% ; l'ecart est redistribue equitabelement sur les autres elements du groupe. Chaque config est evaluee par <strong>sim_v1</strong>, <strong>sim_v2</strong> et <strong>ml</strong> (3 solutions). On retient le plus grand CA estime.</p>
+        <p class="muted">Perimetre = types/gammes <strong>actives</strong> a l'etape Leviers. L'optimisation calcule le top produits par m_lin et rang de marge, propose les parts de mix, estime le CA (sim_v1 / sim_v2 / ml), puis pre-charge les proportions (modifiables ensuite). Fallback : <code>method=grid</code> (balayage 10&nbsp;%, redistribution proportionnelle).</p>
         <div class="section-title">Mix de reference (leviers)</div>
         <div id="opt-baseline-preview" class="muted">Ouvrir les leviers puis revenir ici.</div>
         <div class="nav-row">
@@ -255,6 +258,8 @@ const memory={
   hotel:null, identity:null, exploitation:null, services:null, proximity:null,
   levers:null, defaults_used:{}, typeMix:null, gammeMixFb:null, gammeMixNfb:null,
   optimize:null,
+  /** select = ON/OFF types&gammes seulement ; edit = proportions apres reco */
+  mixMode:'select',
 };
 
 /** Classification gammes (alignee ventes TYPE / GAMME). */
@@ -325,39 +330,58 @@ function toGlobalGammeMix(typeMixObj, fbObj, nfbObj){
   return combineGammeMix(typeMixObj, fbObj, nfbObj);
 }
 
-// ---------- MixPanel (switch bleu = libre) ----------
+// ---------- MixPanel ----------
+// mode 'select' : ON/OFF uniquement (perimetre avant reco)
+// mode 'edit'   : proportions + redistribution proportionnelle (apres reco)
 class MixPanel {
-  constructor(rootId, title, entries){
+  constructor(rootId, title, entries, mode){
     this.root=document.getElementById(rootId);
     this.title=title;
-    this.items=entries.map(e=>({key:e.key,value:Math.max(0,Number(e.value)||0),locked:false,autoLocked:false}));
-    this._normalizeAll(); this.render();
+    this.mode=mode||memory.mixMode||'select';
+    this.items=entries.map(e=>{
+      const v=Math.max(0,Number(e.value)||0);
+      // enabled: actif dans le perimetre (select) ; locked: fixe en edit
+      const enabled = e.enabled!=null ? !!e.enabled : (v>EPS || this.mode==='select');
+      return {key:e.key, value:v, enabled, locked:!!e.locked, autoLocked:false};
+    });
+    if(this.mode==='select') this._equalizeEnabled();
+    else this._normalizeAll();
+    this.render();
+  }
+  setMode(mode){
+    this.mode=mode;
+    if(mode==='select') this._equalizeEnabled();
+    this.render();
   }
   lockedSum(exceptKey=null){ return this.items.filter(i=>i.locked&&i.key!==exceptKey).reduce((s,i)=>s+i.value,0); }
-  freeItems(exceptKey=null){ return this.items.filter(i=>!i.locked&&i.key!==exceptKey); }
+  freeItems(exceptKey=null){ return this.items.filter(i=>!i.locked&&i.enabled!==false&&i.key!==exceptKey); }
   freeMaxPct(key){ return Math.max(0,(1-this.lockedSum(key))*100); }
+  /** Parts egales entre items enabled (mode select). */
+  _equalizeEnabled(){
+    const on=this.items.filter(i=>i.enabled);
+    const off=this.items.filter(i=>!i.enabled);
+    off.forEach(i=>{ i.value=0; });
+    if(!on.length){ this.items.forEach(i=>{ i.enabled=true; }); return this._equalizeEnabled(); }
+    const e=1/on.length;
+    on.forEach(i=>{ i.value=e; });
+  }
   setValue(key,pct,{soft=true}={}){
+    if(this.mode==='select') return; // pas d'edition de parts en select
     /**
      * Fixe la part de `key` a pct (%).
-     * L'ecart (ajout ou retrait) est repercute sur les autres gammes/types
-     * LIBRES, proportionnellement a leur part actuelle relative.
-     * Ex. A=50 B=30 C=20 ; A → 60 : on prend 10 sur B+C au prorata 30:20 → B=24 C=16.
-     * A → 40 : on rend 10 a B+C au meme prorata → B=36 C=24.
+     * Ecart repercute sur les autres LIBRES enabled, proportionnellement.
      */
-    const it=this.items.find(i=>i.key===key); if(!it||it.locked) return;
+    const it=this.items.find(i=>i.key===key); if(!it||it.locked||it.enabled===false) return;
     const locked=this.lockedSum(); const max=Math.max(0,1-locked);
     let v=Math.min(max,Math.max(0,Number(pct)/100)); v=Math.round(v*1000)/1000;
     const others=this.freeItems(key);
     if(!others.length){ it.value=max; this._fixFloat(); soft?this._paint():this.render(); return; }
-    // masse restante a repartir entre les autres libres
     const rem=Math.max(0,1-locked-v);
     const othersSum=others.reduce((s,o)=>s+Math.max(0,o.value),0);
     if(othersSum<=EPS){
-      // autres a 0 : repartition egale (seul cas non proportionnel)
       const each=rem/others.length;
       others.forEach(o=>{ o.value=each; });
     }else{
-      // proportionnel aux parts actuelles des autres
       others.forEach(o=>{
         const w=Math.max(0,o.value)/othersSum;
         o.value=rem*w;
@@ -366,7 +390,15 @@ class MixPanel {
     it.value=v;
     this._fixFloat(); soft?this._paint():this.render();
   }
+  setEnabled(key, on){
+    const it=this.items.find(i=>i.key===key); if(!it) return;
+    it.enabled=!!on;
+    if(!it.enabled) it.value=0;
+    this._equalizeEnabled();
+    this.render();
+  }
   setFree(key,free){
+    if(this.mode==='select'){ this.setEnabled(key, free); return; }
     const it=this.items.find(i=>i.key===key); if(!it) return;
     if(it.autoLocked&&free){ this.items.forEach(i=>{if(i.autoLocked){i.locked=false;i.autoLocked=false;}}); this.render(); return; }
     if(free){ it.locked=false; it.autoLocked=false; this.items.forEach(i=>{if(i.autoLocked){i.locked=false;i.autoLocked=false;}}); }
@@ -375,34 +407,53 @@ class MixPanel {
   }
   _autoLockResidual(){
     this.items.forEach(i=>{if(i.autoLocked){i.locked=false;i.autoLocked=false;}});
-    const free=this.items.filter(i=>!i.locked);
+    const free=this.items.filter(i=>!i.locked && i.enabled!==false);
     if(free.length===1){ const only=free[0]; only.value=Math.max(0,1-this.lockedSum(only.key)); only.locked=true; only.autoLocked=true; }
   }
-  _normalizeAll(){ const s=this.items.reduce((a,i)=>a+i.value,0); if(s<=EPS){const e=1/this.items.length; this.items.forEach(i=>i.value=e);} else this.items.forEach(i=>i.value=i.value/s); }
-  _fixFloat(){ const s=this.items.reduce((a,i)=>a+i.value,0); const d=1-s; if(Math.abs(d)<1e-12)return; const free=this.items.filter(i=>!i.locked); const t=free.length?free[free.length-1]:this.items[this.items.length-1]; t.value=Math.max(0,t.value+d); }
-  toObject(){ const o={}; this.items.forEach(i=>o[i.key]=Math.round(i.value*1e6)/1e6); return o; }
+  _normalizeAll(){
+    const active=this.items.filter(i=>i.enabled!==false);
+    const s=active.reduce((a,i)=>a+i.value,0);
+    if(s<=EPS){ const e=1/Math.max(active.length,1); active.forEach(i=>i.value=e); }
+    else active.forEach(i=>{ i.value=i.value/s; });
+    this.items.filter(i=>i.enabled===false).forEach(i=>{ i.value=0; });
+  }
+  _fixFloat(){ const s=this.items.reduce((a,i)=>a+i.value,0); const d=1-s; if(Math.abs(d)<1e-12)return; const free=this.items.filter(i=>!i.locked&&i.enabled!==false); const t=free.length?free[free.length-1]:this.items[this.items.length-1]; t.value=Math.max(0,t.value+d); }
+  toObject(){
+    // renvoie parts normalisees (0 si desactive en select)
+    if(this.mode==='select') this._equalizeEnabled();
+    const o={}; this.items.forEach(i=>o[i.key]=Math.round(i.value*1e6)/1e6); return o;
+  }
+  /** Cles actives (perimetre) pour filtres API. */
+  activeKeys(){ return this.items.filter(i=>i.enabled!==false && i.value>EPS).map(i=>i.key); }
   _paint(){
     const sum=this.items.reduce((a,i)=>a+i.value,0);
     const sumEl=this.root.querySelector('.mix-sum'); if(sumEl){ sumEl.textContent=`Σ ${pctLabel(sum)}`; sumEl.classList.toggle('warn',Math.abs(sum-1)>=1e-6); }
     for(const it of this.items){
       const row=this.root.querySelector(`.mix-row[data-key="${CSS.escape(it.key)}"]`); if(!row) continue;
       const pct=Math.round(it.value*1000)/10;
-      const pctEl=row.querySelector('.mix-pct'); if(pctEl) pctEl.textContent=pctLabel(it.value);
+      const pctEl=row.querySelector('.mix-pct'); if(pctEl) pctEl.textContent=this.mode==='select'?(it.enabled?'actif':'off'):pctLabel(it.value);
       const range=row.querySelector('input[type=range]');
-      if(range){ range.min=0; range.max=100; range.value=String(pct); range.style.setProperty('--pct',`${pct}%`); range.disabled=!!it.locked; }
+      if(range){ range.min=0; range.max=100; range.value=String(pct); range.style.setProperty('--pct',`${pct}%`); range.disabled=this.mode==='select'||!!it.locked||it.enabled===false; }
       row.classList.toggle('locked',!!it.locked); row.classList.toggle('residual',!!it.autoLocked);
-      const sw=row.querySelector('input[data-lock]'); if(sw){ sw.checked=!it.locked; sw.disabled=!!it.autoLocked; }
+      row.classList.toggle('mix-off', it.enabled===false);
+      const sw=row.querySelector('input[data-lock]'); if(sw){ sw.checked=this.mode==='select'?!!it.enabled:!it.locked; sw.disabled=!!it.autoLocked; }
     }
   }
   render(){
     const sum=this.items.reduce((a,i)=>a+i.value,0);
-    let html=`<div class="mix-head"><p class="mix-title">${this.title}</p><span class="mix-sum">Σ ${pctLabel(sum)}</span></div>`;
+    const modeLabel=this.mode==='select'?'Perimetre (ON/OFF)':'Proportions (editables)';
+    let html=`<div class="mix-head"><p class="mix-title">${this.title} <span class="muted" style="font-weight:400">· ${modeLabel}</span></p><span class="mix-sum">${this.mode==='select'?'':`Σ ${pctLabel(sum)}`}</span></div>`;
     for(const it of this.items){
-      const pct=Math.round(it.value*1000)/10; const free=!it.locked;
-      html+=`<div class="mix-row${it.locked?' locked':''}${it.autoLocked?' residual':''}" data-key="${it.key.replace(/"/g,'&quot;')}">
-        <div class="mix-label">${it.key}</div><div class="mix-pct">${pctLabel(it.value)}</div>
-        <label class="sw"><input type="checkbox" data-lock="${it.key.replace(/"/g,'&quot;')}" ${free?'checked':''} ${it.autoLocked?'disabled':''}/><span class="slider"></span></label>
-        <div class="mix-slider-wrap"><input type="range" min="0" max="100" step="0.1" value="${pct}" data-key="${it.key.replace(/"/g,'&quot;')}" ${it.locked?'disabled':''} style="--pct:${pct}%"/></div>
+      const pct=Math.round(it.value*1000)/10;
+      const on=this.mode==='select'?!!it.enabled:!it.locked;
+      html+=`<div class="mix-row${it.locked?' locked':''}${it.autoLocked?' residual':''}${it.enabled===false?' mix-off':''}" data-key="${it.key.replace(/"/g,'&quot;')}">
+        <div class="mix-label">${it.key}</div>
+        <div class="mix-pct">${this.mode==='select'?(it.enabled?'actif':'off'):pctLabel(it.value)}</div>
+        <label class="sw" title="${this.mode==='select'?'Activer / desactiver':'Libre / verrouille'}">
+          <input type="checkbox" data-lock="${it.key.replace(/"/g,'&quot;')}" ${on?'checked':''} ${it.autoLocked?'disabled':''}/>
+          <span class="slider"></span>
+        </label>
+        ${this.mode==='edit'?`<div class="mix-slider-wrap"><input type="range" min="0" max="100" step="0.1" value="${pct}" data-key="${it.key.replace(/"/g,'&quot;')}" ${it.locked||it.enabled===false?'disabled':''} style="--pct:${pct}%"/></div>`:''}
       </div>`;
     }
     this.root.innerHTML=html;
@@ -730,16 +781,33 @@ function renderLevers(){
     + kpiFixed('Guests / chambre', L.hotel_guests_per_chambre, {digits:1})
     + kpiFixed('Metres lineaires', L.metres_lineaires, {digits:1});
 
+  const mode=memory.mixMode||'select';
+  const hint=document.getElementById('mix-mode-hint');
+  if(hint){
+    hint.innerHTML=mode==='select'
+      ? 'Etape 1 : activez / desactivez uniquement les <strong>types</strong> et <strong>gammes</strong> autorises. Les proportions optimales seront calculees a l\'estimation.'
+      : 'Etape 2 : proportions recommandees pre-chargees — vous pouvez les <strong>ajuster</strong> (redistribution proportionnelle). Relancez l\'estimation pour recalculer le CA.';
+  }
+
   const tm=L.type_mix||{ 'F&B':0.7, 'NON F&B':0.3 };
-  // prefer structured defaults if API provides them, else split flat gamme_mix
   let fb=L.gamme_mix_fb, nfb=L.gamme_mix_nfb;
   if(!fb || !nfb){
     const split=splitGammeMix(L.gamme_mix||{...DEFAULT_GAMME_FB, ...DEFAULT_GAMME_NFB});
     fb=fb||split.fb; nfb=nfb||split.nfb;
   }
-  memory.typeMix=new MixPanel('mix_type','Mix type (F&B vs Non F&B)', Object.entries(tm).map(([k,v])=>({key:k,value:v})));
-  memory.gammeMixFb=new MixPanel('mix_gamme_fb','Gammes F&B', Object.entries(fb).map(([k,v])=>({key:k,value:v})));
-  memory.gammeMixNfb=new MixPanel('mix_gamme_nfb','Gammes Non F&B', Object.entries(nfb).map(([k,v])=>({key:k,value:v})));
+  // preserve enabled flags from previous panels if same keys
+  const prevEn=(panel)=>{
+    const m={};
+    if(panel&&panel.items) panel.items.forEach(i=>{ m[i.key]=i.enabled; });
+    return m;
+  };
+  const peT=prevEn(memory.typeMix), peF=prevEn(memory.gammeMixFb), peN=prevEn(memory.gammeMixNfb);
+  memory.typeMix=new MixPanel('mix_type','Mix type (F&B vs Non F&B)',
+    Object.entries(tm).map(([k,v])=>({key:k,value:v, enabled: peT[k]!=null?peT[k]:(v>EPS||mode==='select')})), mode);
+  memory.gammeMixFb=new MixPanel('mix_gamme_fb','Gammes F&B',
+    Object.entries(fb).map(([k,v])=>({key:k,value:v, enabled: peF[k]!=null?peF[k]:(v>EPS||mode==='select')})), mode);
+  memory.gammeMixNfb=new MixPanel('mix_gamme_nfb','Gammes Non F&B',
+    Object.entries(nfb).map(([k,v])=>({key:k,value:v, enabled: peN[k]!=null?peN[k]:(v>EPS||mode==='select')})), mode);
 }
 
 // when going to step 3, refresh levers from step 2
@@ -858,23 +926,44 @@ function engineBlock(eng, block){
 async function runSim(){
   setStep(4);
   const out=document.getElementById('sim-out');
-  out.innerHTML='<p class="muted">Estimation sim_v1 · sim_v2 · IA…</p>';
+  out.innerHTML='<p class="muted">Calcul du meilleur mix (assortiment produits / m_lin) puis CA sim_v1 · sim_v2 · ml…</p>';
   try{
-    const res=await fetch('/api/user/simulate',{
+    // 1) perimetre ON/OFF → product_rank → mix optimal + CA
+    const payload=payloadFromMemory();
+    payload.method='product_rank';
+    const res=await fetch('/api/user/optimize',{
       method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(payloadFromMemory())
+      body:JSON.stringify(payload)
     });
     const data=await res.json();
     if(!data.ok) throw new Error(data.error||'erreur');
-    const by=data.by_engine||{};
-    let html='<p class="muted">Trois moteurs : sim_v1 · sim_v2 · <strong>ml</strong> (super-modele). Montants en <strong>€ / an</strong> (sorties mensuelles des modeles ×&nbsp;12). Regles de couts / reco identiques.</p>';
+    memory.optimize=data;
+    applyRecommendedMix(data); // passe mixMode=edit + precharge proportions
+
+    // 2) affichage : mix reco + detail moteurs (meme structure que opt)
+    let html='<p class="muted">Mix calcule a partir du perimetre types/gammes actifs, puis estime par <strong>sim_v1 · sim_v2 · ml</strong>. Montants en <strong>€ / an</strong>. Vous pouvez maintenant modifier les proportions a l\'etape Leviers.</p>';
+    // reuse opt renderer block
+    const tmp=document.createElement('div');
+    tmp.id='opt-out-tmp';
+    // inline minimal summary from optimize payload
+    if(data.best){
+      const best=data.best;
+      const bestA=annualOf(best.result||best);
+      html+=`<div class="reco-box"><h4>Mix &amp; CA recommandes</h4>
+        <p style="margin:0 0 .4rem"><strong>${fmt(bestA.ca!=null?bestA.ca:(best.ca_monthly!=null?best.ca_monthly*12:null))}</strong> €/an · ${tag(best.engine)} · ${tag(best.solution)}</p>
+        <div style="margin:.35rem 0"><strong>Type</strong><br/>${chipsMix(best.type_mix)}</div>
+        <div style="margin:.35rem 0"><strong>Gammes F&B</strong><br/>${chipsMix(best.gamme_mix_fb)}</div>
+        <div style="margin:.35rem 0"><strong>Gammes Non F&B</strong><br/>${chipsMix(best.gamme_mix_nfb)}</div>
+      </div>`;
+    }
+    const by=data.best_by_engine||{};
     for(const eng of ['sim_v1','sim_v2','ml']){
       html+=engineBlock(eng, by[eng]||{results:[], recommendation:{}});
     }
     if((data.errors||[]).length){
       html+='<h2>Alertes</h2>';
       for(const e of data.errors){
-        html+=`<div class="err-soft">${e.engine||''} ${e.solution||''}: ${e.error||''}</div>`;
+        html+=`<div class="err-soft">${e.scenario||e.engine||''}: ${e.error||''}</div>`;
       }
     }
     out.innerHTML=html;
@@ -906,7 +995,7 @@ function showOptTab(name){
 }
 
 function applyRecommendedMix(data){
-  /** Precharge les mix reco dans l'etat leviers (modifiables ensuite). */
+  /** Precharge les mix reco puis passe en mode edition des proportions. */
   const am=data.apply_mix||(data.best?{
     type_mix:data.best.type_mix,
     gamme_mix_fb:data.best.gamme_mix_fb,
@@ -920,7 +1009,7 @@ function applyRecommendedMix(data){
   memory.levers.gamme_mix_nfb=am.gamme_mix_nfb||memory.levers.gamme_mix_nfb;
   memory.levers.gamme_mix=am.gamme_mix
     ||toGlobalGammeMix(am.type_mix, am.gamme_mix_fb, am.gamme_mix_nfb);
-  // recreate panels if DOM ready (renderLevers lit memory.levers)
+  memory.mixMode='edit';
   try{ renderLevers(); }catch(_e){}
 }
 
