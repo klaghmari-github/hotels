@@ -39,15 +39,31 @@ Mise à jour métier 2026-08 (correction des erreurs Simply / Liberty / Connecte
 - `data/files/input/hotel_clients.xlsx` (sans H6188)
 - DuckDB : `t_sales` (HB6A3), `t_hotel_params`, `t_pilot_concepts`, `t_dataset_pivot`, `t_rich_data`, tables LOO
 
-## Rebuild partiel recommandé (pas toute la sim_v2)
+## Rebuild LOO / vues admin (après correction mapping)
 
 ```bash
-# recharger concepts / params v1
-python scripts/p_table_view.py t_pilot_concepts
-python scripts/p_table_view.py t_hotel_params
-# vues assortiment (rangs par solution)
-python scripts/p_table_view.py v_product_mean_rank_by_solution
+# hotels LOO + vues web (solution = t_pilot_concepts)
+python scripts/p_table_view.py t_loo_hotels
+python scripts/p_table_view.py v_web_sales_obs
+
+# exports Excel lus par l'UI comparaison / eval
+python run.py sim-v1
+python run.py sim-v2 --rebuild
+python run.py ml --rebuild
 ```
 
-Pour un recalcul LOO / coeffs sim_v2 complets après nouvelles ventes Rennes :  
-`python run.py sim-v2 --rebuild` (long).
+`t_loo_hotels` lit désormais le mapping **métier** (`t_pilot_concepts`), pas `t_sales.SOLUTION`.  
+H6188 et H5586 sont exclus du LOO et de `v_web_sales_obs`.
+
+### LOO mono-solution (eval biaisée)
+
+Si une solution n’a **qu’un seul** hôtel pilote avec ventes (ex. SIMPLY = H2075, LIBERTY = HB5I0) :
+
+- on **ne sort pas** cet hôtel du jeu d’apprentissage ;
+- on estime quand même avec sim_v1 / sim_v2 / ml et on compare au réel ;
+- flag `eval_biased = true` (meilleur que ne pas évaluer du tout).
+
+Si ≥ 2 hôtels pour la solution → LOO strict classique.
+
+Pour un recalcul complet scenarios sim_v2 (long) :  
+`python run.py sim-v2-build` puis LOO.

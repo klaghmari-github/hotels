@@ -41,12 +41,19 @@ v_solution_reference_loo:
     - v_hotel_params
     - t_pilot_defaults
   sql: |-
+    -- Pairs meme solution hors hotel evalue ; si solution mono-hotel
+    -- (eval_biased / n_solution_hotels <= 1) on garde l'hotel (ref biaisee).
     WITH peers AS (
       SELECT p.*
       FROM v_hotel_params AS p
       CROSS JOIN v_loo_step AS step
-      WHERE p.solution = step.solution
-        AND p.hotel_code <> step.hotel_code
+      WHERE UPPER(TRIM(CAST(p.solution AS VARCHAR)))
+          = UPPER(TRIM(CAST(step.solution AS VARCHAR)))
+        AND (
+          COALESCE(step.eval_biased, FALSE)
+          OR COALESCE(step.n_solution_hotels, 0) <= 1
+          OR p.hotel_code <> step.hotel_code
+        )
     ),
     agg AS (
       SELECT
@@ -61,7 +68,8 @@ v_solution_reference_loo:
         COUNT(DISTINCT peers.hotel_code) AS nombre_peers
       FROM v_loo_step AS step
       LEFT JOIN peers
-        ON peers.solution = step.solution
+        ON UPPER(TRIM(CAST(peers.solution AS VARCHAR)))
+          = UPPER(TRIM(CAST(step.solution AS VARCHAR)))
       GROUP BY step.hotel_code, step.solution
     )
     SELECT

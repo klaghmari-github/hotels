@@ -28,6 +28,11 @@ v_ml_training_dataset:
       h.hotel_to_annuel,
       h.hotel_guests_per_chambre,
       p.metres_lineaires,
+      p.nombre_guests_par_mois,
+      p.nombre_ventes_par_mois,
+      -- taux de conversion clients (cible ML par solution)
+      p.nombre_ventes_par_mois
+        / NULLIF(p.nombre_guests_par_mois, 0) AS taux_conversion,
       COLUMNS('^(type|gamme)_.*_part_natures$'),
       p.montant_ventes_par_mois,
       p.montant_marge_par_mois,
@@ -35,3 +40,4 @@ v_ml_training_dataset:
     FROM t_dataset_pivot AS p
     INNER JOIN v_ml_hotel_context AS h
       USING (hotel_code)
+    WHERE CAST(p.hotel_code AS VARCHAR) NOT IN ('H5586', 'H6188')

@@ -66,6 +66,7 @@ CatBoost uniquement (pas XGBoost, pas reseau). LOO hotel + export `data/files/ou
 | [doc/FEATURE_MIX_REDISTRIBUTION.md](doc/FEATURE_MIX_REDISTRIBUTION.md) | Edition mix type/gammes : redistribution **proportionnelle** (UI + grid) |
 | [doc/FEATURE_OPTIMAL_MIX.md](doc/FEATURE_OPTIMAL_MIX.md) | Assortiment optimal m_lin × rangs de marge → mix + CA |
 | [doc/PILOT_SOLUTION_MAPPING.md](doc/PILOT_SOLUTION_MAPPING.md) | Mapping hôtel ↔ solution / partenaire (pilotes) |
+| [doc/sim_v2_scientific.html](doc/sim_v2_scientific.html) | **Doc scientifique sim_v2** (simulation + estimation, schémas) |
 | [doc/ARCHITECTURE.md](doc/ARCHITECTURE.md) | Couches package |
 | [doc/index.html](doc/index.html) | Vue d’ensemble HTML |
 

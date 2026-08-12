@@ -95,10 +95,11 @@ form.card .row { display: grid; grid-template-columns: 1fr 1fr; gap: .65rem; }
   border: 1px solid var(--line); border-radius: 10px; background: #141c28;
 }
 .mix-family-grid .mix-block { margin-top: 0; }
-.mix-block-fb { border-color: rgba(61,139,253,.35); box-shadow: inset 0 0 0 1px rgba(61,139,253,.08); }
-.mix-block-nfb { border-color: rgba(196,181,253,.35); box-shadow: inset 0 0 0 1px rgba(196,181,253,.08); }
-.mix-block-fb .mix-title { color: #93c5fd; }
-.mix-block-nfb .mix-title { color: #c4b5fd; }
+/* F&B cyan/teal vs Non F&B ambre/orange — lisible a l'oeil */
+.mix-block-fb { border-color: rgba(34,211,238,.4); box-shadow: inset 0 0 0 1px rgba(6,182,212,.1); }
+.mix-block-nfb { border-color: rgba(251,146,60,.4); box-shadow: inset 0 0 0 1px rgba(249,115,22,.1); }
+.mix-block-fb .mix-title { color: #67e8f9; }
+.mix-block-nfb .mix-title { color: #fdba74; }
 .mix-block .mix-head {
   display: flex; align-items: center; justify-content: space-between; gap: .5rem;
   margin-bottom: .55rem;

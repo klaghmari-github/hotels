@@ -67,48 +67,53 @@ v_web_loo_metrics:
 # ----------------------------------------------------------------------
 
 # Observation utilisee comme point de depart des simulations sim_v2
-# (scenario sans retrait de natures) : 1 ligne / hotel pilote
+# (scenario sans retrait de natures) : 1 ligne / hotel pilote metier
+# solution forcee via t_pilot_concepts (pas l'historique t_sales / pivot)
 v_web_sales_obs:
   type: view
   mode: create_or_replace
   requires:
     - t_dataset_pivot
+    - t_pilot_concepts
   sql: |-
     SELECT
-      hotel_code,
-      solution,
-      scenario_id,
-      scenario_removed_natures,
+      p.hotel_code,
+      LOWER(TRIM(CAST(c.solution AS VARCHAR))) AS solution,
+      p.scenario_id,
+      p.scenario_removed_natures,
       'observation' AS row_kind,
-      nombre_guests_par_mois,
-      metres_lineaires,
-      nombre_mois,
-      nombre_natures,
-      nombre_categories,
-      nombre_gammes,
-      nombre_types,
-      nombre_marques,
-      nombre_fournisseurs,
-      nombre_ventes_par_mois,
-      montant_ventes_par_mois,
-      montant_marge_par_mois,
-      montant_marge_selon_coef_par_mois,
-      type_f_b_part_natures,
-      type_non_f_b_part_natures,
-      gamme_alcool_part_natures,
-      gamme_sans_alcool_part_natures,
-      gamme_food_salee_part_natures,
-      gamme_food_sucree_part_natures,
-      gamme_formule_part_natures,
-      gamme_accessoires_part_natures,
-      gamme_sos_part_natures,
-      gamme_cosmetique_part_natures,
-      gamme_pap_part_natures,
-      gamme_jeux_enfants_part_natures,
-      gamme_souvenirs_part_natures
-    FROM t_dataset_pivot
-    WHERE COALESCE(LEN(scenario_removed_natures), 0) = 0
-    ORDER BY solution, hotel_code
+      p.nombre_guests_par_mois,
+      p.metres_lineaires,
+      p.nombre_mois,
+      p.nombre_natures,
+      p.nombre_categories,
+      p.nombre_gammes,
+      p.nombre_types,
+      p.nombre_marques,
+      p.nombre_fournisseurs,
+      p.nombre_ventes_par_mois,
+      p.montant_ventes_par_mois,
+      p.montant_marge_par_mois,
+      p.montant_marge_selon_coef_par_mois,
+      p.type_f_b_part_natures,
+      p.type_non_f_b_part_natures,
+      p.gamme_alcool_part_natures,
+      p.gamme_sans_alcool_part_natures,
+      p.gamme_food_salee_part_natures,
+      p.gamme_food_sucree_part_natures,
+      p.gamme_formule_part_natures,
+      p.gamme_accessoires_part_natures,
+      p.gamme_sos_part_natures,
+      p.gamme_cosmetique_part_natures,
+      p.gamme_pap_part_natures,
+      p.gamme_jeux_enfants_part_natures,
+      p.gamme_souvenirs_part_natures
+    FROM t_dataset_pivot AS p
+    INNER JOIN t_pilot_concepts AS c
+      ON CAST(c.hotel_code AS VARCHAR) = CAST(p.hotel_code AS VARCHAR)
+    WHERE COALESCE(LEN(p.scenario_removed_natures), 0) = 0
+      AND CAST(p.hotel_code AS VARCHAR) NOT IN ('H5586', 'H6188')
+    ORDER BY c.solution, p.hotel_code
 
 # Resultats simules sim_v2 : un scenario de retrait natures × hotel
 # (~6 hotels × ~1780 scenarios hors baseline)

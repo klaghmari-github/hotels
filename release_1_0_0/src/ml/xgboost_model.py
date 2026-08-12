@@ -176,22 +176,45 @@ class XGBoostService:
         self,
         df: pd.DataFrame | None = None,
     ) -> tuple[pd.DataFrame, pd.DataFrame]:
+        """
+        LOO par hotel. Si une solution n'a qu'un seul hotel pilote,
+        on le garde dans le train (evaluation biaisee).
+        """
         df = df if df is not None else self.load_dataset()
         features, _ = self.feature_matrix(df)
         groups = df["hotel_code"].astype(str)
         observation = df["is_observation"]
         hotels = sorted(df.loc[observation, "hotel_code"].astype(str).unique())
 
+        obs_df = df.loc[observation, ["hotel_code", "solution"]].copy()
+        obs_df["hotel_code"] = obs_df["hotel_code"].astype(str)
+        obs_df["solution"] = (
+            obs_df["solution"].astype(str).str.strip().str.lower()
+        )
+        hotel_sol = {
+            str(r.hotel_code): str(r.solution)
+            for r in obs_df.itertuples(index=False)
+        }
+        sol_counts: dict[str, int] = {}
+        for sol in hotel_sol.values():
+            sol_counts[sol] = sol_counts.get(sol, 0) + 1
+
         rows: list[dict[str, Any]] = []
         for index, hotel in enumerate(hotels, start=1):
+            sol = hotel_sol.get(hotel, "")
+            biased = sol_counts.get(sol, 0) <= 1
             logger.info(
-                "%s LOO %s/%s | hotel=%s",
+                "%s LOO %s/%s | hotel=%s%s",
                 self.engine_name,
                 index,
                 len(hotels),
                 hotel,
+                " | eval_biased" if biased else "",
             )
-            train_mask = groups != hotel
+            if biased:
+                train_mask = pd.Series(True, index=df.index)
+            else:
+                train_mask = groups != hotel
             test_mask = observation & (groups == hotel)
             if int(test_mask.sum()) != 1:
                 raise ValueError(
@@ -202,6 +225,7 @@ class XGBoostService:
             row: dict[str, Any] = {
                 "hotel_code": hotel,
                 "solution": source["solution"],
+                "eval_biased": bool(biased),
             }
             x_train = features.loc[train_mask]
             x_test = features.loc[test_mask]

@@ -47,8 +47,8 @@
     "objective": "reg:squarederror",
     "tree_method": "hist"
   },
-  "training_rows": 6,
-  "xgb_training_rows": 10680,
+  "training_rows": 5,
+  "xgb_training_rows": 8900,
   "dataset_source": "v_ml_training_dataset",
   "engine": "ml",
   "note": "super stacking = sim_v2 + xgboost(sim_v2 simulations)"

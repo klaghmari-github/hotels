@@ -186,7 +186,11 @@ def load_ml_dataset(
             continue
         if col in {t for t, _ in TARGETS} or col.startswith(
             ("type_", "gamme_", "categorie_", "hd_", "px_", "wx_", "hol_", "br_")
-        ) or col in CONTEXT_FEATURES:
+        ) or col in CONTEXT_FEATURES or col in {
+            "taux_conversion",
+            "nombre_ventes_par_mois",
+            "nombre_guests_par_mois",
+        }:
             df[col] = pd.to_numeric(df[col], errors="coerce")
 
     for col in CONTEXT_FEATURES:

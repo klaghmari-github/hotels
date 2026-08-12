@@ -35,6 +35,7 @@
     <a href="#pipeline">Pipelines</a>
     <a href="#simv1">sim_v1</a>
     <a href="#simv2">sim_v2</a>
+    <a href="sim_v2_scientific.html">sim_v2 scientifique</a>
     <a href="#ml">CatBoost</a>
     <a href="#api">API</a>
     <a href="#web">Web</a>
@@ -77,6 +78,11 @@
     <section id="simv2">
       <h2>4. sim_v2 (restitution coefficients)</h2>
       <p>Coefficients unitaires par variable de mix et solution. Methodes A (moyenne toutes variables) et B (moyenne par famille). LOO : exclusion de toutes les simulations de l hotel.</p>
+      <p><strong>Documentation scientifique / métier</strong> (génération des données simulées, formules, estimation, schémas) :</p>
+      <ul>
+        <li><a href="sim_v2_scientific.html"><strong>sim_v2_scientific.html</strong></a> — doc principale (clair, formules pipeline, justification métier)</li>
+        <li><a href="sim_v2_methodologie.html">sim_v2_methodologie.html</a> — variante visuelle complémentaire</li>
+      </ul>
       <pre>python run.py sim-v2 --rebuild
 # → data/files/output/sim_v2/eval_sim_v2_loo.xlsx</pre>
     </section>

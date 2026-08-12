@@ -146,6 +146,53 @@ def mix_configs_for_group(
     return configs
 
 
+def normalize_mix_exact(
+    mix: dict[str, Any] | None,
+    defaults: dict[str, float] | None = None,
+) -> dict[str, float]:
+    """
+    Renormalise un mix pour que la somme soit exactement 1.0.
+    Residu place sur la plus grande part (evite les rejets sim_v2
+    sur les arrondis float).
+    """
+    out: dict[str, float] = {}
+    for k, v in (mix or {}).items():
+        key = str(k).strip()
+        if not key:
+            continue
+        try:
+            val = max(0.0, float(v))
+        except (TypeError, ValueError):
+            val = 0.0
+        out[key] = out.get(key, 0.0) + val
+    s = sum(out.values())
+    if s <= 1e-12:
+        out = {}
+        for k, v in (defaults or {}).items():
+            key = str(k).strip()
+            if not key:
+                continue
+            try:
+                val = max(0.0, float(v))
+            except (TypeError, ValueError):
+                val = 0.0
+            out[key] = out.get(key, 0.0) + val
+        s = sum(out.values())
+        if s <= 1e-12:
+            if not out:
+                out = dict(defaults or {"F&B": 0.7, "NON F&B": 0.3})
+            n = max(len(out), 1)
+            out = {k: 1.0 / n for k in out}
+            s = 1.0
+    out = {k: v / s for k, v in out.items()}
+    # residu float sur la plus grande cle → somme exacte 1.0
+    if out:
+        max_k = max(out, key=lambda k: out[k])
+        residual = 1.0 - sum(out.values())
+        out[max_k] = max(0.0, out[max_k] + residual)
+    return out
+
+
 def combine_gamme_mix(
     type_mix: dict[str, float],
     gamme_fb: dict[str, float],
@@ -157,9 +204,10 @@ def combine_gamme_mix(
     part_totale = weight(type) * part_famille.
     Aligné sur t_dataset_mix : metric_value / nombre_natures_global.
     """
+    tm = normalize_mix_exact(type_mix, {"F&B": 0.7, "NON F&B": 0.3})
     w_fb = 0.0
     w_nfb = 0.0
-    for k, v in type_mix.items():
+    for k, v in tm.items():
         key = str(k).lower().replace("&", "").replace("_", " ")
         if "non" in key:
             w_nfb += float(v)
@@ -170,15 +218,31 @@ def combine_gamme_mix(
         w_fb, w_nfb = 0.7, 0.3
     else:
         w_fb, w_nfb = w_fb / total, w_nfb / total
+
+    default_fb = {
+        "sans alcool": 0.40,
+        "food salee": 0.28,
+        "food sucree": 0.18,
+        "alcool": 0.10,
+        "formule": 0.04,
+    }
+    default_nfb = {
+        "accessoires": 0.35,
+        "sos": 0.30,
+        "cosmetique": 0.12,
+        "pap": 0.10,
+        "jeux enfants": 0.08,
+        "souvenirs": 0.05,
+    }
+    fb = normalize_mix_exact(gamme_fb, default_fb) if w_fb > 1e-12 else {}
+    nfb = normalize_mix_exact(gamme_nfb, default_nfb) if w_nfb > 1e-12 else {}
+
     out: dict[str, float] = {}
-    for k, v in gamme_fb.items():
+    for k, v in fb.items():
         out[str(k)] = out.get(str(k), 0.0) + w_fb * float(v)
-    for k, v in gamme_nfb.items():
+    for k, v in nfb.items():
         out[str(k)] = out.get(str(k), 0.0) + w_nfb * float(v)
-    s = sum(out.values())
-    if s > 1e-12:
-        out = {k: round(v / s, 8) for k, v in out.items()}
-    return out
+    return normalize_mix_exact(out, {**default_fb, **default_nfb})
 
 
 def run_mix_optimization(
@@ -194,11 +258,21 @@ def run_mix_optimization(
     solutions: list[str] | None = None,
     evaluate_fn: Callable[..., list[dict[str, Any]]],
     step: float = STEP,
+    progress_cb: Callable[[int, int, str], None] | None = None,
 ) -> dict[str, Any]:
     """
     evaluate_fn(type_mix=..., gamme_mix=..., gamme_mix_fb=..., gamme_mix_nfb=...)
     → liste de resultats enrichis (engine, solution, ca_monthly, ...).
+
+    progress_cb(done, total, message) optionnel.
     """
+    def _progress(done: int, total: int, message: str) -> None:
+        if progress_cb is not None:
+            try:
+                progress_cb(done, total, message)
+            except Exception:  # noqa: BLE001
+                pass
+
     base_type = _norm_mix(type_mix, {"F&B": 0.7, "NON F&B": 0.3})
     base_fb = _norm_mix(
         gamme_mix_fb,
@@ -266,8 +340,15 @@ def run_mix_optimization(
     trials: list[dict[str, Any]] = []
     best: dict[str, Any] | None = None
     errors: list[dict[str, str]] = []
+    n_sc = max(len(scenarios), 1)
+    _progress(0, n_sc, "Estimation du CA…")
 
     for i, sc in enumerate(scenarios):
+        _progress(
+            i,
+            n_sc,
+            f"Estimation du CA ({i + 1}/{n_sc})…",
+        )
         tm = sc["type_mix"]
         fb = sc["gamme_mix_fb"]
         nfb = sc["gamme_mix_nfb"]
@@ -319,6 +400,8 @@ def run_mix_optimization(
 
         if (i + 1) % 25 == 0:
             logger.info("optimize mix: %s/%s scenarios", i + 1, len(scenarios))
+
+    _progress(n_sc, n_sc, "Finalisation…")
 
     # Recommandation metier sur le meilleur mix (tous moteurs / solutions de ce mix)
     best_recommendation = None
@@ -420,13 +503,23 @@ def run_product_rank_optimization(
     solutions: list[str] | None = None,
     evaluate_fn: Callable[..., list[dict[str, Any]]],
     recommend_fn: Callable[..., dict[str, Any]],
+    progress_cb: Callable[[int, int, str], None] | None = None,
 ) -> dict[str, Any]:
     """
     Optimisation par assortiment : densite produits/m_lin × rangs marge.
 
     recommend_fn(solution, metres_lineaires, allowed_types, allowed_gammes)
     → payload optimal_mix.
+
+    progress_cb(done, total, message) optionnel pour barre de progression.
     """
+    def _progress(done: int, total: int, message: str) -> None:
+        if progress_cb is not None:
+            try:
+                progress_cb(done, total, message)
+            except Exception:  # noqa: BLE001
+                pass
+
     base_type = _norm_mix(type_mix, {"F&B": 0.7, "NON F&B": 0.3})
     base_fb = _norm_mix(
         gamme_mix_fb,
@@ -461,11 +554,22 @@ def run_product_rank_optimization(
         for g in allowed_gammes_ui
     ]
 
+    # total etapes : 1 prep + 1 reco par solution + 1 evaluation par scenario
+    total_steps = 1 + len(sols) + max(len(sols), 1)
+    step_i = 0
+    _progress(step_i, total_steps, "Preparation…")
+
     scenarios: list[dict[str, Any]] = []
     errors: list[dict[str, str]] = []
     assortments: dict[str, Any] = {}
 
     for sol in sols:
+        step_i += 1
+        _progress(
+            step_i,
+            total_steps,
+            f"Calcul du mix recommande ({step_i}/{total_steps})…",
+        )
         try:
             reco = recommend_fn(
                 solution=sol,
@@ -510,10 +614,20 @@ def run_product_rank_optimization(
             + (errors[0]["error"] if errors else "")
         )
 
+    # recalibre total si certains assortiments ont echoue
+    total_steps = 1 + len(sols) + len(scenarios)
+    _progress(step_i, total_steps, "Estimation du CA…")
+
     trials: list[dict[str, Any]] = []
     best: dict[str, Any] | None = None
 
     for i, sc in enumerate(scenarios):
+        step_i += 1
+        _progress(
+            step_i,
+            total_steps,
+            f"Estimation du CA ({step_i}/{total_steps})…",
+        )
         tm = sc["type_mix"]
         fb = sc["gamme_mix_fb"]
         nfb = sc["gamme_mix_nfb"]
@@ -566,9 +680,11 @@ def run_product_rank_optimization(
             if best is None or ca_a > float(best.get("ca_annual") or -1e18):
                 best = trial
             elif abs(ca_a - float(best.get("ca_annual") or 0)) < 1e-6:
-                focus = str(sc.get("solution_focus") or "").upper()
-                if str(r.get("solution") or "").upper() == focus:
+                focus_sol = str(sc.get("solution_focus") or "").upper()
+                if str(r.get("solution") or "").upper() == focus_sol:
                     best = trial
+
+    _progress(total_steps, total_steps, "Finalisation…")
 
     best_recommendation = None
     best_by_engine: dict[str, Any] = {}

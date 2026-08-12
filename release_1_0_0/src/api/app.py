@@ -636,6 +636,81 @@ def create_api_app(paths: Paths | None = None) -> Flask:
             row["best_ca_engine"] = best_eng
             rows_out.append(row)
 
+        # ---------- Metriques + meilleur moteur PAR SOLUTION ----------
+        # Objectif : identifier l'estimation la plus proche du reel
+        # pour simply / liberty / connected separement.
+        def _norm_sol(s: Any) -> str:
+            return str(s or "").strip().lower().replace("_", " ")
+
+        def _mean_abs(vals: list[float]) -> float | None:
+            if not vals:
+                return None
+            return float(sum(vals) / len(vals))
+
+        by_solution: dict[str, Any] = {}
+        sol_order = ("simply", "liberty", "connected")
+        # regrouper les hotels par solution
+        hotels_by_sol: dict[str, list[dict[str, Any]]] = {}
+        for row in rows_out:
+            sol = _norm_sol(row.get("solution"))
+            if not sol:
+                continue
+            hotels_by_sol.setdefault(sol, []).append(row)
+
+        for sol in list(sol_order) + sorted(
+            s for s in hotels_by_sol if s not in sol_order
+        ):
+            hrows = hotels_by_sol.get(sol) or []
+            if not hrows:
+                continue
+            eng_stats: dict[str, Any] = {}
+            for eng in engines:
+                ca_errs: list[float] = []
+                m_errs: list[float] = []
+                for r in hrows:
+                    ce = r.get(f"ca_err_{eng}")
+                    me = r.get(f"marge_err_{eng}")
+                    try:
+                        if ce is not None:
+                            ca_errs.append(float(ce))
+                    except (TypeError, ValueError):
+                        pass
+                    try:
+                        if me is not None:
+                            m_errs.append(float(me))
+                    except (TypeError, ValueError):
+                        pass
+                eng_stats[eng] = {
+                    "mae_ca": _mean_abs(ca_errs),
+                    "mae_marge": _mean_abs(m_errs),
+                    "n_hotels": len(ca_errs) if ca_errs else len(hrows),
+                }
+
+            def _best_key(metric: str) -> str | None:
+                best_e = None
+                best_v = None
+                for eng, st in eng_stats.items():
+                    v = st.get(metric)
+                    if v is None:
+                        continue
+                    try:
+                        fv = float(v)
+                    except (TypeError, ValueError):
+                        continue
+                    if best_v is None or fv < best_v:
+                        best_v = fv
+                        best_e = eng
+                return best_e
+
+            by_solution[sol] = {
+                "solution": sol,
+                "n_hotels": len(hrows),
+                "hotels": [r.get("hotel_code") for r in hrows],
+                "engines": eng_stats,
+                "best_ca_engine": _best_key("mae_ca"),
+                "best_marge_engine": _best_key("mae_marge"),
+            }
+
         if not rows_out and missing == list(engines):
             return jsonify(
                 {
@@ -654,6 +729,7 @@ def create_api_app(paths: Paths | None = None) -> Flask:
                 "period": "monthly",
                 "period_label": "€ / mois",
                 "global_metrics": global_metrics,
+                "by_solution": by_solution,
                 "rows": _clean_records(pd.DataFrame(rows_out))
                 if rows_out
                 else [],
@@ -1332,6 +1408,29 @@ def create_api_app(paths: Paths | None = None) -> Flask:
         """Evalue sim_v1 + sim_v2 + ml pour un jeu de leviers / mix (+ overrides RAM)."""
         from src.user.business import enrich_prediction_with_costs
         from src.sim_v2.restitution import normalized_mix_name
+        from src.user.optimize import normalize_mix_exact
+
+        # Garde-fou : type / gamme toujours somme exacte 1 (jamais d'alerte sim_v2
+        # pour un residu float ou un mix UI non renorme).
+        type_mix = normalize_mix_exact(
+            type_mix, {"F&B": 0.7, "NON F&B": 0.3}
+        )
+        gamme_mix = normalize_mix_exact(
+            gamme_mix,
+            {
+                "sans alcool": 0.28,
+                "food salee": 0.20,
+                "food sucree": 0.12,
+                "alcool": 0.07,
+                "formule": 0.03,
+                "accessoires": 0.10,
+                "sos": 0.09,
+                "cosmetique": 0.04,
+                "pap": 0.03,
+                "jeux enfants": 0.02,
+                "souvenirs": 0.02,
+            },
+        )
 
         results: list[dict[str, Any]] = []
         errors: list[dict[str, str]] = []
@@ -1552,21 +1651,7 @@ def create_api_app(paths: Paths | None = None) -> Flask:
         except Exception as exc:  # noqa: BLE001
             return jsonify({"ok": False, "error": str(exc)}), 400
 
-    @app.post("/api/user/optimize")
-    def user_optimize():
-        """
-        Optimisation mix.
-
-        method=product_rank (defaut) : top produits par marge / m_lin puis CA.
-        method=grid : balayage 10 % type + gammes (historique).
-        """
-        from src.user.optimize import (
-            run_mix_optimization,
-            run_product_rank_optimization,
-        )
-
-        body = request.get_json(force=True) or {}
-        method = str(body.get("method") or "product_rank").strip().lower()
+    def _parse_optimize_body(body: dict) -> dict:
         hotel_code = str(body.get("hotel_code") or "").strip()
         nb = float(body.get("hotel_nb_chambres") or 100)
         to = float(body.get("hotel_to_annuel") or 0.7)
@@ -1596,54 +1681,145 @@ def create_api_app(paths: Paths | None = None) -> Flask:
         proximity = (
             body.get("proximity") if isinstance(body.get("proximity"), dict) else {}
         )
+        method = str(body.get("method") or "product_rank").strip().lower()
+        return {
+            "hotel_code": hotel_code,
+            "nb": nb,
+            "to": to,
+            "guests": guests,
+            "m_lin": m_lin,
+            "type_mix": type_mix,
+            "gamme_mix_fb": gamme_mix_fb,
+            "gamme_mix_nfb": gamme_mix_nfb,
+            "solutions": solutions,
+            "frigos": frigos,
+            "step": step,
+            "services": services,
+            "proximity": proximity,
+            "method": method,
+        }
+
+    def _run_optimize_core(p: dict, progress_cb=None) -> dict:
+        from src.user.optimize import (
+            run_mix_optimization,
+            run_product_rank_optimization,
+        )
 
         def evaluate_fn(**kw):
             rows, _errs = _evaluate_engines(
-                nb=nb,
-                to=to,
-                guests=guests,
-                m_lin=m_lin,
+                nb=p["nb"],
+                to=p["to"],
+                guests=p["guests"],
+                m_lin=p["m_lin"],
                 type_mix=kw["type_mix"],
                 gamme_mix=kw["gamme_mix"],
-                solutions=solutions,
-                hotel_code=hotel_code or None,
-                frigos=frigos,
-                services=services,
-                proximity=proximity,
+                solutions=p["solutions"],
+                hotel_code=p["hotel_code"] or None,
+                frigos=p["frigos"],
+                services=p["services"],
+                proximity=p["proximity"],
             )
             return rows
 
+        if p["method"] == "grid":
+            return run_mix_optimization(
+                hotel_nb_chambres=p["nb"],
+                hotel_to_annuel=p["to"],
+                hotel_guests_per_chambre=p["guests"],
+                metres_lineaires=p["m_lin"],
+                type_mix=p["type_mix"],
+                gamme_mix_fb=p["gamme_mix_fb"],
+                gamme_mix_nfb=p["gamme_mix_nfb"],
+                hotel_code=p["hotel_code"] or None,
+                solutions=p["solutions"],
+                evaluate_fn=evaluate_fn,
+                step=p["step"],
+                progress_cb=progress_cb,
+            )
+        return run_product_rank_optimization(
+            hotel_nb_chambres=p["nb"],
+            hotel_to_annuel=p["to"],
+            hotel_guests_per_chambre=p["guests"],
+            metres_lineaires=p["m_lin"],
+            type_mix=p["type_mix"],
+            gamme_mix_fb=p["gamme_mix_fb"],
+            gamme_mix_nfb=p["gamme_mix_nfb"],
+            hotel_code=p["hotel_code"] or None,
+            solutions=[s.upper() for s in p["solutions"]],
+            evaluate_fn=evaluate_fn,
+            recommend_fn=lambda **kw: sim_v2.recommend_optimal_mix(**kw),
+            progress_cb=progress_cb,
+        )
+
+    @app.post("/api/user/optimize")
+    def user_optimize():
+        """
+        Optimisation mix (synchrone, compat).
+
+        method=product_rank (defaut) : top produits par marge / m_lin puis CA.
+        method=grid : balayage 10 % type + gammes (historique).
+
+        Preferez POST /api/user/jobs/optimize + GET /api/user/jobs/<id>
+        pour une barre de progression reelle.
+        """
+        body = request.get_json(force=True) or {}
         try:
-            if method == "grid":
-                out = run_mix_optimization(
-                    hotel_nb_chambres=nb,
-                    hotel_to_annuel=to,
-                    hotel_guests_per_chambre=guests,
-                    metres_lineaires=m_lin,
-                    type_mix=type_mix,
-                    gamme_mix_fb=gamme_mix_fb,
-                    gamme_mix_nfb=gamme_mix_nfb,
-                    hotel_code=hotel_code or None,
-                    solutions=solutions,
-                    evaluate_fn=evaluate_fn,
-                    step=step,
-                )
-            else:
-                out = run_product_rank_optimization(
-                    hotel_nb_chambres=nb,
-                    hotel_to_annuel=to,
-                    hotel_guests_per_chambre=guests,
-                    metres_lineaires=m_lin,
-                    type_mix=type_mix,
-                    gamme_mix_fb=gamme_mix_fb,
-                    gamme_mix_nfb=gamme_mix_nfb,
-                    hotel_code=hotel_code or None,
-                    solutions=[s.upper() for s in solutions],
-                    evaluate_fn=evaluate_fn,
-                    recommend_fn=lambda **kw: sim_v2.recommend_optimal_mix(**kw),
-                )
+            p = _parse_optimize_body(body)
+            out = _run_optimize_core(p)
             return jsonify(out)
         except Exception as exc:  # noqa: BLE001
             return jsonify({"ok": False, "error": str(exc)}), 400
+
+    @app.post("/api/user/jobs/optimize")
+    def user_jobs_optimize_start():
+        """
+        Demarre l'estimation/optimisation en tache de fond.
+        Retourne job_id ; poller GET /api/user/jobs/<job_id>.
+        """
+        import threading
+
+        from src.user.jobs import JOB_STORE
+
+        body = request.get_json(force=True) or {}
+        try:
+            p = _parse_optimize_body(body)
+        except Exception as exc:  # noqa: BLE001
+            return jsonify({"ok": False, "error": str(exc)}), 400
+
+        n_sol = max(len(p["solutions"]), 1)
+        # estimation product_rank : 1 + n_sol reco + n_sol eval
+        total_guess = (
+            1 + 2 * n_sol if p["method"] != "grid" else max(int(1.0 / p["step"]) * 15, 10)
+        )
+        job = JOB_STORE.create(
+            kind="optimize",
+            total=total_guess,
+            message="Demarrage…",
+        )
+        job_id = job.job_id
+        cb = JOB_STORE.progress_callback(job_id)
+
+        def _worker() -> None:
+            try:
+                JOB_STORE.update(
+                    job_id, status="running", message="Calcul en cours…"
+                )
+                out = _run_optimize_core(p, progress_cb=cb)
+                JOB_STORE.complete(job_id, out)
+            except Exception as exc:  # noqa: BLE001
+                JOB_STORE.fail(job_id, str(exc))
+
+        threading.Thread(target=_worker, daemon=True).start()
+        return jsonify(job.to_public())
+
+    @app.get("/api/user/jobs/<job_id>")
+    def user_jobs_status(job_id: str):
+        """Etat + progression d'un job (estimation, optim, …)."""
+        from src.user.jobs import JOB_STORE
+
+        job = JOB_STORE.get(job_id)
+        if not job:
+            return jsonify({"ok": False, "error": "Job inconnu"}), 404
+        return jsonify(job.to_public())
 
     return app

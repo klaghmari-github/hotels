@@ -6,16 +6,29 @@ t_v1_loo_hotels:
   requires:
     - t_scope_hotels
   sql: |-
+    WITH base AS (
+      SELECT
+        hotel_code,
+        solution,
+        label,
+        name
+      FROM t_scope_hotels
+      WHERE hotel_code IN (
+        'H2075', 'HB6A3', 'H0373', 'HB5I0', 'H3546'
+      )
+        AND hotel_code NOT IN ('H5586', 'H6188')
+    )
     SELECT
       hotel_code,
       solution,
       label,
-      name
-    FROM t_scope_hotels
-    WHERE hotel_code IN (
-      'H2075', 'HB6A3', 'H0373', 'HB5I0', 'H3546'
-    )
-      AND hotel_code NOT IN ('H5586', 'H6188')
+      name,
+      COUNT(*) OVER (PARTITION BY solution) AS n_solution_hotels,
+      CASE
+        WHEN COUNT(*) OVER (PARTITION BY solution) <= 1 THEN TRUE
+        ELSE FALSE
+      END AS eval_biased
+    FROM base
     ORDER BY solution, hotel_code
 
 t_v1_loo_results:

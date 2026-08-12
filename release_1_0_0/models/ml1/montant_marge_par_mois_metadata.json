@@ -38,8 +38,8 @@
     "objective": "reg:squarederror",
     "tree_method": "hist"
   },
-  "training_rows": 10680,
-  "training_hotels": 6,
+  "training_rows": 8900,
+  "training_hotels": 5,
   "engine": "ml1",
   "variant": "ml1",
   "dataset_source": "v_ml_training_dataset",

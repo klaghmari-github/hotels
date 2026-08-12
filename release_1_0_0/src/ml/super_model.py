@@ -1,18 +1,15 @@
 """
-Super-modele (stacking) expose comme « ml » dans l'UI.
+ML expose dans l'UI : modeles de **taux de conversion** separes par solution.
 
-Couches intermediaires (non affichees) :
-  1) XGBoost base : entraine sur la liste de simulations sim_v2
-     (v_ml_training_dataset / pivot — features TO, guests, chambres, mix type/gamme)
-  2) sim_v2 restitution : prediction simulateur pour le meme vecteur
+Architecture (pas de melange simply / liberty / connected) :
+  - model_simply, model_liberty, model_connected
+  - chacun predit : taux_conversion = nombre_ventes / nombre_guests
+  - CA / marge finaux =
+        CA_sim_v2  × (conversion_ML / conversion_baseline_solution)
+        marge_sim_v2 × meme ratio
 
-Meta-modele XGB :
-  features descriptives (contexte + mix + solution)
-  + pred_sim_v2__*
-  + pred_xgboost__*
-  → CA / marge / marge selon coef
-
-LOO hotel pour l'eval admin ; production via predict_row.
+Le simulateur sim_v2 fournit l'intensite / mix ; le ML ajuste le taux
+de conversion clients propre au contexte (par solution).
 """
 
 from __future__ import annotations
@@ -32,22 +29,18 @@ from src.ml.common import (
     CONTEXT_FEATURES,
     TARGETS,
     build_feature_row,
-    feature_matrix,
     load_ml_dataset,
     metrics_frame,
     mix_columns,
 )
-from src.ml.xgboost_model import XGBoostService
 from src.pipeline.connection import PipelineFactory
 from src.pipeline.paths import Paths
 
 logger = logging.getLogger(__name__)
 
-# Couches de base uniquement (pas affichees dans l'UI)
-BASE_ENGINES = ("sim_v2", "xgboost")
-# Cibles meta = les 3 sorties metier
-META_TARGETS = TARGETS
-META_PRED_TARGETS = tuple(t for t, _ in META_TARGETS)
+SOLUTIONS = ("simply", "liberty", "connected")
+CONVERSION_TARGET = "taux_conversion"
+META_PRED_TARGETS = tuple(t for t, _ in TARGETS)
 
 
 @dataclass(frozen=True)
@@ -64,10 +57,13 @@ class SuperModelConfig:
     n_jobs: int = -1
 
 
+def _norm_sol(s: Any) -> str:
+    return str(s or "").strip().lower().replace("_", " ")
+
+
 class SuperModelService:
     """
-    Stacking final = ml affiche.
-    XGBoost base entraine sur simulations sim_v2 (skinny).
+    Trois modeles de conversion (simply / liberty / connected) + scale sim_v2.
     """
 
     def __init__(
@@ -81,18 +77,82 @@ class SuperModelService:
         self.factory = factory or PipelineFactory(self.paths)
         self.models_dir = self.paths.models_super
         self.models_dir.mkdir(parents=True, exist_ok=True)
-        # couche XGB : uniquement sim_v2 pre-agreg (liste simulations)
-        self.xgboost = XGBoostService(
-            self.paths, factory=self.factory, variant="ml1"
-        )
 
+    # ------------------------------------------------------------------ data
     def load_dataset(self) -> pd.DataFrame:
-        """Liste simulations sim_v2 (pas le rich dataset)."""
-        return load_ml_dataset(
+        """Liste simulations sim_v2 + taux_conversion."""
+        df = load_ml_dataset(
             self.paths, self.factory, mode="sim_v2", prefer_rich=False
         )
+        df = df.copy()
+        df["solution"] = df["solution"].map(_norm_sol)
+        # reconstruire conversion si absente (vues non rebuildees)
+        if CONVERSION_TARGET not in df.columns:
+            if (
+                "nombre_ventes_par_mois" in df.columns
+                and "nombre_guests_par_mois" in df.columns
+            ):
+                g = pd.to_numeric(df["nombre_guests_par_mois"], errors="coerce")
+                v = pd.to_numeric(df["nombre_ventes_par_mois"], errors="coerce")
+                df[CONVERSION_TARGET] = (v / g.replace(0, np.nan)).fillna(0.0)
+            else:
+                # fallback : proxy ventes/guests via CA (moins ideal)
+                guests = (
+                    pd.to_numeric(df.get("hotel_nb_chambres"), errors="coerce").fillna(0)
+                    * pd.to_numeric(df.get("hotel_to_annuel"), errors="coerce").fillna(0)
+                    * pd.to_numeric(
+                        df.get("hotel_guests_per_chambre"), errors="coerce"
+                    ).fillna(0)
+                    * 30.5
+                )
+                ca = pd.to_numeric(
+                    df.get("montant_ventes_par_mois"), errors="coerce"
+                ).fillna(0)
+                # proxy non comparable — forcer rebuild dataset
+                df[CONVERSION_TARGET] = 0.0
+                logger.warning(
+                    "taux_conversion absent du dataset ML — "
+                    "rebuild v_ml_training_dataset recommande"
+                )
+        df[CONVERSION_TARGET] = pd.to_numeric(
+            df[CONVERSION_TARGET], errors="coerce"
+        ).fillna(0.0)
+        # bornes raisonnables
+        df[CONVERSION_TARGET] = df[CONVERSION_TARGET].clip(lower=0.0, upper=1.0)
+        return df
 
-    def _meta_model_params(self) -> dict[str, Any]:
+    def _feature_columns(self, df: pd.DataFrame) -> list[str]:
+        """Features descriptives sans solution dummies (modeles separes)."""
+        exclude = {
+            "scenario_id",
+            "hotel_code",
+            "solution",
+            "is_observation",
+            "scenario_removed_natures",
+            CONVERSION_TARGET,
+            "nombre_ventes_par_mois",
+            "nombre_guests_par_mois",
+        } | {t for t, _ in TARGETS}
+        ordered: list[str] = []
+        for c in [*CONTEXT_FEATURES, *mix_columns(df)]:
+            if c in df.columns and c not in exclude and c not in ordered:
+                ordered.append(c)
+        for c in sorted(df.columns):
+            if c in exclude or c in ordered:
+                continue
+            if pd.api.types.is_numeric_dtype(df[c]):
+                ordered.append(c)
+        return ordered
+
+    def _xy(
+        self, df: pd.DataFrame, feature_names: list[str]
+    ) -> tuple[pd.DataFrame, np.ndarray, pd.Series]:
+        x = df.reindex(columns=feature_names).astype(float).fillna(0.0)
+        y = df[CONVERSION_TARGET].to_numpy(dtype=float)
+        groups = df["hotel_code"].astype(str)
+        return x, y, groups
+
+    def _model_params(self) -> dict[str, Any]:
         cfg = self.config
         return {
             "n_estimators": cfg.n_estimators,
@@ -109,17 +169,16 @@ class SuperModelService:
             "tree_method": "hist",
         }
 
-    def _fit_meta(
+    def _fit_conversion(
         self,
         x_train: pd.DataFrame,
         y_train: np.ndarray,
         groups: pd.Series | None = None,
     ) -> XGBRegressor:
-        model = XGBRegressor(**self._meta_model_params())
+        model = XGBRegressor(**self._model_params())
         if groups is not None and groups.nunique() >= 3:
-            gkf = GroupKFold(n_splits=min(3, groups.nunique()))
+            gkf = GroupKFold(n_splits=min(3, int(groups.nunique())))
             tr_idx, va_idx = next(gkf.split(x_train, y_train, groups))
-            model.set_params(early_stopping_rounds=self.config.early_stopping_rounds)
             model.fit(
                 x_train.iloc[tr_idx],
                 y_train[tr_idx],
@@ -130,96 +189,84 @@ class SuperModelService:
             model.fit(x_train, y_train, verbose=False)
         return model
 
+    def _solution_dir(self, solution: str) -> Path:
+        d = self.models_dir / _norm_sol(solution)
+        d.mkdir(parents=True, exist_ok=True)
+        return d
+
     def _load_sim_v2_loo_map(self) -> dict[str, dict[str, float]]:
-        """hotel_code -> {target: pred} depuis LOO sim_v2."""
-        out: dict[str, dict[str, float]] = {}
         p2 = self.paths.out_sim_v2("eval_sim_v2_loo.xlsx")
         if not p2.exists():
-            return out
-        df = pd.read_excel(p2, sheet_name="predictions")
+            return {}
+        try:
+            df = pd.read_excel(p2, sheet_name="predictions")
+        except Exception:  # noqa: BLE001
+            return {}
+        out: dict[str, dict[str, float]] = {}
         for _, r in df.iterrows():
-            code = str(r.get("hotel_code") or "")
+            code = str(r.get("hotel_code") or "").strip()
             if not code:
                 continue
             out[code] = {
                 "montant_ventes_par_mois": float(
-                    r.get("montant_ventes_par_mois_predit") or 0
+                    r.get("montant_ventes_par_mois_predit")
+                    or r.get("ca_pred")
+                    or 0
+                ),
+                "montant_marge_selon_coef_par_mois": float(
+                    r.get("montant_marge_selon_coef_par_mois_predite")
+                    or r.get("marge_pred")
+                    or 0
                 ),
                 "montant_marge_par_mois": float(
                     r.get("montant_marge_par_mois_predite")
                     or r.get("montant_marge_par_mois_predit")
                     or 0
                 ),
-                "montant_marge_selon_coef_par_mois": float(
-                    r.get("montant_marge_selon_coef_par_mois_predite")
-                    or r.get("montant_marge_selon_coef_par_mois_predit")
-                    or 0
-                ),
             }
         return out
 
-    def _predict_xgboost_oof(
-        self,
-        *,
-        train_df: pd.DataFrame,
-        x_train: pd.DataFrame,
-        x_test: pd.DataFrame,
-        train_groups: pd.Series,
-    ) -> dict[str, float]:
-        """Entraine XGB hors hotel test, predit la ligne observation."""
-        preds: dict[str, float] = {}
-        for target, _ in META_TARGETS:
-            if target not in train_df.columns:
-                preds[target] = 0.0
-                continue
-            y_train = train_df[target].to_numpy(dtype=float)
-            model = self.xgboost._fit_one(x_train, y_train, train_groups)
-            preds[target] = max(float(model.predict(x_test)[0]), 0.0)
-        return preds
-
     def _sim_v2_pred_for_observation(self, row: pd.Series) -> dict[str, float]:
-        """Restitution sim_v2 pour une ligne (params hotel + mix)."""
-        from src.sim_v2.service import SimV2Service
-
+        """Restitution sim_v2 live pour une ligne hotel / mix."""
         try:
-            svc = SimV2Service(self.paths, self.factory)
+            from src.sim_v2.service import SimV2Service
+
+            svc = SimV2Service(self.paths, factory=self.factory)
             type_mix: dict[str, float] = {}
             gamme_mix: dict[str, float] = {}
-            for c in mix_columns(pd.DataFrame([row])):
-                val = float(row.get(c) or 0)
-                if c.startswith("type_") and c.endswith("_part_natures"):
-                    label = c[len("type_") : -len("_part_natures")].replace("_", " ")
-                    type_mix[label] = val
-                elif c.startswith("gamme_") and c.endswith("_part_natures"):
-                    label = c[len("gamme_") : -len("_part_natures")].replace("_", " ")
-                    gamme_mix[label] = val
-            if not type_mix:
-                type_mix = {"F&B": 0.7, "NON F&B": 0.3}
-            if not gamme_mix:
-                gamme_mix = {
-                    "sans alcool": 0.35,
-                    "food salee": 0.25,
-                    "food sucree": 0.15,
-                    "accessoires": 0.15,
-                    "sos": 0.10,
-                }
-            # renormalise gamme a 1 (format restitution)
-            s = sum(gamme_mix.values()) or 1.0
-            gamme_mix = {k: v / s for k, v in gamme_mix.items()}
-            st = sum(type_mix.values()) or 1.0
-            type_mix = {k: v / st for k, v in type_mix.items()}
-
+            for c, v in row.items():
+                cs = str(c)
+                if cs.startswith("type_") and cs.endswith("_part_natures"):
+                    key = (
+                        cs[len("type_") : -len("_part_natures")]
+                        .replace("_", " ")
+                        .replace("f b", "F&B")
+                    )
+                    if "non" in key.lower():
+                        key = "NON F&B"
+                    elif "f" in key.lower() and "b" in key.lower():
+                        key = "F&B"
+                    type_mix[key] = float(v or 0)
+                if cs.startswith("gamme_") and cs.endswith("_part_natures"):
+                    key = cs[len("gamme_") : -len("_part_natures")].replace(
+                        "_", " "
+                    )
+                    gamme_mix[key] = float(v or 0)
+            nb = float(row.get("hotel_nb_chambres") or 100)
+            to = float(row.get("hotel_to_annuel") or 0.7)
+            guests = float(row.get("hotel_guests_per_chambre") or 1.7)
+            m_lin = float(row.get("metres_lineaires") or 6)
+            sol = _norm_sol(row.get("solution") or "simply")
             df = svc.predict(
-                hotel_nb_chambres=float(row.get("hotel_nb_chambres") or 100),
-                hotel_to_annuel=float(row.get("hotel_to_annuel") or 0.7),
-                hotel_guests_per_chambre=float(
-                    row.get("hotel_guests_per_chambre") or 1.7
-                ),
-                metres_lineaires=float(row.get("metres_lineaires") or 6),
-                type_mix=type_mix,
-                gamme_mix=gamme_mix,
+                hotel_nb_chambres=nb,
+                hotel_to_annuel=to,
+                hotel_guests_per_chambre=guests,
+                metres_lineaires=m_lin,
+                type_mix=type_mix or {"F&B": 0.7, "NON F&B": 0.3},
+                gamme_mix=gamme_mix or None,
             )
-            sol = str(row.get("solution") or "").lower()
+            if df is None or df.empty:
+                return {t: 0.0 for t in META_PRED_TARGETS}
             if "solution" in df.columns:
                 hit = df.loc[df["solution"].astype(str).str.lower() == sol]
                 if hit.empty:
@@ -229,235 +276,292 @@ class SuperModelService:
             r = hit.iloc[0]
             return {
                 "montant_ventes_par_mois": float(
-                    r.get("montant_ventes_par_mois_predit") or 0
-                ),
-                "montant_marge_par_mois": float(
-                    r.get("montant_marge_par_mois_predite")
-                    or r.get("montant_marge_par_mois_predit")
+                    r.get("montant_ventes_par_mois_predit")
+                    or r.get("montant_ventes_par_mois")
                     or 0
                 ),
                 "montant_marge_selon_coef_par_mois": float(
                     r.get("montant_marge_selon_coef_par_mois_predite")
-                    or r.get("montant_marge_selon_coef_par_mois_predit")
+                    or r.get("montant_marge_selon_coef_par_mois")
+                    or 0
+                ),
+                "montant_marge_par_mois": float(
+                    r.get("montant_marge_par_mois_predite")
+                    or r.get("montant_marge_par_mois")
                     or 0
                 ),
             }
         except Exception as exc:  # noqa: BLE001
-            logger.warning("sim_v2 pred super: %s", exc)
+            logger.warning("sim_v2 pred failed: %s", exc)
             return {t: 0.0 for t in META_PRED_TARGETS}
 
     @staticmethod
-    def _meta_feature_names(base_feature_names: list[str]) -> list[str]:
-        names = list(base_feature_names)
-        for eng in BASE_ENGINES:
-            for target in META_PRED_TARGETS:
-                names.append(f"pred_{eng}__{target}")
-        return names
-
-    def _build_meta_row(
-        self,
-        base_feat: pd.Series,
-        base_preds: dict[str, dict[str, float]],
-        feature_names: list[str],
+    def _scale_with_conversion(
+        sim_v2: dict[str, float],
+        conv_pred: float,
+        conv_baseline: float,
     ) -> dict[str, float]:
-        row = {n: 0.0 for n in feature_names}
-        for n in base_feat.index:
-            if n in row:
-                row[n] = float(base_feat[n])
-        for eng in BASE_ENGINES:
-            preds = base_preds.get(eng) or {}
-            for target in META_PRED_TARGETS:
-                key = f"pred_{eng}__{target}"
-                if key in row:
-                    row[key] = float(preds.get(target) or 0.0)
-        return row
+        """CA_ml = CA_sim_v2 × (conv_ML / conv_baseline_solution)."""
+        base = float(conv_baseline) if conv_baseline and conv_baseline > 1e-12 else 1e-12
+        ratio = max(0.0, float(conv_pred)) / base
+        out: dict[str, float] = {
+            "taux_conversion_predit": float(conv_pred),
+            "taux_conversion_baseline": float(conv_baseline),
+            "conversion_scale": float(ratio),
+        }
+        for t in META_PRED_TARGETS:
+            out[t] = max(0.0, float(sim_v2.get(t) or 0.0) * ratio)
+        return out
 
-    def leave_one_hotel_out(
-        self,
-        df: pd.DataFrame | None = None,
-    ) -> tuple[pd.DataFrame, pd.DataFrame]:
-        """
-        LOO stacking hotel :
-          1) XGB base sans l'hotel
-          2) pred sim_v2 (LOO excel ou restitution)
-          3) meta-XGB sur hotels restants
-        """
-        df = df if df is not None else self.load_dataset()
-        features, base_names = feature_matrix(df)
-        meta_names = self._meta_feature_names(base_names)
-        groups = df["hotel_code"].astype(str)
-        observation = df["is_observation"]
-        hotels = sorted(df.loc[observation, "hotel_code"].astype(str).unique())
-
-        oof_base: dict[str, dict[str, dict[str, float]]] = {}
-        oof_desc: dict[str, pd.Series] = {}
-        oof_actual: dict[str, dict[str, float]] = {}
-        oof_solution: dict[str, str] = {}
-        sim_loo = self._load_sim_v2_loo_map()
-
-        for index, hotel in enumerate(hotels, start=1):
-            logger.info(
-                "ml super LOO base %s/%s | hotel=%s", index, len(hotels), hotel
-            )
-            train_mask = groups != hotel
-            test_mask = observation & (groups == hotel)
-            if int(test_mask.sum()) != 1:
-                raise ValueError(
-                    f"Observation unique attendue pour {hotel}, "
-                    f"trouve {int(test_mask.sum())}"
-                )
-            source = df.loc[test_mask].iloc[0]
-            oof_solution[hotel] = str(source["solution"])
-            oof_actual[hotel] = {
-                t: float(source[t]) for t, _ in META_TARGETS if t in source
-            }
-            oof_desc[hotel] = features.loc[test_mask].iloc[0]
-
-            x_train = features.loc[train_mask]
-            x_test = features.loc[test_mask]
-            train_groups = groups.loc[train_mask]
-            train_df = df.loc[train_mask]
-
-            xgb_preds = self._predict_xgboost_oof(
-                train_df=train_df,
-                x_train=x_train,
-                x_test=x_test,
-                train_groups=train_groups,
-            )
-            if hotel in sim_loo:
-                v2 = sim_loo[hotel]
-            else:
-                v2 = self._sim_v2_pred_for_observation(source)
-
-            oof_base[hotel] = {
-                "xgboost": xgb_preds,
-                "sim_v2": v2,
-            }
-
-        meta_rows = []
-        for hotel in hotels:
-            meta_rows.append(
-                self._build_meta_row(
-                    oof_desc[hotel], oof_base[hotel], meta_names
-                )
-            )
-        meta_X = pd.DataFrame(meta_rows, index=hotels)[meta_names].astype(float)
-
-        rows: list[dict[str, Any]] = []
-        for index, hotel in enumerate(hotels, start=1):
-            logger.info(
-                "ml super LOO meta %s/%s | hotel=%s", index, len(hotels), hotel
-            )
-            train_hotels = [h for h in hotels if h != hotel]
-            x_tr = meta_X.loc[train_hotels]
-            x_te = meta_X.loc[[hotel]]
-            g_tr = pd.Series(train_hotels, index=train_hotels)
-
-            row: dict[str, Any] = {
-                "hotel_code": hotel,
-                "solution": oof_solution[hotel],
-            }
-            for eng in BASE_ENGINES:
-                for target in META_PRED_TARGETS:
-                    row[f"pred_{eng}__{target}"] = float(
-                        (oof_base[hotel].get(eng) or {}).get(target) or 0
-                    )
-
-            for target, _label in META_TARGETS:
-                if target not in oof_actual[hotel]:
-                    continue
-                y_tr = np.array(
-                    [oof_actual[h].get(target, 0.0) for h in train_hotels],
-                    dtype=float,
-                )
-                model = self._fit_meta(x_tr, y_tr, g_tr)
-                pred = float(model.predict(x_te)[0])
-                actual = float(oof_actual[hotel][target])
-                row[f"{target}_reel"] = actual
-                row[f"{target}_predit"] = pred
-                row[f"{target}_erreur"] = pred - actual
-                row[f"{target}_erreur_absolue"] = abs(pred - actual)
-
-            rows.append(row)
-
-        predictions = pd.DataFrame(rows)
-        return predictions, metrics_frame(predictions, META_TARGETS)
-
+    # ------------------------------------------------------------------ train
     def train_final(self, df: pd.DataFrame | None = None) -> list[dict[str, Any]]:
-        """
-        Production :
-          1) XGB base sur toutes les simulations sim_v2
-          2) meta-features = descriptives + pred sim_v2 + pred xgb
-          3) meta-XGB sur observations
-        """
+        """Entrainement de 3 modeles de conversion (un par solution)."""
         df = df if df is not None else self.load_dataset()
         logger.info(
-            "ml super dataset: source=%s rows=%s hotels=%s",
-            df.attrs.get("ml_source"),
+            "ml conversion dataset: rows=%s hotels=%s",
             len(df),
             df["hotel_code"].nunique(),
         )
-        self.xgboost.train_final(df)
+        feature_names = self._feature_columns(df)
+        results: list[dict[str, Any]] = []
 
-        obs = df.loc[df["is_observation"]].copy()
-        if obs.empty:
-            raise ValueError("Aucune observation pour entrainer le super-modele.")
-
-        features, base_names = feature_matrix(obs)
-        meta_names = self._meta_feature_names(base_names)
-        sim_loo = self._load_sim_v2_loo_map()
-
-        meta_rows = []
-        for idx, source in obs.iterrows():
-            hotel = str(source["hotel_code"])
-            sol = str(source["solution"])
-            base_feat = features.loc[idx]
-            feat_row = {
-                c: float(source[c])
-                for c in [*CONTEXT_FEATURES, *mix_columns(obs)]
-                if c in source.index
-            }
-            xg = self.xgboost.predict_row(feat_row, sol)
-            v2 = sim_loo.get(hotel) or self._sim_v2_pred_for_observation(source)
-            base_preds = {
-                "xgboost": {t: float(xg.get(t) or 0) for t in META_PRED_TARGETS},
-                "sim_v2": {
-                    t: float((v2 or {}).get(t) or 0) for t in META_PRED_TARGETS
-                },
-            }
-            meta_rows.append(
-                self._build_meta_row(base_feat, base_preds, meta_names)
-            )
-
-        meta_X = pd.DataFrame(meta_rows).astype(float)[meta_names]
-        results = []
-        for target, label in META_TARGETS:
-            if target not in obs.columns:
+        for sol in SOLUTIONS:
+            sub = df.loc[df["solution"] == sol].copy()
+            if sub.empty:
+                logger.warning("Pas de donnees pour model_%s — skip", sol)
                 continue
-            y = obs[target].to_numpy(dtype=float)
-            model = self._fit_meta(meta_X, y)
-            model_path = self.models_dir / f"{target}.json"
-            meta_path = self.models_dir / f"{target}_metadata.json"
+            x, y, groups = self._xy(sub, feature_names)
+            if len(sub) < 3 or float(np.nanstd(y)) < 1e-12:
+                # fallback : conversion moyenne constante (predict = baseline)
+                baseline = float(np.nanmean(y)) if len(y) else 0.05
+                meta = {
+                    "solution": sol,
+                    "target": CONVERSION_TARGET,
+                    "feature_names": feature_names,
+                    "params": self._model_params(),
+                    "training_rows": len(sub),
+                    "training_hotels": int(sub["hotel_code"].nunique()),
+                    "conversion_baseline": baseline,
+                    "engine": "ml",
+                    "model_kind": "conversion_mean_fallback",
+                    "note": (
+                        f"model_{sol}: trop peu de variance — "
+                        "prediction = moyenne solution"
+                    ),
+                }
+                sdir = self._solution_dir(sol)
+                (sdir / "conversion_metadata.json").write_text(
+                    json.dumps(meta, ensure_ascii=False, indent=2),
+                    encoding="utf-8",
+                )
+                # pas de .json model — predict_row utilisera baseline
+                results.append(meta)
+                logger.info(
+                    "model_%s fallback mean conv=%.5f (rows=%s)",
+                    sol,
+                    baseline,
+                    len(sub),
+                )
+                continue
+
+            model = self._fit_conversion(x, y, groups)
+            baseline = float(np.nanmean(y))
+            sdir = self._solution_dir(sol)
+            model_path = sdir / "conversion.json"
+            meta_path = sdir / "conversion_metadata.json"
             model.save_model(str(model_path))
             meta = {
-                "target": target,
-                "target_label": label,
-                "feature_names": meta_names,
-                "base_engines": list(BASE_ENGINES),
-                "params": self._meta_model_params(),
-                "training_rows": len(obs),
-                "xgb_training_rows": len(df),
-                "dataset_source": df.attrs.get("ml_source"),
+                "solution": sol,
+                "target": CONVERSION_TARGET,
+                "feature_names": feature_names,
+                "params": self._model_params(),
+                "training_rows": len(sub),
+                "training_hotels": int(sub["hotel_code"].nunique()),
+                "conversion_baseline": baseline,
+                "conversion_mean": baseline,
+                "conversion_std": float(np.nanstd(y)),
                 "engine": "ml",
-                "note": "super stacking = sim_v2 + xgboost(sim_v2 simulations)",
+                "model_kind": "conversion_xgb_by_solution",
+                "note": (
+                    f"model_{sol}: predit taux_conversion ; "
+                    "CA = sim_v2 × (conv_ML / conv_baseline)"
+                ),
             }
             meta_path.write_text(
                 json.dumps(meta, ensure_ascii=False, indent=2),
                 encoding="utf-8",
             )
             results.append(meta)
-            logger.info("ml (super) sauve : %s", model_path.name)
+            logger.info(
+                "model_%s sauve (%s rows, %s hotels, baseline=%.5f)",
+                sol,
+                len(sub),
+                sub["hotel_code"].nunique(),
+                baseline,
+            )
+
+        # index global pour compat (pointeur vers architecture)
+        index = {
+            "engine": "ml",
+            "architecture": "conversion_by_solution + sim_v2_scale",
+            "solutions": list(SOLUTIONS),
+            "models": results,
+        }
+        (self.models_dir / "index.json").write_text(
+            json.dumps(index, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+        # marqueur pour detecter l'architecture (ancien super stack n'a pas ca)
+        # aussi ecrire un metadata "montant_ventes" factice? non — predict_row
+        # lit index / solution dirs
         return results
+
+    def _predict_conversion(
+        self,
+        solution: str,
+        feature_row: dict[str, float],
+        *,
+        model: XGBRegressor | None = None,
+        feature_names: list[str] | None = None,
+        baseline: float | None = None,
+    ) -> tuple[float, float]:
+        """Retourne (conv_pred, conv_baseline)."""
+        sol = _norm_sol(solution)
+        sdir = self._solution_dir(sol)
+        meta_path = sdir / "conversion_metadata.json"
+        if meta_path.exists():
+            meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        else:
+            meta = {}
+        names = feature_names or meta.get("feature_names") or list(
+            CONTEXT_FEATURES
+        )
+        base = (
+            float(baseline)
+            if baseline is not None
+            else float(meta.get("conversion_baseline") or 0.05)
+        )
+        model_path = sdir / "conversion.json"
+        if model is None and model_path.exists():
+            model = XGBRegressor()
+            model.load_model(str(model_path))
+        if model is None:
+            return base, base
+        # build_feature_row avec solution dummies inutiles si absents des names
+        x = build_feature_row(names, feature_row, sol)
+        pred = float(model.predict(x)[0])
+        pred = max(0.0, min(1.0, pred))
+        return pred, base
+
+    # ------------------------------------------------------------------ LOO
+    def leave_one_hotel_out(
+        self,
+        df: pd.DataFrame | None = None,
+    ) -> tuple[pd.DataFrame, pd.DataFrame]:
+        """
+        Eval par hotel :
+          - entraine model_SOLUTION sans l'hotel (sauf mono-solution → biaise)
+          - predit conversion
+          - scale CA/marge sim_v2
+        """
+        df = df if df is not None else self.load_dataset()
+        feature_names = self._feature_columns(df)
+        observation = df["is_observation"].astype(bool)
+        obs = df.loc[observation].copy()
+        hotels = sorted(obs["hotel_code"].astype(str).unique())
+        sim_loo = self._load_sim_v2_loo_map()
+
+        # effectifs par solution (observations)
+        sol_of = {
+            str(r.hotel_code): _norm_sol(r.solution)
+            for r in obs.itertuples(index=False)
+        }
+        sol_counts: dict[str, int] = {}
+        for s in sol_of.values():
+            sol_counts[s] = sol_counts.get(s, 0) + 1
+
+        rows: list[dict[str, Any]] = []
+        for index, hotel in enumerate(hotels, start=1):
+            sol = sol_of.get(hotel, "simply")
+            biased = sol_counts.get(sol, 0) <= 1
+            logger.info(
+                "ml conversion LOO %s/%s | hotel=%s sol=%s%s",
+                index,
+                len(hotels),
+                hotel,
+                sol,
+                " | eval_biased" if biased else "",
+            )
+            test_mask = observation & (df["hotel_code"].astype(str) == hotel)
+            if int(test_mask.sum()) != 1:
+                raise ValueError(
+                    f"Observation unique attendue pour {hotel}, "
+                    f"trouve {int(test_mask.sum())}"
+                )
+            source = df.loc[test_mask].iloc[0]
+            # train = meme solution uniquement
+            train_sol = df["solution"] == sol
+            if biased:
+                train_mask = train_sol
+            else:
+                train_mask = train_sol & (df["hotel_code"].astype(str) != hotel)
+
+            sub = df.loc[train_mask]
+            if sub.empty:
+                sub = df.loc[train_sol]
+
+            x_tr, y_tr, g_tr = self._xy(sub, feature_names)
+            if len(sub) >= 3 and float(np.nanstd(y_tr)) > 1e-12:
+                model = self._fit_conversion(x_tr, y_tr, g_tr)
+                baseline = float(np.nanmean(y_tr))
+            else:
+                model = None
+                baseline = (
+                    float(np.nanmean(y_tr))
+                    if len(y_tr)
+                    else float(source.get(CONVERSION_TARGET) or 0.05)
+                )
+
+            feat_row = {
+                c: float(source[c])
+                for c in feature_names
+                if c in source.index and pd.notna(source[c])
+            }
+            x_te = build_feature_row(feature_names, feat_row, sol)
+            if model is not None:
+                conv_pred = max(0.0, min(1.0, float(model.predict(x_te)[0])))
+            else:
+                conv_pred = baseline
+
+            if hotel in sim_loo:
+                v2 = sim_loo[hotel]
+            else:
+                v2 = self._sim_v2_pred_for_observation(source)
+
+            scaled = self._scale_with_conversion(v2, conv_pred, baseline)
+            conv_reel = float(source.get(CONVERSION_TARGET) or 0.0)
+
+            row: dict[str, Any] = {
+                "hotel_code": hotel,
+                "solution": sol,
+                "eval_biased": bool(biased),
+                "taux_conversion_reel": conv_reel,
+                "taux_conversion_predit": conv_pred,
+                "taux_conversion_baseline": baseline,
+                "conversion_scale": scaled["conversion_scale"],
+            }
+            for t, _lab in TARGETS:
+                actual = float(source.get(t) or 0.0)
+                pred = float(scaled.get(t) or 0.0)
+                row[f"{t}_reel"] = actual
+                row[f"{t}_predit"] = pred
+                row[f"{t}_erreur"] = pred - actual
+                row[f"{t}_erreur_absolue"] = abs(pred - actual)
+                # aussi pred sim_v2 brute pour diagnostic
+                row[f"pred_sim_v2__{t}"] = float(v2.get(t) or 0.0)
+            rows.append(row)
+
+        predictions = pd.DataFrame(rows)
+        return predictions, metrics_frame(predictions, TARGETS)
 
     def export_loo(
         self,
@@ -466,7 +570,6 @@ class SuperModelService:
     ) -> Path:
         if predictions is None or metrics is None:
             predictions, metrics = self.leave_one_hotel_out()
-        # eval_ml_loo = ce que l'UI admin /api/eval/ml lit
         path = self.paths.out_ml("eval_ml_loo.xlsx")
         path.parent.mkdir(parents=True, exist_ok=True)
         resume = metrics.copy()
@@ -475,19 +578,15 @@ class SuperModelService:
             predictions.to_excel(writer, sheet_name="predictions", index=False)
             metrics.to_excel(writer, sheet_name="metrics", index=False)
             resume.to_excel(writer, sheet_name="resume", index=False)
-        # alias historique
-        alias = self.paths.out_ml("eval_super_loo.xlsx")
-        with pd.ExcelWriter(alias, engine="openpyxl") as writer:
-            predictions.to_excel(writer, sheet_name="predictions", index=False)
-            metrics.to_excel(writer, sheet_name="metrics", index=False)
-            resume.to_excel(writer, sheet_name="resume", index=False)
-        # compat ancien catboost path pour clients qui lisent encore ce fichier
-        legacy = self.paths.out_ml("eval_catboost_loo.xlsx")
-        with pd.ExcelWriter(legacy, engine="openpyxl") as writer:
-            predictions.to_excel(writer, sheet_name="predictions", index=False)
-            metrics.to_excel(writer, sheet_name="metrics", index=False)
-            resume.to_excel(writer, sheet_name="resume", index=False)
-        logger.info("Export ml (super) LOO : %s", path)
+        for alias_name in ("eval_super_loo.xlsx", "eval_catboost_loo.xlsx"):
+            alias = self.paths.out_ml(alias_name)
+            with pd.ExcelWriter(alias, engine="openpyxl") as writer:
+                predictions.to_excel(
+                    writer, sheet_name="predictions", index=False
+                )
+                metrics.to_excel(writer, sheet_name="metrics", index=False)
+                resume.to_excel(writer, sheet_name="resume", index=False)
+        logger.info("Export ml conversion-by-solution LOO : %s", path)
         return path
 
     def predict_row(
@@ -498,23 +597,36 @@ class SuperModelService:
         hotel_code: str | None = None,
         type_mix: dict[str, float] | None = None,
         gamme_mix: dict[str, float] | None = None,
-    ) -> dict[str, float]:
-        """Prediction production = super-modele (affiche comme ml)."""
-        targets = [t for t, _ in META_TARGETS]
-        meta_path = self.models_dir / f"{targets[0]}_metadata.json"
-        if not meta_path.exists():
+    ) -> dict[str, Any]:
+        """
+        Production :
+          1) model_{solution} → taux_conversion
+          2) sim_v2 → CA / marge
+          3) scale CA par ratio conversion
+        """
+        sol = _norm_sol(solution)
+        sdir = self._solution_dir(sol)
+        meta_path = sdir / "conversion_metadata.json"
+        index_path = self.models_dir / "index.json"
+        if not meta_path.exists() and not index_path.exists():
+            # fallback ancien super stack?
+            legacy = self.models_dir / "montant_ventes_par_mois_metadata.json"
+            if legacy.exists():
+                raise FileNotFoundError(
+                    "Ancien modele ml (stacking) detecte. "
+                    "Relancer : python run.py ml --rebuild "
+                    "(architecture conversion par solution)"
+                )
             raise FileNotFoundError(
-                "Modele ml (super) absent. Lancer : python run.py ml --rebuild"
+                "Modele ml absent. Lancer : python run.py ml --rebuild"
             )
-        meta = json.loads(meta_path.read_text(encoding="utf-8"))
-        feature_names: list[str] = meta["feature_names"]
 
-        xg = self.xgboost.predict_row(feature_row, solution)
+        conv_pred, conv_base = self._predict_conversion(sol, feature_row)
 
         series = pd.Series(
             {
                 **feature_row,
-                "solution": solution,
+                "solution": sol,
                 **{
                     f"type_{k.replace(' ', '_').replace('&', '_')}_part_natures": v
                     for k, v in (type_mix or {}).items()
@@ -525,39 +637,43 @@ class SuperModelService:
                 },
             }
         )
-        # normalise cles type F&B
         v2 = self._sim_v2_pred_for_observation(series)
         if hotel_code:
-            loo = self._load_sim_v2_loo_map().get(hotel_code)
-            # live restitution preferred for what-if ; keep loo only if live fails
+            loo = self._load_sim_v2_loo_map().get(str(hotel_code))
             if not any(v2.values()) and loo:
                 v2 = loo
 
-        base_preds = {
-            "xgboost": {t: float(xg.get(t) or 0) for t in META_PRED_TARGETS},
-            "sim_v2": {t: float(v2.get(t) or 0) for t in META_PRED_TARGETS},
-        }
-
-        base_only = [n for n in feature_names if not n.startswith("pred_")]
-        base_vec = build_feature_row(base_only, feature_row, solution).iloc[0]
-        meta_row = self._build_meta_row(base_vec, base_preds, feature_names)
-        x = pd.DataFrame([meta_row])[feature_names].astype(float)
-
+        scaled = self._scale_with_conversion(v2, conv_pred, conv_base)
         out: dict[str, Any] = {
-            "solution": solution,
+            "solution": sol,
             "engine": "ml",
-            "base_predictions": base_preds,
+            "model": f"model_{sol}",
+            "taux_conversion_predit": scaled["taux_conversion_predit"],
+            "taux_conversion_baseline": scaled["taux_conversion_baseline"],
+            "conversion_scale": scaled["conversion_scale"],
+            "base_predictions": {
+                "sim_v2": {t: float(v2.get(t) or 0) for t in META_PRED_TARGETS},
+                "conversion_ml": {
+                    "taux_conversion": conv_pred,
+                    "baseline": conv_base,
+                },
+            },
         }
-        for target in targets:
-            model_path = self.models_dir / f"{target}.json"
-            if not model_path.exists():
-                continue
-            model = XGBRegressor()
-            model.load_model(str(model_path))
-            out[target] = max(float(model.predict(x)[0]), 0.0)
+        for t in META_PRED_TARGETS:
+            out[t] = float(scaled.get(t) or 0.0)
         return out
 
     def run_full(self) -> dict[str, Any]:
+        # s'assurer que la vue dataset a les colonnes conversion
+        try:
+            cp = self.factory.open(read_only=False)
+            try:
+                cp.p_table_view("v_ml_training_dataset")
+            finally:
+                cp.close()
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("refresh v_ml_training_dataset: %s", exc)
+
         df = self.load_dataset()
         self.train_final(df)
         predictions, metrics = self.leave_one_hotel_out(df)
@@ -567,5 +683,6 @@ class SuperModelService:
             "metrics": metrics,
             "excel": path,
             "engine": "ml",
+            "architecture": "conversion_by_solution + sim_v2_scale",
             "source": df.attrs.get("ml_source"),
         }

@@ -1,26 +1,54 @@
+# Hotels LOO = pilotes concepts AVEC tickets, solution = mapping metier (t_pilot_concepts)
+# n_solution_hotels : si = 1 → eval biaisee (on ne sort pas l'hotel du train).
 t_loo_hotels:
   type: table
-  mode: create_if_not_exists
+  mode: create_or_replace
   requires:
   - t_sales
+  - t_pilot_concepts
   sql: |-
+    WITH base AS (
+      SELECT
+        p.hotel_code AS hotel_code,
+        LOWER(TRIM(CAST(p.solution AS VARCHAR))) AS solution
+      FROM t_pilot_concepts AS p
+      INNER JOIN (
+        SELECT DISTINCT CAST(HOTEL_CODE AS VARCHAR) AS hotel_code
+        FROM t_sales
+        WHERE CAST(HOTEL_CODE AS VARCHAR) NOT IN ('H5586', 'H6188')
+      ) AS s
+        ON s.hotel_code = CAST(p.hotel_code AS VARCHAR)
+      WHERE CAST(p.hotel_code AS VARCHAR) NOT IN ('H5586', 'H6188')
+    )
     SELECT
-      HOTEL_CODE AS hotel_code,
-      ANY_VALUE(SOLUTION) AS solution
-    FROM t_sales
-    WHERE CAST(HOTEL_CODE AS VARCHAR) NOT IN ('H5586')
-    GROUP BY HOTEL_CODE
-    ORDER BY HOTEL_CODE
+      hotel_code,
+      solution,
+      COUNT(*) OVER (PARTITION BY solution) AS n_solution_hotels,
+      CASE
+        WHEN COUNT(*) OVER (PARTITION BY solution) <= 1 THEN TRUE
+        ELSE FALSE
+      END AS eval_biased
+    FROM base
+    ORDER BY hotel_code
 v_loo_training_source:
   type: view
   mode: create_or_replace
   requires:
   - v_restitution_simulation_long
+  - t_loo_hotels
   sql: |-
+    -- LOO strict si ≥2 hotels de la meme solution ; sinon garder l'hotel
+    -- evalue dans le train (evaluation biaisee mais realisable).
     SELECT source.*
     FROM v_restitution_simulation_long AS source
     CROSS JOIN v_loo_step AS step
-    WHERE source.hotel_code <> step.hotel_code
+    WHERE
+      CASE
+        WHEN COALESCE(step.eval_biased, FALSE)
+          OR COALESCE(step.n_solution_hotels, 0) <= 1
+        THEN TRUE
+        ELSE source.hotel_code <> step.hotel_code
+      END
 v_loo_solution_coefficients:
   type: view
   mode: create_or_replace

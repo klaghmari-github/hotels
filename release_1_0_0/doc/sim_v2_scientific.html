@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>sim_v2 — Documentation scientifique du simulateur</title>
+  <style>
+    :root {
+      --ink: #152033;
+      --muted: #5b6778;
+      --line: #d9e1ec;
+      --navy: #163a5f;
+      --accent: #1f6feb;
+      --accent-2: #0d9488;
+      --warn: #b45309;
+      --bg: #eef2f7;
+      --card: #ffffff;
+      --code-bg: #f0f4f9;
+      --ok: #15803d;
+      --shadow: 0 10px 30px rgba(22, 58, 95, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(1200px 500px at 10% -10%, #dbeafe 0%, transparent 55%),
+        radial-gradient(900px 400px at 100% 0%, #ccfbf1 0%, transparent 45%),
+        var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 0 1.25rem 3.5rem; }
+    header.hero {
+      background: linear-gradient(135deg, #0f2744 0%, #1a4d7c 48%, #0f766e 100%);
+      color: #fff;
+      padding: 2.4rem 0 2rem;
+      margin-bottom: 0;
+      box-shadow: 0 8px 24px rgba(15, 39, 68, 0.25);
+    }
+    header.hero .wrap { padding-bottom: 0; }
+    .eyebrow {
+      display: inline-block;
+      font-size: .75rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      opacity: .85;
+      margin-bottom: .55rem;
+      font-weight: 700;
+    }
+    h1 { margin: 0 0 .5rem; font-size: clamp(1.45rem, 2.5vw, 1.9rem); line-height: 1.25; }
+    .lead { margin: 0; max-width: 48rem; color: #e2eefc; font-size: 1.02rem; }
+    .meta {
+      display: flex; flex-wrap: wrap; gap: .5rem;
+      margin-top: 1.1rem;
+    }
+    .pill {
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 999px;
+      padding: .28rem .7rem;
+      font-size: .8rem;
+      font-weight: 600;
+    }
+    nav.toc {
+      position: sticky; top: 0; z-index: 20;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+      box-shadow: 0 2px 12px rgba(0,0,0,.04);
+    }
+    nav.toc .wrap {
+      display: flex; flex-wrap: wrap; gap: .45rem .85rem;
+      padding: .7rem 1.25rem;
+    }
+    nav.toc a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: .84rem;
+      font-weight: 650;
+    }
+    nav.toc a:hover { text-decoration: underline; }
+    section.card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 1.25rem 1.35rem 1.4rem;
+      margin-top: 1rem;
+      box-shadow: var(--shadow);
+    }
+    h2 {
+      margin: 0 0 .75rem;
+      font-size: 1.18rem;
+      color: var(--navy);
+      letter-spacing: -.01em;
+    }
+    h3 {
+      margin: 1.15rem 0 .45rem;
+      font-size: 1rem;
+      color: #1e3a5f;
+    }
+    p { margin: .45rem 0; }
+    .muted { color: var(--muted); }
+    .callout {
+      border-left: 4px solid var(--accent);
+      background: #f5f9ff;
+      padding: .75rem 1rem;
+      border-radius: 0 10px 10px 0;
+      margin: .9rem 0;
+    }
+    .callout.warn {
+      border-left-color: var(--warn);
+      background: #fffbeb;
+    }
+    .callout.ok {
+      border-left-color: var(--ok);
+      background: #f0fdf4;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .9rem;
+      margin: .6rem 0 0;
+    }
+    th, td {
+      text-align: left;
+      padding: .48rem .55rem;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    th { color: var(--navy); font-size: .82rem; text-transform: uppercase; letter-spacing: .03em; }
+    code, pre {
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .84rem;
+    }
+    code {
+      background: var(--code-bg);
+      padding: .08rem .35rem;
+      border-radius: 5px;
+    }
+    pre {
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: .95rem 1.05rem;
+      border-radius: 10px;
+      overflow: auto;
+      line-height: 1.45;
+      margin: .7rem 0 0;
+    }
+    pre .c { color: #94a3b8; }
+    pre .k { color: #7dd3fc; }
+    pre .n { color: #fde68a; }
+    .formula {
+      background: linear-gradient(180deg, #f8fafc, #eef6ff);
+      border: 1px solid #cfe0f5;
+      border-radius: 12px;
+      padding: .9rem 1rem;
+      margin: .7rem 0;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      font-size: .9rem;
+      overflow-x: auto;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .85rem;
+    }
+    @media (max-width: 760px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+    .mini {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: .8rem .9rem;
+    }
+    .mini h4 { margin: 0 0 .35rem; font-size: .92rem; color: var(--navy); }
+    .mini p { margin: 0; font-size: .9rem; }
+    /* Flow diagram */
+    .flow {
+      display: flex;
+      flex-direction: column;
+      gap: .55rem;
+      margin: 1rem 0 .3rem;
+    }
+    .flow-row {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: .65rem;
+      align-items: stretch;
+    }
+    .flow-num {
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; color: #fff;
+      background: linear-gradient(145deg, var(--accent), #0ea5e9);
+      box-shadow: 0 4px 10px rgba(31,111,235,.25);
+      font-size: .95rem;
+    }
+    .flow-num.g2 { background: linear-gradient(145deg, #0d9488, #14b8a6); }
+    .flow-num.g3 { background: linear-gradient(145deg, #7c3aed, #a78bfa); }
+    .flow-num.g4 { background: linear-gradient(145deg, #c2410c, #f59e0b); }
+    .flow-body {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: .7rem .9rem;
+      background: #fff;
+    }
+    .flow-body strong { display: block; color: var(--navy); margin-bottom: .15rem; }
+    .flow-body span { font-size: .9rem; color: var(--muted); }
+    .arrow {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 1.1rem;
+      margin: -.15rem 0 -.15rem 12px;
+      width: 42px;
+    }
+    .schema-box {
+      background: #0b1220;
+      color: #cbd5e1;
+      border-radius: 14px;
+      padding: 1rem 1.1rem;
+      overflow-x: auto;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      font-size: .78rem;
+      line-height: 1.35;
+      white-space: pre;
+      margin-top: .75rem;
+      border: 1px solid #1e293b;
+    }
+    .tag {
+      display: inline-block;
+      font-size: .72rem;
+      font-weight: 700;
+      padding: .12rem .45rem;
+      border-radius: 999px;
+      margin-right: .25rem;
+      vertical-align: middle;
+    }
+    .tag.obs { background: #dbeafe; color: #1e40af; }
+    .tag.sim { background: #d1fae5; color: #065f46; }
+    .tag.est { background: #fef3c7; color: #92400e; }
+    footer {
+      margin-top: 1.5rem;
+      color: var(--muted);
+      font-size: .85rem;
+      text-align: center;
+    }
+    a.ext { color: var(--accent); font-weight: 600; text-decoration: none; }
+    a.ext:hover { text-decoration: underline; }
+    ul.clean { margin: .4rem 0 .2rem 1.1rem; padding: 0; }
+    ul.clean li { margin: .25rem 0; }
+    .two-col-formulas {
+      display: grid;
+      gap: .65rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <div class="eyebrow">Release 1.0.0 · Accor ROD</div>
+      <h1>Simulateur v2 — documentation scientifique</h1>
+      <p class="lead">
+        Explication détaillée de la génération des <strong>hôtels simulés</strong>
+        (observations + scénarios de retrait de natures) et de leur usage lors de
+        l’<strong>estimation</strong> d’un hôtel cible. Les formules ci-dessous
+        reflètent le code pipeline YAML / restitution réellement exécuté.
+      </p>
+      <div class="meta">
+        <span class="pill">Source : tickets de vente pilotes</span>
+        <span class="pill">Grain : hôtel × scénario</span>
+        <span class="pill">Restitution par solution</span>
+        <span class="pill">Méthode coefficients unitaires</span>
+      </div>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <div class="wrap">
+      <a href="#objectif">Objectif</a>
+      <a href="#schema">Schéma global</a>
+      <a href="#donnees">Données d’entrée</a>
+      <a href="#scenarios">Scénarios</a>
+      <a href="#simulation">Simulation</a>
+      <a href="#dataset">Dataset pivot</a>
+      <a href="#coefficients">Coefficients</a>
+      <a href="#estimation">Estimation</a>
+      <a href="#lecture">Lecture métier</a>
+      <a href="#limites">Limites</a>
+      <a href="#refs">Références code</a>
+    </div>
+  </nav>
+
+  <main class="wrap">
+
+    <section class="card" id="objectif">
+      <h2>1. Objectif scientifique du sim_v2</h2>
+      <p>
+        Le simulateur v2 répond à la question métier :
+        <em>« Si un hôtel cible adopte un certain mix de types / gammes et une
+        surface retail (mètres linéaires), quel chiffre d’affaires mensuel
+        peut-on attendre, pour chaque concept (Simply / Liberty / Connected) ? »</em>
+      </p>
+      <div class="callout ok">
+        <strong>Principe fondateur.</strong>
+        On ne calibre pas un modèle « boîte noire » uniquement sur l’observation
+        brute. On construit un <strong>espace de configurations simulées</strong>
+        en retirant des natures de produits (références catalogue) des ventes
+        réelles, en <strong>redistribuant le volume retiré</strong> sur les natures
+        restantes, puis on en extrait des <strong>coefficients d’intensité</strong>
+        (CA par guest × m_lin × part de mix). L’estimation applique ces
+        coefficients aux leviers de l’hôtel cible.
+      </div>
+      <div class="grid-2" style="margin-top:.85rem">
+        <div class="mini">
+          <h4><span class="tag obs">OBS</span> Lignes observées</h4>
+          <p>Scénario vide (aucune nature retirée) : ventes réelles agrégées par hôtel, normalisées au mois.</p>
+        </div>
+        <div class="mini">
+          <h4><span class="tag sim">SIM</span> Lignes simulées</h4>
+          <p>Même hôtel, assortiment amputé d’un ensemble de natures ; volumes réalloués ; mix et CA re-calculés.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="schema">
+      <h2>2. Schéma global des étapes</h2>
+      <p class="muted">Vue d’ensemble de la chaîne pipeline <code>pipeline/sim_v2/</code>.</p>
+
+      <div class="flow">
+        <div class="flow-row">
+          <div class="flow-num">1</div>
+          <div class="flow-body">
+            <strong>Source ventes</strong>
+            <span><code>hotel_sales_raw_extended_data.xlsx</code> → <code>t_sales</code> (filtre PRIX_TTC &gt; 0, MARGE &gt; 0, hors H5586)</span>
+          </div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="flow-row">
+          <div class="flow-num">2</div>
+          <div class="flow-body">
+            <strong>Référentiels &amp; rangs</strong>
+            <span>Types, gammes, catégories, marques, natures… puis <code>t_rank_*</code> pour ordonner les natures par performance dans chaque groupe.</span>
+          </div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="flow-row">
+          <div class="flow-num g2">3</div>
+          <div class="flow-body">
+            <strong>Génération de scénarios</strong>
+            <span>Ensembles de natures à retirer (cumulatifs / équilibrés par groupe) → <code>t_scenarios</code> / <code>scenarios.xlsx</code>. Inclut le scénario vide (observation pure).</span>
+          </div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="flow-row">
+          <div class="flow-num g2">4</div>
+          <div class="flow-body">
+            <strong>Simulation par scénario (itération parallèle)</strong>
+            <span>Pour chaque scénario : filtrer les tickets hors natures retirées, redistribuer le volume retiré, reconstruire le mix, insérer une ligne hôtel dans <code>t_dataset_pivot</code>.</span>
+          </div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="flow-row">
+          <div class="flow-num g3">5</div>
+          <div class="flow-body">
+            <strong>Restitution — coefficients</strong>
+            <span>Dépliage long des parts type/gamme → coefficients unitaires → moyenne par <code>(solution, famille, variable)</code>.</span>
+          </div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="flow-row">
+          <div class="flow-num g4">6</div>
+          <div class="flow-body">
+            <strong>Estimation hôtel cible</strong>
+            <span>Injecter guests_cible, m_lin_cible, mix_cible → CA prédit par variable → moyenne par famille → moyenne globale par solution.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="schema-box">┌──────────────────┐     ┌──────────────────┐     ┌─────────────────────────┐
+│  Tickets t_sales │────▶│  Scénarios        │────▶│  Simulation itérative   │
+│  (pilotes réels) │     │  retrait natures  │     │  v_sales_current / pivot│
+└──────────────────┘     └──────────────────┘     └───────────┬─────────────┘
+                                                              │
+                                                              ▼
+┌──────────────────┐     ┌──────────────────┐     ┌─────────────────────────┐
+│ Estimation cible │◀────│ Coefficients     │◀────│ t_dataset_pivot         │
+│ guests×m_lin×mix │     │ par solution     │     │ (obs + sim)             │
+└──────────────────┘     └──────────────────┘     └─────────────────────────┘</div>
+    </section>
+
+    <section class="card" id="donnees">
+      <h2>3. Données d’entrée et grain d’observation</h2>
+      <h3>3.1 Table source <code>t_sales</code></h3>
+      <p>
+        Chaque ligne est un ticket / ligne produit de vente (export bornes), enrichie
+        des attributs hôtel (solution, m_lin, chambres, TO, guests/chambre) et
+        produit (TYPE F&amp;B / NON_F&amp;B, GAMME, NATURE_PRODUIT, NOM_PRODUIT, quantités, CA, marges).
+      </p>
+      <table>
+        <tr><th>Champ clé</th><th>Rôle dans sim_v2</th></tr>
+        <tr><td><code>HOTEL_CODE</code>, <code>SOLUTION</code></td><td>Identité hôtel et concept (Simply / Liberty / Connected)</td></tr>
+        <tr><td><code>NATURE_PRODUIT</code></td><td>Unité de retrait dans les scénarios (catalogue « nature »)</td></tr>
+        <tr><td><code>TYPE</code>, <code>GAMME</code></td><td>Axes de mix pour la restitution</td></tr>
+        <tr><td><code>QUANTITE</code>, <code>PRIX_TTC</code>, <code>MARGE*</code></td><td>Volumes et montants agrégés</td></tr>
+        <tr><td><code>HOTEL_NB_CHAMBRES</code>, <code>HOTEL_TO_ANNUEL</code>, <code>HOTEL_GUESTS_PER_CHAMBRE</code></td><td>Trafic hébergement</td></tr>
+        <tr><td><code>METRES_LINEAIRES</code></td><td>Surface retail de référence</td></tr>
+      </table>
+
+      <h3>3.2 Trafic clients (guests)</h3>
+      <div class="formula">
+nombre_guests_par_mois = nb_chambres × TO_annuel × guests_par_chambre × 30,5
+      </div>
+      <p class="muted">
+        Le facteur <strong>30,5</strong> convertit un occupancy journalier moyen en flux mensuel
+        (convention métier ROD, partagée avec sim_v1). Le taux de conversion observé est :
+      </p>
+      <div class="formula">
+taux_conversion = nombre_ventes / nombre_guests
+&nbsp;&nbsp;(sur la période couverte par les tickets de l’hôtel)
+      </div>
+    </section>
+
+    <section class="card" id="scenarios">
+      <h2>4. Génération des scénarios (configurations simulées)</h2>
+      <p>
+        Un <strong>scénario</strong> est un ensemble (éventuellement vide) de
+        <code>NATURE_PRODUIT</code> à retirer de l’assortiment. Le scénario vide
+        reproduit l’observation réelle. Les autres scénarios explorent des
+        assortiments plus resserrés, ordonnés par les rangs de performance
+        (<code>t_rank_nature_by_*</code> : catégorie, gamme, type, marque, fournisseur).
+      </p>
+      <div class="callout">
+        <strong>Pourquoi retirer des natures ?</strong>
+        En pratique, un hôtel cible n’expose pas le catalogue complet d’un pilote.
+        En simulant des retraits, on obtient des <em>points de fonctionnement</em>
+        (mix × CA) plus proches de configurations « allégées », tout en restant
+        ancrés dans des tickets réels (prix, paniers, marges observés).
+      </div>
+      <ul class="clean">
+        <li>Générateur : <code>ScenarioGenerator</code> (<code>src/sim_v2/scenarios.py</code>)</li>
+        <li>Stockage : <code>t_scenarios</code> (<code>scenario_id</code>, liste JSON des natures retirées)</li>
+        <li>À chaque itération, la vue temporaire <code>v_scenario_step</code> porte le scénario courant</li>
+      </ul>
+    </section>
+
+    <section class="card" id="simulation">
+      <h2>5. Mécanique de simulation d’un scénario</h2>
+      <p>
+        Pour un scénario donné, le pipeline reconstruit un flux de ventes
+        « comme si » les natures listées n’étaient plus en rayon.
+        Les étapes SQL (fichier <code>4_simulation_pipeline.yaml</code>) sont les suivantes.
+      </p>
+
+      <h3>5.1 Baseline hôtel</h3>
+      <div class="formula">
+nombre_mois = DATE_DIFF(month, MIN(DATE), MAX(DATE)) + 1
+nombre_guests_par_mois = chambres × TO × guests/chambre × 30,5
+nombre_ventes = Σ QUANTITE &nbsp;&nbsp;(sur t_sales, hors filtre scénario)
+      </div>
+
+      <h3>5.2 Parts de natures dans l’observation</h3>
+      <div class="formula">
+nature_part_nombre_ventes(h, n) = Σ QUANTITE(h,n) / Σ QUANTITE(h)
+      </div>
+
+      <h3>5.3 Volume retiré et filtrage</h3>
+      <ul class="clean">
+        <li><code>v_sales_removed</code> : tickets dont la nature est dans le scénario</li>
+        <li><code>v_sales_filtered</code> : tickets dont la nature <strong>n’est pas</strong> retirée</li>
+        <li><code>nombre_ventes_retirees</code> = somme des quantités retirées pour l’hôtel</li>
+      </ul>
+
+      <h3>5.4 Redistribution du volume retiré (cœur de la simulation)</h3>
+      <p>
+        Le volume retiré n’est pas « perdu » : il est réinjecté sur les natures
+        <em>conservées</em>, proportionnellement à leur poids historique dans les ventes,
+        et pondéré par le <strong>taux de conversion</strong> de l’hôtel
+        (ventes / guests sur la baseline).
+      </p>
+      <div class="formula">
+taux_conversion(h) = nombre_ventes(h) / nombre_guests(h)
+
+nature_nombre_ventes_ajoutees(h, n) =
+    nombre_ventes_retirees(h)
+  × taux_conversion(h)
+  × nature_part_nombre_ventes(h, n)
+
+ligne_part_nature = QUANTITE_ligne / nature_nombre_ventes(h, n)
+
+quantite_scenario = QUANTITE_ligne
+                  + nature_nombre_ventes_ajoutees × ligne_part_nature
+      </div>
+      <p>
+        Les montants (CA HT/TTC, marges) sont <strong>scalés linéairement</strong>
+        avec le ratio de quantités :
+      </p>
+      <div class="formula">
+PRIX_TTC_scenario = PRIX_TTC × quantite_scenario / QUANTITE_origine
+(idem PRIX_HT, MARGE, MARGE_SELON_COEF, …)
+      </div>
+      <div class="callout warn">
+        <strong>Lecture métier.</strong>
+        On suppose que les clients qui « perdaient » les natures retirées se
+        reportent sur le reste de l’assortiment selon les parts historiques,
+        avec une intensité liée au taux de conversion de l’hôtel. C’est une
+        hypothèse de <em>substitution proportionnelle</em> — simple, traçable,
+        et cohérente avec un modèle d’intensité CA / trafic / surface / mix.
+      </div>
+
+      <h3>5.5 Agrégation mensuelle et mix</h3>
+      <p>
+        Sur <code>v_sales_current</code> (ventes déjà transformées par le scénario),
+        on agrège CA, marges, quantités, puis on calcule les parts de mix :
+      </p>
+      <ul class="clean">
+        <li>parts en <strong>nombre de natures distinctes</strong> par type / gamme (…_part_natures)</li>
+        <li>parts en pourcentages de métriques (ventes, CA, …) selon les vues mix</li>
+      </ul>
+      <div class="formula">
+montant_*_par_mois = montant_*_période / nombre_mois
+
+metres_lineaires (dataset) :
+  m_lin_observés / n_natures_observées × n_natures_après_scénario
+      </div>
+      <p class="muted">
+        Ainsi, un assortiment plus petit « occupe » en moyenne moins de mètres linéaires
+        si on conserve la densité m_lin / nature de l’observation.
+      </p>
+    </section>
+
+    <section class="card" id="dataset">
+      <h2>6. Dataset pivot : une ligne = un hôtel × un scénario</h2>
+      <p>
+        La table <code>t_dataset_pivot</code> matérialise, pour chaque couple
+        (scénario, hôtel), une fiche de performance mensuelle et de structure de mix.
+        L’itération parallèle <code>i_iteration_scenario</code> parcourt les scénarios
+        non encore complets et exécute l’insertion (<code>x_insert_dataset_pivot</code>).
+      </p>
+      <table>
+        <tr><th>Bloc</th><th>Contenu typique</th></tr>
+        <tr><td>Identité</td><td><code>scenario_id</code>, <code>scenario_removed_natures</code>, <code>hotel_code</code>, <code>solution</code></td></tr>
+        <tr><td>Trafic</td><td><code>nombre_guests_par_mois</code>, <code>nombre_ventes_par_mois</code></td></tr>
+        <tr><td>Performance</td><td><code>montant_ventes_par_mois</code>, <code>montant_marge_*_par_mois</code></td></tr>
+        <tr><td>Surface</td><td><code>metres_lineaires</code> (ajusté au nombre de natures du scénario)</td></tr>
+        <tr><td>Mix</td><td>colonnes <code>type_*_part_natures</code>, <code>gamme_*_part_natures</code>, …</td></tr>
+      </table>
+      <div class="callout ok">
+        <strong>Point clé pour le métier.</strong>
+        Chaque ligne du pivot est un « hôtel configuré » : même site physique (même trafic de base),
+        mais assortiment / mix / CA correspondant à un scénario de natures. L’ensemble
+        (observations + simulations) constitue le nuage de points d’apprentissage
+        de la restitution.
+      </div>
+    </section>
+
+    <section class="card" id="coefficients">
+      <h2>7. De la simulation aux coefficients unitaires</h2>
+      <h3>7.1 Passage en format long</h3>
+      <p>
+        On « déplie » les colonnes de mix type/gamme
+        (<code>v_restitution_simulation_long</code>) :
+        une ligne par (scénario, hôtel, variable de mix).
+      </p>
+      <div class="formula">
+variable_part = part de la variable dans le mix (ex. type_F_B_part_natures)
+
+montant_ventes_coefficient =
+    montant_ventes_par_mois
+  / (nombre_guests_par_mois × metres_lineaires × variable_part)
+      </div>
+      <p>
+        Interprétation : <strong>CA mensuel par guest, par mètre linéaire, et par point de part de mix</strong>
+        attribué à cette variable. Des formules analogues existent pour les marges.
+      </p>
+
+      <h3>7.2 Agrégation par solution</h3>
+      <div class="formula">
+coeff(solution, famille, variable) =
+  AVG(montant_ventes_coefficient)
+  sur toutes les lignes (obs + sim) de cette solution
+      </div>
+      <p class="muted">
+        Famille = <code>type</code> ou <code>gamme</code>. On stocke aussi écart-type et
+        nombre d’observations / d’hôtels pour diagnostic.
+      </p>
+      <p>
+        En parallèle, le <strong>taux de conversion moyen par solution</strong>
+        (sur scénario vide uniquement) est calculé :
+      </p>
+      <div class="formula">
+taux_conversion_moyen(solution) =
+  AVG( nombre_ventes_par_mois / nombre_guests_par_mois )
+  [WHERE aucune nature retirée]
+      </div>
+    </section>
+
+    <section class="card" id="estimation">
+      <h2>8. Estimation pour un hôtel cible</h2>
+      <p>
+        L’utilisateur (ou l’API) fournit les leviers de la cible et un mix cible
+        (parts type / gammes, somme 1 par famille, puis combinaison en parts globales).
+      </p>
+
+      <h3>8.1 Leviers hôtel</h3>
+      <div class="formula">
+nombre_guests_par_mois_cible =
+  hotel_nb_chambres × hotel_to_annuel × hotel_guests_per_chambre × 30,5
+
+m_lin_cible = metres_lineaires saisis
+      </div>
+
+      <h3>8.2 Mix cible</h3>
+      <p>
+        Pour chaque variable (ex. <code>gamme_SANS_ALCOOL</code>), on dispose d’une
+        <code>target_part</code> ∈ [0,1]. En UI, les gammes sont souvent saisies
+        <em>dans</em> la famille F&amp;B / Non F&amp;B puis converties en part globale :
+      </p>
+      <div class="formula">
+part_globale(gamme) = poids(type de la gamme) × part_dans_la_famille(gamme)
+      </div>
+
+      <h3>8.3 Prédiction par variable</h3>
+      <div class="formula">
+CA_var(solution, variable) =
+  coeff_ventes(solution, variable)
+  × nombre_guests_par_mois_cible
+  × m_lin_cible
+  × target_part(variable)
+      </div>
+      <p class="muted">Même structure pour les marges (selon coef / marché).</p>
+
+      <h3>8.4 Agrégation (méthode publique sim_v2)</h3>
+      <ol class="clean">
+        <li>Moyenne des CA_var <strong>au sein de chaque famille</strong> (type, puis gamme).</li>
+        <li>Moyenne des deux familles → <strong>CA mensuel prédit par solution</strong>.</li>
+      </ol>
+      <div class="formula">
+CA_famille = AVG( CA_var )  sur variables de la famille avec target_part &gt; 0
+
+CA_solution = AVG( CA_famille )  sur familles
+      </div>
+      <div class="callout ok">
+        <strong>Lien avec l’intuition « moyenne des hôtels de modélisation ».</strong>
+        En prenant la moyenne des coefficients unitaires sur tous les points
+        (obs + sim) d’une solution, puis en les appliquant aux leviers cibles,
+        on obtient l’équivalent d’une <em>moyenne d’intensités</em> des hôtels
+        de la solution, reconfigurés au mix et à la surface de la cible.
+        Les parts de mix de la cible jouent le rôle de pondération de chaque axe.
+      </div>
+
+      <h3>8.5 Place du ML (taux de conversion)</h3>
+      <p>
+        Le super-modèle / XGBoost apprend notamment le lien entre contexte hôtel
+        (proximité, météo, brand, équipements, mix…) et la performance
+        (ventes / marge). Dans la lecture métier retenue pour l’estimation croisée :
+      </p>
+      <ul class="clean">
+        <li><strong>sim_v2 pur</strong> : coefficients issus des simulations, conversion « implicite »
+          dans les intensités moyennes des hôtels de la solution ;</li>
+        <li><strong>ML</strong> : peut fournir un taux de conversion (ou un CA) conditionnel à la cible,
+          pour recalibrer ou comparer la projection issue du nuage simulé.</li>
+      </ul>
+      <p class="muted">
+        Les deux sorties sont présentées côte à côte dans l’UI user pour transparence.
+      </p>
+    </section>
+
+    <section class="card" id="lecture">
+      <h2>9. Pourquoi ces opérations sont raisonnables (lecture métier)</h2>
+      <div class="two-col-formulas">
+        <div class="mini">
+          <h4>1. Ancrage dans le réel</h4>
+          <p>Toute simulation part de tickets réellement encaissés (prix, paniers, marges). On ne invente pas de paniers synthétiques hors observation.</p>
+        </div>
+        <div class="mini">
+          <h4>2. Exploration d’assortiments</h4>
+          <p>Les retraits de natures couvrent des configurations plus pauvres que le catalogue complet d’un pilote — situation typique d’un hôtel qui ouvre un corner limité.</p>
+        </div>
+        <div class="mini">
+          <h4>3. Substitution contrôlée</h4>
+          <p>Le volume retiré est redistribué selon les parts historiques et le taux de conversion de l’hôtel : hypothèse explicite, auditée, non arbitraire.</p>
+        </div>
+        <div class="mini">
+          <h4>4. Intensité séparable</h4>
+          <p>Factoriser CA ≈ f(guests) × f(m_lin) × f(mix) permet d’appliquer le modèle à un hôtel cible de taille / surface / mix différents sans re-simuler tout le catalogue.</p>
+        </div>
+        <div class="mini">
+          <h4>5. Stratification par solution</h4>
+          <p>Simply, Liberty et Connected n’ont pas les mêmes densités économiques : les coefficients sont estimés <em>par solution</em>, jamais mélangés globalement.</p>
+        </div>
+        <div class="mini">
+          <h4>6. Traçabilité</h4>
+          <p>Chaque étape est une vue ou table SQL versionnée dans le pipeline. On peut rejouer, auditer et justifier chaque transformation.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="limites">
+      <h2>10. Limites et conditions de validité</h2>
+      <ul class="clean">
+        <li><strong>Substitution linéaire</strong> : le report de volume sur les natures restantes est proportionnel ; pas de modèle d’élasticité prix ni de rupture de stock.</li>
+        <li><strong>Homogénéité intra-solution</strong> : les pilotes d’une même solution sont traités comme échangeables pour l’estimation des coefficients moyens.</li>
+        <li><strong>Qualité du mapping solution</strong> : un hôtel mal classé (Simply vs Connected) biaise tout le nuage de points — d’où l’importance du référentiel pilote à jour.</li>
+        <li><strong>Scénario vide vs non vide</strong> : le taux de conversion affiché en restitution est calculé sur l’observation pure ; les simulations enrichissent surtout les coefficients de mix / intensité.</li>
+        <li><strong>Hors distribution</strong> : un mix cible très éloigné des mixes observés/simulés reste mathématiquement extrapolable mais doit être lu avec prudence métier.</li>
+      </ul>
+    </section>
+
+    <section class="card" id="refs">
+      <h2>11. Références code (traçabilité)</h2>
+      <table>
+        <tr><th>Étape</th><th>Fichiers</th></tr>
+        <tr><td>Source ventes</td><td><code>pipeline/sim_v2/0_src_pipeline.yaml</code></td></tr>
+        <tr><td>Référentiels / rangs</td><td><code>1_ref_pipeline.yaml</code>, <code>2_rank_pipeline.yaml</code></td></tr>
+        <tr><td>Dataset / mix / pivot</td><td><code>3_dataset_pipeline.yaml</code></td></tr>
+        <tr><td>Scénarios + simulation</td><td><code>4_simulation_pipeline.yaml</code>, <code>src/sim_v2/scenarios.py</code></td></tr>
+        <tr><td>Coefficients</td><td><code>5_restitution_base_pipeline.yaml</code></td></tr>
+        <tr><td>Estimation</td><td><code>6_restitution_prediction_pipeline.yaml</code>, <code>src/sim_v2/restitution.py</code></td></tr>
+        <tr><td>LOO évaluation</td><td><code>7_loo_pipeline.yaml</code>, <code>src/sim_v2/loo.py</code></td></tr>
+        <tr><td>Assortiment optimal (UI)</td><td><code>8_optimal_mix_pipeline.yaml</code>, <code>src/sim_v2/optimal_mix.py</code></td></tr>
+        <tr><td>Orchestration</td><td><code>src/sim_v2/service.py</code>, <code>src/sim_v2/modeling.py</code></td></tr>
+      </table>
+      <p class="muted" style="margin-top:.8rem">
+        Documentation index : <a class="ext" href="index.html">doc/index.html</a>
+        · Architecture : <a class="ext" href="ARCHITECTURE.md">ARCHITECTURE.md</a>
+        · Mapping pilotes : <a class="ext" href="PILOT_SOLUTION_MAPPING.md">PILOT_SOLUTION_MAPPING.md</a>
+      </p>
+    </section>
+
+    <footer>
+      Document généré pour justification métier / scientifique du simulateur v2 — release 1.0.0.<br/>
+      Les formules correspondent aux vues SQL et services Python du dépôt ; en cas d’écart de version, le pipeline YAML fait foi.
+    </footer>
+  </main>
+</body>
+</html>

@@ -403,6 +403,111 @@ function renderCompareTable(rows){
   return h;
 }
 
+/** Synthese MAE + meilleur moteur par solution (simply / liberty / connected). */
+function renderBySolution(bySolution, engines){
+  const engList=engines||['sim_v1','sim_v2','ml'];
+  const order=['simply','liberty','connected'];
+  const sols=Object.keys(bySolution||{});
+  if(!sols.length) return '';
+  const ordered=[
+    ...order.filter(s=>bySolution[s]),
+    ...sols.filter(s=>!order.includes(s)).sort(),
+  ];
+  let h='<h2 style="margin-top:1.1rem">Meilleure estimation par solution</h2>';
+  h+='<p class="muted" style="margin:.25rem 0 .65rem">MAE mensuelle (€ / mois) calculee <strong>par solution</strong>. Meilleur moteur = plus faible MAE CA (plus proche du reel).</p>';
+  h+='<div class="grid" style="margin-bottom:.85rem">';
+  for(const sol of ordered){
+    const block=bySolution[sol]||{};
+    const best=block.best_ca_engine;
+    const bestM=block.best_marge_engine;
+    const hotels=(block.hotels||[]).join(', ')||'—';
+    h+=`<div class="card" style="border-color:${best?'rgba(61,214,140,.35)':'var(--line)'}">
+      <div class="lbl">${tag(sol)} · n=${block.n_hotels??'—'}</div>
+      <div class="val" style="font-size:1.05rem;margin:.25rem 0">Meilleur CA : ${best?tag(best):'—'}</div>
+      <div class="sub">Meilleur marge : ${bestM?tag(bestM):'—'} · hotels : ${hotels}</div>
+    </div>`;
+  }
+  h+='</div>';
+  // tableau detail MAE par solution × moteur
+  h+='<div class="admin-table-wrap"><table class="eval-table"><thead><tr>';
+  h+='<th>Solution</th><th class="num">n</th>';
+  for(const eng of engList){
+    h+=`<th class="num col-err">MAE CA ${eng}</th>`;
+  }
+  h+='<th>Meilleur CA</th>';
+  for(const eng of engList){
+    h+=`<th class="num col-err">MAE marge ${eng}</th>`;
+  }
+  h+='<th>Meilleur marge</th>';
+  h+='</tr></thead><tbody>';
+  for(const sol of ordered){
+    const block=bySolution[sol]||{};
+    const est=block.engines||{};
+    const bestCa=block.best_ca_engine;
+    const bestMg=block.best_marge_engine;
+    h+='<tr>';
+    h+=`<td>${tag(sol)}</td>`;
+    h+=`<td class="num">${block.n_hotels??'—'}</td>`;
+    for(const eng of engList){
+      const m=est[eng]||{};
+      const isBest=bestCa===eng;
+      h+=`<td class="num col-err"${isBest?' style="font-weight:800;color:var(--ok)"':''}>${fmt(m.mae_ca)}</td>`;
+    }
+    h+=`<td>${bestCa?tag(bestCa):'—'}</td>`;
+    for(const eng of engList){
+      const m=est[eng]||{};
+      const isBest=bestMg===eng;
+      h+=`<td class="num col-err"${isBest?' style="font-weight:800;color:var(--ok)"':''}>${fmt(m.mae_marge)}</td>`;
+    }
+    h+=`<td>${bestMg?tag(bestMg):'—'}</td>`;
+    h+='</tr>';
+  }
+  h+='</tbody></table></div>';
+  return h;
+}
+
+/** MAE d'un moteur calculee sur ses predictions, par solution. */
+function metricsBySolutionFromPreds(preds){
+  const rows=(preds||[]).map(normalizeEvalRow).filter(Boolean);
+  const by={};
+  for(const r of rows){
+    const sol=String(r.solution||'').trim().toLowerCase();
+    if(!sol) continue;
+    if(!by[sol]) by[sol]={ca:[], marge:[], hotels:new Set()};
+    if(r.hotel_code) by[sol].hotels.add(r.hotel_code);
+    if(r.ca_err_abs!=null && !Number.isNaN(Number(r.ca_err_abs))) by[sol].ca.push(Number(r.ca_err_abs));
+    if(r.marge_err_abs!=null && !Number.isNaN(Number(r.marge_err_abs))) by[sol].marge.push(Number(r.marge_err_abs));
+  }
+  const out={};
+  for(const [sol,v] of Object.entries(by)){
+    const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
+    out[sol]={
+      solution:sol,
+      n_hotels:v.hotels.size,
+      mae_ca:avg(v.ca),
+      mae_marge:avg(v.marge),
+      hotels:[...v.hotels],
+    };
+  }
+  return out;
+}
+
+function renderEngineBySolution(src, bySol){
+  const order=['simply','liberty','connected'];
+  const sols=[...order.filter(s=>bySol[s]), ...Object.keys(bySol).filter(s=>!order.includes(s)).sort()];
+  if(!sols.length) return '';
+  let h='<h2 style="margin-top:1.1rem">MAE par solution</h2>';
+  h+='<div class="grid" style="margin-bottom:.75rem">';
+  for(const sol of sols){
+    const m=bySol[sol];
+    h+=`<div class="card"><div class="lbl">${tag(sol)} · ${tag(src)}</div>
+      <div class="val" style="font-size:1.15rem">${fmt(m.mae_ca)}</div>
+      <div class="sub">MAE CA / mois · n=${m.n_hotels} · MAE marge ${fmt(m.mae_marge)}</div></div>`;
+  }
+  h+='</div>';
+  return h;
+}
+
 async function loadEval(src){
   const main=document.getElementById('eval-main');
   main.innerHTML='<p class="muted">Chargement…</p>';
@@ -413,17 +518,19 @@ async function loadEval(src){
       const data=await res.json();
       if(!data.ok) throw new Error(data.error||'erreur');
       const gm=data.global_metrics||{};
+      const engines=data.engines||['sim_v1','sim_v2','ml'];
       let html='<div class="grid">';
-      for(const eng of (data.engines||['sim_v1','sim_v2','ml'])){
+      for(const eng of engines){
         const m=gm[eng]||{};
-        html+=`<div class="card"><div class="lbl">${tag(eng)} · MAE CA / mois</div><div class="val">${fmt(m.mae_ca)}</div><div class="sub">n=${m.n_hotels??'—'} · mensuel</div></div>`;
+        html+=`<div class="card"><div class="lbl">${tag(eng)} · MAE CA / mois (global)</div><div class="val">${fmt(m.mae_ca)}</div><div class="sub">n=${m.n_hotels??'—'} · mensuel</div></div>`;
       }
       html+='</div>';
       if((data.missing||[]).length){
         html+=`<div class="err-soft" style="margin-top:.75rem">Manquant : ${(data.missing||[]).join(', ')}</div>`;
       }
-      html+='<p class="muted" style="margin:.75rem 0 0">Comparaison LOO par hotel — <strong>mensuel (€ / mois)</strong>. CA reel aligne (ventes). Meilleur moteur = plus faible |err| CA.</p>';
-      html+='<h2 style="margin-top:1rem">sim_v1 vs sim_v2 vs ml (par hotel)</h2>';
+      // bloc principal : par solution
+      html+=renderBySolution(data.by_solution||{}, engines);
+      html+='<h2 style="margin-top:1.25rem">Detail par hotel</h2>';
       html+=renderCompareTable(data.rows||[]);
       main.innerHTML=html;
       return;
@@ -431,17 +538,16 @@ async function loadEval(src){
     const res=await fetch('/api/eval/'+src);
     const data=await res.json();
     if(!data.ok) throw new Error(data.error||'erreur');
-    // une seule carte KPI globale (pas le detail par solution)
     const maeCa=pickMetric(data.metrics,'mae_ca');
     const maeM=pickMetric(data.metrics,'mae_marge');
     const n=new Set((data.predictions||[]).map(p=>p.hotel_code).filter(Boolean)).size;
     let html=`<div class="grid">
-      <div class="card"><div class="lbl">${tag(src)} · MAE CA / mois</div><div class="val">${fmt(maeCa)}</div><div class="sub">n=${n} · mensuel</div></div>
-      <div class="card"><div class="lbl">${tag(src)} · MAE marge / mois</div><div class="val">${fmt(maeM)}</div><div class="sub">selon coef · mensuel</div></div>
+      <div class="card"><div class="lbl">${tag(src)} · MAE CA / mois (global)</div><div class="val">${fmt(maeCa)}</div><div class="sub">n=${n} · mensuel</div></div>
+      <div class="card"><div class="lbl">${tag(src)} · MAE marge / mois (global)</div><div class="val">${fmt(maeM)}</div><div class="sub">selon coef · mensuel</div></div>
     </div>`;
-    html+='<p class="muted" style="margin:.75rem 0 0">Periode : <strong>mensuelle</strong> (€ / mois) — LOO sur cibles <code>montant_*_par_mois</code>. L\'interface user estimation affiche l\'annuel (×12).</p>';
-    html+='<h2 style="margin-top:1rem">Evaluation mensuelle (CA reel vs estime)</h2>';
-    // toujours schema web (jamais raw / methode / metres…)
+    const bySol=metricsBySolutionFromPreds(data.predictions||[]);
+    html+=renderEngineBySolution(src, bySol);
+    html+='<h2 style="margin-top:1rem">Detail par hotel</h2>';
     html+=renderEvalTable(data.predictions||[]);
     main.innerHTML=html;
   }catch(e){ main.innerHTML=`<div class="errbox">${e.message}</div>`; }

@@ -4,12 +4,23 @@ GUI web : accueil, /user, /admin (+ outils avances).
 
 from __future__ import annotations
 
-from flask import Flask, render_template_string
+from flask import Flask, redirect, render_template_string, request, url_for
 
 from src.api.app import create_api_app
+from src.auth.flask_auth import (
+    auth_db_path,
+    is_admin_logged_in,
+    login_admin,
+    logout_admin,
+    register_auth,
+    _is_safe_next,
+)
+from src.auth.store import AuthStore
 from src.pipeline.paths import Paths
 from src.web.pages_admin import ADMIN_BODY, ADMIN_CSS, ADMIN_SCRIPT
+from src.web.pages_login import LOGIN_CSS, render_login_body
 from src.web.pages_user import USER_BODY, USER_CSS, USER_SCRIPT
+from src.web.pages_user_doc import DOC_BODY, DOC_CSS, DOC_SCRIPT
 from src.web.styles import COMMON_CSS
 
 NAV_HOME = """
@@ -22,14 +33,29 @@ NAV_HOME = """
 NAV_USER = """
 <nav>
   <a class="link" href="/user">Parcours</a>
-  <a class="link" href="/admin">Admin</a>
+  <a class="link active" href="/user/doc">Doc</a>
+</nav>
+"""
+
+NAV_USER_PARCOURS = """
+<nav>
+  <a class="link active" href="/user">Parcours</a>
+  <a class="link" href="/user/doc">Doc</a>
 </nav>
 """
 
 NAV_ADMIN = """
 <nav>
   <a class="link" href="/user">User</a>
-  <a class="link" href="/admin">Studio</a>
+  <a class="link active" href="/admin">Studio</a>
+  <a class="link" href="/admin/logout">Deconnexion</a>
+</nav>
+"""
+
+NAV_LOGIN = """
+<nav>
+  <a class="link" href="/">Accueil</a>
+  <a class="link" href="/user">User</a>
 </nav>
 """
 
@@ -714,6 +740,10 @@ def create_web_app(paths: Paths | None = None) -> Flask:
     paths = (paths or Paths()).ensure()
     app = create_api_app(paths)
 
+    # Auth admin : bcrypt + SQLite, session Flask signee
+    auth_store = AuthStore(auth_db_path(paths.root))
+    register_auth(app, paths_root=paths.root, auth_store=auth_store)
+
     @app.get("/")
     def home():
         return render_template_string(
@@ -728,12 +758,64 @@ def create_web_app(paths: Paths | None = None) -> Flask:
                 USER_BODY,
                 USER_SCRIPT,
                 extra_css=USER_CSS,
+                nav=NAV_USER_PARCOURS,
+            )
+        )
+
+    @app.get("/user/doc")
+    def user_doc_page():
+        """Documentation metier sim_v2 + IA (theme sombre projet)."""
+        return render_template_string(
+            _page(
+                "ROD · Documentation",
+                DOC_BODY,
+                DOC_SCRIPT,
+                extra_css=DOC_CSS,
                 nav=NAV_USER,
             )
         )
 
+    @app.route("/admin/login", methods=["GET", "POST"])
+    def admin_login():
+        """Formulaire de connexion admin (seul point d'entree non protege)."""
+        if is_admin_logged_in():
+            return redirect(url_for("admin_page"))
+
+        next_url = request.values.get("next") or "/admin"
+        if not _is_safe_next(next_url):
+            next_url = "/admin"
+
+        error = ""
+        username = ""
+        if request.method == "POST":
+            username = (request.form.get("username") or "").strip()
+            password = request.form.get("password") or ""
+            user = auth_store.authenticate(username, password)
+            if user:
+                login_admin(user)
+                return redirect(next_url)
+            error = "Identifiant ou mot de passe incorrect."
+
+        body = render_login_body(
+            error=error, next_url=next_url, username=username
+        )
+        return render_template_string(
+            _page(
+                "Connexion admin",
+                body,
+                extra_css=LOGIN_CSS,
+                nav=NAV_LOGIN,
+            )
+        )
+
+    @app.get("/admin/logout")
+    def admin_logout():
+        logout_admin()
+        return redirect(url_for("home"))
+
     @app.get("/admin")
     def admin_page():
+        # before_request redirige deja si non authentifie
         return render_template_string(
             _page(
                 "ROD Admin",
@@ -768,5 +850,18 @@ def create_web_app(paths: Paths | None = None) -> Flask:
         return render_template_string(
             _page("Hotels", HOTELS_BODY, HOTELS_SCRIPT, nav=NAV_ADMIN)
         )
+
+    @app.get("/doc/<path:filename>")
+    def doc_static_files(filename: str):
+        """Sert les fichiers HTML/MD de documentation sous doc/."""
+        from flask import abort, send_from_directory
+
+        doc_dir = paths.root / "doc"
+        target = (doc_dir / filename).resolve()
+        if not str(target).startswith(str(doc_dir.resolve())):
+            abort(404)
+        if not target.is_file():
+            abort(404)
+        return send_from_directory(doc_dir, filename)
 
     return app
