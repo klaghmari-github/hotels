@@ -1,0 +1,4 @@
+scenario_id,hotel_code,label
+S1,H001,base
+S2,H002,promo
+S3,H003,test

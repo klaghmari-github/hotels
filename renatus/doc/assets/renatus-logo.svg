@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Logo officiel renatus — marque R pipeline + cycle renaissance -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 528" role="img" aria-label="renatus">
+  <defs>
+    <linearGradient id="ring" x1="40" y1="420" x2="470" y2="80" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="22%" stop-color="#2dd4bf"/>
+      <stop offset="55%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <linearGradient id="rgrad" x1="150" y1="100" x2="360" y2="360" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="45%" stop-color="#3b82f6"/>
+      <stop offset="78%" stop-color="#2dd4bf"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="word" x1="80" y1="470" x2="430" y2="510" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#9ca3af"/>
+      <stop offset="50%" stop-color="#e5e7eb"/>
+      <stop offset="100%" stop-color="#9ca3af"/>
+    </linearGradient>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="context-stroke"/>
+    </marker>
+  </defs>
+  <rect width="512" height="528" fill="#000"/>
+  <!-- Anneau cycle -->
+  <circle cx="256" cy="230" r="168" fill="none" stroke="url(#ring)" stroke-width="14"
+          stroke-linecap="round" stroke-dasharray="900 120" transform="rotate(-40 256 230)"/>
+  <!-- fleches anneau (approx) -->
+  <path d="M118 300 A168 168 0 0 1 130 180" fill="none" stroke="url(#ring)" stroke-width="14"
+        stroke-linecap="round" marker-end="url(#arr)"/>
+  <path d="M390 140 A168 168 0 0 1 420 280" fill="none" stroke="url(#ring)" stroke-width="14"
+        stroke-linecap="round" marker-end="url(#arr)"/>
+  <!-- R pipeline (nodes + edges) -->
+  <g fill="none" stroke="url(#rgrad)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+    <!-- stem vertical -->
+    <path d="M190 120 L190 340" marker-mid="url(#arr)"/>
+    <!-- top bar + bowl of R -->
+    <path d="M190 120 L290 120 Q340 120 340 170 Q340 220 290 220 L190 220"/>
+    <path d="M190 120 L290 120" marker-end="url(#arr)"/>
+    <!-- leg of R -->
+    <path d="M250 220 L340 340" marker-end="url(#arr)"/>
+  </g>
+  <!-- nodes -->
+  <g fill="url(#rgrad)">
+    <circle cx="190" cy="120" r="14"/>
+    <circle cx="190" cy="220" r="14"/>
+    <circle cx="190" cy="340" r="14"/>
+    <circle cx="290" cy="120" r="12"/>
+    <circle cx="250" cy="220" r="12"/>
+    <circle cx="340" cy="340" r="14" fill="#f59e0b"/>
+  </g>
+  <!-- wordmark -->
+  <text x="256" y="500" text-anchor="middle"
+        font-family="Segoe UI, Helvetica Neue, Arial, sans-serif"
+        font-size="64" font-weight="500" letter-spacing="4" fill="url(#word)">renatus</text>
+</svg>

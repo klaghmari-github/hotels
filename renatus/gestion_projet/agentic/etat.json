@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-08-12T13:49:57",
+  "watchdog": {
+    "pid": 21653,
+    "running": true,
+    "heartbeat_at": "2026-08-12T13:49:57"
+  },
+  "agents": [
+    {
+      "role": "gestionnaire",
+      "feature": null,
+      "status": "idle",
+      "notes": "idle; 154 features terminee; pas de spawn"
+    },
+    {
+      "role": "developpeur",
+      "feature": null,
+      "status": "libre",
+      "notes": "backlog vide"
+    },
+    {
+      "role": "testeur",
+      "feature": null,
+      "status": "libre",
+      "notes": "backlog vide"
+    }
+  ],
+  "features_en_cours": [],
+  "anomalies_en_cours": [],
+  "locks": {
+    "develop": null,
+    "main": null
+  },
+  "git": {
+    "local_branch": "main",
+    "local_tip": "4e0fdf82e58c28b85155318e76d952e1ca195d69",
+    "remote_tip": "4e0fdf82e58c28b85155318e76d952e1ca195d69",
+    "ahead": 0,
+    "behind": 0,
+    "dirty": true,
+    "fetch_ok": true,
+    "checked_at": "2026-08-12T01:37:43",
+    "main_local": "4e0fdf8",
+    "main_origin": "4e0fdf8",
+    "develop_local": "4e0fdf8",
+    "develop_origin": "4e0fdf8"
+  }
+}

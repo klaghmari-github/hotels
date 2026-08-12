@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "renatus"
+version = "0.1.0"
+description = "Moteur de pipeline DuckDB (renatus)"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "duckdb>=1.0",
+    "pandas>=2.0",
+    "numpy>=1.26",
+    "pyyaml>=6.0",
+    # API + GUI (entrypoints renatus-api / renatus-gui toujours installes)
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.27",
+    "python-multipart>=0.0.9",
+    # Excel (.xlsx) pour dataframes (A0005)
+    "openpyxl>=3.1",
+]
+
+[project.optional-dependencies]
+excel = ["openpyxl>=3.1"]
+# extras vides (deps deja dans le coeur)
+api = []
+gui = []
+e2e = ["playwright>=1.40", "pytest-playwright>=0.4"]
+dev = ["pytest>=7.0", "renatus[e2e]"]
+
+# Surfaces produit (F0087 / F0088):
+#   renatus-core = package Python renatus (pipeline / moteur)
+#   renatus-cli  = REPL / oneshot (alias: renatus)
+#   renatus-api  = serveur HTTP REST
+#   renatus-gui  = interface web (package renatus.gui)
+[project.scripts]
+renatus = "renatus.cli:main"
+renatus-cli = "renatus.cli:main"
+renatus-api = "renatus.api.server:main"
+renatus-gui = "renatus.gui.server:main"
+
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"renatus.gui" = ["static/**/*", "static/*"]
+
+# Preferer src/renatus (package) a renatus.py (shim racine) pendant pytest
+[tool.pytest.ini_options]
+# src = package produit renatus ; gestion_projet/src = code agents (separe)
+pythonpath = ["src", "gestion_projet/src"]
+testpaths = ["tests", "gestion_projet/tests"]
+markers = [
+    "e2e: tests navigateur Playwright (extra [e2e], install chromium)",
+]
+addopts = "-m 'not e2e'"

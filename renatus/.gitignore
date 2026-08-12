@@ -1,0 +1,103 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+*.egg-info/
+.eggs/
+dist/
+build/
+sdist/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.manifest
+*.spec
+.installed.cfg
+MANIFEST
+
+# Environnements virtuels
+.venv/
+venv/
+ENV/
+env/
+.env/
+.python-version
+
+# Outils de test / couverture / typecheck
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+.cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+
+# Jupyter
+.ipynb_checkpoints/
+
+# VS Code (recursif)
+.vscode/
+**/.vscode/
+*.code-workspace
+
+# Autres editeurs
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+
+# DuckDB et bases locales (partout)
+*.duckdb
+*.duckdb.wal
+
+# Runtime local hors coeur renatus (A0002) — ne jamais versionner
+/data/
+/models/
+
+# Gestion projet — runtime watchdog
+gestion_projet/.running
+gestion_projet/.watchdog_state
+gestion_projet/notifications.log
+gestion_projet/locks/*.lock
+gestion_projet/__pycache__/
+gestion_projet/logs/
+gestion_projet/web_console/cloudflared
+gestion_projet/agentic/web_console/
+gestion_projet/web_console/**/__pycache__/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs et temporaires
+*.log
+*.tmp
+*.temp
+tmp/
+temp/
+
+# Secrets / env locaux
+.env
+.env.*
+!.env.example
+*.pem
+credentials.json
+
+# Workspace local utilisateur (gui) — legacy + F0069
+/workspace/
+/workspaces/
+

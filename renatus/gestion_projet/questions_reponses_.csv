@@ -1,0 +1,5 @@
+id,question,reponse,date,source
+Q0001,Comment communiquer des questions hors features/anomalies ?,Repondre en console ET enregistrer dans questions_reponses_.csv (pas forcement une feature).,2026-08-07,regles_de_gestion.md
+Q0002,Faut-il push pendant le dev/test ?,Oui. Push reguliers sur la branche feature/anomalie pour ne pas perdre le travail en cas de panne/redemarrage.,2026-08-07,regles_de_gestion.md
+Q20260808152434,Tu estimes combien de temps avant d etre libre ?,"Oui, je suis libre pour le moment — file d attente vide. Features ouvertes (CSV): 1 · anomalies: 6. Envoie une question, une feature ou un bug quand tu veux.",2026-08-08T15:24:34Z,web_console
+Q20260808152551,Je suis connecté au pc local aussi et je vois que t as des taches en cours pourquoi tu dis que t a qrien,"Oui, je suis libre pour le moment — file d attente vide. Features ouvertes (CSV): 1 · anomalies: 6. Envoie une question, une feature ou un bug quand tu veux.",2026-08-08T15:25:51Z,web_console

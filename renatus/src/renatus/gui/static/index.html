@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Renatus GUI</title>
+  <link rel="stylesheet" href="/gui/static/style.css?v=F0130" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img
+        class="logo-img"
+        src="/gui/static/renatus-logo.png"
+        alt="renatus"
+        width="32"
+        height="32"
+        data-testid="brand-logo"
+      />
+      <div>
+        <h1>Renatus GUI</h1>
+      </div>
+    </div>
+
+    <div class="workspace-chips">
+      <button type="button" class="chip" id="chip-db" data-testid="chip-db" title="Base DuckDB">
+        <span class="chip-k">DB</span>
+        <span class="chip-v" id="chip-db-label">—</span>
+      </button>
+      <button type="button" class="chip" id="chip-pipe" data-testid="chip-pipe" title="Dossier flow (flux)">
+        <span class="chip-k">FLOW</span>
+        <span class="chip-v" id="chip-pipe-label">—</span>
+      </button>
+      <span id="chip-project" class="chip project-chip" data-testid="chip-project" title="Projet">
+        <span class="chip-k">PROJ</span>
+        <span class="chip-v" id="chip-project-label">—</span>
+      </span>
+      <span class="toolbar-sep" aria-hidden="true"></span>
+      <button type="button" class="btn ghost" id="btn-project-open" data-testid="btn-project-open" title="Ouvrir un projet">Ouvrir</button>
+      <button type="button" class="btn" id="btn-project-save" data-testid="btn-project-save" title="Enregistrer le projet (Ctrl+Shift+S)">Sauver projet</button>
+      <button type="button" class="btn ghost" id="btn-global-changelogs" data-testid="btn-global-changelogs" title="Historique git (Track)">Track</button>
+      <span class="toolbar-sep" aria-hidden="true"></span>
+      <!-- F0109: documentation HTML (UML + guides) -->
+      <a
+        class="btn ghost btn-docs"
+        id="btn-docs"
+        data-testid="btn-docs"
+        href="/gui/docs/documentation.html"
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Documentation renatus (HTML + diagrammes UML)"
+      >Doc</a>
+      <span class="toolbar-sep" aria-hidden="true"></span>
+      <span id="status-pill" data-testid="status-pill" class="pill muted">deconnecte</span>
+    </div>
+  </header>
+
+  <main class="gui" id="gui-layout" data-testid="gui-layout">
+    <!-- Sidebar composants (F0076/F0079: collapsable) -->
+    <aside class="sidebar" id="sidebar" data-testid="gui-sidebar">
+      <div class="panel-head">
+        <h2>Composant</h2>
+        <div class="actions">
+          <button type="button" class="btn ghost icon btn-panel-collapse" id="btn-collapse-sidebar" data-testid="btn-collapse-sidebar" title="Replier les composants (plus d espace flux)" aria-label="Replier Composant" aria-expanded="true">‹</button>
+        </div>
+      </div>
+      <div id="toolbox" data-testid="gui-palette" class="toolbox"></div>
+      <button type="button" class="panel-rail panel-rail-left" id="rail-sidebar" data-testid="rail-sidebar" title="Ouvrir Composant" aria-label="Ouvrir Composant" hidden>
+        <span class="panel-rail-label">Composant</span>
+      </button>
+    </aside>
+
+    <!-- Centre: flux + config -->
+    <section class="center" id="center-layout" data-testid="center-layout">
+      <div class="graph-zone panel">
+        <div class="panel-head">
+          <h2>Flux</h2>
+          <div class="actions">
+            <button
+              type="button"
+              class="btn ghost"
+              id="btn-import-flow"
+              data-testid="btn-import-flow"
+              title="Importer un fichier YAML ou un dossier de flux"
+            >Importer flux</button>
+          </div>
+        </div>
+        <!-- F0096: menu deroulant zones (remplace la barre d onglets pills) -->
+        <div
+          id="pipeline-tabs"
+          class="pipeline-tabs flow-zone-bar"
+          data-testid="pipeline-tabs"
+          role="navigation"
+          aria-label="Zones du flux"
+        >
+          <label class="flow-zone-label" for="flow-zone-select">Zone</label>
+          <div class="renatus-select-wrap flow-zone-select-wrap">
+            <select
+              id="flow-zone-select"
+              class="flow-zone-select renatus-select"
+              data-testid="flow-zone-select"
+              aria-label="Zone a afficher"
+            ></select>
+          </div>
+          <span id="flow-zone-count" class="flow-zone-count" data-testid="flow-zone-count" hidden></span>
+          <!-- F0126: croix fermer zone retiree (navigation via select Zone) -->
+        </div>
+        <!-- F0118: progression Renatus zone (composants restants) -->
+        <div
+          id="build-progress"
+          class="build-progress"
+          data-testid="build-progress"
+          hidden
+          role="progressbar"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0"
+          aria-label="Progression Renatus zone"
+        >
+          <div class="build-progress-track">
+            <div
+              id="build-progress-fill"
+              class="build-progress-fill"
+              data-testid="build-progress-fill"
+            ></div>
+          </div>
+          <span
+            id="build-progress-label"
+            class="build-progress-label"
+            data-testid="build-progress-label"
+          ></span>
+        </div>
+        <div class="graph-canvas-wrap" data-testid="graph-canvas-wrap">
+          <div id="graph-canvas" data-testid="gui-canvas" class="graph-canvas" aria-label="Flux des steps"></div>
+          <!-- F0122: zoom in / out (Ctrl+molette aussi) -->
+          <div
+            id="graph-zoom-controls"
+            class="graph-zoom-controls"
+            data-testid="graph-zoom-controls"
+            role="group"
+            aria-label="Zoom du flux"
+          >
+            <button
+              type="button"
+              class="btn ghost graph-zoom-btn"
+              id="btn-graph-zoom-out"
+              data-testid="btn-graph-zoom-out"
+              title="Zoom arrière (Ctrl + molette)"
+              aria-label="Zoom arrière"
+            >−</button>
+            <button
+              type="button"
+              class="btn ghost graph-zoom-label-btn"
+              id="btn-graph-zoom-reset"
+              data-testid="btn-graph-zoom-reset"
+              title="Réinitialiser le zoom (Ctrl+0)"
+              aria-label="Réinitialiser le zoom à 100%"
+            ><span id="graph-zoom-label" data-testid="graph-zoom-label">100%</span></button>
+            <button
+              type="button"
+              class="btn ghost graph-zoom-btn"
+              id="btn-graph-zoom-in"
+              data-testid="btn-graph-zoom-in"
+              title="Zoom avant (Ctrl + molette)"
+              aria-label="Zoom avant"
+            >+</button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="config-zone panel" id="config-zone" data-testid="gui-config">
+        <div class="panel-head">
+          <h2>Config <span id="selected-name" class="muted">—</span></h2>
+          <div class="actions">
+            <!-- F0086: Supprimer/Sauver/Renatus retires — Suppr clavier, autosave, Renatus dans View (Ctrl+B) -->
+            <button type="button" class="btn ghost icon btn-panel-collapse" id="btn-collapse-config" data-testid="btn-collapse-config" title="Replier la config (plus d espace graphe)" aria-label="Replier Config" aria-expanded="true">›</button>
+          </div>
+        </div>
+        <button type="button" class="panel-rail panel-rail-right" id="rail-config" data-testid="rail-config" title="Ouvrir Config" aria-label="Ouvrir Config" hidden>
+          <span class="panel-rail-label">Config</span>
+        </button>
+        <form id="config-form" class="config-form is-presentation" hidden data-testid="config-form">
+          <!-- F0047/F0050/F0051: presentation ; crayon toggle a cote de la valeur -->
+          <div class="field field-readonly" data-field="id">
+            <div class="field-head">
+              <label for="cfg-id">ID</label>
+            </div>
+            <input
+              id="cfg-id"
+              data-testid="cfg-id"
+              type="text"
+              readonly
+              autocomplete="off"
+              title="Identifiant applicatif (non modifiable)"
+            />
+          </div>
+          <div class="field field-editable" data-field="label" data-edit-target="cfg-name">
+            <div class="field-head">
+              <label for="cfg-name">Label</label>
+            </div>
+            <div class="field-row">
+              <div class="field-value" data-display="cfg-name" data-testid="display-cfg-name">—</div>
+              <div class="field-control">
+                <input id="cfg-name" data-testid="cfg-name" type="text" autocomplete="off" title="Nom affiche (modifiable)" />
+              </div>
+              <button type="button" class="btn-pencil" data-testid="edit-cfg-name" data-edit="cfg-name" title="Modifier le label" aria-label="Modifier le label" aria-pressed="false" data-title-idle="Modifier le label"></button>
+            </div>
+          </div>
+          <div class="field field-editable" data-field="type" data-edit-target="cfg-type">
+            <div class="field-head">
+              <label for="cfg-type">Type</label>
+            </div>
+            <div class="field-row">
+              <div class="field-value" data-display="cfg-type" data-testid="display-cfg-type">—</div>
+              <div class="field-control">
+                <div class="renatus-select-wrap">
+                  <select id="cfg-type" class="renatus-select" data-testid="cfg-type">
+                    <option value="dataframe">dataframe</option>
+                    <option value="table">table</option>
+                    <option value="view">view</option>
+                    <option value="execute_sql">execute_sql</option>
+                    <option value="execute_python">execute_python</option>
+                    <option value="execute_shell">execute_shell</option>
+                    <option value="iterate">iterate</option>
+                    <option value="zone">zone</option>
+                  </select>
+                </div>
+              </div>
+              <button type="button" class="btn-pencil" data-testid="edit-cfg-type" data-edit="cfg-type" title="Modifier le type" aria-label="Modifier le type" aria-pressed="false" data-title-idle="Modifier le type"></button>
+            </div>
+          </div>
+          <div class="field field-editable" id="field-file" data-field="file" data-edit-target="cfg-file" hidden>
+            <div class="field-head">
+              <label>Fichier source</label>
+            </div>
+            <div class="field-row">
+              <!-- F0100: view = field-value ; dropzone seulement apres crayon -->
+              <div
+                class="field-value mono"
+                data-display="cfg-file"
+                data-testid="display-cfg-file"
+              >—</div>
+              <div id="file-summary" class="file-summary" data-testid="file-summary" hidden>
+                <span class="file-summary-icon" aria-hidden="true">📄</span>
+                <div class="file-summary-body">
+                  <span class="file-summary-name" id="file-summary-name" data-testid="file-summary-name">—</span>
+                  <span class="file-summary-path muted mono" id="file-summary-path" data-testid="file-summary-path">—</span>
+                </div>
+              </div>
+              <div class="field-control field-control-file">
+                <div
+                  id="file-dropzone"
+                  class="file-dropzone"
+                  data-testid="file-dropzone"
+                  tabindex="0"
+                >
+                  <input
+                    type="file"
+                    id="cfg-file-picker"
+                    data-testid="cfg-file-picker"
+                    hidden
+                    accept=".csv,.tsv,.txt,.parquet,.json,.xlsx,.xls"
+                  />
+                  <p class="drop-title">Glissez un fichier ici</p>
+                  <p class="drop-sub">
+                    ou
+                    <button type="button" class="btn link" id="btn-browse-file" data-testid="btn-browse-file">
+                      parcourir…
+                    </button>
+                  </p>
+                  <p id="file-drop-status" class="drop-status muted" data-testid="file-drop-status">
+                    Aucun fichier selectionne
+                  </p>
+                </div>
+                <label for="cfg-file" class="path-label">Chemin</label>
+                <input
+                  id="cfg-file"
+                  data-testid="cfg-file"
+                  type="text"
+                  autocomplete="off"
+                />
+              </div>
+              <button type="button" class="btn-pencil" data-testid="edit-cfg-file" data-edit="cfg-file" title="Modifier le fichier" aria-label="Modifier le fichier" aria-pressed="false" data-title-idle="Modifier le fichier"></button>
+            </div>
+          </div>
+          <div class="field field-editable" id="field-relation-name" data-field="relation" data-edit-target="cfg-relation-name" hidden>
+            <div class="field-head">
+              <label for="cfg-relation-name">Name</label>
+            </div>
+            <div class="field-row">
+              <div class="field-value" data-display="cfg-relation-name" data-testid="display-cfg-relation-name">—</div>
+              <div class="field-control">
+                <input
+                  id="cfg-relation-name"
+                  data-testid="cfg-relation-name"
+                  type="text"
+                  autocomplete="off"
+                  placeholder="df_sales"
+                  title="Name (relation en base)"
+                />
+              </div>
+              <button type="button" class="btn-pencil" data-testid="edit-cfg-relation-name" data-edit="cfg-relation-name" title="Modifier le name" aria-label="Modifier le name" aria-pressed="false" data-title-idle="Modifier le name"></button>
+            </div>
+          </div>
+          <!-- Mode create_* : dataframe / table / view (jamais zone — build = membres) -->
+          <div
+            class="field field-editable"
+            id="field-mode"
+            data-field="mode"
+            data-edit-target="cfg-mode"
+            data-testid="field-mode"
+            data-for-types="dataframe,table,view"
+            hidden
+          >
+            <div class="field-head">
+              <label for="cfg-mode">Mode</label>
+            </div>
+            <div class="field-row">
+              <div class="field-value" data-display="cfg-mode" data-testid="display-cfg-mode">—</div>
+              <div class="field-control">
+                <div class="renatus-select-wrap">
+                  <select id="cfg-mode" class="renatus-select" data-testid="cfg-mode">
+                    <option value="create_if_not_exists">create_if_not_exists</option>
+                    <option value="create_or_replace">create_or_replace</option>
+                  </select>
+                </div>
+              </div>
+              <button type="button" class="btn-pencil" data-testid="edit-cfg-mode" data-edit="cfg-mode" title="Modifier le mode" aria-label="Modifier le mode" aria-pressed="false" data-title-idle="Modifier le mode"></button>
+            </div>
+          </div>
+          <!-- F0095: view = chips required; edit = popup graphe zone (dblclick) -->
+          <div
+            class="field field-editable"
+            id="field-requires"
+            hidden
+            data-edit-target="cfg-requires"
+            data-testid="field-requires"
+          >
+            <div class="field-head">
+              <label>Requires</label>
+            </div>
+            <div class="field-row">
+              <div class="field-value field-value-requires" data-testid="display-cfg-requires">
+                <div
+                  id="cfg-requires-selected"
+                  class="requires-selected"
+                  data-testid="cfg-requires-selected"
+                  hidden
+                ></div>
+                <p id="requires-empty" class="empty-msg compact" data-testid="requires-empty" hidden>
+                  —
+                </p>
+              </div>
+              <button
+                type="button"
+                class="btn-pencil"
+                data-testid="edit-cfg-requires"
+                data-edit="cfg-requires"
+                title="Modifier requires"
+                aria-label="Modifier requires"
+                aria-pressed="false"
+                data-title-idle="Modifier requires"
+              ></button>
+            </div>
+            <!-- legacy container (cache) — source de verite = hidden + chips -->
+            <div
+              id="cfg-requires-picker"
+              class="requires-picker"
+              data-testid="cfg-requires-picker"
+              role="group"
+              aria-label="Requires"
+              hidden
+            ></div>
+            <input
+              id="cfg-requires"
+              data-testid="cfg-requires"
+              type="hidden"
+              value=""
+            />
+          </div>
+          <!-- F0116: workers + renatus_mode (zone) -->
+          <div
+            class="field field-editable"
+            id="field-zone-workers"
+            hidden
+            data-testid="field-zone-workers"
+            data-edit-target="cfg-zone-workers"
+            data-for-types="zone"
+          >
+            <div class="field-head">
+              <label for="cfg-zone-workers">Workers</label>
+            </div>
+            <div class="field-row">
+              <div class="field-value" data-display="cfg-zone-workers" data-testid="display-cfg-zone-workers">—</div>
+              <div class="field-control">
+                <div class="renatus-select-wrap">
+                  <select id="cfg-zone-workers" class="renatus-select" data-testid="cfg-zone-workers">
+                    <option value="auto" selected>auto (1 worker / ligne de flux)</option>
+                    <option value="queue">queue (file unique)</option>
+                    <option value="2">2</option>
+                    <option value="4">4</option>
+                    <option value="8">8</option>
+                  </select>
+                </div>
+              </div>
+              <button type="button" class="btn-pencil" data-testid="edit-cfg-zone-workers" data-edit="cfg-zone-workers" title="modifier workers" aria-label="modifier workers" aria-pressed="false" data-title-idle="modifier workers"></button>
+            </div>
+          </div>
+          <div
+            class="field field-editable"
+            id="field-zone-renatus-mode"
+            hidden
+            data-testid="field-zone-renatus-mode"
+            data-edit-target="cfg-zone-renatus-mode"
+            data-for-types="zone"
+          >
+            <div class="field-head">
+              <label for="cfg-zone-renatus-mode">Renatus mode</label>
+            </div>
+            <div class="field-row">
+              <div class="field-value" data-display="cfg-zone-renatus-mode" data-testid="display-cfg-zone-renatus-mode">—</div>
+              <div class="field-control">
+                <div class="renatus-select-wrap">
+                  <select id="cfg-zone-renatus-mode" class="renatus-select" data-testid="cfg-zone-renatus-mode">
+                    <option value="required_for_leaves" selected>required_for_leaves (feuilles + requires)</option>
+                    <option value="root_to_leaves">root_to_leaves (ordre pipeline)</option>
+                  </select>
+                </div>
+              </div>
+              <button type="button" class="btn-pencil" data-testid="edit-cfg-zone-renatus-mode" data-edit="cfg-zone-renatus-mode" title="modifier renatus_mode" aria-label="modifier renatus_mode" aria-pressed="false" data-title-idle="modifier renatus_mode"></button>
+            </div>
+          </div>
+          <!-- F0056 / F0097: objects zone = chips view + popup flux (dblclick) -->
+          <div
+            class="field field-editable"
+            id="field-zone-objects"
+            hidden
+            data-testid="field-zone-objects"
+            data-edit-target="cfg-zone-objects"
+          >
+            <div class="field-head">
+              <label>Objects</label>
+            </div>
+            <div class="field-row">
+              <div class="field-value field-value-requires" data-testid="display-cfg-zone-objects">
+                <div
+                  id="cfg-zone-objects-selected"
+                  class="requires-selected"
+                  data-testid="cfg-zone-objects-selected"
+                  hidden
+                ></div>
+                <p id="zone-objects-empty" class="empty-msg compact" data-testid="zone-objects-empty" hidden>
+                  —
+                </p>
+              </div>
+              <button
+                type="button"
+                class="btn-pencil"
+                data-testid="edit-cfg-zone-objects"
+                data-edit="cfg-zone-objects"
+                title="Modifier objects"
+                aria-label="Modifier objects"
+                aria-pressed="false"
+                data-title-idle="Modifier objects"
+              ></button>
+            </div>
+            <div
+              id="cfg-zone-objects-picker"
+              class="requires-picker"
+              data-testid="cfg-zone-objects-picker"
+              role="group"
+              aria-label="Objects"
+              hidden
+            ></div>
+            <input
+              id="cfg-zone-objects"
+              data-testid="cfg-zone-objects"
+              type="hidden"
+              value=""
+            />
+          </div>
+          <!-- F0128: auto-zone object ref (lecture seule) -->
+          <div class="field" id="field-auto-object" data-testid="field-auto-object" hidden>
+            <div class="field-head">
+              <label for="cfg-auto-object">Object (ref)</label>
+            </div>
+            <div class="field-row">
+              <div class="field-value mono" data-display="cfg-auto-object" data-testid="display-cfg-auto-object">—</div>
+              <div class="field-control" hidden>
+                <input id="cfg-auto-object" class="mono" data-testid="cfg-auto-object" type="text" readonly disabled />
+              </div>
+            </div>
+          </div>
+          <!-- F0128: convertir auto-zone → zone physique -->
+          <div class="field" id="field-auto-convert" data-testid="field-auto-convert" hidden>
+            <div class="field-head">
+              <label>Actions</label>
+            </div>
+            <div class="field-row">
+              <button
+                type="button"
+                class="btn primary"
+                id="btn-auto-convert"
+                data-testid="btn-auto-convert"
+                title="Creer une zone physique dans main (copies YAML)"
+              >Convertir en zone</button>
+            </div>
+          </div>
+          <div class="field" id="field-dependents" data-testid="field-dependents">
+            <label>Required by</label>
+            <div
+              id="cfg-dependents"
+              class="requires-selected dependents-list"
+              data-testid="cfg-dependents"
+            ></div>
+            <p id="dependents-empty" class="empty-msg compact" data-testid="dependents-empty" hidden>
+              —
+            </p>
+          </div>
+          <!-- F0057: zones d appartenance (calculees, inverse de zone.objects) -->
+          <div class="field" id="field-zones" data-testid="field-zones">
+            <label>Zones</label>
+            <div
+              id="cfg-zones"
+              class="requires-selected zones-list"
+              data-testid="cfg-zones"
+            ></div>
+            <p id="zones-empty" class="empty-msg compact" data-testid="zones-empty" hidden>
+              —
+            </p>
+          </div>
+          <!-- F0093: duree dernier Renatus (tous composants) -->
+          <div class="field" id="field-renatus-time" data-testid="field-renatus-time">
+            <label>Renatus time</label>
+            <div class="field-row">
+              <div
+                class="field-value mono"
+                id="cfg-renatus-time"
+                data-testid="cfg-renatus-time"
+              >—</div>
+            </div>
+          </div>
+          <!-- F0092: shape [rows, cols] calcule (dataframe/table/view) -->
+          <div class="field" id="field-shape" data-testid="field-shape" hidden>
+            <label>Shape</label>
+            <div class="field-row">
+              <div
+                class="field-value mono"
+                id="cfg-shape"
+                data-testid="cfg-shape"
+              >—</div>
+            </div>
+          </div>
+          <!-- F0091: schema dataset calcule (dataframe/table/view) -->
+          <div class="field" id="field-schema" data-testid="field-schema" hidden>
+            <label>Schema</label>
+            <div
+              id="cfg-schema"
+              class="schema-list"
+              data-testid="cfg-schema"
+            ></div>
+            <p id="schema-empty" class="empty-msg compact" data-testid="schema-empty" hidden>
+              —
+            </p>
+          </div>
+          <!-- F0067: script unifie (SQL pour table/view/execute, Python pour execute_python) -->
+          <div class="field field-editable" id="field-script" data-field="script" data-edit-target="cfg-script" hidden data-testid="field-script">
+            <div class="field-head">
+              <label for="cfg-script" id="cfg-script-label">Script</label>
+            </div>
+            <div class="field-row">
+              <pre class="field-value field-value-code" data-display="cfg-script" data-testid="display-cfg-script">—</pre>
+              <div class="field-control">
+                <textarea
+                  id="cfg-script"
+                  data-testid="cfg-script"
+                  rows="8"
+                  spellcheck="false"
+                  placeholder="SELECT * FROM df_sales"
+                  title="Script (SQL ou Python). Ctrl+Entrée pour valider, ou clic dehors."
+                ></textarea>
+              </div>
+              <button type="button" class="btn-pencil" data-testid="edit-cfg-script" data-edit="cfg-script" title="Modifier le script" aria-label="Modifier le script" aria-pressed="false" data-title-idle="Modifier le script"></button>
+            </div>
+          </div>
+          <div class="field field-editable" id="field-venv" data-field="venv" data-edit-target="cfg-venv" hidden data-testid="field-venv">
+            <div class="field-head">
+              <label for="cfg-venv">Venv</label>
+            </div>
+            <div class="field-row">
+              <div class="field-value" data-display="cfg-venv" data-testid="display-cfg-venv">—</div>
+              <div class="field-control">
+                <input
+                  id="cfg-venv"
+                  data-testid="cfg-venv"
+                  type="text"
+                  autocomplete="off"
+                  placeholder="(python local)"
+                  title="Vide = python local ; sinon chemin venv ou binaire"
+                />
+              </div>
+              <button type="button" class="btn-pencil" data-testid="edit-cfg-venv" data-edit="cfg-venv" title="Modifier le venv" aria-label="Modifier le venv" aria-pressed="false" data-title-idle="Modifier le venv"></button>
+            </div>
+          </div>
+          <div class="field field-editable" id="field-iter" hidden data-testid="field-iter" data-field="iter">
+            <div class="field-head">
+              <label>Iteration</label>
+            </div>
+            <div class="field-row">
+              <div class="field-value" data-display="cfg-iter" data-testid="display-cfg-iter">—</div>
+              <div class="field-control">
+                <label for="cfg-target">Target</label>
+                <input
+                  id="cfg-target"
+                  data-testid="cfg-target"
+                  type="text"
+                  list="step-names-list"
+                  autocomplete="off"
+                />
+                <label for="cfg-scenarios">Scenarios</label>
+                <input
+                  id="cfg-scenarios"
+                  data-testid="cfg-scenarios"
+                  type="text"
+                  list="step-names-list"
+                  autocomplete="off"
+                />
+                <label for="cfg-step-view">step_view</label>
+                <input
+                  id="cfg-step-view"
+                  data-testid="cfg-step-view"
+                  type="text"
+                  autocomplete="off"
+                />
+                <datalist id="step-names-list"></datalist>
+              </div>
+              <button type="button" class="btn-pencil" data-testid="edit-cfg-iter" data-edit="cfg-target" title="Modifier iteration" aria-label="Modifier iteration" aria-pressed="false" data-title-idle="Modifier iteration"></button>
+            </div>
+          </div>
+          <details class="raw-yaml" open data-testid="raw-yaml-panel">
+            <summary>YAML</summary>
+            <div class="yaml-editor" id="yaml-editor" data-testid="yaml-editor">
+              <div class="yaml-editor-inner">
+                <pre
+                  id="yaml-highlight"
+                  class="yaml-highlight"
+                  data-testid="yaml-highlight"
+                  aria-hidden="true"
+                ></pre>
+                <textarea
+                  id="config-editor"
+                  data-testid="config-yaml"
+                  spellcheck="false"
+                  rows="16"
+                  autocomplete="off"
+                  autocorrect="off"
+                  autocapitalize="off"
+                ></textarea>
+              </div>
+            </div>
+            <div
+              id="yaml-status"
+              class="yaml-status meta muted"
+              data-testid="yaml-status"
+              role="status"
+              aria-live="polite"
+              hidden
+            ></div>
+          </details>
+        </form>
+        <p id="config-placeholder" class="empty-msg">—</p>
+        <p id="file-origin" class="meta muted"></p>
+      </div>
+    </section>
+
+    <!-- Bas: View (data) + Track (git) — F0035 / F0071 / F0076 collapsable -->
+    <section class="dataview panel" id="dataview-zone" data-testid="gui-dataview">
+      <div class="panel-head bottom-tabs-head">
+        <div class="bottom-tabs" data-testid="bottom-tabs" role="tablist">
+          <button type="button" class="bottom-tab active" id="tab-data-preview" data-testid="tab-data-preview" role="tab" aria-selected="true" title="Apercu des donnees">View</button>
+          <button type="button" class="bottom-tab" id="tab-changelogs" data-testid="tab-changelogs" role="tab" aria-selected="false" title="Historique git du projet">Track</button>
+        </div>
+        <!-- F0071/F0074: actions View (Renatus) vs Track (Apply) mutuellement exclusives -->
+        <div class="actions bottom-actions" id="dataview-actions" data-testid="dataview-actions">
+          <button type="button" class="btn primary" id="btn-dv-build" data-testid="btn-dv-build" disabled title="Renatus">Renatus</button>
+        </div>
+        <div class="actions bottom-actions" id="changelog-actions" data-testid="changelog-actions" hidden>
+          <button type="button" class="btn primary" id="btn-changelog-apply-file" data-testid="btn-changelog-apply-file" disabled title="Restaurer uniquement le fichier affiche (nouveau commit)">Apply file</button>
+          <button type="button" class="btn" id="btn-changelog-apply-all" data-testid="btn-changelog-apply-all" disabled title="Restaurer tous les fichiers a l etat de ce commit (nouveau commit)">Apply all</button>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn ghost icon btn-panel-collapse" id="btn-collapse-bottom" data-testid="btn-collapse-bottom" title="Replier View/Track (plus d espace graphe)" aria-label="Replier View" aria-expanded="true">▾</button>
+        </div>
+      </div>
+      <button type="button" class="panel-rail panel-rail-bottom" id="rail-bottom" data-testid="rail-bottom" title="Ouvrir View / Track" aria-label="Ouvrir View" hidden>
+        <span class="panel-rail-label">View / Track</span>
+      </button>
+
+      <div id="panel-data-preview" data-testid="panel-data-preview">
+        <div class="panel-subhead">
+          <span id="dataview-name" class="muted"></span>
+        </div>
+        <div id="dataview-meta" class="meta muted" data-testid="dataview-meta"></div>
+        <!-- F0073: execute_python → sous-onglets Output / Error -->
+        <div id="process-view" class="process-view" data-testid="process-view" hidden>
+          <div class="process-subtabs" data-testid="process-subtabs" role="tablist" aria-label="Sorties Python">
+            <button type="button" class="process-subtab active" id="tab-process-output" data-testid="tab-process-output" role="tab" aria-selected="true">Output</button>
+            <button type="button" class="process-subtab" id="tab-process-error" data-testid="tab-process-error" role="tab" aria-selected="false">Error</button>
+          </div>
+          <pre id="process-out-stdout" class="process-pane" data-testid="process-out-stdout" role="tabpanel" aria-label="stdout"></pre>
+          <pre id="process-out-stderr" class="process-pane process-pane-error" data-testid="process-out-stderr" role="tabpanel" aria-label="stderr" hidden></pre>
+        </div>
+        <!-- F0123/F0124: pagination datasets — 1 page chargee a la fois; pageSize controlable -->
+        <div
+          id="dataview-pager"
+          class="dataview-pager"
+          data-testid="dataview-pager"
+          hidden
+          role="navigation"
+          aria-label="Pagination des lignes"
+        >
+          <label class="dataview-page-size-label" for="dataview-page-size">Lignes</label>
+          <div class="renatus-select-wrap dataview-page-size-wrap">
+            <select
+              id="dataview-page-size"
+              class="renatus-select dataview-page-size"
+              data-testid="dataview-page-size"
+              title="Nombre de lignes par page (seule la page courante est chargee)"
+              aria-label="Lignes par page"
+            >
+              <option value="3" selected>3</option>
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+          <button
+            type="button"
+            class="btn ghost dataview-pager-btn"
+            id="btn-dv-page-prev"
+            data-testid="btn-dv-page-prev"
+            title="Page précédente"
+            aria-label="Page précédente"
+            disabled
+          >‹</button>
+          <span
+            id="dataview-pager-label"
+            class="dataview-pager-label"
+            data-testid="dataview-pager-label"
+          >—</span>
+          <button
+            type="button"
+            class="btn ghost dataview-pager-btn"
+            id="btn-dv-page-next"
+            data-testid="btn-dv-page-next"
+            title="Page suivante"
+            aria-label="Page suivante"
+            disabled
+          >›</button>
+        </div>
+        <div class="table-wrap" id="table-wrap" data-testid="table-wrap">
+          <table id="result-table" data-testid="dataview-table">
+            <thead></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="panel-changelogs" data-testid="panel-changelogs" hidden>
+        <div class="changelog-layout">
+          <aside class="changelog-timeline" data-testid="changelog-timeline">
+            <div class="changelog-timeline-title">Track</div>
+            <ul id="changelog-list" class="changelog-list" data-testid="changelog-list"></ul>
+            <p id="changelog-empty" class="empty-msg compact" data-testid="changelog-empty" hidden>—</p>
+          </aside>
+          <div class="changelog-diff-pane">
+            <div class="changelog-diff-head">
+              <span id="changelog-diff-meta" class="meta muted" data-testid="changelog-diff-meta"></span>
+            </div>
+            <div class="changelog-files-wrap">
+              <ul id="changelog-files" class="changelog-files" data-testid="changelog-files" aria-label="Fichiers du commit"></ul>
+            </div>
+            <pre id="changelog-diff" class="changelog-diff" data-testid="changelog-diff" aria-label="Diff"></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal proprietes DB / Pipeline -->
+  <dialog id="props-dialog" data-testid="props-dialog" class="props-dialog">
+    <form method="dialog" class="props-form">
+      <h3 id="props-title">Proprietes</h3>
+      <label id="props-label" for="props-path">Chemin</label>
+      <input id="props-path" type="text" readonly />
+      <div class="props-actions">
+        <button type="submit" class="btn primary" value="ok">Fermer</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Modal sauver / ouvrir / creer projet (F0036) -->
+  <dialog id="project-dialog" data-testid="project-dialog" class="props-dialog project-dialog-wide">
+    <form method="dialog" id="project-form" class="props-form project-form">
+      <h3 id="project-dialog-title">Projet renatus</h3>
+      <p id="project-dialog-hint" class="project-hint" data-testid="project-dialog-hint" hidden></p>
+
+      <!-- Mode save: nom + chemin fichier -->
+      <div id="project-save-fields" data-testid="project-save-fields" hidden>
+        <label for="project-name">Nom</label>
+        <input id="project-name" data-testid="project-name" type="text" autocomplete="off" />
+        <label for="project-path-save">Fichier projet (.renatus.yaml)</label>
+        <input id="project-path-save" data-testid="project-path-save" type="text" autocomplete="off" />
+      </div>
+
+      <!-- Mode open/create: chemin projet + branchements -->
+      <div id="project-open-fields" data-testid="project-open-fields">
+        <div
+          id="project-path-zone"
+          class="path-zone"
+          data-testid="project-path-zone"
+          tabindex="0"
+        >
+          <p class="drop-title">Dossier ou fichier projet</p>
+          <input
+            id="project-path"
+            data-testid="project-path"
+            type="text"
+            autocomplete="off"
+            placeholder="/chemin/projet ou mon.renatus.yaml"
+          />
+          <p id="project-path-status" class="drop-status muted" data-testid="project-path-status"></p>
+        </div>
+
+        <!-- Existant: resume lecture seule -->
+        <div id="project-existing-panel" class="project-panel" data-testid="project-existing-panel" hidden>
+          <div class="project-panel-title">Projet existant</div>
+          <div class="project-meta-grid">
+            <div class="project-meta-card">
+              <span class="pm-k">Nom</span>
+              <span class="pm-v" id="project-meta-name" data-testid="project-meta-name">—</span>
+            </div>
+            <div class="project-meta-card">
+              <span class="pm-k">Base DuckDB</span>
+              <span class="pm-v mono" id="project-meta-db" data-testid="project-meta-db">—</span>
+            </div>
+            <div class="project-meta-card">
+              <span class="pm-k">Pipelines</span>
+              <span class="pm-v mono" id="project-meta-pipe" data-testid="project-meta-pipe">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nouveau: brancher db + flow -->
+        <div id="project-new-panel" class="project-panel" data-testid="project-new-panel" hidden>
+          <div class="project-panel-title">Nouveau projet</div>
+          <label for="project-create-name">Nom</label>
+          <input id="project-create-name" data-testid="project-create-name" type="text" autocomplete="off" />
+
+          <div
+            id="project-db-zone"
+            class="path-zone path-zone-sm"
+            data-testid="project-db-zone"
+          >
+            <p class="drop-title">Base DuckDB</p>
+            <input
+              id="project-db-path"
+              data-testid="project-db-path"
+              type="text"
+              autocomplete="off"
+              placeholder="base.duckdb"
+            />
+          </div>
+
+          <div
+            id="project-pipe-zone"
+            class="path-zone path-zone-sm"
+            data-testid="project-pipe-zone"
+          >
+            <p class="drop-title">Pipelines</p>
+            <input
+              id="project-pipe-path"
+              data-testid="project-pipe-path"
+              type="text"
+              autocomplete="off"
+              placeholder="flow"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="props-actions">
+        <button type="submit" class="btn" value="cancel">Annuler</button>
+        <button type="submit" class="btn primary" id="project-dialog-confirm" value="ok" data-testid="project-dialog-confirm">OK</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Modal nouvel outil -->
+  <dialog id="new-step-dialog" data-testid="new-step-dialog" class="props-dialog">
+    <form method="dialog" id="new-step-form" class="props-form">
+      <h3 id="new-step-title">Nouvel outil</h3>
+      <p id="new-step-desc" class="hint" hidden></p>
+      <label for="new-step-name">Nom</label>
+      <input id="new-step-name" data-testid="new-step-name" type="text" required autocomplete="off" />
+      <div class="props-actions">
+        <button type="submit" class="btn" value="cancel">Annuler</button>
+        <button type="submit" class="btn primary" value="create">Creer</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Modal nouvelle zone de flux (onglet = sous-dossier) F0038/F0045 -->
+  <dialog id="new-tab-dialog" data-testid="new-tab-dialog" class="props-dialog">
+    <form method="dialog" id="new-tab-form" class="props-form new-tab-form">
+      <div class="dialog-head">
+        <div class="dialog-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6h16M4 12h10M4 18h16"/>
+            <path d="M16 10v8M12 14h8"/>
+          </svg>
+        </div>
+        <div>
+          <h3 id="new-tab-title">Nouvelle zone</h3>
+        </div>
+      </div>
+      <label for="new-tab-name">Nom</label>
+      <input
+        id="new-tab-name"
+        data-testid="new-tab-name"
+        type="text"
+        required
+        autocomplete="off"
+        placeholder="etl"
+        maxlength="64"
+      />
+      <div class="props-actions">
+        <button type="submit" class="btn" value="cancel" data-testid="new-tab-cancel">Annuler</button>
+        <button type="submit" class="btn primary" value="create" data-testid="new-tab-confirm">Creer</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- F0102 / F0107: import flux (fichier ou dossier) — dropzone + selects stylés -->
+  <dialog
+    id="import-flow-dialog"
+    class="props-dialog import-flow-dialog"
+    data-testid="import-flow-dialog"
+    aria-labelledby="import-flow-title"
+  >
+    <form method="dialog" id="import-flow-form" class="props-form import-flow-form">
+      <div class="dialog-head">
+        <div class="dialog-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </div>
+        <div>
+          <h3 id="import-flow-title" data-testid="import-flow-title">Importer flux</h3>
+          <p class="dialog-sub">YAML ou dossier. Chaque objet → 1 fichier. Conflits: stratégie choisie ; entre fichiers d&rsquo;import: préfixe du fichier source.</p>
+        </div>
+      </div>
+
+      <div class="import-flow-section" data-testid="import-flow-source-section">
+        <div class="import-flow-section-label">Source (fichier YAML ou dossier complet)</div>
+        <div
+          id="import-flow-dropzone"
+          class="file-dropzone import-flow-dropzone"
+          data-testid="import-flow-dropzone"
+          tabindex="0"
+        >
+          <!-- F0111/F0113: pickers distincts — webkitdirectory OBLIGATOIRE sur le picker dossier -->
+          <input
+            type="file"
+            id="import-flow-file-picker"
+            class="visually-hidden-file"
+            data-testid="import-flow-file-picker"
+            accept=".yaml,.yml,application/x-yaml,text/yaml"
+            tabindex="-1"
+            aria-hidden="true"
+          />
+          <input
+            type="file"
+            id="import-flow-dir-picker"
+            class="visually-hidden-file"
+            data-testid="import-flow-dir-picker"
+            webkitdirectory="true"
+            directory="true"
+            multiple
+            tabindex="-1"
+            aria-hidden="true"
+          />
+          <p class="drop-title">Glissez un <strong>fichier YAML</strong> ou un <strong>dossier parent</strong> ici</p>
+          <p class="drop-sub">
+            <strong>Recommandé :</strong> glisser le dossier (souvent sans confirmation navigateur).
+            Sinon <strong>Dossier…</strong> pour le sélecteur.
+          </p>
+          <div class="import-flow-browse-row" data-testid="import-flow-browse-row">
+            <button type="button" class="btn" id="import-flow-browse-file" data-testid="import-flow-browse-file" title="Choisir un unique fichier .yaml">
+              📄 Fichier YAML…
+            </button>
+            <button type="button" class="btn primary" id="import-flow-browse-dir" data-testid="import-flow-browse-dir" title="Choisir un dossier parent (toute l arborescence)">
+              📁 Dossier…
+            </button>
+          </div>
+          <p id="import-flow-path-status" class="drop-status muted" data-testid="import-flow-path-status">
+            Aucune source sélectionnée
+          </p>
+        </div>
+        <label for="import-flow-source" class="path-label">Chemin serveur (optionnel — fichier ou dossier déjà sur le serveur)</label>
+        <input
+          id="import-flow-source"
+          data-testid="import-flow-source"
+          type="text"
+          class="import-flow-path-input"
+          autocomplete="off"
+          placeholder="/chemin/serveur/flux.yaml  ou  /chemin/vers/dossier_parent"
+        />
+      </div>
+
+      <div class="import-flow-section import-flow-fields">
+        <div class="import-flow-field">
+          <label for="import-flow-target">Zone cible</label>
+          <div class="renatus-select-wrap">
+            <select id="import-flow-target" class="renatus-select" data-testid="import-flow-target"></select>
+          </div>
+        </div>
+        <div class="import-flow-field">
+          <span class="import-flow-field-label" id="import-flow-conflict-label">En cas de conflit d&rsquo;id</span>
+          <div
+            class="import-flow-conflict-cards"
+            role="radiogroup"
+            aria-labelledby="import-flow-conflict-label"
+            data-testid="import-flow-conflict-cards"
+          >
+            <!-- F0112: pictogrammes distinctifs — emoji + SVG (visibles meme sans CSS) -->
+            <label class="import-flow-conflict-card" data-conflict="keep_both" title="Garder les deux versions : renommer l import">
+              <input type="radio" name="import-flow-conflict" value="keep_both" checked data-testid="import-flow-conflict-keep_both" />
+              <span class="card-icon" data-testid="conflict-icon-keep_both">
+                <span class="card-emoji" aria-hidden="true">📑</span>
+                <svg class="card-svg" viewBox="0 0 48 48" width="40" height="40" aria-hidden="true">
+                  <rect x="8" y="6" width="22" height="28" rx="3" fill="#1a2f3a" stroke="#5eead4" stroke-width="2"/>
+                  <rect x="16" y="12" width="22" height="28" rx="3" fill="#0f2a32" stroke="#2dd4bf" stroke-width="2"/>
+                  <line x1="21" y1="22" x2="33" y2="22" stroke="#99f6e4" stroke-width="2" stroke-linecap="round"/>
+                  <line x1="21" y1="28" x2="30" y2="28" stroke="#99f6e4" stroke-width="2" stroke-linecap="round"/>
+                  <circle cx="36" cy="36" r="9" fill="#2dd4bf"/>
+                  <path d="M32 36h8M36 32v8" stroke="#042f2e" stroke-width="2.2" stroke-linecap="round"/>
+                </svg>
+              </span>
+              <span class="card-title">Renommer</span>
+              <span class="card-desc">Garder les deux versions</span>
+            </label>
+            <label class="import-flow-conflict-card" data-conflict="keep_existing" title="Garder l existant : ignorer l import">
+              <input type="radio" name="import-flow-conflict" value="keep_existing" data-testid="import-flow-conflict-keep_existing" />
+              <span class="card-icon" data-testid="conflict-icon-keep_existing">
+                <span class="card-emoji" aria-hidden="true">🛡️</span>
+                <svg class="card-svg" viewBox="0 0 48 48" width="40" height="40" aria-hidden="true">
+                  <path d="M24 4l16 6v12c0 10-7 17-16 20C15 39 8 32 8 22V10l16-6z" fill="#2a2410" stroke="#fbbf24" stroke-width="2"/>
+                  <path d="M16 24l5.5 5.5L34 16" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              <span class="card-title">Ignorer</span>
+              <span class="card-desc">Garder l&rsquo;existant</span>
+            </label>
+            <label class="import-flow-conflict-card" data-conflict="replace" title="Remplacer : ecraser par l import">
+              <input type="radio" name="import-flow-conflict" value="replace" data-testid="import-flow-conflict-replace" />
+              <span class="card-icon" data-testid="conflict-icon-replace">
+                <span class="card-emoji" aria-hidden="true">⬇️</span>
+                <svg class="card-svg" viewBox="0 0 48 48" width="40" height="40" aria-hidden="true">
+                  <rect x="10" y="4" width="28" height="34" rx="3" fill="#2a1218" stroke="#fb7185" stroke-width="2"/>
+                  <line x1="16" y1="14" x2="32" y2="14" stroke="#fda4af" stroke-width="2" opacity="0.4" stroke-linecap="round"/>
+                  <line x1="16" y1="20" x2="32" y2="20" stroke="#fda4af" stroke-width="2" opacity="0.4" stroke-linecap="round"/>
+                  <path d="M24 16v18M17 27l7 7 7-7" fill="none" stroke="#fb7185" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              <span class="card-title">Remplacer</span>
+              <span class="card-desc">Écraser la version actuelle</span>
+            </label>
+          </div>
+          <!-- miroir pour tests / API existants -->
+          <select id="import-flow-conflict" class="import-flow-conflict-mirror" data-testid="import-flow-conflict" hidden aria-hidden="true">
+            <option value="keep_both" selected>keep_both</option>
+            <option value="keep_existing">keep_existing</option>
+            <option value="replace">replace</option>
+          </select>
+        </div>
+      </div>
+
+      <pre id="import-flow-preview" class="import-flow-preview" data-testid="import-flow-preview" hidden></pre>
+
+      <div class="props-actions">
+        <button type="button" class="btn" id="import-flow-preview-btn" data-testid="import-flow-preview-btn">Aperçu</button>
+        <button type="submit" class="btn" value="cancel" data-testid="import-flow-cancel">Annuler</button>
+        <button type="submit" class="btn primary" value="ok" data-testid="import-flow-ok">Importer</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- F0095: edition Requires — graphe zone lecture seule, dblclick pour ajouter -->
+  <dialog
+    id="requires-edit-dialog"
+    class="props-dialog requires-edit-dialog"
+    data-testid="requires-edit-dialog"
+    aria-labelledby="requires-edit-title"
+  >
+    <form method="dialog" id="requires-edit-form" class="props-form requires-edit-form">
+      <div class="dialog-head">
+        <div class="dialog-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+          </svg>
+        </div>
+        <div>
+          <h3 id="requires-edit-title" data-testid="requires-edit-title">Requires</h3>
+          <p class="dialog-sub">Double-clic sur un composant pour l&rsquo;ajouter. Choisissez une zone dans le menu.</p>
+        </div>
+      </div>
+      <div class="requires-edit-toolbar">
+        <label for="requires-zone-select">Zone</label>
+        <div class="renatus-select-wrap requires-zone-select-wrap">
+          <select
+            id="requires-zone-select"
+            class="renatus-select"
+            data-testid="requires-zone-select"
+          ></select>
+        </div>
+      </div>
+      <div
+        id="requires-edit-selected"
+        class="requires-selected requires-edit-selected"
+        data-testid="requires-edit-selected"
+      ></div>
+      <div
+        id="requires-edit-canvas"
+        class="requires-edit-canvas graph-canvas"
+        data-testid="requires-edit-canvas"
+        role="img"
+        aria-label="Composants de la zone — double-clic pour ajouter"
+        title="Double-clic pour ajouter au required"
+      ></div>
+      <div class="props-actions">
+        <button type="submit" class="btn" value="cancel" data-testid="requires-edit-cancel">Annuler</button>
+        <button type="submit" class="btn primary" value="ok" data-testid="requires-edit-ok">OK</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- F0097: edition Objects d une zone — graphe flux, dropdown zone, dblclick -->
+  <dialog
+    id="zone-objects-edit-dialog"
+    class="props-dialog requires-edit-dialog"
+    data-testid="zone-objects-edit-dialog"
+    aria-labelledby="zone-objects-edit-title"
+  >
+    <form method="dialog" id="zone-objects-edit-form" class="props-form requires-edit-form">
+      <div class="dialog-head">
+        <div class="dialog-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+          </svg>
+        </div>
+        <div>
+          <h3 id="zone-objects-edit-title" data-testid="zone-objects-edit-title">Objects</h3>
+          <p class="dialog-sub">Double-clic pour copier un composant dans cette zone. Menu = zone source a parcourir.</p>
+        </div>
+      </div>
+      <div class="requires-edit-toolbar">
+        <label for="zone-objects-zone-select">Zone</label>
+        <div class="renatus-select-wrap requires-zone-select-wrap">
+          <select
+            id="zone-objects-zone-select"
+            class="renatus-select"
+            data-testid="zone-objects-zone-select"
+          ></select>
+        </div>
+      </div>
+      <div
+        id="zone-objects-edit-selected"
+        class="requires-selected requires-edit-selected"
+        data-testid="zone-objects-edit-selected"
+      ></div>
+      <div
+        id="zone-objects-edit-canvas"
+        class="requires-edit-canvas graph-canvas"
+        data-testid="zone-objects-edit-canvas"
+        role="img"
+        aria-label="Composants de la zone — double-clic pour ajouter"
+        title="Double-clic pour ajouter aux objects"
+      ></div>
+      <div class="props-actions">
+        <button type="submit" class="btn" value="cancel" data-testid="zone-objects-edit-cancel">Annuler</button>
+        <button type="submit" class="btn primary" value="ok" data-testid="zone-objects-edit-ok">OK</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- F0137: notebook style Jupyter Lab + variables session Python -->
+  <dialog
+    id="notebook-dialog"
+    class="props-dialog notebook-dialog"
+    data-testid="notebook-dialog"
+    aria-labelledby="notebook-title"
+  >
+    <div class="notebook-shell">
+      <header class="notebook-head">
+        <div class="dialog-icon dialog-icon-info" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <line x1="3" y1="9" x2="21" y2="9"/>
+            <line x1="3" y1="15" x2="21" y2="15"/>
+            <line x1="9" y1="3" x2="9" y2="21"/>
+          </svg>
+        </div>
+        <div class="notebook-head-text">
+          <h3 id="notebook-title" data-testid="notebook-title">Notebook</h3>
+          <p class="dialog-sub">Session Python partagée — variables réutilisables (pas besoin de reconstruire un DataFrame).</p>
+        </div>
+      </header>
+      <div class="nb-toolbar" data-testid="nb-toolbar">
+        <button type="button" class="btn primary" id="nb-btn-run" data-testid="nb-btn-run" title="Exécuter (Ctrl+Enter)">▶ Run</button>
+        <button type="button" class="btn" id="nb-btn-run-save" data-testid="nb-btn-run-save" title="Exécuter et enregistrer le script">▶ Run &amp; Save</button>
+        <button type="button" class="btn ghost" id="nb-btn-refresh-vars" data-testid="nb-btn-refresh-vars" title="Rafraîchir les variables">↻ Vars</button>
+        <span id="nb-run-meta" class="nb-run-meta" data-testid="nb-run-meta"></span>
+        <span class="nb-toolbar-spacer"></span>
+        <button type="button" class="btn" id="nb-btn-cancel" data-testid="nb-btn-cancel">Fermer</button>
+        <button type="button" class="btn primary" id="nb-btn-apply" data-testid="nb-btn-apply">Appliquer au script</button>
+      </div>
+      <div class="nb-layout">
+        <div class="nb-main">
+          <label class="nb-label" for="nb-code">Cellule</label>
+          <textarea
+            id="nb-code"
+            class="nb-code mono"
+            data-testid="nb-code"
+            spellcheck="false"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            rows="16"
+            placeholder="# code Python — session persistante"
+          ></textarea>
+          <div class="nb-output-wrap">
+            <div class="nb-output-label">Output</div>
+            <pre id="nb-stdout" class="nb-stdout" data-testid="nb-stdout"></pre>
+            <pre id="nb-stderr" class="nb-stderr" data-testid="nb-stderr" hidden></pre>
+          </div>
+        </div>
+        <aside class="nb-vars" data-testid="nb-vars" aria-label="Variables de session">
+          <div class="nb-vars-head">
+            <span>Variables session</span>
+            <span id="nb-vars-count" class="nb-vars-count" data-testid="nb-vars-count">0</span>
+          </div>
+          <p id="nb-vars-empty" class="nb-vars-empty muted" data-testid="nb-vars-empty">Aucune variable — Run une cellule pour peupler la session.</p>
+          <ul id="nb-vars-list" class="nb-vars-list" data-testid="nb-vars-list"></ul>
+          <p class="nb-vars-hint muted">Clic sur un nom → insère dans la cellule.</p>
+        </aside>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- F0132: traitement en cours (bloquant) + barre de progression -->
+  <dialog
+    id="progress-dialog"
+    class="props-dialog progress-dialog"
+    data-testid="progress-dialog"
+    aria-labelledby="progress-dialog-title"
+    aria-modal="true"
+  >
+    <form method="dialog" id="progress-dialog-form" class="props-form progress-dialog-form" onsubmit="return false;">
+      <div class="dialog-head">
+        <div
+          id="progress-dialog-icon"
+          class="dialog-icon dialog-icon-info progress-dialog-icon"
+          data-testid="progress-dialog-icon"
+          aria-hidden="true"
+        >
+          <svg class="progress-spin" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+          </svg>
+        </div>
+        <div class="confirm-dialog-text">
+          <h3 id="progress-dialog-title" data-testid="progress-dialog-title">Traitement en cours</h3>
+          <p class="dialog-sub" id="progress-dialog-message" data-testid="progress-dialog-message">Veuillez patienter…</p>
+        </div>
+      </div>
+      <div
+        id="progress-dialog-track"
+        class="progress-dialog-track"
+        data-testid="progress-dialog-track"
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="0"
+      >
+        <div
+          id="progress-dialog-fill"
+          class="progress-dialog-fill"
+          data-testid="progress-dialog-fill"
+        ></div>
+      </div>
+      <div
+        id="progress-dialog-label"
+        class="progress-dialog-label"
+        data-testid="progress-dialog-label"
+      >…</div>
+    </form>
+  </dialog>
+
+  <!-- F0063 / F0114: confirmation stylée (base commune — remplace window.confirm) -->
+  <dialog
+    id="confirm-dialog"
+    class="props-dialog confirm-dialog"
+    data-testid="confirm-dialog"
+    aria-labelledby="confirm-title"
+  >
+    <form method="dialog" id="confirm-form" class="props-form confirm-form">
+      <div class="dialog-head">
+        <div
+          id="confirm-dialog-icon"
+          class="dialog-icon dialog-icon-warn"
+          data-testid="confirm-dialog-icon"
+          aria-hidden="true"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>
+            <path d="M12 9v4M12 17h.01"/>
+          </svg>
+        </div>
+        <div class="confirm-dialog-text">
+          <h3 id="confirm-title" data-testid="confirm-title">Confirmer</h3>
+          <p class="dialog-sub confirm-message" id="confirm-message" data-testid="confirm-message"></p>
+        </div>
+      </div>
+      <div class="props-actions">
+        <button type="submit" class="btn" value="cancel" data-testid="confirm-cancel" id="confirm-cancel" autofocus>Annuler</button>
+        <button type="submit" class="btn primary" value="ok" data-testid="confirm-ok" id="confirm-ok" tabindex="0">OK</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast hidden" role="status"></div>
+  <script src="/gui/static/js-yaml.min.js"></script>
+  <!-- F0114: cache-bust modules ES -->
+  <script type="module" src="/gui/static/app/main.js?v=F0142"></script>
+</body>
+</html>

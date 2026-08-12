@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Renatus · Console gestion</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>Console gestion</h1>
+      <p class="sub">Demandes → features / anomalies · file d'attente · statut 1 min</p>
+    </div>
+    <div id="status-chip" class="chip idle" data-testid="status-chip">…</div>
+  </header>
+
+  <section class="status-panel" data-testid="status-panel">
+    <h2>Statut agent</h2>
+    <p id="thought" class="thought">Chargement…</p>
+    <ul class="stats">
+      <li><span>File en attente</span><strong id="q-pending">0</strong></li>
+      <li><span>En cours</span><strong id="q-running">0</strong></li>
+      <li><span>Terminees</span><strong id="q-done">0</strong></li>
+      <li><span>Features ouvertes</span><strong id="f-open">0</strong></li>
+      <li><span>Anomalies ouvertes</span><strong id="a-open">0</strong></li>
+      <li><span>Heartbeat</span><strong id="heartbeat">—</strong></li>
+    </ul>
+  </section>
+
+  <main class="chat">
+    <div id="messages" class="messages" data-testid="messages"></div>
+    <form id="composer" class="composer" data-testid="composer">
+      <div class="row">
+        <select id="kind" aria-label="Type">
+          <option value="auto">Auto (detecte)</option>
+          <option value="feature">Feature</option>
+          <option value="anomaly">Anomalie</option>
+          <option value="question">Question</option>
+        </select>
+        <label class="parallel">
+          <input type="checkbox" id="parallel" checked />
+          parallele OK
+        </label>
+      </div>
+      <textarea
+        id="text"
+        rows="3"
+        placeholder="Ecris ta demande depuis le telephone… (feature, bug, question)"
+        required
+      ></textarea>
+      <button type="submit" class="send">Envoyer</button>
+    </form>
+  </main>
+
+  <section class="queue-panel">
+    <h2>File d'attente</h2>
+    <div id="queue" class="queue" data-testid="queue"></div>
+  </section>
+
+  <footer>
+    <small>Gestion only · PC local via tunnel · ne touche pas au package renatus</small>
+  </footer>
+  <script src="/static/app.js"></script>
+</body>
+</html>

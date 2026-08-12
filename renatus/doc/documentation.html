@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>renatus — Documentation</title>
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: "neutral",
+      securityLevel: "loose",
+      class: { hideEmptyMembersBox: false },
+      flowchart: { htmlLabels: true },
+    });
+  </script>
+  <style>
+    :root {
+      --bg: #f4f2ec;
+      --surface: #fff;
+      --ink: #1a1917;
+      --muted: #5a564e;
+      --line: #d9d2c4;
+      --accent: #0f5c4c;
+      --accent-soft: #e3f1ed;
+      --code-bg: #efe9df;
+      --radius: 10px;
+      --shadow: 0 1px 2px rgba(0,0,0,.06), 0 10px 28px rgba(0,0,0,.05);
+      --mono: ui-monospace, "Cascadia Code", Menlo, Consolas, monospace;
+      --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      color: var(--ink);
+      background:
+        radial-gradient(1100px 480px at 8% -8%, #e5f2ee 0%, transparent 55%),
+        radial-gradient(800px 360px at 100% 0%, #f2eee4 0%, transparent 50%),
+        var(--bg);
+      line-height: 1.55;
+      font-size: 16px;
+    }
+    a { color: var(--accent); }
+    a:hover { text-decoration-thickness: 2px; }
+    .layout {
+      display: grid;
+      grid-template-columns: 250px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+    nav.sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+      padding: 1.4rem 1rem 2rem;
+      border-right: 1px solid var(--line);
+      background: rgba(255,255,255,.78);
+      backdrop-filter: blur(8px);
+    }
+    nav .brand {
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--accent);
+      letter-spacing: .02em;
+    }
+    nav .tag {
+      font-size: .8rem;
+      color: var(--muted);
+      margin: .2rem 0 1.2rem;
+    }
+    nav a.navlink {
+      display: block;
+      padding: .4rem .55rem;
+      border-radius: 6px;
+      color: var(--ink);
+      text-decoration: none;
+      font-size: .92rem;
+    }
+    nav a.navlink:hover,
+    nav a.navlink:focus {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    nav .group {
+      margin-top: 1rem;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0 .55rem .3rem;
+    }
+    main {
+      padding: 2rem 2.2rem 4rem;
+      max-width: 72rem;
+    }
+    h1 {
+      font-size: 1.85rem;
+      margin: 0 0 .4rem;
+      letter-spacing: -.02em;
+    }
+    h2 {
+      font-size: 1.35rem;
+      margin: 2.2rem 0 .7rem;
+      padding-top: .4rem;
+      border-top: 1px solid var(--line);
+    }
+    h2:first-of-type { border-top: none; margin-top: 1.2rem; }
+    h3 {
+      font-size: 1.05rem;
+      margin: 1.4rem 0 .45rem;
+      color: var(--accent);
+    }
+    h4 {
+      font-size: .95rem;
+      margin: 1.1rem 0 .35rem;
+      color: var(--ink);
+    }
+    p, li { color: var(--ink); }
+    .lead {
+      font-size: 1.05rem;
+      color: var(--muted);
+      margin: 0 0 1.2rem;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1rem 1.15rem;
+      margin: 1rem 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .9rem;
+      margin: .7rem 0 1rem;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      text-align: left;
+      padding: .5rem .65rem;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    th {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 650;
+      font-size: .8rem;
+    }
+    tr:last-child td { border-bottom: none; }
+    code, pre {
+      font-family: var(--mono);
+      font-size: .84rem;
+    }
+    code {
+      background: var(--code-bg);
+      padding: .1rem .35rem;
+      border-radius: 4px;
+    }
+    pre {
+      background: #1e2430;
+      color: #e8eef7;
+      padding: .9rem 1rem;
+      border-radius: 8px;
+      overflow: auto;
+      line-height: 1.45;
+      margin: .6rem 0 1rem;
+    }
+    pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+    }
+    .pill {
+      display: inline-block;
+      font-size: .72rem;
+      font-weight: 700;
+      padding: .12rem .4rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      margin-right: .25rem;
+    }
+    .pill.opt {
+      background: #f0ebe3;
+      color: var(--muted);
+    }
+    .note {
+      border-left: 3px solid var(--accent);
+      padding: .55rem .85rem;
+      background: var(--accent-soft);
+      border-radius: 0 8px 8px 0;
+      margin: .8rem 0;
+      font-size: .92rem;
+    }
+    .diagram {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1rem;
+      margin: 1rem 0 1.4rem;
+      overflow-x: auto;
+    }
+    .diagram .mermaid {
+      display: flex;
+      justify-content: center;
+      min-width: min(100%, 920px);
+    }
+    .diagram figcaption {
+      font-size: .82rem;
+      color: var(--muted);
+      margin-top: .55rem;
+      text-align: center;
+    }
+    footer {
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--line);
+      font-size: .85rem;
+      color: var(--muted);
+    }
+    @media (max-width: 860px) {
+      .layout { grid-template-columns: 1fr; }
+      nav.sidebar {
+        position: relative;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--line);
+      }
+      main { padding: 1.2rem 1rem 3rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <nav class="sidebar" aria-label="Sommaire">
+      <div class="brand" style="display:flex;align-items:center;gap:.55rem;">
+        <img src="assets/renatus-mark.png" alt="" width="36" height="36" style="border-radius:9px;" />
+        <span>renatus</span>
+      </div>
+      <div class="tag">Documentation produit</div>
+      <a class="navlink" href="#intro">Introduction</a>
+      <div class="group">Parties</div>
+      <a class="navlink" href="#core">Core (pipeline)</a>
+      <a class="navlink" href="#cli">CLI</a>
+      <a class="navlink" href="#api">API HTTP</a>
+      <a class="navlink" href="#gui">GUI</a>
+      <div class="group">UML</div>
+      <a class="navlink" href="#uml-backend">UML Backend</a>
+      <a class="navlink" href="#uml-be-steps">· Steps</a>
+      <a class="navlink" href="#uml-be-engine">· Moteur</a>
+      <a class="navlink" href="#uml-be-services">· Services</a>
+      <a class="navlink" href="#uml-frontend">UML Frontend</a>
+      <a class="navlink" href="#uml-fe-app">· App / état</a>
+      <a class="navlink" href="#uml-fe-controllers">· Contrôleurs</a>
+      <a class="navlink" href="#uml-fe-steptypes">· StepTypes</a>
+      <div class="group">Core détail</div>
+      <a class="navlink" href="#type-dataframe">dataframe</a>
+      <a class="navlink" href="#type-table">table / view</a>
+      <a class="navlink" href="#type-execute">execute*</a>
+      <a class="navlink" href="#type-iterate">iterate</a>
+      <a class="navlink" href="#type-zone">zone</a>
+      <div class="group">Fichiers Markdown</div>
+      <a class="navlink" href="CORE.md">CORE.md</a>
+      <a class="navlink" href="CLI.md">CLI.md</a>
+      <a class="navlink" href="API.md">API.md</a>
+      <a class="navlink" href="GUI.md">GUI.md</a>
+      <a class="navlink" href="ARCHITECTURE.md">ARCHITECTURE.md</a>
+    </nav>
+
+    <main>
+      <h1 id="intro">Documentation renatus</h1>
+      <p style="margin:0 0 1rem;">
+        <img src="assets/renatus-logo.png" alt="Logo renatus" width="88" height="88"
+             style="border-radius:18px;box-shadow:var(--shadow);" />
+      </p>
+      <p class="lead">
+        <strong>renatus</strong> signifie <em>renaitre</em>. On y construit des
+        datasets sur un flux déclaratif : chaque table ou vue peut être
+        recréée parce que son data lineage est connu, exprimé en YAML, et
+        configurable aussi via le GUI graphique. Le même moteur sert le CLI,
+        l’API HTTP et l’interface web.
+      </p>
+      <div class="card">
+        Un dataset n’est pas un fichier opaque. Tant que sa recette de flux
+        existe (sources, requires, script, modes de création), il peut renaitre
+        de façon reproductible.
+      </div>
+
+      <div class="card">
+        <strong>Documents</strong>
+        <ul>
+          <li><a href="CORE.md">CORE.md</a> — types d’étapes, paramètres, lineage</li>
+          <li><a href="CLI.md">CLI.md</a> — commandes terminal</li>
+          <li><a href="API.md">API.md</a> — endpoints REST</li>
+          <li><a href="GUI.md">GUI.md</a> — GUI web</li>
+          <li><a href="ARCHITECTURE.md">ARCHITECTURE.md</a> — couches techniques</li>
+          <li><strong>Cette page</strong> — lecture unique + <a href="#uml-backend">diagrammes UML</a></li>
+        </ul>
+      </div>
+
+      <!-- ========== CORE ========== -->
+      <h2 id="core">1. Core (pipeline)</h2>
+      <p>
+        Package <code>renatus.pipeline</code>. Charge un ou plusieurs fichiers
+        YAML, ouvre DuckDB, exécute les étapes en respectant <code>requires</code>.
+        Hiérarchie OOP : <code>Step</code> ABC + factory (<code>create_step</code>).
+      </p>
+      <p>
+        Le répertoire projet (chemins relatifs des fichiers) est le parent du
+        dossier pipeline. Formats dataframe : csv, tsv, txt, parquet, json,
+        xlsx, xls. Propriété unifiée <code>script</code> (SQL ou Python ; legacy <code>sql</code> migré).
+      </p>
+
+      <h3>Types autorisés</h3>
+      <p>
+        <code>dataframe</code>, <code>table</code>, <code>view</code>,
+        <code>execute</code> / <code>execute_sql</code>,
+        <code>execute_python</code>, <code>execute_shell</code>,
+        <code>iterate</code>, <code>zone</code>,
+        <code>allzone</code>, <code>backzone</code>, <code>forzone</code>,
+        <code>bidzone</code> (auto-zones logiques F0128).
+        Fichier monocomposant : stem = id (F0101).
+      </p>
+
+      <h3 id="type-dataframe">dataframe</h3>
+      <table>
+        <thead><tr><th>Paramètre</th><th>Statut</th><th>Rôle</th></tr></thead>
+        <tbody>
+          <tr><td><code>type</code></td><td><span class="pill">obligatoire</span></td><td><code>dataframe</code></td></tr>
+          <tr><td><code>file</code></td><td><span class="pill">obligatoire</span></td><td>Chemin source (ex. <code>input/sales.csv</code>)</td></tr>
+          <tr><td><code>mode</code></td><td><span class="pill opt">optionnel</span></td><td><code>create_if_not_exists</code> (défaut) / <code>create_or_replace</code></td></tr>
+          <tr><td><code>label</code>, <code>name</code></td><td><span class="pill opt">optionnel</span></td><td>Affichage / relation physique</td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="type-table">table / view</h3>
+      <table>
+        <thead><tr><th>Paramètre</th><th>Statut</th><th>Rôle</th></tr></thead>
+        <tbody>
+          <tr><td><code>type</code></td><td><span class="pill">obligatoire</span></td><td><code>table</code> ou <code>view</code></td></tr>
+          <tr><td><code>script</code></td><td><span class="pill">obligatoire</span></td><td>SELECT (alias legacy <code>sql</code>)</td></tr>
+          <tr><td><code>mode</code></td><td><span class="pill opt">optionnel</span></td><td><code>create_if_not_exists</code> / <code>create_or_replace</code></td></tr>
+          <tr><td><code>requires</code></td><td><span class="pill opt">optionnel</span></td><td>Ids d’étapes à matérialiser avant</td></tr>
+          <tr><td><code>name</code></td><td><span class="pill opt">optionnel</span></td><td>Nom relation SQL (sinon id)</td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="type-execute">execute / execute_python / execute_shell</h3>
+      <table>
+        <thead><tr><th>Type</th><th>Essentiel</th></tr></thead>
+        <tbody>
+          <tr><td><code>execute</code> / <code>execute_sql</code></td><td><code>script</code> SQL, <code>requires?</code></td></tr>
+          <tr><td><code>execute_python</code></td><td><code>script</code> Python, <code>venv?</code>, <code>requires?</code></td></tr>
+          <tr><td><code>execute_shell</code></td><td><code>script</code> shell, <code>requires?</code></td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="type-iterate">iterate</h3>
+      <table>
+        <thead><tr><th>Paramètre</th><th>Statut</th><th>Rôle</th></tr></thead>
+        <tbody>
+          <tr><td><code>scenarios</code></td><td><span class="pill">obligatoire</span></td><td>Table des scénarios</td></tr>
+          <tr><td><code>step_view</code></td><td><span class="pill">obligatoire</span></td><td>Vue temporaire 1 ligne / tour</td></tr>
+          <tr><td><code>target</code></td><td><span class="pill">obligatoire</span></td><td>Étape rejouée</td></tr>
+          <tr><td><code>order_by</code>, <code>execution</code></td><td><span class="pill opt">optionnel</span></td><td>Ordre / parallel</td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="type-zone">zone</h3>
+      <p>
+        Composant organisationnel (onglet Flux). Membership via
+        <code>objects</code> (dict d’ids) union fichiers du dossier FS.
+        <code>workers</code> (auto|queue|N), <code>renatus_mode</code>
+        (required_for_leaves|root_to_leaves). Vue calculée GUI <code>all</code> :
+        tous les composants hors type zone / auto-zone.
+      </p>
+
+      <h3 id="type-auto-zone">auto-zones (F0128)</h3>
+      <p>
+        Vues logiques sous <code>flow/auto/</code> (définition YAML seule, membership recalculé) :
+      </p>
+      <table>
+        <thead><tr><th>Type</th><th>Id</th><th>Membership</th></tr></thead>
+        <tbody>
+          <tr><td><code>allzone</code></td><td><code>allzone</code></td><td>Composants de main hors zones</td></tr>
+          <tr><td><code>backzone</code></td><td><code>bac_{object}</code></td><td>Requires récursifs</td></tr>
+          <tr><td><code>forzone</code></td><td><code>for_{object}</code></td><td>Required_by récursifs</td></tr>
+          <tr><td><code>bidzone</code></td><td><code>bid_{object}</code></td><td>Amont + aval</td></tr>
+        </tbody>
+      </table>
+      <p>Config lecture seule. Bouton <strong>Convertir en zone</strong> → zone physique + copies YAML.</p>
+
+      <h3>API Python</h3>
+      <pre><code>from renatus.pipeline import ConnectionPipeline
+
+cp = ConnectionPipeline("main.duckdb", "flow/")
+try:
+    cp.process_with_requires("t_eu")
+    cp.p_table_view("v_products")
+    cp.p_iteration("i_run")
+finally:
+    cp.close()</code></pre>
+
+      <!-- ========== CLI ========== -->
+      <h2 id="cli">2. CLI</h2>
+      <p>Entrypoints <code>renatus</code> / <code>renatus-cli</code>. Oneshot ou REPL.</p>
+      <pre><code>renatus main.duckdb flow/
+renatus main.duckdb flow/ p_table_view v_sales
+renatus main.duckdb flow/ --read-only table_view t_sales</code></pre>
+      <table>
+        <thead><tr><th>Commande</th><th>Rôle</th></tr></thead>
+        <tbody>
+          <tr><td><code>p_table_view NAME</code></td><td>Lineage + affichage</td></tr>
+          <tr><td><code>table_view NAME</code></td><td>Lecture sans lineage</td></tr>
+          <tr><td><code>process_with_requires NAME</code></td><td>Process + requires</td></tr>
+          <tr><td><code>p_iteration NAME</code></td><td>Itération</td></tr>
+        </tbody>
+      </table>
+
+      <!-- ========== API ========== -->
+      <h2 id="api">3. API HTTP</h2>
+      <pre><code>renatus-api main.duckdb flow/ --host 127.0.0.1 --port 8000</code></pre>
+      <table>
+        <thead><tr><th>Méthode</th><th>Chemin</th><th>Rôle</th></tr></thead>
+        <tbody>
+          <tr><td>GET</td><td><code>/health</code></td><td>État</td></tr>
+          <tr><td>GET</td><td><code>/pipeline</code></td><td>Liste des étapes</td></tr>
+          <tr><td>POST</td><td><code>/p_table_view/{name}</code></td><td>Lineage + rows</td></tr>
+          <tr><td>POST</td><td><code>/process_with_requires/{name}</code></td><td>Build + requires</td></tr>
+          <tr><td>POST</td><td><code>/p_iteration/{name}</code></td><td>Itération</td></tr>
+        </tbody>
+      </table>
+
+      <!-- ========== GUI ========== -->
+      <h2 id="gui">4. GUI</h2>
+      <pre><code>renatus-gui main.duckdb flow/
+renatus-gui mon.renatus.yaml</code></pre>
+
+      <h3>Zones de l’interface</h3>
+      <table>
+        <thead><tr><th>Zone</th><th>Rôle</th></tr></thead>
+        <tbody>
+          <tr><td>Outils</td><td>Palette régions Datasets / Execute / Flow / <strong>Auto</strong></td></tr>
+          <tr><td>Flux</td><td>Graphe requires ; select toutes zones + auto + <code>all</code> ; zoom ; lineage gris ; import</td></tr>
+          <tr><td>Config</td><td>View + crayon ; Objects / Requires ; auto-zones RO + Convertir</td></tr>
+          <tr><td>View / Track</td><td>Aperçu paginé (3–100 l/page) ; process Output/Error ; Track par composant</td></tr>
+        </tbody>
+      </table>
+
+      <h3>API GUI (extrait)</h3>
+      <table>
+        <thead><tr><th>Méthode</th><th>Chemin</th><th>Rôle</th></tr></thead>
+        <tbody>
+          <tr><td>GET</td><td><code>/gui/graph?tab=…</code></td><td>Nœuds / arêtes (tab <code>all</code> = hors zones)</td></tr>
+          <tr><td>GET/PUT</td><td><code>/gui/step/{id}</code></td><td>Config (objects effectifs zone/auto)</td></tr>
+          <tr><td>POST</td><td><code>/gui/auto-zone</code></td><td>Créer auto-zone</td></tr>
+          <tr><td>POST</td><td><code>/gui/auto-zone/{id}/convert</code></td><td>Auto → zone physique</td></tr>
+          <tr><td>GET</td><td><code>/gui/preview/{id}?limit=&amp;page=</code></td><td>Aperçu paginé dataset</td></tr>
+          <tr><td>POST</td><td><code>/gui/steps</code></td><td>Créer</td></tr>
+          <tr><td>DELETE</td><td><code>/gui/step/{id}</code></td><td>Supprimer</td></tr>
+          <tr><td>POST</td><td><code>/gui/build/{id}</code></td><td>Build / zone_build</td></tr>
+          <tr><td>POST</td><td><code>/gui/import/flow</code></td><td>Importer YAML ou dossier</td></tr>
+          <tr><td>POST</td><td><code>/gui/upload</code></td><td>Upload (<code>relative_path</code> pour arbo)</td></tr>
+        </tbody>
+      </table>
+
+      <!-- ========== UML BACKEND ========== -->
+      <h2 id="uml-backend">5. Diagrammes UML — Backend</h2>
+      <p>
+        Classes métiers Python sous <code>src/renatus/</code>. Attributs d’instance
+        et ClassVar principaux. Les méthodes sont documentées dans le code ;
+        les diagrammes privilégient <strong>état (attributs)</strong> et
+        <strong>héritage</strong>.
+      </p>
+
+      <h3 id="uml-be-steps">5.1 Hiérarchie Step (pipeline.steps)</h3>
+      <figure class="diagram">
+        <pre class="mermaid">
+classDiagram
+  direction TB
+  class Step {
+    +ClassVar type
+    +ClassVar ALLOWED_CONFIG_KEYS
+    +str id
+    +dict config
+    +str label
+    +list requires
+  }
+  class RelationStep {
+    +ClassVar DEFAULT_MODE
+    +str physical_name
+  }
+  class DataframeStep {
+    +ClassVar type = dataframe
+  }
+  class TableStep {
+    +ClassVar type = table
+  }
+  class ViewStep {
+    +ClassVar type = view
+  }
+  class ControlStep
+  class IterationStep {
+    +ClassVar type = iterate
+  }
+  class OrgStep
+  class ZoneStep {
+    +ClassVar type = zone
+    +dict objects
+  }
+  class SqlActionStep
+  class ExecuteStep {
+    +ClassVar type = execute_sql
+  }
+  class PythonActionStep
+  class ExecutePythonStep {
+    +ClassVar type = execute_python
+  }
+  class ShellActionStep
+  class ExecuteShellStep {
+    +ClassVar type = execute_shell
+  }
+  class StepFactory {
+    +dict registry
+  }
+  Step <|-- RelationStep
+  RelationStep <|-- DataframeStep
+  RelationStep <|-- TableStep
+  RelationStep <|-- ViewStep
+  Step <|-- ControlStep
+  ControlStep <|-- IterationStep
+  Step <|-- OrgStep
+  OrgStep <|-- ZoneStep
+  Step <|-- SqlActionStep
+  SqlActionStep <|-- ExecuteStep
+  Step <|-- PythonActionStep
+  PythonActionStep <|-- ExecutePythonStep
+  Step <|-- ShellActionStep
+  ShellActionStep <|-- ExecuteShellStep
+  StepFactory ..> Step : create()
+        </pre>
+        <figcaption>Figure B1 — ABC Step et types concrets (attributs métier)</figcaption>
+      </figure>
+
+      <h3 id="uml-be-engine">5.2 Moteur pipeline &amp; projet</h3>
+      <figure class="diagram">
+        <pre class="mermaid">
+classDiagram
+  direction TB
+  class Paths {
+    +Path root
+    +Path data
+    +Path files
+    +Path input
+    +Path output
+    +Path duckdb
+    +Path duckdb_main
+    +Path duckdb_workers
+    +Path main_db
+    +Path pipeline
+    +Path models
+    +Path doc
+    +Path src
+  }
+  class PipelineFactory {
+    +Paths paths
+  }
+  class ConnectionUtils {
+    +str db_path
+    +DuckDBPyConnection con
+  }
+  class ConnectionPipeline {
+    +ClassVar RESERVED_KEYS
+    +Path pipeline_path
+    +dict pipeline
+    +DependencyTree tree
+  }
+  class DependencyTree {
+    +dict pipeline
+  }
+  class ParallelismConfig {
+    +int bucket_count
+    +int max_workers
+    +int reserved_cpus
+    +int duckdb_threads_per_worker
+  }
+  class ParallelIterationManager {
+    +ConnectionPipeline shared_cp
+    +str iteration_name
+    +dict config
+    +ParallelismConfig parallelism
+    +str result_table
+    +str pipeline_hash
+    +str source_hash
+  }
+  class RenatusProject {
+    +str name
+    +str db_path
+    +str pipeline_path
+    +bool read_only
+    +int version
+    +str project_file
+    +dict extra
+  }
+  class ProjectGit {
+    +Path root
+  }
+  class PendingBranch {
+    +str name
+    +int ahead
+    +str last_commit
+    +str last_date
+  }
+  ConnectionUtils <|-- ConnectionPipeline
+  ConnectionPipeline --> DependencyTree : tree
+  PipelineFactory --> Paths : paths
+  PipelineFactory ..> ConnectionPipeline : open()
+  ParallelIterationManager --> ConnectionPipeline : shared_cp
+  ParallelIterationManager --> ParallelismConfig : parallelism
+  ProjectGit --> PendingBranch : list
+  RenatusProject ..> ProjectGit : workspace git
+        </pre>
+        <figcaption>Figure B2 — Connexion DuckDB, factory, itération parallèle, projet git</figcaption>
+      </figure>
+
+      <h3 id="uml-be-services">5.3 API, GUI service, CLI</h3>
+      <figure class="diagram">
+        <pre class="mermaid">
+classDiagram
+  direction TB
+  class RenatusService {
+    +str db_path
+    +str pipeline_path
+    +str pipelines_dir
+    +bool read_only
+    +RLock _lock
+    +ConnectionPipeline _connection
+  }
+  class RelationSerializer {
+    +ClassVar DEFAULT_LIMIT
+    +ClassVar MAX_LIMIT
+    +ClassVar DEFAULT_MAX_ROWS
+  }
+  class RenatusApiRuntime {
+    +str db_path
+    +str pipelines_dir
+    +str pipeline_path
+    +bool read_only
+    +int max_rows
+    +RenatusService _service
+  }
+  class RenatusApiApp {
+    +RenatusApiRuntime runtime
+    +str title
+    +str version
+    +FastAPI _app
+  }
+  class HealthResponse {
+    +bool ok
+    +str status
+    +str db_path
+    +str pipeline_path
+    +str pipelines_dir
+    +bool read_only
+    +int step_count
+  }
+  class PipelineStepInfo {
+    +str name
+    +str type
+    +list requires
+    +str mode
+  }
+  class RelationDataResponse {
+    +bool ok
+    +str name
+    +list columns
+    +list rows
+    +int row_count
+    +bool truncated
+    +int limit
+  }
+  class GuiService {
+    +RLock _lock
+    +RenatusService _api
+    +YamlStepStore _store
+    +int _max_rows
+    +bool _read_only
+    +str _project_file
+    +str _project_name
+    +str _work_branch
+    +str _active_tab
+    +list _open_tabs
+    +dict _renatus_times
+  }
+  class YamlStepStore {
+    +ClassVar ROOT_TAB
+    +ClassVar ALL_TAB
+    +Path pipeline_path
+    +dict _origins
+    +str active_tab
+  }
+  class GraphOps {
+    +GuiService gui
+  }
+  class GuiApp {
+    +GuiService gui
+    +str title
+    +str version
+    +FastAPI _app
+  }
+  class GraphNode {
+    +str id
+    +str type
+    +str mode
+    +str file_origin
+  }
+  class GraphEdge {
+    +str from_
+    +str to
+  }
+  class GuiStepResponse {
+    +bool ok
+    +str name
+    +dict config
+    +str file_origin
+  }
+  class GuiBuildResponse {
+    +bool ok
+    +str name
+    +str action
+    +list columns
+    +list rows
+    +int row_count
+    +bool truncated
+    +bool has_result
+    +int limit
+    +str message
+  }
+  class RenatusCli {
+    +ClassVar PROMPT
+    +str db_path
+    +str pipeline_path
+    +list command_tokens
+    +bool read_only
+    +ResultPrinter _printer
+    +ConnectionPipeline _connection
+    +CommandRunner _runner
+  }
+  class CommandRunner {
+    +ClassVar HELP_TEXT
+    +ConnectionPipeline _connection
+  }
+  class CommandResult {
+    +bool ok
+    +Any relation
+    +str message
+    +bool quit
+  }
+  class ResultPrinter {
+    +ClassVar DEFAULT_MAX_ROWS
+    +TextIO _out
+    +TextIO _err
+    +int max_rows
+  }
+  RenatusApiRuntime --> RenatusService : _service
+  RenatusApiApp --> RenatusApiRuntime : runtime
+  RenatusService --> RelationSerializer : serialize
+  RenatusService --> ConnectionPipeline : _connection
+  GuiService --> RenatusService : _api
+  GuiService --> YamlStepStore : _store
+  GraphOps --> GuiService : gui
+  GuiApp --> GuiService : gui
+  GraphOps ..> GraphNode
+  GraphOps ..> GraphEdge
+  RenatusCli --> CommandRunner : _runner
+  RenatusCli --> ResultPrinter : _printer
+  CommandRunner ..> CommandResult : run()
+        </pre>
+        <figcaption>Figure B3 — Services API / GUI / CLI et DTO principaux</figcaption>
+      </figure>
+
+      <div class="note">
+        DTO GUI supplémentaires : <code>GuiConnectResponse</code>,
+        <code>GuiGraphResponse</code>, <code>GuiSaveResponse</code>.
+        Corps de requête FastAPI (Pydantic) : <code>ConnectBody</code>,
+        <code>StepPutBody</code>, <code>StepCreateBody</code>,
+        <code>ImportFlowBody</code>, <code>ProjectCreateBody</code>, etc.
+        dans <code>renatus.gui.app</code>.
+      </div>
+
+      <!-- ========== UML FRONTEND ========== -->
+      <h2 id="uml-frontend">6. Diagrammes UML — Frontend</h2>
+      <p>
+        Modules ES sous <code>src/renatus/gui/static/app/</code>. Architecture
+        contrôleurs (<code>UiController</code>) + <code>GuiState</code> partagé +
+        registry des <code>StepType</code> (miroir frontend des types pipeline).
+      </p>
+
+      <h3 id="uml-fe-app">6.1 Application, état, API</h3>
+      <figure class="diagram">
+        <pre class="mermaid">
+classDiagram
+  direction TB
+  class GuiApp {
+    +GuiState state
+    +ApiClient api
+    +StepTypeRegistry stepTypes
+    +Toolbox toolbox
+    +GraphCanvas graph
+    +PipelineTabs tabs
+    +ConfigPanel config
+    +ProjectDialogs project
+    +ChangelogPanel changelogs
+    +DataViewPanel dataview
+    +bool _started
+  }
+  class GuiState {
+    +bool connected
+    +str selected
+    +object graph
+    +list allSteps
+    +list tools
+    +object workspace
+    +object pendingTool
+    +object drag
+    +bool syncing
+    +object yamlTimer
+    +str dataviewSource
+    +bool dataviewIsPrereq
+    +str processSubTab
+    +str projectMode
+    +object projectInspect
+    +str activeTab
+    +list tabs
+    +str bottomTab
+    +list changelogEntries
+    +str changelogCommit
+    +str changelogPath
+    +list changelogFiles
+    +object fieldSnapshots
+    +object layout
+    +object lastSelectedByTab
+    +str lastManipulatedZone
+  }
+  class ApiClient {
+    +object defaultHeaders
+    +number _toastTimer
+  }
+  class UiController {
+    +HTMLElement root
+    +bool mounted
+  }
+  class StepTypeRegistry {
+    +Map _types
+  }
+  GuiApp --> GuiState : state
+  GuiApp --> ApiClient : api
+  GuiApp --> StepTypeRegistry : stepTypes
+  GuiApp --> UiController : controllers
+        </pre>
+        <figcaption>Figure F1 — Composition GuiApp et état partagé</figcaption>
+      </figure>
+
+      <h3 id="uml-fe-controllers">6.2 Contrôleurs UI</h3>
+      <figure class="diagram">
+        <pre class="mermaid">
+classDiagram
+  direction TB
+  class UiController {
+    +HTMLElement root
+    +bool mounted
+  }
+  class GraphCanvas {
+  }
+  class PipelineTabs {
+  }
+  class Toolbox {
+  }
+  class ConfigPanel {
+  }
+  class DataViewPanel {
+  }
+  class ChangelogPanel {
+  }
+  class ProjectDialogs {
+  }
+  UiController <|-- GraphCanvas
+  UiController <|-- PipelineTabs
+  UiController <|-- Toolbox
+  UiController <|-- ConfigPanel
+  UiController <|-- DataViewPanel
+  UiController <|-- ChangelogPanel
+  UiController <|-- ProjectDialogs
+        </pre>
+        <figcaption>Figure F2 — Contrôleurs héritant de UiController</figcaption>
+      </figure>
+      <div class="card">
+        <strong>Responsabilités (méthodes clés)</strong>
+        <ul>
+          <li><code>GraphCanvas</code> — <code>layoutNodes</code>, <code>renderGraph</code>, croix delete F0106, vue tab</li>
+          <li><code>PipelineTabs</code> — select zones, onglet virtuel <code>all</code></li>
+          <li><code>Toolbox</code> — palette outils / création step</li>
+          <li><code>ConfigPanel</code> — select/save/build/delete, crayons, presentation</li>
+          <li><code>DataViewPanel</code> — table / process Output|Error</li>
+          <li><code>ChangelogPanel</code> — timeline git, apply FF</li>
+          <li><code>ProjectDialogs</code> — open/save/create projet</li>
+        </ul>
+        Modules fonctionnels associés (sans classe) : <code>import-flow.js</code>,
+        <code>confirm-dialog.js</code>, <code>config/zone-objects.js</code>,
+        <code>config/requires.js</code>, <code>config/pencil.js</code>, <code>config/file-field.js</code>.
+      </div>
+
+      <h3 id="uml-fe-steptypes">6.3 StepTypes (miroir YAML côté form)</h3>
+      <figure class="diagram">
+        <pre class="mermaid">
+classDiagram
+  direction TB
+  class StepType {
+    +str type
+  }
+  class DataframeStepType
+  class TableStepType
+  class ViewStepType
+  class ExecuteStepType
+  class ExecutePythonStepType
+  class ExecuteShellStepType
+  class IterationStepType
+  class ZoneStepType
+  class StepTypeRegistry {
+    +Map _types
+  }
+  StepType <|-- DataframeStepType
+  StepType <|-- TableStepType
+  StepType <|-- ViewStepType
+  StepType <|-- ExecuteStepType
+  StepType <|-- ExecutePythonStepType
+  StepType <|-- ExecuteShellStepType
+  StepType <|-- IterationStepType
+  StepType <|-- ZoneStepType
+  StepTypeRegistry o-- StepType : register
+        </pre>
+        <figcaption>Figure F3 — Registry frontend des types de composant</figcaption>
+      </figure>
+      <div class="note">
+        Chaque <code>*StepType</code> implémente <code>defaultConfig</code>,
+        <code>fieldVisibility</code>, <code>toConfig</code> / <code>fromConfig</code>
+        pour synchroniser le formulaire Config avec le YAML.
+        <code>ZoneStepType</code> gère le champ <code>objects</code> (F0056/F0097/A0015).
+      </div>
+
+      <footer>
+        Sources : <code>doc/CORE.md</code>, <code>CLI.md</code>, <code>API.md</code>,
+        <code>GUI.md</code>, <code>ARCHITECTURE.md</code>.
+        UML généré à partir des classes de <code>src/renatus/</code> et
+        <code>src/renatus/gui/static/app/</code> (mise à jour documentation F0108).
+        Diagrammes rendus par Mermaid 11.
+      </footer>
+    </main>
+  </div>
+</body>
+</html>
