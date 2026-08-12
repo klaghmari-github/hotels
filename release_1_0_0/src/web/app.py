@@ -105,19 +105,19 @@ HOME_BODY = """
     <img src="/static/img/accor-logo.svg" alt="Accor" style="height:40px"/>
     <div>
       <h2 style="margin:0">Accor ROD</h2>
-      <p class="muted" style="margin:.2rem 0 0">Choisir une interface</p>
+      <p class="muted" style="margin:.2rem 0 0">Retail On Demand</p>
     </div>
   </div>
   <div class="grid">
     <a class="card" href="/user" style="text-decoration:none;color:inherit">
       <div class="lbl">User</div>
-      <div class="val" style="font-size:1.05rem">Interface directeur</div>
-      <div class="sub">Recherche hotel · parametres · simulation · recommandation</div>
+      <div class="val" style="font-size:1.05rem">Parcours hotel</div>
+      <div class="sub">Simulation et recommandation de solution</div>
     </a>
     <a class="card" href="/admin" style="text-decoration:none;color:inherit">
       <div class="lbl">Admin</div>
       <div class="val" style="font-size:1.05rem">Studio donnees</div>
-      <div class="sub">ALL · PILOTE · evaluation LOO</div>
+      <div class="sub">Tables, evaluation LOO</div>
     </a>
   </div>
 </div>
@@ -172,11 +172,20 @@ async function load(src){
       <div class="card"><div class="lbl">${tag(src)} · MAE CA</div><div class="val">${fmt(pickM(data.metrics,'mae_ca'))}</div><div class="sub">n=${n}</div></div>
       <div class="card"><div class="lbl">${tag(src)} · MAE marge</div><div class="val">${fmt(pickM(data.metrics,'mae_marge'))}</div><div class="sub">selon coef</div></div>
     </div>`;
-    html+='<p class="muted" style="margin:.75rem 0 .4rem">Bleu reel · Violet estime · Orange erreur · <strong>mensuel (€ / mois)</strong></p>';
+    html+='<p class="muted" style="margin:.75rem 0 .4rem">€ / mois</p>';
     html+='<div class="scroll"><table><thead><tr>';
     html+=EVAL_COLS.map(c=>`<th class="${c.kind?('col-'+c.kind):''}">${c.l}</th>`).join('');
     html+='</tr></thead><tbody>';
-    for(const r of (data.predictions||[])){
+    const solOrder=['connected','liberty','simply'];
+    const preds=[...(data.predictions||[])].sort((a,b)=>{
+      const sa=String(a.solution||'').toLowerCase();
+      const sb=String(b.solution||'').toLowerCase();
+      const ia=solOrder.indexOf(sa); const ib=solOrder.indexOf(sb);
+      const ka=ia<0?999:ia; const kb=ib<0?999:ib;
+      if(ka!==kb) return ka-kb;
+      return String(a.hotel_code||'').localeCompare(String(b.hotel_code||''));
+    });
+    for(const r of preds){
       html+='<tr>'+EVAL_COLS.map(c=>{
         if(c.k==='solution') return `<td>${tag(r[c.k])}</td>`;
         if(c.k==='hotel_code') return `<td><strong>${r[c.k]??'—'}</strong></td>`;
@@ -227,18 +236,20 @@ async function render(){
       err:null,
     };
   });
+  // Meilleur moteur = MAE minimale (erreur), jamais le CA predit le plus haut
   const best=(key)=>{ let b=null,v=Infinity; for(const k of kpis){ if(k[key]!=null&&k[key]<v){v=k[key];b=k.src;} } return b; };
   const bestCa=best('mae_ca'), bestM=best('mae_marge');
-  let html='<p class="muted">Comparaison sur <strong>MAE CA</strong> et <strong>MAE marge selon coef</strong> uniquement.</p><div class="grid">';
+  let html='<div class="grid">';
   for(const k of kpis){
     html+=`<div class="card"><div class="lbl">${tag(k.src)}</div>
-      <div class="val">${fmt(k.mae_ca)}</div><div class="sub">MAE CA${k.src===bestCa?' · meilleur':''}</div>
-      <div class="sub">MAE marge coef : <strong style="${k.src===bestM?'color:var(--ok)':''}">${fmt(k.mae_marge)}</strong></div>
-      <div class="sub">hotels=${k.n??'—'}</div></div>`;
+      <div class="val">${fmt(k.mae_ca)}</div><div class="sub">MAE |err| CA${k.src===bestCa?' · min erreur':''}</div>
+      <div class="sub">MAE |err| marge : <strong style="${k.src===bestM?'color:var(--ok)':''}">${fmt(k.mae_marge)}</strong></div>
+      <div class="sub">n=${k.n??'—'}</div></div>`;
   }
-  html+='</div><h2>Tableau</h2><div class="scroll"><table><thead><tr><th>Metrique</th>';
+  html+='</div><p class="muted" style="margin:.5rem 0">Critere : minimiser l erreur vs reel (MAE), pas maximiser le CA predit.</p>';
+  html+='<h2>Tableau</h2><div class="scroll"><table><thead><tr><th>Metrique</th>';
   html+=SOURCES.map(s=>`<th class="num">${s}</th>`).join('')+'</tr></thead><tbody>';
-  for(const [lab,key] of [['MAE CA','mae_ca'],['MAE marge coef','mae_marge'],['Nb hotels','n']]){
+  for(const [lab,key] of [['MAE |err| CA','mae_ca'],['MAE |err| marge','mae_marge'],['Nb hotels','n']]){
     html+=`<tr><td>${lab}</td>`;
     for(const s of SOURCES){
       const k=kpis.find(x=>x.src===s); const v=k?k[key]:null;
@@ -257,7 +268,15 @@ async function render(){
       byH[p.hotel_code][r.src]=p;
     }
   }
-  const hotels=Object.values(byH).sort((a,b)=>String(a.hotel).localeCompare(String(b.hotel)));
+  const solOrder=['connected','liberty','simply'];
+  const hotels=Object.values(byH).sort((a,b)=>{
+    const sa=String(a.solution||'').toLowerCase();
+    const sb=String(b.solution||'').toLowerCase();
+    const ia=solOrder.indexOf(sa); const ib=solOrder.indexOf(sb);
+    const ka=ia<0?999:ia; const kb=ib<0?999:ib;
+    if(ka!==kb) return ka-kb;
+    return String(a.hotel).localeCompare(String(b.hotel));
+  });
   if(hotels.length){
     html+='<h2>Par hotel (|err| marge coef)</h2><div class="scroll"><table><thead><tr><th>Hotel</th><th>Solution</th>';
     for(const s of SOURCES) html+=`<th class="num col-err">${s}</th>`;
@@ -286,7 +305,7 @@ PREDICT_BODY = """
     <label>Hotel pilote</label>
     <select id="hotel_select"><option value="">— manuel —</option></select>
     <div class="row">
-      <div><label>Chambres</label><input name="hotel_nb_chambres" type="number" step="1" value="100"/></div>
+      <div><label>Chambres</label><input name="hotel_nb_chambres" type="number" step="1" value="200"/></div>
       <div><label>TO annuel (0-1)</label><input name="hotel_to_annuel" type="number" step="0.01" value="0.70"/></div>
     </div>
     <div class="row">
@@ -295,9 +314,9 @@ PREDICT_BODY = """
     </div>
     <label>Solution</label>
     <select name="solution">
-      <option value="simply">simply</option>
-      <option value="liberty">liberty</option>
       <option value="connected">connected</option>
+      <option value="liberty">liberty</option>
+      <option value="simply">simply</option>
     </select>
     <label>hotel_code (sim_v1)</label>
     <input name="hotel_code" type="text" placeholder="ex. H2075"/>
@@ -483,8 +502,8 @@ class MixPanel {
       const residual=it.autoLocked?' residual':'';
       const lockedCls=it.locked?' locked':'';
       const lockTitle=it.autoLocked
-        ? 'Reste automatique (fige) — allumez un autre groupe pour ajuster'
-        : (free ? 'Libre — cliquer pour figer' : 'Figé — cliquer pour liberer');
+        ? 'Reste (auto)'
+        : (free ? 'Libre' : 'Figé');
       html+=`<div class="mix-row${lockedCls}${residual}" data-key="${this._escAttr(it.key)}">
         <div class="mix-label" title="${this._escAttr(it.key)}">${this._escHtml(it.key)}</div>
         <div class="mix-pct">${pctLabel(it.value)}</div>
@@ -592,8 +611,15 @@ function renderOne(data, {title=null, showLabel=false, label=''}={}){
   if(!data.ok) return `<div class="errbox">${showLabel&&label?label+' : ':''}${data.error||'echec'}</div>`;
   const head=title?`<h2>${title}</h2>`:(showLabel&&label?`<h2>${tag(label)}</h2>`:'');
   if(data.predictions){
+    const solOrder=['connected','liberty','simply'];
+    const preds=[...(data.predictions||[])].sort((a,b)=>{
+      const sa=String(a.solution||'').toLowerCase();
+      const sb=String(b.solution||'').toLowerCase();
+      const ia=solOrder.indexOf(sa); const ib=solOrder.indexOf(sb);
+      return (ia<0?9:ia)-(ib<0?9:ib) || sa.localeCompare(sb);
+    });
     let h=head+`<div class="scroll"><table><thead><tr><th>Solution</th><th class="num">CA</th><th class="num">Marge marche</th><th class="num">Marge coef</th></tr></thead><tbody>`;
-    for(const r of data.predictions){
+    for(const r of preds){
       h+=`<tr><td>${tag(r.solution)}</td>
         <td class="num">${fmt(r.montant_ventes_par_mois_predit)}</td>
         <td class="num">${fmt(r.montant_marge_par_mois_predite)}</td>
@@ -764,7 +790,7 @@ def create_web_app(paths: Paths | None = None) -> Flask:
 
     @app.get("/user/doc")
     def user_doc_page():
-        """Documentation metier sim_v2 + IA (theme sombre projet)."""
+        """Documentation simulateur."""
         return render_template_string(
             _page(
                 "ROD · Documentation",

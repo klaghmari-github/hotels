@@ -303,7 +303,7 @@ USER_BODY = """
         <input type="search" id="q" placeholder="Code, nom, marque ou ville…" autocomplete="off"/>
         <button class="btn primary" type="button" id="btn-search">Rechercher</button>
       </div>
-      <div id="results" class="hotel-list"><p class="muted">Saisir une recherche.</p></div>
+      <div id="results" class="hotel-list"></div>
     </div>
   </section>
 
@@ -330,8 +330,11 @@ USER_BODY = """
   <section class="panel" id="panel-3">
     <div class="card">
       <h2 style="margin-top:0">Choix des gammes</h2>
-      <div class="section-title">Exploitation</div>
+      <div class="section-title">Metres lineaires &amp; perimetre</div>
       <div class="kpi-grid" id="kpi-scope"></div>
+      <p class="muted" style="margin:.25rem 0 .85rem;font-size:.88rem">
+        Les metres lineaires F&amp;B se reglent ici (exposition physique), avant le choix des gammes.
+      </p>
       <div class="section-title">Types et gammes</div>
       <div id="mix_type_scope" class="mix-block"></div>
       <div class="mix-family-grid">
@@ -349,7 +352,7 @@ USER_BODY = """
 
   <!-- 4 Mix recommande -->
   <section class="panel" id="panel-4">
-    <div id="mix-reco-out"><p class="muted">En attente…</p></div>
+    <div id="mix-reco-out"></div>
     <div class="nav-row">
       <button class="btn" type="button" data-go="3">Retour</button>
       <div class="right">
@@ -382,7 +385,7 @@ USER_BODY = """
 
   <!-- 6 Estimation -->
   <section class="panel" id="panel-6">
-    <div id="estimate-out"><p class="muted">En attente…</p></div>
+    <div id="estimate-out"></div>
     <div class="nav-row">
       <button class="btn" type="button" data-go="5">Retour</button>
     </div>
@@ -856,7 +859,7 @@ async function search(opts){
   if(!qEl||!box) return;
   const q=qEl.value.trim();
   if(!q){
-    box.innerHTML='<p class="muted">Saisir un code, un nom, une marque ou une ville…</p>';
+    box.innerHTML='';
     return;
   }
   // debounce sauf si Enter / Espace / bouton
@@ -935,12 +938,11 @@ function renderIdentity(){
 function renderGeneralKpis(){
   const e=memory.exploitation||{};
   const d=memory.defaults_used||{};
-  // TO affiche en %
+  // TO affiche en % — metres lineaires sont a l etape 3 (choix gammes)
   document.getElementById('kpi-general').innerHTML=
     kpiInput('g_chambres','Chambres', e.hotel_nb_chambres, {step:1,min:1,max:2000, isDefault:!!d.hotel_nb_chambres})
     + kpiInput('g_to','TO annuel (%)', e.hotel_to_annuel, {step:0.1,min:1,max:100, fmtPct:true, isDefault:!!d.hotel_to_annuel})
-    + kpiInput('g_guests','Guests / chambre', e.hotel_guests_per_chambre, {step:0.1,min:0.5,max:5, isDefault:!!d.hotel_guests_per_chambre})
-    + kpiInput('g_mlin','Metres lineaires', memory.levers?.metres_lineaires??6, {step:0.1,min:0.5,max:50, isDefault:!!d.metres_lineaires});
+    + kpiInput('g_guests','Guests / chambre', e.hotel_guests_per_chambre, {step:0.1,min:0.5,max:5, isDefault:!!d.hotel_guests_per_chambre});
 }
 
 const SERVICE_LABELS={
@@ -973,9 +975,7 @@ function renderServices(){
   let html='';
   for(const [k,lab] of Object.entries(SERVICE_LABELS)){
     const on=_isOn(s[k]);
-    html+=`<button type="button" class="bool-pill${on?' on':''}" data-svc="${k}">
-      ${lab}${on?' · on':' · off'}
-    </button>`;
+    html+=`<button type="button" class="bool-pill${on?' on':''}" data-svc="${k}">${lab}</button>`;
   }
   box.innerHTML=html;
   box.querySelectorAll('[data-svc]').forEach(btn=>{
@@ -1072,7 +1072,7 @@ function renderProximity(){
     <div class="k">Plage a 500 m</div>
     <div class="row" style="flex-wrap:wrap">
       <button type="button" class="bool-pill${plageOn?' on':''}" id="btn-plage-500">
-        ${plageOn?'Oui · presente':'Non · absente'}
+        ${plageOn?'Oui':'Non'}
       </button>
       ${distHtml}
     </div>
@@ -1149,11 +1149,15 @@ function renderFixedKpis(hostId){
 
 // ---------- Step 3 : choix gammes (ON/OFF, catalogue complet) ----------
 function syncGeneralToLevers(){
-  // recopie les KPI generaux vers leviers si l'utilisateur les a modifies
-  const ch=readNum('g_chambres', memory.levers?.hotel_nb_chambres??100);
+  // recopie les KPI generaux (+ m_lin etape 3 si present) vers leviers
+  const ch=readNum('g_chambres', memory.levers?.hotel_nb_chambres??200);
   const toPct=readNum('g_to', (memory.levers?.hotel_to_annuel??0.7)*100);
   const guests=readNum('g_guests', memory.levers?.hotel_guests_per_chambre??1.7);
-  const mlin=readNum('g_mlin', memory.levers?.metres_lineaires??6);
+  // g_mlin n existe qu a l etape 3 (choix gammes)
+  const mlinEl=document.getElementById('g_mlin');
+  const mlin=mlinEl
+    ? readNum('g_mlin', memory.levers?.metres_lineaires??6)
+    : (memory.levers?.metres_lineaires??6);
   memory.levers={
     ...(memory.levers||{}),
     hotel_nb_chambres: ch,
@@ -1163,8 +1167,39 @@ function syncGeneralToLevers(){
   };
 }
 
+/** KPI etape 3 : chambres/TO/guests en lecture, m_lin editable. */
+function renderScopeKpis(){
+  syncGeneralToLevers();
+  const el=document.getElementById('kpi-scope');
+  if(!el) return;
+  const L=memory.levers||{};
+  const d=memory.defaults_used||{};
+  const toDisp = (L.hotel_to_annuel!=null && L.hotel_to_annuel<=1.5)
+    ? L.hotel_to_annuel
+    : (Number(L.hotel_to_annuel)||0.7)/100;
+  el.innerHTML=
+    kpiFixed('Chambres', L.hotel_nb_chambres, {digits:0})
+    + kpiFixed('TO annuel', toDisp, {fmtPct:true})
+    + kpiFixed('Guests / chambre', L.hotel_guests_per_chambre, {digits:1})
+    + kpiInput(
+        'g_mlin',
+        'Metres lineaires',
+        L.metres_lineaires??6,
+        {step:0.1,min:0.5,max:50, isDefault:!!d.metres_lineaires}
+      );
+  const mlinEl=document.getElementById('g_mlin');
+  if(mlinEl){
+    const save=()=>{
+      const v=readNum('g_mlin', memory.levers?.metres_lineaires??6);
+      memory.levers={...(memory.levers||{}), metres_lineaires:v};
+    };
+    mlinEl.addEventListener('change', save);
+    mlinEl.addEventListener('input', save);
+  }
+}
+
 function renderScopeMix(){
-  renderFixedKpis('kpi-scope');
+  renderScopeKpis();
   const L=memory.levers||{};
   const tm=L.type_mix||{ 'F&B':0.7, 'NON F&B':0.3 };
   let fb=L.gamme_mix_fb, nfb=L.gamme_mix_nfb;
@@ -1275,7 +1310,7 @@ function payloadFromMemory(which){
   which=which||'edit';
   syncGeneralToLevers();
   const L=memory.levers||{};
-  const ch=Number(L.hotel_nb_chambres ?? readNum('g_chambres', 100));
+  const ch=Number(L.hotel_nb_chambres ?? readNum('g_chambres', 200));
   let to=Number(L.hotel_to_annuel ?? 0.7);
   if(to>1.5) to=to/100;
   const guests=Number(L.hotel_guests_per_chambre ?? readNum('g_guests', 1.7));
@@ -1338,7 +1373,8 @@ function payloadFromMemory(which){
     gamme_mix_nfb: nfbP,
     services,
     proximity,
-    solutions: ['simply','liberty','connected'],
+    // Affichage / estimation : Connected → Liberty → Simply
+    solutions: ['connected','liberty','simply'],
   };
 }
 
@@ -1353,15 +1389,32 @@ function annualOf(r){
   const cout = r.cout_annual!=null ? Number(r.cout_annual)
     : (r.costs && r.costs.annual_cost!=null ? Number(r.costs.annual_cost)
       : (r.costs && r.costs.monthly_cost!=null ? Number(r.costs.monthly_cost)*12 : null));
-  const nette = r.marge_nette_annual!=null ? Number(r.marge_nette_annual)
-    : (r.marge_nette_annuelle!=null ? Number(r.marge_nette_annuelle)
-      : (r.marge_nette_monthly!=null ? Number(r.marge_nette_monthly)*12 : null));
-  return {ca, marge, cout, nette};
+  // ROI = marge ventes (PV − PA) − couts solution
+  const roi = r.roi_annual!=null ? Number(r.roi_annual)
+    : (r.marge_nette_annual!=null ? Number(r.marge_nette_annual)
+      : (r.marge_nette_annuelle!=null ? Number(r.marge_nette_annuelle)
+        : (r.roi_monthly!=null ? Number(r.roi_monthly)*12
+          : (r.marge_nette_monthly!=null ? Number(r.marge_nette_monthly)*12 : null))));
+  return {ca, marge, cout, roi, nette: roi};
+}
+
+/** Ordre d affichage solutions : Connected → Liberty → Simply (plus chic d abord). */
+const SOLUTION_DISPLAY_ORDER=['connected','liberty','simply'];
+function sortRowsBySolution(rows){
+  const order=SOLUTION_DISPLAY_ORDER;
+  return [...(rows||[])].sort((a,b)=>{
+    const sa=String(a&&a.solution||'').toLowerCase();
+    const sb=String(b&&b.solution||'').toLowerCase();
+    const ia=order.indexOf(sa); const ib=order.indexOf(sb);
+    const ka=ia<0?999:ia; const kb=ib<0?999:ib;
+    if(ka!==kb) return ka-kb;
+    return sa.localeCompare(sb);
+  });
 }
 
 function engineBlock(eng, block){
   const label = ({ml:'ML', sim_v1:'sim_v1', sim_v2:'sim_v2'})[eng] || eng;
-  const rows=block.results||[];
+  const rows=sortRowsBySolution(block.results||[]);
   const reco=block.recommendation||{};
   let html=`<div class="engine-block"><h3>${tag(label)}</h3>`;
   if(reco.recommended){
@@ -1369,7 +1422,7 @@ function engineBlock(eng, block){
     const a=annualOf(best);
     html+=`<div class="reco-box">
       <h4>Recommandation : ${tag(reco.recommended)}</h4>
-      <div class="muted">CA ${fmt(a.ca)} €/an · Marge nette ${fmt(a.nette)} €/an
+      <div class="muted">CA ${fmt(a.ca)} €/an · ROI ${fmt(a.roi)} €/an
       · Amort. ${best.payback_months!=null?`<span class="payback">${fmt(best.payback_months,1)} mois (${fmt(best.payback_years,1)} ans)</span>`:'n/a'}</div>
     </div>`;
   } else {
@@ -1377,8 +1430,8 @@ function engineBlock(eng, block){
   }
   if(rows.length){
     html+=`<div class="admin-table-wrap" style="border:0"><table><thead><tr>
-      <th>Solution</th><th class="num">CA estime / an</th><th class="num">Marge / an</th>
-      <th class="num">Cout / an</th><th class="num">Marge nette / an</th>
+      <th>Solution</th><th class="num">CA estime / an</th><th class="num">Marge ventes / an</th>
+      <th class="num">Cout / an</th><th class="num">ROI / an</th>
       <th class="num">Amort. (mois)</th>
     </tr></thead><tbody>`;
     for(const r of rows){
@@ -1388,7 +1441,7 @@ function engineBlock(eng, block){
         <td class="num col-pred">${fmt(a.ca)}</td>
         <td class="num col-pred">${fmt(a.marge)}</td>
         <td class="num">${fmt(a.cout)}</td>
-        <td class="num"><strong>${fmt(a.nette)}</strong></td>
+        <td class="num"><strong>${fmt(a.roi)}</strong></td>
         <td class="num payback">${r.payback_months!=null?fmt(r.payback_months,1):'—'}</td>
       </tr>`;
     }
@@ -1401,12 +1454,12 @@ function engineBlock(eng, block){
 /** Nettoie le message de progression (pas de detail moteur). */
 function progressMessage(raw){
   let m=String(raw||'').trim();
-  if(!m) return 'Estimation du CA…';
+  if(!m) return 'Calcul…';
   // masquer references techniques sim_v1 / sim_v2 / ml
   m=m.replace(/\s*\(?\s*sim_v1\s*[·/,]\s*sim_v2\s*[·/,]\s*ml\s*\)?/gi,'');
   m=m.replace(/\bsim_v[12]\b/gi,'').replace(/\bml\b/gi,'');
   m=m.replace(/\s{2,}/g,' ').replace(/\s+([,.;:…])/g,'$1').trim();
-  if(!m || /^[\-–—·,/]+$/.test(m)) return 'Estimation du CA…';
+  if(!m || /^[\-–—·,/]+$/.test(m)) return 'Calcul…';
   return m;
 }
 
@@ -1416,7 +1469,7 @@ function renderProgressBar(host, {pct=0, message='', indeterminate=false}={}){
   let wrap=host.querySelector('.progress-wrap');
   if(!wrap){
     host.innerHTML=`<div class="progress-wrap" data-testid="progress-wrap">
-      <div class="progress-label"><span class="progress-title">Avancement</span><span class="progress-pct">0 %</span></div>
+      <div class="progress-label"><span class="progress-title">Calcul</span><span class="progress-pct">0 %</span></div>
       <div class="progress-track"><div class="progress-fill" data-testid="progress-fill"></div></div>
       <div class="progress-msg" data-testid="progress-msg"></div>
     </div>`;
@@ -1443,7 +1496,7 @@ function renderProgressBar(host, {pct=0, message='', indeterminate=false}={}){
  * Retourne le result du job.
  */
 async function runJobWithProgress(startUrl, payload, progressHost, {pollMs=400}={}){
-  renderProgressBar(progressHost, {pct:0, message:'Estimation du CA…', indeterminate:true});
+  renderProgressBar(progressHost, {pct:0, message:'Calcul…', indeterminate:true});
   const startRes=await fetch(startUrl,{
     method:'POST', headers:{'Content-Type':'application/json'},
     body:JSON.stringify(payload)
@@ -1453,7 +1506,7 @@ async function runJobWithProgress(startUrl, payload, progressHost, {pollMs=400}=
   const jobId=start.job_id;
   renderProgressBar(progressHost, {
     pct:start.pct||0,
-    message:start.message||'Estimation du CA…',
+    message:start.message||'Calcul…',
     indeterminate:!(start.total>1),
   });
 
@@ -1467,7 +1520,7 @@ async function runJobWithProgress(startUrl, payload, progressHost, {pollMs=400}=
     }
     renderProgressBar(progressHost, {
       pct:st.pct||0,
-      message:st.message||'Estimation du CA…',
+      message:st.message||'Calcul…',
       indeterminate:st.status==='pending'||(st.total<=1 && st.status==='running'),
     });
     if(st.status==='done'){
@@ -1537,7 +1590,7 @@ function renderMixSummary(typeMix, fbMix, nfbMix, {title='Mix'}={}){
       : `<span class="badge zero">0 %</span>`;
     let body='';
     if(!on){
-      body=`<div class="mix-family-empty">Inactif (type a 0 %)</div>`;
+      body=`<div class="mix-family-empty">Inactif</div>`;
     }else{
       for(const r of items){
         const zero=r.share<=EPS;
@@ -1604,18 +1657,6 @@ async function runMixReco(){
         <p style="margin:0 0 .65rem"><strong>${fmt(bestA.ca!=null?bestA.ca:(best.ca_monthly!=null?best.ca_monthly*12:null))}</strong> €/an · ${tag(best.solution)}</p>
         ${renderMixSummary(best.type_mix, best.gamme_mix_fb, best.gamme_mix_nfb, {title:'Mix recommande'})}
       </div>`;
-      const asrt=best.assortment||((data.assortments||{})[String(best.varied_target||'').toUpperCase()]);
-      if(asrt){
-        const prods=(asrt.top_products||[]).slice(0,12);
-        if(prods.length){
-          html+='<div class="section-title">Top produits</div>';
-          html+='<div class="admin-table-wrap" style="border:0"><table><thead><tr><th>#</th><th>Produit</th><th>Type</th><th>Gamme</th><th class="num">Rang moyen</th></tr></thead><tbody>';
-          for(const p of prods){
-            html+=`<tr><td>${p.rank}</td><td>${p.nom_produit||'—'}</td><td>${p.type||'—'}</td><td>${p.gamme||'—'}</td><td class="num">${fmt(p.rang_moyen,1)}</td></tr>`;
-          }
-          html+='</tbody></table></div>';
-        }
-      }
     }
     const by=data.best_by_engine||{};
     for(const eng of ['sim_v1','sim_v2','ml']){
@@ -1667,11 +1708,10 @@ async function runEstimate(){
   out.innerHTML='';
   // barre de progression (requete sync : avancement visuel pendant l'attente)
   let fakePct=8;
-  renderProgressBar(out, {pct:fakePct, message:'Estimation du CA…', indeterminate:false});
+  renderProgressBar(out, {pct:fakePct, message:'Calcul…', indeterminate:false});
   const tick=setInterval(()=>{
-    // asymptote vers ~90 % tant que la reponse n'est pas la
     fakePct=Math.min(90, fakePct+(90-fakePct)*0.12+1.5);
-    renderProgressBar(out, {pct:fakePct, message:'Estimation du CA…', indeterminate:false});
+    renderProgressBar(out, {pct:fakePct, message:'Calcul…', indeterminate:false});
   }, 220);
   // eviter double-clic pendant le calcul
   const btnEst=document.getElementById('btn-estimate');
@@ -1714,7 +1754,7 @@ async function runEstimate(){
       const best=globalReco.best||{};
       const a=annualOf(best);
       html+=`<div class="reco-box"><h4>Solution recommandee : ${tag(globalReco.recommended)}</h4>
-        <div class="muted">CA ${fmt(a.ca)} €/an · Marge nette ${fmt(a.nette)} €/an
+        <div class="muted">CA ${fmt(a.ca)} €/an · ROI ${fmt(a.roi)} €/an
         ${best.payback_months!=null?` · Amort. <span class="payback">${fmt(best.payback_months,1)} mois (${fmt(best.payback_years,1)} ans)</span>`:''}</div>
       </div>`;
     }
@@ -1758,7 +1798,7 @@ if(qInput){
     if(v.length>=2) search({immediate:false});
     else if(!v){
       const box=document.getElementById('results');
-      if(box) box.innerHTML='<p class="muted">Saisir un code, un nom, une marque ou une ville…</p>';
+      if(box) box.innerHTML='';
     }
   });
 }

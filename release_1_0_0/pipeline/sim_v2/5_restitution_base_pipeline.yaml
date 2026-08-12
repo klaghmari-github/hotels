@@ -95,7 +95,7 @@ v_restitution_default_input_hotel:
   requires: []
   sql: |-
     SELECT
-      100.0::DOUBLE AS hotel_nb_chambres,
+      200.0::DOUBLE AS hotel_nb_chambres,
       0.5::DOUBLE AS hotel_to_annuel,
       1.0::DOUBLE AS hotel_guests_per_chambre,
       10.0::DOUBLE AS metres_lineaires

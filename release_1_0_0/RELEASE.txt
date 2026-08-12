@@ -1,0 +1,8 @@
+release=1.0.0
+package=release_1_0_0
+deployed_at=pending
+source=local-rsync
+note=self-contained: src + pipeline + data + models + run.py; venv created on server
+user=/user
+admin=/admin
+legacy_studio=/studio → redirect /admin

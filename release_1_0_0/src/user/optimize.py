@@ -295,7 +295,10 @@ def run_mix_optimization(
             "souvenirs": 0.05,
         },
     )
-    sols = solutions or ["simply", "liberty", "connected"]
+    from src.user.business import SOLUTION_DISPLAY_ORDER
+
+    # ordre d evaluation / affichage : connected → liberty → simply
+    sols = list(solutions) if solutions else list(SOLUTION_DISPLAY_ORDER)
 
     scenarios: list[dict[str, Any]] = [
         {
@@ -415,8 +418,12 @@ def run_mix_optimization(
         best_recommendation = recommend(
             same_mix, nb_chambres=hotel_nb_chambres
         )
+        from src.user.business import sort_rows_by_solution
+
         for eng in ("sim_v1", "sim_v2", "ml"):
-            eng_rows = [r for r in same_mix if r.get("engine") == eng]
+            eng_rows = sort_rows_by_solution(
+                [r for r in same_mix if r.get("engine") == eng]
+            )
             best_by_engine[eng] = {
                 "results": eng_rows,
                 "recommendation": recommend(eng_rows, nb_chambres=hotel_nb_chambres)
@@ -692,9 +699,13 @@ def run_product_rank_optimization(
         same_mix = [
             t["result"] for t in trials if t["scenario_index"] == best["scenario_index"]
         ]
+        from src.user.business import sort_rows_by_solution
+
         best_recommendation = recommend(same_mix, nb_chambres=hotel_nb_chambres)
         for eng in ("sim_v1", "sim_v2", "ml"):
-            eng_rows = [r for r in same_mix if r.get("engine") == eng]
+            eng_rows = sort_rows_by_solution(
+                [r for r in same_mix if r.get("engine") == eng]
+            )
             best_by_engine[eng] = {
                 "results": eng_rows,
                 "recommendation": recommend(eng_rows, nb_chambres=hotel_nb_chambres)

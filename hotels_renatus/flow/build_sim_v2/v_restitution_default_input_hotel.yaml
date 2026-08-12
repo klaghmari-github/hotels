@@ -2,5 +2,5 @@ v_restitution_default_input_hotel:
   type: view
   mode: create_or_replace
   requires: []
-  script: "SELECT\n  100.0::DOUBLE AS hotel_nb_chambres,\n  0.5::DOUBLE AS hotel_to_annuel,\n\
+  script: "SELECT\n  200.0::DOUBLE AS hotel_nb_chambres,\n  0.5::DOUBLE AS hotel_to_annuel,\n\
     \  1.0::DOUBLE AS hotel_guests_per_chambre,\n  10.0::DOUBLE AS metres_lineaires"

@@ -177,7 +177,7 @@ def create_api_app(paths: Paths | None = None) -> Flask:
     factory = PipelineFactory(paths)
     sim_v1 = SimV1Service(paths, factory)
     sim_v2 = SimV2Service(paths, factory)
-    # « ml » affiche = super-modele (sim_v2 + xgboost sur simulations)
+    # « ml » = chaîne ml_tc → ml_tc_sim_v2 → ml_ca (SuperModelService)
     ml_super = SuperModelService(paths, factory=factory)
     ml = ml_super  # alias UI / predict
     ml_xgb = XGBoostService(paths, factory=factory, variant="ml1")  # couche base
@@ -268,16 +268,76 @@ def create_api_app(paths: Paths | None = None) -> Flask:
         except Exception as exc:  # noqa: BLE001
             return jsonify({"ok": False, "error": str(exc)}), 500
 
+    def _pilot_m_lin_map() -> dict[str, float]:
+        """m_lin pilotes (v_hotel_params) pour couts / amortissement LOO."""
+        try:
+            cp = factory.open(read_only=True)
+            try:
+                df = cp.con.execute(
+                    """
+                    SELECT CAST(hotel_code AS VARCHAR) AS hotel_code,
+                           TRY_CAST(m_lin AS DOUBLE) AS m_lin
+                    FROM v_hotel_params
+                    """
+                ).df()
+            finally:
+                cp.close()
+            out: dict[str, float] = {}
+            for _, r in df.iterrows():
+                code = str(r.get("hotel_code") or "").strip()
+                if not code:
+                    continue
+                try:
+                    v = float(r.get("m_lin"))
+                except (TypeError, ValueError):
+                    v = 6.0
+                if not (v > 0):
+                    v = 6.0
+                out[code] = v
+            return out
+        except Exception:  # noqa: BLE001
+            return {}
+
+    def _eval_economics(
+        solution: str,
+        marge_monthly: Any,
+        metres_lineaires: float,
+    ) -> dict[str, Any]:
+        """Cout mensuel, ROI (marge ventes − couts), payback."""
+        from src.user.business import enrich_prediction_with_costs
+
+        enr = enrich_prediction_with_costs(
+            solution=str(solution or "simply"),
+            ca_monthly=0.0,
+            marge_monthly=(
+                float(marge_monthly)
+                if marge_monthly is not None and pd.notna(marge_monthly)
+                else 0.0
+            ),
+            metres_lineaires=float(metres_lineaires or 6.0),
+        )
+        roi_m = enr.get("roi_monthly", enr.get("marge_nette_monthly"))
+        return {
+            "cout_monthly": enr.get("cout_monthly"),
+            "capex": (enr.get("costs") or {}).get("capex"),
+            "marge_nette_monthly": roi_m,
+            "roi_monthly": roi_m,
+            "payback_months": enr.get("payback_months"),
+            "payback_years": enr.get("payback_years"),
+            "metres_lineaires": float(metres_lineaires or 6.0),
+        }
+
     def _eval_web_payload(engine: str, pred: pd.DataFrame, metrics: pd.DataFrame) -> dict:
         """
         Projection web unifiee (v_web_*) pour l'UI.
 
-        - CA reel / estime / err  (estime = simulation ou prediction)
-        - Marge = marge selon coef quand dispo (comparaison commune)
-        Champs API : ca_pred / marge_pred = valeurs estimees (nom historique).
+        - CA reel / estime / err
+        - Marge selon coef (+ err)
+        - Cout, ROI (marge ventes − couts), amortissement (mois)
         """
         p = pred.copy()
         web_rows: list[dict[str, Any]] = []
+        m_lin_map = _pilot_m_lin_map()
 
         def _f(row, *keys, default=None):
             for k in keys:
@@ -285,13 +345,20 @@ def create_api_app(paths: Paths | None = None) -> Flask:
                     return row[k]
             return default
 
+        def _num(v):
+            if v is None or (isinstance(v, float) and pd.isna(v)):
+                return None
+            try:
+                return float(v)
+            except (TypeError, ValueError):
+                return None
+
         for _, row in p.iterrows():
             r = row.to_dict()
             if engine == "sim_v1":
                 ca_r = _f(r, "ca_reel")
                 ca_p = _f(r, "ca_pred")
                 ca_e = _f(r, "ca_err_abs")
-                # v1 n'a qu'une marge produit — exposee comme marge (comparaison)
                 m_r = _f(r, "marge_reel")
                 m_p = _f(r, "marge_pred")
                 m_e = _f(r, "marge_err_abs")
@@ -310,7 +377,7 @@ def create_api_app(paths: Paths | None = None) -> Flask:
                     "montant_marge_selon_coef_erreur_absolue",
                     "marge_err_abs",
                 )
-            else:  # ml / ml-xgb / ml-super (schema LOO unifie)
+            else:
                 ca_r = _f(r, "montant_ventes_par_mois_reel", "ca_reel")
                 ca_p = _f(r, "montant_ventes_par_mois_predit", "ca_pred")
                 ca_e = _f(
@@ -335,21 +402,44 @@ def create_api_app(paths: Paths | None = None) -> Flask:
                 if ca_e is None and ca_r is not None and ca_p is not None:
                     ca_e = abs(float(ca_p) - float(ca_r))
 
+            code = str(_f(r, "hotel_code") or "").strip()
+            sol = _f(r, "solution")
+            m_lin_raw = _f(r, "metres_lineaires", "m_lin")
+            try:
+                m_lin = float(m_lin_raw) if m_lin_raw is not None else m_lin_map.get(code, 6.0)
+            except (TypeError, ValueError):
+                m_lin = m_lin_map.get(code, 6.0)
+            if not (m_lin > 0):
+                m_lin = 6.0
+
+            eco_r = _eval_economics(sol, m_r, m_lin)
+            eco_p = _eval_economics(sol, m_p, m_lin)
+
             web_rows.append(
                 {
-                    "hotel_code": _f(r, "hotel_code"),
-                    "solution": _f(r, "solution"),
-                    "ca_reel": ca_r,
-                    "ca_pred": ca_p,
-                    "ca_err_abs": ca_e,
-                    "marge_reel": m_r,
-                    "marge_pred": m_p,
-                    "marge_err_abs": m_e,
+                    "hotel_code": code,
+                    "solution": sol,
+                    "metres_lineaires": m_lin,
+                    "ca_reel": _num(ca_r),
+                    "ca_pred": _num(ca_p),
+                    "ca_err_abs": _num(ca_e),
+                    "marge_reel": _num(m_r),
+                    "marge_pred": _num(m_p),
+                    "marge_err_abs": _num(m_e),
+                    "cout_monthly": eco_r.get("cout_monthly"),
+                    "capex": eco_r.get("capex"),
+                    "marge_nette_reel": eco_r.get("roi_monthly"),
+                    "marge_nette_pred": eco_p.get("roi_monthly"),
+                    "roi_reel": eco_r.get("roi_monthly"),
+                    "roi_pred": eco_p.get("roi_monthly"),
+                    "payback_months_reel": eco_r.get("payback_months"),
+                    "payback_months_pred": eco_p.get("payback_months"),
+                    "payback_years_reel": eco_r.get("payback_years"),
+                    "payback_years_pred": eco_p.get("payback_years"),
                 }
             )
 
         web_pred = pd.DataFrame(web_rows)
-        # Metriques web : MAE CA + MAE marge (selon coef)
         metric_rows: list[dict[str, Any]] = []
         if engine == "sim_v1":
             for _, m in metrics.iterrows():
@@ -363,8 +453,6 @@ def create_api_app(paths: Paths | None = None) -> Flask:
                 )
         elif engine == "sim_v2":
             for _, m in metrics.iterrows():
-                # ignorer lignes par-solution detail si on veut global only —
-                # on garde solution pour detail admin
                 metric_rows.append(
                     {
                         "scope": m.get("solution")
@@ -376,7 +464,6 @@ def create_api_app(paths: Paths | None = None) -> Flask:
                     }
                 )
         else:
-            # ml : une ligne par target → extraire CA + marge selon coef
             mae_ca = mae_m = n_h = None
             for _, m in metrics.iterrows():
                 t = str(m.get("target") or "")
@@ -401,14 +488,22 @@ def create_api_app(paths: Paths | None = None) -> Flask:
             "columns": [
                 "hotel_code",
                 "solution",
+                "metres_lineaires",
                 "ca_reel",
                 "ca_pred",
                 "ca_err_abs",
                 "marge_reel",
                 "marge_pred",
                 "marge_err_abs",
+                "cout_monthly",
+                "capex",
+                "marge_nette_reel",
+                "marge_nette_pred",
+                "roi_reel",
+                "roi_pred",
+                "payback_months_reel",
+                "payback_months_pred",
             ],
-            # reel toujours selon_coef (base tickets) ; estime v1 = marge produit R1-R4
             "margin_kind": "selon_coef_reel"
             if engine == "sim_v1"
             else "selon_coef",
@@ -417,7 +512,6 @@ def create_api_app(paths: Paths | None = None) -> Flask:
                 if engine in ("sim_v1", "sim_v2")
                 else "prediction"
             ),
-            # LOO admin : cibles modeles = mensuelles
             "period": "monthly",
             "period_label": "€ / mois",
         }
@@ -588,15 +682,32 @@ def create_api_app(paths: Paths | None = None) -> Flask:
                         "solution": rec.get("solution"),
                         "ca_reel": rec.get("ca_reel"),
                         "marge_reel": rec.get("marge_reel"),
+                        "metres_lineaires": rec.get("metres_lineaires"),
+                        "cout_monthly": rec.get("cout_monthly"),
+                        "capex": rec.get("capex"),
+                        "marge_nette_reel": rec.get("roi_reel", rec.get("marge_nette_reel")),
+                        "roi_reel": rec.get("roi_reel", rec.get("marge_nette_reel")),
+                        "payback_months_reel": rec.get("payback_months_reel"),
                     },
                 )
-                # garder solution / reel si manquants
                 if not row.get("solution") and rec.get("solution"):
                     row["solution"] = rec.get("solution")
                 if row.get("ca_reel") is None and rec.get("ca_reel") is not None:
                     row["ca_reel"] = rec.get("ca_reel")
                 if row.get("marge_reel") is None and rec.get("marge_reel") is not None:
                     row["marge_reel"] = rec.get("marge_reel")
+                for k in (
+                    "metres_lineaires",
+                    "cout_monthly",
+                    "capex",
+                    "marge_nette_reel",
+                    "roi_reel",
+                    "payback_months_reel",
+                ):
+                    if row.get(k) is None and rec.get(k) is not None:
+                        row[k] = rec.get(k)
+                    if k == "roi_reel" and row.get(k) is None:
+                        row[k] = rec.get("marge_nette_reel")
                 ca_p = rec.get("ca_pred")
                 ca_e = rec.get("ca_err_abs")
                 if ca_e is None and ca_p is not None and row.get("ca_reel") is not None:
@@ -615,8 +726,13 @@ def create_api_app(paths: Paths | None = None) -> Flask:
                 row[f"ca_err_{eng}"] = ca_e
                 row[f"marge_pred_{eng}"] = m_p
                 row[f"marge_err_{eng}"] = m_e
+                roi_p = rec.get("roi_pred", rec.get("marge_nette_pred"))
+                row[f"marge_nette_pred_{eng}"] = roi_p
+                row[f"roi_pred_{eng}"] = roi_p
+                row[f"payback_months_pred_{eng}"] = rec.get("payback_months_pred")
 
-        # meilleur moteur par hotel (plus faible |err| CA)
+        # Meilleur moteur par hotel = plus faible |err| CA vs reel
+        # (PAS le plus grand CA predit : une surestimation est une mauvaise eval)
         rows_out: list[dict[str, Any]] = []
         for code in sorted(by_hotel.keys()):
             row = by_hotel[code]
@@ -625,20 +741,30 @@ def create_api_app(paths: Paths | None = None) -> Flask:
             for eng in engines:
                 err = row.get(f"ca_err_{eng}")
                 if err is None:
+                    # recalcule |err| si pred + reel dispo
+                    ca_p = row.get(f"ca_pred_{eng}")
+                    ca_r = row.get("ca_reel")
+                    if ca_p is not None and ca_r is not None:
+                        try:
+                            err = abs(float(ca_p) - float(ca_r))
+                            row[f"ca_err_{eng}"] = err
+                        except (TypeError, ValueError):
+                            err = None
+                if err is None:
                     continue
                 try:
-                    e = float(err)
+                    e = abs(float(err))
                 except (TypeError, ValueError):
                     continue
                 if best_err is None or e < best_err:
                     best_err = e
                     best_eng = eng
             row["best_ca_engine"] = best_eng
+            row["best_ca_err"] = best_err
             rows_out.append(row)
 
         # ---------- Metriques + meilleur moteur PAR SOLUTION ----------
-        # Objectif : identifier l'estimation la plus proche du reel
-        # pour simply / liberty / connected separement.
+        # Meilleur = MAE (erreur moyenne abs.) minimale, pas CA predit max.
         def _norm_sol(s: Any) -> str:
             return str(s or "").strip().lower().replace("_", " ")
 
@@ -648,7 +774,9 @@ def create_api_app(paths: Paths | None = None) -> Flask:
             return float(sum(vals) / len(vals))
 
         by_solution: dict[str, Any] = {}
-        sol_order = ("simply", "liberty", "connected")
+        from src.user.business import SOLUTION_DISPLAY_ORDER
+
+        sol_order = SOLUTION_DISPLAY_ORDER  # connected → liberty → simply
         # regrouper les hotels par solution
         hotels_by_sol: dict[str, list[dict[str, Any]]] = {}
         for row in rows_out:
@@ -720,6 +848,11 @@ def create_api_app(paths: Paths | None = None) -> Flask:
                 }
             ), 404
 
+        from src.user.business import sort_rows_by_solution
+
+        # Detail par hotel : Connected → Liberty → Simply, puis code hotel
+        rows_sorted = sort_rows_by_solution(rows_out)
+
         return jsonify(
             {
                 "ok": True,
@@ -730,10 +863,10 @@ def create_api_app(paths: Paths | None = None) -> Flask:
                 "period_label": "€ / mois",
                 "global_metrics": global_metrics,
                 "by_solution": by_solution,
-                "rows": _clean_records(pd.DataFrame(rows_out))
-                if rows_out
+                "rows": _clean_records(pd.DataFrame(rows_sorted))
+                if rows_sorted
                 else [],
-                "n_hotels": len(rows_out),
+                "n_hotels": len(rows_sorted),
             }
         )
 
@@ -776,21 +909,31 @@ def create_api_app(paths: Paths | None = None) -> Flask:
                 sols = body.get("solutions") or body.get("solution")
                 if isinstance(sols, str):
                     sols = [sols]
-                rows = sim_v1.predict_from_levers(
-                    hotel_nb_chambres=float(body.get("hotel_nb_chambres") or 100),
-                    hotel_to_annuel=float(body.get("hotel_to_annuel") or 0.70),
-                    hotel_guests_per_chambre=float(
-                        body.get("hotel_guests_per_chambre") or 1.7
-                    ),
-                    metres_lineaires=float(body.get("metres_lineaires") or 6),
-                    type_mix=body.get("type_mix"),
-                    gamme_mix=body.get("gamme_mix"),
-                    nb_frigos_froid=float(
-                        body.get("nb_frigos_froid") or body.get("nb_frigos") or 3
-                    ),
-                    solutions=sols,
-                    hotel_code=code or None,
-                    mix_fb=body.get("mix_fb"),
+                from src.user.business import sort_rows_by_solution
+
+                rows = sort_rows_by_solution(
+                    sim_v1.predict_from_levers(
+                        hotel_nb_chambres=float(
+                            body.get("hotel_nb_chambres") or 200
+                        ),
+                        hotel_to_annuel=float(body.get("hotel_to_annuel") or 0.70),
+                        hotel_guests_per_chambre=float(
+                            body.get("hotel_guests_per_chambre") or 1.7
+                        ),
+                        metres_lineaires=float(
+                            body.get("metres_lineaires") or 6
+                        ),
+                        type_mix=body.get("type_mix"),
+                        gamme_mix=body.get("gamme_mix"),
+                        nb_frigos_froid=float(
+                            body.get("nb_frigos_froid")
+                            or body.get("nb_frigos")
+                            or 3
+                        ),
+                        solutions=sols,
+                        hotel_code=code or None,
+                        mix_fb=body.get("mix_fb"),
+                    )
                 )
                 return jsonify(
                     {
@@ -808,8 +951,10 @@ def create_api_app(paths: Paths | None = None) -> Flask:
     def predict_v2():
         body = request.get_json(force=True) or {}
         try:
+            from src.user.business import sort_rows_by_solution
+
             df = sim_v2.predict(
-                hotel_nb_chambres=float(body.get("hotel_nb_chambres", 100)),
+                hotel_nb_chambres=float(body.get("hotel_nb_chambres", 200)),
                 hotel_to_annuel=float(body.get("hotel_to_annuel", 0.70)),
                 hotel_guests_per_chambre=float(
                     body.get("hotel_guests_per_chambre", 1.7)
@@ -818,14 +963,15 @@ def create_api_app(paths: Paths | None = None) -> Flask:
                 type_mix=body.get("type_mix"),
                 gamme_mix=body.get("gamme_mix"),
             )
-            return jsonify({"ok": True, "model": "sim_v2", "predictions": _clean_records(df)})
+            preds = sort_rows_by_solution(_clean_records(df))
+            return jsonify({"ok": True, "model": "sim_v2", "predictions": preds})
         except Exception as exc:  # noqa: BLE001
             return jsonify({"ok": False, "error": str(exc)}), 400
 
     def _features_from_body(body: dict) -> tuple[str, dict[str, float]]:
         solution = str(body.get("solution") or "simply").lower()
         features = {
-            "hotel_nb_chambres": float(body.get("hotel_nb_chambres", 100)),
+            "hotel_nb_chambres": float(body.get("hotel_nb_chambres", 200)),
             "hotel_to_annuel": float(body.get("hotel_to_annuel", 0.70)),
             "hotel_guests_per_chambre": float(
                 body.get("hotel_guests_per_chambre", 1.7)
@@ -947,17 +1093,67 @@ def create_api_app(paths: Paths | None = None) -> Flask:
         },
     ]
 
-    @app.get("/api/admin/datasets")
-    def admin_datasets():
-        return jsonify({"ok": True, "datasets": DATASET_CATALOG})
+    # Catalogue restreint pour la doc user (popups schema) — lecture seule publique
+    DOC_DATASET_CATALOG = [
+        {
+            "id": "t_sales",
+            "table": "t_sales",
+            "label": "t_sales",
+            "description": "Tickets pilotes",
+        },
+        {
+            "id": "t_scenarios",
+            "table": "t_scenarios",
+            "label": "t_scenarios",
+            "description": "Definitions des scenarios (retraits de natures)",
+        },
+        {
+            "id": "sim_scenarios",
+            "table": "v_web_sales_sim_scenarios",
+            "label": "sim_scenarios",
+            "description": "Scenarios (vue web)",
+        },
+        {
+            "id": "t_dataset_pivot",
+            "table": "t_dataset_pivot",
+            "label": "t_dataset_pivot",
+            "description": "Scenarios × hotels pilotes (obs + sim)",
+        },
+        {
+            "id": "sales_sim",
+            "table": "v_web_sales_sim",
+            "label": "sales_sim",
+            "description": "Simulations (vue legere scenario × hotel)",
+        },
+        {
+            "id": "sales_obs",
+            "table": "v_web_sales_obs",
+            "label": "sales_obs",
+            "description": "Observations baseline par hotel pilote",
+        },
+        {
+            "id": "coeffs",
+            "table": "v_restitution_solution_coefficients",
+            "label": "coeffs",
+            "description": "Coefficients unitaires par solution",
+        },
+        {
+            "id": "conversion",
+            "table": "v_solution_conversion_rate",
+            "label": "conversion",
+            "description": "Taux de conversion moyen par solution",
+        },
+        {
+            "id": "pilot_concepts",
+            "table": "t_pilot_concepts",
+            "label": "t_pilot_concepts",
+            "description": "Mapping hotel ↔ solution pilote",
+        },
+    ]
 
-    @app.get("/api/admin/datasets/<dataset_id>")
-    def admin_dataset_page(dataset_id: str):
-        """
-        Page de dataset admin — pagination SQL (evite de charger toute la table
-        en RAM, source frequente de timeouts / Failed to fetch).
-        """
-        meta = next((d for d in DATASET_CATALOG if d["id"] == dataset_id), None)
+    def _dataset_page_response(catalog: list[dict], dataset_id: str):
+        """Pagination SQL partagee admin / doc."""
+        meta = next((d for d in catalog if d["id"] == dataset_id), None)
         if not meta:
             return jsonify({"ok": False, "error": f"Dataset inconnu : {dataset_id}"}), 404
         page = max(int(request.args.get("page", 1)), 1)
@@ -965,7 +1161,6 @@ def create_api_app(paths: Paths | None = None) -> Flask:
         q = (request.args.get("q") or "").strip()
         table = str(meta["table"])
 
-        # preferer lecture seule (moins de contention DuckDB)
         cp = None
         last_err: Exception | None = None
         for read_only in (True, False):
@@ -984,14 +1179,11 @@ def create_api_app(paths: Paths | None = None) -> Flask:
             ), 503
 
         try:
-            # materialise vue/table via pipeline si absente
             try:
                 cp.p_table_view(table)
             except Exception:
-                # table de base deja presente (create_if_not_exists)
                 pass
 
-            # colonnes
             try:
                 desc = cp.con.execute(f'DESCRIBE "{table}"').fetchall()
                 cols = [str(r[0]) for r in desc]
@@ -1019,13 +1211,9 @@ def create_api_app(paths: Paths | None = None) -> Flask:
             where_sql = ""
             params: list[Any] = []
             if q:
-                # filtre ILIKE sur colonnes (max 40 pour limiter la requete)
-                esc = q.replace("'", "''")
                 clauses = []
                 for c in cols[:40]:
-                    clauses.append(
-                        f'CAST("{c}" AS VARCHAR) ILIKE ?'
-                    )
+                    clauses.append(f'CAST("{c}" AS VARCHAR) ILIKE ?')
                     params.append(f"%{q}%")
                 where_sql = " WHERE (" + " OR ".join(clauses) + ")"
 
@@ -1033,7 +1221,6 @@ def create_api_app(paths: Paths | None = None) -> Flask:
             total = int(cp.con.execute(count_sql, params).fetchone()[0])
 
             offset = (page - 1) * page_size
-            # ORDER BY 1 pour pagination stable
             order_col = cols[0]
             data_sql = (
                 f'SELECT * FROM "{table}"{where_sql} '
@@ -1068,6 +1255,28 @@ def create_api_app(paths: Paths | None = None) -> Flask:
                 cp.close()
             except Exception:
                 pass
+
+    @app.get("/api/admin/datasets")
+    def admin_datasets():
+        return jsonify({"ok": True, "datasets": DATASET_CATALOG})
+
+    @app.get("/api/admin/datasets/<dataset_id>")
+    def admin_dataset_page(dataset_id: str):
+        """
+        Page de dataset admin — pagination SQL (evite de charger toute la table
+        en RAM, source frequente de timeouts / Failed to fetch).
+        """
+        return _dataset_page_response(DATASET_CATALOG, dataset_id)
+
+    @app.get("/api/doc/datasets")
+    def doc_datasets():
+        """Catalogue des tables exposees dans la documentation (popups schema)."""
+        return jsonify({"ok": True, "datasets": DOC_DATASET_CATALOG})
+
+    @app.get("/api/doc/datasets/<dataset_id>")
+    def doc_dataset_page(dataset_id: str):
+        """Lecture paginee publique pour popups de la doc user."""
+        return _dataset_page_response(DOC_DATASET_CATALOG, dataset_id)
 
     # ------------------------------------------------------------------ user hotels
     @app.get("/api/user/hotels/search")
@@ -1204,7 +1413,7 @@ def create_api_app(paths: Paths | None = None) -> Flask:
                 pass
 
             # leviers simulation (defaults si NaN en base — cas frequent hors pilotes)
-            nb = _as_float(hotel.get("hotel_nb_chambres"), 100.0) or 100.0
+            nb = _as_float(hotel.get("hotel_nb_chambres"), 200.0) or 200.0
             to = _normalize_to(hotel.get("hotel_to_annuel"), 0.70)
             guests = _as_float(hotel.get("hotel_guests_per_chambre"), 1.7) or 1.7
             m_lin = (
@@ -1479,7 +1688,7 @@ def create_api_app(paths: Paths | None = None) -> Flask:
             features.update(ram_overrides)
             return features
 
-        # ml = super-modele uniquement (sim_v2 + xgb base) — pas ml1/ml2 en UI
+        # ml = chaîne ml_tc → ml_tc_sim_v2 → ml_ca — pas ml1/ml2 en UI
         for sol in solutions:
             try:
                 pred = ml_super.predict_row(
@@ -1545,7 +1754,7 @@ def create_api_app(paths: Paths | None = None) -> Flask:
 
         body = request.get_json(force=True) or {}
         hotel_code = str(body.get("hotel_code") or "").strip()
-        nb = float(body.get("hotel_nb_chambres") or 100)
+        nb = float(body.get("hotel_nb_chambres") or 200)
         to = float(body.get("hotel_to_annuel") or 0.7)
         guests = float(body.get("hotel_guests_per_chambre") or 1.7)
         m_lin = float(
@@ -1561,7 +1770,9 @@ def create_api_app(paths: Paths | None = None) -> Flask:
             "accessoires": 0.15,
             "sos": 0.10,
         }
-        solutions = body.get("solutions") or ["simply", "liberty", "connected"]
+        from src.user.business import SOLUTION_DISPLAY_ORDER
+
+        solutions = body.get("solutions") or list(SOLUTION_DISPLAY_ORDER)
         solutions = [str(s).lower() for s in solutions]
         frigos = float(body.get("nb_frigos_froid") or body.get("nb_frigos") or 3)
         services = body.get("services") if isinstance(body.get("services"), dict) else {}
@@ -1583,9 +1794,14 @@ def create_api_app(paths: Paths | None = None) -> Flask:
             proximity=proximity,
         )
 
+        from src.user.business import sort_rows_by_solution
+
+        results = sort_rows_by_solution(results)
         by_engine: dict[str, Any] = {}
         for eng in ("sim_v1", "sim_v2", "ml"):
-            eng_rows = [r for r in results if r.get("engine") == eng]
+            eng_rows = sort_rows_by_solution(
+                [r for r in results if r.get("engine") == eng]
+            )
             by_engine[eng] = {
                 "results": eng_rows,
                 "recommendation": recommend(eng_rows, nb_chambres=nb)
@@ -1653,7 +1869,7 @@ def create_api_app(paths: Paths | None = None) -> Flask:
 
     def _parse_optimize_body(body: dict) -> dict:
         hotel_code = str(body.get("hotel_code") or "").strip()
-        nb = float(body.get("hotel_nb_chambres") or 100)
+        nb = float(body.get("hotel_nb_chambres") or 200)
         to = float(body.get("hotel_to_annuel") or 0.7)
         guests = float(body.get("hotel_guests_per_chambre") or 1.7)
         m_lin = float(body.get("metres_lineaires") or 6)
@@ -1673,7 +1889,9 @@ def create_api_app(paths: Paths | None = None) -> Flask:
             "jeux enfants": 0.08,
             "souvenirs": 0.05,
         }
-        solutions = body.get("solutions") or ["simply", "liberty", "connected"]
+        from src.user.business import SOLUTION_DISPLAY_ORDER
+
+        solutions = body.get("solutions") or list(SOLUTION_DISPLAY_ORDER)
         solutions = [str(s).lower() for s in solutions]
         frigos = float(body.get("nb_frigos_froid") or body.get("nb_frigos") or 3)
         step = float(body.get("step") or 0.1)

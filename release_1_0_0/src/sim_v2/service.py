@@ -119,7 +119,7 @@ class SimV2Service:
     def predict(
         self,
         *,
-        hotel_nb_chambres: float = 100,
+        hotel_nb_chambres: float = 200,
         hotel_to_annuel: float = 0.70,
         hotel_guests_per_chambre: float = 1.7,
         metres_lineaires: float = 6.0,

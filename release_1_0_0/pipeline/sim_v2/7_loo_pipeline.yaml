@@ -37,18 +37,25 @@ v_loo_training_source:
   - v_restitution_simulation_long
   - t_loo_hotels
   sql: |-
+    -- Train LOO = uniquement les hotels pilotes (t_loo_hotels), hors exclus.
     -- LOO strict si ≥2 hotels de la meme solution ; sinon garder l'hotel
-    -- evalue dans le train (evaluation biaisee mais realisable).
+    -- evalue dans le train (evaluation biaisee : simply / liberty).
+    -- Connected (3 hotels) : exclusion reelle de l'hotel test.
     SELECT source.*
     FROM v_restitution_simulation_long AS source
+    INNER JOIN t_loo_hotels AS pilots
+      ON CAST(pilots.hotel_code AS VARCHAR) = CAST(source.hotel_code AS VARCHAR)
     CROSS JOIN v_loo_step AS step
-    WHERE
-      CASE
-        WHEN COALESCE(step.eval_biased, FALSE)
-          OR COALESCE(step.n_solution_hotels, 0) <= 1
-        THEN TRUE
-        ELSE source.hotel_code <> step.hotel_code
-      END
+    WHERE CAST(source.hotel_code AS VARCHAR) NOT IN ('H5586', 'H6188')
+      AND (
+        CASE
+          WHEN COALESCE(step.eval_biased, FALSE)
+            OR COALESCE(step.n_solution_hotels, 0) <= 1
+          THEN TRUE
+          ELSE CAST(source.hotel_code AS VARCHAR)
+            <> CAST(step.hotel_code AS VARCHAR)
+        END
+      )
 v_loo_solution_coefficients:
   type: view
   mode: create_or_replace
@@ -169,11 +176,14 @@ v_loo_result:
   requires:
   - v_loo_observed_row
   - v_loo_prediction
+  - t_loo_hotels
   sql: |-
     SELECT
       p.hotel_code,
       p.solution,
       p.methode,
+      COALESCE(h.eval_biased, FALSE) AS eval_biased,
+      COALESCE(h.n_solution_hotels, 0) AS n_solution_hotels,
       o.nombre_guests_par_mois,
       o.metres_lineaires,
       o.montant_ventes_par_mois AS montant_ventes_par_mois_reel,
@@ -199,7 +209,9 @@ v_loo_result:
       p.nombre_hotels_apprentissage
     FROM v_loo_observed_row AS o
     INNER JOIN v_loo_prediction AS p
-    USING (hotel_code, solution)
+      USING (hotel_code, solution)
+    LEFT JOIN t_loo_hotels AS h
+      ON CAST(h.hotel_code AS VARCHAR) = CAST(p.hotel_code AS VARCHAR)
 t_loo_results:
   type: table
   mode: create_if_not_exists

@@ -24,6 +24,39 @@ def load_rod_reference(root: str | None = None) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+# Affichage UI : toujours Connected → Liberty → Simply (plus « chic » d abord).
+# La meilleure solution reste identifiable via la recommandation / ROI.
+SOLUTION_DISPLAY_ORDER: tuple[str, ...] = (
+    "connected",
+    "liberty",
+    "simply",
+)
+
+
+def solution_sort_key(solution: Any) -> tuple[int, str]:
+    """Cle de tri pour listes de resultats par solution."""
+    s = str(solution or "").strip().lower()
+    try:
+        idx = SOLUTION_DISPLAY_ORDER.index(s)
+    except ValueError:
+        idx = len(SOLUTION_DISPLAY_ORDER)
+    return (idx, s)
+
+
+def sort_rows_by_solution(
+    rows: list[dict[str, Any]],
+    *,
+    key: str = "solution",
+) -> list[dict[str, Any]]:
+    """Trie une liste de dicts selon SOLUTION_DISPLAY_ORDER."""
+    return sorted(
+        rows,
+        key=lambda r: solution_sort_key(
+            r.get(key) if isinstance(r, dict) else r
+        ),
+    )
+
+
 def _concept_key(solution: str) -> str:
     s = (solution or "simply").strip().upper()
     if s in {"SIMPLY", "LIBERTY", "CONNECTED"}:
@@ -153,11 +186,11 @@ def enrich_prediction_with_costs(
     cout_m = float(costs["monthly_cost"] or 0)
     marge_nette_m = marge_m - cout_m
     capex = float(costs.get("capex") or 0)
-    # Delai d'amortissement estime (mois) si marge nette positive
+    # Amortissement (mois) = capex / ROI mensuel si ROI > 0
     if marge_nette_m > 1e-6 and capex > 0:
         payback_months = capex / marge_nette_m
     elif marge_nette_m <= 0:
-        payback_months = None  # non amortissable sur marge nette
+        payback_months = None  # ROI <= 0 : non amortissable
     else:
         payback_months = 0.0
 
@@ -178,13 +211,16 @@ def enrich_prediction_with_costs(
         # mensuel (source moteurs)
         "ca_monthly": round(ca_m, 4),
         "marge_monthly": round(marge_m, 4),
+        # ROI = (prix vente − prix achat) − couts solution
         "marge_nette_monthly": round(marge_nette_m, 4),
+        "roi_monthly": round(marge_nette_m, 4),
         "cout_monthly": round(cout_m, 4),
         # annuel (affichage estimation = × 12)
         "ca_annual": round(ca_a, 4),
         "marge_annual": round(marge_a, 4),
         "marge_nette_annual": round(marge_nette_a, 4),
         "marge_nette_annuelle": round(marge_nette_a, 4),  # alias FR
+        "roi_annual": round(marge_nette_a, 4),
         "cout_annual": round(cout_a, 4),
         "period": "annual",
         "period_label": "€ / an",
@@ -208,7 +244,8 @@ def recommend(
     nb_chambres: float | None = None,
 ) -> dict[str, Any]:
     """
-    Recommandation : meilleure marge nette annuelle parmi les candidats.
+    Recommandation : meilleur ROI annuel
+    (marge ventes PV−PA − couts solution) parmi les candidats.
 
     Filtre leger taille : < 50 chambres → prefere SIMPLY si present.
     """
@@ -228,12 +265,21 @@ def recommend(
             warnings.append("Hotel < 50 chambres — SIMPLY privilegie (regle taille).")
             candidates = simply
 
-    best = max(candidates, key=lambda r: float(r.get("marge_nette_annuelle") or -1e18))
+    def _roi(r: dict[str, Any]) -> float:
+        for k in ("roi_annual", "marge_nette_annual", "marge_nette_annuelle"):
+            if r.get(k) is not None:
+                try:
+                    return float(r[k])
+                except (TypeError, ValueError):
+                    pass
+        return -1e18
+
+    best = max(candidates, key=_roi)
     sol = best.get("solution")
     engine = best.get("engine")
     reason = (
-        f"{sol} ({engine}) offre la meilleure marge nette annuelle "
-        f"({float(best.get('marge_nette_annuelle') or 0):,.0f} €)."
+        f"{sol} ({engine}) offre le meilleur ROI annuel "
+        f"({_roi(best):,.0f} €)."
     )
     return {
         "recommended": sol,

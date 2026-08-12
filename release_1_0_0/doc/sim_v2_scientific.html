@@ -651,20 +651,29 @@ CA_solution = AVG( CA_famille )  sur familles
         Les parts de mix de la cible jouent le rôle de pondération de chaque axe.
       </div>
 
-      <h3>8.5 Place du ML (taux de conversion)</h3>
+      <h3>8.5 Place du ML (chaîne ml_tc → ml_tc_sim_v2 → ml_ca)</h3>
       <p>
-        Le super-modèle / XGBoost apprend notamment le lien entre contexte hôtel
-        (proximité, météo, brand, équipements, mix…) et la performance
-        (ventes / marge). Dans la lecture métier retenue pour l’estimation croisée :
+        Un simple scale du CA sim_v2 par un TC prédit (XGBoost) ne suffit pas&nbsp;:
+        le TC «&nbsp;réel&nbsp;» (ventes/guests) n’est pas le TC qui, une fois
+        réappliqué à sim_v2, redonne le bon CA. D’où une chaîne en trois étapes
+        (un couple de modèles <strong>par solution</strong>)&nbsp;:
       </p>
       <ul class="clean">
-        <li><strong>sim_v2 pur</strong> : coefficients issus des simulations, conversion « implicite »
-          dans les intensités moyennes des hôtels de la solution ;</li>
-        <li><strong>ML</strong> : peut fournir un taux de conversion (ou un CA) conditionnel à la cible,
-          pour recalibrer ou comparer la projection issue du nuage simulé.</li>
+        <li><strong>ml_tc</strong> — XGBoost du taux de conversion réel ;
+          features = leviers + mix + proximité + météo + marque +
+          <code>sim_v2_brut</code> (CA restitution pure) ;</li>
+        <li><strong>ml_tc_sim_v2</strong> — intermédiaire non entraîné&nbsp;:
+          <code>sim_v2_brut × (TC_ml_tc / TC_baseline)</code> ;</li>
+        <li><strong>ml_ca</strong> — XGBoost du CA final ; features =
+          descriptives de ml_tc + sortie <code>ml_tc_sim_v2</code>.
+          <strong>C’est la décision reportée par le moteur «&nbsp;ml&nbsp;»</strong>
+          en admin (LOO) et en estimation utilisateur.</li>
       </ul>
-      <p class="muted">
-        Les deux sorties sont présentées côte à côte dans l’UI user pour transparence.
+      <p>
+        <strong>sim_v2 pur</strong> reste le moteur de règles métier (coefficients
+        empiriques). Les deux sorties (sim_v2 et ml) sont présentées côte à côte
+        dans l’UI pour transparence. Détail&nbsp;:
+        <a class="ext" href="sim_v2_methodologie.html#ml">méthodologie §7 Moteur ML</a>.
       </p>
     </section>
 

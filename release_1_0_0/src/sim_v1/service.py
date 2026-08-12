@@ -276,18 +276,22 @@ class SimV1Service:
             predictions = cp.con.execute(
                 """
                 SELECT
-                  hotel_code,
-                  solution,
-                  ca_reel_mensuel AS ca_reel,
-                  ca_ht_predit AS ca_pred,
-                  abs_erreur_ca AS ca_err_abs,
-                  marge_reelle_mensuelle AS marge_reel,
-                  marge_produit_predite AS marge_pred,
-                  abs_erreur_marge AS marge_err_abs,
-                  n_mois
-                FROM t_v1_loo_results
-                WHERE hotel_code IS NOT NULL
-                ORDER BY solution, hotel_code
+                  r.hotel_code,
+                  r.solution,
+                  COALESCE(h.eval_biased, FALSE) AS eval_biased,
+                  COALESCE(h.n_solution_hotels, 0) AS n_solution_hotels,
+                  r.ca_reel_mensuel AS ca_reel,
+                  r.ca_ht_predit AS ca_pred,
+                  r.abs_erreur_ca AS ca_err_abs,
+                  r.marge_reelle_mensuelle AS marge_reel,
+                  r.marge_produit_predite AS marge_pred,
+                  r.abs_erreur_marge AS marge_err_abs,
+                  r.n_mois
+                FROM t_v1_loo_results AS r
+                LEFT JOIN t_v1_loo_hotels AS h
+                  ON CAST(h.hotel_code AS VARCHAR) = CAST(r.hotel_code AS VARCHAR)
+                WHERE r.hotel_code IS NOT NULL
+                ORDER BY r.solution, r.hotel_code
                 """
             ).df()
             metrics = cp.p_table_view("v_v1_loo_metrics").df()
@@ -371,7 +375,7 @@ class SimV1Service:
     def predict_from_levers(
         self,
         *,
-        hotel_nb_chambres: float = 100.0,
+        hotel_nb_chambres: float = 200.0,
         hotel_to_annuel: float = 0.70,
         hotel_guests_per_chambre: float = 1.7,
         metres_lineaires: float = 6.0,
@@ -391,7 +395,7 @@ class SimV1Service:
         - une estimation par solution (simply / liberty / connected)
         """
         defaults = self.pilot_defaults()
-        nb = max(_f(hotel_nb_chambres, 100.0), 1.0)
+        nb = max(_f(hotel_nb_chambres, 200.0), 1.0)
         to = _f(hotel_to_annuel, 0.70)
         if to > 1.5:  # UI parfois en %
             to = to / 100.0

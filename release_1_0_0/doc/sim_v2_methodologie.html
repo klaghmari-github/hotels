@@ -246,9 +246,10 @@
       <a href="#simulation">4. Simulation d’assortiment</a>
       <a href="#coeffs">5. Coefficients</a>
       <a href="#estimate">6. Estimation</a>
-      <a href="#loo">7. Validation LOO</a>
-      <a href="#justif">8. Justification métier</a>
-      <a href="#annexes">9. Annexes</a>
+      <a href="#ml">7. Moteur ML</a>
+      <a href="#loo">8. Validation LOO</a>
+      <a href="#justif">9. Justification métier</a>
+      <a href="#annexes">10. Annexes</a>
     </nav>
 
     <!-- 1 -->
@@ -714,9 +715,135 @@ agrégation (méthode sim_v2) :
       </p>
     </section>
 
-    <!-- 7 -->
+    <!-- 7 — Moteur ML -->
+    <section id="ml">
+      <h2><span class="n">7</span> Moteur ML (<code>ml_tc</code> → <code>ml_tc_sim_v2</code> → <code>ml_ca</code>)</h2>
+
+      <div class="callout ok">
+        <strong>Décision finale du moteur « ml ».</strong>
+        Dans les évaluations admin (LOO) et les estimations utilisateur, le
+        moteur nommé <strong>ml</strong> est la <em>chaîne complète</em>
+        <code>ml_tc → ml_tc_sim_v2 → ml_ca</code>. La valeur de CA reportée est
+        toujours la sortie de <strong>ml_ca</strong>.
+      </div>
+
+      <h3>7.1 Pourquoi pas un simple scale par taux de conversion&nbsp;?</h3>
+      <p>
+        <strong>sim_v2</strong> (règles métier + coefficients empiriques) obtient
+        déjà un CA proche de la réalité sur le panel pilote. Un modèle ML qui a
+        accès à <em>toutes</em> les données de détail sous-jacentes à sim_v2
+        <em>plus</em> des signaux supplémentaires (proximité, météo, marque) et
+        même à la prédiction CA brute de sim_v2 peut néanmoins mal performer s’il
+        se contente de prédire un taux de conversion puis de scaler le CA
+        sim_v2&nbsp;:
+      </p>
+      <div class="formula">CA_scale = CA_sim_v2 × (TC_ml / TC_baseline)</div>
+      <p>
+        La raison est structurelle&nbsp;: le <strong>taux de conversion prédit
+        par le ML n’est pas le TC «&nbsp;compatible sim_v2&nbsp;»</strong> — celui
+        qui, une fois réinjecté dans la logique sim_v2, redonnerait le bon CA.
+        Autrement dit, optimiser le TC au sens ventes/guests ne garantit pas
+        d’optimiser le CA après application de sim_v2.
+      </p>
+
+      <h3>7.2 Architecture en trois étapes</h3>
+      <table class="data">
+        <thead>
+          <tr>
+            <th>Étape</th>
+            <th>Type</th>
+            <th>Cible / rôle</th>
+            <th>Entrées principales</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>ml_tc</code></td>
+            <td>XGBoost (par solution)</td>
+            <td>Taux de conversion <em>réel</em><br/><code>ventes / guests</code></td>
+            <td>Leviers hôtel, mix type/gamme, services (<code>hd_</code>),
+                proximité (<code>px_</code>), météo (<code>wx_</code>),
+                marque (<code>br_</code>),
+                <strong>+ <code>sim_v2_brut</code></strong> (CA/marges restitution pure)</td>
+          </tr>
+          <tr>
+            <td><code>ml_tc_sim_v2</code></td>
+            <td>Intermédiaire (pas un modèle)</td>
+            <td>CA obtenu en appliquant le TC de <code>ml_tc</code> à sim_v2</td>
+            <td>
+              <code>ml_tc_sim_v2 = sim_v2_brut × (TC_ml_tc / TC_baseline_solution)</code>
+            </td>
+          </tr>
+          <tr>
+            <td><code>ml_ca</code></td>
+            <td>XGBoost (par solution)</td>
+            <td><strong>CA final</strong> (décision moteur ml)</td>
+            <td>Toutes les variables descriptives de <code>ml_tc</code>
+                <strong>+ sortie <code>ml_tc_sim_v2</code></strong></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>7.3 Chaîne d’apprentissage</h3>
+      <ol>
+        <li>
+          Partir des <strong>scénarios sim_v2</strong> (observations + simulations)
+          enrichis par jointure proximité / météo / marque / services hôtel
+          (<code>t_rich_data</code>).
+        </li>
+        <li>
+          Pour chaque ligne, calculer <strong><code>sim_v2_brut</code></strong>&nbsp;:
+          prédiction restitution pure (formule
+          <code>coeff × guests × m_lin × part</code>, agrégation type/gamme)
+          — même logique que l’estimation sim_v2.
+        </li>
+        <li>
+          Entraîner <strong><code>ml_tc</code></strong> (cible =
+          <code>taux_conversion</code> recalculé obs+sim) avec les features
+          descriptives + <code>sim_v2_brut</code>.
+        </li>
+        <li>
+          Une fois <code>ml_tc</code> appris&nbsp;: prédire le TC sur le dataset
+          d’apprentissage, puis construire
+          <strong><code>ml_tc_sim_v2</code></strong> =
+          <code>sim_v2_brut × (TC_pred / TC_baseline)</code>.
+        </li>
+        <li>
+          Enrichir le dataset d’une colonne supplémentaire
+          <code>ml_tc_sim_v2__montant_ventes_par_mois</code> (et marges associées)
+          et entraîner <strong><code>ml_ca</code></strong> pour prédire le CA
+          le plus proche de la réalité.
+        </li>
+      </ol>
+
+      <h3>7.4 Inférence (estimation utilisateur / eval)</h3>
+      <div class="formula">1) sim_v2_brut  ← restitution pure (mix + leviers cibles)
+2) TC           ← ml_tc(features, sim_v2_brut)
+3) ml_tc_sim_v2 ← sim_v2_brut × (TC / TC_baseline)
+4) CA_final     ← ml_ca(features, sim_v2_brut, ml_tc_sim_v2)   ← reporté comme « ml »</div>
+      <p class="muted">
+        Les marges associées sont dérivées par proportionnalité par rapport au
+        pont <code>ml_tc_sim_v2</code> (ratio CA_ml_ca / CA_ml_tc_sim_v2).
+      </p>
+
+      <h3>7.5 Fichiers et commandes</h3>
+      <ul class="tight">
+        <li>Code&nbsp;: <code>src/ml/super_model.py</code> (<code>SuperModelService</code>)</li>
+        <li>Modèles&nbsp;: <code>models/super/{solution}/ml_tc.json</code>,
+            <code>ml_ca.json</code> (+ métadonnées) ; LOO sous
+            <code>loo/{hotel}/</code></li>
+        <li>Éval LOO&nbsp;: <code>data/files/output/ml/eval_ml_loo.xlsx</code></li>
+        <li>Rebuild&nbsp;: <code>python run.py ml --rebuild</code></li>
+      </ul>
+      <p class="muted">
+        Un couple de modèles est entraîné <strong>par solution machine</strong>
+        (simply / liberty / connected) — jamais de mélange inter-solutions.
+      </p>
+    </section>
+
+    <!-- 8 -->
     <section id="loo">
-      <h2><span class="n">7</span> Validation Leave-One-Hotel-Out</h2>
+      <h2><span class="n">8</span> Validation Leave-One-Hotel-Out</h2>
       <p>
         Pour chaque hôtel <em>h</em> :
       </p>
@@ -733,9 +860,9 @@ agrégation (méthode sim_v2) :
       </p>
     </section>
 
-    <!-- 8 -->
+    <!-- 9 -->
     <section id="justif">
-      <h2><span class="n">8</span> Justification des opérations (synthèse)</h2>
+      <h2><span class="n">9</span> Justification des opérations (synthèse)</h2>
       <table class="data">
         <thead>
           <tr>
@@ -794,9 +921,9 @@ agrégation (méthode sim_v2) :
       </table>
     </section>
 
-    <!-- 9 -->
+    <!-- 10 -->
     <section id="annexes">
-      <h2><span class="n">9</span> Annexes techniques</h2>
+      <h2><span class="n">10</span> Annexes techniques</h2>
       <h3>Fichiers pipeline de référence</h3>
       <table class="data">
         <thead>
@@ -822,6 +949,8 @@ agrégation (méthode sim_v2) :
         <li><code>src/sim_v2/modeling.py</code> — orchestration simulation</li>
         <li><code>src/sim_v2/restitution.py</code> — injection input hôtel/mix, run restitution</li>
         <li><code>src/sim_v2/loo.py</code> — boucle leave-one-out</li>
+        <li><code>src/ml/super_model.py</code> — moteur ml (<code>ml_tc</code> → <code>ml_tc_sim_v2</code> → <code>ml_ca</code>)</li>
+        <li><code>src/ml/common.py</code> — dataset riche, features, métriques</li>
       </ul>
 
       <h3>Glossaire express</h3>

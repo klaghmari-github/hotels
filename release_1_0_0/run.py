@@ -3,16 +3,16 @@
 CLI haut niveau release 1.0.0 — appelle les services, n'implemente pas la logique.
 
   python run.py serve [--port 5080]
-  python run.py warm [--rebuild]      # materialise t_rich_data + ml super LOO
+  python run.py warm [--rebuild]      # materialise t_rich_data + modeles ml_tc/ml_ca LOO
   python run.py duckdb-ui             # UI web DuckDB sur main.duckdb
   python run.py sim-v1 --rebuild
   python run.py sim-v2 --rebuild
   python run.py sim-v2-build          # modelisation complete (scenarios + simulation)
-  python run.py ml --rebuild          # super-modele (GUI ml)
-  python run.py ml1 --rebuild         # XGBoost sim_v2 seul
-  python run.py ml2 --rebuild         # XGBoost sim_v2 + rich + brand
+  python run.py ml --rebuild          # chaîne ml_tc → ml_tc_sim_v2 → ml_ca (GUI ml)
+  python run.py ml1 --rebuild         # legacy XGB multi-cibles CA (debug)
+  python run.py ml2 --rebuild         # legacy XGB multi-cibles CA rich (debug)
   python run.py ml-xgb --rebuild      # legacy alias ml2/xgb
-  python run.py ml-super --rebuild    # alias super
+  python run.py ml-super --rebuild    # alias ml
   python run.py all --rebuild
 """
 
@@ -123,14 +123,14 @@ def cmd_warm(args: argparse.Namespace) -> int:
     finally:
         cp.close()
 
-    # ml = super-modele (XGB sur sim_v2 + stacking sim_v2)
-    log.info("ml super run_full (XGB sim_v2 + meta) …")
+    # ml = chaîne ml_tc → ml_tc_sim_v2 → ml_ca (par solution)
+    log.info("ml chain (ml_tc → ml_tc_sim_v2 → ml_ca) run_full …")
     from src.ml.super_model import SuperModelService
 
-    result = SuperModelService(paths).run_full()
+    result = SuperModelService(paths).run_full(rebuild_rich=True)
     print(result["metrics"].to_string(index=False))
     print(f"ml LOO → {result['excel']}")
-    print("Warm termine : t_rich_data + ml (super) prets pour la GUI.")
+    print("Warm termine : t_rich_data + modeles ml_tc/ml_ca prets pour la GUI.")
     return 0
 
 
@@ -168,15 +168,23 @@ def cmd_sim_v2_build(args: argparse.Namespace) -> int:
 
 def cmd_ml(args: argparse.Namespace) -> int:
     """
-    Modele ml = super-modele :
-      XGB base sur simulations sim_v2 + stacking avec pred sim_v2.
+    Moteur ml = chaîne ml_tc → ml_tc_sim_v2 → ml_ca (un couple par solution).
+
+      ml_tc        : XGBoost → taux de conversion réel (ventes/guests)
+                     features = descriptives + sim_v2_brut (+ proximité/météo/marque)
+      ml_tc_sim_v2 : intermédiaire CA = sim_v2_brut × (tc_ml_tc / baseline)
+      ml_ca        : XGBoost → CA final (décision reportée admin + user)
+                     features = descriptives ml_tc + ml_tc_sim_v2
+
+    LOO : exclusion hôtel seulement si n_hotels(solution) > 1.
     """
     from src.ml.super_model import SuperModelService
 
     _log()
-    result = SuperModelService(Paths(ROOT)).run_full()
+    rebuild = bool(getattr(args, "rebuild", False))
+    result = SuperModelService(Paths(ROOT)).run_full(rebuild_rich=rebuild or True)
     print(result["metrics"].to_string(index=False))
-    print(f"ml (super) LOO → {result['excel']}")
+    print(f"ml chain LOO → {result['excel']}")
     return 0
 
 
@@ -213,13 +221,8 @@ def cmd_ml2(args: argparse.Namespace) -> int:
 
 
 def cmd_ml_super(args: argparse.Namespace) -> int:
-    from src.ml.super_model import SuperModelService
-
-    _log()
-    result = SuperModelService(Paths(ROOT)).run_full()
-    print(result["metrics"].to_string(index=False))
-    print(f"Super LOO → {result['excel']}")
-    return 0
+    """Alias de cmd_ml (chaîne ml_tc → ml_tc_sim_v2 → ml_ca)."""
+    return cmd_ml(args)
 
 
 def cmd_all(args: argparse.Namespace) -> int:

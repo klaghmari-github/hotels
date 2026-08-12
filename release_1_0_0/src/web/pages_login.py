@@ -47,7 +47,7 @@ LOGIN_BODY = """
 <div class="login-wrap">
   <div class="login-card">
     <h2>Connexion admin</h2>
-    <p class="sub">Acces reserve au studio donnees</p>
+    <p class="sub">Studio donnees</p>
     __ERROR__
     <form method="post" action="/admin/login" autocomplete="on">
       <input type="hidden" name="next" value="__NEXT__"/>

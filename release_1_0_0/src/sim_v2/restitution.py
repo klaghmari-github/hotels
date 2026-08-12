@@ -154,7 +154,7 @@ def replace_restitution_input_views(
 
 def run_restitution(
     cp: ConnectionPipeline,
-    hotel_nb_chambres: float = 100,
+    hotel_nb_chambres: float = 200,
     hotel_to_annuel: float = 0.5,
     hotel_guests_per_chambre: float = 1.0,
     metres_lineaires: float = 10.0,

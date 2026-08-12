@@ -230,31 +230,25 @@ v_hotel_holidays_features:
     WHERE hotel_code IS NOT NULL
     GROUP BY CAST(hotel_code AS VARCHAR)
 
-# create_if_not_exists : materialise une fois (run.py warm), puis le web lit direct.
-# Pour forcer le rebuild : python run.py warm --rebuild
+# Dataset riche ML = pivot sim_v2 (obs + sim, conversion recalculee)
+# + services hotel (hd_) + holidays (hol_).
+# Proximite (px_) et meteo mensuelle moyennee (wx_) sont deja dans v_ml_training_dataset.
+# Materialise via run.py warm / ml --rebuild (drop + recreate).
 t_rich_data:
   type: table
   mode: create_if_not_exists
   requires:
     - v_ml_training_dataset
     - v_hotel_data_features
-    - v_hotel_proximity_features
-    - v_hotel_weather_features
     - v_hotel_holidays_features
   sql: |-
     SELECT
       m.*,
       hd.* EXCLUDE (hotel_code),
-      px.* EXCLUDE (hotel_code),
-      wx.* EXCLUDE (hotel_code),
       hol.* EXCLUDE (hotel_code)
     FROM v_ml_training_dataset AS m
     LEFT JOIN v_hotel_data_features AS hd
       ON CAST(m.hotel_code AS VARCHAR) = hd.hotel_code
-    LEFT JOIN v_hotel_proximity_features AS px
-      ON CAST(m.hotel_code AS VARCHAR) = px.hotel_code
-    LEFT JOIN v_hotel_weather_features AS wx
-      ON CAST(m.hotel_code AS VARCHAR) = wx.hotel_code
     LEFT JOIN v_hotel_holidays_features AS hol
       ON CAST(m.hotel_code AS VARCHAR) = hol.hotel_code
 

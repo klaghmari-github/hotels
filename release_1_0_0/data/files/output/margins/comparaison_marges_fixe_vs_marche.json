@@ -1,0 +1,245 @@
+{
+  "meta": {
+    "generated_at": "2026-08-12T19:44:38.179033+00:00",
+    "scope": "pilotes t_pilot_concepts avec tickets, hors H5586/H6188",
+    "marge_fixe": {
+      "formule": "marge = CA - CA/coeff ; taux = (coeff-1)/coeff",
+      "source": "sim_v1_pilot_defaults.json by_solution.coeff_fb / coeff_nfb"
+    },
+    "marge_marche": {
+      "formule": "MARGE = PRIX_TTC - PRIX_TTC_MARCHE ; taux = SUM(MARGE)/SUM(PRIX_TTC)",
+      "source": "t_sales (prix marche alimentes par scraping web)"
+    },
+    "marge_coef_observe": {
+      "formule": "SUM(MARGE_SELON_COEF)/SUM(PRIX_TTC) sur tickets",
+      "note": "meme formule fixe appliquee ligne a ligne via COEF_MARGE"
+    }
+  },
+  "coeffs_fixes": [
+    {
+      "solution": "connected",
+      "coeff_fb": 2.6,
+      "taux_marge_fixe_fb": 0.6153846153846154,
+      "coeff_nfb": 1.8,
+      "taux_marge_fixe_nfb": 0.4444444444444445,
+      "formule": "marge = CA - CA/coeff = CA * (1 - 1/coeff)",
+      "source": "data/files/input/sim_v1_pilot_defaults.json (by_solution)"
+    },
+    {
+      "solution": "liberty",
+      "coeff_fb": 2.6,
+      "taux_marge_fixe_fb": 0.6153846153846154,
+      "coeff_nfb": 2.0,
+      "taux_marge_fixe_nfb": 0.5,
+      "formule": "marge = CA - CA/coeff = CA * (1 - 1/coeff)",
+      "source": "data/files/input/sim_v1_pilot_defaults.json (by_solution)"
+    },
+    {
+      "solution": "simply",
+      "coeff_fb": 2.6,
+      "taux_marge_fixe_fb": 0.6153846153846154,
+      "coeff_nfb": 1.45,
+      "taux_marge_fixe_nfb": 0.31034482758620685,
+      "formule": "marge = CA - CA/coeff = CA * (1 - 1/coeff)",
+      "source": "data/files/input/sim_v1_pilot_defaults.json (by_solution)"
+    }
+  ],
+  "par_solution": [
+    {
+      "solution": "connected",
+      "n_lignes": 107244,
+      "n_hotels": 3,
+      "ca_ttc": 527046.8652005303,
+      "marge_marche": 291942.70650000224,
+      "marge_coef": 279669.16708832554,
+      "mix_ca_fb": 0.8227619850001732,
+      "coeff_fb": 2.6,
+      "coeff_nfb": 1.8,
+      "taux_marge_fixe_fb": 0.6153846153846154,
+      "taux_marge_fixe_nfb": 0.4444444444444445,
+      "taux_marge_fixe_pondere_ca": 0.5850875188034484,
+      "taux_marge_coef_observe": 0.53063434308051,
+      "taux_marge_marche": 0.5539217207732071,
+      "delta_pts_marche_moins_fixe_pondere": -3.116579803024133
+    },
+    {
+      "solution": "liberty",
+      "n_lignes": 5414,
+      "n_hotels": 1,
+      "ca_ttc": 46124.2270000001,
+      "marge_marche": 25455.21200000019,
+      "marge_coef": 21275.396465824444,
+      "mix_ca_fb": 0.3013003773483283,
+      "coeff_fb": 2.6,
+      "coeff_nfb": 2.0,
+      "taux_marge_fixe_fb": 0.6153846153846154,
+      "taux_marge_fixe_nfb": 0.5,
+      "taux_marge_fixe_pondere_ca": 0.5347654281555764,
+      "taux_marge_coef_observe": 0.4612629381479802,
+      "taux_marge_marche": 0.5518837638189608,
+      "delta_pts_marche_moins_fixe_pondere": 1.7118335663384388
+    },
+    {
+      "solution": "simply",
+      "n_lignes": 5417,
+      "n_hotels": 1,
+      "ca_ttc": 18818.780000000697,
+      "marge_marche": 7699.599999999634,
+      "marge_coef": 8208.53358151938,
+      "mix_ca_fb": 0.5906450896391845,
+      "coeff_fb": 2.6,
+      "coeff_nfb": 1.45,
+      "taux_marge_fixe_fb": 0.6153846153846154,
+      "taux_marge_fixe_nfb": 0.31034482758620685,
+      "taux_marge_fixe_pondere_ca": 0.4905150803939157,
+      "taux_marge_coef_observe": 0.4361884023044573,
+      "taux_marge_marche": 0.40914448226714745,
+      "delta_pts_marche_moins_fixe_pondere": -8.137059812676828
+    }
+  ],
+  "par_solution_type": [
+    {
+      "solution": "connected",
+      "type_produit": "F&B",
+      "type_raw": "F_B",
+      "n_lignes": 95806,
+      "n_hotels": 3,
+      "ca_ttc": 433634.1250003973,
+      "ca_marche": 184150.95000003008,
+      "marge_marche": 249483.17499992455,
+      "marge_coef": 244860.0203474679,
+      "coeff_fixe": 2.6,
+      "taux_marge_fixe": 0.6153846153846154,
+      "taux_marge_marche": 0.5753310466506665,
+      "taux_marge_coef_observe": 0.5646696286811919,
+      "delta_pts_marche_moins_fixe": -4.005356873394894
+    },
+    {
+      "solution": "connected",
+      "type_produit": "NON F&B",
+      "type_raw": "NON_F_B",
+      "n_lignes": 11438,
+      "n_hotels": 2,
+      "ca_ttc": 93412.7401999997,
+      "ca_marche": 50953.20870000006,
+      "marge_marche": 42459.531500000056,
+      "marge_coef": 34809.14674089958,
+      "coeff_fixe": 1.8,
+      "taux_marge_fixe": 0.4444444444444445,
+      "taux_marge_marche": 0.4545368373638631,
+      "taux_marge_coef_observe": 0.3726381076753778,
+      "delta_pts_marche_moins_fixe": 1.0092392919418602
+    },
+    {
+      "solution": "liberty",
+      "type_produit": "F&B",
+      "type_raw": "F_B",
+      "n_lignes": 3320,
+      "n_hotels": 1,
+      "ca_ttc": 13897.246999999976,
+      "ca_marche": 5946.120000000048,
+      "marge_marche": 7951.126999999962,
+      "marge_coef": 7786.645052641069,
+      "coeff_fixe": 2.6,
+      "taux_marge_fixe": 0.6153846153846154,
+      "taux_marge_marche": 0.5721368412031517,
+      "taux_marge_coef_observe": 0.5603012634546312,
+      "delta_pts_marche_moins_fixe": -4.324777418146375
+    },
+    {
+      "solution": "liberty",
+      "type_produit": "NON F&B",
+      "type_raw": "NON_F_B",
+      "n_lignes": 2094,
+      "n_hotels": 1,
+      "ca_ttc": 32226.980000000098,
+      "ca_marche": 14722.895000000051,
+      "marge_marche": 17504.085000000003,
+      "marge_coef": 13488.75141318398,
+      "coeff_fixe": 2.0,
+      "taux_marge_fixe": 0.5,
+      "taux_marge_marche": 0.5431500252273079,
+      "taux_marge_coef_observe": 0.4185546214129881,
+      "delta_pts_marche_moins_fixe": 4.3150025227307935
+    },
+    {
+      "solution": "simply",
+      "type_produit": "F&B",
+      "type_raw": "F_B",
+      "n_lignes": 4655,
+      "n_hotels": 1,
+      "ca_ttc": 11115.220000000225,
+      "ca_marche": 6488.240000000201,
+      "marge_marche": 4626.97999999991,
+      "marge_coef": 6215.670489510729,
+      "coeff_fixe": 2.6,
+      "taux_marge_fixe": 0.6153846153846154,
+      "taux_marge_marche": 0.416274261777978,
+      "taux_marge_coef_observe": 0.5592035505829487,
+      "delta_pts_marche_moins_fixe": -19.911035360663742
+    },
+    {
+      "solution": "simply",
+      "type_produit": "NON F&B",
+      "type_raw": "NON_F_B",
+      "n_lignes": 762,
+      "n_hotels": 1,
+      "ca_ttc": 7703.5599999999995,
+      "ca_marche": 4630.9400000000005,
+      "marge_marche": 3072.62,
+      "marge_coef": 1992.8630920084868,
+      "coeff_fixe": 1.45,
+      "taux_marge_fixe": 0.31034482758620685,
+      "taux_marge_marche": 0.3988571517584078,
+      "taux_marge_coef_observe": 0.2586937846928546,
+      "delta_pts_marche_moins_fixe": 8.851232417220094
+    }
+  ],
+  "par_hotel": [
+    {
+      "hotel_code": "H0373",
+      "solution": "connected",
+      "ca_ttc": 96104.5951999985,
+      "marge_marche": 61994.09649999623,
+      "marge_coef": 55383.704161699236,
+      "taux_marge_marche": 0.6450690143482046,
+      "taux_marge_coef": 0.5762857025352738
+    },
+    {
+      "hotel_code": "H3546",
+      "solution": "connected",
+      "ca_ttc": 410319.13000025303,
+      "marge_marche": 220023.02999993623,
+      "marge_coef": 212748.83187776318,
+      "taux_marge_marche": 0.5362241580103773,
+      "taux_marge_coef": 0.5184960103557248
+    },
+    {
+      "hotel_code": "HB6A3",
+      "solution": "connected",
+      "ca_ttc": 20623.140000000174,
+      "marge_marche": 9925.579999999834,
+      "marge_coef": 11536.631048951142,
+      "taux_marge_marche": 0.48128364545843894,
+      "taux_marge_coef": 0.5594022563465624
+    },
+    {
+      "hotel_code": "HB5I0",
+      "solution": "liberty",
+      "ca_ttc": 46124.2270000001,
+      "marge_marche": 25455.21200000019,
+      "marge_coef": 21275.396465824444,
+      "taux_marge_marche": 0.5518837638189608,
+      "taux_marge_coef": 0.4612629381479802
+    },
+    {
+      "hotel_code": "H2075",
+      "solution": "simply",
+      "ca_ttc": 18818.780000000697,
+      "marge_marche": 7699.599999999634,
+      "marge_coef": 8208.53358151938,
+      "taux_marge_marche": 0.40914448226714745,
+      "taux_marge_coef": 0.4361884023044573
+    }
+  ]
+}

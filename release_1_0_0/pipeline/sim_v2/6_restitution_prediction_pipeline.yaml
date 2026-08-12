@@ -89,4 +89,11 @@ v_restitution_prediction:
       c.nombre_hotels AS nombre_hotels_conversion
     FROM v_restitution_prediction_core AS p
     LEFT JOIN v_solution_conversion_rate AS c USING (solution)
-    ORDER BY solution
+    ORDER BY
+      CASE lower(cast(solution AS VARCHAR))
+        WHEN 'connected' THEN 0
+        WHEN 'liberty' THEN 1
+        WHEN 'simply' THEN 2
+        ELSE 9
+      END,
+      solution
