@@ -1,0 +1,30 @@
+build_sim_v1:
+  type: zone
+  label: Build sim_v1 (datasets + LOO)
+  objects:
+    df_hotel_params: {}
+    df_pilot_concepts: {}
+    df_pilot_defaults: {}
+    i_v1_loo_evaluation: {}
+    t_hotel_params: {}
+    t_pilot_concepts: {}
+    t_pilot_defaults: {}
+    t_scope_hotels: {}
+    t_solution_reference: {}
+    t_v1_loo_hotels: {}
+    t_v1_loo_results: {}
+    v_hotel_params: {}
+    v_solution_reference_loo: {}
+    v_v1_hotel_input: {}
+    v_v1_loo_metrics: {}
+    v_v1_loo_result: {}
+    v_v1_marge_produit: {}
+    v_v1_pivot_observation: {}
+    v_v1_prediction: {}
+    v_v1_r1_buyers: {}
+    v_v1_r2_mix: {}
+    v_v1_r3_categories: {}
+    v_v1_r4_surface: {}
+    v_v1_sales_observation: {}
+  workers: auto
+  renatus_mode: required_for_leaves

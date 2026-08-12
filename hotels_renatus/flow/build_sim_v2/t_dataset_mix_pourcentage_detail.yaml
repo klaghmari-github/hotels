@@ -1,0 +1,14 @@
+t_dataset_mix_pourcentage_detail:
+  type: table
+  mode: create_or_replace
+  requires:
+  - v_dataset_mix_pourcentage_long
+  script: 'PIVOT v_dataset_mix_pourcentage_long
+
+    ON metric_name
+
+    USING MAX(metric_value)
+
+    GROUP BY hotel_code
+
+    '

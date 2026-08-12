@@ -1,0 +1,10 @@
+v_hotel_params:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_hotel_params
+  script: "SELECT\n  hotel_code,\n  solution,\n  label,\n  hotel_name,\n  hotel_brand,\n\
+    \  nb_chambres,\n  taux_occupation,\n  guests_per_chambre,\n  m_lin,\n  nb_frigos_froid,\n\
+    \  clients_mois,\n  mix_fb,\n  ca_reel_mensuel,\n  ca_fb_mensuel,\n  ca_nf_mensuel,\n\
+    \  marge_reelle_mensuelle,\n  nb_ventes_mensuel,\n  nb_paniers_mensuel,\n  n_mois\n\
+    FROM t_hotel_params"

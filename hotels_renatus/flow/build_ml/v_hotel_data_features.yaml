@@ -1,0 +1,58 @@
+v_hotel_data_features:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_hotel_data
+  script: "SELECT\n  CAST(hotel_code AS VARCHAR) AS hotel_code,\n  TRY_CAST(hotel_solution_simply\
+    \ AS DOUBLE) AS hd_hotel_solution_simply,\n  TRY_CAST(hotel_solution_liberty AS\
+    \ DOUBLE) AS hd_hotel_solution_liberty,\n  TRY_CAST(hotel_solution_connected AS\
+    \ DOUBLE) AS hd_hotel_solution_connected,\n  TRY_CAST(hotel_lat AS DOUBLE) AS\
+    \ hd_hotel_lat,\n  TRY_CAST(hotel_lon AS DOUBLE) AS hd_hotel_lon,\n  TRY_CAST(hotel_contrat_signe_annee\
+    \ AS DOUBLE) AS hd_hotel_contrat_signe_annee,\n  TRY_CAST(hotel_derniere_reno\
+    \ AS DOUBLE) AS hd_hotel_derniere_reno,\n  TRY_CAST(hotel_lobby_derniere_reno\
+    \ AS DOUBLE) AS hd_hotel_lobby_derniere_reno,\n  TRY_CAST(hotel_nb_chambres AS\
+    \ DOUBLE) AS hd_hotel_nb_chambres,\n  TRY_CAST(hotel_to_annuel AS DOUBLE) AS hd_hotel_to_annuel,\n\
+    \  TRY_CAST(hotel_to_le_plus_bas_taux AS DOUBLE) AS hd_hotel_to_le_plus_bas_taux,\n\
+    \  TRY_CAST(hotel_to_le_plus_haut_taux AS DOUBLE) AS hd_hotel_to_le_plus_haut_taux,\n\
+    \  TRY_CAST(hotel_dispo_dans_lobby_assises AS DOUBLE) AS hd_hotel_dispo_dans_lobby_assises,\n\
+    \  TRY_CAST(hotel_dispo_dans_lobby_bouilloire AS DOUBLE) AS hd_hotel_dispo_dans_lobby_bouilloire,\n\
+    \  TRY_CAST(hotel_dispo_dans_lobby_fontaine_a_eau AS DOUBLE) AS hd_hotel_dispo_dans_lobby_fontaine_a_eau,\n\
+    \  TRY_CAST(hotel_dispo_dans_lobby_machine_a_cafe AS DOUBLE) AS hd_hotel_dispo_dans_lobby_machine_a_cafe,\n\
+    \  TRY_CAST(hotel_dispo_dans_lobby_micro_ondes AS DOUBLE) AS hd_hotel_dispo_dans_lobby_micro_ondes,\n\
+    \  TRY_CAST(hotel_dispo_dans_lobby_vitrine_refrigeree AS DOUBLE) AS hd_hotel_dispo_dans_lobby_vitrine_refrigeree,\n\
+    \  TRY_CAST(hotel_f_b_bar AS DOUBLE) AS hd_hotel_f_b_bar,\n  TRY_CAST(hotel_f_b_minibar\
+    \ AS DOUBLE) AS hd_hotel_f_b_minibar,\n  TRY_CAST(hotel_f_b_restaurant AS DOUBLE)\
+    \ AS hd_hotel_f_b_restaurant,\n  TRY_CAST(hotel_f_b_room_service AS DOUBLE) AS\
+    \ hd_hotel_f_b_room_service,\n  TRY_CAST(hotel_non_f_b_piscine AS DOUBLE) AS hd_hotel_non_f_b_piscine,\n\
+    \  TRY_CAST(hotel_non_f_b_salle_de_sport AS DOUBLE) AS hd_hotel_non_f_b_salle_de_sport,\n\
+    \  TRY_CAST(hotel_non_f_b_salles_de_reunion AS DOUBLE) AS hd_hotel_non_f_b_salles_de_reunion,\n\
+    \  TRY_CAST(hotel_non_f_b_spa AS DOUBLE) AS hd_hotel_non_f_b_spa,\n  TRY_CAST(hotel_has_parking\
+    \ AS DOUBLE) AS hd_hotel_has_parking,\n  TRY_CAST(hotel_has_wifi AS DOUBLE) AS\
+    \ hd_hotel_has_wifi,\n  TRY_CAST(hotel_has_clim AS DOUBLE) AS hd_hotel_has_clim,\n\
+    \  TRY_CAST(hotel_has_petit_dejeuner AS DOUBLE) AS hd_hotel_has_petit_dejeuner,\n\
+    \  TRY_CAST(hotel_has_accessible AS DOUBLE) AS hd_hotel_has_accessible,\n  TRY_CAST(hotel_has_animaux\
+    \ AS DOUBLE) AS hd_hotel_has_animaux,\n  TRY_CAST(hotel_has_non_fumeur AS DOUBLE)\
+    \ AS hd_hotel_has_non_fumeur,\n  TRY_CAST(hotel_has_navette AS DOUBLE) AS hd_hotel_has_navette,\n\
+    \  TRY_CAST(hotel_has_reunion AS DOUBLE) AS hd_hotel_has_reunion,\n  TRY_CAST(hotel_affaires_pct\
+    \ AS DOUBLE) AS hd_hotel_affaires_pct,\n  TRY_CAST(hotel_loisirs_pct AS DOUBLE)\
+    \ AS hd_hotel_loisirs_pct,\n  TRY_CAST(hotel_loisirs_top_1_amis AS DOUBLE) AS\
+    \ hd_hotel_loisirs_top_1_amis,\n  TRY_CAST(hotel_loisirs_top_1_couples AS DOUBLE)\
+    \ AS hd_hotel_loisirs_top_1_couples,\n  TRY_CAST(hotel_loisirs_top_1_familles\
+    \ AS DOUBLE) AS hd_hotel_loisirs_top_1_familles,\n  TRY_CAST(hotel_international_pct\
+    \ AS DOUBLE) AS hd_hotel_international_pct,\n  TRY_CAST(hotel_national_pct AS\
+    \ DOUBLE) AS hd_hotel_national_pct,\n  TRY_CAST(hotel_corner_actuel_existe_deja\
+    \ AS DOUBLE) AS hd_hotel_corner_actuel_existe_deja,\n  TRY_CAST(hotel_corner_de_vente_actuel_metres_lineaires\
+    \ AS DOUBLE) AS hd_hotel_corner_de_vente_actuel_metres_lineaires,\n  TRY_CAST(hotel_corner_actuel_offre_f_b_caisse_code_barres\
+    \ AS DOUBLE) AS hd_hotel_corner_actuel_offre_f_b_caisse_code_barres,\n  TRY_CAST(hotel_corner_actuel_offre_f_b_distributeur_auto\
+    \ AS DOUBLE) AS hd_hotel_corner_actuel_offre_f_b_distributeur_auto,\n  TRY_CAST(hotel_corner_actuel_offre_f_b_frigo_connecte\
+    \ AS DOUBLE) AS hd_hotel_corner_actuel_offre_f_b_frigo_connecte,\n  TRY_CAST(hotel_corner_actuel_offre_f_b_reception\
+    \ AS DOUBLE) AS hd_hotel_corner_actuel_offre_f_b_reception,\n  TRY_CAST(hotel_corner_actuel_offre_f_b_snacking_comptoir\
+    \ AS DOUBLE) AS hd_hotel_corner_actuel_offre_f_b_snacking_comptoir,\n  TRY_CAST(hotel_corner_actuel_offre_non_f_b_armoire_connectee\
+    \ AS DOUBLE) AS hd_hotel_corner_actuel_offre_non_f_b_armoire_connectee,\n  TRY_CAST(hotel_corner_actuel_offre_non_f_b_caisse_code_barres\
+    \ AS DOUBLE) AS hd_hotel_corner_actuel_offre_non_f_b_caisse_code_barres,\n  TRY_CAST(hotel_corner_actuel_offre_non_f_b_distributeur_auto\
+    \ AS DOUBLE) AS hd_hotel_corner_actuel_offre_non_f_b_distributeur_auto,\n  TRY_CAST(hotel_corner_actuel_offre_non_f_b_reception\
+    \ AS DOUBLE) AS hd_hotel_corner_actuel_offre_non_f_b_reception,\n  TRY_CAST(hotel_metres_lineaires_dedies_corner\
+    \ AS DOUBLE) AS hd_hotel_metres_lineaires_dedies_corner,\n  TRY_CAST(hotel_contrat_type_franchise\
+    \ AS DOUBLE) AS hd_hotel_contrat_type_franchise,\n  TRY_CAST(hotel_contrat_type_manage\
+    \ AS DOUBLE) AS hd_hotel_contrat_type_manage\nFROM t_hotel_data\nWHERE hotel_code\
+    \ IS NOT NULL"

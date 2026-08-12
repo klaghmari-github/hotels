@@ -1,0 +1,8 @@
+v_ml_hotel_context:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_sales
+  script: "SELECT\n  HOTEL_CODE AS hotel_code,\n  MAX(HOTEL_NB_CHAMBRES)::DOUBLE AS\
+    \ hotel_nb_chambres,\n  MAX(HOTEL_TO_ANNUEL)::DOUBLE AS hotel_to_annuel,\n  MAX(HOTEL_GUESTS_PER_CHAMBRE)::DOUBLE\
+    \ AS hotel_guests_per_chambre\nFROM t_sales\nGROUP BY HOTEL_CODE\n"

@@ -1,0 +1,8 @@
+v_v1_loo_result:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_v1_prediction
+  script: 'SELECT *
+
+    FROM v_v1_prediction'

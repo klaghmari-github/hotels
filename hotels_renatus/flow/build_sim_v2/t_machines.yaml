@@ -1,0 +1,14 @@
+t_machines:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - t_sales
+  script: 'SELECT DISTINCT MACHINE
+
+    FROM t_sales
+
+    WHERE MACHINE IS NOT NULL
+
+    ORDER BY MACHINE
+
+    '

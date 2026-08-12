@@ -1,0 +1,26 @@
+v_v1_sales_observation:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_sales
+  script: "WITH base AS (\n  SELECT\n    CAST(HOTEL_CODE AS VARCHAR) AS hotel_code,\n\
+    \    DATE_DIFF('month', MIN(DATE), MAX(DATE)) + 1 AS n_mois,\n    SUM(PRIX_TTC)\
+    \ AS montant_ventes,\n    SUM(MARGE) AS montant_marge,\n    SUM(MARGE_SELON_COEF)\
+    \ AS montant_marge_selon_coef,\n    SUM(QUANTITE) AS nombre_ventes,\n    COUNT(DISTINCT\
+    \ ORDER_ID) AS nombre_paniers,\n    SUM(\n      CASE\n        WHEN UPPER(TRIM(CAST(CATEGORIE\
+    \ AS VARCHAR))) IN ('NON_F_B', 'SOUVENIRS')\n        THEN PRIX_TTC\n        ELSE\
+    \ 0.0\n      END\n    ) AS montant_ventes_nfb,\n    SUM(\n      CASE\n       \
+    \ WHEN UPPER(TRIM(CAST(CATEGORIE AS VARCHAR))) IN ('NON_F_B', 'SOUVENIRS')\n \
+    \       THEN 0.0\n        ELSE PRIX_TTC\n      END\n    ) AS montant_ventes_fb,\n\
+    \    MAX(HOTEL_NB_CHAMBRES) AS hotel_nb_chambres,\n    MAX(HOTEL_TO_ANNUEL) AS\
+    \ hotel_to_annuel,\n    MAX(HOTEL_GUESTS_PER_CHAMBRE) AS hotel_guests_per_chambre,\n\
+    \    MAX(METRES_LINEAIRES) AS metres_lineaires\n  FROM t_sales\n  GROUP BY CAST(HOTEL_CODE\
+    \ AS VARCHAR)\n)\nSELECT\n  hotel_code,\n  n_mois,\n  montant_ventes / NULLIF(n_mois,\
+    \ 0) AS ca_ttc_mensuel,\n  montant_ventes_fb / NULLIF(n_mois, 0) AS ca_fb_mensuel,\n\
+    \  montant_ventes_nfb / NULLIF(n_mois, 0) AS ca_nf_mensuel,\n  montant_marge_selon_coef\
+    \ / NULLIF(n_mois, 0) AS marge_selon_coef_mensuelle,\n  montant_marge / NULLIF(n_mois,\
+    \ 0) AS marge_marche_mensuelle,\n  nombre_ventes / NULLIF(n_mois, 0) AS nb_ventes_mensuel,\n\
+    \  nombre_paniers / NULLIF(n_mois, 0) AS nb_paniers_mensuel,\n  montant_ventes_fb\
+    \ / NULLIF(montant_ventes, 0) AS mix_fb,\n  hotel_nb_chambres\n    * hotel_to_annuel\n\
+    \    * hotel_guests_per_chambre\n    * 30.5 AS clients_mois,\n  hotel_nb_chambres,\n\
+    \  hotel_to_annuel,\n  hotel_guests_per_chambre,\n  metres_lineaires\nFROM base"

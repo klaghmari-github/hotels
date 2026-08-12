@@ -1,0 +1,42 @@
+v_solution_reference_loo:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_hotel_params
+  - t_pilot_defaults
+  script: "WITH peers AS (\n  SELECT p.*\n  FROM v_hotel_params AS p\n  CROSS JOIN\
+    \ v_loo_step AS step\n  WHERE p.solution = step.solution\n    AND p.hotel_code\
+    \ <> step.hotel_code\n),\nagg AS (\n  SELECT\n    step.hotel_code AS loo_hotel_code,\n\
+    \    step.solution,\n    AVG(peers.ca_fb_mensuel) AS ca_fb_peers,\n    AVG(peers.ca_nf_mensuel)\
+    \ AS ca_nfb_peers,\n    AVG(peers.nb_ventes_mensuel) AS ventes_peers,\n    AVG(peers.clients_mois)\
+    \ AS clients_peers,\n    AVG(peers.mix_fb) AS mix_fb_peers,\n    AVG(peers.m_lin)\
+    \ AS m_lin_peers,\n    COUNT(DISTINCT peers.hotel_code) AS nombre_peers\n  FROM\
+    \ v_loo_step AS step\n  LEFT JOIN peers\n    ON peers.solution = step.solution\n\
+    \  GROUP BY step.hotel_code, step.solution\n)\nSELECT\n  a.loo_hotel_code,\n \
+    \ a.solution,\n  a.nombre_peers,\n  -- Reference operationnelle = moyenne pairs\
+    \ (sinon fallback pilote Excel)\n  COALESCE(a.ca_fb_peers, d.ca_fb) AS ca_fb_ref,\n\
+    \  COALESCE(a.ca_nfb_peers, d.ca_nfb) AS ca_nfb_ref,\n  COALESCE(a.ventes_peers,\
+    \ d.ventes) AS ventes_ref,\n  COALESCE(a.clients_peers, d.clients_heb) AS clients_ref,\n\
+    \  COALESCE(a.mix_fb_peers, d.mix_fb) AS mix_fb_ref,\n  CASE\n    WHEN COALESCE(a.m_lin_peers,\
+    \ d.ml_ref) > 0\n    THEN COALESCE(a.m_lin_peers, d.ml_ref)\n    ELSE 6.0\n  END\
+    \ AS ml_ref,\n  d.frigo_ref,\n  -- ca_10 Excel : (CA * 10%) / mix_ref   (E51 =\
+    \ (E34*10%)/I9)\n  -- si CA pair = 0, fallback pivots Excel d.ca_10_*\n  CASE\n\
+    \    WHEN COALESCE(a.ca_fb_peers, d.ca_fb) IS NULL\n      OR COALESCE(a.ca_fb_peers,\
+    \ d.ca_fb) = 0\n    THEN d.ca_10_fb\n    WHEN COALESCE(a.mix_fb_peers, d.mix_fb)\
+    \ > 0\n    THEN COALESCE(a.ca_fb_peers, d.ca_fb)\n      * 0.1\n      / COALESCE(a.mix_fb_peers,\
+    \ d.mix_fb)\n    ELSE d.ca_10_fb\n  END AS ca_10_fb,\n  CASE\n    WHEN COALESCE(a.ca_nfb_peers,\
+    \ d.ca_nfb) IS NULL\n      OR COALESCE(a.ca_nfb_peers, d.ca_nfb) = 0\n    THEN\
+    \ d.ca_10_nfb\n    WHEN (1.0 - COALESCE(a.mix_fb_peers, d.mix_fb)) > 0\n    THEN\
+    \ COALESCE(a.ca_nfb_peers, d.ca_nfb)\n      * 0.1\n      / (1.0 - COALESCE(a.mix_fb_peers,\
+    \ d.mix_fb))\n    ELSE d.ca_10_nfb\n  END AS ca_10_nfb,\n  -- ca par ml : 0 si\
+    \ CA pair nul (comme Python ca_nf / ml_ref)\n  COALESCE(a.ca_fb_peers, d.ca_fb)\n\
+    \    / NULLIF(\n        CASE\n          WHEN COALESCE(a.m_lin_peers, d.ml_ref)\
+    \ > 0\n          THEN COALESCE(a.m_lin_peers, d.ml_ref)\n          ELSE 6.0\n\
+    \        END,\n        0\n      ) AS ca_1ml_fb,\n  COALESCE(a.ca_nfb_peers, d.ca_nfb)\n\
+    \    / NULLIF(\n        CASE\n          WHEN COALESCE(a.m_lin_peers, d.ml_ref)\
+    \ > 0\n          THEN COALESCE(a.m_lin_peers, d.ml_ref)\n          ELSE 6.0\n\
+    \        END,\n        0\n      ) AS ca_1ml_nfb,\n  -- frigos Connected : CA /\
+    \ 3 (meme si CA pair = 0 → 0)\n  COALESCE(a.ca_fb_peers, d.ca_fb) / 3.0 AS ca_1frigo_fb,\n\
+    \  COALESCE(a.ca_nfb_peers, d.ca_nfb) / 3.0 AS ca_1frigo_nfb,\n  d.coeff_fb,\n\
+    \  d.coeff_nfb\nFROM agg AS a\nINNER JOIN t_pilot_defaults AS d\n  ON d.solution\
+    \ = a.solution"

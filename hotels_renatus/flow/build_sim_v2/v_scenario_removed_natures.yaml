@@ -1,0 +1,9 @@
+v_scenario_removed_natures:
+  type: view
+  mode: create_or_replace
+  requires: []
+  script: 'SELECT scenario_id, UNNEST(scenario_removed_natures) AS nature
+
+    FROM v_scenario_step
+
+    '

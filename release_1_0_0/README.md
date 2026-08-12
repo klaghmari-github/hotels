@@ -59,6 +59,15 @@ cd release_1_0_0
 
 CatBoost uniquement (pas XGBoost, pas reseau). LOO hotel + export `data/files/output/ml/eval_catboost_loo.xlsx`.
 
+## Documentation features (extraits)
+
+| Doc | Contenu |
+|-----|---------|
+| [doc/FEATURE_MIX_REDISTRIBUTION.md](doc/FEATURE_MIX_REDISTRIBUTION.md) | Edition mix type/gammes : redistribution **proportionnelle** (UI + grid) |
+| [doc/FEATURE_OPTIMAL_MIX.md](doc/FEATURE_OPTIMAL_MIX.md) | Assortiment optimal m_lin × rangs de marge → mix + CA |
+| [doc/ARCHITECTURE.md](doc/ARCHITECTURE.md) | Couches package |
+| [doc/index.html](doc/index.html) | Vue d’ensemble HTML |
+
 ## Note
 
 La base `main.duckdb` est initialisee a partir du dataset sim_v2 deja calcule.  

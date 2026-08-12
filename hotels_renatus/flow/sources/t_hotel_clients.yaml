@@ -1,0 +1,9 @@
+t_hotel_clients:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - df_hotel_clients
+  script: "SELECT\n  CAST(hotel_code AS VARCHAR) AS hotel_code,\n  CAST(hotel_name\
+    \ AS VARCHAR) AS hotel_name,\n  TRY_CAST(hotel_nb_chambres AS DOUBLE) AS hotel_nb_chambres,\n\
+    \  TRY_CAST(hotel_to_annuel AS DOUBLE) AS hotel_to_annuel,\n  TRY_CAST(hotel_guests_per_chambre\
+    \ AS DOUBLE) AS hotel_guests_per_chambre\nFROM df_hotel_clients"

@@ -1,0 +1,8 @@
+x_insert_dataset_pivot:
+  type: execute_sql
+  requires:
+  - t_dataset_pivot
+  - v_dataset_pivot
+  script: "INSERT INTO t_dataset_pivot BY NAME\nSELECT p.*\nFROM v_dataset_pivot AS\
+    \ p\nWHERE NOT EXISTS (\n  SELECT 1\n  FROM t_dataset_pivot AS t\n  WHERE t.scenario_id\
+    \ = p.scenario_id\n    AND t.hotel_code = p.hotel_code\n)\n"

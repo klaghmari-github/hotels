@@ -1,0 +1,12 @@
+v_v1_prediction:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_v1_marge_produit
+  script: "SELECT\n  hotel_code,\n  solution,\n  clients_hotel,\n  taux_acheteurs,\n\
+    \  nb_acheteurs,\n  mix_steps,\n  mult_fb,\n  mult_nfb,\n  r4_mode,\n  r4_diff,\n\
+    \  ca_fb_r4,\n  ca_nfb_r4,\n  ca_ht_predit,\n  marge_produit_predite,\n  ca_reel_mensuel,\n\
+    \  marge_reelle_mensuelle,\n  n_mois,\n  ca_ht_predit - ca_reel_mensuel AS erreur_ca,\n\
+    \  marge_produit_predite - marge_reelle_mensuelle AS erreur_marge,\n  ABS(ca_ht_predit\
+    \ - ca_reel_mensuel) AS abs_erreur_ca,\n  ABS(marge_produit_predite - marge_reelle_mensuelle)\
+    \ AS abs_erreur_marge\nFROM v_v1_marge_produit"

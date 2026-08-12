@@ -1,0 +1,19 @@
+i_iteration_scenario:
+  type: iterate
+  execution: parallel
+  tasks: auto
+  reserved_cpus: 2
+  duckdb_threads_per_worker: 1
+  worker_database_pattern: data/duckdb/workers/simulation_task_{task_id:03d}.duckdb
+  requires:
+  - v_scenarios_to_process
+  scenarios: v_scenarios_to_process
+  step_view: v_scenario_step
+  target: x_insert_dataset_pivot
+  result_table: t_dataset_pivot
+  completed_table: t_dataset_pivot
+  completed_key: scenario_id
+  completed_group_key: hotel_code
+  expected_count_table: t_hotel_codes
+  order_by:
+  - scenario_id

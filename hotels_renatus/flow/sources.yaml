@@ -1,0 +1,28 @@
+sources:
+  type: zone
+  label: Sources communes
+  objects:
+    df_hotel_brand_data: {}
+    df_hotel_clients: {}
+    df_hotel_data: {}
+    df_hotel_holidays_data: {}
+    df_hotel_proximity_data: {}
+    df_hotel_weather_data: {}
+    t_hotel_brand_data: {}
+    t_hotel_clients: {}
+    t_hotel_data: {}
+    t_hotel_holidays_data: {}
+    t_hotel_proximity_data: {}
+    t_hotel_weather_data: {}
+    v_hotel_clients: {}
+    v_web_loo_metrics: {}
+    v_web_loo_results: {}
+    v_web_sales_obs: {}
+    v_web_sales_sim: {}
+    v_web_sales_sim_scenarios: {}
+    v_web_v1_loo_results: {}
+    x_insert_dataset_pivot: {}
+    x_insert_loo_result: {}
+    x_insert_v1_loo_result: {}
+  workers: auto
+  renatus_mode: required_for_leaves

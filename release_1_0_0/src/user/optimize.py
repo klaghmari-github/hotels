@@ -1,10 +1,10 @@
 """
-Optimisation de mix (type F&B / gammes) par balayage 10 %.
+Optimisation de mix (type F&B / gammes).
 
-Pour chaque cle d'un groupe, on teste 0.0, 0.1, …, 1.0 ; l'ecart par rapport
-a la valeur initiale est redistribue equitabelement sur les autres cles du groupe.
-Chaque configuration est evaluee par sim_v1, sim_v2 et ml (3 solutions).
-On retient la ligne au plus grand CA estime.
+Deux modes :
+- product_rank (defaut) : top N produits par rang de marge (m_lin × densite)
+  → mix F&B / gammes deduit, puis evaluation sim_v1 / sim_v2 / ml
+- grid : balayage 10 % historique (fallback)
 """
 
 from __future__ import annotations
@@ -17,6 +17,42 @@ from src.user.business import enrich_prediction_with_costs, recommend
 logger = logging.getLogger(__name__)
 
 STEP = 0.1
+
+# GAMME ventes (SANS_ALCOOL) → cle UI ("sans alcool")
+_GAMME_TO_UI = {
+    "SANS_ALCOOL": "sans alcool",
+    "FOOD_SALEE": "food salee",
+    "FOOD_SUCREE": "food sucree",
+    "ALCOOL": "alcool",
+    "FORMULE": "formule",
+    "ACCESSOIRES": "accessoires",
+    "SOS": "sos",
+    "COSMETIQUE": "cosmetique",
+    "PAP": "pap",
+    "JEUX_ENFANTS": "jeux enfants",
+    "SOUVENIRS": "souvenirs",
+}
+
+
+def _gamme_ui(key: str) -> str:
+    k = str(key or "").strip().upper().replace(" ", "_")
+    if k in _GAMME_TO_UI:
+        return _GAMME_TO_UI[k]
+    return str(key or "").lower().replace("_", " ").strip()
+
+
+def _map_mix_keys_ui(mix: dict[str, Any] | None) -> dict[str, float]:
+    out: dict[str, float] = {}
+    for k, v in (mix or {}).items():
+        uk = _gamme_ui(k)
+        try:
+            out[uk] = out.get(uk, 0.0) + float(v)
+        except (TypeError, ValueError):
+            continue
+    s = sum(out.values())
+    if s > 1e-12:
+        out = {k: round(v / s, 6) for k, v in out.items()}
+    return out
 
 
 def _grid(step: float = STEP) -> list[float]:
@@ -47,28 +83,38 @@ def vary_one(
     new_val: float,
 ) -> dict[str, float]:
     """
-    Place `key` a new_val (clamp 0..1) et redistribue l'ecart equitabelement
-    sur les autres cles du groupe, puis renormalise si besoin.
+    Place `key` a new_val (clamp 0..1).
+
+    L'ecart (ajout ou retrait) est repercute sur les autres cles
+    **proportionnellement** a leur part actuelle relative.
+
+    Exemple : A=0.50, B=0.30, C=0.20 ; A → 0.60
+    → on retire 0.10 de B+C au prorata 0.30:0.20 → B=0.24, C=0.16.
     """
     keys = list(base.keys())
     if key not in base:
         raise KeyError(key)
     others = [k for k in keys if k != key]
     new_val = max(0.0, min(1.0, float(new_val)))
-    base_val = float(base[key])
-    delta = base_val - new_val  # >0 si on baisse key → a redistribuer aux autres
 
     if not others:
         return {key: 1.0}
 
+    rem = max(0.0, 1.0 - new_val)
+    others_sum = sum(max(0.0, float(base[o])) for o in others)
     out: dict[str, float] = {key: new_val}
-    share = delta / len(others)
-    for o in others:
-        out[o] = max(0.0, float(base[o]) + share)
+
+    if others_sum <= 1e-12:
+        each = rem / len(others)
+        for o in others:
+            out[o] = each
+    else:
+        for o in others:
+            w = max(0.0, float(base[o])) / others_sum
+            out[o] = rem * w
 
     s = sum(out.values())
     if s <= 1e-12:
-        # cas extreme (tous a 0) : mass sur key
         return {k: (1.0 if k == key else 0.0) for k in keys}
     if abs(s - 1.0) > 1e-9:
         out = {k: v / s for k, v in out.items()}
@@ -320,6 +366,7 @@ def run_mix_optimization(
 
     return {
         "ok": True,
+        "method": "grid",
         "hotel_code": hotel_code,
         "n_scenarios": len(scenarios),
         "n_trials": len(trials),
@@ -336,4 +383,260 @@ def run_mix_optimization(
         "top": top_light,
         "errors": errors,
         "solutions": sols,
+        "apply_mix": {
+            "type_mix": best["type_mix"] if best else base_type,
+            "gamme_mix_fb": best["gamme_mix_fb"] if best else base_fb,
+            "gamme_mix_nfb": best["gamme_mix_nfb"] if best else base_nfb,
+            "gamme_mix": best["gamme_mix"]
+            if best
+            else combine_gamme_mix(base_type, base_fb, base_nfb),
+        }
+        if best
+        else None,
+    }
+
+
+def _active_keys(mix: dict[str, Any] | None, thr: float = 0.02) -> list[str]:
+    out: list[str] = []
+    for k, v in (mix or {}).items():
+        try:
+            if float(v) > thr:
+                out.append(str(k))
+        except (TypeError, ValueError):
+            continue
+    return out
+
+
+def run_product_rank_optimization(
+    *,
+    hotel_nb_chambres: float,
+    hotel_to_annuel: float,
+    hotel_guests_per_chambre: float,
+    metres_lineaires: float,
+    type_mix: dict[str, Any],
+    gamme_mix_fb: dict[str, Any],
+    gamme_mix_nfb: dict[str, Any],
+    hotel_code: str | None = None,
+    solutions: list[str] | None = None,
+    evaluate_fn: Callable[..., list[dict[str, Any]]],
+    recommend_fn: Callable[..., dict[str, Any]],
+) -> dict[str, Any]:
+    """
+    Optimisation par assortiment : densite produits/m_lin × rangs marge.
+
+    recommend_fn(solution, metres_lineaires, allowed_types, allowed_gammes)
+    → payload optimal_mix.
+    """
+    base_type = _norm_mix(type_mix, {"F&B": 0.7, "NON F&B": 0.3})
+    base_fb = _norm_mix(
+        gamme_mix_fb,
+        {
+            "sans alcool": 0.4,
+            "food salee": 0.28,
+            "food sucree": 0.18,
+            "alcool": 0.1,
+            "formule": 0.04,
+        },
+    )
+    base_nfb = _norm_mix(
+        gamme_mix_nfb,
+        {
+            "accessoires": 0.35,
+            "sos": 0.3,
+            "cosmetique": 0.12,
+            "pap": 0.1,
+            "jeux enfants": 0.08,
+            "souvenirs": 0.05,
+        },
+    )
+    sols = [str(s).strip().upper() for s in (solutions or ["SIMPLY", "LIBERTY", "CONNECTED"])]
+
+    # Filtres : types / gammes actives dans l'UI (parts > seuil)
+    allowed_types = _active_keys(base_type, thr=0.02)
+    allowed_gammes_ui = _active_keys(base_fb, thr=0.02) + _active_keys(base_nfb, thr=0.02)
+    # vers codes ventes pour le filtre SQL (SANS_ALCOOL …)
+    ui_to_raw = {v: k for k, v in _GAMME_TO_UI.items()}
+    allowed_gammes_raw = [
+        ui_to_raw.get(_gamme_ui(g), str(g).upper().replace(" ", "_"))
+        for g in allowed_gammes_ui
+    ]
+
+    scenarios: list[dict[str, Any]] = []
+    errors: list[dict[str, str]] = []
+    assortments: dict[str, Any] = {}
+
+    for sol in sols:
+        try:
+            reco = recommend_fn(
+                solution=sol,
+                metres_lineaires=metres_lineaires,
+                allowed_types=allowed_types or None,
+                allowed_gammes=allowed_gammes_raw or None,
+            )
+        except Exception as exc:  # noqa: BLE001
+            errors.append({"scenario": f"assortment:{sol}", "error": str(exc)})
+            continue
+
+        tm = reco.get("type_mix") or base_type
+        fb = _map_mix_keys_ui(reco.get("gamme_mix_fb") or {})
+        nfb = _map_mix_keys_ui(reco.get("gamme_mix_nfb") or {})
+        if not fb:
+            fb = base_fb
+        if not nfb:
+            nfb = base_nfb
+        # renormalise familles
+        fb = _norm_mix(fb, base_fb)
+        nfb = _norm_mix(nfb, base_nfb)
+        tm = _norm_mix(tm, base_type)
+
+        assortments[sol] = reco
+        scenarios.append(
+            {
+                "group": "product_rank",
+                "varied_key": "assortment",
+                "varied_target": sol,
+                "base_value": reco.get("n_products_selected"),
+                "type_mix": tm,
+                "gamme_mix_fb": fb,
+                "gamme_mix_nfb": nfb,
+                "assortment": reco,
+                "solution_focus": sol,
+            }
+        )
+
+    if not scenarios:
+        raise ValueError(
+            "Impossible de construire un assortiment optimal. "
+            + (errors[0]["error"] if errors else "")
+        )
+
+    trials: list[dict[str, Any]] = []
+    best: dict[str, Any] | None = None
+
+    for i, sc in enumerate(scenarios):
+        tm = sc["type_mix"]
+        fb = sc["gamme_mix_fb"]
+        nfb = sc["gamme_mix_nfb"]
+        gm = combine_gamme_mix(tm, fb, nfb)
+        try:
+            rows = evaluate_fn(
+                type_mix=tm,
+                gamme_mix=gm,
+                gamme_mix_fb=fb,
+                gamme_mix_nfb=nfb,
+            )
+        except Exception as exc:  # noqa: BLE001
+            errors.append(
+                {
+                    "scenario": f"product_rank:{sc.get('solution_focus')}",
+                    "error": str(exc),
+                }
+            )
+            continue
+
+        for r in rows:
+            ca_m = float(r.get("ca_monthly") or 0)
+            ca_a = float(
+                r.get("ca_annual") if r.get("ca_annual") is not None else ca_m * 12.0
+            )
+            trial = {
+                "scenario_index": i,
+                "group": sc.get("group"),
+                "varied_key": sc.get("varied_key"),
+                "varied_target": sc.get("varied_target"),
+                "base_value": sc.get("base_value"),
+                "type_mix": tm,
+                "gamme_mix_fb": fb,
+                "gamme_mix_nfb": nfb,
+                "gamme_mix": gm,
+                "engine": r.get("engine"),
+                "solution": r.get("solution"),
+                "ca_monthly": ca_m,
+                "ca_annual": ca_a,
+                "marge_monthly": r.get("marge_monthly"),
+                "marge_annual": r.get("marge_annual"),
+                "marge_nette_monthly": r.get("marge_nette_monthly"),
+                "marge_nette_annual": r.get("marge_nette_annual")
+                or r.get("marge_nette_annuelle"),
+                "result": r,
+                "assortment": sc.get("assortment"),
+            }
+            trials.append(trial)
+            # Prefer trial matching assortment solution when equal CA
+            if best is None or ca_a > float(best.get("ca_annual") or -1e18):
+                best = trial
+            elif abs(ca_a - float(best.get("ca_annual") or 0)) < 1e-6:
+                focus = str(sc.get("solution_focus") or "").upper()
+                if str(r.get("solution") or "").upper() == focus:
+                    best = trial
+
+    best_recommendation = None
+    best_by_engine: dict[str, Any] = {}
+    if best is not None:
+        same_mix = [
+            t["result"] for t in trials if t["scenario_index"] == best["scenario_index"]
+        ]
+        best_recommendation = recommend(same_mix, nb_chambres=hotel_nb_chambres)
+        for eng in ("sim_v1", "sim_v2", "ml"):
+            eng_rows = [r for r in same_mix if r.get("engine") == eng]
+            best_by_engine[eng] = {
+                "results": eng_rows,
+                "recommendation": recommend(eng_rows, nb_chambres=hotel_nb_chambres)
+                if eng_rows
+                else {
+                    "recommended": None,
+                    "reason": "Pas de prediction pour ce moteur.",
+                    "warnings": [],
+                },
+            }
+
+    top = sorted(trials, key=lambda t: float(t.get("ca_annual") or 0), reverse=True)[
+        :15
+    ]
+    top_light = [
+        {
+            "group": t["group"],
+            "varied_key": t["varied_key"],
+            "varied_target": t["varied_target"],
+            "engine": t["engine"],
+            "solution": t["solution"],
+            "ca_monthly": t["ca_monthly"],
+            "ca_annual": t["ca_annual"],
+            "marge_nette_monthly": t["marge_nette_monthly"],
+            "marge_nette_annual": t["marge_nette_annual"],
+        }
+        for t in top
+    ]
+
+    apply_mix = None
+    if best is not None:
+        apply_mix = {
+            "type_mix": best["type_mix"],
+            "gamme_mix_fb": best["gamme_mix_fb"],
+            "gamme_mix_nfb": best["gamme_mix_nfb"],
+            "gamme_mix": best["gamme_mix"],
+        }
+
+    return {
+        "ok": True,
+        "method": "product_rank",
+        "hotel_code": hotel_code,
+        "n_scenarios": len(scenarios),
+        "n_trials": len(trials),
+        "step": None,
+        "baseline": {
+            "type_mix": base_type,
+            "gamme_mix_fb": base_fb,
+            "gamme_mix_nfb": base_nfb,
+            "gamme_mix": combine_gamme_mix(base_type, base_fb, base_nfb),
+        },
+        "best": best,
+        "best_by_engine": best_by_engine,
+        "best_recommendation": best_recommendation,
+        "top": top_light,
+        "errors": errors,
+        "solutions": sols,
+        "assortments": assortments,
+        "apply_mix": apply_mix,
+        "metres_lineaires": metres_lineaires,
     }

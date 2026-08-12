@@ -1,0 +1,12 @@
+v_v1_pivot_observation:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_dataset_pivot
+  script: "SELECT\n  CAST(hotel_code AS VARCHAR) AS hotel_code,\n  LOWER(TRIM(CAST(solution\
+    \ AS VARCHAR))) AS solution,\n  ANY_VALUE(montant_ventes_par_mois) AS ca_reel_mensuel,\n\
+    \  ANY_VALUE(montant_marge_selon_coef_par_mois) AS marge_reelle_mensuelle,\n \
+    \ ANY_VALUE(montant_marge_par_mois) AS marge_marche_mensuelle,\n  ANY_VALUE(nombre_guests_par_mois)\
+    \ AS clients_mois,\n  ANY_VALUE(metres_lineaires) AS metres_lineaires,\n  ANY_VALUE(nombre_mois)\
+    \ AS n_mois\nFROM t_dataset_pivot\nWHERE COALESCE(LEN(scenario_removed_natures),\
+    \ 0) = 0\nGROUP BY CAST(hotel_code AS VARCHAR), LOWER(TRIM(CAST(solution AS VARCHAR)))"

@@ -1,0 +1,12 @@
+t_dataset_pivot:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - v_dataset_pivot
+  script: 'SELECT *
+
+    FROM v_dataset_pivot
+
+    LIMIT 0
+
+    '

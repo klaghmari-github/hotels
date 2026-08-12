@@ -1,0 +1,9 @@
+v_restitution_prediction:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_restitution_prediction_core
+  - v_solution_conversion_rate
+  script: "SELECT\n  p.*,\n  c.taux_conversion_moyen,\n  c.taux_conversion_pondere,\n\
+    \  c.nombre_hotels AS nombre_hotels_conversion\nFROM v_restitution_prediction_core\
+    \ AS p\nLEFT JOIN v_solution_conversion_rate AS c USING (solution)\nORDER BY solution"

@@ -1,0 +1,11 @@
+v_loo_input_mix:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_loo_observed_row
+  script: "WITH source AS (\n  SELECT COLUMNS('^(type|gamme)_.*_part_natures$')\n\
+    \  FROM v_loo_observed_row\n), long_mix AS (\n  UNPIVOT source\n  ON COLUMNS('^(type|gamme)_.*_part_natures$')\n\
+    \  INTO NAME variable_name VALUE target_part\n)\nSELECT\n  CASE\n    WHEN variable_name\
+    \ LIKE 'type_%' THEN 'type'\n    WHEN variable_name LIKE 'gamme_%' THEN 'gamme'\n\
+    \  END AS variable_family,\n  variable_name,\n  target_part\nFROM long_mix\nWHERE\
+    \ target_part > 0"

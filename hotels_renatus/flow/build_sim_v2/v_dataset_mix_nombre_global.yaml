@@ -1,0 +1,16 @@
+v_dataset_mix_nombre_global:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_hotel_codes
+  - v_sales_current
+  script: "WITH current_mix AS (\n  SELECT\n    HOTEL_CODE AS hotel_code,\n    COUNT(DISTINCT\
+    \ NATURE_PRODUIT) AS nombre_natures,\n    COUNT(DISTINCT CATEGORIE) AS nombre_categories,\n\
+    \    COUNT(DISTINCT GAMME) AS nombre_gammes,\n    COUNT(DISTINCT TYPE) AS nombre_types,\n\
+    \    COUNT(DISTINCT MARQUE) AS nombre_marques,\n    COUNT(DISTINCT FOURNISSEUR)\
+    \ AS nombre_fournisseurs\n  FROM v_sales_current\n  GROUP BY HOTEL_CODE\n)\nSELECT\n\
+    \  h.HOTEL_CODE AS hotel_code,\n  COALESCE(m.nombre_natures, 0) AS nombre_natures,\n\
+    \  COALESCE(m.nombre_categories, 0) AS nombre_categories,\n  COALESCE(m.nombre_gammes,\
+    \ 0) AS nombre_gammes,\n  COALESCE(m.nombre_types, 0) AS nombre_types,\n  COALESCE(m.nombre_marques,\
+    \ 0) AS nombre_marques,\n  COALESCE(m.nombre_fournisseurs, 0) AS nombre_fournisseurs\n\
+    FROM t_hotel_codes AS h\nLEFT JOIN current_mix AS m ON m.hotel_code = h.HOTEL_CODE\n"

@@ -1,0 +1,9 @@
+estimate_sim_v1:
+  type: zone
+  label: Estimate sim_v1 (row in → CA/marge)
+  objects:
+    df_estimate_input_v1: {}
+    v_estimate_hotel_levers: {}
+    v_estimate_sim_v1: {}
+  workers: auto
+  renatus_mode: required_for_leaves

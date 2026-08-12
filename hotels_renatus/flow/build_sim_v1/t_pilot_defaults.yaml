@@ -1,0 +1,17 @@
+t_pilot_defaults:
+  type: table
+  mode: create_or_replace
+  requires:
+  - df_pilot_defaults
+  script: "SELECT\n  UPPER(TRIM(CAST(solution AS VARCHAR))) AS solution,\n  TRY_CAST(nb_chambres\
+    \ AS DOUBLE) AS nb_chambres,\n  TRY_CAST(guests AS DOUBLE) AS guests,\n  TRY_CAST(\"\
+    to\" AS DOUBLE) AS to_rate,\n  TRY_CAST(ml_ref AS DOUBLE) AS ml_ref,\n  TRY_CAST(frigo_ref\
+    \ AS DOUBLE) AS frigo_ref,\n  TRY_CAST(mix_fb AS DOUBLE) AS mix_fb,\n  TRY_CAST(ventes\
+    \ AS DOUBLE) AS ventes,\n  TRY_CAST(ca_fb AS DOUBLE) AS ca_fb,\n  TRY_CAST(ca_nfb\
+    \ AS DOUBLE) AS ca_nfb,\n  TRY_CAST(ca_10_fb AS DOUBLE) AS ca_10_fb,\n  TRY_CAST(ca_10_nfb\
+    \ AS DOUBLE) AS ca_10_nfb,\n  TRY_CAST(ca_1ml_fb AS DOUBLE) AS ca_1ml_fb,\n  TRY_CAST(ca_1ml_nfb\
+    \ AS DOUBLE) AS ca_1ml_nfb,\n  TRY_CAST(ca_1frigo_fb AS DOUBLE) AS ca_1frigo_fb,\n\
+    \  TRY_CAST(ca_1frigo_nfb AS DOUBLE) AS ca_1frigo_nfb,\n  TRY_CAST(coeff_fb AS\
+    \ DOUBLE) AS coeff_fb,\n  TRY_CAST(coeff_nfb AS DOUBLE) AS coeff_nfb,\n  TRY_CAST(clients_heb\
+    \ AS DOUBLE) AS clients_heb\nFROM df_pilot_defaults\nWHERE UPPER(TRIM(CAST(solution\
+    \ AS VARCHAR))) IN (\n  'SIMPLY', 'LIBERTY', 'CONNECTED'\n)"

@@ -1,0 +1,10 @@
+v_dataset_observation_par_mois:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_dataset_observation_total
+  script: "SELECT\n  hotel_code,\n  nombre_mois,\n  nombre_guests / NULLIF(nombre_mois,\
+    \ 0) AS nombre_guests_par_mois,\n  nombre_ventes / NULLIF(nombre_mois, 0) AS nombre_ventes_par_mois,\n\
+    \  montant_ventes / NULLIF(nombre_mois, 0) AS montant_ventes_par_mois,\n  montant_marge_selon_coef\
+    \ / NULLIF(nombre_mois, 0) AS montant_marge_selon_coef_par_mois,\n  montant_marge\
+    \ / NULLIF(nombre_mois, 0) AS montant_marge_par_mois\nFROM v_dataset_observation_total"

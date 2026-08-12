@@ -1,0 +1,9 @@
+v_loo_method_comparison:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_loo_metrics
+  script: "SELECT\n  methode,\n  montant_ventes_mae,\n  montant_ventes_rmse,\n  montant_ventes_mape,\n\
+    \  marge_selon_coef_mae,\n  marge_selon_coef_rmse,\n  marge_selon_coef_mape,\n\
+    \  marge_mae,\n  marge_rmse,\n  marge_mape\nFROM v_loo_metrics\nWHERE solution\
+    \ IS NULL\nORDER BY montant_ventes_mae"

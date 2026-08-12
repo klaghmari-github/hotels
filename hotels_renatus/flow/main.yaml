@@ -1,0 +1,13 @@
+main:
+  type: zone
+  label: main
+  objects:
+    sources: {}
+    build_sim_v1: {}
+    build_sim_v2: {}
+    build_ml: {}
+    estimate_sim_v1: {}
+    estimate_sim_v2: {}
+    estimate_ml: {}
+  workers: auto
+  renatus_mode: required_for_leaves

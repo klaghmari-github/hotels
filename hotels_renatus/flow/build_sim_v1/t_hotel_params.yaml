@@ -1,0 +1,33 @@
+t_hotel_params:
+  type: table
+  mode: create_or_replace
+  requires:
+  - df_hotel_params
+  - t_pilot_concepts
+  - v_v1_sales_observation
+  - v_v1_pivot_observation
+  script: "SELECT\n  CAST(h.hotel_code AS VARCHAR) AS hotel_code,\n  UPPER(TRIM(CAST(h.solution\
+    \ AS VARCHAR))) AS solution,\n  CAST(h.label AS VARCHAR) AS label,\n  CAST(h.hotel_name\
+    \ AS VARCHAR) AS hotel_name,\n  CAST(h.hotel_brand AS VARCHAR) AS hotel_brand,\n\
+    \  COALESCE(s.hotel_nb_chambres, TRY_CAST(h.nb_chambres AS DOUBLE)) AS nb_chambres,\n\
+    \  COALESCE(s.hotel_to_annuel, TRY_CAST(h.taux_occupation AS DOUBLE)) AS taux_occupation,\n\
+    \  COALESCE(s.hotel_guests_per_chambre, TRY_CAST(h.guests_per_chambre AS DOUBLE))\n\
+    \    AS guests_per_chambre,\n  COALESCE(o.metres_lineaires, s.metres_lineaires,\
+    \ TRY_CAST(h.m_lin AS DOUBLE))\n    AS m_lin,\n  COALESCE(TRY_CAST(h.nb_frigos_froid\
+    \ AS DOUBLE), 3.0) AS nb_frigos_froid,\n  -- clients : meme formule que sim_v2\
+    \ (chambres x TO x guests x 30.5)\n  COALESCE(o.clients_mois, s.clients_mois,\
+    \ TRY_CAST(h.clients_mois AS DOUBLE))\n    AS clients_mois,\n  COALESCE(s.mix_fb,\
+    \ TRY_CAST(h.mix_fb AS DOUBLE)) AS mix_fb,\n  -- REEL aligne sim_v2/ML (pivot\
+    \ observation, fallback t_sales)\n  COALESCE(o.ca_reel_mensuel, s.ca_ttc_mensuel,\
+    \ TRY_CAST(h.ca_reel_mensuel AS DOUBLE))\n    AS ca_reel_mensuel,\n  COALESCE(s.ca_fb_mensuel,\
+    \ TRY_CAST(h.ca_fb_mensuel AS DOUBLE)) AS ca_fb_mensuel,\n  COALESCE(s.ca_nf_mensuel,\
+    \ TRY_CAST(h.ca_nf_mensuel AS DOUBLE)) AS ca_nf_mensuel,\n  COALESCE(\n    o.marge_reelle_mensuelle,\n\
+    \    s.marge_selon_coef_mensuelle,\n    TRY_CAST(h.marge_reelle_mensuelle AS DOUBLE)\n\
+    \  ) AS marge_reelle_mensuelle,\n  COALESCE(s.nb_ventes_mensuel, TRY_CAST(h.nb_ventes_mensuel\
+    \ AS DOUBLE))\n    AS nb_ventes_mensuel,\n  COALESCE(s.nb_paniers_mensuel, TRY_CAST(h.nb_paniers_mensuel\
+    \ AS DOUBLE))\n    AS nb_paniers_mensuel,\n  COALESCE(o.n_mois, s.n_mois, TRY_CAST(h.n_mois\
+    \ AS DOUBLE)) AS n_mois\nFROM df_hotel_params AS h\nINNER JOIN t_pilot_concepts\
+    \ AS p\n  ON CAST(h.hotel_code AS VARCHAR) = p.hotel_code\nLEFT JOIN v_v1_sales_observation\
+    \ AS s\n  ON s.hotel_code = CAST(h.hotel_code AS VARCHAR)\nLEFT JOIN v_v1_pivot_observation\
+    \ AS o\n  ON o.hotel_code = CAST(h.hotel_code AS VARCHAR)\nWHERE CAST(h.hotel_code\
+    \ AS VARCHAR) NOT IN ('H5586')"

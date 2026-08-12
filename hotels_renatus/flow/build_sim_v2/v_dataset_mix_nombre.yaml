@@ -1,0 +1,13 @@
+v_dataset_mix_nombre:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_dataset_mix_nombre_global
+  - t_dataset_mix_nombre_detail
+  script: 'SELECT g.*, d.* EXCLUDE (hotel_code)
+
+    FROM v_dataset_mix_nombre_global AS g
+
+    LEFT JOIN t_dataset_mix_nombre_detail AS d USING (hotel_code)
+
+    '

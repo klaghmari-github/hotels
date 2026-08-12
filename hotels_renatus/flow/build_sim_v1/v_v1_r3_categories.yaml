@@ -1,0 +1,12 @@
+v_v1_r3_categories:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_v1_r2_mix
+  script: "SELECT\n  r2.*,\n  0.48 AS cumul_fb,\n  0.33 AS cumul_nfb,\n  CASE\n  \
+    \  WHEN r2.ca_fb_r2 < 0 THEN (1.0 - 0.48)\n    ELSE (1.0 + 0.48)\n  END AS mult_fb,\n\
+    \  CASE\n    WHEN r2.ca_nfb_r2 < 0 THEN (1.0 - 0.33)\n    ELSE (1.0 + 0.33)\n\
+    \  END AS mult_nfb,\n  r2.ca_fb_r2 * CASE\n    WHEN r2.ca_fb_r2 < 0 THEN (1.0\
+    \ - 0.48)\n    ELSE (1.0 + 0.48)\n  END AS ca_fb_r3,\n  r2.ca_nfb_r2 * CASE\n\
+    \    WHEN r2.ca_nfb_r2 < 0 THEN (1.0 - 0.33)\n    ELSE (1.0 + 0.33)\n  END AS\
+    \ ca_nfb_r3\nFROM v_v1_r2_mix AS r2"

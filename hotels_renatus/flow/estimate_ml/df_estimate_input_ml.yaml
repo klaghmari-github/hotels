@@ -1,0 +1,6 @@
+df_estimate_input_ml:
+  type: dataframe
+  label: estimate_input_ml
+  name: df_estimate_input_ml
+  file: input_estimate/estimate_input_ml.xlsx
+  mode: create_or_replace

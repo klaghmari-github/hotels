@@ -1,0 +1,16 @@
+v_hotel_holidays_features:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_hotel_holidays_data
+  script: "SELECT\n  CAST(hotel_code AS VARCHAR) AS hotel_code,\n  AVG(TRY_CAST(zone_scolaire_a\
+    \ AS DOUBLE)) AS hol_zone_scolaire_a,\n  AVG(TRY_CAST(zone_scolaire_b AS DOUBLE))\
+    \ AS hol_zone_scolaire_b,\n  AVG(TRY_CAST(zone_scolaire_c AS DOUBLE)) AS hol_zone_scolaire_c,\n\
+    \  AVG(TRY_CAST(nb_jours_dans_mois AS DOUBLE)) AS hol_nb_jours_dans_mois,\n  AVG(TRY_CAST(nb_jours_feries\
+    \ AS DOUBLE)) AS hol_nb_jours_feries,\n  AVG(TRY_CAST(nb_jours_weekend AS DOUBLE))\
+    \ AS hol_nb_jours_weekend,\n  AVG(TRY_CAST(nb_jours_vacances_scolaires AS DOUBLE))\
+    \ AS hol_nb_jours_vacances_scolaires,\n  AVG(TRY_CAST(nb_jours_vacances_hors_feries\
+    \ AS DOUBLE)) AS hol_nb_jours_vacances_hors_feries,\n  AVG(TRY_CAST(nb_jours_holidays\
+    \ AS DOUBLE)) AS hol_nb_jours_holidays,\n  AVG(TRY_CAST(pct_jours_holidays AS\
+    \ DOUBLE)) AS hol_pct_jours_holidays\nFROM t_hotel_holidays_data\nWHERE hotel_code\
+    \ IS NOT NULL\nGROUP BY CAST(hotel_code AS VARCHAR)"

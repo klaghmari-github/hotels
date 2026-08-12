@@ -1,0 +1,10 @@
+v_web_v1_loo_results:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_v1_loo_results
+  script: "SELECT\n  hotel_code,\n  solution,\n  ca_reel_mensuel AS ca_reel,\n  ca_ht_predit\
+    \ AS ca_pred,\n  abs_erreur_ca AS ca_err_abs,\n  marge_reelle_mensuelle AS marge_reel,\n\
+    \  marge_produit_predite AS marge_pred,\n  abs_erreur_marge AS marge_err_abs,\n\
+    \  n_mois\nFROM t_v1_loo_results\nWHERE hotel_code IS NOT NULL\nORDER BY solution,\
+    \ hotel_code"

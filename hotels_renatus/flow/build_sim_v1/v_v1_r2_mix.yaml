@@ -1,0 +1,10 @@
+v_v1_r2_mix:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_v1_r1_buyers
+  script: "SELECT\n  r1.*,\n  (COALESCE(r1.mix_fb_hotel, r1.mix_fb_ref) - r1.mix_fb_ref)\
+    \ * 10.0 AS mix_steps,\n  r1.ca_fb_r1\n    + r1.ca_10_fb\n      * ((COALESCE(r1.mix_fb_hotel,\
+    \ r1.mix_fb_ref) - r1.mix_fb_ref) * 10.0)\n    AS ca_fb_r2,\n  r1.ca_nfb_r1\n\
+    \    + r1.ca_10_nfb\n      * (-((COALESCE(r1.mix_fb_hotel, r1.mix_fb_ref) - r1.mix_fb_ref)\
+    \ * 10.0))\n    AS ca_nfb_r2\nFROM v_v1_r1_buyers AS r1"

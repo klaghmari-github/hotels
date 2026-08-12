@@ -1,0 +1,21 @@
+v_restitution_simulation_long:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_dataset_pivot
+  script: "WITH source AS (\n  SELECT\n    scenario_id,\n    hotel_code,\n    solution,\n\
+    \    nombre_guests_par_mois,\n    metres_lineaires,\n    montant_ventes_par_mois,\n\
+    \    montant_marge_selon_coef_par_mois,\n    montant_marge_par_mois,\n    COLUMNS('^(type|gamme)_.*_part_natures$')\n\
+    \  FROM t_dataset_pivot\n), long_mix AS (\n  UNPIVOT source\n  ON COLUMNS('^(type|gamme)_.*_part_natures$')\n\
+    \  INTO NAME variable_name VALUE variable_part\n)\nSELECT\n  scenario_id,\n  hotel_code,\n\
+    \  solution,\n  CASE\n    WHEN variable_name LIKE 'type_%' THEN 'type'\n    WHEN\
+    \ variable_name LIKE 'gamme_%' THEN 'gamme'\n  END AS variable_family,\n  variable_name,\n\
+    \  variable_part,\n  nombre_guests_par_mois,\n  metres_lineaires,\n  montant_ventes_par_mois,\n\
+    \  montant_marge_selon_coef_par_mois,\n  montant_marge_par_mois,\n  montant_ventes_par_mois\n\
+    \    / NULLIF(nombre_guests_par_mois * metres_lineaires * variable_part, 0)\n\
+    \      AS montant_ventes_coefficient,\n  montant_marge_selon_coef_par_mois\n \
+    \   / NULLIF(nombre_guests_par_mois * metres_lineaires * variable_part, 0)\n \
+    \     AS montant_marge_selon_coef_coefficient,\n  montant_marge_par_mois\n   \
+    \ / NULLIF(nombre_guests_par_mois * metres_lineaires * variable_part, 0)\n   \
+    \   AS montant_marge_coefficient\nFROM long_mix\nWHERE variable_part > 0\n  AND\
+    \ nombre_guests_par_mois > 0\n  AND metres_lineaires > 0"

@@ -1,0 +1,30 @@
+v_hotel_weather_features:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_hotel_weather_data
+  script: "SELECT\n  CAST(hotel_code AS VARCHAR) AS hotel_code,\n  AVG(TRY_CAST(meteo_temperature_c_mean\
+    \ AS DOUBLE)) AS wx_meteo_temperature_c_mean,\n  AVG(TRY_CAST(meteo_temperature_c_min\
+    \ AS DOUBLE)) AS wx_meteo_temperature_c_min,\n  AVG(TRY_CAST(meteo_temperature_c_max\
+    \ AS DOUBLE)) AS wx_meteo_temperature_c_max,\n  AVG(TRY_CAST(meteo_point_rosee_c_mean\
+    \ AS DOUBLE)) AS wx_meteo_point_rosee_c_mean,\n  AVG(TRY_CAST(meteo_point_rosee_c_min\
+    \ AS DOUBLE)) AS wx_meteo_point_rosee_c_min,\n  AVG(TRY_CAST(meteo_point_rosee_c_max\
+    \ AS DOUBLE)) AS wx_meteo_point_rosee_c_max,\n  AVG(TRY_CAST(meteo_humidite_pct_mean\
+    \ AS DOUBLE)) AS wx_meteo_humidite_pct_mean,\n  AVG(TRY_CAST(meteo_humidite_pct_min\
+    \ AS DOUBLE)) AS wx_meteo_humidite_pct_min,\n  AVG(TRY_CAST(meteo_humidite_pct_max\
+    \ AS DOUBLE)) AS wx_meteo_humidite_pct_max,\n  AVG(TRY_CAST(meteo_precipitations_mm_mean\
+    \ AS DOUBLE)) AS wx_meteo_precipitations_mm_mean,\n  AVG(TRY_CAST(meteo_precipitations_mm_min\
+    \ AS DOUBLE)) AS wx_meteo_precipitations_mm_min,\n  AVG(TRY_CAST(meteo_precipitations_mm_max\
+    \ AS DOUBLE)) AS wx_meteo_precipitations_mm_max,\n  AVG(TRY_CAST(meteo_neige_mm_mean\
+    \ AS DOUBLE)) AS wx_meteo_neige_mm_mean,\n  AVG(TRY_CAST(meteo_neige_mm_min AS\
+    \ DOUBLE)) AS wx_meteo_neige_mm_min,\n  AVG(TRY_CAST(meteo_neige_mm_max AS DOUBLE))\
+    \ AS wx_meteo_neige_mm_max,\n  AVG(TRY_CAST(meteo_vent_kmh_mean AS DOUBLE)) AS\
+    \ wx_meteo_vent_kmh_mean,\n  AVG(TRY_CAST(meteo_vent_kmh_min AS DOUBLE)) AS wx_meteo_vent_kmh_min,\n\
+    \  AVG(TRY_CAST(meteo_vent_kmh_max AS DOUBLE)) AS wx_meteo_vent_kmh_max,\n  AVG(TRY_CAST(meteo_pression_hpa_mean\
+    \ AS DOUBLE)) AS wx_meteo_pression_hpa_mean,\n  AVG(TRY_CAST(meteo_pression_hpa_min\
+    \ AS DOUBLE)) AS wx_meteo_pression_hpa_min,\n  AVG(TRY_CAST(meteo_pression_hpa_max\
+    \ AS DOUBLE)) AS wx_meteo_pression_hpa_max,\n  AVG(TRY_CAST(meteo_ensoleillement_min_mean\
+    \ AS DOUBLE)) AS wx_meteo_ensoleillement_min_mean,\n  AVG(TRY_CAST(meteo_ensoleillement_min_min\
+    \ AS DOUBLE)) AS wx_meteo_ensoleillement_min_min,\n  AVG(TRY_CAST(meteo_ensoleillement_min_max\
+    \ AS DOUBLE)) AS wx_meteo_ensoleillement_min_max\nFROM t_hotel_weather_data\n\
+    WHERE hotel_code IS NOT NULL\nGROUP BY CAST(hotel_code AS VARCHAR)"

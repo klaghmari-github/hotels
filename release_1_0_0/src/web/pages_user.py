@@ -337,13 +337,34 @@ class MixPanel {
   freeItems(exceptKey=null){ return this.items.filter(i=>!i.locked&&i.key!==exceptKey); }
   freeMaxPct(key){ return Math.max(0,(1-this.lockedSum(key))*100); }
   setValue(key,pct,{soft=true}={}){
+    /**
+     * Fixe la part de `key` a pct (%).
+     * L'ecart (ajout ou retrait) est repercute sur les autres gammes/types
+     * LIBRES, proportionnellement a leur part actuelle relative.
+     * Ex. A=50 B=30 C=20 ; A → 60 : on prend 10 sur B+C au prorata 30:20 → B=24 C=16.
+     * A → 40 : on rend 10 a B+C au meme prorata → B=36 C=24.
+     */
     const it=this.items.find(i=>i.key===key); if(!it||it.locked) return;
     const locked=this.lockedSum(); const max=Math.max(0,1-locked);
     let v=Math.min(max,Math.max(0,Number(pct)/100)); v=Math.round(v*1000)/1000;
     const others=this.freeItems(key);
     if(!others.length){ it.value=max; this._fixFloat(); soft?this._paint():this.render(); return; }
-    it.value=v; const rem=Math.max(0,1-locked-v); const each=rem/others.length;
-    others.forEach(o=>o.value=each); this._fixFloat(); soft?this._paint():this.render();
+    // masse restante a repartir entre les autres libres
+    const rem=Math.max(0,1-locked-v);
+    const othersSum=others.reduce((s,o)=>s+Math.max(0,o.value),0);
+    if(othersSum<=EPS){
+      // autres a 0 : repartition egale (seul cas non proportionnel)
+      const each=rem/others.length;
+      others.forEach(o=>{ o.value=each; });
+    }else{
+      // proportionnel aux parts actuelles des autres
+      others.forEach(o=>{
+        const w=Math.max(0,o.value)/othersSum;
+        o.value=rem*w;
+      });
+    }
+    it.value=v;
+    this._fixFloat(); soft?this._paint():this.render();
   }
   setFree(key,free){
     const it=this.items.find(i=>i.key===key); if(!it) return;
@@ -884,6 +905,25 @@ function showOptTab(name){
   document.getElementById('opt-estim').classList.toggle('on', name==='estim');
 }
 
+function applyRecommendedMix(data){
+  /** Precharge les mix reco dans l'etat leviers (modifiables ensuite). */
+  const am=data.apply_mix||(data.best?{
+    type_mix:data.best.type_mix,
+    gamme_mix_fb:data.best.gamme_mix_fb,
+    gamme_mix_nfb:data.best.gamme_mix_nfb,
+    gamme_mix:data.best.gamme_mix,
+  }:null);
+  if(!am) return;
+  if(!memory.levers) memory.levers={};
+  memory.levers.type_mix=am.type_mix||memory.levers.type_mix;
+  memory.levers.gamme_mix_fb=am.gamme_mix_fb||memory.levers.gamme_mix_fb;
+  memory.levers.gamme_mix_nfb=am.gamme_mix_nfb||memory.levers.gamme_mix_nfb;
+  memory.levers.gamme_mix=am.gamme_mix
+    ||toGlobalGammeMix(am.type_mix, am.gamme_mix_fb, am.gamme_mix_nfb);
+  // recreate panels if DOM ready (renderLevers lit memory.levers)
+  try{ renderLevers(); }catch(_e){}
+}
+
 function renderOptResults(data){
   const out=document.getElementById('opt-out');
   const best=data.best;
@@ -891,15 +931,40 @@ function renderOptResults(data){
     out.innerHTML=`<div class="errbox">Aucune estimation obtenue.${(data.errors||[]).map(e=>`<div>${e.error||''}</div>`).join('')}</div>`;
     return;
   }
-  let html=`<p class="muted">${data.n_scenarios||0} scenarios · ${data.n_trials||0} estimations (pas ${pctLabel(data.step||0.1)})</p>`;
+  const method=data.method||'grid';
+  const methodLabel=method==='product_rank'
+    ? 'Assortiment optimal (top produits par marge / m_lin)'
+    : `Balayage mix (pas ${pctLabel(data.step||0.1)})`;
+  let html=`<p class="muted">${methodLabel} · ${data.n_scenarios||0} scenarios · ${data.n_trials||0} estimations</p>`;
   const bestA=annualOf(best.result||best);
   html+=`<div class="reco-box">
     <h4>Meilleur CA estime (annuel)</h4>
     <p style="margin:0 0 .4rem"><strong>${fmt(bestA.ca!=null?bestA.ca:(best.ca_monthly!=null?best.ca_monthly*12:null))}</strong> €/an · ${tag(best.engine)} · ${tag(best.solution)}</p>
-    <div class="muted">Variation : groupe <em>${best.group||'baseline'}</em>${best.varied_key!=null?` · <em>${best.varied_key}</em> → ${pctLabel(best.varied_target)} (base ${pctLabel(best.base_value||0)})`:''}</div>
+    <div class="muted">${method==='product_rank'
+      ? `Assortiment solution <em>${best.varied_target||best.solution||'—'}</em>${best.base_value!=null?` · ${best.base_value} produits selectionnes`:''}`
+      : `Variation : groupe <em>${best.group||'baseline'}</em>${best.varied_key!=null?` · <em>${best.varied_key}</em> → ${pctLabel(best.varied_target)} (base ${pctLabel(best.base_value||0)})`:''}`
+    }</div>
   </div>`;
 
-  html+='<div class="section-title">Mix optimal</div>';
+  // Detail densite / top produits si present
+  const asrt=(best.assortment)||((data.assortments||{})[String(best.varied_target||'').toUpperCase()]);
+  if(asrt){
+    html+=`<div class="muted" style="margin:.5rem 0">Densite ${fmt(asrt.produits_par_m_lin,1)} produits/m_lin · cible ${fmt(asrt.metres_lineaires,1)} m_lin → top ${asrt.n_products_selected||asrt.n_products_target||'—'} produits (moy. ${asrt.nombre_hotels_densite||'—'} hotels solution)</div>`;
+    const prods=(asrt.top_products||[]).slice(0,15);
+    if(prods.length){
+      html+='<div class="section-title">Top produits (extrait)</div>';
+      html+='<div class="admin-table-wrap" style="border:0"><table><thead><tr><th>#</th><th>Produit</th><th>Type</th><th>Gamme</th><th class="num">Rang moyen</th><th class="num">Hotels</th></tr></thead><tbody>';
+      for(const p of prods){
+        html+=`<tr><td>${p.rank}</td><td>${p.nom_produit||'—'}</td><td>${p.type||'—'}</td><td>${p.gamme||'—'}</td><td class="num">${fmt(p.rang_moyen,1)}</td><td class="num">${p.nombre_hotels_rang??'—'}</td></tr>`;
+      }
+      html+='</tbody></table></div>';
+      if((asrt.top_products||[]).length>15){
+        html+=`<p class="muted">… ${(asrt.top_products||[]).length - 15} autres produits dans le top.</p>`;
+      }
+    }
+  }
+
+  html+='<div class="section-title">Mix optimal (pre-charge dans Configuration)</div>';
   html+=`<div style="margin:.35rem 0"><strong>Type</strong><br/>${chipsMix(best.type_mix)}</div>`;
   html+=`<div style="margin:.35rem 0"><strong>Gammes F&B</strong><br/>${chipsMix(best.gamme_mix_fb)}</div>`;
   html+=`<div style="margin:.35rem 0"><strong>Gammes Non F&B</strong><br/>${chipsMix(best.gamme_mix_nfb)}</div>`;
@@ -960,20 +1025,24 @@ async function runOptimize(){
   if(!memory.typeMix) renderLevers();
   previewOptBaseline();
   const status=document.getElementById('opt-status');
-  status.textContent='Optimisation en cours (balayage 10 % sur type + gammes) — cela peut prendre 1 a 3 minutes…';
+  status.textContent='Optimisation assortiment (produits / m_lin + rangs marge) puis CA sim_v2/ml…';
   const btn=document.getElementById('btn-optimize');
   if(btn) btn.disabled=true;
   try{
+    const payload=payloadFromMemory();
+    payload.method='product_rank';
     const res=await fetch('/api/user/optimize',{
       method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(payloadFromMemory())
+      body:JSON.stringify(payload)
     });
     const data=await res.json();
     if(!data.ok) throw new Error(data.error||'erreur optimisation');
     memory.optimize=data;
-    status.textContent=`Termine : ${data.n_scenarios} scenarios, ${data.n_trials} estimations.`;
+    applyRecommendedMix(data);
+    status.textContent=`Termine (${data.method||'product_rank'}) : ${data.n_scenarios} scenarios, ${data.n_trials} estimations. Mix reco charge dans Configuration.`;
     renderOptResults(data);
     showOptTab('estim');
+    try{ renderLevers(); }catch(_e){}
   }catch(e){
     status.textContent='';
     document.getElementById('opt-out').innerHTML=`<div class="errbox">${e.message}</div>`;

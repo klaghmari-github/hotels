@@ -1,0 +1,14 @@
+t_marques:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - t_sales
+  script: 'SELECT DISTINCT MARQUE
+
+    FROM t_sales
+
+    WHERE MARQUE IS NOT NULL
+
+    ORDER BY MARQUE
+
+    '

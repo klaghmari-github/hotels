@@ -50,6 +50,13 @@ Services metier v1 (R1–R4 LOO) et CatBoost ; s'appuient sur `PipelineFactory`.
 | `run.py` | CLI mince |
 | `main.py` | **Compatibilite** : reexporte les symboles historiques (`from main import ConnectionPipeline, ScenarioGenerator, main`) sans logique |
 | `src/api`, `src/web` | Exposition HTTP |
+| `src/user/optimize.py` | Optimisation mix (`product_rank` / `grid`) ; `vary_one` = redistrib. **proportionnelle** |
+| `src/web/pages_user.py` | GUI user ; `MixPanel.setValue` = meme regle de prorata sur type & gammes |
+
+Doc features :
+
+- [FEATURE_OPTIMAL_MIX.md](FEATURE_OPTIMAL_MIX.md) — assortiment m_lin × rangs marge
+- [FEATURE_MIX_REDISTRIBUTION.md](FEATURE_MIX_REDISTRIBUTION.md) — edition mix proportionnelle
 
 ## Aucune perte fonctionnelle
 

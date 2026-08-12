@@ -1,0 +1,11 @@
+v_dataset_observation_total:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_dataset_observation_context
+  - v_dataset_observation_activity
+  script: "SELECT\n  c.hotel_code,\n  c.nombre_mois,\n  c.nombre_guests,\n  COALESCE(a.nombre_ventes,\
+    \ 0) AS nombre_ventes,\n  COALESCE(a.montant_ventes, 0) AS montant_ventes,\n \
+    \ COALESCE(a.montant_marge_selon_coef, 0) AS montant_marge_selon_coef,\n  COALESCE(a.montant_marge,\
+    \ 0) AS montant_marge\nFROM v_dataset_observation_context AS c\nLEFT JOIN v_dataset_observation_activity\
+    \ AS a USING (hotel_code)"

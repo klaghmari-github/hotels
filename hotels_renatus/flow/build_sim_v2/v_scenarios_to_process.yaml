@@ -1,0 +1,11 @@
+v_scenarios_to_process:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_scenarios
+  - t_dataset_pivot
+  - t_hotel_codes
+  script: "WITH completed_scenarios AS (\n  SELECT scenario_id\n  FROM t_dataset_pivot\n\
+    \  GROUP BY scenario_id\n  HAVING COUNT(DISTINCT hotel_code) =\n         (SELECT\
+    \ COUNT(*) FROM t_hotel_codes)\n)\nSELECT s.*\nFROM t_scenarios AS s\nLEFT JOIN\
+    \ completed_scenarios AS c\n  USING (scenario_id)\nWHERE c.scenario_id IS NULL"

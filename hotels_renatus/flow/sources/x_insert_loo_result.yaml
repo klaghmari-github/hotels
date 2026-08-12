@@ -1,0 +1,8 @@
+x_insert_loo_result:
+  type: execute_sql
+  requires:
+  - t_loo_results
+  - v_loo_result
+  script: "INSERT INTO t_loo_results BY NAME\nSELECT r.*\nFROM v_loo_result AS r\n\
+    WHERE NOT EXISTS (\n  SELECT 1 FROM t_loo_results AS t\n  WHERE t.hotel_code =\
+    \ r.hotel_code AND t.methode = r.methode\n)"

@@ -1,0 +1,34 @@
+v_dataset_mix_metric_names:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_sales
+  script: 'SELECT DISTINCT ''categorie_'' || TRIM(BOTH ''_'' FROM REGEXP_REPLACE(LOWER(CAST(CATEGORIE
+    AS VARCHAR)), ''[^a-z0-9]+'', ''_'', ''g'')) || ''_nombre_natures'' AS metric_name
+    FROM t_sales WHERE CATEGORIE IS NOT NULL
+
+    UNION
+
+    SELECT DISTINCT ''gamme_'' || TRIM(BOTH ''_'' FROM REGEXP_REPLACE(LOWER(CAST(GAMME
+    AS VARCHAR)), ''[^a-z0-9]+'', ''_'', ''g'')) || ''_nombre_natures'' FROM t_sales
+    WHERE GAMME IS NOT NULL
+
+    UNION
+
+    SELECT DISTINCT ''type_'' || TRIM(BOTH ''_'' FROM REGEXP_REPLACE(LOWER(CAST(TYPE
+    AS VARCHAR)), ''[^a-z0-9]+'', ''_'', ''g'')) || ''_nombre_natures'' FROM t_sales
+    WHERE TYPE IS NOT NULL
+
+    UNION
+
+    SELECT DISTINCT ''marque_'' || TRIM(BOTH ''_'' FROM REGEXP_REPLACE(LOWER(CAST(MARQUE
+    AS VARCHAR)), ''[^a-z0-9]+'', ''_'', ''g'')) || ''_nombre_natures'' FROM t_sales
+    WHERE MARQUE IS NOT NULL
+
+    UNION
+
+    SELECT DISTINCT ''fournisseur_'' || TRIM(BOTH ''_'' FROM REGEXP_REPLACE(LOWER(CAST(FOURNISSEUR
+    AS VARCHAR)), ''[^a-z0-9]+'', ''_'', ''g'')) || ''_nombre_natures'' FROM t_sales
+    WHERE FOURNISSEUR IS NOT NULL
+
+    '

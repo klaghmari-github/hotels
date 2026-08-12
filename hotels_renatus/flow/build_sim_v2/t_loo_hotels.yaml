@@ -1,0 +1,8 @@
+t_loo_hotels:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - t_sales
+  script: "SELECT\n  HOTEL_CODE AS hotel_code,\n  ANY_VALUE(SOLUTION) AS solution\n\
+    FROM t_sales\nWHERE CAST(HOTEL_CODE AS VARCHAR) NOT IN ('H5586')\nGROUP BY HOTEL_CODE\n\
+    ORDER BY HOTEL_CODE"

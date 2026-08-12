@@ -1,0 +1,12 @@
+t_rank_fournisseur:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - t_rank_nature_by_fournisseur
+  script: "WITH t_group AS (\n    SELECT hotel_code, fournisseur, SUM(montant_marge)\
+    \ AS montant_marge,\n           COUNT(*) AS nombre_natures,\n           LIST(nature\
+    \ ORDER BY rang_nature) AS natures\n    FROM t_rank_nature_by_fournisseur\n  \
+    \  GROUP BY hotel_code, fournisseur\n)\nSELECT hotel_code, fournisseur, montant_marge,\
+    \ nombre_natures, natures,\n       ROW_NUMBER() OVER (PARTITION BY hotel_code\
+    \ ORDER BY montant_marge, fournisseur) AS rang_fournisseur\nFROM t_group\nORDER\
+    \ BY hotel_code, rang_fournisseur"

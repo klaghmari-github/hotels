@@ -1,0 +1,14 @@
+t_fournisseurs:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - t_sales
+  script: 'SELECT DISTINCT FOURNISSEUR
+
+    FROM t_sales
+
+    WHERE FOURNISSEUR IS NOT NULL
+
+    ORDER BY FOURNISSEUR
+
+    '

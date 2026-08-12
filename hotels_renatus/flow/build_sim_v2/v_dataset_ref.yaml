@@ -1,0 +1,16 @@
+v_dataset_ref:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_sales
+  - v_dataset_mix_nombre_global
+  script: "WITH hotel_baseline AS (\n  SELECT\n    HOTEL_CODE AS hotel_code,\n   \
+    \ ANY_VALUE(SOLUTION) AS solution,\n    MAX(METRES_LINEAIRES) AS metres_lineaires_observes,\n\
+    \    COUNT(DISTINCT NATURE_PRODUIT) AS nombre_natures_observees\n  FROM t_sales\n\
+    \  GROUP BY HOTEL_CODE\n)\nSELECT\n  b.hotel_code,\n  b.solution,\n  b.metres_lineaires_observes,\n\
+    \  b.nombre_natures_observees,\n  CASE\n    WHEN b.nombre_natures_observees =\
+    \ 0 THEN 0\n    ELSE b.metres_lineaires_observes / b.nombre_natures_observees\n\
+    \  END AS metres_lineaires_par_nature,\n  CASE\n    WHEN b.nombre_natures_observees\
+    \ = 0 THEN 0\n    ELSE\n      (b.metres_lineaires_observes / b.nombre_natures_observees)\n\
+    \      * COALESCE(m.nombre_natures, 0)\n  END AS metres_lineaires\nFROM hotel_baseline\
+    \ AS b\nLEFT JOIN v_dataset_mix_nombre_global AS m\n  USING (hotel_code)"

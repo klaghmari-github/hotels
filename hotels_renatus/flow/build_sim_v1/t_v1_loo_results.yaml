@@ -1,0 +1,16 @@
+t_v1_loo_results:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - t_v1_loo_hotels
+  script: "SELECT\n  CAST(NULL AS VARCHAR) AS hotel_code,\n  CAST(NULL AS VARCHAR)\
+    \ AS solution,\n  CAST(NULL AS DOUBLE) AS clients_hotel,\n  CAST(NULL AS DOUBLE)\
+    \ AS taux_acheteurs,\n  CAST(NULL AS DOUBLE) AS nb_acheteurs,\n  CAST(NULL AS\
+    \ DOUBLE) AS mix_steps,\n  CAST(NULL AS DOUBLE) AS mult_fb,\n  CAST(NULL AS DOUBLE)\
+    \ AS mult_nfb,\n  CAST(NULL AS VARCHAR) AS r4_mode,\n  CAST(NULL AS DOUBLE) AS\
+    \ r4_diff,\n  CAST(NULL AS DOUBLE) AS ca_fb_r4,\n  CAST(NULL AS DOUBLE) AS ca_nfb_r4,\n\
+    \  CAST(NULL AS DOUBLE) AS ca_ht_predit,\n  CAST(NULL AS DOUBLE) AS marge_produit_predite,\n\
+    \  CAST(NULL AS DOUBLE) AS ca_reel_mensuel,\n  CAST(NULL AS DOUBLE) AS marge_reelle_mensuelle,\n\
+    \  CAST(NULL AS DOUBLE) AS n_mois,\n  CAST(NULL AS DOUBLE) AS erreur_ca,\n  CAST(NULL\
+    \ AS DOUBLE) AS erreur_marge,\n  CAST(NULL AS DOUBLE) AS abs_erreur_ca,\n  CAST(NULL\
+    \ AS DOUBLE) AS abs_erreur_marge\nWHERE 1 = 0"

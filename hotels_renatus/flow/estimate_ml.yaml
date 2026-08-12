@@ -1,0 +1,9 @@
+estimate_ml:
+  type: zone
+  label: Estimate ML (row in → score)
+  objects:
+    df_estimate_input_ml: {}
+    v_estimate_ml_features: {}
+    x_estimate_ml_score: {}
+  workers: auto
+  renatus_mode: required_for_leaves

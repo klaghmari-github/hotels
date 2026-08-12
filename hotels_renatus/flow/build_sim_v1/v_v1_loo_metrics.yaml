@@ -1,0 +1,18 @@
+v_v1_loo_metrics:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_v1_loo_results
+  script: "SELECT\n  'ALL' AS perimetre,\n  COUNT(*) AS n_hotels,\n  AVG(abs_erreur_ca)\
+    \ AS mae_ca,\n  AVG(abs_erreur_marge) AS mae_marge,\n  AVG(\n    CASE\n      WHEN\
+    \ ca_reel_mensuel <> 0\n      THEN 100.0 * abs_erreur_ca / ABS(ca_reel_mensuel)\n\
+    \      ELSE NULL\n    END\n  ) AS mape_ca_pct,\n  AVG(\n    CASE\n      WHEN marge_reelle_mensuelle\
+    \ <> 0\n      THEN 100.0 * abs_erreur_marge / ABS(marge_reelle_mensuelle)\n  \
+    \    ELSE NULL\n    END\n  ) AS mape_marge_pct\nFROM t_v1_loo_results\nWHERE hotel_code\
+    \ IS NOT NULL\n\nUNION ALL\n\nSELECT\n  solution AS perimetre,\n  COUNT(*) AS\
+    \ n_hotels,\n  AVG(abs_erreur_ca) AS mae_ca,\n  AVG(abs_erreur_marge) AS mae_marge,\n\
+    \  AVG(\n    CASE\n      WHEN ca_reel_mensuel <> 0\n      THEN 100.0 * abs_erreur_ca\
+    \ / ABS(ca_reel_mensuel)\n      ELSE NULL\n    END\n  ) AS mape_ca_pct,\n  AVG(\n\
+    \    CASE\n      WHEN marge_reelle_mensuelle <> 0\n      THEN 100.0 * abs_erreur_marge\
+    \ / ABS(marge_reelle_mensuelle)\n      ELSE NULL\n    END\n  ) AS mape_marge_pct\n\
+    FROM t_v1_loo_results\nWHERE hotel_code IS NOT NULL\nGROUP BY solution"

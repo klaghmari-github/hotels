@@ -1,0 +1,40 @@
+v_dataset_mix_nombre_observed_long:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_sales_current
+  script: 'SELECT HOTEL_CODE AS hotel_code, ''categorie_'' || TRIM(BOTH ''_'' FROM
+    REGEXP_REPLACE(LOWER(CAST(CATEGORIE AS VARCHAR)), ''[^a-z0-9]+'', ''_'', ''g''))
+    || ''_nombre_natures'' AS metric_name, COUNT(DISTINCT NATURE_PRODUIT) AS metric_value
+    FROM v_sales_current WHERE CATEGORIE IS NOT NULL AND NATURE_PRODUIT IS NOT NULL
+    GROUP BY HOTEL_CODE, CATEGORIE
+
+    UNION ALL
+
+    SELECT HOTEL_CODE, ''gamme_'' || TRIM(BOTH ''_'' FROM REGEXP_REPLACE(LOWER(CAST(GAMME
+    AS VARCHAR)), ''[^a-z0-9]+'', ''_'', ''g'')) || ''_nombre_natures'', COUNT(DISTINCT
+    NATURE_PRODUIT) FROM v_sales_current WHERE GAMME IS NOT NULL AND NATURE_PRODUIT
+    IS NOT NULL GROUP BY HOTEL_CODE, GAMME
+
+    UNION ALL
+
+    SELECT HOTEL_CODE, ''type_'' || TRIM(BOTH ''_'' FROM REGEXP_REPLACE(LOWER(CAST(TYPE
+    AS VARCHAR)), ''[^a-z0-9]+'', ''_'', ''g'')) || ''_nombre_natures'', COUNT(DISTINCT
+    NATURE_PRODUIT) FROM v_sales_current WHERE TYPE IS NOT NULL AND NATURE_PRODUIT
+    IS NOT NULL GROUP BY HOTEL_CODE, TYPE
+
+    UNION ALL
+
+    SELECT HOTEL_CODE, ''marque_'' || TRIM(BOTH ''_'' FROM REGEXP_REPLACE(LOWER(CAST(MARQUE
+    AS VARCHAR)), ''[^a-z0-9]+'', ''_'', ''g'')) || ''_nombre_natures'', COUNT(DISTINCT
+    NATURE_PRODUIT) FROM v_sales_current WHERE MARQUE IS NOT NULL AND NATURE_PRODUIT
+    IS NOT NULL GROUP BY HOTEL_CODE, MARQUE
+
+    UNION ALL
+
+    SELECT HOTEL_CODE, ''fournisseur_'' || TRIM(BOTH ''_'' FROM REGEXP_REPLACE(LOWER(CAST(FOURNISSEUR
+    AS VARCHAR)), ''[^a-z0-9]+'', ''_'', ''g'')) || ''_nombre_natures'', COUNT(DISTINCT
+    NATURE_PRODUIT) FROM v_sales_current WHERE FOURNISSEUR IS NOT NULL AND NATURE_PRODUIT
+    IS NOT NULL GROUP BY HOTEL_CODE, FOURNISSEUR
+
+    '

@@ -1,0 +1,14 @@
+t_gammes:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - t_sales
+  script: 'SELECT DISTINCT GAMME
+
+    FROM t_sales
+
+    WHERE GAMME IS NOT NULL
+
+    ORDER BY GAMME
+
+    '

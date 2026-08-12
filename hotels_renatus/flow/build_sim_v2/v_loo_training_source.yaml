@@ -1,0 +1,12 @@
+v_loo_training_source:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_restitution_simulation_long
+  script: 'SELECT source.*
+
+    FROM v_restitution_simulation_long AS source
+
+    CROSS JOIN v_loo_step AS step
+
+    WHERE source.hotel_code <> step.hotel_code'

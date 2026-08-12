@@ -1,0 +1,4 @@
+df_pilot_defaults:
+  type: dataframe
+  requires: []
+  file: input/v1_pilot_defaults.xlsx

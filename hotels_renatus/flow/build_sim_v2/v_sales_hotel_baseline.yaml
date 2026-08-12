@@ -1,0 +1,11 @@
+v_sales_hotel_baseline:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_sales
+  script: "SELECT\n  HOTEL_CODE AS hotel_code,\n  DATE_DIFF('month', MIN(DATE), MAX(DATE))\
+    \ + 1 AS nombre_mois,\n  MAX(HOTEL_NB_CHAMBRES) * MAX(HOTEL_TO_ANNUEL) * MAX(HOTEL_GUESTS_PER_CHAMBRE)\
+    \ * 30.5 AS nombre_guests_par_mois,\n  MAX(HOTEL_NB_CHAMBRES) * MAX(HOTEL_TO_ANNUEL)\
+    \ * MAX(HOTEL_GUESTS_PER_CHAMBRE) * 30.5\n    * (DATE_DIFF('month', MIN(DATE),\
+    \ MAX(DATE)) + 1) AS nombre_guests,\n  SUM(QUANTITE) AS nombre_ventes\nFROM t_sales\n\
+    GROUP BY HOTEL_CODE\n"

@@ -1,0 +1,15 @@
+v_loo_metrics:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_loo_results
+  script: "SELECT\n  methode,\n  solution,\n  COUNT(*) AS nombre_hotels,\n  AVG(montant_ventes_erreur_absolue)\
+    \ AS montant_ventes_mae,\n  SQRT(AVG(POWER(montant_ventes_erreur, 2))) AS montant_ventes_rmse,\n\
+    \  AVG(montant_ventes_erreur_relative) AS montant_ventes_mape,\n  AVG(montant_ventes_erreur)\
+    \ AS montant_ventes_biais,\n  AVG(montant_marge_selon_coef_erreur_absolue) AS\
+    \ marge_selon_coef_mae,\n  SQRT(AVG(POWER(montant_marge_selon_coef_erreur, 2)))\
+    \ AS marge_selon_coef_rmse,\n  AVG(montant_marge_selon_coef_erreur_relative) AS\
+    \ marge_selon_coef_mape,\n  AVG(montant_marge_erreur_absolue) AS marge_mae,\n\
+    \  SQRT(AVG(POWER(montant_marge_erreur, 2))) AS marge_rmse,\n  AVG(montant_marge_erreur_relative)\
+    \ AS marge_mape\nFROM t_loo_results\nWHERE methode = 'sim_v2'\nGROUP BY GROUPING\
+    \ SETS ((methode, solution), (methode))"

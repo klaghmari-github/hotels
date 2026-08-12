@@ -1,0 +1,14 @@
+v_dataset_pivot:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_dataset_ref
+  - v_dataset_observation_par_mois
+  - v_dataset_mix_nombre
+  - v_dataset_mix_pourcentage
+  script: "SELECT\n  s.scenario_id,\n  s.scenario_removed_natures,\n  r.hotel_code,\n\
+    \  r.solution,\n  r.metres_lineaires,\n  o.* EXCLUDE (hotel_code),\n  mn.* EXCLUDE\
+    \ (hotel_code),\n  mp.* EXCLUDE (hotel_code, nombre_natures)\nFROM v_dataset_ref\
+    \ AS r\nCROSS JOIN v_scenario_step AS s\nLEFT JOIN v_dataset_observation_par_mois\
+    \ AS o USING (hotel_code)\nLEFT JOIN v_dataset_mix_nombre AS mn USING (hotel_code)\n\
+    LEFT JOIN v_dataset_mix_pourcentage AS mp USING (hotel_code)\n"

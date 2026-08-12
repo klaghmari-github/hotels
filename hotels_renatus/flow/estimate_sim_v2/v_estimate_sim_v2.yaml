@@ -1,0 +1,14 @@
+v_estimate_sim_v2:
+  type: view
+  mode: create_or_replace
+  label: estimate_sim_v2
+  requires:
+  - df_estimate_input_v2
+  - v_restitution_solution_coefficients
+  - v_solution_conversion_rate
+  script: "-- Stub estimate: joins hotel levers to trained coefficients.\n-- Full\
+    \ restitution formulas to be completed in migration phase B\n-- (map v_restitution_prediction_*\
+    \ onto estimate input).\nSELECT\n  i.*,\n  c.solution,\n  c.variable_family,\n\
+    \  c.variable_name,\n  c.montant_ventes_coefficient,\n  c.montant_marge_selon_coef_coefficient\n\
+    FROM df_estimate_input_v2 AS i\nCROSS JOIN v_restitution_solution_coefficients\
+    \ AS c\nLIMIT 100\n"

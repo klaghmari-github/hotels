@@ -1,0 +1,11 @@
+t_rank_nature_by_marque:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - t_sales
+  script: "WITH t_nature_marge AS (\n    SELECT HOTEL_CODE AS hotel_code, MARQUE AS\
+    \ marque, NATURE_PRODUIT AS nature, SUM(MARGE) AS montant_marge\n    FROM t_sales\n\
+    \    WHERE MARQUE IS NOT NULL AND NATURE_PRODUIT IS NOT NULL\n    GROUP BY HOTEL_CODE,\
+    \ MARQUE, NATURE_PRODUIT\n)\nSELECT hotel_code, marque, nature, montant_marge,\n\
+    \       ROW_NUMBER() OVER (PARTITION BY hotel_code, marque ORDER BY montant_marge,\
+    \ nature) AS rang_nature\nFROM t_nature_marge\nORDER BY hotel_code, marque, rang_nature"

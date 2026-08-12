@@ -1,0 +1,7 @@
+t_sales:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - df_sales
+  script: "SELECT\n    *\nFROM\n    df_sales\nWHERE\n    PRIX_TTC > 0\n    AND MARGE\
+    \ > 0\n    AND CAST(HOTEL_CODE AS VARCHAR) NOT IN ('H5586')"

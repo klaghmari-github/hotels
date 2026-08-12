@@ -1,0 +1,17 @@
+t_solution_reference:
+  type: table
+  mode: create_or_replace
+  requires:
+  - v_hotel_params
+  - t_pilot_defaults
+  script: "SELECT\n  p.solution,\n  AVG(p.nb_chambres) AS nb_chambres,\n  AVG(p.taux_occupation)\
+    \ AS to_rate,\n  AVG(p.guests_per_chambre) AS guests,\n  AVG(p.m_lin) AS m_lin,\n\
+    \  AVG(p.clients_mois) AS clients_mois,\n  AVG(p.mix_fb) AS mix_fb,\n  AVG(p.nb_ventes_mensuel)\
+    \ AS ventes,\n  AVG(p.ca_reel_mensuel) AS ca_total,\n  COUNT(DISTINCT p.hotel_code)\
+    \ AS nombre_hotels,\n  ANY_VALUE(d.ca_fb) AS ca_fb_pilote,\n  ANY_VALUE(d.ca_nfb)\
+    \ AS ca_nfb_pilote,\n  ANY_VALUE(d.ventes) AS ventes_pilote,\n  ANY_VALUE(d.clients_heb)\
+    \ AS clients_heb_pilote,\n  ANY_VALUE(d.mix_fb) AS mix_fb_pilote,\n  ANY_VALUE(d.ml_ref)\
+    \ AS ml_ref,\n  ANY_VALUE(d.frigo_ref) AS frigo_ref,\n  ANY_VALUE(d.coeff_fb)\
+    \ AS coeff_fb,\n  ANY_VALUE(d.coeff_nfb) AS coeff_nfb\nFROM v_hotel_params AS\
+    \ p\nINNER JOIN t_pilot_defaults AS d\n  ON d.solution = p.solution\nGROUP BY\
+    \ p.solution"

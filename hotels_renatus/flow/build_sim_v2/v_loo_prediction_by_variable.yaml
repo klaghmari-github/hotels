@@ -1,0 +1,17 @@
+v_loo_prediction_by_variable:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_loo_solution_coefficients
+  - v_loo_observed_row
+  - v_loo_input_mix
+  script: "SELECT\n  o.hotel_code,\n  o.solution,\n  c.variable_family,\n  c.variable_name,\n\
+    \  m.target_part,\n  c.montant_ventes_coefficient\n    * o.nombre_guests_par_mois\
+    \ * o.metres_lineaires * m.target_part\n      AS montant_ventes_par_mois_predit,\n\
+    \  c.montant_marge_selon_coef_coefficient\n    * o.nombre_guests_par_mois * o.metres_lineaires\
+    \ * m.target_part\n      AS montant_marge_selon_coef_par_mois_predite,\n  c.montant_marge_coefficient\n\
+    \    * o.nombre_guests_par_mois * o.metres_lineaires * m.target_part\n      AS\
+    \ montant_marge_par_mois_predite,\n  c.nombre_observations,\n  c.nombre_hotels\n\
+    FROM v_loo_observed_row AS o\nINNER JOIN v_loo_solution_coefficients AS c\n  ON\
+    \ c.solution = o.solution\nINNER JOIN v_loo_input_mix AS m\n  USING (variable_family,\
+    \ variable_name)"

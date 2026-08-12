@@ -1,0 +1,7 @@
+t_scope_hotels:
+  type: table
+  mode: create_or_replace
+  requires:
+  - t_hotel_params
+  script: "SELECT\n  hotel_code,\n  solution,\n  label,\n  hotel_name AS name\nFROM\
+    \ t_hotel_params\nORDER BY solution, hotel_code"

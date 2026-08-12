@@ -1,0 +1,10 @@
+t_pilot_concepts:
+  type: table
+  mode: create_or_replace
+  requires:
+  - df_pilot_concepts
+  script: "SELECT\n  CAST(hotel_code AS VARCHAR) AS hotel_code,\n  UPPER(TRIM(CAST(solution\
+    \ AS VARCHAR))) AS solution,\n  CAST(label AS VARCHAR) AS label,\n  CAST(name\
+    \ AS VARCHAR) AS name\nFROM df_pilot_concepts\nWHERE CAST(hotel_code AS VARCHAR)\
+    \ IN (\n  'H2075', 'HB6A3', 'H6188', 'HB5I0', 'H0373', 'H3546'\n)\n  AND CAST(hotel_code\
+    \ AS VARCHAR) NOT IN ('H5586')\nORDER BY solution, hotel_code"

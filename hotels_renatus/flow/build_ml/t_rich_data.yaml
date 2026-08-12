@@ -1,0 +1,16 @@
+t_rich_data:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - v_ml_training_dataset
+  - v_hotel_data_features
+  - v_hotel_proximity_features
+  - v_hotel_weather_features
+  - v_hotel_holidays_features
+  script: "SELECT\n  m.*,\n  hd.* EXCLUDE (hotel_code),\n  px.* EXCLUDE (hotel_code),\n\
+    \  wx.* EXCLUDE (hotel_code),\n  hol.* EXCLUDE (hotel_code)\nFROM v_ml_training_dataset\
+    \ AS m\nLEFT JOIN v_hotel_data_features AS hd\n  ON CAST(m.hotel_code AS VARCHAR)\
+    \ = hd.hotel_code\nLEFT JOIN v_hotel_proximity_features AS px\n  ON CAST(m.hotel_code\
+    \ AS VARCHAR) = px.hotel_code\nLEFT JOIN v_hotel_weather_features AS wx\n  ON\
+    \ CAST(m.hotel_code AS VARCHAR) = wx.hotel_code\nLEFT JOIN v_hotel_holidays_features\
+    \ AS hol\n  ON CAST(m.hotel_code AS VARCHAR) = hol.hotel_code"

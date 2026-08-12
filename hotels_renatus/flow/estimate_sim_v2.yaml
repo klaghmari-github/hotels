@@ -1,0 +1,8 @@
+estimate_sim_v2:
+  type: zone
+  label: Estimate sim_v2 (row in → prediction)
+  objects:
+    df_estimate_input_v2: {}
+    v_estimate_sim_v2: {}
+  workers: auto
+  renatus_mode: required_for_leaves

@@ -1,0 +1,6 @@
+v_restitution_input_mix:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_restitution_default_input_mix
+  script: SELECT * FROM v_restitution_default_input_mix

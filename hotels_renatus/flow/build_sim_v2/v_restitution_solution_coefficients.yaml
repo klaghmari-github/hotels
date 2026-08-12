@@ -1,0 +1,14 @@
+v_restitution_solution_coefficients:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_restitution_training_source
+  script: "SELECT\n  solution,\n  variable_family,\n  variable_name,\n  AVG(montant_ventes_coefficient)\
+    \ AS montant_ventes_coefficient,\n  AVG(montant_marge_selon_coef_coefficient)\
+    \ AS montant_marge_selon_coef_coefficient,\n  AVG(montant_marge_coefficient) AS\
+    \ montant_marge_coefficient,\n  COUNT(*) AS nombre_observations,\n  COUNT(DISTINCT\
+    \ hotel_code) AS nombre_hotels,\n  STDDEV_SAMP(montant_ventes_coefficient) AS\
+    \ montant_ventes_coefficient_stddev,\n  STDDEV_SAMP(montant_marge_selon_coef_coefficient)\
+    \ AS montant_marge_selon_coef_coefficient_stddev,\n  STDDEV_SAMP(montant_marge_coefficient)\
+    \ AS montant_marge_coefficient_stddev\nFROM v_restitution_training_source\nGROUP\
+    \ BY solution, variable_family, variable_name"

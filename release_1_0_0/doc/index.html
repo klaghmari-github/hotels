@@ -105,7 +105,22 @@ POST /api/predict/sim_v1|sim_v2|ml</pre>
         <li><strong>/eval</strong> — comparaison visuelle des LOO</li>
         <li><strong>/predict</strong> — formulaire hotel (champs modifiables) + boutons sim_v1 / sim_v2 / CatBoost</li>
         <li><strong>/hotels</strong> — liste pilotes et acces prediction</li>
+        <li><strong>User / Configuration</strong> — mix type &amp; gammes : si on monte ou baisse une part,
+          l’écart est réparti <strong>proportionnellement</strong> aux parts actuelles des autres
+          (pas à parts égales). Items verrouillés exclus. Voir
+          <code>doc/FEATURE_MIX_REDISTRIBUTION.md</code>.</li>
+        <li><strong>User / Optimisation</strong> — assortiment optimal (top produits par m_lin / marge)
+          puis CA ; mix reco pré-chargés et ré-éditables. Voir
+          <code>doc/FEATURE_OPTIMAL_MIX.md</code>.</li>
       </ul>
+    </section>
+
+    <section id="mix">
+      <h2>7.bis Mix — redistribution proportionnelle</h2>
+      <p>Exemple : A=50&nbsp;%, B=30&nbsp;%, C=20&nbsp;%. Si A passe à 60&nbsp;%, on retire 10&nbsp;% de B+C
+        au prorata 30:20 → B=24&nbsp;%, C=16&nbsp;%. Si A passe à 40&nbsp;%, on rend 10&nbsp;% au même
+        prorata → B=36&nbsp;%, C=24&nbsp;%.</p>
+      <p>Code : <code>MixPanel.setValue</code> (UI), <code>vary_one</code> (optimisation grid).</p>
     </section>
 
     <section id="usage">

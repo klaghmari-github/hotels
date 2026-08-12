@@ -1,0 +1,9 @@
+v_web_loo_metrics:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_loo_results
+  script: "SELECT\n  methode,\n  solution,\n  COUNT(*) AS n_hotels,\n  AVG(montant_ventes_erreur_absolue)\
+    \ AS mae_ca,\n  AVG(montant_marge_selon_coef_erreur_absolue) AS mae_marge\nFROM\
+    \ t_loo_results\nWHERE methode = 'sim_v2'\nGROUP BY GROUPING SETS ((methode, solution),\
+    \ (methode))"

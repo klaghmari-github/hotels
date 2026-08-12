@@ -1,0 +1,14 @@
+t_hotel_codes:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - t_sales
+  script: 'SELECT DISTINCT HOTEL_CODE
+
+    FROM t_sales
+
+    WHERE CAST(HOTEL_CODE AS VARCHAR) NOT IN (''H5586'')
+
+    ORDER BY HOTEL_CODE
+
+    '

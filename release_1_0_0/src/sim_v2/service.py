@@ -15,6 +15,10 @@ from src.pipeline.engine import ConnectionPipeline
 from src.pipeline.paths import Paths
 from src.sim_v2.loo import run_leave_one_out
 from src.sim_v2.modeling import run_modeling_simulation
+from src.sim_v2.optimal_mix import (
+    hotel_exposure_frame,
+    recommend_optimal_mix,
+)
 from src.sim_v2.restitution import normalized_mix_name, run_restitution
 from src.sim_v2.scenarios import ScenarioGenerator
 
@@ -133,6 +137,35 @@ class SimV2Service:
                 type_mix=type_mix,
                 gamme_mix=gamme_mix,
             )
+        finally:
+            cp.close()
+
+    def recommend_optimal_mix(
+        self,
+        *,
+        solution: str,
+        metres_lineaires: float,
+        allowed_types: list[str] | None = None,
+        allowed_gammes: list[str] | None = None,
+    ) -> dict[str, Any]:
+        """Top N produits par rang de marge + mix F&B/gammes pour m_lin cible."""
+        cp = self.open(rebuild=False)
+        try:
+            return recommend_optimal_mix(
+                cp,
+                solution=solution,
+                metres_lineaires=metres_lineaires,
+                allowed_types=allowed_types,
+                allowed_gammes=allowed_gammes,
+            )
+        finally:
+            cp.close()
+
+    def product_exposure(self) -> pd.DataFrame:
+        """Exposition produits / m_lin par hotel pilote."""
+        cp = self.open(rebuild=False)
+        try:
+            return hotel_exposure_frame(cp)
         finally:
             cp.close()
 

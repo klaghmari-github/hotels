@@ -1,0 +1,14 @@
+t_categories:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - t_sales
+  script: 'SELECT DISTINCT CATEGORIE
+
+    FROM t_sales
+
+    WHERE CATEGORIE IS NOT NULL
+
+    ORDER BY CATEGORIE
+
+    '

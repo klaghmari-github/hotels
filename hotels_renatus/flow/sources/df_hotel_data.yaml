@@ -1,0 +1,4 @@
+df_hotel_data:
+  type: dataframe
+  requires: []
+  file: input/hotel_data.xlsx

@@ -1,0 +1,4 @@
+df_sales:
+  type: dataframe
+  requires: []
+  file: input/hotel_sales_raw_extended_data.xlsx

@@ -1,0 +1,8 @@
+v_web_rich_data:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_rich_data
+  script: "SELECT\n  hotel_code,\n  solution,\n  is_observation,\n  hotel_nb_chambres,\n\
+    \  hotel_to_annuel,\n  hotel_guests_per_chambre,\n  metres_lineaires,\n  montant_ventes_par_mois,\n\
+    \  montant_marge_selon_coef_par_mois\nFROM t_rich_data"

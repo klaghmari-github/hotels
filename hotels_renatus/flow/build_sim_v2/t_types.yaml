@@ -1,0 +1,14 @@
+t_types:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - t_sales
+  script: 'SELECT DISTINCT TYPE
+
+    FROM t_sales
+
+    WHERE TYPE IS NOT NULL
+
+    ORDER BY TYPE
+
+    '

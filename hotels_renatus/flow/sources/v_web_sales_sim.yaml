@@ -1,0 +1,17 @@
+v_web_sales_sim:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_dataset_pivot
+  script: "SELECT\n  hotel_code,\n  solution,\n  scenario_id,\n  scenario_removed_natures,\n\
+    \  'simulation' AS row_kind,\n  LEN(scenario_removed_natures) AS n_natures_retirees,\n\
+    \  nombre_guests_par_mois,\n  metres_lineaires,\n  nombre_mois,\n  nombre_natures,\n\
+    \  nombre_categories,\n  nombre_gammes,\n  nombre_types,\n  nombre_marques,\n\
+    \  nombre_fournisseurs,\n  nombre_ventes_par_mois,\n  montant_ventes_par_mois,\n\
+    \  montant_marge_par_mois,\n  montant_marge_selon_coef_par_mois,\n  type_f_b_part_natures,\n\
+    \  type_non_f_b_part_natures,\n  gamme_alcool_part_natures,\n  gamme_sans_alcool_part_natures,\n\
+    \  gamme_food_salee_part_natures,\n  gamme_food_sucree_part_natures,\n  gamme_formule_part_natures,\n\
+    \  gamme_accessoires_part_natures,\n  gamme_sos_part_natures,\n  gamme_cosmetique_part_natures,\n\
+    \  gamme_pap_part_natures,\n  gamme_jeux_enfants_part_natures,\n  gamme_souvenirs_part_natures\n\
+    FROM t_dataset_pivot\nWHERE COALESCE(LEN(scenario_removed_natures), 0) > 0\nORDER\
+    \ BY hotel_code, scenario_id"

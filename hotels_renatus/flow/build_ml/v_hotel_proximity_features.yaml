@@ -1,0 +1,89 @@
+v_hotel_proximity_features:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_hotel_proximity_data
+  script: "SELECT\n  CAST(hotel_code AS VARCHAR) AS hotel_code,\n  TRY_CAST(commerce_convenience_100m\
+    \ AS DOUBLE) AS px_commerce_convenience_100m,\n  TRY_CAST(commerce_bakery_100m\
+    \ AS DOUBLE) AS px_commerce_bakery_100m,\n  TRY_CAST(commerce_supermarket_100m\
+    \ AS DOUBLE) AS px_commerce_supermarket_100m,\n  TRY_CAST(commerce_alcohol_100m\
+    \ AS DOUBLE) AS px_commerce_alcohol_100m,\n  TRY_CAST(commerce_confectionery_100m\
+    \ AS DOUBLE) AS px_commerce_confectionery_100m,\n  TRY_CAST(commerce_beverages_100m\
+    \ AS DOUBLE) AS px_commerce_beverages_100m,\n  TRY_CAST(commerce_grocery_100m\
+    \ AS DOUBLE) AS px_commerce_grocery_100m,\n  TRY_CAST(commerce_ice_cream_100m\
+    \ AS DOUBLE) AS px_commerce_ice_cream_100m,\n  TRY_CAST(commerce_fast_food_100m\
+    \ AS DOUBLE) AS px_commerce_fast_food_100m,\n  TRY_CAST(commerce_cosmetics_100m\
+    \ AS DOUBLE) AS px_commerce_cosmetics_100m,\n  TRY_CAST(commerce_gift_100m AS\
+    \ DOUBLE) AS px_commerce_gift_100m,\n  TRY_CAST(commerce_tobacco_100m AS DOUBLE)\
+    \ AS px_commerce_tobacco_100m,\n  TRY_CAST(commerce_kiosk_100m AS DOUBLE) AS px_commerce_kiosk_100m,\n\
+    \  TRY_CAST(commerce_pharmacy_100m AS DOUBLE) AS px_commerce_pharmacy_100m,\n\
+    \  TRY_CAST(commerce_chemist_100m AS DOUBLE) AS px_commerce_chemist_100m,\n  TRY_CAST(commerce_fb_100m\
+    \ AS DOUBLE) AS px_commerce_fb_100m,\n  TRY_CAST(commerce_non_fb_100m AS DOUBLE)\
+    \ AS px_commerce_non_fb_100m,\n  TRY_CAST(commerce_convenience_200m AS DOUBLE)\
+    \ AS px_commerce_convenience_200m,\n  TRY_CAST(commerce_bakery_200m AS DOUBLE)\
+    \ AS px_commerce_bakery_200m,\n  TRY_CAST(commerce_supermarket_200m AS DOUBLE)\
+    \ AS px_commerce_supermarket_200m,\n  TRY_CAST(commerce_alcohol_200m AS DOUBLE)\
+    \ AS px_commerce_alcohol_200m,\n  TRY_CAST(commerce_confectionery_200m AS DOUBLE)\
+    \ AS px_commerce_confectionery_200m,\n  TRY_CAST(commerce_beverages_200m AS DOUBLE)\
+    \ AS px_commerce_beverages_200m,\n  TRY_CAST(commerce_grocery_200m AS DOUBLE)\
+    \ AS px_commerce_grocery_200m,\n  TRY_CAST(commerce_ice_cream_200m AS DOUBLE)\
+    \ AS px_commerce_ice_cream_200m,\n  TRY_CAST(commerce_fast_food_200m AS DOUBLE)\
+    \ AS px_commerce_fast_food_200m,\n  TRY_CAST(commerce_cosmetics_200m AS DOUBLE)\
+    \ AS px_commerce_cosmetics_200m,\n  TRY_CAST(commerce_gift_200m AS DOUBLE) AS\
+    \ px_commerce_gift_200m,\n  TRY_CAST(commerce_tobacco_200m AS DOUBLE) AS px_commerce_tobacco_200m,\n\
+    \  TRY_CAST(commerce_kiosk_200m AS DOUBLE) AS px_commerce_kiosk_200m,\n  TRY_CAST(commerce_pharmacy_200m\
+    \ AS DOUBLE) AS px_commerce_pharmacy_200m,\n  TRY_CAST(commerce_chemist_200m AS\
+    \ DOUBLE) AS px_commerce_chemist_200m,\n  TRY_CAST(commerce_fb_200m AS DOUBLE)\
+    \ AS px_commerce_fb_200m,\n  TRY_CAST(commerce_non_fb_200m AS DOUBLE) AS px_commerce_non_fb_200m,\n\
+    \  TRY_CAST(commerce_convenience_300m AS DOUBLE) AS px_commerce_convenience_300m,\n\
+    \  TRY_CAST(commerce_bakery_300m AS DOUBLE) AS px_commerce_bakery_300m,\n  TRY_CAST(commerce_supermarket_300m\
+    \ AS DOUBLE) AS px_commerce_supermarket_300m,\n  TRY_CAST(commerce_alcohol_300m\
+    \ AS DOUBLE) AS px_commerce_alcohol_300m,\n  TRY_CAST(commerce_confectionery_300m\
+    \ AS DOUBLE) AS px_commerce_confectionery_300m,\n  TRY_CAST(commerce_beverages_300m\
+    \ AS DOUBLE) AS px_commerce_beverages_300m,\n  TRY_CAST(commerce_grocery_300m\
+    \ AS DOUBLE) AS px_commerce_grocery_300m,\n  TRY_CAST(commerce_ice_cream_300m\
+    \ AS DOUBLE) AS px_commerce_ice_cream_300m,\n  TRY_CAST(commerce_fast_food_300m\
+    \ AS DOUBLE) AS px_commerce_fast_food_300m,\n  TRY_CAST(commerce_cosmetics_300m\
+    \ AS DOUBLE) AS px_commerce_cosmetics_300m,\n  TRY_CAST(commerce_gift_300m AS\
+    \ DOUBLE) AS px_commerce_gift_300m,\n  TRY_CAST(commerce_tobacco_300m AS DOUBLE)\
+    \ AS px_commerce_tobacco_300m,\n  TRY_CAST(commerce_kiosk_300m AS DOUBLE) AS px_commerce_kiosk_300m,\n\
+    \  TRY_CAST(commerce_pharmacy_300m AS DOUBLE) AS px_commerce_pharmacy_300m,\n\
+    \  TRY_CAST(commerce_chemist_300m AS DOUBLE) AS px_commerce_chemist_300m,\n  TRY_CAST(commerce_fb_300m\
+    \ AS DOUBLE) AS px_commerce_fb_300m,\n  TRY_CAST(commerce_non_fb_300m AS DOUBLE)\
+    \ AS px_commerce_non_fb_300m,\n  TRY_CAST(commerce_convenience_400m AS DOUBLE)\
+    \ AS px_commerce_convenience_400m,\n  TRY_CAST(commerce_bakery_400m AS DOUBLE)\
+    \ AS px_commerce_bakery_400m,\n  TRY_CAST(commerce_supermarket_400m AS DOUBLE)\
+    \ AS px_commerce_supermarket_400m,\n  TRY_CAST(commerce_alcohol_400m AS DOUBLE)\
+    \ AS px_commerce_alcohol_400m,\n  TRY_CAST(commerce_confectionery_400m AS DOUBLE)\
+    \ AS px_commerce_confectionery_400m,\n  TRY_CAST(commerce_beverages_400m AS DOUBLE)\
+    \ AS px_commerce_beverages_400m,\n  TRY_CAST(commerce_grocery_400m AS DOUBLE)\
+    \ AS px_commerce_grocery_400m,\n  TRY_CAST(commerce_ice_cream_400m AS DOUBLE)\
+    \ AS px_commerce_ice_cream_400m,\n  TRY_CAST(commerce_fast_food_400m AS DOUBLE)\
+    \ AS px_commerce_fast_food_400m,\n  TRY_CAST(commerce_cosmetics_400m AS DOUBLE)\
+    \ AS px_commerce_cosmetics_400m,\n  TRY_CAST(commerce_gift_400m AS DOUBLE) AS\
+    \ px_commerce_gift_400m,\n  TRY_CAST(commerce_tobacco_400m AS DOUBLE) AS px_commerce_tobacco_400m,\n\
+    \  TRY_CAST(commerce_kiosk_400m AS DOUBLE) AS px_commerce_kiosk_400m,\n  TRY_CAST(commerce_pharmacy_400m\
+    \ AS DOUBLE) AS px_commerce_pharmacy_400m,\n  TRY_CAST(commerce_chemist_400m AS\
+    \ DOUBLE) AS px_commerce_chemist_400m,\n  TRY_CAST(commerce_fb_400m AS DOUBLE)\
+    \ AS px_commerce_fb_400m,\n  TRY_CAST(commerce_non_fb_400m AS DOUBLE) AS px_commerce_non_fb_400m,\n\
+    \  TRY_CAST(commerce_convenience_500m AS DOUBLE) AS px_commerce_convenience_500m,\n\
+    \  TRY_CAST(commerce_bakery_500m AS DOUBLE) AS px_commerce_bakery_500m,\n  TRY_CAST(commerce_supermarket_500m\
+    \ AS DOUBLE) AS px_commerce_supermarket_500m,\n  TRY_CAST(commerce_alcohol_500m\
+    \ AS DOUBLE) AS px_commerce_alcohol_500m,\n  TRY_CAST(commerce_confectionery_500m\
+    \ AS DOUBLE) AS px_commerce_confectionery_500m,\n  TRY_CAST(commerce_beverages_500m\
+    \ AS DOUBLE) AS px_commerce_beverages_500m,\n  TRY_CAST(commerce_grocery_500m\
+    \ AS DOUBLE) AS px_commerce_grocery_500m,\n  TRY_CAST(commerce_ice_cream_500m\
+    \ AS DOUBLE) AS px_commerce_ice_cream_500m,\n  TRY_CAST(commerce_fast_food_500m\
+    \ AS DOUBLE) AS px_commerce_fast_food_500m,\n  TRY_CAST(commerce_cosmetics_500m\
+    \ AS DOUBLE) AS px_commerce_cosmetics_500m,\n  TRY_CAST(commerce_gift_500m AS\
+    \ DOUBLE) AS px_commerce_gift_500m,\n  TRY_CAST(commerce_tobacco_500m AS DOUBLE)\
+    \ AS px_commerce_tobacco_500m,\n  TRY_CAST(commerce_kiosk_500m AS DOUBLE) AS px_commerce_kiosk_500m,\n\
+    \  TRY_CAST(commerce_pharmacy_500m AS DOUBLE) AS px_commerce_pharmacy_500m,\n\
+    \  TRY_CAST(commerce_chemist_500m AS DOUBLE) AS px_commerce_chemist_500m,\n  TRY_CAST(commerce_fb_500m\
+    \ AS DOUBLE) AS px_commerce_fb_500m,\n  TRY_CAST(commerce_non_fb_500m AS DOUBLE)\
+    \ AS px_commerce_non_fb_500m,\n  TRY_CAST(plage_1km AS DOUBLE) AS px_plage_1km,\n\
+    \  TRY_CAST(plage_2km AS DOUBLE) AS px_plage_2km,\n  TRY_CAST(plage_3km AS DOUBLE)\
+    \ AS px_plage_3km,\n  TRY_CAST(plage_4km AS DOUBLE) AS px_plage_4km,\n  TRY_CAST(plage_5km\
+    \ AS DOUBLE) AS px_plage_5km,\n  TRY_CAST(plage_distance_km AS DOUBLE) AS px_plage_distance_km,\n\
+    \  TRY_CAST(proximity_ok AS DOUBLE) AS px_proximity_ok\nFROM t_hotel_proximity_data\n\
+    WHERE hotel_code IS NOT NULL"

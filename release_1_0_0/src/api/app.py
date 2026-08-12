@@ -1516,15 +1516,57 @@ def create_api_app(paths: Paths | None = None) -> Flask:
             }
         )
 
+    @app.post("/api/user/recommend_mix")
+    def user_recommend_mix():
+        """
+        Assortiment optimal : densite produits/m_lin × top N par rang de marge.
+        Ne calcule pas le CA (voir /api/user/optimize method=product_rank).
+        """
+        body = request.get_json(force=True) or {}
+        solution = str(body.get("solution") or "SIMPLY").strip().upper()
+        m_lin = float(body.get("metres_lineaires") or 6)
+        allowed_types = body.get("allowed_types")
+        allowed_gammes = body.get("allowed_gammes")
+        try:
+            out = sim_v2.recommend_optimal_mix(
+                solution=solution,
+                metres_lineaires=m_lin,
+                allowed_types=allowed_types,
+                allowed_gammes=allowed_gammes,
+            )
+            return jsonify(out)
+        except Exception as exc:  # noqa: BLE001
+            return jsonify({"ok": False, "error": str(exc)}), 400
+
+    @app.get("/api/user/product_exposure")
+    def user_product_exposure():
+        """nombre_produits_distincts et produits_par_m_lin par hotel pilote."""
+        try:
+            df = sim_v2.product_exposure()
+            return jsonify(
+                {
+                    "ok": True,
+                    "rows": _clean_records(df),
+                }
+            )
+        except Exception as exc:  # noqa: BLE001
+            return jsonify({"ok": False, "error": str(exc)}), 400
+
     @app.post("/api/user/optimize")
     def user_optimize():
         """
-        Optimisation mix : balayage 10 % type + gammes F&B / Non F&B.
-        Retourne le meilleur CA (sim_v1 / sim_v2 / ml × solutions) + reco.
+        Optimisation mix.
+
+        method=product_rank (defaut) : top produits par marge / m_lin puis CA.
+        method=grid : balayage 10 % type + gammes (historique).
         """
-        from src.user.optimize import run_mix_optimization
+        from src.user.optimize import (
+            run_mix_optimization,
+            run_product_rank_optimization,
+        )
 
         body = request.get_json(force=True) or {}
+        method = str(body.get("method") or "product_rank").strip().lower()
         hotel_code = str(body.get("hotel_code") or "").strip()
         nb = float(body.get("hotel_nb_chambres") or 100)
         to = float(body.get("hotel_to_annuel") or 0.7)
@@ -1572,19 +1614,34 @@ def create_api_app(paths: Paths | None = None) -> Flask:
             return rows
 
         try:
-            out = run_mix_optimization(
-                hotel_nb_chambres=nb,
-                hotel_to_annuel=to,
-                hotel_guests_per_chambre=guests,
-                metres_lineaires=m_lin,
-                type_mix=type_mix,
-                gamme_mix_fb=gamme_mix_fb,
-                gamme_mix_nfb=gamme_mix_nfb,
-                hotel_code=hotel_code or None,
-                solutions=solutions,
-                evaluate_fn=evaluate_fn,
-                step=step,
-            )
+            if method == "grid":
+                out = run_mix_optimization(
+                    hotel_nb_chambres=nb,
+                    hotel_to_annuel=to,
+                    hotel_guests_per_chambre=guests,
+                    metres_lineaires=m_lin,
+                    type_mix=type_mix,
+                    gamme_mix_fb=gamme_mix_fb,
+                    gamme_mix_nfb=gamme_mix_nfb,
+                    hotel_code=hotel_code or None,
+                    solutions=solutions,
+                    evaluate_fn=evaluate_fn,
+                    step=step,
+                )
+            else:
+                out = run_product_rank_optimization(
+                    hotel_nb_chambres=nb,
+                    hotel_to_annuel=to,
+                    hotel_guests_per_chambre=guests,
+                    metres_lineaires=m_lin,
+                    type_mix=type_mix,
+                    gamme_mix_fb=gamme_mix_fb,
+                    gamme_mix_nfb=gamme_mix_nfb,
+                    hotel_code=hotel_code or None,
+                    solutions=[s.upper() for s in solutions],
+                    evaluate_fn=evaluate_fn,
+                    recommend_fn=lambda **kw: sim_v2.recommend_optimal_mix(**kw),
+                )
             return jsonify(out)
         except Exception as exc:  # noqa: BLE001
             return jsonify({"ok": False, "error": str(exc)}), 400

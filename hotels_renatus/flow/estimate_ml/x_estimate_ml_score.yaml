@@ -1,0 +1,12 @@
+x_estimate_ml_score:
+  type: execute_python
+  label: estimate_ml_score
+  requires:
+  - v_estimate_ml_features
+  script: '# Placeholder: load SuperModel / XGB and write predictions table.
+
+    # Phase C of migration — keep SQL features pure until model wiring.
+
+    print("estimate_ml: model scoring not wired yet (phase C)")
+
+    '

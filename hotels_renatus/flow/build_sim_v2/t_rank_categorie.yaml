@@ -1,0 +1,11 @@
+t_rank_categorie:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - t_rank_nature_by_categorie
+  script: "WITH t_group AS (\n    SELECT hotel_code, categorie, SUM(montant_marge)\
+    \ AS montant_marge,\n           COUNT(*) AS nombre_natures,\n           LIST(nature\
+    \ ORDER BY rang_nature) AS natures\n    FROM t_rank_nature_by_categorie\n    GROUP\
+    \ BY hotel_code, categorie\n)\nSELECT hotel_code, categorie, montant_marge, nombre_natures,\
+    \ natures,\n       ROW_NUMBER() OVER (PARTITION BY hotel_code ORDER BY montant_marge,\
+    \ categorie) AS rang_categorie\nFROM t_group\nORDER BY hotel_code, rang_categorie"

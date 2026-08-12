@@ -1,0 +1,10 @@
+v_restitution_default_input_mix:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_restitution_solution_coefficients
+  script: "WITH variables AS (\n  SELECT DISTINCT variable_family, variable_name\n\
+    \  FROM v_restitution_solution_coefficients\n), counts AS (\n  SELECT variable_family,\
+    \ COUNT(*) AS variable_count\n  FROM variables\n  GROUP BY variable_family\n)\n\
+    SELECT\n  v.variable_family,\n  v.variable_name,\n  1.0 / c.variable_count AS\
+    \ target_part\nFROM variables AS v\nINNER JOIN counts AS c USING (variable_family)"

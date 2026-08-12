@@ -1,0 +1,22 @@
+v_v1_r1_buyers:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_v1_hotel_input
+  - v_solution_reference_loo
+  script: "SELECT\n  h.hotel_code,\n  h.solution,\n  h.clients_mois AS clients_hotel,\n\
+    \  r.ventes_ref AS ventes_pilote,\n  r.clients_ref AS clients_pilote,\n  r.ca_fb_ref\
+    \ AS ca_fb_pilote,\n  r.ca_nfb_ref AS ca_nfb_pilote,\n  CASE\n    WHEN r.clients_ref\
+    \ > 0 THEN r.ventes_ref / r.clients_ref\n    ELSE 0.0\n  END AS taux_acheteurs,\n\
+    \  CASE\n    WHEN r.clients_ref > 0\n    THEN h.clients_mois * (r.ventes_ref /\
+    \ r.clients_ref)\n    ELSE 0.0\n  END AS nb_acheteurs,\n  CASE\n    WHEN r.ventes_ref\
+    \ > 0 AND r.clients_ref > 0\n    THEN (r.ca_fb_ref / r.ventes_ref)\n      * (h.clients_mois\
+    \ * (r.ventes_ref / r.clients_ref))\n    ELSE 0.0\n  END AS ca_fb_r1,\n  CASE\n\
+    \    WHEN r.ventes_ref > 0 AND r.clients_ref > 0\n    THEN (r.ca_nfb_ref / r.ventes_ref)\n\
+    \      * (h.clients_mois * (r.ventes_ref / r.clients_ref))\n    ELSE 0.0\n  END\
+    \ AS ca_nfb_r1,\n  r.mix_fb_ref,\n  h.mix_fb AS mix_fb_hotel,\n  h.m_lin AS m_lin_hotel,\n\
+    \  h.nb_frigos_froid,\n  r.ml_ref,\n  r.frigo_ref,\n  r.ca_10_fb,\n  r.ca_10_nfb,\n\
+    \  r.ca_1ml_fb,\n  r.ca_1ml_nfb,\n  r.ca_1frigo_fb,\n  r.ca_1frigo_nfb,\n  r.coeff_fb,\n\
+    \  r.coeff_nfb,\n  h.ca_reel_mensuel,\n  h.marge_reelle_mensuelle,\n  h.n_mois\n\
+    FROM v_v1_hotel_input AS h\nINNER JOIN v_solution_reference_loo AS r\n  ON r.loo_hotel_code\
+    \ = h.hotel_code\n AND r.solution = h.solution"

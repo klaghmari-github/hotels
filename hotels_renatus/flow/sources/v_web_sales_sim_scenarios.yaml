@@ -1,0 +1,7 @@
+v_web_sales_sim_scenarios:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_scenarios
+  script: "SELECT\n  scenario_id,\n  scenario_removed_natures,\n  LEN(scenario_removed_natures)\
+    \ AS n_natures_retirees\nFROM t_scenarios\nORDER BY scenario_id"

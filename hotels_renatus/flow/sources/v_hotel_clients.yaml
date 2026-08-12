@@ -1,0 +1,8 @@
+v_hotel_clients:
+  type: view
+  mode: create_if_not_exists
+  requires:
+  - t_hotel_clients
+  script: "SELECT\n  hotel_code,\n  hotel_name,\n  hotel_nb_chambres,\n  hotel_to_annuel,\n\
+    \  hotel_guests_per_chambre,\n  hotel_nb_chambres * hotel_to_annuel * hotel_guests_per_chambre\
+    \ * 365.25 / 12.0 AS hotel_clients_mensuel\nFROM t_hotel_clients"

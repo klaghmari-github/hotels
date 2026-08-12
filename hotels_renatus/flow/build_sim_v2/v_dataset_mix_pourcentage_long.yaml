@@ -1,0 +1,10 @@
+v_dataset_mix_pourcentage_long:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_dataset_mix_nombre_long
+  - v_dataset_mix_nombre_global
+  script: "SELECT\n  l.hotel_code,\n  REGEXP_REPLACE(l.metric_name, '_nombre_natures$',\
+    \ '_part_natures') AS metric_name,\n  CASE WHEN g.nombre_natures = 0 THEN 0 ELSE\
+    \ l.metric_value / g.nombre_natures END AS metric_value\nFROM v_dataset_mix_nombre_long\
+    \ AS l\nINNER JOIN v_dataset_mix_nombre_global AS g USING (hotel_code)\n"

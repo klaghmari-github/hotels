@@ -1,0 +1,10 @@
+v_v1_marge_produit:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_v1_r4_surface
+  script: "SELECT\n  r4.*,\n  r4.ca_fb_r4 + r4.ca_nfb_r4 AS ca_ht_predit,\n  CASE\n\
+    \    WHEN r4.coeff_fb > 0\n    THEN r4.ca_fb_r4 - (r4.ca_fb_r4 / r4.coeff_fb)\n\
+    \    ELSE 0.0\n  END\n  + CASE\n    WHEN r4.coeff_nfb > 0\n    THEN r4.ca_nfb_r4\
+    \ - (r4.ca_nfb_r4 / r4.coeff_nfb)\n    ELSE 0.0\n  END AS marge_produit_predite\n\
+    FROM v_v1_r4_surface AS r4"

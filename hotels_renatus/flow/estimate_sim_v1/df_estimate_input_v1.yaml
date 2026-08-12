@@ -1,0 +1,6 @@
+df_estimate_input_v1:
+  type: dataframe
+  label: estimate_input_v1
+  name: df_estimate_input_v1
+  file: input_estimate/estimate_input_v1.xlsx
+  mode: create_or_replace

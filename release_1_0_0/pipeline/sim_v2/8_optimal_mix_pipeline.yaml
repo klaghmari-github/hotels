@@ -1,0 +1,128 @@
+# Assortiment optimal par m_lin : densite produits, rangs marge, mix F&B / gammes
+# Derive de t_sales (NOM_PRODUIT, MARGE_SELON_COEF) + m_lin hotel.
+
+# Exposition produit par hotel (base pour densite produits / m_lin)
+v_hotel_product_exposure:
+  type: view
+  mode: create_or_replace
+  requires:
+    - t_sales
+    - t_hotel_params
+  sql: |-
+    WITH sales_stats AS (
+      SELECT
+        CAST(HOTEL_CODE AS VARCHAR) AS hotel_code,
+        COUNT(DISTINCT NOM_PRODUIT) AS nombre_produits_distincts,
+        SUM(COALESCE(MARGE_SELON_COEF, MARGE, 0.0)) AS marge_totale,
+        SUM(COALESCE(PRIX_HT, 0.0)) AS ca_ht_total
+      FROM t_sales
+      WHERE NOM_PRODUIT IS NOT NULL
+        AND TRIM(CAST(NOM_PRODUIT AS VARCHAR)) <> ''
+      GROUP BY 1
+    )
+    SELECT
+      p.hotel_code,
+      p.solution,
+      p.m_lin AS metres_lineaires,
+      s.nombre_produits_distincts,
+      s.marge_totale,
+      s.ca_ht_total,
+      CASE
+        WHEN p.m_lin > 0
+        THEN s.nombre_produits_distincts::DOUBLE / p.m_lin
+        ELSE NULL
+      END AS produits_par_m_lin
+    FROM t_hotel_params AS p
+    INNER JOIN sales_stats AS s
+      ON s.hotel_code = p.hotel_code
+
+# Densite moyenne produits / m_lin par solution
+v_solution_produits_par_m_lin:
+  type: view
+  mode: create_or_replace
+  requires:
+    - v_hotel_product_exposure
+  sql: |-
+    SELECT
+      solution,
+      AVG(produits_par_m_lin) AS produits_par_m_lin,
+      AVG(nombre_produits_distincts) AS nombre_produits_distincts_moyen,
+      AVG(metres_lineaires) AS metres_lineaires_moyen,
+      COUNT(*) AS nombre_hotels
+    FROM v_hotel_product_exposure
+    WHERE produits_par_m_lin IS NOT NULL
+      AND produits_par_m_lin > 0
+    GROUP BY solution
+
+# Marge mensuelle approx. par produit et hotel (total / n_mois hotel)
+v_product_margin_by_hotel:
+  type: view
+  mode: create_or_replace
+  requires:
+    - t_sales
+    - t_hotel_params
+  sql: |-
+    WITH span AS (
+      SELECT
+        CAST(HOTEL_CODE AS VARCHAR) AS hotel_code,
+        GREATEST(
+          DATE_DIFF('month', MIN(DATE), MAX(DATE)) + 1,
+          1
+        ) AS n_mois
+      FROM t_sales
+      GROUP BY 1
+    ),
+    agg AS (
+      SELECT
+        CAST(s.HOTEL_CODE AS VARCHAR) AS hotel_code,
+        CAST(s.NOM_PRODUIT AS VARCHAR) AS nom_produit,
+        ANY_VALUE(CAST(s.TYPE AS VARCHAR)) AS type_produit,
+        ANY_VALUE(CAST(s.GAMME AS VARCHAR)) AS gamme,
+        SUM(COALESCE(s.MARGE_SELON_COEF, s.MARGE, 0.0)) AS marge_totale,
+        SUM(COALESCE(s.PRIX_HT, 0.0)) AS ca_ht_total,
+        COUNT(*) AS n_lignes
+      FROM t_sales AS s
+      WHERE s.NOM_PRODUIT IS NOT NULL
+        AND TRIM(CAST(s.NOM_PRODUIT AS VARCHAR)) <> ''
+      GROUP BY 1, 2
+    )
+    SELECT
+      a.hotel_code,
+      p.solution,
+      a.nom_produit,
+      a.type_produit,
+      a.gamme,
+      a.marge_totale,
+      a.ca_ht_total,
+      a.n_lignes,
+      sp.n_mois,
+      a.marge_totale / sp.n_mois AS marge_par_mois,
+      a.ca_ht_total / sp.n_mois AS ca_ht_par_mois,
+      RANK() OVER (
+        PARTITION BY a.hotel_code
+        ORDER BY a.marge_totale DESC, a.nom_produit
+      ) AS rang_marge
+    FROM agg AS a
+    INNER JOIN t_hotel_params AS p
+      ON p.hotel_code = a.hotel_code
+    INNER JOIN span AS sp
+      ON sp.hotel_code = a.hotel_code
+
+# Rang moyen d'un produit au sein d'une solution (hotels sans produit ignores)
+v_product_mean_rank_by_solution:
+  type: view
+  mode: create_or_replace
+  requires:
+    - v_product_margin_by_hotel
+  sql: |-
+    SELECT
+      solution,
+      nom_produit,
+      ANY_VALUE(type_produit) AS type_produit,
+      ANY_VALUE(gamme) AS gamme,
+      AVG(rang_marge::DOUBLE) AS rang_moyen,
+      COUNT(DISTINCT hotel_code) AS nombre_hotels_rang,
+      SUM(marge_par_mois) AS marge_par_mois_sum,
+      AVG(marge_par_mois) AS marge_par_mois_moyenne
+    FROM v_product_margin_by_hotel
+    GROUP BY solution, nom_produit

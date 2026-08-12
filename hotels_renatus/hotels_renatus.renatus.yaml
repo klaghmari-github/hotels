@@ -1,0 +1,3 @@
+db_path: /media/laghmari/ssd-data/dev/hotels/hotels_renatus/data/main.duckdb
+flow_path: /media/laghmari/ssd-data/dev/hotels/hotels_renatus/flow
+name: hotels_renatus

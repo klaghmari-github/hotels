@@ -1,0 +1,10 @@
+v_solution_conversion_rate:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_dataset_pivot
+  script: "SELECT\n  solution,\n  AVG(nombre_ventes_par_mois / NULLIF(nombre_guests_par_mois,\
+    \ 0)) AS taux_conversion_moyen,\n  SUM(nombre_ventes_par_mois) / NULLIF(SUM(nombre_guests_par_mois),\
+    \ 0) AS taux_conversion_pondere,\n  COUNT(DISTINCT hotel_code) AS nombre_hotels\n\
+    FROM t_dataset_pivot\nWHERE COALESCE(LEN(scenario_removed_natures), 0) = 0\nGROUP\
+    \ BY solution"

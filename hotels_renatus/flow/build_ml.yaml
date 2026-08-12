@@ -1,0 +1,14 @@
+build_ml:
+  type: zone
+  label: Build ML (rich + training)
+  objects:
+    t_rich_data: {}
+    v_hotel_data_features: {}
+    v_hotel_holidays_features: {}
+    v_hotel_proximity_features: {}
+    v_hotel_weather_features: {}
+    v_ml_hotel_context: {}
+    v_ml_training_dataset: {}
+    v_web_rich_data: {}
+  workers: auto
+  renatus_mode: required_for_leaves

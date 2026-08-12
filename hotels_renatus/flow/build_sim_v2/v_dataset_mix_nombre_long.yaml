@@ -1,0 +1,11 @@
+v_dataset_mix_nombre_long:
+  type: view
+  mode: create_or_replace
+  requires:
+  - t_hotel_codes
+  - v_dataset_mix_metric_names
+  - v_dataset_mix_nombre_observed_long
+  script: "SELECT h.HOTEL_CODE AS hotel_code, m.metric_name, COALESCE(o.metric_value,\
+    \ 0) AS metric_value\nFROM t_hotel_codes AS h\nCROSS JOIN v_dataset_mix_metric_names\
+    \ AS m\nLEFT JOIN v_dataset_mix_nombre_observed_long AS o\n  ON o.hotel_code =\
+    \ h.HOTEL_CODE AND o.metric_name = m.metric_name\n"

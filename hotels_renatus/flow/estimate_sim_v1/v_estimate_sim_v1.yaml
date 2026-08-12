@@ -1,0 +1,51 @@
+v_estimate_sim_v1:
+  type: view
+  mode: create_or_replace
+  label: estimate_sim_v1
+  requires:
+  - v_estimate_hotel_levers
+  - t_pilot_defaults
+  script: "-- Estimate R1-R4 from pilot defaults (Excel rules) + one input row.\n\
+    -- Full chain inlined for single-shot estimate without LOO step_view.\nWITH h\
+    \ AS (\n  SELECT * FROM v_estimate_hotel_levers\n),\nd AS (\n  SELECT * FROM t_pilot_defaults\n\
+    ),\nj AS (\n  SELECT\n    h.*,\n    d.ventes AS ventes_ref,\n    d.clients_heb\
+    \ AS clients_ref,\n    d.ca_fb AS ca_fb_ref,\n    d.ca_nfb AS ca_nfb_ref,\n  \
+    \  d.mix_fb AS mix_fb_ref,\n    d.ml_ref,\n    d.frigo_ref,\n    d.ca_10_fb,\n\
+    \    d.ca_10_nfb,\n    d.ca_1ml_fb,\n    d.ca_1ml_nfb,\n    d.ca_1frigo_fb,\n\
+    \    d.ca_1frigo_nfb,\n    d.coeff_fb,\n    d.coeff_nfb,\n    CASE WHEN d.clients_heb\
+    \ > 0 THEN d.ventes / d.clients_heb ELSE 0.0 END AS taux_acheteurs,\n    CASE\n\
+    \      WHEN d.clients_heb > 0\n      THEN h.clients_mois * (d.ventes / d.clients_heb)\n\
+    \      ELSE 0.0\n    END AS nb_acheteurs\n  FROM h\n  INNER JOIN d ON d.solution\
+    \ = h.solution\n),\nr1 AS (\n  SELECT\n    j.*,\n    CASE\n      WHEN j.ventes_ref\
+    \ > 0 AND j.clients_ref > 0\n      THEN (j.ca_fb_ref / j.ventes_ref) * j.nb_acheteurs\n\
+    \      ELSE 0.0\n    END AS ca_fb_r1,\n    CASE\n      WHEN j.ventes_ref > 0 AND\
+    \ j.clients_ref > 0\n      THEN (j.ca_nfb_ref / j.ventes_ref) * j.nb_acheteurs\n\
+    \      ELSE 0.0\n    END AS ca_nfb_r1,\n    (COALESCE(j.mix_fb, j.mix_fb_ref)\
+    \ - j.mix_fb_ref) * 10.0 AS mix_steps\n  FROM j\n),\nr2 AS (\n  SELECT\n    r1.*,\n\
+    \    r1.ca_fb_r1 + r1.ca_10_fb * r1.mix_steps AS ca_fb_r2,\n    r1.ca_nfb_r1 +\
+    \ r1.ca_10_nfb * (-r1.mix_steps) AS ca_nfb_r2\n  FROM r1\n),\nr3 AS (\n  SELECT\n\
+    \    r2.*,\n    r2.ca_fb_r2 * CASE WHEN r2.ca_fb_r2 < 0 THEN 0.52 ELSE 1.48 END\
+    \ AS ca_fb_r3,\n    r2.ca_nfb_r2 * CASE WHEN r2.ca_nfb_r2 < 0 THEN 0.67 ELSE 1.33\
+    \ END AS ca_nfb_r3\n  FROM r2\n),\nr4 AS (\n  SELECT\n    r3.*,\n    CASE\n  \
+    \    WHEN r3.solution = 'CONNECTED' AND r3.frigo_ref IS NOT NULL\n      THEN r3.nb_frigos_froid\
+    \ - r3.frigo_ref\n      ELSE r3.metres_lineaires - r3.ml_ref\n    END AS r4_diff,\n\
+    \    CASE\n      WHEN r3.solution = 'CONNECTED' AND r3.frigo_ref IS NOT NULL\n\
+    \      THEN r3.ca_fb_r3\n        + SIGN(r3.nb_frigos_froid - r3.frigo_ref)\n \
+    \         * COALESCE(r3.ca_1frigo_fb, r3.ca_fb_ref / 3.0)\n          * ABS(r3.nb_frigos_froid\
+    \ - r3.frigo_ref)\n      ELSE r3.ca_fb_r3\n        + SIGN(r3.metres_lineaires\
+    \ - r3.ml_ref)\n          * r3.ca_1ml_fb\n          * ABS(r3.metres_lineaires\
+    \ - r3.ml_ref)\n    END AS ca_fb_r4,\n    CASE\n      WHEN r3.solution = 'CONNECTED'\
+    \ AND r3.frigo_ref IS NOT NULL\n      THEN r3.ca_nfb_r3\n        + SIGN(r3.nb_frigos_froid\
+    \ - r3.frigo_ref)\n          * COALESCE(r3.ca_1frigo_nfb, r3.ca_nfb_ref / 3.0)\n\
+    \          * ABS(r3.nb_frigos_froid - r3.frigo_ref)\n      ELSE r3.ca_nfb_r3\n\
+    \        + SIGN(r3.metres_lineaires - r3.ml_ref)\n          * r3.ca_1ml_nfb\n\
+    \          * ABS(r3.metres_lineaires - r3.ml_ref)\n    END AS ca_nfb_r4\n  FROM\
+    \ r3\n)\nSELECT\n  hotel_code,\n  solution,\n  clients_mois,\n  taux_acheteurs,\n\
+    \  nb_acheteurs,\n  mix_steps,\n  r4_diff,\n  ca_fb_r4,\n  ca_nfb_r4,\n  ca_fb_r4\
+    \ + ca_nfb_r4 AS ca_ht_predit,\n  CASE WHEN coeff_fb > 0 THEN ca_fb_r4 - (ca_fb_r4\
+    \ / coeff_fb) ELSE 0.0 END\n    + CASE WHEN coeff_nfb > 0 THEN ca_nfb_r4 - (ca_nfb_r4\
+    \ / coeff_nfb) ELSE 0.0 END\n    AS marge_produit_predite,\n  GREATEST(ca_fb_r4\
+    \ + ca_nfb_r4, 0.0) AS montant_ventes_par_mois,\n  GREATEST(\n    CASE WHEN coeff_fb\
+    \ > 0 THEN ca_fb_r4 - (ca_fb_r4 / coeff_fb) ELSE 0.0 END\n    + CASE WHEN coeff_nfb\
+    \ > 0 THEN ca_nfb_r4 - (ca_nfb_r4 / coeff_nfb) ELSE 0.0 END,\n    0.0\n  ) AS\
+    \ montant_marge_par_mois\nFROM r4\n"

@@ -1,0 +1,6 @@
+t_loo_results:
+  type: table
+  mode: create_if_not_exists
+  requires:
+  - v_loo_result
+  script: SELECT * FROM v_loo_result LIMIT 0

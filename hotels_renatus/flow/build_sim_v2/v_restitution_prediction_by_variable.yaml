@@ -1,0 +1,20 @@
+v_restitution_prediction_by_variable:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_restitution_solution_coefficients
+  - v_restitution_input_hotel
+  - v_restitution_input_mix
+  script: "WITH hotel AS (\n  SELECT *,\n    hotel_nb_chambres * hotel_to_annuel *\
+    \ hotel_guests_per_chambre * 30.5\n      AS nombre_guests_par_mois\n  FROM v_restitution_input_hotel\n\
+    )\nSELECT\n  c.solution,\n  c.variable_family,\n  c.variable_name,\n  m.target_part,\n\
+    \  h.nombre_guests_par_mois,\n  h.metres_lineaires,\n  c.montant_ventes_coefficient\n\
+    \    * h.nombre_guests_par_mois * h.metres_lineaires * m.target_part\n      AS\
+    \ montant_ventes_par_mois_predit,\n  c.montant_marge_selon_coef_coefficient\n\
+    \    * h.nombre_guests_par_mois * h.metres_lineaires * m.target_part\n      AS\
+    \ montant_marge_selon_coef_par_mois_predite,\n  c.montant_marge_coefficient\n\
+    \    * h.nombre_guests_par_mois * h.metres_lineaires * m.target_part\n      AS\
+    \ montant_marge_par_mois_predite,\n  c.nombre_observations,\n  c.nombre_hotels\n\
+    FROM v_restitution_solution_coefficients AS c\nINNER JOIN v_restitution_input_mix\
+    \ AS m\n  USING (variable_family, variable_name)\nCROSS JOIN hotel AS h\nWHERE\
+    \ m.target_part > 0"

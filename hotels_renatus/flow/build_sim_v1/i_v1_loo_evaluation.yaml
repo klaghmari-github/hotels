@@ -1,0 +1,11 @@
+i_v1_loo_evaluation:
+  type: iterate
+  execution: sequential
+  tasks: 1
+  requires:
+  - t_v1_loo_hotels
+  scenarios: t_v1_loo_hotels
+  step_view: v_loo_step
+  target: x_insert_v1_loo_result
+  order_by:
+  - hotel_code

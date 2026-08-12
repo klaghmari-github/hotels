@@ -1,0 +1,26 @@
+v_loo_result:
+  type: view
+  mode: create_or_replace
+  requires:
+  - v_loo_observed_row
+  - v_loo_prediction
+  script: "SELECT\n  p.hotel_code,\n  p.solution,\n  p.methode,\n  o.nombre_guests_par_mois,\n\
+    \  o.metres_lineaires,\n  o.montant_ventes_par_mois AS montant_ventes_par_mois_reel,\n\
+    \  p.montant_ventes_par_mois_predit,\n  p.montant_ventes_par_mois_predit - o.montant_ventes_par_mois\
+    \ AS montant_ventes_erreur,\n  ABS(p.montant_ventes_par_mois_predit - o.montant_ventes_par_mois)\
+    \ AS montant_ventes_erreur_absolue,\n  ABS(p.montant_ventes_par_mois_predit -\
+    \ o.montant_ventes_par_mois)\n    / NULLIF(ABS(o.montant_ventes_par_mois), 0)\
+    \ AS montant_ventes_erreur_relative,\n  o.montant_marge_selon_coef_par_mois AS\
+    \ montant_marge_selon_coef_par_mois_reel,\n  p.montant_marge_selon_coef_par_mois_predite,\n\
+    \  p.montant_marge_selon_coef_par_mois_predite - o.montant_marge_selon_coef_par_mois\
+    \ AS montant_marge_selon_coef_erreur,\n  ABS(p.montant_marge_selon_coef_par_mois_predite\
+    \ - o.montant_marge_selon_coef_par_mois) AS montant_marge_selon_coef_erreur_absolue,\n\
+    \  ABS(p.montant_marge_selon_coef_par_mois_predite - o.montant_marge_selon_coef_par_mois)\n\
+    \    / NULLIF(ABS(o.montant_marge_selon_coef_par_mois), 0) AS montant_marge_selon_coef_erreur_relative,\n\
+    \  o.montant_marge_par_mois AS montant_marge_par_mois_reel,\n  p.montant_marge_par_mois_predite,\n\
+    \  p.montant_marge_par_mois_predite - o.montant_marge_par_mois AS montant_marge_erreur,\n\
+    \  ABS(p.montant_marge_par_mois_predite - o.montant_marge_par_mois) AS montant_marge_erreur_absolue,\n\
+    \  ABS(p.montant_marge_par_mois_predite - o.montant_marge_par_mois)\n    / NULLIF(ABS(o.montant_marge_par_mois),\
+    \ 0) AS montant_marge_erreur_relative,\n  p.nombre_predicteurs,\n  p.nombre_familles,\n\
+    \  p.nombre_hotels_apprentissage\nFROM v_loo_observed_row AS o\nINNER JOIN v_loo_prediction\
+    \ AS p\nUSING (hotel_code, solution)"
