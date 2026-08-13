@@ -562,17 +562,19 @@ CA_solution = AVG_familles ( AVG_variables (pred_variable) )</div>
       <p>Pour un scénario donné, au niveau de chaque hôtel :</p>
       <ol>
         <li><strong>Baseline</strong> : ventes totales et
-          <code>taux_conversion = ventes / guests</code> sur l’historique brut.</li>
+          <code>taux_conversion = ventes / guests</code> (diagnostic / ML ; non utilisé ici).</li>
         <li><strong>Natures retirées</strong> : quantités associées
           <code>nombre_ventes_retirees</code>.</li>
-        <li><strong>Natures restantes</strong> (<code>v_sales_filtered</code>).</li>
+        <li><strong>Natures restantes</strong> (<code>v_sales_filtered</code>)
+          et total de ventes restantes <code>Q_remaining</code>.</li>
         <li><strong>Réinjection</strong> sur chaque ligne restante
-          (<code>v_sales_current</code> :</li>
+          (<code>v_sales_current</code> — volume non perdu :</li>
       </ol>
       <div class="formula">nature_ventes_ajoutées =
     nombre_ventes_retirees
-  × taux_conversion
-  × part_de_la_nature_dans_les_ventes_hôtel
+  × ( nature_nombre_ventes / Q_remaining )
+
+// Σ ajouts sur natures conservées = nombre_ventes_retirees
 
 quantité_scénario = QUANTITE_ligne
   + nature_ventes_ajoutées × (QUANTITE_ligne / total_nature)
@@ -582,10 +584,9 @@ montants (PRIX, MARGE…) mis à l’échelle : × (quantité_scénario / QUANTI
         <strong>Sens métier.</strong>
         On suppose que le client continue de venir (guests inchangés) et que le
         volume « perdu » sur les natures retirées se reporte sur le reste de
-        l’assortiment <em>proportionnellement à la structure de ventes déjà
-        observée</em> de l’hôtel, modulé par son taux de conversion.
-        C’est une hypothèse de <strong>substitution intra-hôtel</strong>, pas un
-        modèle de prix ni d’élasticité croisée produit-par-produit.
+        l’assortiment <em>au prorata des ventes historiques parmi les natures
+        restantes</em>. C’est une hypothèse de <strong>substitution intra-hôtel</strong>,
+        pas un modèle de prix ni d’élasticité croisée produit-par-produit.
       </div>
 
       <h3>4.3 Pivot final</h3>
