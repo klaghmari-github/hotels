@@ -61,6 +61,9 @@ Admin : onglets **LOO · comparaison** et **full · comparaison**.
 | Doc | Contenu |
 |-----|---------|
 | [doc/index.html](doc/index.html) | Vue d’ensemble |
+| [doc/sim_v1.html](doc/sim_v1.html) | Règles Excel R1–R4, lab interactif (pilote → cible) |
+| [doc/roi.html](doc/roi.html) | Marge, coûts solution, amortissement, ROI |
+| [doc/reco.html](doc/reco.html) | Arbre de décision concept (éditable) |
 | [doc/analyse.html](doc/analyse.html) | Interprétation LOO / full |
 | [doc/sim_v2_scientific.html](doc/sim_v2_scientific.html) | Méthode sim_v2 |
 | [doc/ARCHITECTURE.md](doc/ARCHITECTURE.md) | Couches package |

@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>sim_v1 — règles Excel R1–R4 (doc interactive)</title>
+  <style>
+    :root {
+      --ink:#1c2430; --muted:#5a6675; --line:#d5dde6; --navy:#1a3a5c;
+      --bg:#f4f6f8; --card:#fff; --a:#2a6fad; --ok:#0f766e; --warn:#b45309;
+      --simply:#1d4ed8; --liberty:#047857; --conn:#b45309;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:"Segoe UI",system-ui,sans-serif; background:var(--bg); color:var(--ink); line-height:1.55; }
+    header { background:linear-gradient(135deg,#142b45,#245c8f); color:#fff; padding:1.6rem 1.25rem; }
+    header .wrap, nav.wrap, main { max-width:1100px; margin:0 auto; }
+    h1 { margin:0 0 .35rem; font-size:1.4rem; }
+    .sub { margin:0; color:#dbe7f5; font-size:.92rem; }
+    nav.wrap { display:flex; flex-wrap:wrap; gap:.55rem 1rem; padding:.75rem 1.25rem; background:#fff; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5; }
+    nav a { color:var(--a); text-decoration:none; font-weight:600; font-size:.88rem; }
+    main { padding:1.1rem 1.25rem 3rem; }
+    section { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:1.05rem 1.2rem; margin-bottom:1rem; }
+    h2 { margin:0 0 .7rem; font-size:1.12rem; color:var(--navy); border-left:4px solid var(--a); padding-left:.55rem; }
+    h3 { margin:1rem 0 .45rem; font-size:1rem; color:#334155; }
+    .muted { color:var(--muted); font-size:.9rem; }
+    table { width:100%; border-collapse:collapse; font-size:.88rem; margin:.5rem 0; }
+    th, td { text-align:left; padding:.4rem .5rem; border-bottom:1px solid var(--line); vertical-align:top; }
+    th { color:var(--muted); font-weight:600; background:#f8fafc; }
+    code, .f { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.82rem; }
+    .f { display:block; background:#0f172a; color:#7dd3fc; padding:.75rem .9rem; border-radius:8px; white-space:pre-wrap; margin:.5rem 0; overflow:auto; }
+    .note { background:#fffbeb; border:1px solid #fcd34d; border-radius:8px; padding:.65rem .85rem; margin:.6rem 0; font-size:.9rem; }
+    .ok { background:#ecfdf5; border:1px solid #6ee7b7; border-radius:8px; padding:.65rem .85rem; margin:.6rem 0; font-size:.9rem; }
+    .warn { background:#fef2f2; border:1px solid #fca5a5; border-radius:8px; padding:.65rem .85rem; margin:.6rem 0; font-size:.9rem; }
+    .g3 { display:grid; grid-template-columns:repeat(3,1fr); gap:.75rem; }
+    @media(max-width:900px){ .g3 { grid-template-columns:1fr; } }
+    .card-s, .card-l, .card-c { border-radius:10px; padding:.85rem; border:1px solid var(--line); font-size:.88rem; }
+    .card-s { background:#eff6ff; border-color:#93c5fd; }
+    .card-l { background:#ecfdf5; border-color:#6ee7b7; }
+    .card-c { background:#fff7ed; border-color:#fdba74; }
+    .card-s h4 { color:var(--simply); margin:.1rem 0 .4rem; }
+    .card-l h4 { color:var(--liberty); margin:.1rem 0 .4rem; }
+    .card-c h4 { color:var(--conn); margin:.1rem 0 .4rem; }
+    .tag { display:inline-block; font-size:.72rem; font-weight:700; padding:.12rem .4rem; border-radius:4px; }
+    .ts { background:#dbeafe; color:#1e40af; }
+    .tl { background:#d1fae5; color:#065f46; }
+    .tc { background:#ffedd5; color:#9a3412; }
+    .panel { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+    @media(max-width:900px){ .panel { grid-template-columns:1fr; } }
+    label { display:block; font-size:.82rem; color:var(--muted); margin:.35rem 0 .15rem; }
+    input[type=number], select { width:100%; padding:.4rem .5rem; border:1px solid var(--line); border-radius:6px; font-size:.92rem; background:#fff; }
+    input:focus, select:focus { outline:2px solid #93c5fd; border-color:var(--a); }
+    .btnrow { display:flex; flex-wrap:wrap; gap:.5rem; margin:.6rem 0; }
+    button { border:none; border-radius:7px; padding:.5rem .85rem; font-weight:600; font-size:.88rem; cursor:pointer; }
+    .btn-primary { background:var(--a); color:#fff; }
+    .btn-secondary { background:#e2e8f0; color:#1e293b; }
+    .btn-excel { background:#1e3a5f; color:#fff; }
+    .btn-data { background:#0f766e; color:#fff; }
+    .step { border-left:3px solid var(--a); padding:.55rem .8rem; margin:.55rem 0; background:#f8fafc; border-radius:0 8px 8px 0; }
+    .step strong { color:var(--navy); }
+    .res { font-size:1.05rem; font-weight:700; color:var(--navy); }
+    .cell { font-family:ui-monospace,monospace; font-size:.78rem; background:#eef2f6; padding:.08rem .3rem; border-radius:3px; }
+    .map td:first-child { white-space:nowrap; }
+    footer { max-width:1100px; margin:0 auto; padding:0 1.25rem 2rem; color:var(--muted); font-size:.82rem; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>sim_v1 — Simulateur ROD Excel (R1 → R4)</h1>
+    <p class="sub">
+      Lecture approfondie des feuilles <em>SIMULATEUR SIMPLY / LIBERTY / CONNECTED</em>
+      · formules, cellules, textes d’explication · projection pilote → hôtel cible
+      · aligné sur <code>src/sim_v1/service.py</code>
+    </p>
+  </div>
+</header>
+<nav class="wrap">
+  <a href="index.html">Index</a>
+  <a href="#arch">Architecture</a>
+  <a href="#cells">Carte cellules</a>
+  <a href="#pilotes">Pilotes</a>
+  <a href="#example">Exemple</a>
+  <a href="#lab">Lab interactif</a>
+  <a href="#rules">Règles R1–R4</a>
+  <a href="roi.html">ROI</a>
+  <a href="reco.html">Reco</a>
+</nav>
+<main>
+
+<section id="arch">
+  <h2>1. Architecture Excel — deux zones</h2>
+  <p>Chaque feuille <code>SIMULATEUR {CONCEPT}</code> du fichier
+    <em>ROD - Simulateurs + détail des coûts.xlsx</em> est scindée en :</p>
+  <table>
+    <tr><th>Zone</th><th>Colonnes</th><th>Rôle</th></tr>
+    <tr>
+      <td><strong>Gauche — PILOTE</strong></td>
+      <td>B–J</td>
+      <td>Référence fixe : paramètres hôtel pilote, CA F&amp;B / N-F&amp;B, coefficients.
+        Ne doit pas être « inventée » à la volée : c’est la base de projection.</td>
+    </tr>
+    <tr>
+      <td><strong>Droite — SIMULATEUR</strong></td>
+      <td>L–T</td>
+      <td>Hôtel <em>cible</em> : entrées éditables (chambres, TO, guests, m_lin / frigos, mix).
+        Les formules projettent le pilote sur la cible (colonne O surtout).</td>
+    </tr>
+  </table>
+  <div class="ok">
+    <strong>Principe :</strong> le pilote est un <em>mois moyen</em> de résultat concept.
+    L’hôtel cible n’a pas besoin d’être un pilote terrain : on applique les mêmes ratios
+    (taux d’acheteurs, CA/vente, impact mix, surface…).
+  </div>
+  <p class="muted">Source code : <code>run_rules_r1_r4</code> + <code>predict_from_levers</code>
+    dans <code>release_1_0_0/src/sim_v1/service.py</code>.
+    Coefficients stockés dans <code>v1_pilot_defaults.xlsx</code> /
+    <code>sim_v1_pilot_defaults.json</code>.</p>
+</section>
+
+<section id="cells">
+  <h2>2. Carte des cellules (SIMPLY — structure commune aux 3)</h2>
+  <p>Les textes en colonnes B/C/D (gauche) et L/M/N (droite) jouent le rôle de
+    <strong>commentaires métier intégrés</strong> (peu de vrais commentaires Excel
+    thread — le sens est dans les libellés et les blocs « REGLE N°x »).</p>
+
+  <h3>2.1 Paramètres hôtel</h3>
+  <table class="map">
+    <tr><th>Cellule pilote</th><th>Cellule cible</th><th>Libellé</th><th>Valeur SIMPLY (cache)</th></tr>
+    <tr><td class="cell">C9</td><td class="cell">M9</td><td>Nb. de chambres</td><td>129 → cible ex. 100</td></tr>
+    <tr><td class="cell">C10</td><td class="cell">M10</td><td>Guests / chambre</td><td>1,7 → 1,5</td></tr>
+    <tr><td class="cell">C11</td><td class="cell">M11</td><td>TO (YTD)</td><td>0,80 → 0,80</td></tr>
+    <tr><td class="cell">F9</td><td class="cell">P9</td><td>Mètres linéaires</td><td>6 → 3 (simu Excel défaut)</td></tr>
+    <tr><td class="cell">I9 / I10</td><td class="cell">S9 / S10</td><td>Mix F&amp;B / N-F&amp;B</td><td>0,40 / 0,60 → 0,70 / 0,30</td></tr>
+    <tr><td class="cell">J9 / J10</td><td class="cell">T9 / T10</td><td>Coeff marge F&amp;B / N-F&amp;B</td><td>2,6 / 1,45</td></tr>
+  </table>
+
+  <h3>2.2 Clients hébergés (avant R1)</h3>
+  <div class="f">C15 = C9 * C11                    // chambres occupées / jour
+C16 = (C10 * C9) * C11            // clients hébergés / jour
+C17 = C16 * 30.5                  // clients hébergés / mois
+// Cible : mêmes formules en M15, M16, M17</div>
+  <p>Constante Excel : <strong>30,5 jours / mois</strong> (alignée code
+    <code>clients_mois = chambres × TO × guests × 30.5</code>).</p>
+
+  <h3>2.3 Taux d’acheteurs pilote</h3>
+  <div class="f">C19 = 231                        // nb ventes mensuelles pilote (valeur fixe)
+C21 = C19 / C17                  // taux clients acheteurs
+M19 = M17 * $C$21                // ventes projetées cible
+C31 = C17 * $C$21  (= C19)       // acheteurs pilote
+M31 = M17 * $C$21                // acheteurs cible</div>
+
+  <h3>2.4 Chaîne R1 → R4 (colonne O = CA HT projeté cible)</h3>
+  <table class="map">
+    <tr><th>Étape</th><th>Cellules</th><th>Formule Excel (essence)</th></tr>
+    <tr>
+      <td><strong>R1</strong> clients</td>
+      <td class="cell">O34, O35</td>
+      <td><code>O34 = ($M$31 * E34) / $C$31</code> — CA F&amp;B proportionnel aux acheteurs<br>
+          <code>O35</code> idem pour N-F&amp;B avec <code>E35</code></td>
+    </tr>
+    <tr>
+      <td><strong>R2</strong> mix ±10&nbsp;%</td>
+      <td class="cell">O42–O52, E51, E52</td>
+      <td><code>O42 = S9 − I9</code> · <code>O43 = O42 × 10</code><br>
+          <code>E51 = (E34 × 10%) / $I$9</code> → CA pour +10 pts de mix F&amp;B<br>
+          <code>O44 = E51 × O43</code> · <code>O51 = O34 + O44</code><br>
+          N-F&amp;B : <code>O46 = S10 − I10</code>, <code>O48 = E52 × O47</code>, <code>O52 = O35 + O48</code></td>
+    </tr>
+    <tr>
+      <td><strong>R3</strong> catégories</td>
+      <td class="cell">H64–H70, O64–O70, H75, O75, O94, O95</td>
+      <td>Cumul F&amp;B <code>I75 = SUM(I64:I70)</code> (max 0,48 si tout ON)<br>
+          Cumul N-F&amp;B <code>P75</code> (max 0,33 si tout ON ; ex. simu Excel partial)<br>
+          <code>O94 = SI(O51&lt;0; O51−O51×H75; O51+O51×H75)</code> → ×(1±cumul)<br>
+          Idem <code>O95</code> avec <code>O75</code></td>
+    </tr>
+    <tr>
+      <td><strong>R4</strong> surface</td>
+      <td class="cell">O108–O113, E112, E113</td>
+      <td>Simply/Liberty : <code>O108 = P9 − F9</code> (Δ m_lin)<br>
+          <code>E112 = E34 / $F$9</code> (CA HT par mètre linéaire F&amp;B)<br>
+          <code>O112 = SI(O108&lt;0; O94−E112×|Δ|; O94+E112×|Δ|)</code><br>
+          <strong>Connected</strong> : Δ frigos <code>P10 − F10</code> (frigos froid réf. = 3)</td>
+    </tr>
+    <tr>
+      <td><strong>CA final</strong></td>
+      <td class="cell">O120–O122</td>
+      <td><code>O120 = O112</code>, <code>O121 = O113</code>, <code>O122 = SUM(O120:O121)</code></td>
+    </tr>
+    <tr>
+      <td><strong>Marge produit</strong></td>
+      <td class="cell">O132–O134</td>
+      <td><code>O132 = O120 − (O120 / O128)</code> avec <code>O128 = T9</code> (coeff)<br>
+          = CA − CA/coeff = CA × (1 − 1/coeff)</td>
+    </tr>
+  </table>
+
+  <div class="note">
+    <strong>Textes « REGLE » dans Excel (équivalents commentaires) :</strong><br>
+    · R1 (B27) : « Chaque client acheteur génère du CA. » · base = résultat pilotes.<br>
+    · R2 (C41–C42) : chaque 10 % de mix en plus/moins impacte F&amp;B et N-F&amp;B (bonus/malus vs mix de référence).<br>
+    · R3 (C58) : catégorie cochée → +X % sur CA ; non cochée → −X %.<br>
+    · R4 (C101–C102 / L101) : chaque m_lin (ou frigo) en plus ajoute du CA ; en moins en retire.
+      Attention Excel : si m_lin &gt; réf. → ajoute ; sinon retire.<br>
+    · Note L72–L73 : hôtels +50 ch. avec ≥1 des 5 catégories N-F&amp;B « lifestyle »
+      → solution recommandée LIBERTY (voir <a href="reco.html">reco.html</a>).
+  </div>
+</section>
+
+<section id="pilotes">
+  <h2>3. Références pilotes (zone gauche / JSON release)</h2>
+  <div class="g3">
+    <div class="card-s">
+      <h4><span class="tag ts">SIMPLY</span></h4>
+      <ul>
+        <li>Ch. C9 = <strong>129</strong> · guests 1,7 · TO 0,80</li>
+        <li>m_lin F9 = <strong>6</strong> · mix F&amp;B 0,40</li>
+        <li>Ventes C19 = <strong>231</strong></li>
+        <li>CA F&amp;B E34 = <strong>533 €</strong> · N-F&amp;B E35 = <strong>187 €</strong></li>
+        <li>CA total = 720 € HT / mois</li>
+        <li>Clients/mois C17 = 5 350,92</li>
+        <li>ca_10 F&amp;B E51 = 133,25 · N-F&amp;B 31,17</li>
+        <li>CA / m_lin : 88,83 / 31,17</li>
+        <li>Coeff J9/J10 = 2,6 / 1,45</li>
+      </ul>
+    </div>
+    <div class="card-l">
+      <h4><span class="tag tl">LIBERTY</span></h4>
+      <ul>
+        <li>Ch. 142 · guests 2,2 · TO 0,70</li>
+        <li>m_lin = <strong>8</strong> · mix F&amp;B 0,70</li>
+        <li>Ventes 312 · CA 1 055 + 424 = <strong>1 479 €</strong></li>
+        <li>Clients/mois 6 669,74</li>
+        <li>ca_10 : 150,71 / 141,33</li>
+        <li>CA / m_lin : 131,88 / 53,00</li>
+        <li>Coeff 2,6 / <strong>2,0</strong></li>
+      </ul>
+    </div>
+    <div class="card-c">
+      <h4><span class="tag tc">CONNECTED</span></h4>
+      <ul>
+        <li>Ch. 305 · guests 1,8 · TO 0,75</li>
+        <li>m_lin 7 · <strong>frigos froid réf. F10 = 3</strong></li>
+        <li>Mix F&amp;B 0,80 · ventes 534</li>
+        <li>CA 3 503 + 131 = <strong>3 634 €</strong></li>
+        <li>Clients/mois 12 558,38</li>
+        <li>ca_10 : 437,88 / 65,50</li>
+        <li>CA / frigo : 1 167,67 / 43,67</li>
+        <li>Coeff 2,6 / <strong>1,8</strong></li>
+      </ul>
+    </div>
+  </div>
+  <div class="warn">
+    <strong>Implémentation release :</strong> R3 applique le <em>cumul max toutes catégories ON</em>
+    (F&amp;B 0,48 · N-F&amp;B 0,33) — pas de toggles catégorie dans le moteur <code>sim_v1</code> actuel.
+    L’Excel peut cocher un sous-ensemble (ex. cumul N-F&amp;B 0,19 sur la simu SIMPLY par défaut).
+  </div>
+</section>
+
+<section id="example">
+  <h2>4. Exemple réel pas-à-pas — projection SIMPLY</h2>
+  <p><strong>Pilote Excel SIMPLY</strong> (moyenne concept, calée sur profil type Ibis budget Nice) :</p>
+  <ul>
+    <li>129 chambres · TO 80 % · 1,7 guests/ch · 6 m_lin · mix F&amp;B 40 %</li>
+    <li>231 ventes/mois · CA HT 533 € F&amp;B + 187 € N-F&amp;B</li>
+  </ul>
+  <p><strong>Hôtel cible illustratif</strong> (profil proche Ibis budget Strasbourg / données
+    <code>v1_hotel_params</code> H2075 ajusté pour lecture) :</p>
+  <ul>
+    <li>100 chambres · TO 70 % · 1,7 guests · 4 m_lin · mix F&amp;B 70 %</li>
+  </ul>
+
+  <div class="step">
+    <strong>Étape 0 — Clients hébergés cible</strong><br>
+    clients/mois = 100 × 0,70 × 1,7 × 30,5 = <strong>3 629,5</strong>
+  </div>
+  <div class="step">
+    <strong>R1 — Taux acheteurs &amp; CA proportionnel</strong><br>
+    taux = 231 / 5 350,92 ≈ <strong>0,04317</strong><br>
+    nb_acheteurs = 3 629,5 × 0,04317 ≈ <strong>156,7</strong><br>
+    CA_F&amp;B R1 = (533/231) × 156,7 ≈ <strong>361,5 €</strong><br>
+    CA_N-F&amp;B R1 = (187/231) × 156,7 ≈ <strong>126,8 €</strong>
+  </div>
+  <div class="step">
+    <strong>R2 — Écart mix (cible 0,70 vs réf. 0,40)</strong><br>
+    mix_steps = (0,70 − 0,40) × 10 = <strong>+3</strong> pas de 10 %<br>
+    Δ F&amp;B = 133,25 × 3 = +399,75 → CA_F&amp;B R2 ≈ <strong>761,2 €</strong><br>
+    Δ N-F&amp;B = 31,17 × (−3) = −93,5 → CA_N-F&amp;B R2 ≈ <strong>33,3 €</strong>
+  </div>
+  <div class="step">
+    <strong>R3 — Catégories toutes ON (release)</strong><br>
+    F&amp;B × 1,48 → ≈ <strong>1 126,6 €</strong><br>
+    N-F&amp;B × 1,33 → ≈ <strong>44,3 €</strong>
+  </div>
+  <div class="step">
+    <strong>R4 — Surface (4 m_lin vs réf. 6 → Δ = −2)</strong><br>
+    F&amp;B − 2 × 88,83 → ≈ <strong>948,9 €</strong><br>
+    N-F&amp;B − 2 × 31,17 → ≈ <strong>−18,0 €</strong>
+  </div>
+  <div class="step">
+    <strong>CA HT final</strong> = 948,9 + (−18,0) ≈ <strong>930,9 € / mois</strong><br>
+    Marge produit = CA×(1−1/coeff) F&amp;B + N-F&amp;B ≈ <strong>≈ 590 € / mois</strong>
+    (détail recalculé dans le lab ci-dessous)
+  </div>
+  <p class="muted">Ces montants sont monétaires HT mensuels « mois moyen » — annuel = × 12
+    côté UI estimation. Le ROI (marge − coûts) est documenté dans
+    <a href="roi.html">roi.html</a>.</p>
+</section>
+
+<section id="lab">
+  <h2>5. Lab interactif — hôtel cible éditable</h2>
+  <p class="muted">Seuls les champs <strong>impliqués dans les formules</strong> de projection
+    sont éditables. Les coefficients pilotes se chargent selon la solution, restent visibles
+    et <strong>restent éditables</strong> après chargement.</p>
+
+  <div class="btnrow">
+    <button type="button" class="btn-excel" id="btnExcel">① Charger valeurs Excel pilote</button>
+    <button type="button" class="btn-data" id="btnData">② Charger depuis données hôtel</button>
+    <select id="dataHotel" style="max-width:280px"></select>
+    <button type="button" class="btn-secondary" id="btnReset">Réinit. exemple §4</button>
+  </div>
+
+  <div class="panel">
+    <div>
+      <h3>Hôtel cible (entrées formule)</h3>
+      <label>Solution (réf. pilote)</label>
+      <select id="sol">
+        <option value="SIMPLY">SIMPLY</option>
+        <option value="LIBERTY">LIBERTY</option>
+        <option value="CONNECTED">CONNECTED</option>
+      </select>
+      <label>Nb. chambres</label>
+      <input type="number" id="chambres" min="1" step="1" value="100"/>
+      <label>Taux d’occupation (0–1 ou %)</label>
+      <input type="number" id="to" min="0" step="0.01" value="0.70"/>
+      <label>Guests / chambre</label>
+      <input type="number" id="guests" min="0.1" step="0.1" value="1.7"/>
+      <label>Mètres linéaires</label>
+      <input type="number" id="mlin" min="0.1" step="0.5" value="4"/>
+      <label>Nb. frigos froid (CONNECTED R4)</label>
+      <input type="number" id="frigos" min="0" step="1" value="3"/>
+      <label>Mix F&amp;B (0–1)</label>
+      <input type="number" id="mixfb" min="0" max="1" step="0.05" value="0.70"/>
+    </div>
+    <div>
+      <h3>Référence pilote (éditable après chargement)</h3>
+      <label>Ventes mensuelles pilote</label>
+      <input type="number" id="ref_ventes" step="1"/>
+      <label>Clients hébergés / mois pilote</label>
+      <input type="number" id="ref_clients" step="1"/>
+      <label>CA F&amp;B pilote (€ HT)</label>
+      <input type="number" id="ref_cafb" step="1"/>
+      <label>CA N-F&amp;B pilote (€ HT)</label>
+      <input type="number" id="ref_canfb" step="1"/>
+      <label>Mix F&amp;B réf.</label>
+      <input type="number" id="ref_mix" step="0.01"/>
+      <label>m_lin réf. / frigo réf.</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem">
+        <input type="number" id="ref_ml" step="0.5"/>
+        <input type="number" id="ref_frigo" step="1" placeholder="frigo (C)"/>
+      </div>
+      <label>ca_10 F&amp;B / N-F&amp;B · ca_1ml ou ca_1frigo</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem">
+        <input type="number" id="ref_ca10fb" step="0.01"/>
+        <input type="number" id="ref_ca10nfb" step="0.01"/>
+        <input type="number" id="ref_ca1fb" step="0.01"/>
+        <input type="number" id="ref_ca1nfb" step="0.01"/>
+      </div>
+      <label>Coeff marge F&amp;B / N-F&amp;B</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem">
+        <input type="number" id="ref_coeffb" step="0.05"/>
+        <input type="number" id="ref_coeffnfb" step="0.05"/>
+      </div>
+    </div>
+  </div>
+
+  <h3>Étapes de calcul (recalcul live)</h3>
+  <div id="steps"></div>
+  <p class="res" id="summary"></p>
+</section>
+
+<section id="rules">
+  <h2>6. Formules code = formules Excel</h2>
+  <div class="f">// R1
+taux_acheteurs = ventes_ref / clients_ref
+nb_acheteurs   = clients_mois * taux_acheteurs
+ca_fb_r1  = (ca_fb_ref  / ventes_ref) * nb_acheteurs
+ca_nfb_r1 = (ca_nfb_ref / ventes_ref) * nb_acheteurs
+
+// R2  (ca_10 = CA_pilote * 10% / mix_ref)
+mix_steps = (mix_fb_hotel - mix_fb_ref) * 10
+ca_fb_r2  = ca_fb_r1  + ca_10_fb  * mix_steps
+ca_nfb_r2 = ca_nfb_r1 + ca_10_nfb * (-mix_steps)
+
+// R3  (cumul toutes catégories ON en release)
+factor_fb  = ca_fb_r2  &lt; 0 ? (1 - 0.48) : (1 + 0.48)
+factor_nfb = ca_nfb_r2 &lt; 0 ? (1 - 0.33) : (1 + 0.33)
+ca_fb_r3  = ca_fb_r2  * factor_fb
+ca_nfb_r3 = ca_nfb_r2 * factor_nfb
+
+// R4
+// SIMPLY/LIBERTY : Δ = m_lin - ml_ref ; unit = ca_1ml_*
+// CONNECTED : Δ = nb_frigos - frigo_ref ; unit = ca_1frigo_*
+ca_fb_r4  = ca_fb_r3  ± unit_fb  * |Δ|
+ca_nfb_r4 = ca_nfb_r3 ± unit_nfb * |Δ|
+
+ca_ht = ca_fb_r4 + ca_nfb_r4
+marge = ca_fb_r4*(1-1/coeff_fb) + ca_nfb_r4*(1-1/coeff_nfb)</div>
+
+  <h3>Catégories &amp; coefficients R3 (Excel H64–H70 / O64–O70)</h3>
+  <table>
+    <tr><th>F&amp;B</th><th>Coeff</th><th>N-F&amp;B</th><th>Coeff</th></tr>
+    <tr><td>Drinks without alcohol</td><td>0,10</td><td>SOS</td><td>0,08</td></tr>
+    <tr><td>Drinks with alcohol</td><td>0,05</td><td>Hygiene</td><td>0,05</td></tr>
+    <tr><td>Sugary food (dry)</td><td>0,10</td><td>Cosmetics</td><td>0,03</td></tr>
+    <tr><td>Sugary food (fresh)</td><td>0,05</td><td>Kids items</td><td>0,08</td></tr>
+    <tr><td>Salty food (dry)</td><td>0,10</td><td>Ready-to-wear</td><td>0,03</td></tr>
+    <tr><td>Salty food (fresh)</td><td>0,05</td><td>Accessories</td><td>0,03</td></tr>
+    <tr><td>Gourmet food</td><td>0,03</td><td>Souvenirs</td><td>0,03</td></tr>
+    <tr><td><strong>Cumul max</strong></td><td><strong>0,48</strong></td><td><strong>Cumul max</strong></td><td><strong>0,33</strong></td></tr>
+  </table>
+</section>
+
+</main>
+<footer>
+  Sources : <code>ROD - Simulateurs + détail des coûts.xlsx</code> ·
+  <code>v1_pilot_defaults.xlsx</code> · <code>src/sim_v1/service.py</code> ·
+  release 1.0.0 — doc interactive (pas de déploiement Adixon).
+</footer>
+
+<script>
+const PILOT = {
+  SIMPLY: {
+    nb_chambres:129, guests:1.7, to:0.8, ml_ref:6, frigo_ref:null, mix_fb:0.4,
+    ventes:231, ca_fb:533, ca_nfb:187, ca_10_fb:133.25, ca_10_nfb:31.17,
+    ca_1ml_fb:88.83, ca_1ml_nfb:31.17, ca_1frigo_fb:null, ca_1frigo_nfb:null,
+    coeff_fb:2.6, coeff_nfb:1.45, clients_heb:5350.92
+  },
+  LIBERTY: {
+    nb_chambres:142, guests:2.2, to:0.7, ml_ref:8, frigo_ref:null, mix_fb:0.7,
+    ventes:312, ca_fb:1055, ca_nfb:424, ca_10_fb:150.714286, ca_10_nfb:141.333333,
+    ca_1ml_fb:131.875, ca_1ml_nfb:53, ca_1frigo_fb:null, ca_1frigo_nfb:null,
+    coeff_fb:2.6, coeff_nfb:2.0, clients_heb:6669.74
+  },
+  CONNECTED: {
+    nb_chambres:305, guests:1.8, to:0.75, ml_ref:7, frigo_ref:3, mix_fb:0.8,
+    ventes:534, ca_fb:3503, ca_nfb:131, ca_10_fb:437.875, ca_10_nfb:65.5,
+    ca_1ml_fb:500.428571, ca_1ml_nfb:18.714286, ca_1frigo_fb:1167.666667, ca_1frigo_nfb:43.666667,
+    coeff_fb:2.6, coeff_nfb:1.8, clients_heb:12558.375
+  }
+};
+
+// Extraits v1_hotel_params.xlsx (données terrain)
+const HOTELS = [
+  { code:"H2075", name:"Ibis budget Nice Californie", solution:"SIMPLY", chambres:129, to:0.72, guests:1.7, mlin:3, frigos:3, mix_fb:0.6191, ca_reel:439.71 },
+  { code:"HB6A3", name:"Ibis budget Strasbourg", solution:"CONNECTED", chambres:97, to:0.70, guests:1.7, mlin:2, frigos:3, mix_fb:1.0, ca_reel:1088.19 },
+  { code:"HB5I0", name:"Novotel Megève Mont-Blanc", solution:"LIBERTY", chambres:572, to:0.60, guests:1.8, mlin:8, frigos:3, mix_fb:0.5663, ca_reel:1585.06 },
+  { code:"H0373", name:"Mercure Paris Montmartre", solution:"CONNECTED", chambres:305, to:0.76, guests:2.0, mlin:6, frigos:3, mix_fb:0.9594, ca_reel:4125.77 },
+  { code:"H3546", name:"Novotel Paris Tour Eiffel", solution:"CONNECTED", chambres:764, to:0.80, guests:1.8, mlin:7, frigos:3, mix_fb:0.7414, ca_reel:17839.96 }
+];
+
+const CUMUL_FB = 0.48, CUMUL_NFB = 0.33;
+const $ = id => document.getElementById(id);
+const num = id => parseFloat($(id).value) || 0;
+
+function fillPilotRef(sol) {
+  const p = PILOT[sol];
+  $("ref_ventes").value = p.ventes;
+  $("ref_clients").value = p.clients_heb;
+  $("ref_cafb").value = p.ca_fb;
+  $("ref_canfb").value = p.ca_nfb;
+  $("ref_mix").value = p.mix_fb;
+  $("ref_ml").value = p.ml_ref;
+  $("ref_frigo").value = p.frigo_ref == null ? "" : p.frigo_ref;
+  $("ref_ca10fb").value = +p.ca_10_fb.toFixed(4);
+  $("ref_ca10nfb").value = +p.ca_10_nfb.toFixed(4);
+  $("ref_ca1fb").value = sol === "CONNECTED" ? +p.ca_1frigo_fb.toFixed(4) : +p.ca_1ml_fb.toFixed(4);
+  $("ref_ca1nfb").value = sol === "CONNECTED" ? +p.ca_1frigo_nfb.toFixed(4) : +p.ca_1ml_nfb.toFixed(4);
+  $("ref_coeffb").value = p.coeff_fb;
+  $("ref_coeffnfb").value = p.coeff_nfb;
+}
+
+function loadExcel() {
+  const sol = $("sol").value;
+  const p = PILOT[sol];
+  // cible = paramètres pilote Excel (zone droite = zone gauche)
+  $("chambres").value = p.nb_chambres;
+  $("to").value = p.to;
+  $("guests").value = p.guests;
+  $("mlin").value = p.ml_ref;
+  $("frigos").value = p.frigo_ref == null ? 3 : p.frigo_ref;
+  $("mixfb").value = p.mix_fb;
+  fillPilotRef(sol);
+  calc();
+}
+
+function loadData() {
+  const h = HOTELS.find(x => x.code === $("dataHotel").value) || HOTELS[0];
+  $("sol").value = h.solution;
+  $("chambres").value = h.chambres;
+  $("to").value = h.to;
+  $("guests").value = h.guests;
+  $("mlin").value = h.mlin;
+  $("frigos").value = h.frigos;
+  $("mixfb").value = h.mix_fb;
+  fillPilotRef(h.solution); // coeffs Excel de la solution concept
+  calc();
+}
+
+function fmt(x, d=2) {
+  if (!isFinite(x)) return "—";
+  return x.toLocaleString("fr-FR", { maximumFractionDigits:d, minimumFractionDigits:0 });
+}
+
+function calc() {
+  let to = num("to");
+  if (to > 1.5) to = to / 100;
+  const sol = $("sol").value;
+  const ch = Math.max(num("chambres"), 1);
+  const guests = Math.max(num("guests"), 0.1);
+  const mlin = Math.max(num("mlin"), 0.1);
+  const frigos = Math.max(num("frigos"), 0);
+  const mix = Math.min(1, Math.max(0, num("mixfb")));
+
+  const ventes = num("ref_ventes");
+  const clients_ref = num("ref_clients");
+  const ca_fb_ref = num("ref_cafb");
+  const ca_nfb_ref = num("ref_canfb");
+  const mix_ref = num("ref_mix");
+  const ml_ref = num("ref_ml") || 6;
+  const frigo_ref_raw = $("ref_frigo").value;
+  const frigo_ref = frigo_ref_raw === "" ? null : parseFloat(frigo_ref_raw);
+  const ca10fb = num("ref_ca10fb");
+  const ca10nfb = num("ref_ca10nfb");
+  const ca1fb = num("ref_ca1fb");
+  const ca1nfb = num("ref_ca1nfb");
+  const coeff_fb = num("ref_coeffb") || 2.6;
+  const coeff_nfb = num("ref_coeffnfb") || 1.45;
+
+  const clients = ch * to * guests * 30.5;
+  const taux = clients_ref > 0 ? ventes / clients_ref : 0;
+  const acheteurs = clients * taux;
+  const ca_fb_r1 = ventes > 0 ? (ca_fb_ref / ventes) * acheteurs : 0;
+  const ca_nfb_r1 = ventes > 0 ? (ca_nfb_ref / ventes) * acheteurs : 0;
+
+  const mix_steps = (mix - mix_ref) * 10;
+  const ca_fb_r2 = ca_fb_r1 + ca10fb * mix_steps;
+  const ca_nfb_r2 = ca_nfb_r1 + ca10nfb * (-mix_steps);
+
+  const fac_fb = ca_fb_r2 < 0 ? (1 - CUMUL_FB) : (1 + CUMUL_FB);
+  const fac_nfb = ca_nfb_r2 < 0 ? (1 - CUMUL_NFB) : (1 + CUMUL_NFB);
+  const ca_fb_r3 = ca_fb_r2 * fac_fb;
+  const ca_nfb_r3 = ca_nfb_r2 * fac_nfb;
+
+  const useFrigo = sol === "CONNECTED" && frigo_ref != null && !isNaN(frigo_ref);
+  let r4_diff, r4_mode, ca_fb_r4, ca_nfb_r4;
+  if (useFrigo) {
+    r4_diff = frigos - frigo_ref;
+    r4_mode = "frigos_froid";
+    const sign = r4_diff > 0 ? 1 : (r4_diff < 0 ? -1 : 0);
+    ca_fb_r4 = ca_fb_r3 + sign * ca1fb * Math.abs(r4_diff);
+    ca_nfb_r4 = ca_nfb_r3 + sign * ca1nfb * Math.abs(r4_diff);
+  } else {
+    r4_diff = mlin - ml_ref;
+    r4_mode = "m_lin";
+    const sign = r4_diff > 0 ? 1 : (r4_diff < 0 ? -1 : 0);
+    ca_fb_r4 = ca_fb_r3 + sign * ca1fb * Math.abs(r4_diff);
+    ca_nfb_r4 = ca_nfb_r3 + sign * ca1nfb * Math.abs(r4_diff);
+  }
+
+  const ca = ca_fb_r4 + ca_nfb_r4;
+  let marge = 0;
+  if (coeff_fb > 0) marge += ca_fb_r4 - ca_fb_r4 / coeff_fb;
+  if (coeff_nfb > 0) marge += ca_nfb_r4 - ca_nfb_r4 / coeff_nfb;
+
+  $("steps").innerHTML = `
+    <div class="step"><strong>0 · Clients hébergés / mois</strong><br>
+      ${fmt(ch,0)} × ${fmt(to,3)} × ${fmt(guests,2)} × 30,5 = <strong>${fmt(clients,1)}</strong>
+      <span class="muted"> · Excel M17</span></div>
+    <div class="step"><strong>R1 · Acheteurs &amp; CA proportionnel</strong><br>
+      taux = ${fmt(ventes,0)} / ${fmt(clients_ref,1)} = <strong>${fmt(taux,5)}</strong> (C21)<br>
+      acheteurs = ${fmt(clients,1)} × taux = <strong>${fmt(acheteurs,1)}</strong> (M31)<br>
+      CA F&amp;B R1 = (${fmt(ca_fb_ref,0)}/${fmt(ventes,0)}) × acheteurs = <strong>${fmt(ca_fb_r1)} €</strong> (O34)<br>
+      CA N-F&amp;B R1 = <strong>${fmt(ca_nfb_r1)} €</strong> (O35)</div>
+    <div class="step"><strong>R2 · Mix ±10 %</strong><br>
+      mix_steps = (${fmt(mix,2)} − ${fmt(mix_ref,2)}) × 10 = <strong>${fmt(mix_steps,2)}</strong> (O43)<br>
+      CA F&amp;B R2 = ${fmt(ca_fb_r1)} + ${fmt(ca10fb)} × ${fmt(mix_steps,2)} = <strong>${fmt(ca_fb_r2)} €</strong> (O51)<br>
+      CA N-F&amp;B R2 = ${fmt(ca_nfb_r1)} + ${fmt(ca10nfb)} × (${fmt(-mix_steps,2)}) = <strong>${fmt(ca_nfb_r2)} €</strong> (O52)</div>
+    <div class="step"><strong>R3 · Catégories (cumul release 0,48 / 0,33)</strong><br>
+      facteur F&amp;B = ${fmt(fac_fb,2)} · N-F&amp;B = ${fmt(fac_nfb,2)} (O94 / O95)<br>
+      CA F&amp;B R3 = <strong>${fmt(ca_fb_r3)} €</strong> · N-F&amp;B = <strong>${fmt(ca_nfb_r3)} €</strong></div>
+    <div class="step"><strong>R4 · ${r4_mode} (Δ = ${fmt(r4_diff,2)})</strong><br>
+      unit F&amp;B / N-F&amp;B = ${fmt(ca1fb)} / ${fmt(ca1nfb)} €<br>
+      CA F&amp;B R4 = <strong>${fmt(ca_fb_r4)} €</strong> (O112) · N-F&amp;B = <strong>${fmt(ca_nfb_r4)} €</strong> (O113)</div>
+    <div class="step"><strong>Marge produit</strong><br>
+      Marge = CA − CA/coeff · F&amp;B coeff ${fmt(coeff_fb,2)} · N-F&amp;B ${fmt(coeff_nfb,2)} (O132–O134)<br>
+      = <strong>${fmt(marge)} € / mois</strong></div>
+  `;
+  $("summary").textContent =
+    `CA HT estimé = ${fmt(ca)} € / mois  ·  ${fmt(ca*12)} € / an  ·  Marge produit = ${fmt(marge)} € / mois  (${sol})`;
+}
+
+// init
+const sel = $("dataHotel");
+HOTELS.forEach(h => {
+  const o = document.createElement("option");
+  o.value = h.code;
+  o.textContent = `${h.code} — ${h.name} (${h.solution})`;
+  sel.appendChild(o);
+});
+$("sol").addEventListener("change", () => { fillPilotRef($("sol").value); calc(); });
+["chambres","to","guests","mlin","frigos","mixfb",
+ "ref_ventes","ref_clients","ref_cafb","ref_canfb","ref_mix","ref_ml","ref_frigo",
+ "ref_ca10fb","ref_ca10nfb","ref_ca1fb","ref_ca1nfb","ref_coeffb","ref_coeffnfb"
+].forEach(id => $(id).addEventListener("input", calc));
+$("btnExcel").addEventListener("click", loadExcel);
+$("btnData").addEventListener("click", loadData);
+$("btnReset").addEventListener("click", () => {
+  $("sol").value = "SIMPLY";
+  $("chambres").value = 100; $("to").value = 0.70; $("guests").value = 1.7;
+  $("mlin").value = 4; $("frigos").value = 3; $("mixfb").value = 0.70;
+  fillPilotRef("SIMPLY"); calc();
+});
+fillPilotRef("SIMPLY");
+calc();
+</script>
+</body>
+</html>

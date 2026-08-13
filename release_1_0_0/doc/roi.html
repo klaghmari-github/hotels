@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ROI — marge, coûts, amortissement (doc officielle)</title>
+  <style>
+    :root {
+      --ink:#1c2430; --muted:#5a6675; --line:#d5dde6; --navy:#1a3a5c;
+      --bg:#f4f6f8; --a:#2a6fad; --ok:#0f766e;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:"Segoe UI",system-ui,sans-serif; background:var(--bg); color:var(--ink); line-height:1.55; }
+    header { background:linear-gradient(135deg,#0f3d2e,#1a7a5c); color:#fff; padding:1.6rem 1.25rem; }
+    header .wrap, nav.wrap, main, footer { max-width:980px; margin:0 auto; }
+    h1 { margin:0 0 .35rem; font-size:1.4rem; }
+    .sub { margin:0; color:#d1fae5; font-size:.92rem; }
+    nav.wrap { display:flex; flex-wrap:wrap; gap:.55rem 1rem; padding:.75rem 1.25rem; background:#fff; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5; }
+    nav a { color:var(--a); text-decoration:none; font-weight:600; font-size:.88rem; }
+    main { padding:1.1rem 1.25rem 3rem; }
+    section { background:#fff; border:1px solid var(--line); border-radius:10px; padding:1.05rem 1.2rem; margin-bottom:1rem; }
+    h2 { margin:0 0 .7rem; font-size:1.12rem; color:var(--navy); border-left:4px solid #0f766e; padding-left:.55rem; }
+    h3 { margin:1rem 0 .45rem; font-size:1rem; }
+    .muted { color:var(--muted); font-size:.9rem; }
+    table { width:100%; border-collapse:collapse; font-size:.88rem; margin:.5rem 0; }
+    th, td { text-align:left; padding:.4rem .5rem; border-bottom:1px solid var(--line); }
+    th { color:var(--muted); background:#f8fafc; }
+    code, .f { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.82rem; }
+    .f { display:block; background:#0f172a; color:#6ee7b7; padding:.75rem .9rem; border-radius:8px; white-space:pre-wrap; margin:.5rem 0; }
+    .note { background:#fffbeb; border:1px solid #fcd34d; border-radius:8px; padding:.65rem .85rem; margin:.6rem 0; font-size:.9rem; }
+    .ok { background:#ecfdf5; border:1px solid #6ee7b7; border-radius:8px; padding:.65rem .85rem; margin:.6rem 0; font-size:.9rem; }
+    .warn { background:#fef2f2; border:1px solid #fca5a5; border-radius:8px; padding:.65rem .85rem; margin:.6rem 0; font-size:.9rem; }
+    label { display:block; font-size:.82rem; color:var(--muted); margin:.4rem 0 .15rem; }
+    input, select { width:100%; max-width:320px; padding:.45rem .55rem; border:1px solid var(--line); border-radius:6px; font-size:.95rem; }
+    .kpi { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:.6rem; margin:.8rem 0; }
+    .kpi div { background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:.7rem .8rem; }
+    .kpi .v { font-size:1.15rem; font-weight:700; color:#065f46; }
+    .kpi .l { font-size:.78rem; color:var(--muted); }
+    .neg .v { color:#b91c1c; }
+    .step { border-left:3px solid #0f766e; padding:.5rem .75rem; margin:.45rem 0; background:#f8fafc; border-radius:0 8px 8px 0; font-size:.9rem; }
+    footer { padding:0 1.25rem 2rem; color:var(--muted); font-size:.82rem; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>ROI — documentation officielle</h1>
+    <p class="sub">
+      Marge sur les ventes (PV − PA) · coûts solution · amortissement · ROI
+      = marge − coûts · source Excel H168 / E176 / O176 + <code>src/user/business.py</code>
+    </p>
+  </div>
+</header>
+<nav class="wrap">
+  <a href="index.html">Index</a>
+  <a href="sim_v1.html">sim_v1</a>
+  <a href="#def">Définition</a>
+  <a href="#marge">Marge</a>
+  <a href="#couts">Coûts</a>
+  <a href="#roi">ROI &amp; payback</a>
+  <a href="#lab">Lab (CA éditable)</a>
+  <a href="reco.html">Reco</a>
+</nav>
+<main>
+
+<section id="def">
+  <h2>1. Définition officielle du ROI</h2>
+  <div class="ok">
+    <strong>ROI (mensuel ou annuel)</strong> =
+    <em>marge sur les ventes</em> (prix de vente − prix d’achat, via coefficients de marge)
+    <strong>moins</strong> les <em>coûts de la solution</em> (techno + annexes + agencement amorti).
+  </div>
+  <div class="f">ROI_mensuel  = marge_produit_mensuelle − coût_solution_mensuel
+ROI_annuel   = ROI_mensuel × 12
+
+// Alias code (même grandeur) :
+marge_nette_monthly = roi_monthly
+marge_nette_annual  = roi_annual</div>
+  <p class="muted">Fichier Excel : <code>E176 = E134 − H168</code> (pilote) ·
+    <code>O176 = O134 − R168</code> (simulation). Libellé B173 :
+    « Formule = (marge produits mensuelle − coûts mensuels) ».</p>
+  <p>Les moteurs <code>sim_v1</code> / <code>sim_v2</code> / <code>ml</code> ne calculent
+    que le CA (et la marge produit). L’enrichissement ROI est
+    <strong>commun</strong> via <code>enrich_prediction_with_costs</code>.</p>
+</section>
+
+<section id="marge">
+  <h2>2. Règle — marge produit à partir du CA</h2>
+  <p>Excel <code>E132 / E133</code> (et O132 / O133 côté simulation) :</p>
+  <div class="f">// Coefficients = « Marge » J9 / J10 (pilote) ou T9 / T10 (simu)
+// Ce ne sont pas des % de marge mais des ratios PV/PR (markup)
+
+Marge_F&amp;B  = CA_F&amp;B  − (CA_F&amp;B  / coeff_F&amp;B)
+Marge_NFB  = CA_NFB  − (CA_NFB  / coeff_NFB)
+Marge      = Marge_F&amp;B + Marge_NFB
+
+// Équivalent :
+Marge = CA × (1 − 1/coeff)</div>
+  <table>
+    <tr><th>Solution</th><th>coeff F&amp;B (J9)</th><th>coeff N-F&amp;B (J10)</th><th>Marge % F&amp;B</th><th>Marge % N-F&amp;B</th></tr>
+    <tr><td>SIMPLY</td><td>2,6</td><td>1,45</td><td>61,5 %</td><td>31,0 %</td></tr>
+    <tr><td>LIBERTY</td><td>2,6</td><td>2,0</td><td>61,5 %</td><td>50,0 %</td></tr>
+    <tr><td>CONNECTED</td><td>2,6</td><td>1,8</td><td>61,5 %</td><td>44,4 %</td></tr>
+  </table>
+  <div class="note">
+    Si l’on ne dispose que d’un <strong>CA total HT</strong> (cas lab ci-dessous),
+    la doc applique le <strong>mix F&amp;B de référence</strong> de la solution pour
+    ventiler le CA, puis les coeffs de marge. C’est la règle minimale pour
+    enchaîner CA → marge → ROI sans rejouer tout sim_v1.
+  </div>
+</section>
+
+<section id="couts">
+  <h2>3. Règles — coûts de la solution</h2>
+  <p>Excel section « COUTS MENSUELS » (lignes ~137–168) + feuilles
+    <code>COUTS - TECHNOS</code>, <code>COUTS - ANNEXES</code>, <code>COUTS - AGENCEMENT</code>.</p>
+  <div class="f">Coût_mensuel = Techno_mensuel + Annexes_mensuel + Agencement_mensuel
+
+// Mensualisation équipement (BUY, durée H142 = 60 mois) :
+mensuel_ligne = capex_ligne / 60
+
+// Agencement (durée 84 mois) :
+capex_agencement = prix_par_m × mètres_linéaires
+mensuel_agencement = capex_agencement / 84
+
+// Total mensuel Excel :
+H168 = SUM(H151, H158, H166)   // pilote
+R168 = SUM(R151, R158, R166)   // simulation</div>
+
+  <h3>3.1 Montants de référence (rod_reference.json / extraction Excel)</h3>
+  <table>
+    <tr><th></th><th>SIMPLY</th><th>LIBERTY</th><th>CONNECTED</th></tr>
+    <tr><td>Techno €/mois</td><td>75</td><td>≈ 347</td><td>≈ 900*</td></tr>
+    <tr><td>Annexes €/mois</td><td>15</td><td>30</td><td>85</td></tr>
+    <tr><td>Agencement €/m</td><td>2 200 (Bespoke)</td><td>2 200</td><td>1 000 (Prem)</td></tr>
+    <tr><td>Amort. agencement</td><td>84 mois</td><td>84</td><td>84</td></tr>
+    <tr><td>m_lin défaut</td><td>6</td><td>8</td><td>7</td></tr>
+    <tr><td>Coût mensuel total pilote</td><td>≈ <strong>247 €</strong></td><td>≈ <strong>586 €</strong></td><td>≈ <strong>1 968 €</strong>**</td></tr>
+    <tr><td>Capex fixe (indicatif)</td><td>18 500</td><td>32 000</td><td>58 000</td></tr>
+  </table>
+  <p class="muted">* Détail Connected : frigos froid 3×450 + ambiant 400 + OS 50 = structure techno
+    selon extraction ; le total pilote JSON peut inclure quantités élevées.
+    ** Valeur <code>monthly_cost_total</code> dans <code>rod_reference.json</code>.</p>
+
+  <h3>3.2 Lignes types SIMPLY (BUY)</h3>
+  <table>
+    <tr><th>Ligne</th><th>Capex</th><th>€ / mois (÷60)</th></tr>
+    <tr><td>Scanner</td><td>500</td><td>8,33</td></tr>
+    <tr><td>Licence</td><td>3 000</td><td>50</td></tr>
+    <tr><td>Frais OS</td><td>1 000</td><td>16,67</td></tr>
+    <tr><td>Élec. scanner / vitrine / staff</td><td>—</td><td>2 + 10 + 3 = 15</td></tr>
+    <tr><td>Agencement Bespoke 6 m × 2 200</td><td>13 200</td><td>157,14 (÷84)</td></tr>
+  </table>
+</section>
+
+<section id="roi">
+  <h2>4. ROI, taux &amp; amortissement (payback)</h2>
+
+  <h3>4.1 Marge nette / ROI</h3>
+  <div class="f">// Excel E176 / O176
+Marge_nette = Marge_produits − Coûts_mensuels
+
+// Taux (E177) — si nette &lt; 0 → "N/A"
+Taux = Marge_nette / CA_HT_total</div>
+
+  <h3>4.2 Amortissement Excel vs payback code</h3>
+  <p><strong>Excel (B182 / E184)</strong> — libellé :
+    « Formule = (coût total sur 60 mois / marge nette mensuelle) » :</p>
+  <div class="f">// Excel (approximation documentée dans la feuille)
+Amortissement_mois = E168 / E176
+// E168 = somme des totaux capex+coûts packagés affichés
+// E176 = marge nette mensuelle</div>
+
+  <p><strong>Code release</strong> (<code>enrich_prediction_with_costs</code>) — payback
+    sur le <em>capex</em> et le <em>ROI mensuel</em> :</p>
+  <div class="f">SI marge_nette_mensuelle &gt; 0 ET capex &gt; 0 :
+    payback_months = capex / marge_nette_mensuelle
+    payback_years  = payback_months / 12
+SINON SI marge_nette ≤ 0 :
+    payback = null   // non amortissable / « Not profitable »
+SINON :
+    payback = 0</div>
+  <div class="warn">
+    Les deux définitions d’« amortissement » ne sont pas strictement identiques
+    (Excel regroupe un coût total packagé 60 mois ; le code utilise le capex
+    d’installation). Le <strong>ROI = marge − coûts</strong> est en revanche aligné.
+  </div>
+</section>
+
+<section id="lab">
+  <h2>5. Lab — entrée CA éditable, reste = règles</h2>
+  <p class="muted">Une seule entrée métier libre : le <strong>CA HT mensuel</strong>.
+    Solution + m_lin paramètrent les règles de coûts (configuration, pas re-saisie de CA).</p>
+
+  <label>CA HT mensuel (€)</label>
+  <input type="number" id="ca" value="930" step="10" min="0"/>
+
+  <label>Solution (barème coûts + coeffs marge)</label>
+  <select id="sol">
+    <option value="SIMPLY">SIMPLY</option>
+    <option value="LIBERTY">LIBERTY</option>
+    <option value="CONNECTED">CONNECTED</option>
+  </select>
+
+  <label>Mètres linéaires (coût agencement)</label>
+  <input type="number" id="mlin" value="4" step="0.5" min="0"/>
+
+  <div class="kpi" id="kpi"></div>
+  <div id="steps"></div>
+</section>
+
+<section id="refs">
+  <h2>6. Références code &amp; fichiers</h2>
+  <table>
+    <tr><th>Élément</th><th>Emplacement</th></tr>
+    <tr><td>enrich_prediction_with_costs / compute_costs</td><td><code>src/user/business.py</code></td></tr>
+    <tr><td>Barèmes solutions</td><td><code>data/files/input/rod_reference.json</code></td></tr>
+    <tr><td>Excel coûts + marge nette</td><td><code>SIMULATEUR *</code> lignes 125–184</td></tr>
+    <tr><td>Doc chaînage CA</td><td><a href="sim_v1.html">sim_v1.html</a></td></tr>
+  </table>
+</section>
+
+</main>
+<footer>
+  ROI officiel release 1.0.0 — CA éditable, règles figées documentées.
+</footer>
+
+<script>
+// Barèmes alignés rod_reference.json + coeffs pilote v1
+const CFG = {
+  SIMPLY: {
+    mix_fb: 0.4, coeff_fb: 2.6, coeff_nfb: 1.45,
+    techno: 75, annexes: 15, agencement_per_m: 2200, amort_m: 84,
+    fixed_capex: 18500, techno_capex: 4500, annexes_capex: 900
+  },
+  LIBERTY: {
+    mix_fb: 0.7, coeff_fb: 2.6, coeff_nfb: 2.0,
+    techno: 346.6667, annexes: 30, agencement_per_m: 2200, amort_m: 84,
+    fixed_capex: 32000, techno_capex: 20800, annexes_capex: 1800
+  },
+  CONNECTED: {
+    mix_fb: 0.8, coeff_fb: 2.6, coeff_nfb: 1.8,
+    techno: 900, annexes: 85, agencement_per_m: 1000, amort_m: 84,
+    fixed_capex: 58000, techno_capex: 108000, annexes_capex: 5100
+  }
+};
+
+const $ = id => document.getElementById(id);
+const fmt = (x, d=2) => !isFinite(x) ? "—" :
+  x.toLocaleString("fr-FR", { maximumFractionDigits:d, minimumFractionDigits:0 });
+
+function calc() {
+  const ca = Math.max(parseFloat($("ca").value) || 0, 0);
+  const sol = $("sol").value;
+  const mlin = Math.max(parseFloat($("mlin").value) || 0, 0);
+  const c = CFG[sol];
+
+  // --- Règle marge : split CA par mix réf. solution ---
+  const ca_fb = ca * c.mix_fb;
+  const ca_nfb = ca * (1 - c.mix_fb);
+  const marge_fb = ca_fb - ca_fb / c.coeff_fb;
+  const marge_nfb = ca_nfb - ca_nfb / c.coeff_nfb;
+  const marge = marge_fb + marge_nfb;
+
+  // --- Règle coûts ---
+  const agen_capex = c.agencement_per_m * mlin;
+  const agen_m = c.amort_m > 0 ? agen_capex / c.amort_m : 0;
+  const cout_m = c.techno + c.annexes + agen_m;
+  const capex = c.fixed_capex + c.techno_capex + c.annexes_capex + agen_capex;
+
+  // --- ROI ---
+  const roi_m = marge - cout_m;
+  const roi_a = roi_m * 12;
+  const payback = roi_m > 1e-6 && capex > 0 ? capex / roi_m : null;
+  const taux = ca > 0 && roi_m > 0 ? roi_m / ca : null;
+
+  const neg = roi_m < 0 ? "neg" : "";
+  $("kpi").innerHTML = `
+    <div><div class="l">CA HT / mois</div><div class="v">${fmt(ca)} €</div></div>
+    <div><div class="l">Marge produit / mois</div><div class="v">${fmt(marge)} €</div></div>
+    <div><div class="l">Coût solution / mois</div><div class="v">${fmt(cout_m)} €</div></div>
+    <div class="${neg}"><div class="l">ROI / mois</div><div class="v">${fmt(roi_m)} €</div></div>
+    <div class="${neg}"><div class="l">ROI / an</div><div class="v">${fmt(roi_a)} €</div></div>
+    <div><div class="l">Payback</div><div class="v">${payback==null ? "N/A" : fmt(payback,1)+" mois"}</div></div>
+  `;
+
+  $("steps").innerHTML = `
+    <div class="step"><strong>1. Ventilation CA (mix réf. ${sol} = ${fmt(c.mix_fb*100,0)} % F&amp;B)</strong><br>
+      CA F&amp;B = ${fmt(ca_fb)} € · CA N-F&amp;B = ${fmt(ca_nfb)} €</div>
+    <div class="step"><strong>2. Marge produit (coeffs ${c.coeff_fb} / ${c.coeff_nfb})</strong><br>
+      Marge F&amp;B = ${fmt(ca_fb)} − ${fmt(ca_fb)}/${c.coeff_fb} = <strong>${fmt(marge_fb)} €</strong><br>
+      Marge N-F&amp;B = <strong>${fmt(marge_nfb)} €</strong> · Total = <strong>${fmt(marge)} €</strong></div>
+    <div class="step"><strong>3. Coûts solution</strong><br>
+      Techno ${fmt(c.techno)} + Annexes ${fmt(c.annexes)} + Agencement (${fmt(c.agencement_per_m)} × ${fmt(mlin,1)} m) / ${c.amort_m}
+      = ${fmt(c.techno)} + ${fmt(c.annexes)} + ${fmt(agen_m)} = <strong>${fmt(cout_m)} € / mois</strong><br>
+      Capex estimé (fixe + lignes + agencement) ≈ <strong>${fmt(capex,0)} €</strong></div>
+    <div class="step"><strong>4. ROI = marge − coûts</strong><br>
+      ${fmt(marge)} − ${fmt(cout_m)} = <strong>${fmt(roi_m)} € / mois</strong>
+      · annuel <strong>${fmt(roi_a)} €</strong>
+      ${taux==null ? " · taux N/A (ROI ≤ 0)" : " · taux = "+fmt(taux*100,1)+" % du CA"}</div>
+    <div class="step"><strong>5. Amortissement / payback</strong><br>
+      ${payback==null
+        ? "ROI ≤ 0 → non amortissable (Excel afficherait « Not profitable » / N/A)"
+        : "payback = capex / ROI_mensuel = "+fmt(capex,0)+" / "+fmt(roi_m)+" = <strong>"+fmt(payback,1)+" mois</strong> ("+fmt(payback/12,2)+" ans)"}
+    </div>
+  `;
+}
+
+["ca","sol","mlin"].forEach(id => $(id).addEventListener("input", calc));
+$("sol").addEventListener("change", calc);
+calc();
+</script>
+</body>
+</html>

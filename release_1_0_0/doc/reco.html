@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Reco — arbre de décision concept (doc interactive)</title>
+  <style>
+    :root {
+      --ink:#1c2430; --muted:#5a6675; --line:#d5dde6; --navy:#1a3a5c;
+      --bg:#f4f6f8; --a:#2a6fad;
+      --simply:#1d4ed8; --liberty:#047857; --conn:#b45309;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:"Segoe UI",system-ui,sans-serif; background:var(--bg); color:var(--ink); line-height:1.55; }
+    header { background:linear-gradient(135deg,#3b1d6d,#6d28d9); color:#fff; padding:1.6rem 1.25rem; }
+    header .wrap, nav.wrap, main, footer { max-width:980px; margin:0 auto; }
+    h1 { margin:0 0 .35rem; font-size:1.4rem; }
+    .sub { margin:0; color:#e9d5ff; font-size:.92rem; }
+    nav.wrap { display:flex; flex-wrap:wrap; gap:.55rem 1rem; padding:.75rem 1.25rem; background:#fff; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5; }
+    nav a { color:var(--a); text-decoration:none; font-weight:600; font-size:.88rem; }
+    main { padding:1.1rem 1.25rem 3rem; }
+    section { background:#fff; border:1px solid var(--line); border-radius:10px; padding:1.05rem 1.2rem; margin-bottom:1rem; }
+    h2 { margin:0 0 .7rem; font-size:1.12rem; color:var(--navy); border-left:4px solid #7c3aed; padding-left:.55rem; }
+    h3 { margin:1rem 0 .45rem; font-size:1rem; }
+    .muted { color:var(--muted); font-size:.9rem; }
+    table { width:100%; border-collapse:collapse; font-size:.88rem; margin:.5rem 0; }
+    th, td { text-align:left; padding:.4rem .5rem; border-bottom:1px solid var(--line); vertical-align:top; }
+    th { color:var(--muted); background:#f8fafc; }
+    code, .f, .tree { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.82rem; }
+    .f, .tree { display:block; background:#0f172a; color:#e9d5ff; padding:.85rem 1rem; border-radius:8px; white-space:pre-wrap; margin:.5rem 0; line-height:1.65; }
+    .tree .hit { color:#fcd34d; font-weight:700; }
+    .tree .dim { color:#64748b; }
+    .tree .sol-s { color:#93c5fd; font-weight:700; }
+    .tree .sol-l { color:#6ee7b7; font-weight:700; }
+    .tree .sol-c { color:#fdba74; font-weight:700; }
+    .note { background:#fffbeb; border:1px solid #fcd34d; border-radius:8px; padding:.65rem .85rem; margin:.6rem 0; font-size:.9rem; }
+    .ok { background:#ecfdf5; border:1px solid #6ee7b7; border-radius:8px; padding:.65rem .85rem; margin:.6rem 0; font-size:.9rem; }
+    .warn { background:#fef2f2; border:1px solid #fca5a5; border-radius:8px; padding:.65rem .85rem; margin:.6rem 0; font-size:.9rem; }
+    label { display:block; font-size:.82rem; color:var(--muted); margin:.35rem 0 .15rem; }
+    input[type=number], select { width:100%; max-width:280px; padding:.4rem .5rem; border:1px solid var(--line); border-radius:6px; }
+    .checks { display:grid; grid-template-columns:1fr 1fr; gap:.25rem .75rem; margin:.4rem 0; }
+    @media(max-width:700px){ .checks { grid-template-columns:1fr; } }
+    .checks label { display:flex; align-items:center; gap:.4rem; color:var(--ink); font-size:.88rem; }
+    .checks input { width:auto; }
+    .badge { display:inline-block; padding:.35rem .75rem; border-radius:8px; font-weight:800; font-size:1.05rem; margin:.4rem 0; }
+    .b-s { background:#dbeafe; color:#1e40af; }
+    .b-l { background:#d1fae5; color:#065f46; }
+    .b-c { background:#ffedd5; color:#9a3412; }
+    .path li { margin:.25rem 0; }
+    .path .active { font-weight:700; color:#6d28d9; }
+    .path .skip { color:var(--muted); text-decoration:line-through; }
+    footer { padding:0 1.25rem 2rem; color:var(--muted); font-size:.82rem; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Recommandation de concept — arbre de décision</h1>
+    <p class="sub">
+      Source Excel : feuille <em>REGLES POUR RECO DU CONCEPT</em>
+      (<code>ROD - Paramètres &amp; règles + projections nb. d'hôtels.xlsx</code>)
+      · version éditable + chemin de décision live
+    </p>
+  </div>
+</header>
+<nav class="wrap">
+  <a href="index.html">Index</a>
+  <a href="sim_v1.html">sim_v1</a>
+  <a href="roi.html">ROI</a>
+  <a href="#rules">Règles Excel</a>
+  <a href="#tree">Arbre</a>
+  <a href="#lab">Lab éditable</a>
+  <a href="#app">Reco app ROI</a>
+</nav>
+<main>
+
+<section id="rules">
+  <h2>1. Règles Excel (ordre strict)</h2>
+  <p>La feuille <code>REGLES POUR RECO DU CONCEPT</code> définit un <strong>filtre en cascade</strong>.
+    La <em>première</em> condition vraie fixe le concept affiché en premier.
+    Les 3 P&amp;L restent calculables ; la reco n’est pas exclusive.</p>
+
+  <table>
+    <tr><th>Règle</th><th>Cellule / libellé Excel</th><th>Condition</th><th>Résultat</th></tr>
+    <tr>
+      <td><strong>#1</strong></td>
+      <td>B4 · D4–E4 / K4</td>
+      <td>Nb. de chambres <strong>entre 0 et 49</strong></td>
+      <td><strong>SIMPLY</strong></td>
+    </tr>
+    <tr>
+      <td><strong>#2</strong></td>
+      <td>B15 · D15–D16 · K16 = YES</td>
+      <td>≥ 1 catégorie parmi<br>
+        Cosmetics · Kids items · Ready-to-wear · Accessories · Souvenirs</td>
+      <td><strong>LIBERTY</strong></td>
+    </tr>
+    <tr>
+      <td><strong>#3</strong></td>
+      <td>B27 · D27–D28 · K28</td>
+      <td>mètres linéaires <strong>&gt; 4</strong></td>
+      <td><strong>LIBERTY</strong></td>
+    </tr>
+    <tr>
+      <td><strong>#4</strong></td>
+      <td>B42 · D42 · K42 = YES</td>
+      <td>Hôtel déjà en possession d’une <strong>vitrine réfrigérée</strong></td>
+      <td><strong>LIBERTY</strong></td>
+    </tr>
+    <tr>
+      <td><strong>#5</strong></td>
+      <td>B52 · D52 · K52</td>
+      <td>TO moyen (YTD) <strong>&lt; 70 %</strong></td>
+      <td><strong>LIBERTY</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Sinon</strong></td>
+      <td>B36 (critères résiduels)</td>
+      <td>≥ 50 ch. · aucune des 5 cat. · m_lin ≤ 4 · pas de vitrine · TO ≥ 70 %</td>
+      <td><strong>CONNECTED</strong></td>
+    </tr>
+  </table>
+
+  <div class="note">
+    Note G20 Excel : « Le choix doit être possible pour les hôtels NOV et MER » —
+    LIBERTY doit rester accessible pour Novotel / Mercure même si le panel
+    catégories est pauvre (avertissement métier, pas un hard-block dans la release).
+  </div>
+
+  <h3>Projections de volume (parc 1 343 hôtels, Excel)</h3>
+  <table>
+    <tr><th>Concept</th><th>Volume projeté</th><th>%</th></tr>
+    <tr><td>SIMPLY</td><td>≈ 178</td><td>13 %</td></tr>
+    <tr><td>LIBERTY</td><td>≈ 937</td><td>70 %</td></tr>
+    <tr><td>CONNECTED</td><td>≈ 228</td><td>17 %</td></tr>
+  </table>
+</section>
+
+<section id="tree">
+  <h2>2. Arbre de décision (pseudo-code)</h2>
+  <div class="tree" id="treeStatic">SI nb_chambres ≤ 49
+    → SIMPLY
+
+SINON SI ≥1 cat. ∈ {Cosmetics, Kids, RTW, Accessories, Souvenirs}
+    → LIBERTY
+
+SINON SI mètres_linéaires &gt; 4
+    → LIBERTY
+
+SINON SI possède_vitrine_réfrigérée
+    → LIBERTY
+
+SINON SI TO_moyen &lt; 0,70
+    → LIBERTY
+
+SINON
+    → CONNECTED</div>
+  <div class="warn">
+    <strong>Point critique Excel :</strong> la recommandation n’est <em>pas</em>
+    le max de CA brut. On peut recommander la 2<sup>e</sup> meilleure solution
+    en CA si les règles structurelles (taille, catégories, ML, vitrine, TO) l’imposent.
+  </div>
+</section>
+
+<section id="lab">
+  <h2>3. Lab éditable — attributs hôtel → décision</h2>
+  <p class="muted">Tous les attributs qui entrent dans l’arbre sont éditables.
+    Le chemin pris est surligné ; la solution recommandée s’affiche en direct.</p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+    <div>
+      <label>Nb. de chambres</label>
+      <input type="number" id="chambres" min="1" step="1" value="97"/>
+      <label>Mètres linéaires souhaités</label>
+      <input type="number" id="mlin" min="0" step="0.5" value="3"/>
+      <label>TO moyen YTD (0–1 ou %)</label>
+      <input type="number" id="to" min="0" step="0.01" value="0.70"/>
+      <label style="display:flex;align-items:center;gap:.4rem;color:var(--ink);margin-top:.6rem">
+        <input type="checkbox" id="vitrine"/> Possède déjà une vitrine réfrigérée
+      </label>
+    </div>
+    <div>
+      <label>Catégories N-F&amp;B (règle #2 — les 5 « lifestyle »)</label>
+      <div class="checks">
+        <label><input type="checkbox" class="cat" value="cosmetics"/> Cosmetics</label>
+        <label><input type="checkbox" class="cat" value="kids"/> Kids items</label>
+        <label><input type="checkbox" class="cat" value="rtw"/> Ready-to-wear</label>
+        <label><input type="checkbox" class="cat" value="accessories"/> Accessories</label>
+        <label><input type="checkbox" class="cat" value="souvenirs"/> Souvenirs</label>
+      </div>
+      <p class="muted" style="margin-top:.5rem">Autres catégories (SOS, Hygiene…) influencent le CA (R3 sim_v1)
+        mais <strong>pas</strong> cet arbre de reco.</p>
+    </div>
+  </div>
+
+  <div id="result" style="margin-top:1rem"></div>
+  <h3>Chemin de décision</h3>
+  <ol class="path" id="path"></ol>
+  <h3>Arbre annoté (branche active)</h3>
+  <div class="tree" id="treeLive"></div>
+</section>
+
+<section id="app">
+  <h2>4. Recommandation dans l’app release (complément ROI)</h2>
+  <p>Une fois les simulations lancées (sim_v1 / sim_v2 / ml),
+    <code>src/user/business.py → recommend()</code> choisit parmi les
+    <strong>résultats chiffrés</strong> :</p>
+  <div class="f">// Filtre léger taille (écho règle #1)
+SI nb_chambres &lt; 50 ET une prédiction SIMPLY existe :
+    candidats = { SIMPLY seulement }
+    warning = "Hotel &lt; 50 chambres — SIMPLY privilégié"
+
+// Choix final
+recommandé = argmax ROI_annuel parmi candidats
+// ROI_annuel = marge_nette_annual = (marge_ventes − coûts) × 12</div>
+  <div class="ok">
+    <strong>Deux couches :</strong><br>
+    1. <em>Arbre Excel</em> (cette page) → concept « affiché en premier » / adéquation opérationnelle.<br>
+    2. <em>Reco ROI app</em> → parmi les P&amp;L calculés, meilleur ROI annuel
+    (avec filtre taille &lt; 50 ch. → SIMPLY).
+  </div>
+  <p>Voir aussi <a href="roi.html">roi.html</a> pour le détail marge − coûts.</p>
+</section>
+
+<section id="examples">
+  <h2>5. Exemples de parcours</h2>
+  <table>
+    <tr><th>Hôtel type</th><th>Attributs</th><th>Règle qui gagne</th><th>Reco Excel</th></tr>
+    <tr>
+      <td>Petit Ibis Budget</td>
+      <td>40 ch. · 3 m_lin · TO 75 %</td>
+      <td>#1 taille</td>
+      <td>SIMPLY</td>
+    </tr>
+    <tr>
+      <td>Mercure midscale lifestyle</td>
+      <td>120 ch. · Cosmetics coché</td>
+      <td>#2 catégories</td>
+      <td>LIBERTY</td>
+    </tr>
+    <tr>
+      <td>Boutique large</td>
+      <td>150 ch. · 6 m_lin · pas de cat. lifestyle</td>
+      <td>#3 m_lin &gt; 4</td>
+      <td>LIBERTY</td>
+    </tr>
+    <tr>
+      <td>TO faible</td>
+      <td>200 ch. · 3 m_lin · TO 60 % · pas vitrine</td>
+      <td>#5 TO &lt; 70 %</td>
+      <td>LIBERTY</td>
+    </tr>
+    <tr>
+      <td>Grand volume plein</td>
+      <td>300 ch. · 3 m_lin · TO 80 % · pas lifestyle · pas vitrine</td>
+      <td>Sinon</td>
+      <td>CONNECTED</td>
+    </tr>
+  </table>
+</section>
+
+</main>
+<footer>
+  Source : <code>REGLES POUR RECO DU CONCEPT</code> · notes L72–L73 des SIMULATEUR ·
+  <code>recommend()</code> dans business.py.
+</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+
+function decide() {
+  let ch = parseFloat($("chambres").value) || 0;
+  let mlin = parseFloat($("mlin").value) || 0;
+  let to = parseFloat($("to").value) || 0;
+  if (to > 1.5) to = to / 100;
+  const vitrine = $("vitrine").checked;
+  const cats = [...document.querySelectorAll(".cat:checked")].map(c => c.value);
+  const hasLifestyle = cats.length > 0;
+
+  const steps = [];
+  let rec = null;
+  let rule = null;
+
+  // #1
+  if (ch <= 49) {
+    steps.push({ id:1, text:`#1 Nb chambres = ${ch} ≤ 49`, hit:true, sol:"SIMPLY" });
+    rec = "SIMPLY"; rule = 1;
+  } else {
+    steps.push({ id:1, text:`#1 Nb chambres = ${ch} > 49 → non`, hit:false });
+  }
+
+  // #2
+  if (!rec) {
+    if (hasLifestyle) {
+      steps.push({ id:2, text:`#2 Catégories lifestyle cochées (${cats.join(", ")})`, hit:true, sol:"LIBERTY" });
+      rec = "LIBERTY"; rule = 2;
+    } else {
+      steps.push({ id:2, text:"#2 Aucune des 5 catégories lifestyle → non", hit:false });
+    }
+  }
+
+  // #3
+  if (!rec) {
+    if (mlin > 4) {
+      steps.push({ id:3, text:`#3 m_lin = ${mlin} > 4`, hit:true, sol:"LIBERTY" });
+      rec = "LIBERTY"; rule = 3;
+    } else {
+      steps.push({ id:3, text:`#3 m_lin = ${mlin} ≤ 4 → non`, hit:false });
+    }
+  }
+
+  // #4
+  if (!rec) {
+    if (vitrine) {
+      steps.push({ id:4, text:"#4 Vitrine réfrigérée déjà présente", hit:true, sol:"LIBERTY" });
+      rec = "LIBERTY"; rule = 4;
+    } else {
+      steps.push({ id:4, text:"#4 Pas de vitrine réfrigérée → non", hit:false });
+    }
+  }
+
+  // #5
+  if (!rec) {
+    if (to < 0.70) {
+      steps.push({ id:5, text:`#5 TO = ${(to*100).toFixed(0)} % < 70 %`, hit:true, sol:"LIBERTY" });
+      rec = "LIBERTY"; rule = 5;
+    } else {
+      steps.push({ id:5, text:`#5 TO = ${(to*100).toFixed(0)} % ≥ 70 % → non`, hit:false });
+    }
+  }
+
+  if (!rec) {
+    steps.push({ id:6, text:"Sinon → critères résiduels CONNECTED", hit:true, sol:"CONNECTED" });
+    rec = "CONNECTED"; rule = 6;
+  }
+
+  const badgeClass = rec === "SIMPLY" ? "b-s" : (rec === "LIBERTY" ? "b-l" : "b-c");
+  $("result").innerHTML = `
+    <span class="badge ${badgeClass}">Recommandé : ${rec}</span>
+    <p class="muted">Règle déclenchante : ${rule === 6 ? "défaut (sinon)" : "#"+rule}</p>
+  `;
+
+  $("path").innerHTML = steps.map(s => {
+    const cls = s.hit ? "active" : "skip";
+    const extra = s.sol ? ` → <strong>${s.sol}</strong>` : "";
+    return `<li class="${cls}">${s.text}${extra}</li>`;
+  }).join("");
+
+  // annotated tree
+  const line = (cond, solClass, sol, active, skipped) => {
+    if (active) return `<span class="hit">SI ${cond}\n    → </span><span class="${solClass}">${sol}</span>  ← ICI`;
+    if (skipped) return `<span class="dim">SI ${cond}\n    → ${sol}  (non évalué / déjà décidé)</span>`;
+    return `<span class="dim">SI ${cond}\n    → ${sol}  (faux)</span>`;
+  };
+
+  const decided = rule != null;
+  $("treeLive").innerHTML = [
+    line("nb_chambres ≤ 49", "sol-s", "SIMPLY", rule===1, decided && rule<1),
+    "",
+    line("≥1 cat. lifestyle", "sol-l", "LIBERTY", rule===2, decided && rule<2),
+    "",
+    line("m_lin > 4", "sol-l", "LIBERTY", rule===3, decided && rule<3),
+    "",
+    line("vitrine réfrigérée", "sol-l", "LIBERTY", rule===4, decided && rule<4),
+    "",
+    line("TO < 70 %", "sol-l", "LIBERTY", rule===5, decided && rule<5),
+    "",
+    rule===6
+      ? `<span class="hit">SINON\n    → </span><span class="sol-c">CONNECTED</span>  ← ICI`
+      : `<span class="dim">SINON\n    → CONNECTED</span>`
+  ].join("\n");
+}
+
+["chambres","mlin","to","vitrine"].forEach(id => {
+  $(id).addEventListener("input", decide);
+  $(id).addEventListener("change", decide);
+});
+document.querySelectorAll(".cat").forEach(c => c.addEventListener("change", decide));
+decide();
+</script>
+</body>
+</html>
