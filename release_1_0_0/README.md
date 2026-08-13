@@ -1,6 +1,7 @@
 # Accor ROD — release 1.0.0
 
-Simulateurs **sim_v1** / **sim_v2**, moteur **ml** (XGBoost conversion + CA), API et interfaces user / admin.
+Simulateurs **sim_v1** / **sim_v2**, moteur **ml** (chaîne conversion → pont → CA),
+API et interfaces user / admin. ROI et recommandation de concept en modules communs.
 
 ## Structure
 
@@ -13,9 +14,11 @@ release_1_0_0/
   src/
     sim_v1/ sim_v2/ ml/ # services
     eval/               # évaluation full (in-sample)
-    api/ web/ user/     # API, GUI, coûts/ROI
-  models/super/         # modèles ml par solution
-  doc/                  # documentation HTML + analyse
+    api/ web/ user/     # API, GUI, coûts/ROI/reco
+  models/super/         # modèles ml par solution (ml_tc, ml_ca)
+  doc/                  # documentation HTML + MD
+  scripts/              # deploy Adixon, studio_redirect, utilitaires
+  ecosystem.config.js   # PM2 prod
   run.py
 ```
 
@@ -39,13 +42,14 @@ cd release_1_0_0
 
 ## Moteurs
 
-| Moteur | Principe |
-|--------|----------|
-| **sim_v1** | Règles Excel R1–R4 + marge ventes par coefficients F&B/Non F&B |
-| **sim_v2** | Coefficients d’intensité sur obs+sim pilotes, restitution mix |
-| **ml** | XGBoost : taux de conversion puis CA (par solution), features hôtel/proximité/météo/marque |
+| Moteur | Principe | Doc |
+|--------|----------|-----|
+| **sim_v1** | Règles Excel R1–R4 + marge ventes par coefficients F&B/Non F&B | [sim_v1.html](doc/sim_v1.html) |
+| **sim_v2** | Scénarios obs+sim, coefficients d’intensité, restitution mix | [sim_v2.html](doc/sim_v2.html) |
+| **ml** | Par solution : TC → pont sim_v2 → CA final (+ contexte hôtel) | [ml.html](doc/ml.html) |
 
-**ROI** = marge ventes (PV − PA) − coûts solution. Recommandation = meilleur ROI annuel.
+**ROI** = marge ventes (PV − PA) − coûts solution — [roi.html](doc/roi.html).  
+**Reco concept** = arbre Excel + meilleur ROI app — [reco.html](doc/reco.html).
 
 ## Évaluations
 
@@ -60,15 +64,17 @@ Admin : onglets **LOO · comparaison** et **full · comparaison**.
 
 | Doc | Contenu |
 |-----|---------|
-| [doc/index.html](doc/index.html) | Vue d’ensemble |
+| [doc/index.html](doc/index.html) | **Index général** (catalogue, arbo, moteurs, API, deploy) |
 | [doc/sim_v1.html](doc/sim_v1.html) | Règles Excel R1–R4, lab interactif (pilote → cible) |
 | [doc/sim_v2.html](doc/sim_v2.html) | Pipeline scénarios → dataset → coeffs → CA (lab live) |
+| [doc/sim_v2_scientific.html](doc/sim_v2_scientific.html) | Méthode scientifique sim_v2 |
+| [doc/sim_v2_methodologie.html](doc/sim_v2_methodologie.html) | Complément méthodologique sim_v2 |
 | [doc/ml.html](doc/ml.html) | Chaîne ml_tc → pont → ml_ca (sans détail d’algo) |
 | [doc/roi.html](doc/roi.html) | Marge, coûts solution, amortissement, ROI |
 | [doc/reco.html](doc/reco.html) | Arbre de décision concept (éditable) |
 | [doc/analyse.html](doc/analyse.html) | Interprétation LOO / full |
-| [doc/sim_v2_scientific.html](doc/sim_v2_scientific.html) | Méthode sim_v2 |
 | [doc/ARCHITECTURE.md](doc/ARCHITECTURE.md) | Couches package |
+| [doc/SYNC_ADIXON.md](doc/SYNC_ADIXON.md) | Sync / deploy Adixon |
 
 ## Déploiement Adixon
 
@@ -90,4 +96,6 @@ Admin : onglets **LOO · comparaison** et **full · comparaison**.
 ./scripts/deploy_to_adixon.sh --dry-run
 ```
 
-**Règle :** push GitHub libre ; **déploiement Adixon uniquement** sur consigne explicite (« déploie sur Adixon »). Les évolutions locales / GitHub n’impliquent **pas** de déploiement hébergement.
+**Règle :** push GitHub libre ; **déploiement Adixon uniquement** sur consigne explicite
+(« déploie sur Adixon »). Les évolutions locales / GitHub n’impliquent **pas** de
+déploiement hébergement.

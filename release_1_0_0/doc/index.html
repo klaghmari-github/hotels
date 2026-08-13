@@ -8,74 +8,154 @@
     :root { --ink:#1c2430; --muted:#5a6675; --line:#d5dde6; --navy:#1a3a5c; --bg:#f4f6f8; }
     body { margin:0; font-family:"Segoe UI",system-ui,sans-serif; background:var(--bg); color:var(--ink); line-height:1.55; }
     header { background:linear-gradient(135deg,#142b45,#245c8f); color:#fff; padding:2rem 1.5rem; }
-    header, main, nav { max-width:920px; margin:0 auto; }
-    nav { display:flex; flex-wrap:wrap; gap:.6rem 1rem; padding:.85rem 1.25rem; background:#fff; border-bottom:1px solid var(--line); position:sticky; top:0; }
-    nav a { color:#2a6fad; text-decoration:none; font-weight:600; font-size:.9rem; }
+    header .inner, main, nav { max-width:960px; margin:0 auto; }
+    nav { display:flex; flex-wrap:wrap; gap:.55rem 1rem; padding:.85rem 1.25rem; background:#fff; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5; }
+    nav a { color:#2a6fad; text-decoration:none; font-weight:600; font-size:.88rem; }
     main { padding:1.25rem 1.25rem 3rem; }
     section { background:#fff; border:1px solid var(--line); border-radius:10px; padding:1.1rem 1.25rem; margin-bottom:1rem; }
     h1 { margin:0 0 .4rem; font-size:1.45rem; }
     h2 { margin:0 0 .6rem; font-size:1.1rem; color:var(--navy); }
+    h3 { margin:1rem 0 .4rem; font-size:1rem; color:#334155; }
     code, pre { background:#eef2f6; border-radius:6px; font-size:.88rem; }
     code { padding:.1rem .35rem; }
     pre { padding:.8rem 1rem; overflow:auto; }
     table { width:100%; border-collapse:collapse; font-size:.9rem; }
-    th, td { text-align:left; padding:.4rem .5rem; border-bottom:1px solid var(--line); }
+    th, td { text-align:left; padding:.4rem .5rem; border-bottom:1px solid var(--line); vertical-align:top; }
+    th { color:var(--muted); background:#f8fafc; }
     .muted { color:var(--muted); }
+    .pill {
+      display:inline-block; font-size:.75rem; font-weight:700; padding:.12rem .45rem;
+      border-radius:999px; background:#e0e7ff; color:#3730a3; margin-right:.25rem;
+    }
   </style>
 </head>
 <body>
   <header>
-    <div>
+    <div class="inner">
       <h1>Release 1.0.0 — documentation</h1>
       <p class="muted" style="color:#dbe7f5;margin:0">
-        Pipelines, sim_v1 / sim_v2 / ml, évaluations LOO &amp; full, API, GUI.
+        Vue d’ensemble : pipelines, moteurs sim_v1 / sim_v2 / ml, ROI, reco,
+        évaluations LOO &amp; full, API, GUI, déploiement Adixon.
       </p>
     </div>
   </header>
   <nav>
+    <a href="#docs">Catalogue</a>
     <a href="#arbo">Arborescence</a>
     <a href="#moteurs">Moteurs</a>
     <a href="#eval">Évaluations</a>
     <a href="#api">API</a>
     <a href="#usage">Usage</a>
-    <a href="sim_v1.html">sim_v1 Excel</a>
-    <a href="sim_v2.html">sim_v2 pipeline</a>
+    <a href="#deploy">Déploiement</a>
+    <a href="sim_v1.html">sim_v1</a>
+    <a href="sim_v2.html">sim_v2</a>
     <a href="ml.html">ml</a>
     <a href="roi.html">ROI</a>
     <a href="reco.html">Reco</a>
-    <a href="analyse.html">Analyse résultats</a>
-    <a href="sim_v2_scientific.html">sim_v2 scientifique</a>
   </nav>
   <main>
+
+    <section id="docs">
+      <h2>0. Catalogue de la documentation</h2>
+      <p class="muted">Pages HTML interactives et notes techniques livrées avec la release.</p>
+      <table>
+        <tr><th>Document</th><th>Contenu</th></tr>
+        <tr>
+          <td><a href="index.html"><strong>index.html</strong></a></td>
+          <td>Cette page — index général release 1.0.0</td>
+        </tr>
+        <tr>
+          <td><a href="sim_v1.html"><strong>sim_v1.html</strong></a></td>
+          <td>Règles Excel R1–R4, carte cellules, lab pilote → hôtel cible (2 chargements)</td>
+        </tr>
+        <tr>
+          <td><a href="sim_v2.html"><strong>sim_v2.html</strong></a></td>
+          <td>Pipeline scénarios → simulation → dataset → coefficients → CA (lab live)</td>
+        </tr>
+        <tr>
+          <td><a href="sim_v2_scientific.html">sim_v2_scientific.html</a></td>
+          <td>Méthode scientifique sim_v2 (formules, restitution)</td>
+        </tr>
+        <tr>
+          <td><a href="sim_v2_methodologie.html">sim_v2_methodologie.html</a></td>
+          <td>Complément méthodologique sim_v2</td>
+        </tr>
+        <tr>
+          <td><a href="ml.html"><strong>ml.html</strong></a></td>
+          <td>Chaîne ml : dataset → TC → pont sim_v2 → CA final (sans détail d’algo)</td>
+        </tr>
+        <tr>
+          <td><a href="roi.html"><strong>roi.html</strong></a></td>
+          <td>Marge produit, coûts solution, amortissement, ROI (CA éditable)</td>
+        </tr>
+        <tr>
+          <td><a href="reco.html"><strong>reco.html</strong></a></td>
+          <td>Arbre de recommandation de concept (éditable) + reco ROI app</td>
+        </tr>
+        <tr>
+          <td><a href="analyse.html">analyse.html</a></td>
+          <td>Interprétation des résultats LOO / full</td>
+        </tr>
+        <tr>
+          <td><a href="ARCHITECTURE.md">ARCHITECTURE.md</a></td>
+          <td>Couches package (src, pipeline, data)</td>
+        </tr>
+        <tr>
+          <td><a href="SYNC_ADIXON.md">SYNC_ADIXON.md</a></td>
+          <td>Déploiement local → Adixon (<code>scripts/deploy_to_adixon.sh</code>)</td>
+        </tr>
+      </table>
+      <p class="muted">README racine : <code>../README.md</code> (commandes, moteurs, liens docs, deploy).</p>
+    </section>
+
     <section id="arbo">
       <h2>1. Arborescence</h2>
       <table>
         <tr><th>Chemin</th><th>Rôle</th></tr>
-        <tr><td><code>data/files/input</code></td><td>Ventes, hôtels, proximité, météo, brands</td></tr>
+        <tr><td><code>data/files/input</code></td><td>Ventes, hôtels, proximité, météo, brands, defaults sim_v1</td></tr>
         <tr><td><code>data/files/output</code></td><td>LOO, full, extracts</td></tr>
         <tr><td><code>data/duckdb/main</code></td><td>Base principale</td></tr>
         <tr><td><code>pipeline/{sim_v1,sim_v2,ml}</code></td><td>YAML déclaratifs</td></tr>
         <tr><td><code>src/sim_v1|sim_v2|ml|eval</code></td><td>Services métier + eval full</td></tr>
         <tr><td><code>src/api</code> + <code>src/web</code></td><td>API et GUI</td></tr>
-        <tr><td><code>models/super</code></td><td>XGBoost par solution (ml_tc, ml_ca)</td></tr>
+        <tr><td><code>src/user</code></td><td>Coûts, ROI, reco, optimisation mix</td></tr>
+        <tr><td><code>models/super</code></td><td>Modèles ml par solution (ml_tc, ml_ca + LOO)</td></tr>
+        <tr><td><code>doc/</code></td><td>Documentation HTML + MD</td></tr>
+        <tr><td><code>scripts/deploy_to_adixon.sh</code></td><td>Sync prod Adixon (sur consigne explicite)</td></tr>
+        <tr><td><code>ecosystem.config.js</code></td><td>PM2 (user :8000 + redirect /studio :8001)</td></tr>
       </table>
     </section>
 
     <section id="moteurs">
       <h2>2. Moteurs</h2>
       <ul>
-        <li><strong>sim_v1</strong> — règles ROD Excel (R1–R4), référence pilotes, marge ventes par coeff F&amp;B/Non F&amp;B.
-          Doc interactive : <a href="sim_v1.html">sim_v1.html</a>.</li>
-        <li><strong>sim_v2</strong> — scénarios × pilotes, coefficients d’intensité, restitution mix.
-          Doc interactive : <a href="sim_v2.html">sim_v2.html</a>
-          · scientifique : <a href="sim_v2_scientific.html">sim_v2_scientific.html</a>.</li>
-        <li><strong>ml</strong> — chaîne par solution : taux de conversion → pont sim_v2 → CA final ;
+        <li>
+          <span class="pill">sim_v1</span>
+          <strong>Règles Excel R1–R4</strong> — référence pilotes, marge ventes par coeffs F&amp;B / Non F&amp;B.
+          Doc : <a href="sim_v1.html">sim_v1.html</a>.
+        </li>
+        <li>
+          <span class="pill">sim_v2</span>
+          <strong>Scénarios × pilotes</strong> — coefficients d’intensité, restitution mix.
+          Doc : <a href="sim_v2.html">sim_v2.html</a>
+          · <a href="sim_v2_scientific.html">scientifique</a>
+          · <a href="sim_v2_methodologie.html">méthodologie</a>.
+        </li>
+        <li>
+          <span class="pill">ml</span>
+          <strong>Chaîne par solution</strong> — taux de conversion → pont sim_v2 → CA final ;
           features hôtel, proximité, météo, marque + signaux sim_v2.
-          Doc : <a href="ml.html">ml.html</a>.</li>
+          Doc : <a href="ml.html">ml.html</a>.
+        </li>
       </ul>
-      <p><strong>ROI</strong> = marge ventes (PV − PA) − coûts solution. Commun aux trois moteurs après le CA.
+      <p>
+        <strong>ROI</strong> = marge ventes (PV − PA) − coûts solution — commun aux trois moteurs après le CA.
         Doc : <a href="roi.html">roi.html</a>.
-        Arbre de recommandation concept : <a href="reco.html">reco.html</a>.</p>
+      </p>
+      <p>
+        <strong>Reco concept</strong> — arbre Excel (taille, catégories, m_lin, vitrine, TO)
+        + choix ROI dans l’app. Doc : <a href="reco.html">reco.html</a>.
+      </p>
     </section>
 
     <section id="eval">
@@ -95,7 +175,8 @@
           <td><code>run.py eval-full</code> → <code>eval_*_full.xlsx</code></td>
         </tr>
       </table>
-      <p>Admin : <em>LOO · comparaison</em> et <em>full · comparaison</em>. Détail interprétation : <a href="analyse.html">analyse.html</a>.</p>
+      <p>Admin : <em>LOO · comparaison</em> et <em>full · comparaison</em>.
+        Interprétation : <a href="analyse.html">analyse.html</a>.</p>
     </section>
 
     <section id="api">
@@ -114,9 +195,35 @@
       <h2>5. Usage local</h2>
       <pre>cd release_1_0_0
 .venv/bin/python run.py serve --port 5080
+.venv/bin/python run.py sim-v1 --rebuild
+.venv/bin/python run.py sim-v2 --rebuild
+.venv/bin/python run.py ml --rebuild
 .venv/bin/python run.py eval-full</pre>
-      <p class="muted">UI : http://127.0.0.1:5080/ — déploiement hébergement séparé, non automatique.</p>
+      <table>
+        <tr><th>URL locale</th><th>Rôle</th></tr>
+        <tr><td>http://127.0.0.1:5080/</td><td>Accueil</td></tr>
+        <tr><td>http://127.0.0.1:5080/user</td><td>Parcours estimation</td></tr>
+        <tr><td>http://127.0.0.1:5080/user/doc</td><td>Doc parcours UI</td></tr>
+        <tr><td>http://127.0.0.1:5080/admin</td><td>Studio (auth)</td></tr>
+      </table>
     </section>
+
+    <section id="deploy">
+      <h2>6. Déploiement Adixon</h2>
+      <p>
+        Script : <code>../scripts/deploy_to_adixon.sh</code> ·
+        procédure : <a href="SYNC_ADIXON.md">SYNC_ADIXON.md</a> ·
+        PM2 : <code>../ecosystem.config.js</code>
+      </p>
+      <pre>./scripts/deploy_to_adixon.sh           # code + reload PM2
+./scripts/deploy_to_adixon.sh --all     # + data + duckdb + models + deps
+./scripts/deploy_to_adixon.sh --dry-run</pre>
+      <p class="muted">
+        <strong>Règle :</strong> push GitHub libre. Déploiement hébergement
+        <strong>uniquement</strong> sur consigne explicite (« déploie sur Adixon »).
+      </p>
+    </section>
+
   </main>
 </body>
 </html>
