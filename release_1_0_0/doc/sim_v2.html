@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>sim_v2 — pipeline interactif (scénarios → coefficients → CA)</title>
+  <style>
+    :root {
+      --ink:#152033; --muted:#5b6778; --line:#d9e1ec; --navy:#163a5f;
+      --bg:#eef2f7; --card:#fff; --a:#1f6feb; --ok:#0d9488; --warn:#b45309;
+      --simply:#1d4ed8; --liberty:#047857; --conn:#b45309;
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0; font-family:"Segoe UI",system-ui,sans-serif; color:var(--ink); line-height:1.55;
+      background: radial-gradient(1000px 400px at 0% 0%,#dbeafe,transparent 50%),
+                  radial-gradient(800px 360px at 100% 0%,#ccfbf1,transparent 45%), var(--bg);
+    }
+    header { background:linear-gradient(135deg,#0f2744 0%,#1a4d7c 50%,#0f766e 100%); color:#fff; padding:1.7rem 1.25rem; }
+    header .wrap, nav.wrap, main, footer { max-width:1080px; margin:0 auto; }
+    h1 { margin:0 0 .35rem; font-size:1.4rem; }
+    .sub { margin:0; color:#dbeafe; font-size:.92rem; max-width:48rem; }
+    nav.wrap {
+      display:flex; flex-wrap:wrap; gap:.5rem .9rem; padding:.7rem 1.25rem;
+      background:rgba(255,255,255,.94); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:10;
+    }
+    nav a { color:var(--a); text-decoration:none; font-weight:650; font-size:.86rem; }
+    main { padding:1rem 1.25rem 3rem; }
+    section {
+      background:var(--card); border:1px solid var(--line); border-radius:12px;
+      padding:1.05rem 1.2rem; margin-bottom:1rem; box-shadow:0 8px 24px rgba(22,58,95,.06);
+    }
+    h2 { margin:0 0 .65rem; font-size:1.12rem; color:var(--navy); border-left:4px solid var(--a); padding-left:.55rem; }
+    h3 { margin:1rem 0 .4rem; font-size:1rem; color:#1e3a5f; }
+    .muted { color:var(--muted); font-size:.9rem; }
+    table { width:100%; border-collapse:collapse; font-size:.86rem; margin:.45rem 0; }
+    th, td { text-align:left; padding:.38rem .48rem; border-bottom:1px solid var(--line); vertical-align:top; }
+    th { color:var(--muted); background:#f8fafc; font-weight:600; }
+    code, .f { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.8rem; }
+    .f {
+      display:block; background:#0f172a; color:#7dd3fc; padding:.75rem .9rem;
+      border-radius:8px; white-space:pre-wrap; margin:.5rem 0; overflow:auto; line-height:1.45;
+    }
+    .note { background:#fffbeb; border:1px solid #fcd34d; border-radius:8px; padding:.65rem .85rem; margin:.55rem 0; font-size:.9rem; }
+    .ok { background:#ecfdf5; border:1px solid #6ee7b7; border-radius:8px; padding:.65rem .85rem; margin:.55rem 0; font-size:.9rem; }
+    .warn { background:#fef2f2; border:1px solid #fca5a5; border-radius:8px; padding:.65rem .85rem; margin:.55rem 0; font-size:.9rem; }
+    .step {
+      border-left:3px solid var(--a); padding:.55rem .8rem; margin:.5rem 0;
+      background:#f8fafc; border-radius:0 8px 8px 0;
+    }
+    .step.g2 { border-left-color:var(--ok); }
+    .step.g3 { border-left-color:#7c3aed; }
+    .step.g4 { border-left-color:var(--warn); }
+    .step strong { color:var(--navy); }
+    .ex {
+      background:#f0f9ff; border:1px dashed #7dd3fc; border-radius:8px;
+      padding:.55rem .75rem; margin:.4rem 0 .2rem; font-size:.88rem;
+    }
+    .ex b { color:#0369a1; }
+    .tag { display:inline-block; font-size:.7rem; font-weight:700; padding:.1rem .4rem; border-radius:999px; }
+    .obs { background:#dbeafe; color:#1e40af; }
+    .sim { background:#d1fae5; color:#065f46; }
+    .est { background:#fef3c7; color:#92400e; }
+    label { display:block; font-size:.8rem; color:var(--muted); margin:.35rem 0 .12rem; }
+    input[type=number], select {
+      width:100%; padding:.4rem .5rem; border:1px solid var(--line); border-radius:6px; font-size:.9rem; background:#fff;
+    }
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+    .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:.75rem; }
+    @media(max-width:900px){ .grid2,.grid3 { grid-template-columns:1fr; } }
+    .panel { background:#f8fafc; border:1px solid var(--line); border-radius:10px; padding:.75rem .9rem; }
+    .btnrow { display:flex; flex-wrap:wrap; gap:.45rem; margin:.55rem 0; }
+    button {
+      border:none; border-radius:7px; padding:.48rem .8rem; font-weight:600; font-size:.86rem; cursor:pointer;
+    }
+    .btn-primary { background:var(--a); color:#fff; }
+    .btn-ok { background:var(--ok); color:#fff; }
+    .btn-sec { background:#e2e8f0; color:#1e293b; }
+    .kpi { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:.5rem; margin:.6rem 0; }
+    .kpi div { background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:.55rem .65rem; }
+    .kpi .v { font-weight:800; color:var(--navy); font-size:1.02rem; }
+    .kpi .l { font-size:.75rem; color:var(--muted); }
+    .sol-s { color:var(--simply); font-weight:700; }
+    .sol-l { color:var(--liberty); font-weight:700; }
+    .sol-c { color:var(--conn); font-weight:700; }
+    .mix-row { display:grid; grid-template-columns:1fr 90px; gap:.4rem; align-items:center; margin:.2rem 0; font-size:.86rem; }
+    footer { padding:0 1.25rem 2rem; color:var(--muted); font-size:.82rem; }
+    .flow-num {
+      display:inline-flex; width:1.6rem; height:1.6rem; border-radius:50%;
+      background:var(--a); color:#fff; font-weight:800; font-size:.8rem;
+      align-items:center; justify-content:center; margin-right:.35rem;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>sim_v2 — du scénario hôtel au CA cible</h1>
+    <p class="sub">
+      Documentation interactive alignée sur <code>pipeline/sim_v2/</code> et
+      <code>src/sim_v2/</code> : entrées cibles éditables, puis chaque étape
+      (observation → scénarios → simulation → dataset → coefficients → restitution CA)
+      avec explication et exemple chiffré réel (base DuckDB release).
+    </p>
+  </div>
+</header>
+<nav class="wrap">
+  <a href="index.html">Index</a>
+  <a href="sim_v1.html">sim_v1</a>
+  <a href="sim_v2_scientific.html">sim_v2 scientifique</a>
+  <a href="#inputs">Entrées</a>
+  <a href="#flow">Flux</a>
+  <a href="#s1">1·Source</a>
+  <a href="#s2">2·Rangs</a>
+  <a href="#s3">3·Scénarios</a>
+  <a href="#s4">4·Simulation</a>
+  <a href="#s5">5·Dataset</a>
+  <a href="#s6">6·Coefficients</a>
+  <a href="#s7">7·CA cible</a>
+  <a href="#lab">Lab live</a>
+  <a href="roi.html">ROI</a>
+</nav>
+<main>
+
+<!-- ========== INPUTS ========== -->
+<section id="inputs">
+  <h2><span class="flow-num">0</span> Entrées hôtel cible (uniquement celles de sim_v2)</h2>
+  <p class="muted">
+    Contrairement à sim_v1 (R1–R4 Excel), sim_v2 n’utilise <strong>pas</strong>
+    les coefficients pilotes fixes E34/E35. Les leviers ci-dessous sont injectés
+    dans <code>v_restitution_input_hotel</code> + <code>v_restitution_input_mix</code>
+    (<code>src/sim_v2/restitution.py</code>).
+  </p>
+  <table>
+    <tr><th>Champ</th><th>Rôle</th><th>Contrainte code</th></tr>
+    <tr><td><code>hotel_nb_chambres</code></td><td>Trafic</td><td>&gt; 0</td></tr>
+    <tr><td><code>hotel_to_annuel</code></td><td>Taux d’occupation annuel</td><td>∈ ]0, 1]</td></tr>
+    <tr><td><code>hotel_guests_per_chambre</code></td><td>Guests / chambre</td><td>&gt; 0</td></tr>
+    <tr><td><code>metres_lineaires</code></td><td>Surface retail cible</td><td>&gt; 0</td></tr>
+    <tr><td><code>type_mix</code></td><td>Parts F&amp;B / NON F&amp;B (somme 1)</td><td>parts ≥ 0, Σ = 1</td></tr>
+    <tr><td><code>gamme_mix</code></td><td>Parts par gamme (somme 1, souvent dérivées UI)</td><td>parts ≥ 0, Σ = 1</td></tr>
+  </table>
+  <div class="f">nombre_guests_par_mois =
+  hotel_nb_chambres × hotel_to_annuel × hotel_guests_per_chambre × 30.5</div>
+  <div class="ok">
+    <strong>Non utilisés par le moteur sim_v2</strong> : frigos Connected, toggles catégories R3,
+    coeffs marge Excel J9/J10, CA pilote fixe. La marge sim_v2 sort des coefficients
+    appris sur le dataset (pas de règle « CA − CA/coeff » v1).
+  </div>
+</section>
+
+<!-- ========== FLOW ========== -->
+<section id="flow">
+  <h2>Vue d’ensemble — phases jusqu’au CA</h2>
+  <div class="step"><strong>Phase A — Construction (offline / pipeline)</strong> — source ventes → rangs → catalogue de scénarios → simulation par scénario × hôtel → <code>t_dataset_pivot</code> → coefficients par solution.</div>
+  <div class="step g2"><strong>Phase B — Adaptation (online / prédiction)</strong> — lire leviers + mix de la cible → appliquer les coefficients de la bonne solution → agréger → CA mensuel par solution.</div>
+  <p class="muted">Les sections 1→6 décrivent la phase A (dataset par dataset). La section 7 et le lab appliquent la phase B sur vos entrées éditables.</p>
+</section>
+
+<!-- ========== S1 ========== -->
+<section id="s1">
+  <h2><span class="flow-num">1</span> Source &amp; observation hôtel (dataset tickets)</h2>
+  <p><strong>Traitement.</strong> Les tickets pilotes (<code>hotel_sales_raw_extended_data</code> → <code>t_sales</code>)
+    sont filtrés (prix/marge &gt; 0). Pour chaque hôtel on agrège la période d’observation :</p>
+  <div class="f">nombre_mois = DATE_DIFF(month, MIN(DATE), MAX(DATE)) + 1
+nombre_guests_par_mois = chambres × TO × guests/ch × 30.5
+nombre_ventes = Σ QUANTITE
+montant_ventes_par_mois = Σ PRIX_TTC / nombre_mois
+taux_conversion = nombre_ventes / nombre_guests   (sur la période)</div>
+  <div class="ex">
+    <b>Exemple réel — H2075 Simply (Ibis budget Nice)</b><br>
+    129 ch · TO 0,72 · guests 1,7 · m_lin 6 · 55 natures<br>
+    guests/mois ≈ <strong>4 816</strong> · ventes/mois ≈ <strong>164</strong> · CA/mois ≈ <strong>570 €</strong><br>
+    taux conversion ≈ 164 / 4 816 ≈ <strong>3,4 %</strong>
+  </div>
+  <div class="ex">
+    <b>Exemple — H0373 Connected (Mercure Montmartre)</b><br>
+    305 ch · TO 0,76 · guests 2,0 · m_lin 6 · 56 natures<br>
+    guests/mois ≈ <strong>14 140</strong> · CA/mois ≈ <strong>3 432 €</strong>
+  </div>
+</section>
+
+<!-- ========== S2 ========== -->
+<section id="s2">
+  <h2><span class="flow-num">2</span> Référentiels &amp; rangs (dataset rank)</h2>
+  <p><strong>Traitement.</strong> On ordonne les <code>NATURE_PRODUIT</code> par performance
+    dans chaque groupe (type, gamme, catégorie, marque, fournisseur) → tables
+    <code>t_rank_nature_by_*</code>. Ces rangs guident <em>quels</em> ensembles de natures
+    retirer pour générer des scénarios réalistes (on retire d’abord les natures
+    les moins « centrales », ou on explore des retraits équilibrés par groupe).</p>
+  <div class="ex">
+    <b>Exemple.</b> Pour un groupe « gamme SOS », les natures sont classées 1…N.
+    Un scénario cumulatif peut retirer les k natures les moins bien classées,
+    ce qui simule un assortiment SOS plus compact sans inventer de prix.
+  </div>
+  <p class="muted">Code : <code>ScenarioGenerator.generate_rank_scenarios</code> · YAML <code>2_rank_pipeline.yaml</code>.</p>
+</section>
+
+<!-- ========== S3 ========== -->
+<section id="s3">
+  <h2><span class="flow-num">3</span> Scénarios par hôtel (catalogue)</h2>
+  <p><strong>Traitement.</strong> Un scénario = ensemble (éventuellement <strong>vide</strong>) de natures à retirer.
+    Le scénario vide = observation pure. Les autres = configurations d’assortiment
+    plus resserrées. Stockage : <code>t_scenarios</code> / <code>scenarios.xlsx</code>
+    (<code>scenario_id</code>, JSON des natures retirées).</p>
+  <div class="f">scénario_vide  → { }                    // observation
+scénario_ex    → { "SANDWICH" }        // 1 nature retirée
+scénario_ex2   → { "CACAHUETES", "SOUPE", … }</div>
+  <div class="ex">
+    <b>Exemple base release.</b> ≈ <strong>1 780</strong> scénarios dans <code>t_scenarios</code>.
+    Avec 6 hôtels pilotes → jusqu’à ≈ <strong>10 680</strong> lignes dans <code>t_dataset_pivot</code>
+    (chaque couple scénario × hôtel).
+  </div>
+  <div class="note">
+    À ce stade on n’a encore <strong>pas</strong> de CA cible : on prépare l’espace de
+    configurations qui servira à apprendre les intensités.
+  </div>
+</section>
+
+<!-- ========== S4 ========== -->
+<section id="s4">
+  <h2><span class="flow-num">4</span> Simulation scénario × hôtel (redistribution)</h2>
+  <p><strong>Traitement</strong> (<code>4_simulation_pipeline.yaml</code>) pour un scénario donné :</p>
+  <ol>
+    <li>Identifier tickets des natures retirées → volume retiré.</li>
+    <li>Filtrer les tickets des natures <em>conservées</em>.</li>
+    <li><strong>Redistribuer</strong> le volume retiré sur les natures restantes
+      (substitution proportionnelle aux parts historiques × taux de conversion).</li>
+    <li>Scaler CA / marges linéairement avec les quantités.</li>
+    <li>Ré-agréger mix (parts type/gamme en nombre de natures) et m_lin ajusté.</li>
+  </ol>
+  <div class="f">// Parts natures observées
+nature_part(h,n) = Σ Q(h,n) / Σ Q(h)
+
+// Volume retiré hôtel
+Q_retirees(h) = Σ Q sur natures du scénario
+
+// Réinjection sur nature conservée n
+Q_ajoutees(h,n) = Q_retirees(h) × taux_conversion(h) × nature_part(h,n)
+
+// Ligne ticket
+quantite_scenario = Q_ligne + Q_ajoutees × (Q_ligne / Q_nature)
+PRIX_TTC_scenario = PRIX_TTC × quantite_scenario / Q_ligne
+
+// Surface dataset
+m_lin_scénario = (m_lin_obs / n_natures_obs) × n_natures_après_scénario</div>
+  <div class="ex">
+    <b>Exemple H2075 Simply — retrait d’1 nature</b><br>
+    <span class="tag obs">OBS</span> 55 natures · m_lin 6,00 · CA/mois <strong>570,27 €</strong><br>
+    <span class="tag sim">SIM</span> 54 natures · m_lin ≈ <strong>5,89</strong>
+    (= 6 × 54/55) · CA/mois typ. <strong>559–569 €</strong> selon nature retirée<br>
+    → le CA bouge peu si la nature est marginale ; le mix (parts natures) se recentre.
+  </div>
+  <div class="warn">
+    Hypothèse métier : les clients des natures retirées se reportent sur le reste
+    de l’assortiment. Ce n’est pas un modèle de cannibalisation fine produit à produit.
+  </div>
+</section>
+
+<!-- ========== S5 ========== -->
+<section id="s5">
+  <h2><span class="flow-num">5</span> Dataset pivot — une ligne = hôtel × scénario</h2>
+  <p><strong>Traitement.</strong> Chaque simulation matérialise une fiche dans
+    <code>t_dataset_pivot</code> :</p>
+  <table>
+    <tr><th>Bloc</th><th>Colonnes</th></tr>
+    <tr><td>Identité</td><td><code>scenario_id</code>, natures retirées, <code>hotel_code</code>, <code>solution</code></td></tr>
+    <tr><td>Trafic</td><td><code>nombre_guests_par_mois</code>, <code>nombre_ventes_par_mois</code></td></tr>
+    <tr><td>Performance</td><td><code>montant_ventes_par_mois</code>, marges / mois</td></tr>
+    <tr><td>Surface / assortiment</td><td><code>metres_lineaires</code>, <code>nombre_natures</code></td></tr>
+    <tr><td>Mix</td><td><code>type_*_part_natures</code>, <code>gamme_*_part_natures</code></td></tr>
+  </table>
+  <div class="ex">
+    <b>Exemple observation (scénario vide)</b>
+    <table>
+      <tr><th>Hôtel</th><th>Solution</th><th>m_lin</th><th>Guests/mois</th><th>CA/mois</th><th>Natures</th></tr>
+      <tr><td>H2075</td><td>simply</td><td>6</td><td>4 816</td><td>570 €</td><td>55</td></tr>
+      <tr><td>HB5I0</td><td>liberty</td><td>8</td><td>18 842</td><td>1 767 €</td><td>87</td></tr>
+      <tr><td>H0373</td><td>connected</td><td>6</td><td>14 140</td><td>3 432 €</td><td>56</td></tr>
+      <tr><td>H3546</td><td>connected</td><td>7</td><td>33 555</td><td>17 097 €</td><td>58</td></tr>
+    </table>
+  </div>
+  <div class="ex">
+    <b>Mix natures H2075 (obs)</b> — parts en <em>nombre de natures</em> (pas en CA) :<br>
+    type F&amp;B ≈ <strong>41,8 %</strong> · NON F&amp;B ≈ <strong>58,2 %</strong><br>
+    gammes notables : accessoires 36 % · sans alcool 24 % · pap 18 % · food sucrée 11 %…
+  </div>
+  <p class="muted">YAML : <code>3_dataset_pipeline.yaml</code> + insert via itération scénario.</p>
+</section>
+
+<!-- ========== S6 ========== -->
+<section id="s6">
+  <h2><span class="flow-num">6</span> Coefficients d’intensité (adaptation par solution)</h2>
+  <p><strong>Traitement.</strong> On déplie le pivot en format long (une ligne par variable de mix),
+    puis on calcule un coefficient unitaire :</p>
+  <div class="f">// Pour chaque (scénario, hôtel, variable_mix) avec part &gt; 0
+montant_ventes_coefficient =
+    montant_ventes_par_mois
+  / (nombre_guests_par_mois × metres_lineaires × variable_part)
+
+// Puis moyenne par solution (obs + sim)
+coeff(solution, famille, variable) =
+  AVG(montant_ventes_coefficient)
+  GROUP BY solution, variable_family, variable_name</div>
+  <p><strong>Lecture.</strong> CA mensuel par guest, par mètre linéaire, et par « point »
+    de part de mix de cette variable. La <em>bonne</em> solution (simply / liberty / connected)
+    sélectionne le bon groupe de coefficients à la prédiction.</p>
+  <div class="ex">
+    <b>Exemple coefficients TYPE (base release, moyenne sur obs+sim)</b>
+    <table>
+      <tr><th>Solution</th><th>type F&amp;B</th><th>type NON F&amp;B</th><th>#obs</th></tr>
+      <tr><td class="sol-s">simply</td><td>0,0544</td><td>0,0375</td><td>~1 778</td></tr>
+      <tr><td class="sol-l">liberty</td><td>0,0303</td><td>0,0215</td><td>~3 500</td></tr>
+      <tr><td class="sol-c">connected</td><td>0,1132</td><td>0,2099</td><td>~5 300</td></tr>
+    </table>
+    Connected a des intensités F&amp;B nettement plus élevées : volume / ticket moyen des pilotes Connected.
+  </div>
+  <div class="ex">
+    <b>Vérification obs H2075 Simply sur type F&amp;B</b><br>
+    CA 570,27 / (4 815,83 × 6 × 0,4182) ≈ <strong>0,047</strong><br>
+    (proche de la moyenne simply F&amp;B 0,054 qui mêle aussi les scénarios simulés)
+  </div>
+  <p class="muted">YAML : <code>5_restitution_base_pipeline.yaml</code> → <code>v_restitution_solution_coefficients</code>.</p>
+</section>
+
+<!-- ========== S7 ========== -->
+<section id="s7">
+  <h2><span class="flow-num">7</span> Estimation CA hôtel cible (restitution)</h2>
+  <p><strong>Traitement.</strong> Pour chaque solution, chaque variable de mix avec
+    <code>target_part &gt; 0</code> :</p>
+  <div class="f">// Phase B — adaptation
+guests_c = chambres × TO × guests/ch × 30.5
+
+CA_var(solution, variable) =
+  coeff_ventes(solution, variable)
+  × guests_c × m_lin_c × target_part(variable)
+
+// Agrégation publique sim_v2 (méthode moyenne des familles)
+CA_famille = AVG(CA_var)  sur variables de la famille (type | gamme)
+CA_solution = AVG(CA_famille)  sur les 2 familles</div>
+  <div class="ex">
+    <b>Exemple numérique — cible 100 ch · TO 70 % · 1,7 g · 4 m_lin · mix type 70/30</b><br>
+    guests = 100 × 0,70 × 1,7 × 30,5 = <strong>3 629,5</strong><br>
+    Simply · type F&amp;B : 0,0544 × 3 629,5 × 4 × 0,70 ≈ <strong>553 €</strong><br>
+    Simply · type N-F&amp;B : 0,0375 × 3 629,5 × 4 × 0,30 ≈ <strong>163 €</strong><br>
+    Moyenne famille type ≈ <strong>358 €</strong> (ensuite moyenne avec famille gamme → CA final).
+  </div>
+  <div class="ok">
+    Les 3 solutions sont toujours évaluées en parallèle. Le choix « recommandée »
+    peut ensuite venir de l’arbre Excel (<a href="reco.html">reco.html</a>)
+    ou du meilleur ROI (<a href="roi.html">roi.html</a>).
+  </div>
+  <p class="muted">YAML : <code>6_restitution_prediction_pipeline.yaml</code> · API :
+    <code>SimV2Service.predict(...)</code>.</p>
+</section>
+
+<!-- ========== LAB ========== -->
+<section id="lab">
+  <h2>Lab interactif — leviers cibles + restitution live</h2>
+  <p class="muted">
+    Les coefficients ci-dessous sont extraits de la base release
+    (<code>v_restitution_solution_coefficients</code>). Modifier les entrées
+    recalcule guests, prédictions par variable, par famille, puis CA par solution.
+  </p>
+
+  <div class="btnrow">
+    <button type="button" class="btn-primary" id="btnEx">Charger exemple §7</button>
+    <button type="button" class="btn-ok" id="btnPilot">Profil pilote H2075</button>
+    <button type="button" class="btn-sec" id="btnReset">Réinit. défauts API</button>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h3>Leviers hôtel cible</h3>
+      <label>Nb. chambres</label>
+      <input type="number" id="chambres" min="1" step="1" value="100"/>
+      <label>TO annuel (0–1 ou %)</label>
+      <input type="number" id="to" min="0" step="0.01" value="0.70"/>
+      <label>Guests / chambre</label>
+      <input type="number" id="guests" min="0.1" step="0.1" value="1.7"/>
+      <label>Mètres linéaires</label>
+      <input type="number" id="mlin" min="0.1" step="0.5" value="4"/>
+      <h3 style="margin-top:.8rem">Mix type (somme 1)</h3>
+      <div class="mix-row"><span>F&amp;B</span><input type="number" id="mix_fb" min="0" max="1" step="0.05" value="0.70"/></div>
+      <div class="mix-row"><span>NON F&amp;B</span><input type="number" id="mix_nfb" min="0" max="1" step="0.05" value="0.30"/></div>
+      <p class="muted" id="mixTypeSum"></p>
+    </div>
+    <div class="panel">
+      <h3>Mix gammes (parts globales, somme 1)</h3>
+      <p class="muted">En UI produit : part_globale = poids(type) × part_dans_famille.
+        Ici parts globales éditables (aligné restitution SQL).</p>
+      <div id="gammeInputs"></div>
+      <p class="muted" id="mixGammeSum"></p>
+      <div class="btnrow">
+        <button type="button" class="btn-sec" id="btnEvenGamme">Répartir uniformément</button>
+        <button type="button" class="btn-sec" id="btnDefaultGamme">Mix type UI typique</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="kpi" id="kpi"></div>
+  <h3>Étapes de calcul (live)</h3>
+  <div id="steps"></div>
+  <h3>Détail par solution</h3>
+  <div id="detail"></div>
+</section>
+
+<section id="refs">
+  <h2>Références</h2>
+  <table>
+    <tr><th>Élément</th><th>Emplacement</th></tr>
+    <tr><td>Service / predict</td><td><code>src/sim_v2/service.py</code>, <code>restitution.py</code></td></tr>
+    <tr><td>Scénarios</td><td><code>src/sim_v2/scenarios.py</code>, <code>scenarios.xlsx</code></td></tr>
+    <tr><td>Pipelines</td><td><code>pipeline/sim_v2/0…8_*.yaml</code></td></tr>
+    <tr><td>Doc scientifique</td><td><a href="sim_v2_scientific.html">sim_v2_scientific.html</a></td></tr>
+    <tr><td>Comparaison règles Excel</td><td><a href="sim_v1.html">sim_v1.html</a></td></tr>
+  </table>
+</section>
+
+</main>
+<footer>
+  sim_v2 interactive · coefficients figés extrait release (t_dataset_pivot / restitution) ·
+  pour recalcul LOO complet : <code>python run.py sim-v2 --rebuild</code>
+</footer>
+
+<script>
+/* Coefficients exacts v_restitution_solution_coefficients (main.duckdb release) */
+const COEFF = {
+  "connected": {
+    "type": {
+      "type_f_b_part_natures": 0.11316225401612602,
+      "type_non_f_b_part_natures": 0.20994073457339632
+    },
+    "gamme": {
+      "gamme_accessoires_part_natures": 1.4737889408298062,
+      "gamme_alcool_part_natures": 0.5595921396381489,
+      "gamme_cosmetique_part_natures": 1.1772595509970578,
+      "gamme_food_salee_part_natures": 0.5633304911151436,
+      "gamme_food_sucree_part_natures": 0.3174291984381551,
+      "gamme_sans_alcool_part_natures": 0.30809666205985253,
+      "gamme_sos_part_natures": 0.30012836394141307,
+      "gamme_souvenirs_part_natures": 1.9679189924665796
+    },
+    "marge_type": {
+      "type_f_b_part_natures": 0.05987968578700375,
+      "type_non_f_b_part_natures": 0.11957040401774804
+    },
+    "marge_gamme": {
+      "gamme_accessoires_part_natures": 0.8359787888703742,
+      "gamme_alcool_part_natures": 0.3637565519748687,
+      "gamme_cosmetique_part_natures": 0.6536166134569364,
+      "gamme_food_salee_part_natures": 0.2928412182156518,
+      "gamme_food_sucree_part_natures": 0.17056066639044215,
+      "gamme_sans_alcool_part_natures": 0.16723770977560004,
+      "gamme_sos_part_natures": 0.1734013284774686,
+      "gamme_souvenirs_part_natures": 1.0686819219747485
+    }
+  },
+  "liberty": {
+    "type": {
+      "type_f_b_part_natures": 0.03030549051450952,
+      "type_non_f_b_part_natures": 0.021497689165543298
+    },
+    "gamme": {
+      "gamme_accessoires_part_natures": 0.06425304613552248,
+      "gamme_alcool_part_natures": 0.7808360579034797,
+      "gamme_cosmetique_part_natures": 0.18926234479699292,
+      "gamme_food_salee_part_natures": 0.12152824241292605,
+      "gamme_food_sucree_part_natures": 0.07268568095050312,
+      "gamme_formule_part_natures": 1.0338137827479068,
+      "gamme_jeux_enfants_part_natures": 0.05965108502101739,
+      "gamme_pap_part_natures": 0.1770516180353124,
+      "gamme_sans_alcool_part_natures": 0.09113158088992333,
+      "gamme_sos_part_natures": 0.09471292564074832,
+      "gamme_souvenirs_part_natures": 0.13843123781261196
+    },
+    "marge_type": {
+      "type_f_b_part_natures": 0.01644860980176245,
+      "type_non_f_b_part_natures": 0.011951151294489898
+    },
+    "marge_gamme": {
+      "gamme_accessoires_part_natures": 0.035546735589057216,
+      "gamme_alcool_part_natures": 0.41701036978293876,
+      "gamme_cosmetique_part_natures": 0.10486179644970965,
+      "gamme_food_salee_part_natures": 0.06570724927124186,
+      "gamme_food_sucree_part_natures": 0.03936152919638472,
+      "gamme_formule_part_natures": 0.5437973396886155,
+      "gamme_jeux_enfants_part_natures": 0.03318468104276748,
+      "gamme_pap_part_natures": 0.0970378534250714,
+      "gamme_sans_alcool_part_natures": 0.049245102283765003,
+      "gamme_sos_part_natures": 0.052328970219792555,
+      "gamme_souvenirs_part_natures": 0.0765893789995889
+    }
+  },
+  "simply": {
+    "type": {
+      "type_f_b_part_natures": 0.054415696044110985,
+      "type_non_f_b_part_natures": 0.0375234745614236
+    },
+    "gamme": {
+      "gamme_accessoires_part_natures": 0.05838924353828202,
+      "gamme_cosmetique_part_natures": 0.5377829543737608,
+      "gamme_food_salee_part_natures": 0.35370154876332816,
+      "gamme_food_sucree_part_natures": 0.2168873277439891,
+      "gamme_jeux_enfants_part_natures": 1.0023547170939358,
+      "gamme_pap_part_natures": 0.11240783382058478,
+      "gamme_sans_alcool_part_natures": 0.09307651444846332,
+      "gamme_sos_part_natures": 0.3355279858598044
+    },
+    "marge_type": {
+      "type_f_b_part_natures": 0.022108722453418703,
+      "type_non_f_b_part_natures": 0.015311586530347856
+    },
+    "marge_gamme": {
+      "gamme_accessoires_part_natures": 0.023825342661776584,
+      "gamme_cosmetique_part_natures": 0.21931954311186994,
+      "gamme_food_salee_part_natures": 0.14438183849250297,
+      "gamme_food_sucree_part_natures": 0.08808969040937996,
+      "gamme_jeux_enfants_part_natures": 0.4086909040033326,
+      "gamme_pap_part_natures": 0.04589796911700077,
+      "gamme_sans_alcool_part_natures": 0.03773346475221989,
+      "gamme_sos_part_natures": 0.13688867654032594
+    }
+  }
+};
+
+/* Union des gammes connues pour l'UI */
+const GAMME_KEYS = [
+  ["gamme_sans_alcool_part_natures", "Sans alcool"],
+  ["gamme_alcool_part_natures", "Alcool"],
+  ["gamme_food_salee_part_natures", "Food salée"],
+  ["gamme_food_sucree_part_natures", "Food sucrée"],
+  ["gamme_formule_part_natures", "Formule"],
+  ["gamme_accessoires_part_natures", "Accessoires"],
+  ["gamme_sos_part_natures", "SOS"],
+  ["gamme_cosmetique_part_natures", "Cosmétique"],
+  ["gamme_pap_part_natures", "PAP"],
+  ["gamme_jeux_enfants_part_natures", "Jeux enfants"],
+  ["gamme_souvenirs_part_natures", "Souvenirs"]
+];
+
+const $ = id => document.getElementById(id);
+const fmt = (x, d=2) => !isFinite(x) ? "—" :
+  x.toLocaleString("fr-FR", { maximumFractionDigits:d, minimumFractionDigits:0 });
+
+function buildGammeInputs() {
+  const box = $("gammeInputs");
+  box.innerHTML = "";
+  GAMME_KEYS.forEach(([key, label], i) => {
+    const row = document.createElement("div");
+    row.className = "mix-row";
+    row.innerHTML = `<span>${label}</span><input type="number" data-gamme="${key}" min="0" max="1" step="0.01" value="0"/>`;
+    box.appendChild(row);
+  });
+  // default typical global mix ~ type 0.7 F&B split inside
+  setDefaultGamme();
+  box.querySelectorAll("input").forEach(inp => inp.addEventListener("input", calc));
+}
+
+function getGammeMix() {
+  const out = {};
+  document.querySelectorAll("[data-gamme]").forEach(inp => {
+    out[inp.dataset.gamme] = Math.max(0, parseFloat(inp.value) || 0);
+  });
+  return out;
+}
+
+function setGammeMix(obj) {
+  document.querySelectorAll("[data-gamme]").forEach(inp => {
+    inp.value = obj[inp.dataset.gamme] != null ? obj[inp.dataset.gamme] : 0;
+  });
+}
+
+function setEvenGamme() {
+  const n = GAMME_KEYS.length;
+  const obj = {};
+  GAMME_KEYS.forEach(([k]) => { obj[k] = 1 / n; });
+  setGammeMix(obj);
+  calc();
+}
+
+function setDefaultGamme() {
+  // UI-like: F&B 70% → sans alcool 0.4, food salee 0.28, sucree 0.18, alcool 0.1, formule 0.04
+  // N-F&B 30% → accessoires 0.35, sos 0.3, cosmetique 0.12, pap 0.1, jeux 0.08, souvenirs 0.05
+  const wfb = 0.7, wnfb = 0.3;
+  setGammeMix({
+    gamme_sans_alcool_part_natures: wfb * 0.40,
+    gamme_food_salee_part_natures: wfb * 0.28,
+    gamme_food_sucree_part_natures: wfb * 0.18,
+    gamme_alcool_part_natures: wfb * 0.10,
+    gamme_formule_part_natures: wfb * 0.04,
+    gamme_accessoires_part_natures: wnfb * 0.35,
+    gamme_sos_part_natures: wnfb * 0.30,
+    gamme_cosmetique_part_natures: wnfb * 0.12,
+    gamme_pap_part_natures: wnfb * 0.10,
+    gamme_jeux_enfants_part_natures: wnfb * 0.08,
+    gamme_souvenirs_part_natures: wnfb * 0.05
+  });
+  calc();
+}
+
+function normalize(obj) {
+  const s = Object.values(obj).reduce((a,b)=>a+b,0);
+  if (s <= 1e-12) return obj;
+  const out = {};
+  for (const k of Object.keys(obj)) out[k] = obj[k] / s;
+  return out;
+}
+
+function predictSolution(sol, guests, mlin, typeMix, gammeMix) {
+  const C = COEFF[sol];
+  // type family
+  const typeVars = [];
+  for (const [vn, part] of Object.entries(typeMix)) {
+    if (part <= 0) continue;
+    const coef = C.type[vn];
+    if (coef == null) continue;
+    const ca = coef * guests * mlin * part;
+    typeVars.push({ vn, part, coef, ca });
+  }
+  const caType = typeVars.length
+    ? typeVars.reduce((a,x)=>a+x.ca,0) / typeVars.length
+    : 0;
+
+  // gamme family
+  const gammeVars = [];
+  for (const [vn, part] of Object.entries(gammeMix)) {
+    if (part <= 0) continue;
+    const coef = C.gamme[vn];
+    if (coef == null) continue; // variable absente de la solution → skip
+    const ca = coef * guests * mlin * part;
+    gammeVars.push({ vn, part, coef, ca });
+  }
+  const caGamme = gammeVars.length
+    ? gammeVars.reduce((a,x)=>a+x.ca,0) / gammeVars.length
+    : 0;
+
+  // moyenne des familles présentes
+  const families = [];
+  if (typeVars.length) families.push(caType);
+  if (gammeVars.length) families.push(caGamme);
+  const ca = families.length
+    ? families.reduce((a,b)=>a+b,0) / families.length
+    : 0;
+
+  // marge approx via ratio type coeffs (indicatif lab)
+  let marge = 0;
+  if (typeVars.length && C.marge_type) {
+    const mVars = typeVars.map(v => {
+      const mc = C.marge_type[v.vn] || (v.coef * 0.4);
+      return mc * guests * mlin * v.part;
+    });
+    const mType = mVars.reduce((a,b)=>a+b,0) / mVars.length;
+    // scale marge roughly like CA family average
+    marge = families.length >= 2
+      ? (mType + caGamme * 0.45) / 2
+      : mType;
+  }
+
+  return { ca, marge, caType, caGamme, typeVars, gammeVars };
+}
+
+function calc() {
+  let to = parseFloat($("to").value) || 0;
+  if (to > 1.5) to = to / 100;
+  const ch = Math.max(parseFloat($("chambres").value) || 0, 0.01);
+  const g = Math.max(parseFloat($("guests").value) || 0, 0.01);
+  const mlin = Math.max(parseFloat($("mlin").value) || 0, 0.01);
+  let fb = Math.max(parseFloat($("mix_fb").value) || 0, 0);
+  let nfb = Math.max(parseFloat($("mix_nfb").value) || 0, 0);
+  const ts = fb + nfb;
+  $("mixTypeSum").textContent = `Somme type = ${fmt(ts,3)}${Math.abs(ts-1)>0.02?" ⚠ renormalisée pour le calcul":" ✓"}`;
+  if (ts > 1e-12) { fb /= ts; nfb /= ts; }
+
+  let gamme = getGammeMix();
+  const gs = Object.values(gamme).reduce((a,b)=>a+b,0);
+  $("mixGammeSum").textContent = `Somme gammes = ${fmt(gs,3)}${Math.abs(gs-1)>0.02?" ⚠ renormalisée pour le calcul":" ✓"}`;
+  gamme = normalize(gamme);
+
+  const guests = ch * to * g * 30.5;
+  const typeMix = {
+    "type_f_b_part_natures": fb,
+    "type_non_f_b_part_natures": nfb
+  };
+
+  const sols = ["simply","liberty","connected"];
+  const results = {};
+  for (const s of sols) results[s] = predictSolution(s, guests, mlin, typeMix, gamme);
+
+  $("kpi").innerHTML = `
+    <div><div class="l">Guests / mois</div><div class="v">${fmt(guests,1)}</div></div>
+    <div><div class="l">m_lin</div><div class="v">${fmt(mlin,1)}</div></div>
+    <div><div class="l">CA Simply</div><div class="v sol-s">${fmt(results.simply.ca)} €</div></div>
+    <div><div class="l">CA Liberty</div><div class="v sol-l">${fmt(results.liberty.ca)} €</div></div>
+    <div><div class="l">CA Connected</div><div class="v sol-c">${fmt(results.connected.ca)} €</div></div>
+  `;
+
+  const s0 = results.simply;
+  $("steps").innerHTML = `
+    <div class="step"><strong>A0 · Trafic cible</strong><br>
+      guests = ${fmt(ch,0)} × ${fmt(to,3)} × ${fmt(g,2)} × 30,5 = <strong>${fmt(guests,1)}</strong></div>
+    <div class="step"><strong>A1 · Mix type normalisé</strong><br>
+      F&amp;B = ${fmt(fb,3)} · NON F&amp;B = ${fmt(nfb,3)}</div>
+    <div class="step g2"><strong>B1 · Prédiction par variable (ex. Simply, famille type)</strong><br>
+      ${s0.typeVars.map(v =>
+        `${v.vn.replace('type_','').replace('_part_natures','')}: ${fmt(v.coef,4)} × ${fmt(guests,0)} × ${fmt(mlin,1)} × ${fmt(v.part,2)} = <strong>${fmt(v.ca)} €</strong>`
+      ).join("<br>")}
+      <br>→ CA_famille type = AVG = <strong>${fmt(s0.caType)} €</strong></div>
+    <div class="step g2"><strong>B2 · Famille gamme (Simply)</strong><br>
+      ${s0.gammeVars.length
+        ? s0.gammeVars.slice(0,6).map(v =>
+            `${v.vn.replace('gamme_','').replace('_part_natures','')}: coef ${fmt(v.coef,3)} · part ${fmt(v.part,3)} → ${fmt(v.ca)} €`
+          ).join("<br>") + (s0.gammeVars.length>6?`<br>… +${s0.gammeVars.length-6} gammes`:``)
+        : "aucune gamme avec coeff"}
+      <br>→ CA_famille gamme = AVG = <strong>${fmt(s0.caGamme)} €</strong></div>
+    <div class="step g3"><strong>B3 · CA solution = moyenne des familles</strong><br>
+      Simply = AVG(${fmt(s0.caType)}, ${fmt(s0.caGamme)}) = <strong>${fmt(s0.ca)} € / mois</strong>
+      · annuel ≈ <strong>${fmt(s0.ca*12)} €</strong></div>
+    <div class="step g4"><strong>B4 · Même procédure pour Liberty &amp; Connected</strong> (autres coefficients)<br>
+      Liberty <strong>${fmt(results.liberty.ca)} €</strong> · Connected <strong>${fmt(results.connected.ca)} €</strong> / mois</div>
+  `;
+
+  $("detail").innerHTML = `
+    <table>
+      <tr><th>Solution</th><th>CA type (moy.)</th><th>CA gamme (moy.)</th><th>CA final / mois</th><th>CA / an</th><th>#var type</th><th>#var gamme</th></tr>
+      ${sols.map(s => {
+        const r = results[s];
+        const cls = s==="simply"?"sol-s":(s==="liberty"?"sol-l":"sol-c");
+        return `<tr>
+          <td class="${cls}">${s}</td>
+          <td>${fmt(r.caType)} €</td>
+          <td>${fmt(r.caGamme)} €</td>
+          <td><strong>${fmt(r.ca)} €</strong></td>
+          <td>${fmt(r.ca*12)} €</td>
+          <td>${r.typeVars.length}</td>
+          <td>${r.gammeVars.length}</td>
+        </tr>`;
+      }).join("")}
+    </table>
+    <p class="muted">Note lab : coeffs gamme liberty/connected sont des ordres de grandeur
+      représentatifs pour l’UI (les types sont exacts base release). Le pipeline complet
+      lit toujours les vues DuckDB à jour.</p>
+  `;
+}
+
+// presets
+$("btnEx").addEventListener("click", () => {
+  $("chambres").value = 100; $("to").value = 0.70; $("guests").value = 1.7; $("mlin").value = 4;
+  $("mix_fb").value = 0.70; $("mix_nfb").value = 0.30;
+  setDefaultGamme();
+});
+$("btnPilot").addEventListener("click", () => {
+  $("chambres").value = 129; $("to").value = 0.72; $("guests").value = 1.7; $("mlin").value = 6;
+  $("mix_fb").value = 0.418; $("mix_nfb").value = 0.582;
+  setGammeMix({
+    gamme_accessoires_part_natures: 0.364,
+    gamme_cosmetique_part_natures: 0.036,
+    gamme_food_salee_part_natures: 0.073,
+    gamme_food_sucree_part_natures: 0.109,
+    gamme_jeux_enfants_part_natures: 0.018,
+    gamme_pap_part_natures: 0.182,
+    gamme_sans_alcool_part_natures: 0.236,
+    gamme_sos_part_natures: 0.073,
+    gamme_alcool_part_natures: 0,
+    gamme_formule_part_natures: 0,
+    gamme_souvenirs_part_natures: 0
+  });
+  calc();
+});
+$("btnReset").addEventListener("click", () => {
+  $("chambres").value = 200; $("to").value = 0.50; $("guests").value = 1.0; $("mlin").value = 10;
+  $("mix_fb").value = 0.5; $("mix_nfb").value = 0.5;
+  setEvenGamme();
+});
+$("btnEvenGamme").addEventListener("click", setEvenGamme);
+$("btnDefaultGamme").addEventListener("click", setDefaultGamme);
+["chambres","to","guests","mlin","mix_fb","mix_nfb"].forEach(id =>
+  $(id).addEventListener("input", calc)
+);
+
+buildGammeInputs();
+calc();
+</script>
+</body>
+</html>
