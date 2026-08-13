@@ -38,6 +38,7 @@ def test_execute_step_runs_script_sql(tmp_path: Path):
 
     pipe = tmp_path / "p"
     pipe.mkdir()
+    (pipe / "default").mkdir(parents=True, exist_ok=True)
     (pipe / "default" / "x.yaml").write_text(
         "x:\n  type: execute\n  requires: []\n  script: SELECT 1\n",
         encoding="utf-8",
@@ -55,6 +56,7 @@ def test_legacy_sql_yaml_still_loads(tmp_path: Path):
 
     pipe = tmp_path / "p"
     pipe.mkdir()
+    (pipe / "default").mkdir(parents=True, exist_ok=True)
     (pipe / "default" / "t.yaml").write_text(
         "t:\n  type: table\n  mode: create_or_replace\n"
         "  requires: []\n  sql: SELECT 9 AS n\n",

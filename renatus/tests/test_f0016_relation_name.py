@@ -94,6 +94,7 @@ def test_relation_name_explicit_differs_from_step(tmp_path: Path):
 def test_empty_name_rejected(tmp_path: Path):
     pipe = tmp_path / "p"
     pipe.mkdir()
+    (pipe / "default").mkdir(parents=True, exist_ok=True)
     (pipe / "default" / "bad.yaml").write_text(
         yaml.dump(
             {

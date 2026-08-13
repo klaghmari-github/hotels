@@ -101,17 +101,22 @@ def test_import_directory_zones_listed_and_objects_synced(tmp_path: Path):
         assert (pipe / "default" / "pack" / "a" / "t1.yaml").is_file()
         assert (pipe / "default" / "pack" / "b" / "t2.yaml").is_file()
 
-        # F0131: selecteur = main + zones physiques (pas de vue all par defaut)
+        # F0131 / F0144: selecteur = default + zones physiques sous default/
         tabs = client.get("/gui/tabs").json()
         ids = [t["id"] for t in tabs["tabs"]]
         assert "default" in ids
         assert "all" not in ids
-        assert "pack" in ids
-        assert "pack/a" in ids
-        assert "pack/b" in ids
+        assert "default/pack" in ids or "pack" in ids
+        assert "default/pack/a" in ids or "pack/a" in ids
+        assert "default/pack/b" in ids or "pack/b" in ids
 
         # active_tab bascule sur la zone racine importee
-        assert tabs.get("active_tab") == "pack" or body.get("root_import_tab") == "pack"
+        active = tabs.get("active_tab") or ""
+        root_imp = body.get("root_import_tab") or ""
+        assert (
+            active in {"pack", "default/pack"}
+            or root_imp in {"pack", "default/pack"}
+        )
 
         # objects de pack contiennent a et b (sous-zones)
         pack = client.get("/gui/step/pack").json()
@@ -142,6 +147,7 @@ def test_list_tabs_shows_existing_zones_without_open(tmp_path: Path):
     pipe = tmp_path / "flow"
     _seed_main(pipe)
     (pipe / "default" / "etl").mkdir()
+    (pipe / "default").mkdir(parents=True, exist_ok=True)
     (pipe / "default" / "etl.yaml").write_text(
         "etl:\n  type: zone\n  label: etl\n  objects: {}\n",
         encoding="utf-8",

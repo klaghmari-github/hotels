@@ -58,6 +58,7 @@ def test_execute_without_venv_uses_local(tmp_path: Path):
     pipe = project / "flow"
     pipe.mkdir(parents=True)
     out = project / "ok.txt"
+    (pipe / "default").mkdir(parents=True, exist_ok=True)
     (pipe / "default" / "py.yaml").write_text(
         yaml.dump(
             {

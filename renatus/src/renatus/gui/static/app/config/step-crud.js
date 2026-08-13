@@ -355,6 +355,10 @@ export async function persistCurrentStep(opts) {
     // autosave: YAML incomplet pendant la frappe → ignorer sans bruit
     return false;
   }
+  // F0146: structure notebook pour sidecar .ipynb
+  if (state._pendingNotebook && config && config.type === "notebook") {
+    config = Object.assign({}, config, { notebook: state._pendingNotebook });
+  }
 
   try {
     const res = await api(
@@ -467,6 +471,9 @@ export async function selectStep(name, options) {
     state.selected = name;
     state.dataviewSource = name;
     state.dataviewIsPrereq = false;
+    // F0146: notebook structure pour l editeur multi-cellules
+    state._stepNotebook = data.notebook || null;
+    state._sourceFile = data.source_file || null;
     const label = data.label || (data.config && data.config.label) || name;
     const stepType = (data.config && data.config.type) || "";
     rememberSelection(name, stepType);
@@ -517,9 +524,11 @@ export async function selectStep(name, options) {
     renderRenatusTime(data.renatus_time);
     renderShape(data.shape, stepType);
     renderSchema(data.schema || [], stepType);
-    el.fileOrigin.textContent = data.file_origin
-      ? "YAML: " + data.file_origin
-      : "";
+    let originTxt = data.file_origin ? "YAML: " + data.file_origin : "";
+    if (data.source_file) {
+      originTxt += (originTxt ? " · " : "") + "Source: " + data.source_file;
+    }
+    el.fileOrigin.textContent = originTxt;
     // F0086: plus de boutons Config (Supprimer / Sauver / Renatus)
     if (el.btnSave) el.btnSave.disabled = true;
     if (el.btnBuild) el.btnBuild.disabled = false;

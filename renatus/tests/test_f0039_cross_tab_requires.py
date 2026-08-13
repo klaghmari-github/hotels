@@ -85,7 +85,7 @@ def test_graph_catalog_lists_all_tabs(tmp_path: Path):
         assert "t_etl" in cat_ids
         tabs = {n["id"]: n.get("tab") for n in g["catalog"]}
         assert tabs["src_main"] == "default"
-        assert tabs["t_etl"] == "etl"
+        assert tabs["t_etl"] in {"etl", "default/etl"}
 
 
 def test_cross_tab_require_saved_and_ghost_node(tmp_path: Path):

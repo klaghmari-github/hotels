@@ -58,6 +58,7 @@ def test_global_log_and_snapshot_apply(tmp_path: Path):
     git.init_repository()
     pipe = root / "flow"
     pipe.mkdir()
+    (pipe / "default").mkdir(parents=True, exist_ok=True)
     a = pipe / "default" / "a.yaml"
     b = pipe / "default" / "b.yaml"
     a.write_text(
@@ -83,16 +84,16 @@ def test_global_log_and_snapshot_apply(tmp_path: Path):
     assert len(log) >= 3
     # recent first
     assert "update a" in log[0]["subject"]
-    assert "flow/a.yaml" in log[0]["files"]
+    assert "flow/default/a.yaml" in log[0]["files"]
     assert log[0]["file_count"] >= 1
 
     # trouver commit "add b" (a=SELECT 1, b exists)
     add_b = next(e for e in log if "add b" in e["subject"])
-    assert "flow/b.yaml" in add_b["files"]
+    assert "flow/default/b.yaml" in add_b["files"]
 
     # apply file only: restore a from before update (commit add b still has SELECT 1)
     # use parent of update = add b's tree has a with SELECT 1
-    res = git.restore_file_from_commit(add_b["commit"], "flow/a.yaml")
+    res = git.restore_file_from_commit(add_b["commit"], "flow/default/a.yaml")
     assert res["ok"] is True
     assert res["mode"] == "file"
     assert "SELECT 1" in a.read_text(encoding="utf-8")

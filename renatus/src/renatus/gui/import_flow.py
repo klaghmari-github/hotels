@@ -115,6 +115,88 @@ def _normalize_cfg(step_id: str, config: dict[str, Any]) -> dict[str, Any]:
     return cfg
 
 
+def _import_companions(
+    store: YamlStepStore,
+    *,
+    source_yaml: Path | None,
+    dest_yaml: Path,
+    final_id: str,
+    step_type: str,
+    cfg: dict[str, Any],
+) -> list[str]:
+    """
+    F0146: copie les fichiers du meme stem (hors yaml) depuis le dossier source.
+
+    Si le stem source differe de final_id, renomme en final_id.<ext>.
+    """
+    from renatus.pipeline.steps.source_files import (
+        SIDECAR_TYPES,
+        companion_files,
+        script_from_sidecar_path,
+        write_sidecar_content,
+    )
+
+    copied: list[str] = []
+    if source_yaml is None or not source_yaml.is_file():
+        # creer sidecar defaut pour python/notebook si absent
+        if step_type in SIDECAR_TYPES:
+            side = store.sidecar_path_for(
+                final_id, step_type=step_type, yaml_path=dest_yaml
+            )
+            if side is not None and not side.exists():
+                write_sidecar_content(
+                    side,
+                    step_type=step_type,
+                    script=str(cfg.get("script") or ""),
+                )
+                copied.append(side.name)
+        return copied
+
+    src_parent = source_yaml.parent
+    src_stem = source_yaml.stem
+    dest_parent = Path(dest_yaml).parent
+    dest_parent.mkdir(parents=True, exist_ok=True)
+
+    for companion in companion_files(source_yaml):
+        # renomme vers final_id si id change (conflit rename)
+        dest_name = companion.name
+        if companion.stem == src_stem and src_stem != final_id:
+            dest_name = final_id + companion.suffix
+        dest = dest_parent / dest_name
+        if dest.exists() or dest.is_symlink():
+            continue
+        try:
+            # copie reelle a l import (pas symlink vers source hors projet)
+            data = companion.read_bytes()
+            dest.write_bytes(data)
+            copied.append(dest.name)
+        except OSError:
+            continue
+
+    # si type sidecar et pas de fichier source, generer depuis script yaml
+    if step_type in SIDECAR_TYPES:
+        side = store.sidecar_path_for(
+            final_id, step_type=step_type, yaml_path=dest_yaml
+        )
+        if side is not None and not side.exists():
+            # peut-etre deja copie sous autre nom
+            script = str(cfg.get("script") or "")
+            # tente de lire un compagnon deja copie
+            for c in companion_files(dest_yaml):
+                if c.suffix.lower() in {".py", ".ipynb"}:
+                    script = script_from_sidecar_path(c) or script
+                    break
+            if not any(
+                c.suffix.lower() in {".py", ".ipynb"}
+                for c in companion_files(dest_yaml)
+            ):
+                write_sidecar_content(
+                    side, step_type=step_type, script=script
+                )
+                copied.append(side.name)
+    return copied
+
+
 def _remap_refs(config: dict[str, Any], id_map: dict[str, str]) -> dict[str, Any]:
     """Remappe requires / objects / iterate selon le plan d import."""
     out = dict(config)
@@ -418,6 +500,18 @@ def apply_import_plan(
         step_type = str(cfg.get("type") or "")
         path = store.save_step(final_id, cfg, tab=dest_tab)
         pipeline[final_id] = cfg
+        # F0146: copier les fichiers compagnons (meme stem) du dossier source
+        try:
+            _import_companions(
+                store,
+                source_yaml=Path(src) if src else None,
+                dest_yaml=path,
+                final_id=final_id,
+                step_type=step_type,
+                cfg=cfg,
+            )
+        except Exception:
+            pass
         # rattacher a la zone parente (objects)
         parent_zone_id = (
             dest_tab.split("/")[-1]

@@ -69,6 +69,7 @@ def test_gui_build_returns_stdout_stderr(tmp_path: Path):
     pipe.mkdir(parents=True)
     _mock_python(project / ".venv")
 
+    (pipe / "default").mkdir(parents=True, exist_ok=True)
     (pipe / "default" / "py1.yaml").write_text(
         yaml.dump(
             {
@@ -116,6 +117,7 @@ def test_gui_build_stderr_on_nonzero_exit(tmp_path: Path):
     pipe.mkdir(parents=True)
     _mock_python(project / ".venv")
 
+    (pipe / "default").mkdir(parents=True, exist_ok=True)
     (pipe / "default" / "py_fail.yaml").write_text(
         yaml.dump(
             {

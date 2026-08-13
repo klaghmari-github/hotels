@@ -45,6 +45,7 @@ def test_dataframe_name_used_for_register(tmp_path: Path):
     # mini csv
     csv = tmp_path / "sales.csv"
     csv.write_text("id,amount\n1,10\n2,20\n", encoding="utf-8")
+    (pipe / "default").mkdir(parents=True, exist_ok=True)
     (pipe / "default" / "df_step.yaml").write_text(
         yaml.dump(
             {
@@ -59,6 +60,7 @@ def test_dataframe_name_used_for_register(tmp_path: Path):
         ),
         encoding="utf-8",
     )
+    (pipe / "default").mkdir(parents=True, exist_ok=True)
     (pipe / "default" / "v_step.yaml").write_text(
         yaml.dump(
             {
@@ -207,6 +209,7 @@ def test_relation_name_fallback_label(tmp_path: Path):
     pipe = tmp_path / "p2"
     pipe.mkdir()
     # F0101: stem = id
+    (pipe / "default").mkdir(parents=True, exist_ok=True)
     (pipe / "default" / "step_x.yaml").write_text(
         yaml.dump(
             {

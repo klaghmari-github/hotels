@@ -153,13 +153,44 @@ class ExecutePythonStep(PythonActionStep):
         }
     )
 
+    def _resolve_script_text(self, pipeline_obj: Any) -> str:
+        """
+        F0146: lit <id>.py a cote du YAML si present, sinon config.script.
+        """
+        from renatus.pipeline.steps.source_files import (
+            script_from_sidecar_path,
+            sidecar_ext_for,
+        )
+
+        # 1) chemin pipeline + id
+        pipe_path = getattr(pipeline_obj, "pipeline_path", None)
+        if pipe_path is not None:
+            root = Path(pipe_path)
+            ext = sidecar_ext_for(self.type) or ".py"
+            # cherche <id>.py n importe ou sous flow (premier match rglob)
+            if root.is_dir():
+                matches = sorted(root.rglob(f"{self.id}{ext}"))
+                for m in matches:
+                    if m.is_file() or m.is_symlink():
+                        text = script_from_sidecar_path(m)
+                        if text.strip():
+                            return text
+            elif root.is_file():
+                side = root.with_name(f"{self.id}{ext}")
+                if side.exists():
+                    text = script_from_sidecar_path(side)
+                    if text.strip():
+                        return text
+        # 2) legacy YAML
+        script = self.config.get("script")
+        if script is not None and str(script).strip():
+            return str(script)
+        return ""
+
     def validate(self, pipeline_keys: set[str] | frozenset[str]) -> None:
         super().validate(pipeline_keys)
-        script = self.config.get("script")
-        if script is None or not str(script).strip():
-            raise ValueError(
-                f"script manquant ou vide pour {self.id}"
-            )
+        # F0146: script peut vivre uniquement dans le sidecar — validate
+        # souple ici; process re-verifie apres lecture fichier
         # timeout valide si present
         if "timeout" in self.config and self.config["timeout"] is not None:
             _parse_timeout(self.config.get("timeout"))
@@ -169,12 +200,12 @@ class ExecutePythonStep(PythonActionStep):
             run_python_oneshot,
         )
 
-        script = self.config.get("script")
-        if script is None or not str(script).strip():
+        script_text = self._resolve_script_text(pipeline_obj)
+        if not script_text.strip():
             raise ValueError(
-                f"script manquant ou vide pour {self.id}"
+                f"script manquant ou vide pour {self.id} "
+                f"(fichier {self.id}.py ou champ script)"
             )
-        script_text = str(script)
         project_dir = Path(pipeline_obj.project_dir).resolve()
         venv_cfg = self.config.get("venv")
         venv_str = (
@@ -328,8 +359,8 @@ class NotebookStep(ExecutePythonStep):
             _parse_timeout(self.config.get("timeout"))
 
     def process(self, pipeline_obj: Any) -> None:
-        script = self.config.get("script")
-        if script is None or not str(script).strip():
+        script_text = self._resolve_script_text(pipeline_obj)
+        if not script_text.strip():
             # notebook vide = no-op (pas d erreur a build)
             self.last_result = {
                 "returncode": 0,
@@ -346,6 +377,9 @@ class NotebookStep(ExecutePythonStep):
                 pipeline_obj.python_run_results = store
             store[self.id] = dict(self.last_result)
             return
+        # injecte pour super.process (qui relit aussi le sidecar)
+        self.config = dict(self.config)
+        self.config["script"] = script_text
         super().process(pipeline_obj)
 
     @classmethod
@@ -355,8 +389,8 @@ class NotebookStep(ExecutePythonStep):
             "label": "Notebook",
             "type": "notebook",
             "description": (
-                "Cellule Python interactive (session persistante). "
-                "Edition script = editeur type Jupyter Lab + variables session."
+                "Notebook Python multi-cellules (session persistante). "
+                "Fichier .ipynb a cote du YAML ; venv optionnel."
             ),
             "icon": "nb",
             "fields": ["name", "requires", "script", "venv", "timeout"],

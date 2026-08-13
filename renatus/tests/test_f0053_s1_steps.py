@@ -47,9 +47,12 @@ def test_registry_has_core_types():
         "zone",
         # F0128
         "allzone",
+        "flatzone",
         "backzone",
         "forzone",
         "bidzone",
+        # F0136
+        "notebook",
     }
     assert set(REGISTRY.keys()) == expected
     assert allowed_types() == expected
@@ -226,6 +229,7 @@ def test_engine_delegates_zone_and_relation(tmp_path: Path):
 
     pipe = tmp_path / "p"
     pipe.mkdir()
+    (pipe / "default").mkdir(parents=True, exist_ok=True)
     (pipe / "default" / "steps.yaml").write_text(
         yaml.dump(
             {
@@ -263,6 +267,7 @@ def test_engine_validate_uses_registry(tmp_path: Path):
 
     pipe = tmp_path / "p"
     pipe.mkdir()
+    (pipe / "default").mkdir(parents=True, exist_ok=True)
     (pipe / "default" / "bad.yaml").write_text(
         "x:\n  type: not_a_type\n",
         encoding="utf-8",

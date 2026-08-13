@@ -2,12 +2,14 @@
 YamlStepStore — persistence monocomposant + onglets/zones.
 
 F0031: un composant = fichiers <id>.yaml
-F0060: multi-presence = plusieurs copies <id>.yaml (meme id) sous
-differents dossiers de zone. Save propage sur toutes les copies.
+F0060 / F0145: multi-presence = un seul fichier physique + symlinks
+<id>.yaml (meme nom/id) sous chaque zone qui l utilise.
+Dossier zone partage = symlink de dossier du meme nom.
 """
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Any
 
@@ -16,14 +18,14 @@ import yaml
 
 class YamlStepStore:
     """
-    Index step -> liste de fichiers YAML (copies multi-zones F0060).
+    Index step -> liste de chemins YAML (presence multi-zones F0060/F0145).
 
     Onglets / zones :
     - tab "default" = flow/default/*.yaml (F0082 / F0144, zone racine protegee)
     - legacy "main" migre vers "default" a l ouverture
     - sous-zones : flow/default/<zone>/… (hierarchie)
-    - Presence dans une zone = fichier <id>.yaml dans ce dossier
-    - Partage = duplication du fichier (meme id)
+    - Presence dans une zone = fichier <id>.yaml (reel ou symlink) dans ce dossier
+    - Partage = symlink relatif vers l unique fichier physique (meme nom = meme id)
 
     F0101: id composant = shortname du fichier YAML
     (stem: sans dossiers parents, sans extension .yaml/.yml).
@@ -272,9 +274,15 @@ class YamlStepStore:
 
         origins: dict[str, list[Path]] = {}
         for yaml_file in yaml_files:
-            content = yaml.safe_load(
-                yaml_file.read_text(encoding="utf-8")
-            ) or {}
+            try:
+                if not yaml_file.exists():
+                    # symlink casse
+                    continue
+                content = yaml.safe_load(
+                    yaml_file.read_text(encoding="utf-8")
+                ) or {}
+            except OSError:
+                continue
             if not isinstance(content, dict):
                 continue
             # F0101: monocomposant <id>.yaml → index par stem ;
@@ -300,40 +308,66 @@ class YamlStepStore:
                 except ValueError:
                     continue
                 origins.setdefault(sid, []).append(yaml_file)
-        # dedupe + tri stable (main d abord = chemin plus court)
+        # F0145: garder chaque presence path (reel + symlink), pas dedupe resolve
         for name, paths in list(origins.items()):
             uniq: list[Path] = []
-            seen: set[Path] = set()
-            for p in sorted(paths, key=lambda x: (len(x.parts), str(x))):
-                r = p.resolve()
-                if r in seen:
+            seen: set[str] = set()
+            for p in sorted(
+                paths,
+                key=lambda x: (
+                    0 if self.tab_of_path(x) == self.ROOT_TAB else 1,
+                    0 if not x.is_symlink() else 1,
+                    len(x.parts),
+                    str(x),
+                ),
+            ):
+                key = str(p)
+                if key in seen:
                     continue
-                seen.add(r)
+                seen.add(key)
                 uniq.append(p)
             origins[name] = uniq
         self._origins = origins
 
     def origins_of(self, name: str) -> list[Path]:
-        """Toutes les copies disque de l objet (F0060)."""
+        """Toutes les presences disque de l objet (F0060/F0145)."""
         return list(self._origins.get(str(name), []))
 
     def origin_of(self, name: str) -> Path | None:
-        """Copie primaire (home preferentiel: main / chemin le plus court)."""
+        """
+        Presence primaire (fichier physique prefere, puis default / chemin court).
+        """
         paths = self.origins_of(name)
         if not paths:
             return None
-        # preferer main
-        for p in paths:
+        # preferer fichier reel (pas symlink)
+        real = [p for p in paths if not p.is_symlink()]
+        candidates = real or paths
+        for p in candidates:
             if self.tab_of_path(p) == self.ROOT_TAB:
                 return p
-        return paths[0]
+        return sorted(
+            candidates, key=lambda x: (len(x.parts), str(x))
+        )[0]
+
+    def canonical_path_of(self, name: str) -> Path | None:
+        """Fichier physique resolu (unique) pour l id, si present."""
+        primary = self.origin_of(name)
+        if primary is None:
+            return None
+        try:
+            if primary.exists():
+                return primary.resolve()
+        except OSError:
+            pass
+        return primary
 
     def tabs_of(self, name: str) -> list[str]:
-        """Tous les onglets/zones FS ou l objet a une copie."""
+        """Tous les onglets/zones FS ou l objet a une presence."""
         tabs = {self.tab_of_path(p) for p in self.origins_of(name)}
         if not tabs:
             return [self.active_tab or self.ROOT_TAB]
-        # main d abord
+        # default d abord
         ordered = []
         if self.ROOT_TAB in tabs:
             ordered.append(self.ROOT_TAB)
@@ -382,19 +416,26 @@ class YamlStepStore:
         flow/default.yaml          → default   (definition zone default)
         flow/default/etl/b.yaml    → default/etl
         flow/default/etl/sub/c.yaml → default/etl/sub
+
+        F0145: ne pas resolve() le fichier lui-meme (symlink) sinon la
+        presence sous zone_a/obj.yaml → ../obj.yaml serait vue dans default.
+        On resolve uniquement le dossier parent.
         """
         path = self.pipeline_path
         if path.is_file():
             return self.ROOT_TAB
+        fp = Path(file_path)
         try:
-            rel = file_path.resolve().relative_to(path.resolve())
+            parent_res = fp.parent.resolve()
+            root_res = path.resolve()
+            rel_parent = parent_res.relative_to(root_res)
         except ValueError:
             return self.ROOT_TAB
-        parts = rel.parts
-        if len(parts) <= 1:
-            # racine flow: default.yaml ou legacy step.yaml
+        parts = rel_parent.parts
+        if not parts:
+            # YAML directement sous flow/ (ex. default.yaml)
             return self.ROOT_TAB
-        parent = "/".join(parts[:-1])
+        parent = "/".join(parts)
         # flow/default/xxx → onglet default
         if parent == self.ROOT_TAB or parent == self.LEGACY_ROOT_TAB:
             return self.ROOT_TAB
@@ -527,7 +568,9 @@ class YamlStepStore:
         return out
 
     def _dump_step_file(self, path: Path, step_id: str, clean: dict[str, Any]) -> None:
-        path.parent.mkdir(parents=True, exist_ok=True)
+        # Ecriture via symlink: pathlib ecrit la cible (F0145)
+        if not path.is_symlink():
+            path.parent.mkdir(parents=True, exist_ok=True)
         content = {step_id: clean}
         dumped = yaml.dump(
             content,
@@ -536,6 +579,246 @@ class YamlStepStore:
             sort_keys=False,
         )
         path.write_text(dumped, encoding="utf-8")
+
+    def sidecar_path_for(
+        self,
+        step_id: str,
+        tab: str | None = None,
+        *,
+        step_type: str | None = None,
+        yaml_path: Path | None = None,
+    ) -> Path | None:
+        """Chemin <id>.py / <id>.ipynb a cote du YAML (F0146)."""
+        from renatus.pipeline.steps.source_files import sidecar_ext_for
+
+        ext = sidecar_ext_for(step_type)
+        if not ext:
+            return None
+        if yaml_path is not None:
+            return Path(yaml_path).with_suffix(ext)
+        ypath = self.default_path_for(
+            step_id, tab=tab, step_type=step_type
+        )
+        return ypath.with_suffix(ext)
+
+    def write_sidecar_for_step(
+        self,
+        step_id: str,
+        clean: dict[str, Any],
+        *,
+        yaml_path: Path,
+        notebook: dict[str, Any] | None = None,
+    ) -> Path | None:
+        """Ecrit le fichier source a cote du yaml; retourne le path ou None."""
+        from renatus.pipeline.steps.source_files import (
+            SIDECAR_TYPES,
+            write_sidecar_content,
+        )
+
+        st = str(clean.get("type") or "").strip()
+        if st not in SIDECAR_TYPES:
+            return None
+        side = self.sidecar_path_for(
+            step_id, step_type=st, yaml_path=yaml_path
+        )
+        if side is None:
+            return None
+        # ne pas ecraser un symlink cible (ecrit via le lien)
+        script = clean.get("script")
+        return write_sidecar_content(
+            side,
+            step_type=st,
+            script=None if script is None else str(script),
+            notebook=notebook,
+        )
+
+    def read_script_for_step(
+        self,
+        step_id: str,
+        config: dict[str, Any] | None = None,
+    ) -> str:
+        """
+        F0146: code executable — sidecar prioritaire, sinon config.script legacy.
+        """
+        from renatus.pipeline.steps.source_files import (
+            SIDECAR_TYPES,
+            script_from_sidecar_path,
+        )
+
+        cfg = config if isinstance(config, dict) else {}
+        st = str(cfg.get("type") or "").strip()
+        origin = self.origin_of(step_id)
+        if origin is not None and st in SIDECAR_TYPES:
+            side = self.sidecar_path_for(
+                step_id, step_type=st, yaml_path=origin
+            )
+            if side is not None and side.exists():
+                text = script_from_sidecar_path(side)
+                if text or st == "notebook":
+                    return text
+        if cfg.get("script") is not None:
+            return str(cfg.get("script"))
+        return ""
+
+    def symlink_companions(self, master_yaml: Path, dest_yaml: Path) -> list[Path]:
+        """
+        F0146: symlink tous les fichiers meme stem que master dans dest dir.
+
+        Ex: obj1.yaml + obj1.py → dest/obj1.yaml + dest/obj1.py (liens).
+        """
+        from renatus.pipeline.steps.source_files import companion_files
+
+        master = Path(master_yaml)
+        dest = Path(dest_yaml)
+        linked: list[Path] = []
+        try:
+            master_res = (
+                master if not master.is_symlink() else master.resolve()
+            )
+        except OSError:
+            master_res = master
+        for companion in companion_files(master_res):
+            try:
+                src = (
+                    companion
+                    if not companion.is_symlink()
+                    else companion.resolve()
+                )
+            except OSError:
+                src = companion
+            dest_c = dest.parent / companion.name
+            try:
+                if dest_c.resolve() == src.resolve():
+                    linked.append(dest_c)
+                    continue
+            except OSError:
+                pass
+            try:
+                self._relative_symlink(src, dest_c)
+                linked.append(dest_c)
+            except Exception:
+                continue
+        return linked
+
+    @staticmethod
+    def _relative_symlink(source: Path, dest: Path) -> Path:
+        """
+        F0145: cree dest comme symlink relatif vers source (meme basename).
+        """
+        src = Path(source)
+        dst = Path(dest)
+        try:
+            src_res = src.resolve()
+        except OSError:
+            src_res = src
+        if not src_res.exists() and not src.exists():
+            raise LookupError(f"Cible symlink introuvable: {source}")
+
+        if dst.exists() or dst.is_symlink():
+            try:
+                if dst.resolve() == src_res:
+                    return dst
+            except OSError:
+                pass
+            # remplace une ancienne copie reelle ou un lien casse
+            if dst.is_symlink() or dst.is_file():
+                dst.unlink(missing_ok=True)
+            elif dst.is_dir():
+                try:
+                    next(dst.iterdir())
+                    raise ValueError(
+                        f"Impossible de lier {dst}: dossier reel non vide"
+                    )
+                except StopIteration:
+                    dst.rmdir()
+
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        rel = os.path.relpath(str(src_res), start=str(dst.parent.resolve()))
+        dst.symlink_to(rel, target_is_directory=src_res.is_dir())
+        return dst
+
+    def _unlink_presence(self, path: Path) -> None:
+        """Supprime une presence (symlink ou fichier) + compagnons + dossier zone."""
+        from renatus.pipeline.steps.source_files import companion_files
+
+        p = Path(path)
+        folder = (
+            p.with_suffix("")
+            if p.suffix.lower() in {".yaml", ".yml"}
+            else None
+        )
+        # F0146: retirer aussi .py / .ipynb jumeaux (symlinks ou reels si multi)
+        if p.suffix.lower() in {".yaml", ".yml"}:
+            for c in companion_files(p):
+                try:
+                    if c.is_symlink() or c.is_file():
+                        c.unlink(missing_ok=True)
+                except OSError:
+                    pass
+        try:
+            if p.is_symlink() or p.is_file():
+                p.unlink(missing_ok=True)
+        except OSError as exc:
+            raise OSError(f"Echec suppression {p}: {exc}") from exc
+        if folder is not None and folder.is_symlink():
+            try:
+                folder.unlink(missing_ok=True)
+            except OSError:
+                pass
+
+    def _promote_symlink_to_real(self, master: Path, promote: Path) -> Path:
+        """
+        Avant de retirer le fichier physique master: transforme promote
+        (symlink) en fichier reel et re-pointe les autres liens.
+        """
+        if not promote.is_symlink():
+            return promote
+        try:
+            if promote.resolve() != master.resolve():
+                return promote
+        except OSError:
+            return promote
+        content = master.read_bytes()
+        master_folder = master.with_suffix("")
+        promote_folder = promote.with_suffix("")
+        promote.unlink(missing_ok=True)
+        promote.write_bytes(content)
+        if master_folder.is_dir() and not master_folder.is_symlink():
+            if promote_folder.is_symlink():
+                promote_folder.unlink(missing_ok=True)
+            if not promote_folder.exists():
+                try:
+                    master_folder.rename(promote_folder)
+                except OSError:
+                    pass
+        stem = master.stem
+        root = self.pipeline_path
+        if root.is_dir():
+            for other in root.rglob(f"{stem}.yaml"):
+                try:
+                    if other.resolve() == promote.resolve():
+                        continue
+                except OSError:
+                    continue
+                if other.is_symlink():
+                    try:
+                        other.unlink(missing_ok=True)
+                        self._relative_symlink(promote, other)
+                    except OSError:
+                        pass
+                ofold = other.with_suffix("")
+                if ofold.is_symlink() and promote_folder.exists():
+                    try:
+                        ofold.unlink(missing_ok=True)
+                        self._relative_symlink(promote_folder, ofold)
+                    except OSError:
+                        pass
+        try:
+            if master.exists() or master.is_symlink():
+                master.unlink(missing_ok=True)
+        except OSError:
+            pass
+        return promote
 
     def _remove_step_from_multikey(self, path: Path, step_id: str) -> None:
         """
@@ -591,10 +874,10 @@ class YamlStepStore:
         tab: str | None = None,
     ) -> Path:
         """
-        Persiste une step dans TOUTES ses copies <id>.yaml (F0031 / F0060).
+        Persiste une step (F0031 / F0060 / F0145).
 
-        - F0031: un composant = un fichier <id>.yaml (extraction depuis multi-cles)
-        - F0060: multi-presence = N fichiers synchronises
+        - F0031: un composant = un fichier <id>.yaml
+        - F0145: un seul contenu physique ; les symlinks voient la meme donnee
         - F0067: config normalisee (sql → script)
         """
         step_id = self.normalize_step_id(name)
@@ -609,19 +892,53 @@ class YamlStepStore:
             return target
 
         step_type = str(clean.get("type") or "") or None
+        # F0146: notebook payload optionnel (dict) avant strip script yaml
+        notebook_payload = clean.pop("_notebook", None)
+        from renatus.pipeline.steps.source_files import SIDECAR_TYPES
+
+        # YAML: ne stocke plus le corps du script (sidecar = verite)
+        yaml_clean = dict(clean)
+        if step_type in SIDECAR_TYPES:
+            # garde un marqueur leger pour l UI / imports
+            if yaml_clean.get("script") is not None:
+                yaml_clean["script"] = ""  # corps dans .py / .ipynb
+
+        def _persist_yaml_and_side(target: Path, body: dict[str, Any]) -> None:
+            self._dump_step_file(target, step_id, body)
+            self.write_sidecar_for_step(
+                step_id,
+                clean,  # version avec script complet
+                yaml_path=target,
+                notebook=(
+                    notebook_payload
+                    if isinstance(notebook_payload, dict)
+                    else None
+                ),
+            )
+
         if not paths:
             target = self.default_path_for(
                 step_id, tab=tab, step_type=step_type
             )
-            self._dump_step_file(target, step_id, clean)
+            _persist_yaml_and_side(target, yaml_clean)
             self._origins[step_id] = [target]
             return target
 
+        # F0145: ecrire une fois par fichier physique resolu
         written: list[Path] = []
+        seen_resolved: set[Path] = set()
         for origin in paths:
+            try:
+                resolved = origin.resolve()
+            except OSError:
+                resolved = origin
             if origin.name == dedicated:
-                # copie monocomposant (F0060 multi-zone)
-                self._dump_step_file(origin, step_id, clean)
+                if resolved in seen_resolved:
+                    continue
+                seen_resolved.add(resolved)
+                # preferer ecrire via le chemin non-symlink
+                target = origin if not origin.is_symlink() else resolved
+                _persist_yaml_and_side(target, yaml_clean)
                 written.append(origin)
             else:
                 # F0031: extraire du YAML multi-cles vers <id>.yaml
@@ -629,31 +946,47 @@ class YamlStepStore:
                 target = self.default_path_for(
                     step_id, tab=tab_id, step_type=step_type
                 )
-                self._dump_step_file(target, step_id, clean)
-                written.append(target)
+                try:
+                    tres = target.resolve()
+                except OSError:
+                    tres = target
+                if tres not in seen_resolved:
+                    seen_resolved.add(tres)
+                    _persist_yaml_and_side(target, yaml_clean)
+                    written.append(target)
                 if origin.resolve() != target.resolve():
                     self._remove_step_from_multikey(origin, step_id)
 
         self.refresh()
-        return written[0] if written else (
-            self.origin_of(step_id) or paths[0]
+        return (
+            self.origin_of(step_id)
+            or (written[0] if written else paths[0])
         )
 
     def attach_to_tab(self, step_id: str, tab: str) -> Path:
         """
-        F0060: partage — duplique <id>.yaml dans le dossier de l onglet/zone.
+        F0060 / F0145: partage — symlink <id>.yaml (meme nom) vers le
+        fichier physique unique. Si zone, symlink aussi le dossier homonyme.
         """
         step_id = str(step_id).strip()
-        tab_id = (tab or self.ROOT_TAB).strip() or self.ROOT_TAB
+        tab_id = self.normalize_tab_id(tab)
         if step_id not in self._origins and not self.origin_of(step_id):
-            # peut arriver avant refresh
             self.refresh()
         primary = self.origin_of(step_id)
         if primary is None or not primary.is_file():
             raise LookupError(
-                f"Impossible de partager {step_id}: aucune copie source"
+                f"Impossible de partager {step_id}: aucune source physique"
             )
-        content = yaml.safe_load(primary.read_text(encoding="utf-8")) or {}
+        # master physique (pas un lien)
+        try:
+            master = primary if not primary.is_symlink() else primary.resolve()
+        except OSError:
+            master = primary
+        if not master.is_file():
+            raise LookupError(
+                f"Impossible de partager {step_id}: source invalide"
+            )
+        content = yaml.safe_load(master.read_text(encoding="utf-8")) or {}
         if not isinstance(content, dict) or step_id not in content:
             raise LookupError(f"Config source absente pour {step_id}")
         clean = self.normalize_step_config(
@@ -664,24 +997,58 @@ class YamlStepStore:
             tab=tab_id,
             step_type=str(clean.get("type") or "") or None,
         )
-        if dest.resolve() == primary.resolve():
-            return dest
-        if dest.is_file():
-            # deja present
-            self.refresh()
-            return dest
-        self._dump_step_file(dest, step_id, clean)
+        try:
+            if dest.resolve() == master.resolve():
+                return dest
+        except OSError:
+            if dest == master:
+                return dest
+
+        # presence deja un lien correct
+        if dest.is_symlink():
+            try:
+                if dest.resolve() == master.resolve():
+                    self.refresh()
+                    return dest
+            except OSError:
+                pass
+
+        # F0145: symlink fichier (remplace une ancienne copie reelle)
+        self._relative_symlink(master, dest)
+
+        # F0146: symlink compagnons meme stem (.py, .ipynb, …) non recursif
+        try:
+            self.symlink_companions(master, dest)
+        except Exception:
+            pass
+
+        # Dossier zone homonyme → symlink de dossier
+        src_folder = master.with_suffix("")
+        if src_folder.is_dir() or src_folder.is_symlink():
+            dest_folder = dest.with_suffix("")
+            try:
+                if not (
+                    dest_folder.exists()
+                    and dest_folder.resolve() == src_folder.resolve()
+                    and dest_folder == src_folder
+                ):
+                    self._relative_symlink(src_folder, dest_folder)
+            except Exception:
+                # dossier optionnel (composant non-zone sans dossier)
+                pass
+
         self.refresh()
         return dest
 
     def detach_from_tab(self, step_id: str, tab: str) -> None:
         """
-        F0060: retire une copie de zone.
+        F0060 / F0145: retire une presence (symlink ou copie) d une zone.
 
-        Refuse si c est la seule copie (evite objet orphelin / reference perdue).
+        Refuse si c est la seule presence. Si on retire le fichier physique
+        alors que d autres liens existent, un lien est promu en fichier reel.
         """
         step_id = str(step_id).strip()
-        tab_id = (tab or self.ROOT_TAB).strip() or self.ROOT_TAB
+        tab_id = self.normalize_tab_id(tab)
         paths = self.origins_of(step_id)
         if not paths:
             self.refresh()
@@ -697,26 +1064,34 @@ class YamlStepStore:
         ]
         if not to_remove:
             raise LookupError(
-                f"{step_id} n a pas de copie dans l onglet {tab_id}"
+                f"{step_id} n a pas de presence dans l onglet {tab_id}"
             )
+        remaining = [p for p in paths if p not in to_remove]
         for p in to_remove:
-            try:
-                if p.is_file():
-                    # monocomposant attendu
-                    p.unlink(missing_ok=True)
-            except OSError as exc:
-                raise OSError(f"Echec suppression {p}: {exc}") from exc
+            if not p.is_symlink() and remaining:
+                # retirer le master physique: promouvoir un autre lien
+                promote = next(
+                    (r for r in remaining if r.is_symlink()),
+                    remaining[0],
+                )
+                try:
+                    if p.resolve() == promote.resolve() or promote.is_symlink():
+                        self._promote_symlink_to_real(p, promote)
+                        continue
+                except OSError:
+                    pass
+            self._unlink_presence(p)
         self.refresh()
 
     def move_to_tab(self, step_id: str, tab: str) -> Path:
         """
-        F0060: deplace l unique copie vers un onglet (si multi: refuse).
+        F0060: deplace l unique presence physique vers un onglet (si multi: refuse).
         """
         paths = self.origins_of(step_id)
         if len(paths) != 1:
             raise ValueError(
                 f"Deplacement de {step_id} refuse: "
-                f"{len(paths)} copie(s) — utilisez share/detach"
+                f"{len(paths)} presence(s) — utilisez share/detach"
             )
         src = paths[0]
         step_type = None
@@ -729,10 +1104,19 @@ class YamlStepStore:
         dest = self.default_path_for(step_id, tab=tab, step_type=step_type)
         if src.resolve() == dest.resolve():
             return dest
-        content = src.read_text(encoding="utf-8")
+        # deplace fichier reel (+ dossier zone jumeau)
         dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_text(content, encoding="utf-8")
-        src.unlink(missing_ok=True)
+        if dest.exists() or dest.is_symlink():
+            raise ValueError(f"Destination deja presente: {dest}")
+        src_folder = src.with_suffix("")
+        src.rename(dest)
+        if src_folder.is_dir() and not src_folder.is_symlink():
+            dest_folder = dest.with_suffix("")
+            if not dest_folder.exists():
+                try:
+                    src_folder.rename(dest_folder)
+                except OSError:
+                    pass
         self.refresh()
         return dest
 

@@ -66,7 +66,7 @@ def test_zone_build_updates_member_renatus_times(tmp_path: Path):
         assert client.get("/gui/step/v_b").json().get("renatus_time") is None
         assert client.get("/gui/step/default").json().get("renatus_time") is None
 
-        b = client.post("/gui/build/main")
+        b = client.post("/gui/build/default")
         assert b.status_code == 200, b.text
         body = b.json()
         assert body.get("action") == "zone_build"
@@ -118,7 +118,7 @@ def test_zone_leaves_mode_times_requires_too(tmp_path: Path):
         )
     client = TestClient(create_gui_app(tmp_path / "u.duckdb", pipe))
     with client:
-        body = client.post("/gui/build/main").json()
+        body = client.post("/gui/build/default").json()
         assert body.get("ok") is True
         times = body.get("member_renatus_times") or {}
         assert "t_a" in times

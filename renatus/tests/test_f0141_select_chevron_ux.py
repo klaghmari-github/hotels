@@ -30,4 +30,5 @@ def test_css_chevron_and_flat_parent():
 
 
 def test_cache_bust_f0141():
-    assert "F0141" in read_index()
+    # cache-bust avance avec les features suivantes (ex. F0144)
+    assert "main.js?v=F" in read_index()

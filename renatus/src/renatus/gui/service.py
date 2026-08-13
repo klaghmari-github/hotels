@@ -646,12 +646,12 @@ class GuiService:
 
     def zones_of(self, step_id: str) -> list[dict[str, Any]]:
         """
-        Zones ou apparait un objet (F0057/F0060) — calcule, non stocke YAML.
+        Zones ou apparait un objet (F0057/F0060/F0145) — calcule, non stocke YAML.
 
-        Source de verite F0060: copies disque <id>.yaml sous flow/.
-        - main si copie a la racine
-        - zone X si copie dans le dossier de la zone
-        can_remove = True ssi plus d une copie (sinon il faut supprimer l objet).
+        Source de verite: presences disque <id>.yaml (fichier ou symlink) sous flow/.
+        - default si presence a la racine protegee
+        - zone X si presence dans le dossier de la zone
+        can_remove = True ssi plus d une presence (sinon il faut supprimer l objet).
         """
         pipeline = self.api.connection.pipeline
         sid = str(step_id)
@@ -681,6 +681,12 @@ class GuiService:
             if zid in seen:
                 continue
             seen.add(zid)
+            # presence symlink?
+            is_link = False
+            for op in self.store.origins_of(sid):
+                if self.store.tab_of_path(op) == tab:
+                    is_link = op.is_symlink()
+                    break
             out.append(
                 {
                     "id": zid,
@@ -688,9 +694,10 @@ class GuiService:
                     "zone_path": zpath,
                     "tab": tab,
                     "kind": kind,
-                    # F0060: retirable ssi >1 copie disque
+                    # F0060/F0145: retirable ssi >1 presence disque
                     "can_remove": n_copies > 1,
                     "copies": n_copies,
+                    "symlink": is_link,
                 }
             )
 
@@ -704,7 +711,7 @@ class GuiService:
         return out
 
     def share_step_to_zone(self, step_id: str, zone_tab: str) -> dict[str, Any]:
-        """Duplique le YAML de l objet dans le dossier de la zone (F0060)."""
+        """Lien symbolique <id>.yaml vers l objet dans la zone (F0060/F0145)."""
         with self._lock:
             if self.api.read_only:
                 raise PermissionError("Lecture seule")
@@ -719,15 +726,16 @@ class GuiService:
                 "id": step_id,
                 "tab": zone_tab,
                 "path": str(path),
+                "symlink": path.is_symlink(),
                 "zones": self.zones_of(step_id),
-                "message": f"{step_id} partage dans {zone_tab}",
+                "message": f"{step_id} lie dans {zone_tab}",
             }
 
     def unshare_step_from_zone(
         self, step_id: str, zone_tab: str
     ) -> dict[str, Any]:
         """
-        Retire la copie dans une zone (F0060).
+        Retire le lien (ou la presence) dans une zone (F0060/F0145).
 
         Refuse si seule presence → il faut delete_step.
         """
@@ -845,6 +853,35 @@ class GuiService:
                 config = dict(config)
                 config["objects"] = self.effective_zone_objects(name)
             origin = self.store.origin_of(name)
+            # F0146: script affiche = contenu sidecar .py / .ipynb
+            source_file = None
+            source_format = None
+            notebook = None
+            from renatus.pipeline.steps.source_files import (
+                SIDECAR_TYPES,
+                parse_ipynb,
+                sidecar_ext_for,
+            )
+
+            if step.type in SIDECAR_TYPES and origin is not None:
+                side = self.store.sidecar_path_for(
+                    name, step_type=step.type, yaml_path=origin
+                )
+                if side is not None:
+                    source_file = str(side)
+                    source_format = side.suffix.lstrip(".").lower()
+                    script_txt = self.store.read_script_for_step(
+                        name, {**raw, "type": step.type}
+                    )
+                    config = dict(config)
+                    config["script"] = script_txt
+                    if step.type == "notebook" and side.exists():
+                        try:
+                            notebook = parse_ipynb(
+                                side.read_text(encoding="utf-8")
+                            )
+                        except OSError:
+                            notebook = parse_ipynb(script_txt)
             label = str(config.get("label") or name)
             body = GuiStepResponse(
                 ok=True,
@@ -890,6 +927,10 @@ class GuiService:
                 "shape": shape,
                 # F0093: duree dernier Renatus (secondes), None si jamais build
                 "renatus_time": self._renatus_times.get(str(name)),
+                # F0146: fichier source (.py / .ipynb) + notebook structure
+                "source_file": source_file,
+                "source_format": source_format,
+                "notebook": notebook,
             }
 
     def put_step(
@@ -944,6 +985,18 @@ class GuiService:
             config.pop("shape", None)
             config.pop("renatus_time", None)
             config.pop("renatus-time", None)
+            # F0146: structure notebook → sidecar .ipynb (pas dans YAML)
+            nb_struct = config.pop("notebook", None)
+            if nb_struct is not None and not isinstance(nb_struct, dict):
+                nb_struct = None
+            if nb_struct is not None:
+                # derive script affichage depuis cellules si absente
+                if not str(config.get("script") or "").strip():
+                    from renatus.pipeline.steps.source_files import (
+                        ipynb_to_script,
+                    )
+
+                    config["script"] = ipynb_to_script(nb_struct)
 
             # Valide le type de base avant ecriture disque
             from renatus.pipeline.steps import create_step
@@ -985,6 +1038,8 @@ class GuiService:
             # F0052/F0056/F0060: zone = dossier + objects + copies FS
             prev_zone_objects: dict[str, Any] = {}
             zone_content_tab: str | None = None
+            # conserve le corps script avant sanitize allow-list
+            script_body = config.get("script")
             if step_type == "zone":
                 from renatus.pipeline.steps.org import normalize_zone_objects
 
@@ -1029,6 +1084,11 @@ class GuiService:
                 config = create_step(step_id, config).to_config()
                 if "label" not in config and new_label:
                     config["label"] = new_label
+                # F0146: re-injecte script + notebook pour sidecar
+                if script_body is not None:
+                    config["script"] = script_body
+                if nb_struct is not None:
+                    config["_notebook"] = nb_struct
             path = self.store.save_step(step_id, config, tab=tab_id)
 
             # F0060: sync copies disque pour membership zone
@@ -3378,15 +3438,17 @@ class GuiService:
 
             objects: dict[str, Any] = {}
             copied: list[str] = []
+            # F0145: materialise membres via symlinks (pas de copies YAML)
             for mid in member_ids:
                 if mid not in pipe or mid == zid:
                     continue
                 origin = self.store.origin_of(mid)
                 if origin is None or not origin.is_file():
                     continue
-                dest = dest_dir / f"{mid}.yaml"
-                if not dest.exists():
-                    shutil.copy2(origin, dest)
+                try:
+                    self.store.attach_to_tab(mid, zone_path)
+                except Exception:
+                    continue
                 objects[mid] = {}
                 copied.append(mid)
 
@@ -3399,7 +3461,7 @@ class GuiService:
             }
             zpath = self.store.save_step(zid, zcfg, tab=parent_tab)
             self._reload_pipeline()
-            # rattache a la zone parent du tab (main ou zone active)
+            # rattache a la zone parent du tab (default ou zone active)
             attach_parent = (
                 YamlStepStore.ROOT_TAB
                 if parent_tab == YamlStepStore.ROOT_TAB
@@ -3412,7 +3474,7 @@ class GuiService:
             self.store.active_tab = zone_path
             self._autocommit(
                 f"init zone {zid} from template {k} "
-                f"({len(copied)} yaml copies)",
+                f"({len(copied)} symlink members)",
                 components=[zid] + copied,
             )
             return {
@@ -3426,7 +3488,7 @@ class GuiService:
                 "file_origin": str(zpath),
                 "message": (
                     f"Zone {zid} creee ({k}) — "
-                    f"{len(copied)} composant(s) copies"
+                    f"{len(copied)} composant(s) lies"
                 ),
                 "tab": zone_path,
                 "zone_path": zone_path,
@@ -3481,21 +3543,24 @@ class GuiService:
             root = self.api.pipeline_path
             if not root.is_dir():
                 raise ValueError("Pipeline fichier unique: convert impossible")
-            dest_dir = root / zid
-            if dest_dir.exists():
-                raise ValueError(f"Dossier zone deja present: {zid}")
-            dest_dir.mkdir(parents=True, exist_ok=False)
+            zone_path = self.store.zone_path_for(zid, YamlStepStore.ROOT_TAB)
+            dest_dir = self.store.dir_for_tab(zone_path)
+            if dest_dir.exists() and any(dest_dir.iterdir()):
+                raise ValueError(f"Dossier zone deja present: {zone_path}")
+            dest_dir.mkdir(parents=True, exist_ok=True)
             objects: dict[str, Any] = {}
             copied: list[str] = []
+            # F0145: liens symboliques vers les membres (pas de copies)
             for mid in members:
                 if mid not in pipe:
                     continue
                 origin = self.store.origin_of(mid)
                 if origin is None or not origin.is_file():
                     continue
-                dest = dest_dir / f"{mid}.yaml"
-                if not dest.exists():
-                    shutil.copy2(origin, dest)
+                try:
+                    self.store.attach_to_tab(mid, zone_path)
+                except Exception:
+                    continue
                 objects[mid] = {}
                 copied.append(mid)
             zcfg = {
@@ -3509,9 +3574,9 @@ class GuiService:
                 zid, zcfg, tab=YamlStepStore.ROOT_TAB
             )
             self._reload_pipeline()
-            self._open_tab_id(zid)
-            self._active_tab = zid
-            self.store.active_tab = zid
+            self._open_tab_id(zone_path)
+            self._active_tab = zone_path
+            self.store.active_tab = zone_path
             self._autocommit(
                 f"convert auto-zone {aid} -> zone {zid}",
                 components=[zid] + copied,
@@ -3736,8 +3801,14 @@ class GuiService:
         Doit etre appele sous self._lock (RLock).
         """
         sid = str(name).strip()
-        if not sid or sid == YamlStepStore.ROOT_TAB:
-            raise ValueError("Zone main protegee : suppression interdite")
+        if not sid or sid in {
+            YamlStepStore.ROOT_TAB,
+            YamlStepStore.LEGACY_ROOT_TAB,
+        }:
+            raise ValueError(
+                f"Zone {YamlStepStore.ROOT_TAB} protegee : "
+                "suppression interdite"
+            )
         if sid not in self.api.connection.pipeline:
             # fichier orphelin eventuel
             paths = self.store.origins_of(sid)
@@ -3823,11 +3894,21 @@ class GuiService:
                             )
                 # F0064: fermer l onglet zone + sous-onglets ouverts
                 closed_tabs = self._close_open_tabs_for_zone(zpath)
-            # F0060: supprimer TOUTES les copies disque
-            for origin in paths:
-                if not origin.is_file():
-                    continue
+            # F0060/F0145: supprimer toutes les presences (symlinks d abord)
+            ordered = sorted(
+                paths,
+                key=lambda p: (0 if p.is_symlink() else 1, str(p)),
+            )
+            for origin in ordered:
                 try:
+                    if origin.is_symlink():
+                        origin.unlink(missing_ok=True)
+                        fold = origin.with_suffix("")
+                        if fold.is_symlink():
+                            fold.unlink(missing_ok=True)
+                        continue
+                    if not origin.is_file():
+                        continue
                     content = yaml.safe_load(
                         origin.read_text(encoding="utf-8")
                     ) or {}
@@ -3850,9 +3931,24 @@ class GuiService:
                 except OSError:
                     pass
             if step_type == "zone":
+                # tous les dossiers zone (reel + symlinks de dossier)
+                for origin in ordered:
+                    fold = origin.with_suffix("")
+                    try:
+                        if fold.is_symlink():
+                            fold.unlink(missing_ok=True)
+                        elif fold.is_dir() and not any(fold.iterdir()):
+                            fold.rmdir()
+                    except OSError:
+                        pass
                 folder = self.store.zone_folder_for(name, parent_tab)
-                if folder.is_dir() and not any(folder.iterdir()):
-                    folder.rmdir()
+                try:
+                    if folder.is_symlink():
+                        folder.unlink(missing_ok=True)
+                    elif folder.is_dir() and not any(folder.iterdir()):
+                        folder.rmdir()
+                except OSError:
+                    pass
             self._reload_pipeline()
             self._autocommit(
                 f"delete step {name}",
@@ -3860,7 +3956,7 @@ class GuiService:
             )
             # F0064: renvoyer l etat des onglets pour resync GUI
             tabs_state = self.list_tabs()
-            msg = f"Step {name} supprimee ({len(paths)} copie(s))"
+            msg = f"Step {name} supprimee ({len(paths)} presence(s))"
             if detached:
                 msg += f" ; requires nettoyes sur {len(detached)} dependant(s)"
             return {

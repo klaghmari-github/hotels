@@ -57,7 +57,8 @@ def test_js_select_step_anti_recursion():
 
 def test_cache_bust_f0133():
     html = read_index()
-    assert "F0133" in html
+    # cache-bust avance avec les features suivantes (ex. F0144)
+    assert "main.js?v=F" in html
 
 
 def test_all_js_mentions_f0133_path():

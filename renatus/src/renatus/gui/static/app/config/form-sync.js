@@ -38,12 +38,18 @@ export function syncFormVisibility(type) {
     // dependents utiles pour tous sauf pure zone vide ok
     el.fieldDependents.hidden = false;
   }
-  // F0067: champ unifie Script (SQL ou Python selon le type)
+  // F0067 / F0146: libelle Script selon type
   if (el.cfgScriptLabel) {
-    el.cfgScriptLabel.textContent = "Script";
+    if (t === "notebook") el.cfgScriptLabel.textContent = "Notebook (.ipynb)";
+    else if (t === "execute_python")
+      el.cfgScriptLabel.textContent = "Script (.py)";
+    else if (t === "execute_sql" || t === "table" || t === "view")
+      el.cfgScriptLabel.textContent = "Script SQL";
+    else el.cfgScriptLabel.textContent = "Script";
   }
   if (el.cfgSqlLabel) {
-    el.cfgSqlLabel.textContent = "Script";
+    el.cfgSqlLabel.textContent =
+      (el.cfgScriptLabel && el.cfgScriptLabel.textContent) || "Script";
   }
   if (el.fieldRequires && !el.fieldRequires.hidden) {
     // Miroir hidden = source de verite a l'ouverture / sync YAML

@@ -65,6 +65,7 @@ def test_engine_requires_uses_step_id_not_relation_name(tmp_path: Path):
     pipe.mkdir()
 
     # source: id=src_step, label humain, relation SQL explicite
+    (pipe / "default").mkdir(parents=True, exist_ok=True)
     (pipe / "default" / "src_step.yaml").write_text(
         yaml.dump(
             {
@@ -82,6 +83,7 @@ def test_engine_requires_uses_step_id_not_relation_name(tmp_path: Path):
         encoding="utf-8",
     )
     # dependant: requires l id src_step, PAS rel_physique
+    (pipe / "default").mkdir(parents=True, exist_ok=True)
     (pipe / "default" / "child.yaml").write_text(
         yaml.dump(
             {
@@ -112,6 +114,7 @@ def test_engine_requires_uses_step_id_not_relation_name(tmp_path: Path):
 
     # transformer src: label + type (table reste table, SQL change)
     # require id pipeline reste src_step (pas le label ni la relation)
+    (pipe / "default").mkdir(parents=True, exist_ok=True)
     (pipe / "default" / "src_step.yaml").write_text(
         yaml.dump(
             {

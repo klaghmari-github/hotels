@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Renatus GUI</title>
-  <link rel="stylesheet" href="/gui/static/style.css?v=F0130" />
+  <link rel="stylesheet" href="/gui/static/style.css?v=F0146" />
 </head>
 <body>
   <header class="topbar">
@@ -1222,32 +1222,39 @@
         </div>
       </header>
       <div class="nb-toolbar" data-testid="nb-toolbar">
-        <button type="button" class="btn primary" id="nb-btn-run" data-testid="nb-btn-run" title="Exécuter (Ctrl+Enter)">▶ Run</button>
-        <button type="button" class="btn" id="nb-btn-run-save" data-testid="nb-btn-run-save" title="Exécuter et enregistrer le script">▶ Run &amp; Save</button>
+        <button type="button" class="btn primary" id="nb-btn-run" data-testid="nb-btn-run" title="Exécuter cellule active (Ctrl+Enter)">▶ Run</button>
+        <button type="button" class="btn" id="nb-btn-run-all" data-testid="nb-btn-run-all" title="Exécuter toutes les cellules">▶ Run all</button>
+        <button type="button" class="btn" id="nb-btn-run-save" data-testid="nb-btn-run-save" title="Exécuter et enregistrer">▶ Run &amp; Save</button>
+        <button type="button" class="btn ghost" id="nb-btn-add-cell" data-testid="nb-btn-add-cell" title="Ajouter une cellule">+ Cellule</button>
         <button type="button" class="btn ghost" id="nb-btn-refresh-vars" data-testid="nb-btn-refresh-vars" title="Rafraîchir les variables">↻ Vars</button>
         <span id="nb-run-meta" class="nb-run-meta" data-testid="nb-run-meta"></span>
         <span class="nb-toolbar-spacer"></span>
         <button type="button" class="btn" id="nb-btn-cancel" data-testid="nb-btn-cancel">Fermer</button>
-        <button type="button" class="btn primary" id="nb-btn-apply" data-testid="nb-btn-apply">Appliquer au script</button>
+        <button type="button" class="btn primary" id="nb-btn-apply" data-testid="nb-btn-apply">Enregistrer</button>
       </div>
       <div class="nb-layout">
         <div class="nb-main">
-          <label class="nb-label" for="nb-code">Cellule</label>
-          <textarea
-            id="nb-code"
-            class="nb-code mono"
-            data-testid="nb-code"
-            spellcheck="false"
-            autocomplete="off"
-            autocorrect="off"
-            autocapitalize="off"
-            rows="16"
-            placeholder="# code Python — session persistante"
-          ></textarea>
-          <div class="nb-output-wrap">
-            <div class="nb-output-label">Output</div>
-            <pre id="nb-stdout" class="nb-stdout" data-testid="nb-stdout"></pre>
-            <pre id="nb-stderr" class="nb-stderr" data-testid="nb-stderr" hidden></pre>
+          <div id="nb-cells-wrap" data-testid="nb-cells-wrap">
+            <div id="nb-cells" class="nb-cells" data-testid="nb-cells"></div>
+          </div>
+          <div id="nb-py-wrap" data-testid="nb-py-wrap" hidden>
+            <label class="nb-label" for="nb-code">Script Python (.py)</label>
+            <textarea
+              id="nb-code"
+              class="nb-code mono"
+              data-testid="nb-code"
+              spellcheck="false"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              rows="16"
+              placeholder="# code Python — session persistante"
+            ></textarea>
+            <div class="nb-output-wrap">
+              <div class="nb-output-label">Output</div>
+              <pre id="nb-stdout" class="nb-stdout" data-testid="nb-stdout"></pre>
+              <pre id="nb-stderr" class="nb-stderr" data-testid="nb-stderr" hidden></pre>
+            </div>
           </div>
         </div>
         <aside class="nb-vars" data-testid="nb-vars" aria-label="Variables de session">
@@ -1257,7 +1264,7 @@
           </div>
           <p id="nb-vars-empty" class="nb-vars-empty muted" data-testid="nb-vars-empty">Aucune variable — Run une cellule pour peupler la session.</p>
           <ul id="nb-vars-list" class="nb-vars-list" data-testid="nb-vars-list"></ul>
-          <p class="nb-vars-hint muted">Clic sur un nom → insère dans la cellule.</p>
+          <p class="nb-vars-hint muted">Clic sur un nom → insère dans la cellule active.</p>
         </aside>
       </div>
     </div>
@@ -1346,6 +1353,6 @@
   <div id="toast" class="toast hidden" role="status"></div>
   <script src="/gui/static/js-yaml.min.js"></script>
   <!-- F0114: cache-bust modules ES -->
-  <script type="module" src="/gui/static/app/main.js?v=F0142"></script>
+  <script type="module" src="/gui/static/app/main.js?v=F0146"></script>
 </body>
 </html>

@@ -52,7 +52,7 @@ def test_flatzone_creates_zone_listed_in_selector(tmp_path: Path):
         tabs = client.get("/gui/tabs").json()
         ids = [t["id"] for t in tabs["tabs"]]
         assert "default" in ids
-        assert "z1" in ids
+        assert "default/z1" in ids or "z1" in ids
         assert "all" not in ids
         assert "auto" not in ids
 

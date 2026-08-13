@@ -93,7 +93,7 @@ def test_zone_defaults_and_build_modes(tmp_path: Path):
         assert st["config"]["renatus_mode"] == "required_for_leaves"
 
         # leaves mode: build v1 (pulls t1) + t2
-        b = client.post("/gui/build/main")
+        b = client.post("/gui/build/default")
         assert b.status_code == 200, b.text
         body = b.json()
         assert body.get("action") == "zone_build"
@@ -128,7 +128,7 @@ def test_zone_defaults_and_build_modes(tmp_path: Path):
         assert st2["config"]["workers"] == "queue"
         assert st2["config"]["renatus_mode"] == "root_to_leaves"
 
-        b2 = client.post("/gui/build/main").json()
+        b2 = client.post("/gui/build/default").json()
         assert b2.get("renatus_mode") == "root_to_leaves"
         assert b2.get("workers") == "queue"
         built2 = [x["id"] for x in b2.get("built") or []]

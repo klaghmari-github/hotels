@@ -133,8 +133,8 @@ def test_zone_recursive_changelog(tmp_path: Path):
                 },
             },
         )
-        # main voit commits de z1 et t_in
-        cl_main = client.get("/gui/changelog?step_id=main&limit=50").json()
+        # default voit commits de z1 et t_in
+        cl_main = client.get("/gui/changelog?step_id=default&limit=50").json()
         subjects = " | ".join(e["subject"] for e in cl_main["entries"])
         assert "t_in" in subjects or any(
             "t_in" in (p or "") for p in (cl_main.get("paths") or [])

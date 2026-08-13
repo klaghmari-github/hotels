@@ -39,6 +39,7 @@ def test_main_objects_include_fs_members(tmp_path: Path):
         ),
         encoding="utf-8",
     )
+    (pipe / "default").mkdir(parents=True, exist_ok=True)
     (pipe / "default" / "t2.yaml").write_text(
         yaml.dump(
             {

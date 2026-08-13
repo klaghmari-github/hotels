@@ -71,6 +71,7 @@ def test_create_if_not_exists_reuses_loaded_dataframe(tmp_path: Path):
     pipe = tmp_path / "flow"
     pipe.mkdir()
     # F0101: fichier = id.yaml
+    (pipe / "default").mkdir(parents=True, exist_ok=True)
     (pipe / "default" / "df_a.yaml").write_text(
         yaml.dump(
             {
@@ -107,6 +108,7 @@ def test_create_or_replace_rereads_source(tmp_path: Path):
     _write_csv(src, "id,n\n1,alice\n")
     pipe = tmp_path / "flow"
     pipe.mkdir()
+    (pipe / "default").mkdir(parents=True, exist_ok=True)
     (pipe / "default" / "df_b.yaml").write_text(
         yaml.dump(
             {
@@ -160,6 +162,7 @@ def test_session_keeps_dataframe_and_table_across_builds(tmp_path: Path):
         ),
         encoding="utf-8",
     )
+    (pipe / "default").mkdir(parents=True, exist_ok=True)
     (pipe / "default" / "t_s.yaml").write_text(
         yaml.dump(
             {

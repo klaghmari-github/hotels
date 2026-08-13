@@ -51,6 +51,7 @@ def test_execute_shell_runs_and_stdout(tmp_path: Path):
     pipe = project / "flow"
     pipe.mkdir(parents=True)
     out = project / "marker.txt"
+    (pipe / "default").mkdir(parents=True, exist_ok=True)
     (pipe / "default" / "sh.yaml").write_text(
         yaml.dump(
             {
@@ -80,6 +81,7 @@ def test_execute_shell_runs_and_stdout(tmp_path: Path):
 def test_gui_build_shell(tmp_path: Path):
     pipe = tmp_path / "flow"
     pipe.mkdir()
+    (pipe / "default").mkdir(parents=True, exist_ok=True)
     (pipe / "default" / "s.yaml").write_text(
         yaml.dump(
             {

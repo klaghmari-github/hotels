@@ -42,4 +42,5 @@ def test_css_edge_ortho():
 
 
 def test_cache_bust_f0135():
-    assert "F0135" in read_index()
+    # cache-bust avance avec les features suivantes (ex. F0144)
+    assert "main.js?v=F" in read_index()

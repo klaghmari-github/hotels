@@ -1,9 +1,9 @@
 """
-F0060 — multi-presence objet = copies YAML multi-dossiers (meme id).
+F0060 / F0145 — multi-presence objet = symlink meme nom (meme id).
 
-- share = dupliquer fichier
-- unshare = supprimer une copie si multi, refuse si seule
-- save propage sur toutes les copies
+- share = symlink vers le fichier physique unique
+- unshare = supprimer le lien si multi, refuse si seule presence
+- save ecrit le fichier physique (visible via tous les liens)
 - zones calculees depuis le FS
 """
 
@@ -64,16 +64,19 @@ def test_share_unshare_and_sync_save(tmp_path: Path):
             ).status_code
             == 200
         )
-        # copie FS
-        assert (pipe / "default" / "zone_a" / "obj1.yaml").is_file()
-        assert (pipe / "default" / "obj1.yaml").is_file() or list(pipe.glob("*.yaml"))
+        # F0145: presence = symlink, master physique unique
+        linked = pipe / "default" / "zone_a" / "obj1.yaml"
+        master = pipe / "default" / "obj1.yaml"
+        assert master.is_file() and not master.is_symlink()
+        assert linked.is_file() and linked.is_symlink()
+        assert linked.resolve() == master.resolve()
 
         st = client.get("/gui/step/obj1").json()
         zids = {z["id"] for z in st["zones"]}
         assert "default" in zids and "zone_a" in zids
         assert all(z.get("can_remove") for z in st["zones"])
 
-        # modif label → sync copies
+        # modif label → meme contenu via tous les liens
         assert (
             client.put(
                 "/gui/step/obj1",
@@ -100,11 +103,11 @@ def test_share_unshare_and_sync_save(tmp_path: Path):
             json={"zone_tab": "zone_a"},
         )
         assert r.status_code == 200, r.text
-        assert not (pipe / "default" / "zone_a" / "obj1.yaml").exists()
+        assert not linked.exists()
         st2 = client.get("/gui/step/obj1").json()
         assert not any(z["id"] == "zone_a" for z in st2["zones"])
         assert any(z["id"] == "default" for z in st2["zones"])
-        # plus retirable (seule copie)
+        # plus retirable (seule presence)
         assert all(not z.get("can_remove") for z in st2["zones"])
 
         # unshare sole → erreur
@@ -130,12 +133,13 @@ def test_engine_allows_duplicate_id_files(tmp_path: Path):
 
     pipe = tmp_path / "p"
     pipe.mkdir()
+    (pipe / "default").mkdir(parents=True, exist_ok=True)
     (pipe / "default" / "x.yaml").write_text(
         "o1:\n  type: table\n  label: A\n  mode: create_or_replace\n  requires: []\n  sql: SELECT 1\n",
         encoding="utf-8",
     )
     z = pipe / "default" / "z"
-    z.mkdir()
+    z.mkdir(parents=True, exist_ok=True)
     (z / "o1.yaml").write_text(
         "o1:\n  type: table\n  label: A\n  mode: create_or_replace\n  requires: []\n  sql: SELECT 1\n",
         encoding="utf-8",

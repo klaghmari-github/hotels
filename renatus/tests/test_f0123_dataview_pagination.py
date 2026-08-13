@@ -123,6 +123,7 @@ def test_pipeline_table_view_still_works(tmp_path: Path):
     """Regression: p_table_view core + serializer offset defaut 0."""
     pipe = tmp_path / "flow"
     pipe.mkdir()
+    (pipe / "default").mkdir(parents=True, exist_ok=True)
     (pipe / "default" / "t.yaml").write_text(
         yaml.dump(
             {
@@ -138,6 +139,7 @@ def test_pipeline_table_view_still_works(tmp_path: Path):
     )
     # F0101: stem = id
     (pipe / "default" / "t.yaml").unlink()
+    (pipe / "default").mkdir(parents=True, exist_ok=True)
     (pipe / "default" / "t.yaml").write_text(
         yaml.dump(
             {

@@ -35,4 +35,5 @@ def test_progress_dialog_still_present():
 
 
 def test_cache_bust_f0142():
-    assert "F0142" in read_index()
+    # cache-bust avance avec les features suivantes (ex. F0144)
+    assert "main.js?v=F" in read_index()

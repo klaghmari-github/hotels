@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-12T13:49:57",
+  "updated_at": "2026-08-13T03:58:30",
   "watchdog": {
     "pid": 21653,
     "running": true,
-    "heartbeat_at": "2026-08-12T13:49:57"
+    "heartbeat_at": "2026-08-13T03:58:30"
   },
   "agents": [
     {
       "role": "gestionnaire",
       "feature": null,
       "status": "idle",
-      "notes": "idle; 154 features terminee; pas de spawn"
+      "notes": "idle; 158 features terminee; pas de spawn"
     },
     {
       "role": "developpeur",

@@ -45,6 +45,7 @@ def test_ui_process_subtabs():
 def test_build_still_returns_stdout_stderr(tmp_path: Path):
     pipe = tmp_path / "flow"
     pipe.mkdir()
+    (pipe / "default").mkdir(parents=True, exist_ok=True)
     (pipe / "default" / "py.yaml").write_text(
         yaml.dump(
             {

@@ -552,12 +552,17 @@ def test_gui_create_step_api_yaml(tmp_path: Path):
             },
         )
         assert r.status_code == 200, r.text
-        # F0082: steps main sous flow/default/
+        # F0082 / F0146: steps sous flow/default/ ; corps dans py_api.py
         ypath = pipe / "default" / "py_api.yaml"
+        pypath = pipe / "default" / "py_api.py"
         assert ypath.is_file()
         body = yaml.safe_load(ypath.read_text(encoding="utf-8"))
         assert body["py_api"]["type"] == TYPE_PY
-        assert "print(42)" in body["py_api"].get("script", "")
+        assert pypath.is_file()
+        assert "print(42)" in pypath.read_text(encoding="utf-8")
+        # API get_step rehydrate le script depuis le sidecar
+        st = client.get("/gui/step/py_api").json()
+        assert "print(42)" in (st.get("config") or {}).get("script", "")
 
         g = client.get("/gui/graph?tab=main").json()
         nodes = {n["id"]: n for n in g["nodes"]}

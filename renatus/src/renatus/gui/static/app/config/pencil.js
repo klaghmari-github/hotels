@@ -280,8 +280,7 @@ export function startEditField(editId) {
     return;
   }
 
-  // F0137: notebook (ou execute_python) → editeur style Jupyter Lab
-  // avec variables de la session Python
+  // F0137 / F0146: notebook multi-cellules (.ipynb) ou Python (.py)
   if (editId === "cfg-script" || field === el.fieldScript) {
     const stype =
       (el.cfgType && el.cfgType.value) ||
@@ -295,7 +294,9 @@ export function startEditField(editId) {
       import("../notebook-dialog.js").then(function (mod) {
         if (mod && typeof mod.openNotebookDialog === "function") {
           mod.openNotebookDialog({
+            mode: stype,
             script: el.cfgScript ? el.cfgScript.value : "",
+            notebook: state._stepNotebook || null,
           });
         }
       });

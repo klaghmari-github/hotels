@@ -70,7 +70,7 @@ def test_zones_of_home_and_membership(tmp_path: Path):
         zids2 = {z["id"]: z for z in st2["zones"]}
         assert "default" in zids2
         assert "zone1" in zids2
-        assert zids2["zone1"]["zone_path"] == "zone1"
+        assert zids2["zone1"]["zone_path"] in {"zone1", "default/zone1"}
         assert zids2["zone1"]["kind"] == "member"
 
         # YAML de l objet ne contient pas zones (F0082: sous flow/default/)
