@@ -80,6 +80,7 @@ class ConnectionPipeline(ConnectionUtils):
         python_exe: str | Path,
         *,
         cwd: str | Path | None = None,
+        env: dict | None = None,
     ):
         """
         F0136: noyau Python persistant pour cet interpreteur + cwd.
@@ -88,7 +89,7 @@ class ConnectionPipeline(ConnectionUtils):
         ConnectionPipeline (session de travail) reste ouverte.
         """
         work = Path(cwd) if cwd is not None else self.project_dir
-        return self._python_kernels.get(python_exe, cwd=work)
+        return self._python_kernels.get(python_exe, cwd=work, env=env)
 
     def close(self) -> None:
         """Ferme DuckDB + noyaux Python de session (F0136)."""

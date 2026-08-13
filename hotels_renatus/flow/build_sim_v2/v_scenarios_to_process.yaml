@@ -9,3 +9,4 @@ v_scenarios_to_process:
     \  GROUP BY scenario_id\n  HAVING COUNT(DISTINCT hotel_code) =\n         (SELECT\
     \ COUNT(*) FROM t_hotel_codes)\n)\nSELECT s.*\nFROM t_scenarios AS s\nLEFT JOIN\
     \ completed_scenarios AS c\n  USING (scenario_id)\nWHERE c.scenario_id IS NULL"
+  name: v_scenarios_to_process

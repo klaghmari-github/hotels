@@ -8,3 +8,4 @@ v_web_loo_results:
     \ AS ca_err_abs,\n  montant_marge_selon_coef_par_mois_reel AS marge_reel,\n  montant_marge_selon_coef_par_mois_predite\
     \ AS marge_pred,\n  montant_marge_selon_coef_erreur_absolue AS marge_err_abs\n\
     FROM t_loo_results\nWHERE hotel_code IS NOT NULL\nORDER BY solution, hotel_code"
+  name: v_web_loo_results

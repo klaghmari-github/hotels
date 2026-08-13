@@ -13,3 +13,4 @@ v_loo_metrics:
     \  SQRT(AVG(POWER(montant_marge_erreur, 2))) AS marge_rmse,\n  AVG(montant_marge_erreur_relative)\
     \ AS marge_mape\nFROM t_loo_results\nWHERE methode = 'sim_v2'\nGROUP BY GROUPING\
     \ SETS ((methode, solution), (methode))"
+  name: v_loo_metrics

@@ -15,3 +15,4 @@ t_pilot_defaults:
     \ DOUBLE) AS coeff_fb,\n  TRY_CAST(coeff_nfb AS DOUBLE) AS coeff_nfb,\n  TRY_CAST(clients_heb\
     \ AS DOUBLE) AS clients_heb\nFROM df_pilot_defaults\nWHERE UPPER(TRIM(CAST(solution\
     \ AS VARCHAR))) IN (\n  'SIMPLY', 'LIBERTY', 'CONNECTED'\n)"
+  name: t_pilot_defaults

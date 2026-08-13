@@ -24,3 +24,4 @@ v_loo_result:
     \ 0) AS montant_marge_erreur_relative,\n  p.nombre_predicteurs,\n  p.nombre_familles,\n\
     \  p.nombre_hotels_apprentissage\nFROM v_loo_observed_row AS o\nINNER JOIN v_loo_prediction\
     \ AS p\nUSING (hotel_code, solution)"
+  name: v_loo_result

@@ -10,3 +10,4 @@ v_v1_prediction:
     \  marge_produit_predite - marge_reelle_mensuelle AS erreur_marge,\n  ABS(ca_ht_predit\
     \ - ca_reel_mensuel) AS abs_erreur_ca,\n  ABS(marge_produit_predite - marge_reelle_mensuelle)\
     \ AS abs_erreur_marge\nFROM v_v1_marge_produit"
+  name: v_v1_prediction

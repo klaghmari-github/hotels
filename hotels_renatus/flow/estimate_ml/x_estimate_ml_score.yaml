@@ -2,11 +2,91 @@ x_estimate_ml_score:
   type: execute_python
   label: estimate_ml_score
   requires:
-  - v_estimate_ml_features
-  script: '# Placeholder: load SuperModel / XGB and write predictions table.
+  - t_estimate_input_ml
+  timeout: 300
+  fresh: true
+  script: |
+    # Scoring ml (chaîne ml_tc → pont → ml_ca) via SuperModelService release.
+    # Python nécessaire : artefacts modèles non exprimables en SQL pur.
+    # Accès base : RENATUS_DB_PATH injecté par renatus execute_python.
+    from pathlib import Path
+    import os
+    import sys
+    import duckdb
+    import pandas as pd
 
-    # Phase C of migration — keep SQL features pure until model wiring.
+    RELEASE = Path("/media/laghmari/ssd-data/dev/hotels/release_1_0_0")
+    if str(RELEASE) not in sys.path:
+        sys.path.insert(0, str(RELEASE))
 
-    print("estimate_ml: model scoring not wired yet (phase C)")
+    from src.ml.super_model import SuperModelService
+    from src.pipeline.paths import Paths
+    from src.sim_v2.restitution import normalized_mix_name
 
-    '
+    db = os.environ.get("RENATUS_DB_PATH")
+    if not db:
+        raise RuntimeError("RENATUS_DB_PATH manquant (renatus injecte ce chemin)")
+
+    paths = Paths(RELEASE).ensure()
+    svc = SuperModelService(paths=paths)
+
+    con = duckdb.connect(db)
+    try:
+        inp = con.execute("SELECT * FROM t_estimate_input_ml").df()
+        rows = []
+        for _, r in inp.iterrows():
+            sol = str(r.get("solution") or "simply").lower()
+            features = {
+                "hotel_nb_chambres": float(r.get("hotel_nb_chambres") or 200),
+                "hotel_to_annuel": float(r.get("hotel_to_annuel") or 0.7),
+                "hotel_guests_per_chambre": float(r.get("hotel_guests_per_chambre") or 1.7),
+                "metres_lineaires": float(r.get("metres_lineaires") or 6),
+            }
+            type_mix = {"F&B": 0.7, "NON F&B": 0.3}
+            if "mix_fb" in r.index and pd.notna(r.get("mix_fb")):
+                fb = float(r["mix_fb"])
+                type_mix = {"F&B": fb, "NON F&B": max(0.0, 1.0 - fb)}
+            for lab, part in type_mix.items():
+                features[normalized_mix_name("type", lab)] = float(part)
+            hotel_code = str(r.get("hotel_code") or "").strip() or None
+            try:
+                pred = svc.predict_row(
+                    features,
+                    sol,
+                    hotel_code=hotel_code,
+                    type_mix=type_mix,
+                )
+                rows.append({
+                    "hotel_code": hotel_code or "",
+                    "solution": sol,
+                    "montant_ventes_par_mois": float(pred.get("montant_ventes_par_mois") or 0),
+                    "montant_marge_par_mois": float(
+                        pred.get("montant_marge_selon_coef_par_mois")
+                        or pred.get("montant_marge_par_mois")
+                        or 0
+                    ),
+                    "taux_conversion_predit": float(pred.get("taux_conversion_predit") or 0),
+                    "chain": str(pred.get("chain") or "ml_tc→ml_tc_sim_v2→ml_ca"),
+                    "ok": True,
+                    "error": "",
+                })
+            except Exception as exc:  # noqa: BLE001
+                rows.append({
+                    "hotel_code": hotel_code or "",
+                    "solution": sol,
+                    "montant_ventes_par_mois": 0.0,
+                    "montant_marge_par_mois": 0.0,
+                    "taux_conversion_predit": 0.0,
+                    "chain": "ml",
+                    "ok": False,
+                    "error": str(exc)[:500],
+                })
+
+        out = pd.DataFrame(rows)
+        con.execute("DROP TABLE IF EXISTS t_estimate_ml")
+        con.register("_tmp_estimate_ml", out)
+        con.execute("CREATE TABLE t_estimate_ml AS SELECT * FROM _tmp_estimate_ml")
+        con.unregister("_tmp_estimate_ml")
+        print(f"estimate_ml: {len(out)} row(s) → t_estimate_ml")
+    finally:
+        con.close()

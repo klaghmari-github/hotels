@@ -3,10 +3,13 @@ v_estimate_ml_features:
   mode: create_or_replace
   label: estimate_ml_features
   requires:
-  - df_estimate_input_ml
-  - v_ml_hotel_context
-  script: "-- Feature row for inference; model score needs execute_python later.\n\
-    SELECT\n  i.*,\n  c.hotel_nb_chambres AS ctx_nb_chambres,\n  c.hotel_to_annuel\
-    \ AS ctx_to,\n  c.hotel_guests_per_chambre AS ctx_guests\nFROM df_estimate_input_ml\
-    \ AS i\nLEFT JOIN v_ml_hotel_context AS c\n  ON CAST(c.hotel_code AS VARCHAR)\
-    \ = CAST(i.hotel_code AS VARCHAR)\n"
+  - t_estimate_input_ml
+  script: "-- Leviers d'entrée ML (contexte hôtel optionnel hors build_ml)\nSELECT\n\
+    \  CAST(hotel_code AS VARCHAR) AS hotel_code,\n  LOWER(TRIM(CAST(solution AS VARCHAR)))\
+    \ AS solution,\n  TRY_CAST(hotel_nb_chambres AS DOUBLE) AS hotel_nb_chambres,\n\
+    \  TRY_CAST(hotel_to_annuel AS DOUBLE) AS hotel_to_annuel,\n  TRY_CAST(hotel_guests_per_chambre\
+    \ AS DOUBLE) AS hotel_guests_per_chambre,\n  TRY_CAST(metres_lineaires AS DOUBLE)\
+    \ AS metres_lineaires,\n  TRY_CAST(hotel_nb_chambres AS DOUBLE)\n    * TRY_CAST(hotel_to_annuel\
+    \ AS DOUBLE)\n    * TRY_CAST(hotel_guests_per_chambre AS DOUBLE)\n    * 30.5 AS\
+    \ nombre_guests_par_mois\nFROM t_estimate_input_ml\n"
+  name: v_estimate_ml_features

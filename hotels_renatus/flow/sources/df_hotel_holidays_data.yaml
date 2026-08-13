@@ -2,3 +2,4 @@ df_hotel_holidays_data:
   type: dataframe
   requires: []
   file: input/hotel_holidays_data.xlsx
+  name: df_hotel_holidays_data

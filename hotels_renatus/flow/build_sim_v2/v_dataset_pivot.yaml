@@ -12,3 +12,4 @@ v_dataset_pivot:
     \ AS r\nCROSS JOIN v_scenario_step AS s\nLEFT JOIN v_dataset_observation_par_mois\
     \ AS o USING (hotel_code)\nLEFT JOIN v_dataset_mix_nombre AS mn USING (hotel_code)\n\
     LEFT JOIN v_dataset_mix_pourcentage AS mp USING (hotel_code)\n"
+  name: v_dataset_pivot

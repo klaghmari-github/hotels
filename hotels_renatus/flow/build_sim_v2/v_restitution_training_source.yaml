@@ -4,3 +4,4 @@ v_restitution_training_source:
   requires:
   - v_restitution_simulation_long
   script: SELECT * FROM v_restitution_simulation_long
+  name: v_restitution_training_source

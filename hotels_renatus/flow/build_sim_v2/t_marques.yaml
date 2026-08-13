@@ -12,3 +12,4 @@ t_marques:
     ORDER BY MARQUE
 
     '
+  name: t_marques

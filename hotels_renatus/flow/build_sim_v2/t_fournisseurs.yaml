@@ -12,3 +12,4 @@ t_fournisseurs:
     ORDER BY FOURNISSEUR
 
     '
+  name: t_fournisseurs

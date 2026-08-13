@@ -9,3 +9,4 @@ v_dataset_mix_nombre_long:
     \ 0) AS metric_value\nFROM t_hotel_codes AS h\nCROSS JOIN v_dataset_mix_metric_names\
     \ AS m\nLEFT JOIN v_dataset_mix_nombre_observed_long AS o\n  ON o.hotel_code =\
     \ h.HOTEL_CODE AND o.metric_name = m.metric_name\n"
+  name: v_dataset_mix_nombre_long

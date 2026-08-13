@@ -87,3 +87,4 @@ v_hotel_proximity_features:
     \ AS DOUBLE) AS px_plage_5km,\n  TRY_CAST(plage_distance_km AS DOUBLE) AS px_plage_distance_km,\n\
     \  TRY_CAST(proximity_ok AS DOUBLE) AS px_proximity_ok\nFROM t_hotel_proximity_data\n\
     WHERE hotel_code IS NOT NULL"
+  name: v_hotel_proximity_features

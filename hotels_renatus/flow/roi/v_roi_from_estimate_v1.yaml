@@ -1,0 +1,27 @@
+v_roi_from_estimate_v1:
+  type: view
+  mode: create_or_replace
+  label: roi_from_estimate_v1
+  requires:
+  - v_estimate_sim_v1
+  - t_solution_costs
+  script: "-- ROI = marge_produit − coûts solution (mensuel)\n-- payback_months =\
+    \ capex / ROI_mensuel si ROI > 0\nWITH e AS (\n  SELECT\n    hotel_code,\n   \
+    \ UPPER(TRIM(CAST(solution AS VARCHAR))) AS solution,\n    CAST(metres_lineaires\
+    \ AS DOUBLE) AS metres_lineaires,\n    CAST(montant_ventes_par_mois AS DOUBLE)\
+    \ AS ca_monthly,\n    CAST(montant_marge_par_mois AS DOUBLE) AS marge_monthly\n\
+    \  FROM v_estimate_sim_v1\n), c AS (\n  SELECT\n    UPPER(TRIM(CAST(solution AS\
+    \ VARCHAR))) AS solution,\n    techno_monthly,\n    annexes_monthly,\n    agencement_per_m,\n\
+    \    amort_months,\n    fixed_capex\n  FROM t_solution_costs\n), joined AS (\n\
+    \  SELECT\n    e.*,\n    c.techno_monthly,\n    c.annexes_monthly,\n    c.agencement_per_m\
+    \ * e.metres_lineaires / NULLIF(c.amort_months, 0)\n      AS agencement_monthly,\n\
+    \    c.techno_monthly + c.annexes_monthly\n      + c.agencement_per_m * e.metres_lineaires\
+    \ / NULLIF(c.amort_months, 0)\n      AS cout_monthly,\n    c.fixed_capex\n   \
+    \   + c.agencement_per_m * e.metres_lineaires AS capex_approx\n  FROM e\n  INNER\
+    \ JOIN c USING (solution)\n)\nSELECT\n  hotel_code,\n  solution,\n  metres_lineaires,\n\
+    \  ca_monthly,\n  marge_monthly,\n  cout_monthly,\n  marge_monthly - cout_monthly\
+    \ AS roi_monthly,\n  (marge_monthly - cout_monthly) * 12.0 AS roi_annual,\n  capex_approx,\n\
+    \  CASE\n    WHEN (marge_monthly - cout_monthly) > 1e-6\n    THEN capex_approx\
+    \ / (marge_monthly - cout_monthly)\n    ELSE NULL\n  END AS payback_months\nFROM\
+    \ joined\n"
+  name: v_roi_from_estimate_v1

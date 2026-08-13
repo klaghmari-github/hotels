@@ -16,3 +16,4 @@ v_v1_loo_metrics:
     \    CASE\n      WHEN marge_reelle_mensuelle <> 0\n      THEN 100.0 * abs_erreur_marge\
     \ / ABS(marge_reelle_mensuelle)\n      ELSE NULL\n    END\n  ) AS mape_marge_pct\n\
     FROM t_v1_loo_results\nWHERE hotel_code IS NOT NULL\nGROUP BY solution"
+  name: v_v1_loo_metrics

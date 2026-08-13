@@ -9,3 +9,4 @@ t_rank_nature_by_gamme:
     \ GAMME, NATURE_PRODUIT\n)\nSELECT hotel_code, gamme, nature, montant_marge,\n\
     \       ROW_NUMBER() OVER (PARTITION BY hotel_code, gamme ORDER BY montant_marge,\
     \ nature) AS rang_nature\nFROM t_nature_marge\nORDER BY hotel_code, gamme, rang_nature"
+  name: t_rank_nature_by_gamme

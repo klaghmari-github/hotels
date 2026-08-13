@@ -14,3 +14,4 @@ t_rich_data:
     \ AS VARCHAR) = px.hotel_code\nLEFT JOIN v_hotel_weather_features AS wx\n  ON\
     \ CAST(m.hotel_code AS VARCHAR) = wx.hotel_code\nLEFT JOIN v_hotel_holidays_features\
     \ AS hol\n  ON CAST(m.hotel_code AS VARCHAR) = hol.hotel_code"
+  name: t_rich_data

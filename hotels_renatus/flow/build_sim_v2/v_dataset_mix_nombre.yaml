@@ -11,3 +11,4 @@ v_dataset_mix_nombre:
     LEFT JOIN t_dataset_mix_nombre_detail AS d USING (hotel_code)
 
     '
+  name: v_dataset_mix_nombre

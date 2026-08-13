@@ -226,6 +226,21 @@ class ExecutePythonStep(PythonActionStep):
             not fresh,
         )
 
+        # Env injecte pour scripts metier (hotels_renatus, etc.) :
+        # ouvrir la meme base DuckDB que le pipeline sans re-parser le YAML.
+        run_env = os.environ.copy()
+        db_path = getattr(pipeline_obj, "db_path", None) or getattr(
+            pipeline_obj, "database_path", None
+        )
+        if db_path is not None:
+            run_env["RENATUS_DB_PATH"] = str(Path(db_path).resolve())
+        run_env["RENATUS_PROJECT_DIR"] = str(project_dir)
+        flow_path = getattr(pipeline_obj, "pipeline_path", None) or getattr(
+            pipeline_obj, "flow_path", None
+        )
+        if flow_path is not None:
+            run_env["RENATUS_FLOW_PATH"] = str(Path(flow_path).resolve())
+
         try:
             if fresh:
                 result = run_python_oneshot(
@@ -233,13 +248,13 @@ class ExecutePythonStep(PythonActionStep):
                     script_text,
                     cwd=project_dir,
                     timeout=timeout,
-                    env=os.environ.copy(),
+                    env=run_env,
                 )
             else:
                 # F0136: noyau persistant attache a la ConnectionPipeline
                 get_ker = getattr(pipeline_obj, "get_python_kernel", None)
                 if callable(get_ker):
-                    kernel = get_ker(python_exe, cwd=project_dir)
+                    kernel = get_ker(python_exe, cwd=project_dir, env=run_env)
                     result = kernel.exec(script_text, timeout=timeout)
                 else:
                     # fallback si pipeline sans registry (tests legers)
@@ -248,7 +263,7 @@ class ExecutePythonStep(PythonActionStep):
                         script_text,
                         cwd=project_dir,
                         timeout=timeout,
-                        env=os.environ.copy(),
+                        env=run_env,
                     )
         except TimeoutError as exc:
             raise RuntimeError(

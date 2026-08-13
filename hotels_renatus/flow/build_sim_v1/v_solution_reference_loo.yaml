@@ -40,3 +40,4 @@ v_solution_reference_loo:
     \  COALESCE(a.ca_nfb_peers, d.ca_nfb) / 3.0 AS ca_1frigo_nfb,\n  d.coeff_fb,\n\
     \  d.coeff_nfb\nFROM agg AS a\nINNER JOIN t_pilot_defaults AS d\n  ON d.solution\
     \ = a.solution"
+  name: v_solution_reference_loo

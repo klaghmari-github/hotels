@@ -8,3 +8,4 @@ v_web_v1_loo_results:
     \  marge_produit_predite AS marge_pred,\n  abs_erreur_marge AS marge_err_abs,\n\
     \  n_mois\nFROM t_v1_loo_results\nWHERE hotel_code IS NOT NULL\nORDER BY solution,\
     \ hotel_code"
+  name: v_web_v1_loo_results

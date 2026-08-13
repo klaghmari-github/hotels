@@ -10,3 +10,4 @@ v_loo_training_source:
     CROSS JOIN v_loo_step AS step
 
     WHERE source.hotel_code <> step.hotel_code'
+  name: v_loo_training_source

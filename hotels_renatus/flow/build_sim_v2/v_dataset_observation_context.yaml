@@ -10,3 +10,4 @@ v_dataset_observation_context:
     \ * 30.5 AS nombre_guests_par_mois,\n  MAX(HOTEL_NB_CHAMBRES) * MAX(HOTEL_TO_ANNUEL)\
     \ * MAX(HOTEL_GUESTS_PER_CHAMBRE) * 30.5\n    * (DATE_DIFF('month', MIN(DATE),\
     \ MAX(DATE)) + 1) AS nombre_guests\nFROM t_sales\nGROUP BY HOTEL_CODE\n"
+  name: v_dataset_observation_context

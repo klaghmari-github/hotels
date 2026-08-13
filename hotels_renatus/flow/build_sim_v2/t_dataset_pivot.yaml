@@ -10,3 +10,4 @@ t_dataset_pivot:
     LIMIT 0
 
     '
+  name: t_dataset_pivot

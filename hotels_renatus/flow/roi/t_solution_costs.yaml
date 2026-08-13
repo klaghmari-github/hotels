@@ -1,0 +1,12 @@
+t_solution_costs:
+  type: table
+  mode: create_or_replace
+  label: solution_costs
+  requires: []
+  script: "-- Barèmes extraits rod_reference.json (release) — amort agencement 84\
+    \ mois\n-- techno + annexes + agencement_per_m (Bespoke SIMPLY/LIBERTY, Prem CONNECTED)\n\
+    SELECT * FROM (\n  VALUES\n    ('SIMPLY',    75.0,  15.0, 2200.0, 84.0, 18500.0),\n\
+    \    ('LIBERTY',  346.6667, 30.0, 2200.0, 84.0, 32000.0),\n    ('CONNECTED', 900.0,\
+    \ 85.0, 1000.0, 84.0, 58000.0)\n) AS v(\n  solution,\n  techno_monthly,\n  annexes_monthly,\n\
+    \  agencement_per_m,\n  amort_months,\n  fixed_capex\n)\n"
+  name: t_solution_costs

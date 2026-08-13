@@ -1,9 +1,11 @@
 estimate_ml:
   type: zone
-  label: Estimate ML (row in → score)
+  label: Estimate ml (row → CA chaîne)
   objects:
     df_estimate_input_ml: {}
+    t_estimate_input_ml: {}
     v_estimate_ml_features: {}
     x_estimate_ml_score: {}
+    v_estimate_ml: {}
   workers: auto
   renatus_mode: required_for_leaves

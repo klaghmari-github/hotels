@@ -14,3 +14,4 @@ v_dataset_ref:
     \ = 0 THEN 0\n    ELSE\n      (b.metres_lineaires_observes / b.nombre_natures_observees)\n\
     \      * COALESCE(m.nombre_natures, 0)\n  END AS metres_lineaires\nFROM hotel_baseline\
     \ AS b\nLEFT JOIN v_dataset_mix_nombre_global AS m\n  USING (hotel_code)"
+  name: v_dataset_ref

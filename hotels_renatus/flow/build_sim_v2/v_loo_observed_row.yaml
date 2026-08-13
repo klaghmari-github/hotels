@@ -6,3 +6,4 @@ v_loo_observed_row:
   script: "SELECT p.*\nFROM t_dataset_pivot AS p\nCROSS JOIN v_loo_step AS step\n\
     WHERE p.hotel_code = step.hotel_code\n  AND COALESCE(LEN(p.scenario_removed_natures),\
     \ 0) = 0\nLIMIT 1"
+  name: v_loo_observed_row

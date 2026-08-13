@@ -14,3 +14,4 @@ t_v1_loo_results:
     \  CAST(NULL AS DOUBLE) AS n_mois,\n  CAST(NULL AS DOUBLE) AS erreur_ca,\n  CAST(NULL\
     \ AS DOUBLE) AS erreur_marge,\n  CAST(NULL AS DOUBLE) AS abs_erreur_ca,\n  CAST(NULL\
     \ AS DOUBLE) AS abs_erreur_marge\nWHERE 1 = 0"
+  name: t_v1_loo_results

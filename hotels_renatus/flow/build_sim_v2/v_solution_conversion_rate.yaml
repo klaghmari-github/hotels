@@ -8,3 +8,4 @@ v_solution_conversion_rate:
     \ 0) AS taux_conversion_pondere,\n  COUNT(DISTINCT hotel_code) AS nombre_hotels\n\
     FROM t_dataset_pivot\nWHERE COALESCE(LEN(scenario_removed_natures), 0) = 0\nGROUP\
     \ BY solution"
+  name: v_solution_conversion_rate

@@ -14,3 +14,4 @@ v_web_sales_obs:
     \  gamme_cosmetique_part_natures,\n  gamme_pap_part_natures,\n  gamme_jeux_enfants_part_natures,\n\
     \  gamme_souvenirs_part_natures\nFROM t_dataset_pivot\nWHERE COALESCE(LEN(scenario_removed_natures),\
     \ 0) = 0\nORDER BY solution, hotel_code"
+  name: v_web_sales_obs

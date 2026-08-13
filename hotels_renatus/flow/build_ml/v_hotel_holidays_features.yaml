@@ -14,3 +14,4 @@ v_hotel_holidays_features:
     \ AS DOUBLE)) AS hol_nb_jours_holidays,\n  AVG(TRY_CAST(pct_jours_holidays AS\
     \ DOUBLE)) AS hol_pct_jours_holidays\nFROM t_hotel_holidays_data\nWHERE hotel_code\
     \ IS NOT NULL\nGROUP BY CAST(hotel_code AS VARCHAR)"
+  name: v_hotel_holidays_features

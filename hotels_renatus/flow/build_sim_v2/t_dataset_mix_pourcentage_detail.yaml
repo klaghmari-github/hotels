@@ -12,3 +12,4 @@ t_dataset_mix_pourcentage_detail:
     GROUP BY hotel_code
 
     '
+  name: t_dataset_mix_pourcentage_detail

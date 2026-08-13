@@ -9,3 +9,4 @@ v_loo_solution_coefficients:
     \ montant_marge_coefficient,\n  COUNT(*) AS nombre_observations,\n  COUNT(DISTINCT\
     \ hotel_code) AS nombre_hotels\nFROM v_loo_training_source\nGROUP BY solution,\
     \ variable_family, variable_name"
+  name: v_loo_solution_coefficients

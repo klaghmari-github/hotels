@@ -6,3 +6,4 @@ t_v1_loo_hotels:
   script: "SELECT\n  hotel_code,\n  solution,\n  label,\n  name\nFROM t_scope_hotels\n\
     WHERE hotel_code IN (\n  'H2075', 'HB6A3', 'H6188', 'HB5I0', 'H0373', 'H3546'\n\
     )\n  AND hotel_code NOT IN ('H5586')\nORDER BY solution, hotel_code"
+  name: t_v1_loo_hotels

@@ -20,3 +20,4 @@ v_v1_r1_buyers:
     \  r.coeff_nfb,\n  h.ca_reel_mensuel,\n  h.marge_reelle_mensuelle,\n  h.n_mois\n\
     FROM v_v1_hotel_input AS h\nINNER JOIN v_solution_reference_loo AS r\n  ON r.loo_hotel_code\
     \ = h.hotel_code\n AND r.solution = h.solution"
+  name: v_v1_r1_buyers

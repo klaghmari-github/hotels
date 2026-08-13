@@ -8,3 +8,4 @@ v_dataset_mix_pourcentage_long:
     \ '_part_natures') AS metric_name,\n  CASE WHEN g.nombre_natures = 0 THEN 0 ELSE\
     \ l.metric_value / g.nombre_natures END AS metric_value\nFROM v_dataset_mix_nombre_long\
     \ AS l\nINNER JOIN v_dataset_mix_nombre_global AS g USING (hotel_code)\n"
+  name: v_dataset_mix_pourcentage_long

@@ -7,3 +7,4 @@ v_web_loo_metrics:
     \ AS mae_ca,\n  AVG(montant_marge_selon_coef_erreur_absolue) AS mae_marge\nFROM\
     \ t_loo_results\nWHERE methode = 'sim_v2'\nGROUP BY GROUPING SETS ((methode, solution),\
     \ (methode))"
+  name: v_web_loo_metrics

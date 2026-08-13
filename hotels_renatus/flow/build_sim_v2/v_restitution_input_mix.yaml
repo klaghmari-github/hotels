@@ -4,3 +4,4 @@ v_restitution_input_mix:
   requires:
   - v_restitution_default_input_mix
   script: SELECT * FROM v_restitution_default_input_mix
+  name: v_restitution_input_mix

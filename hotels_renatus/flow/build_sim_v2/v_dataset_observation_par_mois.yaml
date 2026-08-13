@@ -8,3 +8,4 @@ v_dataset_observation_par_mois:
     \  montant_ventes / NULLIF(nombre_mois, 0) AS montant_ventes_par_mois,\n  montant_marge_selon_coef\
     \ / NULLIF(nombre_mois, 0) AS montant_marge_selon_coef_par_mois,\n  montant_marge\
     \ / NULLIF(nombre_mois, 0) AS montant_marge_par_mois\nFROM v_dataset_observation_total"
+  name: v_dataset_observation_par_mois

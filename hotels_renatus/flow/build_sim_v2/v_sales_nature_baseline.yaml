@@ -9,3 +9,4 @@ v_sales_nature_baseline:
     \ 0) AS nature_part_nombre_ventes\nFROM t_sales AS s\nINNER JOIN v_sales_hotel_baseline\
     \ AS h ON h.hotel_code = s.HOTEL_CODE\nWHERE s.NATURE_PRODUIT IS NOT NULL\nGROUP\
     \ BY s.HOTEL_CODE, s.NATURE_PRODUIT\n"
+  name: v_sales_nature_baseline

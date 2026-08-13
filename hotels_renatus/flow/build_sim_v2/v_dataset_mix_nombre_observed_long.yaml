@@ -38,3 +38,4 @@ v_dataset_mix_nombre_observed_long:
     IS NOT NULL GROUP BY HOTEL_CODE, FOURNISSEUR
 
     '
+  name: v_dataset_mix_nombre_observed_long

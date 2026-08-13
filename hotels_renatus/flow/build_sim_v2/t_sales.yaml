@@ -5,3 +5,4 @@ t_sales:
   - df_sales
   script: "SELECT\n    *\nFROM\n    df_sales\nWHERE\n    PRIX_TTC > 0\n    AND MARGE\
     \ > 0\n    AND CAST(HOTEL_CODE AS VARCHAR) NOT IN ('H5586')"
+  name: t_sales

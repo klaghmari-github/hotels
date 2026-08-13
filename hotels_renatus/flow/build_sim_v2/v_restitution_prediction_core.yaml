@@ -13,3 +13,4 @@ v_restitution_prediction_core:
     \ AS montant_marge_selon_coef_par_mois_predite,\n  AVG(montant_marge_par_mois_predite)\
     \ AS montant_marge_par_mois_predite,\n  SUM(nombre_predicteurs) AS nombre_predicteurs,\n\
     \  COUNT(*) AS nombre_familles\nFROM family_prediction\nGROUP BY solution"
+  name: v_restitution_prediction_core

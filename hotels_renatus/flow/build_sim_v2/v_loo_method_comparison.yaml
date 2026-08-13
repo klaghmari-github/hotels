@@ -7,3 +7,4 @@ v_loo_method_comparison:
     \  marge_selon_coef_mae,\n  marge_selon_coef_rmse,\n  marge_selon_coef_mape,\n\
     \  marge_mae,\n  marge_rmse,\n  marge_mape\nFROM v_loo_metrics\nWHERE solution\
     \ IS NULL\nORDER BY montant_ventes_mae"
+  name: v_loo_method_comparison

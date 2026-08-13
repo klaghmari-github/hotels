@@ -17,3 +17,4 @@ v_v1_r4_surface:
     \        * ABS(r3.nb_frigos_froid - r3.frigo_ref)\n    ELSE r3.ca_nfb_r3\n   \
     \   + SIGN(r3.m_lin_hotel - r3.ml_ref)\n        * r3.ca_1ml_nfb\n        * ABS(r3.m_lin_hotel\
     \ - r3.ml_ref)\n  END AS ca_nfb_r4\nFROM v_v1_r3_categories AS r3"
+  name: v_v1_r4_surface

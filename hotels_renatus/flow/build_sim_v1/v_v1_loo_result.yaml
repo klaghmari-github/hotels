@@ -6,3 +6,4 @@ v_v1_loo_result:
   script: 'SELECT *
 
     FROM v_v1_prediction'
+  name: v_v1_loo_result

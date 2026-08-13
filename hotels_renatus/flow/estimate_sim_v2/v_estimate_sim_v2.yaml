@@ -3,12 +3,37 @@ v_estimate_sim_v2:
   mode: create_or_replace
   label: estimate_sim_v2
   requires:
-  - df_estimate_input_v2
+  - v_estimate_input_hotel
+  - v_estimate_input_mix
   - v_restitution_solution_coefficients
   - v_solution_conversion_rate
-  script: "-- Stub estimate: joins hotel levers to trained coefficients.\n-- Full\
-    \ restitution formulas to be completed in migration phase B\n-- (map v_restitution_prediction_*\
-    \ onto estimate input).\nSELECT\n  i.*,\n  c.solution,\n  c.variable_family,\n\
-    \  c.variable_name,\n  c.montant_ventes_coefficient,\n  c.montant_marge_selon_coef_coefficient\n\
-    FROM df_estimate_input_v2 AS i\nCROSS JOIN v_restitution_solution_coefficients\
-    \ AS c\nLIMIT 100\n"
+  script: "-- Restitution sim_v2 pure (alignée pipeline 6_restitution_prediction)\n\
+    -- CA_var = coeff × guests × m_lin × target_part\n-- CA_famille = AVG(CA_var)\
+    \ ; CA_solution = AVG(CA_famille)\nWITH hotel AS (\n  SELECT * FROM v_estimate_input_hotel\n\
+    ), by_var AS (\n  SELECT\n    h.hotel_code,\n    c.solution,\n    c.variable_family,\n\
+    \    c.variable_name,\n    m.target_part,\n    h.nombre_guests_par_mois,\n   \
+    \ h.metres_lineaires,\n    c.montant_ventes_coefficient\n      * h.nombre_guests_par_mois\
+    \ * h.metres_lineaires * m.target_part\n        AS montant_ventes_par_mois_predit,\n\
+    \    c.montant_marge_selon_coef_coefficient\n      * h.nombre_guests_par_mois\
+    \ * h.metres_lineaires * m.target_part\n        AS montant_marge_selon_coef_par_mois_predite,\n\
+    \    c.montant_marge_coefficient\n      * h.nombre_guests_par_mois * h.metres_lineaires\
+    \ * m.target_part\n        AS montant_marge_par_mois_predite\n  FROM v_restitution_solution_coefficients\
+    \ AS c\n  INNER JOIN v_estimate_input_mix AS m\n    USING (variable_family, variable_name)\n\
+    \  CROSS JOIN hotel AS h\n  WHERE m.target_part > 0\n    AND (\n      h.solution\
+    \ IS NULL\n      OR h.solution = ''\n      OR LOWER(c.solution) = h.solution\n\
+    \    )\n), by_family AS (\n  SELECT\n    hotel_code,\n    solution,\n    variable_family,\n\
+    \    AVG(montant_ventes_par_mois_predit) AS montant_ventes_par_mois_predit,\n\
+    \    AVG(montant_marge_selon_coef_par_mois_predite)\n      AS montant_marge_selon_coef_par_mois_predite,\n\
+    \    AVG(montant_marge_par_mois_predite) AS montant_marge_par_mois_predite,\n\
+    \    COUNT(*) AS nombre_predicteurs\n  FROM by_var\n  GROUP BY hotel_code, solution,\
+    \ variable_family\n), core AS (\n  SELECT\n    hotel_code,\n    solution,\n  \
+    \  'sim_v2' AS methode,\n    AVG(montant_ventes_par_mois_predit) AS montant_ventes_par_mois_predit,\n\
+    \    AVG(montant_marge_selon_coef_par_mois_predite)\n      AS montant_marge_selon_coef_par_mois_predite,\n\
+    \    AVG(montant_marge_par_mois_predite) AS montant_marge_par_mois_predite,\n\
+    \    SUM(nombre_predicteurs) AS nombre_predicteurs,\n    COUNT(*) AS nombre_familles\n\
+    \  FROM by_family\n  GROUP BY hotel_code, solution\n)\nSELECT\n  p.*,\n  c.taux_conversion_moyen,\n\
+    \  c.taux_conversion_pondere\nFROM core AS p\nLEFT JOIN v_solution_conversion_rate\
+    \ AS c\n  ON LOWER(c.solution) = LOWER(p.solution)\nORDER BY\n  CASE LOWER(CAST(p.solution\
+    \ AS VARCHAR))\n    WHEN 'connected' THEN 0\n    WHEN 'liberty' THEN 1\n    WHEN\
+    \ 'simply' THEN 2\n    ELSE 9\n  END,\n  p.solution\n"
+  name: v_estimate_sim_v2

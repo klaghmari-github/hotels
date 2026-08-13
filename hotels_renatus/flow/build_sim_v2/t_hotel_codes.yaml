@@ -12,3 +12,4 @@ t_hotel_codes:
     ORDER BY HOTEL_CODE
 
     '
+  name: t_hotel_codes

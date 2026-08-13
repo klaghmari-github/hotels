@@ -4,3 +4,4 @@ v_restitution_input_hotel:
   requires:
   - v_restitution_default_input_hotel
   script: SELECT * FROM v_restitution_default_input_hotel
+  name: v_restitution_input_hotel

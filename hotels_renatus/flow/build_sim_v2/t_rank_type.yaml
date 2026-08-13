@@ -9,3 +9,4 @@ t_rank_type:
     )\nSELECT hotel_code, type, montant_marge, nombre_natures, natures,\n       ROW_NUMBER()\
     \ OVER (PARTITION BY hotel_code ORDER BY montant_marge, type) AS rang_type\nFROM\
     \ t_group\nORDER BY hotel_code, rang_type"
+  name: t_rank_type

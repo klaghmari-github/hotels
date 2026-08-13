@@ -1,0 +1,10 @@
+t_estimate_input_ml:
+  type: table
+  mode: create_or_replace
+  name: t_estimate_input_ml
+  label: t_estimate_input_ml
+  requires:
+  - df_estimate_input_ml
+  script: 'SELECT * FROM df_estimate_input_ml
+
+    '

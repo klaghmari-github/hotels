@@ -3,7 +3,7 @@ v_estimate_hotel_levers:
   mode: create_or_replace
   label: estimate_hotel_levers
   requires:
-  - df_estimate_input_v1
+  - t_estimate_input_v1
   script: "SELECT\n  CAST(hotel_code AS VARCHAR) AS hotel_code,\n  UPPER(TRIM(CAST(solution\
     \ AS VARCHAR))) AS solution,\n  TRY_CAST(hotel_nb_chambres AS DOUBLE) AS hotel_nb_chambres,\n\
     \  TRY_CAST(hotel_to_annuel AS DOUBLE) AS hotel_to_annuel,\n  TRY_CAST(hotel_guests_per_chambre\
@@ -11,4 +11,5 @@ v_estimate_hotel_levers:
     \ AS metres_lineaires,\n  TRY_CAST(mix_fb AS DOUBLE) AS mix_fb,\n  TRY_CAST(nb_frigos_froid\
     \ AS DOUBLE) AS nb_frigos_froid,\n  TRY_CAST(hotel_nb_chambres AS DOUBLE)\n  \
     \  * TRY_CAST(hotel_to_annuel AS DOUBLE)\n    * TRY_CAST(hotel_guests_per_chambre\
-    \ AS DOUBLE)\n    * 30.5 AS clients_mois\nFROM df_estimate_input_v1\n"
+    \ AS DOUBLE)\n    * 30.5 AS clients_mois\nFROM t_estimate_input_v1\n"
+  name: v_estimate_hotel_levers

@@ -9,3 +9,4 @@ v_restitution_prediction:
     \ AS p\nLEFT JOIN v_solution_conversion_rate AS c USING (solution)\nORDER BY\n\
     \  CASE lower(cast(solution AS VARCHAR))\n    WHEN 'connected' THEN 0\n    WHEN\
     \ 'liberty' THEN 1\n    WHEN 'simply' THEN 2\n    ELSE 9\n  END,\n  solution"
+  name: v_restitution_prediction

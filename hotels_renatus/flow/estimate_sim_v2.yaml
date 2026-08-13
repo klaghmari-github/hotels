@@ -1,8 +1,13 @@
 estimate_sim_v2:
   type: zone
-  label: Estimate sim_v2 (row in → prediction)
+  label: Estimate sim_v2 (row → CA restitution)
   objects:
     df_estimate_input_v2: {}
+    t_estimate_input_v2: {}
+    v_estimate_input_hotel: {}
+    v_estimate_input_mix: {}
     v_estimate_sim_v2: {}
+    v_restitution_solution_coefficients: {}
+    v_solution_conversion_rate: {}
   workers: auto
   renatus_mode: required_for_leaves

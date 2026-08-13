@@ -12,3 +12,4 @@ t_natures:
     ORDER BY NATURE
 
     '
+  name: t_natures

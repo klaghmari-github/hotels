@@ -6,3 +6,4 @@ v_sales_filtered:
   - v_scenario_removed_natures
   script: "SELECT s.*\nFROM t_sales AS s\nWHERE NOT EXISTS (\n  SELECT 1\n  FROM v_scenario_removed_natures\
     \ AS r\n  WHERE r.nature = s.NATURE_PRODUIT\n)\n"
+  name: v_sales_filtered

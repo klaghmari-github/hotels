@@ -19,3 +19,4 @@ v_restitution_simulation_long:
     \ / NULLIF(nombre_guests_par_mois * metres_lineaires * variable_part, 0)\n   \
     \   AS montant_marge_coefficient\nFROM long_mix\nWHERE variable_part > 0\n  AND\
     \ nombre_guests_par_mois > 0\n  AND metres_lineaires > 0"
+  name: v_restitution_simulation_long

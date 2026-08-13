@@ -9,3 +9,4 @@ v_loo_input_mix:
     \ LIKE 'type_%' THEN 'type'\n    WHEN variable_name LIKE 'gamme_%' THEN 'gamme'\n\
     \  END AS variable_family,\n  variable_name,\n  target_part\nFROM long_mix\nWHERE\
     \ target_part > 0"
+  name: v_loo_input_mix

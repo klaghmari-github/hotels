@@ -5,3 +5,4 @@ t_scenarios:
   - df_scenarios
   script: "SELECT\n  CAST(scenario_id AS VARCHAR) AS scenario_id,\n  FROM_JSON(scenario_removed_natures_json,\
     \ '[\"VARCHAR\"]') AS scenario_removed_natures\nFROM df_scenarios\nORDER BY scenario_id\n"
+  name: t_scenarios

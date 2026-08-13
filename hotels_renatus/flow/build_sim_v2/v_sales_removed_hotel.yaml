@@ -8,3 +8,4 @@ v_sales_removed_hotel:
     \  MAX(h.nombre_ventes) / NULLIF(MAX(h.nombre_guests), 0) AS taux_conversion\n\
     FROM v_sales_hotel_baseline AS h\nLEFT JOIN v_sales_removed AS r ON r.HOTEL_CODE\
     \ = h.hotel_code\nGROUP BY h.hotel_code\n"
+  name: v_sales_removed_hotel

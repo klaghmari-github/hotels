@@ -1,0 +1,10 @@
+v_estimate_ml:
+  type: view
+  mode: create_or_replace
+  label: estimate_ml
+  requires:
+  - x_estimate_ml_score
+  script: 'SELECT * FROM t_estimate_ml
+
+    '
+  name: v_estimate_ml

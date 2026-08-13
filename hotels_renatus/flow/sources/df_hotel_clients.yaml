@@ -2,3 +2,4 @@ df_hotel_clients:
   type: dataframe
   requires: []
   file: input/hotel_clients.xlsx
+  name: df_hotel_clients

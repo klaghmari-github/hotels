@@ -12,3 +12,4 @@ t_gammes:
     ORDER BY GAMME
 
     '
+  name: t_gammes

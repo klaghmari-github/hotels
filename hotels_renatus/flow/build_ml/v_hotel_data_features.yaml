@@ -56,3 +56,4 @@ v_hotel_data_features:
     \ AS DOUBLE) AS hd_hotel_contrat_type_franchise,\n  TRY_CAST(hotel_contrat_type_manage\
     \ AS DOUBLE) AS hd_hotel_contrat_type_manage\nFROM t_hotel_data\nWHERE hotel_code\
     \ IS NOT NULL"
+  name: v_hotel_data_features

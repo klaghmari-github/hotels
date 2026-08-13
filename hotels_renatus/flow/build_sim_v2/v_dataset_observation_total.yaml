@@ -9,3 +9,4 @@ v_dataset_observation_total:
     \ COALESCE(a.montant_marge_selon_coef, 0) AS montant_marge_selon_coef,\n  COALESCE(a.montant_marge,\
     \ 0) AS montant_marge\nFROM v_dataset_observation_context AS c\nLEFT JOIN v_dataset_observation_activity\
     \ AS a USING (hotel_code)"
+  name: v_dataset_observation_total

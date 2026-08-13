@@ -31,3 +31,4 @@ t_hotel_params:
     \ AS s\n  ON s.hotel_code = CAST(h.hotel_code AS VARCHAR)\nLEFT JOIN v_v1_pivot_observation\
     \ AS o\n  ON o.hotel_code = CAST(h.hotel_code AS VARCHAR)\nWHERE CAST(h.hotel_code\
     \ AS VARCHAR) NOT IN ('H5586')"
+  name: t_hotel_params

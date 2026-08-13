@@ -9,3 +9,4 @@ v_sales_hotel_baseline:
     \ * MAX(HOTEL_GUESTS_PER_CHAMBRE) * 30.5\n    * (DATE_DIFF('month', MIN(DATE),\
     \ MAX(DATE)) + 1) AS nombre_guests,\n  SUM(QUANTITE) AS nombre_ventes\nFROM t_sales\n\
     GROUP BY HOTEL_CODE\n"
+  name: v_sales_hotel_baseline

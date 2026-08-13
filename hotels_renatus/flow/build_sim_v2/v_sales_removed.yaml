@@ -11,3 +11,4 @@ v_sales_removed:
     INNER JOIN v_scenario_removed_natures AS r ON r.nature = s.NATURE_PRODUIT
 
     '
+  name: v_sales_removed

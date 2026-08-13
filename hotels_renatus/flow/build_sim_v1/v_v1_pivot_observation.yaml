@@ -10,3 +10,4 @@ v_v1_pivot_observation:
     \ AS clients_mois,\n  ANY_VALUE(metres_lineaires) AS metres_lineaires,\n  ANY_VALUE(nombre_mois)\
     \ AS n_mois\nFROM t_dataset_pivot\nWHERE COALESCE(LEN(scenario_removed_natures),\
     \ 0) = 0\nGROUP BY CAST(hotel_code AS VARCHAR), LOWER(TRIM(CAST(solution AS VARCHAR)))"
+  name: v_v1_pivot_observation

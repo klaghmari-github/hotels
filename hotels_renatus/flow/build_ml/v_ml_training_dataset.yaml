@@ -9,3 +9,4 @@ v_ml_training_dataset:
     \  p.metres_lineaires,\n  COLUMNS('^(type|gamme)_.*_part_natures$'),\n  p.montant_ventes_par_mois,\n\
     \  p.montant_marge_par_mois,\n  p.montant_marge_selon_coef_par_mois\nFROM t_dataset_pivot\
     \ AS p\nINNER JOIN v_ml_hotel_context AS h\n  USING (hotel_code)\n"
+  name: v_ml_training_dataset

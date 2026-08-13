@@ -15,3 +15,4 @@ v_loo_prediction_by_variable:
     FROM v_loo_observed_row AS o\nINNER JOIN v_loo_solution_coefficients AS c\n  ON\
     \ c.solution = o.solution\nINNER JOIN v_loo_input_mix AS m\n  USING (variable_family,\
     \ variable_name)"
+  name: v_loo_prediction_by_variable

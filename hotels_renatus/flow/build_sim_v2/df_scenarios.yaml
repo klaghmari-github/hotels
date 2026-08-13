@@ -2,3 +2,4 @@ df_scenarios:
   type: dataframe
   requires: []
   file: input/scenarios.xlsx
+  name: df_scenarios

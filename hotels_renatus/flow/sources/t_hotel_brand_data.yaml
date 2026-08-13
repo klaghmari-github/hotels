@@ -4,3 +4,4 @@ t_hotel_brand_data:
   requires:
   - df_hotel_brand_data
   script: SELECT * FROM df_hotel_brand_data
+  name: t_hotel_brand_data

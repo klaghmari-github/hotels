@@ -14,3 +14,4 @@ v_dataset_mix_nombre_global:
     \ 0) AS nombre_gammes,\n  COALESCE(m.nombre_types, 0) AS nombre_types,\n  COALESCE(m.nombre_marques,\
     \ 0) AS nombre_marques,\n  COALESCE(m.nombre_fournisseurs, 0) AS nombre_fournisseurs\n\
     FROM t_hotel_codes AS h\nLEFT JOIN current_mix AS m ON m.hotel_code = h.HOTEL_CODE\n"
+  name: v_dataset_mix_nombre_global

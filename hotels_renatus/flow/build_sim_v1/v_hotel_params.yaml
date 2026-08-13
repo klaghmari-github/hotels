@@ -8,3 +8,4 @@ v_hotel_params:
     \  clients_mois,\n  mix_fb,\n  ca_reel_mensuel,\n  ca_fb_mensuel,\n  ca_nf_mensuel,\n\
     \  marge_reelle_mensuelle,\n  nb_ventes_mensuel,\n  nb_paniers_mensuel,\n  n_mois\n\
     FROM t_hotel_params"
+  name: v_hotel_params

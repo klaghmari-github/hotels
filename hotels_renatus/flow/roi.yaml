@@ -1,0 +1,12 @@
+roi:
+  type: zone
+  label: ROI (marge − coûts)
+  objects:
+    t_solution_costs: {}
+    v_roi_from_estimate_v1: {}
+    v_estimate_sim_v1: {}
+    t_pilot_defaults: {}
+    df_estimate_input_v1: {}
+    v_estimate_hotel_levers: {}
+  workers: auto
+  renatus_mode: required_for_leaves

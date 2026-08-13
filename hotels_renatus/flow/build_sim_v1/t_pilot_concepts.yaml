@@ -8,3 +8,4 @@ t_pilot_concepts:
     \ AS VARCHAR) AS name\nFROM df_pilot_concepts\nWHERE CAST(hotel_code AS VARCHAR)\
     \ IN (\n  'H2075', 'HB6A3', 'H6188', 'HB5I0', 'H0373', 'H3546'\n)\n  AND CAST(hotel_code\
     \ AS VARCHAR) NOT IN ('H5586')\nORDER BY solution, hotel_code"
+  name: t_pilot_concepts

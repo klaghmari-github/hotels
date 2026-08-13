@@ -24,3 +24,4 @@ v_v1_sales_observation:
     \ / NULLIF(montant_ventes, 0) AS mix_fb,\n  hotel_nb_chambres\n    * hotel_to_annuel\n\
     \    * hotel_guests_per_chambre\n    * 30.5 AS clients_mois,\n  hotel_nb_chambres,\n\
     \  hotel_to_annuel,\n  hotel_guests_per_chambre,\n  metres_lineaires\nFROM base"
+  name: v_v1_sales_observation

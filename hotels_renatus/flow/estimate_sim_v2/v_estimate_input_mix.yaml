@@ -1,0 +1,16 @@
+v_estimate_input_mix:
+  type: view
+  mode: create_or_replace
+  label: estimate_input_mix_v2
+  requires:
+  - t_estimate_input_v2
+  - v_restitution_solution_coefficients
+  script: "-- Mix cible : si le fichier d'entrée n'a pas de colonnes de mix,\n-- on\
+    \ utilise une répartition uniforme des variables connues (coeffs).\n-- Sinon on\
+    \ pourrait étendre l'xlsx avec type_* / gamme_*_part_natures.\nWITH vars AS (\n\
+    \  SELECT DISTINCT variable_family, variable_name\n  FROM v_restitution_solution_coefficients\n\
+    ), counts AS (\n  SELECT variable_family, COUNT(*) AS variable_count\n  FROM vars\n\
+    \  GROUP BY variable_family\n)\nSELECT\n  v.variable_family,\n  v.variable_name,\n\
+    \  1.0 / c.variable_count AS target_part\nFROM vars AS v\nINNER JOIN counts AS\
+    \ c USING (variable_family)\n"
+  name: v_estimate_input_mix

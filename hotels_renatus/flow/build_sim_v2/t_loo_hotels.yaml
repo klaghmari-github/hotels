@@ -6,3 +6,4 @@ t_loo_hotels:
   script: "SELECT\n  HOTEL_CODE AS hotel_code,\n  ANY_VALUE(SOLUTION) AS solution\n\
     FROM t_sales\nWHERE CAST(HOTEL_CODE AS VARCHAR) NOT IN ('H5586')\nGROUP BY HOTEL_CODE\n\
     ORDER BY HOTEL_CODE"
+  name: t_loo_hotels

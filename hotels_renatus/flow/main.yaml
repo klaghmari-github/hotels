@@ -9,5 +9,6 @@ main:
     estimate_sim_v1: {}
     estimate_sim_v2: {}
     estimate_ml: {}
+    roi: {}
   workers: auto
   renatus_mode: required_for_leaves

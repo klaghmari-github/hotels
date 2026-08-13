@@ -6,3 +6,4 @@ v_dataset_observation_activity:
   script: "SELECT\n  HOTEL_CODE AS hotel_code,\n  SUM(QUANTITE) AS nombre_ventes,\n\
     \  SUM(PRIX_TTC) AS montant_ventes,\n  SUM(MARGE_SELON_COEF) AS montant_marge_selon_coef,\n\
     \  SUM(MARGE) AS montant_marge\nFROM v_sales_current\nGROUP BY HOTEL_CODE"
+  name: v_dataset_observation_activity

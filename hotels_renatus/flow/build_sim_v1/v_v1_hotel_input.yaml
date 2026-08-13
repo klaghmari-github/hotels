@@ -10,3 +10,4 @@ v_v1_hotel_input:
     CROSS JOIN v_loo_step AS step
 
     WHERE h.hotel_code = step.hotel_code'
+  name: v_v1_hotel_input

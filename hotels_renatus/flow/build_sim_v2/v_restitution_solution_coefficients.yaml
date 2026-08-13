@@ -12,3 +12,4 @@ v_restitution_solution_coefficients:
     \ AS montant_marge_selon_coef_coefficient_stddev,\n  STDDEV_SAMP(montant_marge_coefficient)\
     \ AS montant_marge_coefficient_stddev\nFROM v_restitution_training_source\nGROUP\
     \ BY solution, variable_family, variable_name"
+  name: v_restitution_solution_coefficients

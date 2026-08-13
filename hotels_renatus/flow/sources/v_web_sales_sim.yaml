@@ -15,3 +15,4 @@ v_web_sales_sim:
     \  gamme_pap_part_natures,\n  gamme_jeux_enfants_part_natures,\n  gamme_souvenirs_part_natures\n\
     FROM t_dataset_pivot\nWHERE COALESCE(LEN(scenario_removed_natures), 0) > 0\nORDER\
     \ BY hotel_code, scenario_id"
+  name: v_web_sales_sim

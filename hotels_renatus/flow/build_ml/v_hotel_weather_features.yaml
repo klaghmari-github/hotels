@@ -28,3 +28,4 @@ v_hotel_weather_features:
     \ AS DOUBLE)) AS wx_meteo_ensoleillement_min_min,\n  AVG(TRY_CAST(meteo_ensoleillement_min_max\
     \ AS DOUBLE)) AS wx_meteo_ensoleillement_min_max\nFROM t_hotel_weather_data\n\
     WHERE hotel_code IS NOT NULL\nGROUP BY CAST(hotel_code AS VARCHAR)"
+  name: v_hotel_weather_features

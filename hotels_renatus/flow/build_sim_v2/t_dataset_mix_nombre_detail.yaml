@@ -12,3 +12,4 @@ t_dataset_mix_nombre_detail:
     GROUP BY hotel_code
 
     '
+  name: t_dataset_mix_nombre_detail

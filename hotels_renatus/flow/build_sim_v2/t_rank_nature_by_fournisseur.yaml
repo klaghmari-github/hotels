@@ -10,3 +10,4 @@ t_rank_nature_by_fournisseur:
     \ nature, montant_marge,\n       ROW_NUMBER() OVER (PARTITION BY hotel_code, fournisseur\
     \ ORDER BY montant_marge, nature) AS rang_nature\nFROM t_nature_marge\nORDER BY\
     \ hotel_code, fournisseur, rang_nature"
+  name: t_rank_nature_by_fournisseur

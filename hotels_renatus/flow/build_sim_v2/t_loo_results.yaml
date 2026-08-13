@@ -4,3 +4,4 @@ t_loo_results:
   requires:
   - v_loo_result
   script: SELECT * FROM v_loo_result LIMIT 0
+  name: t_loo_results

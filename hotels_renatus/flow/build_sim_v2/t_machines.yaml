@@ -12,3 +12,4 @@ t_machines:
     ORDER BY MACHINE
 
     '
+  name: t_machines

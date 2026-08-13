@@ -15,3 +15,4 @@ t_solution_reference:
     \ AS coeff_fb,\n  ANY_VALUE(d.coeff_nfb) AS coeff_nfb\nFROM v_hotel_params AS\
     \ p\nINNER JOIN t_pilot_defaults AS d\n  ON d.solution = p.solution\nGROUP BY\
     \ p.solution"
+  name: t_solution_reference

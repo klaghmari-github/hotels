@@ -8,3 +8,4 @@ v_restitution_default_input_mix:
     \ COUNT(*) AS variable_count\n  FROM variables\n  GROUP BY variable_family\n)\n\
     SELECT\n  v.variable_family,\n  v.variable_name,\n  1.0 / c.variable_count AS\
     \ target_part\nFROM variables AS v\nINNER JOIN counts AS c USING (variable_family)"
+  name: v_restitution_default_input_mix

@@ -18,3 +18,4 @@ v_restitution_prediction_by_variable:
     FROM v_restitution_solution_coefficients AS c\nINNER JOIN v_restitution_input_mix\
     \ AS m\n  USING (variable_family, variable_name)\nCROSS JOIN hotel AS h\nWHERE\
     \ m.target_part > 0"
+  name: v_restitution_prediction_by_variable

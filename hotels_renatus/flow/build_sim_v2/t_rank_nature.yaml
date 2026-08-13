@@ -9,3 +9,4 @@ t_rank_nature:
     \ nature, montant_marge,\n       ROW_NUMBER() OVER (PARTITION BY hotel_code ORDER\
     \ BY montant_marge, nature) AS rang_nature\nFROM t_nature_marge\nORDER BY hotel_code,\
     \ rang_nature"
+  name: t_rank_nature

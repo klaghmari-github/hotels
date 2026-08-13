@@ -40,12 +40,13 @@ v_estimate_sim_v1:
     \          * ABS(r3.nb_frigos_froid - r3.frigo_ref)\n      ELSE r3.ca_nfb_r3\n\
     \        + SIGN(r3.metres_lineaires - r3.ml_ref)\n          * r3.ca_1ml_nfb\n\
     \          * ABS(r3.metres_lineaires - r3.ml_ref)\n    END AS ca_nfb_r4\n  FROM\
-    \ r3\n)\nSELECT\n  hotel_code,\n  solution,\n  clients_mois,\n  taux_acheteurs,\n\
-    \  nb_acheteurs,\n  mix_steps,\n  r4_diff,\n  ca_fb_r4,\n  ca_nfb_r4,\n  ca_fb_r4\
-    \ + ca_nfb_r4 AS ca_ht_predit,\n  CASE WHEN coeff_fb > 0 THEN ca_fb_r4 - (ca_fb_r4\
-    \ / coeff_fb) ELSE 0.0 END\n    + CASE WHEN coeff_nfb > 0 THEN ca_nfb_r4 - (ca_nfb_r4\
-    \ / coeff_nfb) ELSE 0.0 END\n    AS marge_produit_predite,\n  GREATEST(ca_fb_r4\
-    \ + ca_nfb_r4, 0.0) AS montant_ventes_par_mois,\n  GREATEST(\n    CASE WHEN coeff_fb\
-    \ > 0 THEN ca_fb_r4 - (ca_fb_r4 / coeff_fb) ELSE 0.0 END\n    + CASE WHEN coeff_nfb\
-    \ > 0 THEN ca_nfb_r4 - (ca_nfb_r4 / coeff_nfb) ELSE 0.0 END,\n    0.0\n  ) AS\
-    \ montant_marge_par_mois\nFROM r4\n"
+    \ r3\n)\nSELECT\n  hotel_code,\n  solution,\n  metres_lineaires,\n  clients_mois,\n\
+    \  taux_acheteurs,\n  nb_acheteurs,\n  mix_steps,\n  r4_diff,\n  ca_fb_r4,\n \
+    \ ca_nfb_r4,\n  ca_fb_r4 + ca_nfb_r4 AS ca_ht_predit,\n  CASE WHEN coeff_fb >\
+    \ 0 THEN ca_fb_r4 - (ca_fb_r4 / coeff_fb) ELSE 0.0 END\n    + CASE WHEN coeff_nfb\
+    \ > 0 THEN ca_nfb_r4 - (ca_nfb_r4 / coeff_nfb) ELSE 0.0 END\n    AS marge_produit_predite,\n\
+    \  GREATEST(ca_fb_r4 + ca_nfb_r4, 0.0) AS montant_ventes_par_mois,\n  GREATEST(\n\
+    \    CASE WHEN coeff_fb > 0 THEN ca_fb_r4 - (ca_fb_r4 / coeff_fb) ELSE 0.0 END\n\
+    \    + CASE WHEN coeff_nfb > 0 THEN ca_nfb_r4 - (ca_nfb_r4 / coeff_nfb) ELSE 0.0\
+    \ END,\n    0.0\n  ) AS montant_marge_par_mois\nFROM r4\n"
+  name: v_estimate_sim_v1

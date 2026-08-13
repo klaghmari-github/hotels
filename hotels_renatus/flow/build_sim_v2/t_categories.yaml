@@ -12,3 +12,4 @@ t_categories:
     ORDER BY CATEGORIE
 
     '
+  name: t_categories

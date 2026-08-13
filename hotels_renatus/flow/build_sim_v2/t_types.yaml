@@ -12,3 +12,4 @@ t_types:
     ORDER BY TYPE
 
     '
+  name: t_types
