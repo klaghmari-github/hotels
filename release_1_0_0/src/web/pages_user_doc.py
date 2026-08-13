@@ -127,6 +127,14 @@ DOC_CSS = """
   background: #152030; font-weight: 650;
 }
 .doc-section tr:last-child td { border-bottom: 0; }
+.doc-dict-title {
+  margin: .75rem 0 .25rem; font-size: .82rem; font-weight: 700;
+  color: var(--muted); text-transform: uppercase; letter-spacing: .03em;
+}
+.doc-section table.dict td:first-child {
+  font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .82rem;
+  white-space: nowrap; color: #93c5fd;
+}
 
 .tag-pill {
   display: inline-block; font-size: .72rem; font-weight: 700;
@@ -264,6 +272,17 @@ DOC_BODY = """
         <p>Natures retirées, volumes réalloués, CA et mix recalculés.</p>
       </div>
     </div>
+    <p class="doc-dict-title">Dictionnaire</p>
+    <table class="dict">
+      <tr><th>Champ</th><th>Description</th></tr>
+      <tr><td>CA</td><td>Chiffre d’affaires (montant des ventes), en € / mois sauf indication contraire</td></tr>
+      <tr><td>chambres</td><td>Nombre de chambres de l’hôtel</td></tr>
+      <tr><td>TO</td><td>Taux d’occupation annuel (fraction 0–1, ou % selon saisie UI)</td></tr>
+      <tr><td>guests/chambre</td><td>Nombre moyen de clients par chambre occupée</td></tr>
+      <tr><td>m_lin</td><td>Mètres linéaires du corner de vente</td></tr>
+      <tr><td>mix</td><td>Parts d’assortiment (types F&amp;B / Non F&amp;B et gammes), somme 1</td></tr>
+      <tr><td>Simply / Liberty / Connected</td><td>Solutions / concepts pilotes à estimer</td></tr>
+    </table>
   </section>
 
   <section class="doc-section" id="schema">
@@ -353,6 +372,18 @@ DOC_BODY = """
       </button>
     </div>
     <div id="doc-pop-host" class="doc-pop-host" aria-live="polite"></div>
+    <p class="doc-dict-title">Dictionnaire</p>
+    <table class="dict">
+      <tr><th>Champ</th><th>Description</th></tr>
+      <tr><td>t_sales</td><td>Table des tickets de vente des hôtels pilotes</td></tr>
+      <tr><td>t_scenarios</td><td>Définitions des scénarios (natures retirées + scénario vide)</td></tr>
+      <tr><td>t_dataset_pivot</td><td>Résultat scénario × hôtel : CA, mix, guests, m_lin, etc.</td></tr>
+      <tr><td>coeffs</td><td>Coefficients d’intensité moyens par solution et variable de mix</td></tr>
+      <tr><td>guests</td><td>Flux clients mensuel (voir §3)</td></tr>
+      <tr><td>m_lin</td><td>Mètres linéaires du corner</td></tr>
+      <tr><td>part</td><td>Part de mix d’une variable type ou gamme (0–1)</td></tr>
+      <tr><td>ml_tc / ml_tc_sim_v2 / ml_ca</td><td>Étapes du moteur ML (voir §7)</td></tr>
+    </table>
   </section>
 
   <section class="doc-section" id="obs">
@@ -362,7 +393,21 @@ DOC_BODY = """
 
 taux_conversion = nombre_ventes / guests
 CA_mois, marge_mois = agrégats tickets ramenés au mois</div>
-    <p>Facteur 30,5 : occupation journalière → flux mensuel.</p>
+    <p class="doc-dict-title">Dictionnaire</p>
+    <table class="dict">
+      <tr><th>Champ</th><th>Description</th></tr>
+      <tr><td>guests_mois</td><td>Nombre de clients (guests) ramené au mois</td></tr>
+      <tr><td>chambres</td><td>Nombre de chambres de l’hôtel</td></tr>
+      <tr><td>TO_annuel</td><td>Taux d’occupation annuel (0–1)</td></tr>
+      <tr><td>guests/chambre</td><td>Clients moyens par chambre occupée</td></tr>
+      <tr><td>30,5</td><td>Facteur convention ROD : jours moyens par mois (occupation journalière → flux mensuel)</td></tr>
+      <tr><td>taux_conversion</td><td>Part des guests qui achètent : nombre_ventes / guests</td></tr>
+      <tr><td>nombre_ventes</td><td>Nombre d’unités vendues (tickets), agrégé sur la période puis ramené au mois</td></tr>
+      <tr><td>guests</td><td>Alias de guests_mois dans le ratio de conversion</td></tr>
+      <tr><td>CA_mois</td><td>Chiffre d’affaires mensuel = SUM(PRIX_TTC) / n_mois</td></tr>
+      <tr><td>marge_mois</td><td>Marge mensuelle (selon coef ou marché) agrégée sur les tickets / n_mois</td></tr>
+      <tr><td>n_mois</td><td>Nombre de mois couverts par l’historique tickets de l’hôtel</td></tr>
+    </table>
   </section>
 
   <section class="doc-section" id="sim">
@@ -398,13 +443,35 @@ volume_ajoute(h, n) =
   ventes_retirées(h) × taux_conversion(h) × part(h, n)
 
 q_scénario = q_ligne + volume_ajoute × (q_ligne / ventes_nature)</div>
+    <p class="doc-dict-title">Dictionnaire — redistribution</p>
+    <table class="dict">
+      <tr><th>Champ</th><th>Description</th></tr>
+      <tr><td>h</td><td>Hôtel pilote</td></tr>
+      <tr><td>n</td><td>Nature produit conservée</td></tr>
+      <tr><td>part(h, n)</td><td>Part des ventes de la nature n dans le total de l’hôtel h</td></tr>
+      <tr><td>ventes(h,n)</td><td>Volume de ventes de la nature n sur l’hôtel h (baseline)</td></tr>
+      <tr><td>ventes_totales(h)</td><td>Somme des ventes toutes natures de l’hôtel h</td></tr>
+      <tr><td>ventes_retirées(h)</td><td>Volume de ventes des natures retirées par le scénario</td></tr>
+      <tr><td>taux_conversion(h)</td><td>nombre_ventes / guests de l’hôtel (observation)</td></tr>
+      <tr><td>volume_ajoute(h, n)</td><td>Volume redistribué sur la nature n après retrait</td></tr>
+      <tr><td>q_ligne</td><td>Quantité de la ligne ticket avant scénario</td></tr>
+      <tr><td>ventes_nature</td><td>Ventes baseline de la nature de la ligne</td></tr>
+      <tr><td>q_scénario</td><td>Quantité de la ligne après redistribution du scénario</td></tr>
+    </table>
     <p>CA et marges suivent le ratio de quantités.</p>
     <h4>Surface et mix</h4>
     <div class="formula">m_lin_scénario ≈ (m_lin_obs / n_natures_obs) × n_natures_restantes</div>
-    <p>
-      Mix type / gamme = parts en <strong>nombre de natures distinctes</strong> du scénario
-      (pas en volume de ventes).
-    </p>
+    <p class="doc-dict-title">Dictionnaire — surface / mix</p>
+    <table class="dict">
+      <tr><th>Champ</th><th>Description</th></tr>
+      <tr><td>m_lin_scénario</td><td>Mètres linéaires estimés pour l’assortiment réduit</td></tr>
+      <tr><td>m_lin_obs</td><td>Mètres linéaires observés (baseline)</td></tr>
+      <tr><td>n_natures_obs</td><td>Nombre de natures distinctes en observation</td></tr>
+      <tr><td>n_natures_restantes</td><td>Nombre de natures encore présentes après retraits</td></tr>
+      <tr><td>mix type / gamme</td><td>Parts = effectifs de natures distinctes par type ou gamme (somme 1)</td></tr>
+      <tr><td>NATURE_PRODUIT</td><td>Regroupement de SKU de même nature catalogue</td></tr>
+      <tr><td>rang</td><td>Ordre d’intérêt commercial (marge tickets), base des retraits</td></tr>
+    </table>
   </section>
 
   <section class="doc-section" id="coef">
@@ -416,6 +483,18 @@ q_scénario = q_ligne + volume_ajoute × (q_ligne / ventes_nature)</div>
     <div class="formula">coeff(solution, variable) =
   AVG[ CA_mois / (guests_mois × m_lin × part_mix) ]
   sur les lignes de cette solution</div>
+    <p class="doc-dict-title">Dictionnaire</p>
+    <table class="dict">
+      <tr><th>Champ</th><th>Description</th></tr>
+      <tr><td>coeff(solution, variable)</td><td>Intensité moyenne de CA pour une solution et une variable de mix</td></tr>
+      <tr><td>solution</td><td>simply, liberty ou connected</td></tr>
+      <tr><td>variable</td><td>Variable de mix : type_* ou gamme_* (ex. type F&amp;B, gamme alcool)</td></tr>
+      <tr><td>CA_mois</td><td>CA mensuel de la ligne pivot (obs ou sim)</td></tr>
+      <tr><td>guests_mois</td><td>Clients mensuels de la ligne</td></tr>
+      <tr><td>m_lin</td><td>Mètres linéaires de la ligne (scénario)</td></tr>
+      <tr><td>part_mix</td><td>Part de la variable dans le mix de la ligne (0–1)</td></tr>
+      <tr><td>AVG[…]</td><td>Moyenne sur toutes les lignes pivot de la solution</td></tr>
+    </table>
     <p>
       Unité : € CA / mois / guest / m_lin / point de mix.
       Calcul séparé pour Simply, Liberty et Connected.
@@ -431,7 +510,21 @@ mix    = parts type / gammes (global)</div>
 
 CA_famille = moyenne des CA_var (type ou gamme)
 CA_solution = moyenne des CA_famille</div>
-
+    <p class="doc-dict-title">Dictionnaire</p>
+    <table class="dict">
+      <tr><th>Champ</th><th>Description</th></tr>
+      <tr><td>guests</td><td>Flux clients mensuel cible (leviers hôtel)</td></tr>
+      <tr><td>chambres</td><td>Nombre de chambres de l’hôtel cible</td></tr>
+      <tr><td>TO</td><td>Taux d’occupation annuel cible</td></tr>
+      <tr><td>guests/chambre</td><td>Clients par chambre cible</td></tr>
+      <tr><td>30,5</td><td>Facteur jours/mois (convention ROD)</td></tr>
+      <tr><td>m_lin</td><td>Mètres linéaires du corner cible</td></tr>
+      <tr><td>mix / part(variable)</td><td>Part de la variable de mix saisie pour la cible (0–1, somme 1)</td></tr>
+      <tr><td>coeff(solution, variable)</td><td>Coefficient d’intensité (§5) de la solution estimée</td></tr>
+      <tr><td>CA_var</td><td>CA mensuel prédit pour une variable de mix</td></tr>
+      <tr><td>CA_famille</td><td>Moyenne des CA_var au sein du type ou de la gamme</td></tr>
+      <tr><td>CA_solution</td><td>CA mensuel retenu pour la solution (moyenne des familles)</td></tr>
+    </table>
   </section>
 
   <section class="doc-section" id="ml">
@@ -463,6 +556,21 @@ CA_solution = moyenne des CA_famille</div>
 ml_tc_sim_v2 = sim_v2_brut × (TC_ml_tc / TC_baseline_solution)
 
 CA_ml = ml_ca(descriptives, sim_v2_brut, ml_tc_sim_v2)</div>
+    <p class="doc-dict-title">Dictionnaire</p>
+    <table class="dict">
+      <tr><th>Champ</th><th>Description</th></tr>
+      <tr><td>taux_conversion / TC</td><td>Ratio ventes / guests (cible de ml_tc)</td></tr>
+      <tr><td>nombre_ventes_par_mois</td><td>Unités vendues ramenées au mois (obs ou sim)</td></tr>
+      <tr><td>nombre_guests_par_mois</td><td>Clients mensuels de la ligne</td></tr>
+      <tr><td>ml_tc</td><td>Modèle XGBoost qui prédit le TC</td></tr>
+      <tr><td>TC_ml_tc</td><td>TC prédit par ml_tc</td></tr>
+      <tr><td>TC_baseline_solution</td><td>TC moyen d’apprentissage de la solution</td></tr>
+      <tr><td>sim_v2_brut</td><td>CA (et marges) issus de la restitution sim_v2 pure</td></tr>
+      <tr><td>ml_tc_sim_v2</td><td>CA sim_v2 rescalé par le ratio TC_ml_tc / TC_baseline</td></tr>
+      <tr><td>ml_ca</td><td>Modèle XGBoost qui prédit le CA final du moteur ml</td></tr>
+      <tr><td>CA_ml</td><td>CA mensuel retenu pour le moteur ml</td></tr>
+      <tr><td>descriptives</td><td>Features hôtel, mix, m_lin, services, marque, proximité, météo…</td></tr>
+    </table>
     <p>
       Apprentissage sur les scénarios sim_v2 (obs + sim) enrichis par
       <code>sim_v2_brut</code> (restitution pure) puis par la sortie
@@ -521,6 +629,19 @@ descriptives + ml_tc_sim_v2 ──▶ ml_ca ──▶ CA_final (= moteur « ml �
     <div class="formula">marge_ventes = f(CA, solution)   # PV − PA
 ROI = marge_ventes − coûts_mensuels(solution)
 payback_mois = capex(solution) / ROI   (si ROI &gt; 0)</div>
+    <p class="doc-dict-title">Dictionnaire</p>
+    <table class="dict">
+      <tr><th>Champ</th><th>Description</th></tr>
+      <tr><td>marge_ventes</td><td>Marge commerciale = prix de vente − prix d’achat (via coeff F&amp;B / Non F&amp;B par solution)</td></tr>
+      <tr><td>CA</td><td>Chiffre d’affaires mensuel issu du moteur (sim_v1, sim_v2 ou ml)</td></tr>
+      <tr><td>solution</td><td>simply, liberty ou connected (fixe les coeffs de marge et la grille de coûts)</td></tr>
+      <tr><td>PV</td><td>Prix de vente (tickets / CA)</td></tr>
+      <tr><td>PA</td><td>Prix d’achat (coût marchandise, via coeff ou marché)</td></tr>
+      <tr><td>ROI</td><td>Gain net mensuel = marge_ventes − coûts_mensuels de la solution</td></tr>
+      <tr><td>coûts_mensuels</td><td>Charges récurrentes (techno, annexes, amortissement d’agencement…)</td></tr>
+      <tr><td>capex</td><td>Investissement initial de la solution</td></tr>
+      <tr><td>payback_mois</td><td>Nombre de mois pour rembourser le capex avec le ROI (si ROI &gt; 0)</td></tr>
+    </table>
   </section>
 
   <section class="doc-section" id="eval">
@@ -533,12 +654,12 @@ payback_mois = capex(solution) / ROI   (si ROI &gt; 0)</div>
       <tr>
         <td><strong>LOO</strong></td>
         <td>observations sauf cas exclu pour sim_v1, observations + simulations sauf cas exclu pour sim_v2 et ml</td>
-        <td>observation exclue de la modélisation</td>
+        <td>observation à estimer exclue de la modélisation</td>
       </tr>
       <tr>
         <td><strong>full</strong></td>
         <td>observations sans exclusion pour sim_v1, observations + simulations sans exclusion pour sim_v2 et ml</td>
-        <td>observation incluse dans la modélisation</td>
+        <td>observation à estimer incluse dans la modélisation</td>
       </tr>
     </table>
 
@@ -571,9 +692,6 @@ payback_mois = capex(solution) / ROI   (si ROI &gt; 0)</div>
     <p>
       <strong>Lecture full</strong> : MAE globale
       sim_v2 (~1 084) &lt; ml (~1 667) &lt; sim_v1 (~2 140).
-      In-sample, les coefficients v2 et le ML (qui a vu l’hôtel) se rapprochent
-      du réel ; sim_v1 reste plus rigide. Ce mode mesure le plafond, pas la
-      généralisation.
     </p>
     <p>
       Le potentiel de l’IA peut être davantage exploité en
@@ -585,11 +703,18 @@ payback_mois = capex(solution) / ROI   (si ROI &gt; 0)</div>
       <strong>liens entre Simply, Liberty et Connected</strong> — plutôt que
       des modèles strictement séparés par solution.
     </p>
-    <p class="muted">
-      Détail : admin studio · analyse globale
-      <code>doc/analyse.html</code> · regen full
-      <code>python run.py eval-full</code>
-    </p>
+    <p class="doc-dict-title">Dictionnaire</p>
+    <table class="dict">
+      <tr><th>Champ</th><th>Description</th></tr>
+      <tr><td>|err| CA</td><td>Erreur absolue de CA mensuel : |CA_prédit − CA_réel| (€ / mois)</td></tr>
+      <tr><td>CA_réel</td><td>CA mensuel observé sur l’hôtel pilote (tickets)</td></tr>
+      <tr><td>CA_prédit</td><td>CA mensuel estimé par le moteur (sim_v1, sim_v2 ou ml)</td></tr>
+      <tr><td>MAE</td><td>Mean Absolute Error : moyenne des |err| sur les hôtels du périmètre</td></tr>
+      <tr><td>LOO</td><td>Leave-one-out : l’observation à estimer est exclue du train (si possible)</td></tr>
+      <tr><td>full</td><td>Modélisation sur toutes les données, test sur les mêmes observations</td></tr>
+      <tr><td>eval_biased</td><td>Cas mono-hôtel par solution : l’hôtel reste dans le train LOO</td></tr>
+      <tr><td>Meilleur</td><td>Moteur avec le plus faible |err| CA pour l’hôtel</td></tr>
+    </table>
   </section>
 
   <section class="doc-section" id="parcours">
