@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROD – Spécification Simulateur Fidèle (Simply / Liberty / Connected)</title>
+<style>
+:root{--bg:#0a0f1a;--card:#111827;--b:#1e293b;--t:#e2e8f0;--m:#94a3b8;--a:#38bdf8;--s:#3b82f6;--l:#10b981;--c:#f59e0b;--p:#a78bfa;--r:#f87171}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t);line-height:1.55;padding:2rem 1.2rem 4rem}
+.w{max-width:1180px;margin:0 auto}
+h1{font-size:1.75rem;margin-bottom:.25rem}
+.sub{color:var(--m);margin-bottom:1.8rem;font-size:.92rem}
+h2{font-size:1.2rem;margin:2.3rem 0 .8rem;padding:.45rem .8rem;background:linear-gradient(90deg,#1e293b,transparent);border-left:4px solid var(--a);border-radius:0 6px 6px 0}
+h3{font-size:1.02rem;margin:1.3rem 0 .5rem;color:#cbd5e1}
+h4{font-size:.95rem;margin:1rem 0 .4rem;color:#94a3b8}
+p,li{font-size:.9rem;margin-bottom:.3rem}
+ul,ol{padding-left:1.2rem}
+.card{background:var(--card);border:1px solid var(--b);border-radius:10px;padding:1rem 1.15rem;margin:.8rem 0}
+.tag{display:inline-block;padding:.1rem .45rem;border-radius:4px;font-size:.72rem;font-weight:700}
+.ts{background:#1e3a8a;color:#93c5fd}.tl{background:#064e3b;color:#6ee7b7}.tc{background:#78350f;color:#fcd34d}
+.tf{background:#3b0764;color:#d8b4fe}.tr{background:#4c0519;color:#fda4af}
+table{width:100%;border-collapse:collapse;margin:.6rem 0 1rem;font-size:.85rem}
+th,td{border:1px solid var(--b);padding:.38rem .55rem;text-align:left}
+th{background:#0f172a;color:var(--m);font-weight:600}
+tr:nth-child(even){background:#0f172a33}
+.f{background:#0f172a;border-left:3px solid var(--a);padding:.7rem .95rem;margin:.55rem 0;border-radius:0 7px 7px 0;font-family:ui-monospace,monospace;font-size:.8rem;color:#7dd3fc;white-space:pre-wrap}
+.tree{background:var(--card);border:1px solid var(--b);border-radius:10px;padding:1rem;font-family:ui-monospace,monospace;font-size:.82rem;line-height:1.65;overflow-x:auto;white-space:pre;color:#a5f3fc}
+.tree .k{color:#f472b6}.tree .s{color:#fcd34d;font-weight:700}.tree .c{color:#64748b}
+.note{background:#1c1917;border:1px solid #78350f;border-radius:8px;padding:.7rem .95rem;margin:.8rem 0;color:#fde68a;font-size:.88rem}
+.ok{background:#052e16;border:1px solid #166534;border-radius:8px;padding:.7rem .95rem;margin:.8rem 0;color:#bbf7d0;font-size:.88rem}
+.warn{background:#450a0a;border:1px solid #991b1b;border-radius:8px;padding:.7rem .95rem;margin:.8rem 0;color:#fecaca;font-size:.88rem}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem;margin:.8rem 0}
+@media(max-width:850px){.g3{grid-template-columns:1fr}}
+.cs{background:#0c1a3a;border:1px solid #1e3a8a;border-radius:10px;padding:.9rem}.cl{background:#042f2e;border:1px solid #065f46;border-radius:10px;padding:.9rem}.cc{background:#2a1a05;border:1px solid #92400e;border-radius:10px;padding:.9rem}
+.cs h4{color:#93c5fd}.cl h4{color:#6ee7b7}.cc h4{color:#fcd34d}
+.flow{display:flex;flex-direction:column;gap:0;margin:1rem 0}
+.st{display:grid;grid-template-columns:48px 1fr;gap:.75rem;position:relative}
+.st:not(:last-child) .rail::after{content:'';position:absolute;left:23px;top:48px;bottom:-6px;width:2px;background:linear-gradient(to bottom,var(--a),#334155)}
+.rail{position:relative;display:flex;justify-content:center;padding-top:2px}
+.num{width:38px;height:38px;border-radius:50%;background:var(--a);color:#0a0f1a;font-weight:800;font-size:.9rem;display:flex;align-items:center;justify-content:center;z-index:1;box-shadow:0 0 0 3px #0a0f1a}
+.bx{background:var(--card);border:1px solid var(--b);border-radius:10px;padding:.85rem 1rem;margin-bottom:.95rem}
+.bx .ti{display:block;font-size:1rem;margin-bottom:.3rem;color:#f1f5f9;font-weight:600}
+.toc{background:var(--card);border:1px solid var(--b);border-radius:10px;padding:1rem 1.2rem;margin:1rem 0 1.5rem}
+.toc a{color:var(--a);text-decoration:none;font-size:.9rem}.toc a:hover{text-decoration:underline}
+.toc li{margin:.25rem 0}
+footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--b);color:var(--m);font-size:.82rem}
+code{background:#0f172a;padding:.1rem .35rem;border-radius:3px;font-size:.82rem;color:#7dd3fc}
+</style>
+</head>
+<body>
+<div class="w">
+
+<h1>ROD – Spécification Simulateur Fidèle</h1>
+<p class="sub">
+  Document de référence pour implémenter un simulateur <strong>identique</strong> aux fichiers Excel<br>
+  Simply · Liberty · Connected · Sans bugs · Calcul CA / Coûts / Marge / Recommandation
+</p>
+
+<div class="toc">
+<strong>Sommaire</strong>
+<ol>
+  <li><a href="#arch">Architecture &amp; zones</a></li>
+  <li><a href="#inputs">Paramètres d’entrée</a></li>
+  <li><a href="#reco">Recommandation de concept (arbre)</a></li>
+  <li><a href="#pilotes">Chiffres de référence pilotes</a></li>
+  <li><a href="#r1">Règle 1 – Clients acheteurs</a></li>
+  <li><a href="#r2">Règle 2 – Mix ±10 %</a></li>
+  <li><a href="#r3">Règle 3 – Catégories</a></li>
+  <li><a href="#r4">Règle 4 – Surface / Frigos</a></li>
+  <li><a href="#marge">Marge produits</a></li>
+  <li><a href="#couts">Coûts mensuels</a></li>
+  <li><a href="#nette">Marge nette &amp; Amortissement</a></li>
+  <li><a href="#ordre">Ordre d’exécution exact</a></li>
+  <li><a href="#guards">Garde-fous &amp; corrections (sans bugs)</a></li>
+  <li><a href="#pseudo">Pseudo-code complet</a></li>
+</ol>
+</div>
+
+<!-- ==================== 1 ==================== -->
+<h2 id="arch">1. Architecture &amp; zones</h2>
+
+<div class="card">
+  <p>Chaque simulateur Excel (Simply / Liberty / Connected) est structuré en <strong>2 zones</strong> :</p>
+  <ul>
+    <li><strong>Zone gauche</strong> = données de référence des <em>pilotes</em> (moyennes fixes, non modifiables par l’utilisateur final)</li>
+    <li><strong>Zone droite</strong> = <em>simulation</em> paramétrable (inputs hôtel → calculs en cascade)</li>
+  </ul>
+  <p style="margin-top:.5rem">Le moteur doit calculer les <strong>3 solutions en parallèle</strong> à chaque changement de paramètre, puis mettre en avant la solution <strong>recommandée</strong> par l’arbre de décision.</p>
+</div>
+
+<div class="ok">
+  <strong>Principe de fidélité :</strong> reproduire exactement les formules et coefficients des fichiers Excel, y compris les valeurs de référence pilotes (même si elles intègrent des ventes réception hors bornes).
+</div>
+
+<!-- ==================== 2 ==================== -->
+<h2 id="inputs">2. Paramètres d’entrée (simulation)</h2>
+
+<table>
+  <thead><tr><th>Paramètre</th><th>Type</th><th>Contraintes</th><th>Défaut typique</th></tr></thead>
+  <tbody>
+    <tr><td>Nb. de chambres</td><td>entier ≥ 1</td><td>—</td><td>100</td></tr>
+    <tr><td>Guests / chambre</td><td>float ≥ 1</td><td>—</td><td>1,5</td></tr>
+    <tr><td>TO (YTD)</td><td>float 0–1</td><td>—</td><td>0,70 – 0,80</td></tr>
+    <tr><td>Mètres linéaires</td><td>float</td><td><strong>minimum 2</strong></td><td>3 – 8</td></tr>
+    <tr><td>Mix F&amp;B</td><td>float 0–1</td><td>pas de pas 10 % ; N-F&amp;B = 1 − F&amp;B</td><td>selon concept</td></tr>
+    <tr><td>Catégories F&amp;B (7 toggles)</td><td>bool</td><td>si toutes OFF → erreur ou forcer 0</td><td>toutes ON</td></tr>
+    <tr><td>Catégories N-F&amp;B (7 toggles)</td><td>bool</td><td>—</td><td>selon concept</td></tr>
+    <tr><td>Possède vitrine réfrigérée</td><td>bool</td><td>impact reco uniquement</td><td>false</td></tr>
+    <tr><td>Nb. frigos froid (Connected)</td><td>entier ≥ 0</td><td>visible si Mix F&amp;B ≥ 10 %</td><td>1–3</td></tr>
+    <tr><td>Nb. frigos ambiant (Connected)</td><td>entier ≥ 0</td><td>visible si Mix N-F&amp;B ≥ 10 %</td><td>0</td></tr>
+    <tr><td>Nb. scanners / caisses / vitrines</td><td>entier</td><td>min. 1 vitrine Simply/Liberty</td><td>1</td></tr>
+    <tr><td>Type contrat</td><td>BUY | LEASE</td><td>Liberty &amp; Connected</td><td>BUY</td></tr>
+    <tr><td>Type agencement</td><td>Classic | Premium | Bespoke</td><td>—</td><td>Classic</td></tr>
+  </tbody>
+</table>
+
+<!-- ==================== 3 ==================== -->
+<h2 id="reco">3. Recommandation de concept (arbre de décision)</h2>
+
+<p>Appliqué <strong>avant</strong> les calculs de CA. Détermine quelle solution s’affiche en premier. <strong>Ne pas</strong> choisir purement sur le CA max.</p>
+
+<div class="tree"><span class="c">// Ordre strict – première condition vraie gagne</span>
+<span class="k">SI</span> nb_chambres ≤ 49
+    → <span class="s">SIMPLY</span>
+
+<span class="k">SINON SI</span> au moins 1 catégorie parmi
+         {Cosmetics, Kids items, Ready-to-wear, Accessories, Souvenirs}
+    → <span class="s">LIBERTY</span>
+
+<span class="k">SINON SI</span> mètres_linéaires > 4
+    → <span class="s">LIBERTY</span>
+
+<span class="k">SINON SI</span> possède_vitrine_refrigerée = true
+    → <span class="s">LIBERTY</span>
+
+<span class="k">SINON SI</span> TO_moyen &lt; 0,70
+    → <span class="s">LIBERTY</span>
+
+<span class="k">SINON</span>
+    → <span class="s">CONNECTED</span></div>
+
+<div class="note">
+  On peut recommander la 2<sup>e</sup> meilleure solution en CA si les règles structurelles l’imposent.
+  Les 3 P&amp;L restent toujours calculés et consultables.
+</div>
+
+<table>
+  <thead><tr><th>Solution</th><th>Volume projeté (parc 1 343)</th></tr></thead>
+  <tbody>
+    <tr><td><span class="tag ts">SIMPLY</span></td><td>178 (13 %)</td></tr>
+    <tr><td><span class="tag tl">LIBERTY</span></td><td>~937 (70 %)</td></tr>
+    <tr><td><span class="tag tc">CONNECTED</span></td><td>~228 (17 %)</td></tr>
+  </tbody>
+</table>
+
+<!-- ==================== 4 ==================== -->
+<h2 id="pilotes">4. Chiffres de référence pilotes (zone gauche)</h2>
+
+<p>Ces valeurs sont <strong>fixes</strong> dans le modèle Excel. Elles servent de base à la Règle 1.</p>
+
+<div class="g3">
+  <div class="cs">
+    <h4>SIMPLY</h4>
+    <ul>
+      <li>Pilotes : IBB NICE, IBB STRA</li>
+      <li>Nb ch. réf. : 129</li>
+      <li>Guests/ch : 1,7</li>
+      <li>TO : 0,80</li>
+      <li>ML réf. : <strong>6</strong></li>
+      <li>Mix F&amp;B / N-F&amp;B : <strong>0,40 / 0,60</strong></li>
+      <li>Nb ventes / mois : <strong>231</strong></li>
+      <li>CA F&amp;B HT : <strong>533 €</strong></li>
+      <li>CA N-F&amp;B HT : <strong>187 €</strong></li>
+      <li>CA total HT : 720 €</li>
+      <li>Coeff marge F&amp;B : 2,6</li>
+      <li>Coeff marge N-F&amp;B : <strong>1,45</strong></li>
+    </ul>
+  </div>
+  <div class="cl">
+    <h4>LIBERTY</h4>
+    <ul>
+      <li>Pilotes : MER BOUL, NOV MEG</li>
+      <li>Nb ch. réf. : 142</li>
+      <li>Guests/ch : 2,2</li>
+      <li>TO : 0,70</li>
+      <li>ML réf. : <strong>8</strong></li>
+      <li>Mix F&amp;B / N-F&amp;B : <strong>0,70 / 0,30</strong></li>
+      <li>Nb ventes / mois : <strong>312</strong></li>
+      <li>CA F&amp;B HT : <strong>1 055 €</strong></li>
+      <li>CA N-F&amp;B HT : <strong>424 €</strong></li>
+      <li>CA total HT : 1 479 €</li>
+      <li>Coeff marge F&amp;B : 2,6</li>
+      <li>Coeff marge N-F&amp;B : <strong>2,0</strong> (pilote) / 1,45 (simu défaut)</li>
+    </ul>
+  </div>
+  <div class="cc">
+    <h4>CONNECTED</h4>
+    <ul>
+      <li>Pilote : MER MONT (+ Tour Eiffel volume)</li>
+      <li>Nb ch. réf. : 305</li>
+      <li>Guests/ch : 1,8</li>
+      <li>TO : 0,75</li>
+      <li>ML réf. : 7 · Frigos froid réf. : <strong>3</strong></li>
+      <li>Mix F&amp;B / N-F&amp;B : <strong>0,80 / 0,20</strong></li>
+      <li>Nb ventes / mois : <strong>534</strong></li>
+      <li>CA F&amp;B HT : <strong>3 503 €</strong></li>
+      <li>CA N-F&amp;B HT : <strong>131 €</strong></li>
+      <li>CA total HT : 3 634 €</li>
+      <li>Coeff marge F&amp;B : 2,6</li>
+      <li>Coeff marge N-F&amp;B : <strong>1,8</strong> (pilote) / 1,45 (simu défaut)</li>
+    </ul>
+  </div>
+</div>
+
+<div class="note">
+  Les CA pilotes intègrent des <strong>ventes en réception</strong> non présentes dans le fichier bornes seul.
+  Ne pas recalibrer bêtement sur les ventes bornes 2023-2025.
+</div>
+
+<!-- ==================== 5 ==================== -->
+<h2 id="r1">5. Règle 1 – Clients acheteurs</h2>
+
+<div class="f">// Constantes pilote (par concept)
+nb_ventes_pilote        // 231 / 312 / 534
+clients_heberges_pilote // calculés depuis ch × guests × TO × 30.5 du pilote
+CA_FB_pilote, CA_NFB_pilote
+
+// Simulation
+clients_heberges_mois = nb_chambres × guests_per_room × TO × 30.5
+taux_acheteurs        = nb_ventes_pilote / clients_heberges_pilote
+nb_acheteurs          = clients_heberges_mois × taux_acheteurs
+
+CA_FB  = (CA_FB_pilote  / nb_ventes_pilote) × nb_acheteurs
+CA_NFB = (CA_NFB_pilote / nb_ventes_pilote) × nb_acheteurs</div>
+
+<p><strong>Équivalent :</strong> chaque acheteur génère un CA unitaire fixe dérivé du pilote.</p>
+
+<table>
+  <thead><tr><th></th><th>Simply</th><th>Liberty</th><th>Connected</th></tr></thead>
+  <tbody>
+    <tr><td>CA HT / acheteur F&amp;B</td><td>533/231 ≈ 2,31 €</td><td>1055/312 ≈ 3,38 €</td><td>3503/534 ≈ 6,56 €</td></tr>
+    <tr><td>CA HT / acheteur N-F&amp;B</td><td>187/231 ≈ 0,81 €</td><td>424/312 ≈ 1,36 €</td><td>131/534 ≈ 0,25 €</td></tr>
+  </tbody>
+</table>
+
+<!-- ==================== 6 ==================== -->
+<h2 id="r2">6. Règle 2 – Impact Mix (±10 %)</h2>
+
+<div class="f">mix_FB_ref  = 0.40 (Simply) | 0.70 (Liberty) | 0.80 (Connected)
+mix_NFB_ref = 1 − mix_FB_ref
+
+diff_FB  = mix_FB_simule − mix_FB_ref
+nb_x10   = diff_FB × 10          // peut être négatif
+
+// CA de référence pour 10% (valeurs Excel zone gauche après R1, pour 10% de mix)
+// Simply  : CA_10pct_FB ≈ 133.25 HT · CA_10pct_NFB ≈ 31.17 HT
+// Liberty : à dériver proportionnellement du CA pilote
+// Connected: CA_10pct_FB ≈ 437.875 HT · CA_10pct_NFB ≈ 65.5 HT
+
+CA_FB_add  = CA_10pct_FB  × nb_x10
+CA_NFB_add = CA_10pct_NFB × (diff_NFB × 10)   // diff_NFB = −diff_FB
+
+CA_FB_apres_R2  = CA_FB_apres_R1  + CA_FB_add
+CA_NFB_apres_R2 = CA_NFB_apres_R1 + CA_NFB_add</div>
+
+<div class="ok">
+  <strong>Implémentation fidèle recommandée :</strong><br>
+  Stocker les montants « CA pour 10 % de mix » tels qu’affichés dans l’Excel (zone gauche Règle 2),
+  plutôt que de les recalculer, pour coller au centime près.
+</div>
+
+<table>
+  <thead><tr><th>Concept</th><th>CA HT pour +10 % F&amp;B</th><th>CA HT pour +10 % N-F&amp;B</th></tr></thead>
+  <tbody>
+    <tr><td>Simply</td><td>133,25 €</td><td>31,17 €</td></tr>
+    <tr><td>Liberty</td><td>≈ 150,7 € <em>(1055×0,1/0,7)</em></td><td>≈ 141,3 € <em>(424×0,1/0,3)</em></td></tr>
+    <tr><td>Connected</td><td>437,875 €</td><td>65,50 €</td></tr>
+  </tbody>
+</table>
+
+<!-- ==================== 7 ==================== -->
+<h2 id="r3">7. Règle 3 – Catégories sélectionnées</h2>
+
+<div class="f">REGLE 3 =
+  SI catégorie cochée     → + coeff × CA_courant
+  SI catégorie non cochée → − coeff × CA_courant
+
+// Appliqué séparément sur CA_FB et CA_NFB après R2
+// Les coefficients se cumulent (additifs)</div>
+
+<table>
+  <thead><tr><th>Catégorie F&amp;B</th><th>Coeff</th><th>Catégorie N-F&amp;B</th><th>Coeff</th></tr></thead>
+  <tbody>
+    <tr><td>Drinks without alcohol</td><td><strong>0,10</strong></td><td>SOS</td><td><strong>0,08</strong></td></tr>
+    <tr><td>Drinks with alcohol</td><td>0,05</td><td>Hygiene</td><td>0,05</td></tr>
+    <tr><td>Sugary food (dry)</td><td>0,10</td><td>Cosmetics</td><td>0,03</td></tr>
+    <tr><td>Sugary food (fresh)</td><td>0,05</td><td>Kids items</td><td>0,08</td></tr>
+    <tr><td>Salty food (dry)</td><td>0,10</td><td>Ready-to-wear</td><td>0,03</td></tr>
+    <tr><td>Salty food (fresh)</td><td>0,05</td><td>Accessories</td><td>0,03</td></tr>
+    <tr><td>Gourmet food</td><td>0,03</td><td>Souvenirs</td><td>0,03</td></tr>
+    <tr><td><strong>Cumul max</strong></td><td><strong>0,48</strong></td><td><strong>Cumul max</strong></td><td><strong>0,19</strong></td></tr>
+  </tbody>
+</table>
+
+<div class="f">// Calcul du multiplicateur
+mult_FB  = 1 + Σ(±coeff_i)   // + si coché, − si non coché
+mult_NFB = 1 + Σ(±coeff_j)
+
+CA_FB_apres_R3  = CA_FB_apres_R2  × mult_FB
+CA_NFB_apres_R3 = CA_NFB_apres_R2 × mult_NFB</div>
+
+<div class="warn">
+  <strong>Cas limite Excel :</strong> si le CA après R2 est négatif, la formule « réduit la perte »
+  (le signe du coefficient s’applique toujours, ce qui peut rapprocher de zéro).
+  Implémenter le comportement additif/multiplicatif de façon cohérente et documentée.
+</div>
+
+<p>Les 5 catégories N-F&amp;B {Cosmetics, Kids, RTW, Accessories, Souvenirs} servent aussi à l’arbre de reco (cf. §3).</p>
+
+<!-- ==================== 8 ==================== -->
+<h2 id="r4">8. Règle 4 – Surface / Équipement</h2>
+
+<h3>Simply &amp; Liberty → mètres linéaires</h3>
+<div class="f">ML_ref = 6 (Simply) | 8 (Liberty)
+diff   = ML_simule − ML_ref
+
+CA_unit_FB  = CA_FB_ref_R4  / ML_ref   // CA unitaire par ML (valeurs Excel zone gauche)
+CA_unit_NFB = CA_NFB_ref_R4 / ML_ref
+
+// Simply exemples zone gauche R4 :
+//   CA_unit_FB  ≈ 88.83 HT  (pour 1 ML)
+//   CA_unit_NFB ≈ 31.17 HT
+
+SI diff &lt; 0 :
+  CA_FB  = CA_apres_R3_FB  − CA_unit_FB  × |diff|
+  CA_NFB = CA_apres_R3_NFB − CA_unit_NFB × |diff|
+SINON :
+  CA_FB  = CA_apres_R3_FB  + CA_unit_FB  × diff
+  CA_NFB = CA_apres_R3_NFB + CA_unit_NFB × diff</div>
+
+<h3>Connected → nombre de frigos</h3>
+<div class="f">Frigo_ref = 3   // frigos froid
+diff = nb_frigos_froid_simule − Frigo_ref
+
+// Même logique additive avec CA_unit dérivé du CA pilote / 3
+CA_FB  = CA_apres_R3_FB  ± (CA_unit_FB  × |diff|)
+CA_NFB = CA_apres_R3_NFB ± (CA_unit_NFB × |diff|)</div>
+
+<div class="ok">
+  Après R4 on obtient le <strong>CA final HT</strong> (F&amp;B + N-F&amp;B) qui alimente marge et coûts.
+</div>
+
+<!-- ==================== 9 ==================== -->
+<h2 id="marge">9. Marge produits mensuelle</h2>
+
+<div class="f">coeff_FB  = 2.6                    // identique pour les 3 concepts
+coeff_NFB = 1.45                   // défaut simulation
+            // (pilote Liberty = 2.0 · pilote Connected = 1.8)
+
+Marge_FB  = CA_FB  − (CA_FB  / coeff_FB)
+Marge_NFB = CA_NFB − (CA_NFB / coeff_NFB)
+// équivalent : Marge = CA × (1 − 1/coeff)
+
+Marge_produits = Marge_FB + Marge_NFB</div>
+
+<table>
+  <thead><tr><th>Concept</th><th>Coeff F&amp;B</th><th>Coeff N-F&amp;B (simu)</th><th>Marge % F&amp;B</th><th>Marge % N-F&amp;B</th></tr></thead>
+  <tbody>
+    <tr><td>Simply</td><td>2,6</td><td>1,45</td><td>61,5 %</td><td>31,0 %</td></tr>
+    <tr><td>Liberty</td><td>2,6</td><td>1,45</td><td>61,5 %</td><td>31,0 %</td></tr>
+    <tr><td>Connected</td><td>2,6</td><td>1,45</td><td>61,5 %</td><td>31,0 %</td></tr>
+  </tbody>
+</table>
+
+<p style="color:var(--m);font-size:.85rem">Ces coefficients sont des <strong>hypothèses business</strong> (PV/PR), pas des marges calculées depuis les ventes réelles.</p>
+
+<!-- ==================== 10 ==================== -->
+<h2 id="couts">10. Coûts mensuels</h2>
+
+<div class="f">Coûts_mensuels = Techno + Annexes + Agencement</div>
+
+<h3>10.1 Coûts Techno</h3>
+
+<table>
+  <thead><tr><th>Élément</th><th>Simply</th><th>Liberty</th><th>Connected</th><th>Amort.</th></tr></thead>
+  <tbody>
+    <tr><td>Équipement principal</td><td>Scanner 500 €</td><td>Caisse 15 000 € (BUY) ou −20 % / lease 250 €/mois</td><td>Frigo froid 27 000 € (lease 450 €/mois)</td><td>/ 60 mois</td></tr>
+    <tr><td>Vitrine</td><td>800 €</td><td>800 €</td><td>—</td><td>/ 60 mois</td></tr>
+    <tr><td>Frigo ambiant</td><td>—</td><td>—</td><td>24 000 € (si N-F&amp;B)</td><td>/ 60 mois</td></tr>
+    <tr><td>Licence logicielle</td><td>3 000 € → <strong>50 €/mois</strong></td><td>idem 50 €/mois</td><td>idem / inclus</td><td>mensuel</td></tr>
+    <tr><td>Frais OS (ad hoc)</td><td>1 000 €</td><td>2 000 €</td><td>3 000 €</td><td>/ 60 mois</td></tr>
+  </tbody>
+</table>
+
+<div class="f">// Mensualisation BUY
+cout_mensuel_equip = prix_achat / 60
+
+// LEASE Liberty caisse : 250 €/mois (au lieu de 15000/60 = 250 € — équivalent)
+// BUY Liberty : prix = 15000 × 0.80 = 12000 → 200 €/mois
+// LEASE Connected frigo froid : 450 €/mois</div>
+
+<h3>10.2 Coûts Annexes (électricité + personnel)</h3>
+
+<table>
+  <thead><tr><th></th><th>Simply €/mois</th><th>Liberty €/mois</th><th>Connected €/mois</th></tr></thead>
+  <tbody>
+    <tr><td>Élec. équipement principal</td><td>2 € (scanner)</td><td>10 € (caisse)</td><td>20 € (frigo froid)</td></tr>
+    <tr><td>Élec. vitrine / frigo amb.</td><td>10 €</td><td>10 €</td><td>15 €</td></tr>
+    <tr><td>Staff</td><td>3 €</td><td>10 €</td><td>10 €</td></tr>
+    <tr><td><strong>Total annexes (config 1)</strong></td><td><strong>15 €</strong></td><td><strong>30 €</strong></td><td><strong>~45 €</strong></td></tr>
+  </tbody>
+</table>
+
+<p>Les montants annexes sont proportionnels au <strong>nombre d’équipements</strong> (2 scanners = 2× élec scanner, etc.).</p>
+
+<h3>10.3 Coûts Agencement (amortis sur <strong>84 mois</strong>)</h3>
+
+<table>
+  <thead><tr><th>Type</th><th>Simply / Liberty (€ / ML)</th><th>Connected (€ / ML)</th></tr></thead>
+  <tbody>
+    <tr><td>Classic</td><td>1 000</td><td>800</td></tr>
+    <tr><td>Premium</td><td>1 200</td><td>1 000</td></tr>
+    <tr><td>Bespoke</td><td>2 200</td><td>1 600</td></tr>
+  </tbody>
+</table>
+
+<div class="f">cout_agencement_mensuel = (prix_par_ML × nb_ML) / 84</div>
+
+<!-- ==================== 11 ==================== -->
+<h2 id="nette">11. Marge nette &amp; Amortissement</h2>
+
+<div class="f">Marge_nette = Marge_produits − Coûts_mensuels_totaux
+
+SI Marge_nette &lt; 0 :
+    afficher « Not profitable »
+    // ne pas afficher un taux négatif trompeur
+SINON :
+    Taux_marge = Marge_nette / CA_HT_total
+
+// Amortissement (uniquement si Marge_nette > 0)
+cout_total_60_mois = somme des coûts one-shot amortis sur 60 mois
+                     + 60 × (licence mensuelle + annexes + agencement mensuel)
+                     // coller à la logique Excel : (coût total sur 60 mois / marge nette)
+
+Amortissement_mois = cout_total_60_mois / Marge_nette
+Amortissement_ans  = Amortissement_mois / 12</div>
+
+<div class="warn">
+  Si CA F&amp;B, CA N-F&amp;B ou total est négatif après les règles → afficher <strong>« Not profitable »</strong>
+  plutôt qu’un chiffre négatif.
+</div>
+
+<!-- ==================== 12 ==================== -->
+<h2 id="ordre">12. Ordre d’exécution exact</h2>
+
+<div class="flow">
+  <div class="st"><div class="rail"><div class="num">1</div></div><div class="bx"><span class="ti">Lire paramètres hôtel</span>chambres, guests/ch, TO, ML, mix, catégories, vitrine, frigos, équipements, contrat, agencement</div></div>
+  <div class="st"><div class="rail"><div class="num">2</div></div><div class="bx"><span class="ti">Arbre de recommandation</span>→ <code>solution_recommandee</code> ∈ {Simply, Liberty, Connected}</div></div>
+  <div class="st"><div class="rail"><div class="num">3</div></div><div class="bx"><span class="ti">Pour chaque solution S ∈ {Simply, Liberty, Connected}</span>
+    <ol>
+      <li>Règle 1 – proportionnalité clients acheteurs → CA_R1</li>
+      <li>Règle 2 – ajustement mix ±10 % → CA_R2</li>
+      <li>Règle 3 – coefficients catégories → CA_R3</li>
+      <li>Règle 4 – ML ou frigos → <strong>CA final</strong></li>
+      <li>Marge produits (coeffs 2,6 / 1,45)</li>
+      <li>Coûts Techno + Annexes + Agencement</li>
+      <li>Marge nette + Amortissement (ou « Not profitable »)</li>
+    </ol>
+  </div></div>
+  <div class="st"><div class="rail"><div class="num">4</div></div><div class="bx"><span class="ti">Affichage</span>Solution recommandée en premier · P&amp;L des 3 solutions · possibilité de forcer une autre solution · refresh immédiat à chaque changement de paramètre</div></div>
+</div>
+
+<!-- ==================== 13 ==================== -->
+<h2 id="guards">13. Garde-fous &amp; corrections (implémenter SANS les bugs)</h2>
+
+<ol>
+  <li><strong>Minimum 2 mètres linéaires</strong> — sinon message d’erreur, pas de calcul.</li>
+  <li><strong>Slider Mix F&amp;B</strong> — pas de pas imposé à 10 %. Continu 0–100 %.</li>
+  <li><strong>Tous toggles catégories OFF</strong> — forcer mix 0 % ou message d’erreur (ne pas laisser un état incohérent).</li>
+  <li><strong>Frigo froid (Connected)</strong> — n’apparaît / n’est compté que si Mix F&amp;B ≥ 10 %.</li>
+  <li><strong>Frigo ambiant</strong> — n’apparaît que si Mix N-F&amp;B ≥ 10 %.</li>
+  <li><strong>Vitrine</strong> — minimum 1 obligatoire pour Simply &amp; Liberty.</li>
+  <li><strong>Paramètre forcé par le système</strong> (pour rendre un résultat positif) → afficher en rouge <code>#DC2C3E</code>.</li>
+  <li><strong>Refresh</strong> — toute modification recalcule immédiatement reco + 3 P&amp;L.</li>
+  <li><strong>Recommandation ≠ max CA</strong> — toujours l’arbre de décision en premier.</li>
+  <li><strong>Années de référence</strong> — calibrage 2023-2025 ; 2026 hors modélisation.</li>
+  <li><strong>CA / marge négatifs</strong> → « Not profitable », pas d’affichage trompeur.</li>
+  <li><strong>VAT</strong> — CA affiché en HT pour les calculs de marge ; TTC = HT × (1+TVA) pour info (TVA soft ~5,5–10 %, non-fb 20 %).</li>
+</ol>
+
+<!-- ==================== 14 ==================== -->
+<h2 id="pseudo">14. Pseudo-code complet</h2>
+
+<div class="tree"><span class="c">// === CONSTANTES PAR CONCEPT ===</span>
+PILOT = {
+  SIMPLY: {
+    ventes: 231, CA_FB: 533, CA_NFB: 187,
+    mix_FB: 0.40, ML_ref: 6,
+    CA_10_FB: 133.25, CA_10_NFB: 31.17,
+    CA_1ML_FB: 88.83, CA_1ML_NFB: 31.17,
+    coeff_FB: 2.6, coeff_NFB: 1.45,
+    clients_heb_pilote: 5350.92   <span class="c">// 129×1.7×0.8×30.5</span>
+  },
+  LIBERTY: {
+    ventes: 312, CA_FB: 1055, CA_NFB: 424,
+    mix_FB: 0.70, ML_ref: 8,
+    coeff_FB: 2.6, coeff_NFB: 1.45,
+    <span class="c">// dériver CA_10 et CA_1ML depuis pilote</span>
+  },
+  CONNECTED: {
+    ventes: 534, CA_FB: 3503, CA_NFB: 131,
+    mix_FB: 0.80, frigo_ref: 3,
+    CA_10_FB: 437.875, CA_10_NFB: 65.5,
+    coeff_FB: 2.6, coeff_NFB: 1.45,
+  }
+}
+
+CAT_FB  = {drinks_no_alc:0.10, drinks_alc:0.05, sugary_dry:0.10,
+           sugary_fresh:0.05, salty_dry:0.10, salty_fresh:0.05, gourmet:0.03}
+CAT_NFB = {sos:0.08, hygiene:0.05, cosmetics:0.03, kids:0.08,
+           rtw:0.03, accessories:0.03, souvenirs:0.03}
+
+<span class="c">// === RECO ===</span>
+<span class="k">function</span> recommend(p):
+  <span class="k">if</span> p.rooms ≤ 49: <span class="k">return</span> SIMPLY
+  <span class="k">if</span> any premium N-FB category selected: <span class="k">return</span> LIBERTY
+  <span class="k">if</span> p.ML > 4: <span class="k">return</span> LIBERTY
+  <span class="k">if</span> p.has_fridge_display: <span class="k">return</span> LIBERTY
+  <span class="k">if</span> p.TO &lt; 0.70: <span class="k">return</span> LIBERTY
+  <span class="k">return</span> CONNECTED
+
+<span class="c">// === P&L POUR UNE SOLUTION ===</span>
+<span class="k">function</span> compute_pnl(sol, p):
+  ref = PILOT[sol]
+
+  <span class="c">// R1</span>
+  clients = p.rooms × p.guests × p.TO × 30.5
+  taux = ref.ventes / ref.clients_heb_pilote
+  acheteurs = clients × taux
+  CA_FB  = (ref.CA_FB  / ref.ventes) × acheteurs
+  CA_NFB = (ref.CA_NFB / ref.ventes) × acheteurs
+
+  <span class="c">// R2</span>
+  dFB = p.mix_FB − ref.mix_FB
+  CA_FB  += ref.CA_10_FB  × (dFB × 10)
+  CA_NFB += ref.CA_10_NFB × (−dFB × 10)
+
+  <span class="c">// R3</span>
+  mult_FB  = 1 + sum(±CAT_FB[c]  for c in categories)
+  mult_NFB = 1 + sum(±CAT_NFB[c] for c in categories)
+  CA_FB  *= mult_FB
+  CA_NFB *= mult_NFB
+
+  <span class="c">// R4</span>
+  <span class="k">if</span> sol != CONNECTED:
+    diff = p.ML − ref.ML_ref
+    CA_FB  += sign(diff) × ref.CA_1ML_FB  × abs(diff)
+    CA_NFB += sign(diff) × ref.CA_1ML_NFB × abs(diff)
+  <span class="k">else</span>:
+    diff = p.frigos_froid − ref.frigo_ref
+    <span class="c">// idem avec CA_unit frigo</span>
+
+  <span class="c">// Marge produits</span>
+  M_FB  = CA_FB  − CA_FB  / ref.coeff_FB
+  M_NFB = CA_NFB − CA_NFB / ref.coeff_NFB
+  M_prod = M_FB + M_NFB
+
+  <span class="c">// Coûts</span>
+  costs = techno(sol, p) + annexes(sol, p) + agencement(sol, p)
+
+  M_nette = M_prod − costs
+  <span class="k">if</span> M_nette &lt; 0 <span class="k">or</span> CA_FB + CA_NFB &lt; 0:
+    <span class="k">return</span> {status: "Not profitable", ...}
+
+  amort_mois = cost_over_60m(sol, p) / M_nette
+  <span class="k">return</span> {CA_FB, CA_NFB, M_prod, costs, M_nette, amort_mois, ...}
+
+<span class="c">// === ENTRY POINT ===</span>
+<span class="k">function</span> simulate(p):
+  reco = recommend(p)
+  results = {S: compute_pnl(S, p) for S in [SIMPLY, LIBERTY, CONNECTED]}
+  display(reco, results)</div>
+
+<footer>
+  ROD – Spécification simulateur fidèle · Juillet 2026<br>
+  Sources : ROD Simulateurs + détail des coûts · Paramètres &amp; règles · Ventes pilotes · Audits HTML précédents<br>
+  Objectif : implémentation 1:1 sans bugs, prête pour un modèle avancé en parallèle
+</footer>
+
+</div>
+</body>
+</html>
