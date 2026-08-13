@@ -65,6 +65,24 @@ Admin : onglets **LOO · comparaison** et **full · comparaison**.
 | [doc/sim_v2_scientific.html](doc/sim_v2_scientific.html) | Méthode sim_v2 |
 | [doc/ARCHITECTURE.md](doc/ARCHITECTURE.md) | Couches package |
 
-## Note déploiement
+## Déploiement Adixon
 
-Les évolutions locales / GitHub n’impliquent **pas** de déploiement hébergement tant qu’il n’est pas demandé explicitement.
+| | |
+|--|--|
+| Script | [`scripts/deploy_to_adixon.sh`](scripts/deploy_to_adixon.sh) |
+| Doc | [`doc/SYNC_ADIXON.md`](doc/SYNC_ADIXON.md) |
+| Cible | `adixon@178.62.220.14:/var/www/rod-ia` → https://rod-ia.adixon-dev.fr |
+| PM2 | `ecosystem.config.js` (`rod-ia-user` :8000 + redirect `/studio` :8001) |
+
+```bash
+# code + reload PM2 (usage courant)
+./scripts/deploy_to_adixon.sh
+
+# premier install / full sync
+./scripts/deploy_to_adixon.sh --all
+
+# simulation
+./scripts/deploy_to_adixon.sh --dry-run
+```
+
+**Règle :** push GitHub libre ; **déploiement Adixon uniquement** sur consigne explicite (« déploie sur Adixon »). Les évolutions locales / GitHub n’impliquent **pas** de déploiement hébergement.
