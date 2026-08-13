@@ -1304,12 +1304,15 @@ class SuperModelService:
                 if k not in merged:
                     merged[k] = v
 
-        # mix → colonnes part_natures
+        # mix → colonnes part_natures (même normalisation que restitution sim_v2)
+        from src.sim_v2.restitution import normalized_mix_name
+
         for k, v in (type_mix or {}).items():
-            col = f"type_{k.replace(' ', '_').replace('&', '_')}_part_natures"
+            col = normalized_mix_name("type", str(k))
+            # ne pas écraser une feature déjà normalisée fournie par l'API
             merged.setdefault(col, float(v))
         for k, v in (gamme_mix or {}).items():
-            col = f"gamme_{k.replace(' ', '_')}_part_natures"
+            col = normalized_mix_name("gamme", str(k))
             merged.setdefault(col, float(v))
 
         series = pd.Series({**merged, "solution": sol})
@@ -1349,7 +1352,6 @@ class SuperModelService:
             "engine": "ml",
             "model": f"ml_ca_{sol}",
             "chain": "ml_tc→ml_tc_sim_v2→ml_ca",
-            "algorithm": "xgboost_regressor",
             "target": CA_TARGET,
             "taux_conversion_predit": float(conv_pred),
             "taux_conversion_baseline": float(conv_base),

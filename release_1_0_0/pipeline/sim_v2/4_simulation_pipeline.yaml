@@ -71,6 +71,7 @@ v_sales_removed_hotel:
     SELECT
       h.hotel_code,
       COALESCE(SUM(r.QUANTITE), 0) AS nombre_ventes_retirees,
+      -- taux de conversion observé (diagnostic / ML) ; non utilisé pour la redistrib
       MAX(h.nombre_ventes) / NULLIF(MAX(h.nombre_guests), 0) AS taux_conversion
     FROM v_sales_hotel_baseline AS h
     LEFT JOIN v_sales_removed AS r ON r.HOTEL_CODE = h.hotel_code
@@ -89,6 +90,10 @@ v_sales_filtered:
       FROM v_scenario_removed_natures AS r
       WHERE r.nature = s.NATURE_PRODUIT
     )
+# Volume retiré réinjecté sur les natures *conservées*, au prorata de leur
+# poids historique **parmi les restantes** (somme des ajouts = volume retiré).
+# Ancienne formule multipliait par taux_conversion (ventes/guests ≪ 1) ce qui
+# annulait quasiment la redistribution — écart vs doc « volume non perdu ».
 v_sales_current:
   type: view
   mode: create_or_replace
@@ -97,15 +102,30 @@ v_sales_current:
   - v_sales_nature_baseline
   - v_sales_removed_hotel
   sql: |
-    WITH sales_factor AS (
+    WITH remaining_totals AS (
+      SELECT
+        f.HOTEL_CODE AS hotel_code,
+        SUM(nb.nature_nombre_ventes) AS remaining_nombre_ventes
+      FROM (
+        SELECT DISTINCT HOTEL_CODE, NATURE_PRODUIT
+        FROM v_sales_filtered
+      ) AS f
+      INNER JOIN v_sales_nature_baseline AS nb
+        ON nb.hotel_code = f.HOTEL_CODE AND nb.nature = f.NATURE_PRODUIT
+      GROUP BY f.HOTEL_CODE
+    ), sales_factor AS (
       SELECT
         f.*,
-        rh.nombre_ventes_retirees * rh.taux_conversion * nb.nature_part_nombre_ventes AS nature_nombre_ventes_ajoutees,
+        -- part de la nature dans l'assortiment restant (pas sur le total baseline)
+        rh.nombre_ventes_retirees
+          * (nb.nature_nombre_ventes / NULLIF(rt.remaining_nombre_ventes, 0))
+          AS nature_nombre_ventes_ajoutees,
         f.QUANTITE / NULLIF(nb.nature_nombre_ventes, 0) AS ligne_part_nature
       FROM v_sales_filtered AS f
       INNER JOIN v_sales_nature_baseline AS nb
         ON nb.hotel_code = f.HOTEL_CODE AND nb.nature = f.NATURE_PRODUIT
       INNER JOIN v_sales_removed_hotel AS rh ON rh.hotel_code = f.HOTEL_CODE
+      INNER JOIN remaining_totals AS rt ON rt.hotel_code = f.HOTEL_CODE
     ), sales_quantite AS (
       SELECT *, QUANTITE + nature_nombre_ventes_ajoutees * ligne_part_nature AS quantite_scenario
       FROM sales_factor

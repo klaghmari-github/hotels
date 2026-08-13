@@ -225,18 +225,21 @@ scénario_ex2   → { "CACAHUETES", "SOUPE", … }</div>
     <li>Identifier tickets des natures retirées → volume retiré.</li>
     <li>Filtrer les tickets des natures <em>conservées</em>.</li>
     <li><strong>Redistribuer</strong> le volume retiré sur les natures restantes
-      (substitution proportionnelle aux parts historiques × taux de conversion).</li>
+      (prorata des ventes historiques <em>parmi les natures conservées</em> —
+      somme des ajouts = volume retiré).</li>
     <li>Scaler CA / marges linéairement avec les quantités.</li>
     <li>Ré-agréger mix (parts type/gamme en nombre de natures) et m_lin ajusté.</li>
   </ol>
-  <div class="f">// Parts natures observées
+  <div class="f">// Parts natures observées (baseline)
 nature_part(h,n) = Σ Q(h,n) / Σ Q(h)
 
 // Volume retiré hôtel
 Q_retirees(h) = Σ Q sur natures du scénario
+Q_remaining(h) = Σ Q sur natures *conservées*
 
-// Réinjection sur nature conservée n
-Q_ajoutees(h,n) = Q_retirees(h) × taux_conversion(h) × nature_part(h,n)
+// Réinjection sur nature conservée n (prorata parmi les restantes)
+// → somme des ajouts = Q_retirees (volume non perdu)
+Q_ajoutees(h,n) = Q_retirees(h) × (Q(h,n) / Q_remaining(h))
 
 // Ligne ticket
 quantite_scenario = Q_ligne + Q_ajoutees × (Q_ligne / Q_nature)

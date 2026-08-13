@@ -482,11 +482,16 @@ nature_part_nombre_ventes(h, n) = Σ QUANTITE(h,n) / Σ QUANTITE(h)
       </p>
       <div class="formula">
 taux_conversion(h) = nombre_ventes(h) / nombre_guests(h)
+&nbsp;&nbsp;(conservé pour diagnostic / ML ; non utilisé dans la redistrib)
+
+// Parts parmi les natures *conservées* uniquement
+Q_remaining(h) = Σ QUANTITE(h,n) pour n non retirées
 
 nature_nombre_ventes_ajoutees(h, n) =
     nombre_ventes_retirees(h)
-  × taux_conversion(h)
-  × nature_part_nombre_ventes(h, n)
+  × ( nature_nombre_ventes(h, n) / Q_remaining(h) )
+
+// → Σ_n conservées nature_nombre_ventes_ajoutees = nombre_ventes_retirees
 
 ligne_part_nature = QUANTITE_ligne / nature_nombre_ventes(h, n)
 
@@ -504,10 +509,9 @@ PRIX_TTC_scenario = PRIX_TTC × quantite_scenario / QUANTITE_origine
       <div class="callout warn">
         <strong>Lecture métier.</strong>
         On suppose que les clients qui « perdaient » les natures retirées se
-        reportent sur le reste de l’assortiment selon les parts historiques,
-        avec une intensité liée au taux de conversion de l’hôtel. C’est une
-        hypothèse de <em>substitution proportionnelle</em> — simple, traçable,
-        et cohérente avec un modèle d’intensité CA / trafic / surface / mix.
+        reportent sur le reste de l’assortiment selon les parts historiques
+        <em>parmi les natures restantes</em> (substitution proportionnelle).
+        Le volume retiré n’est pas perdu : il est entièrement réinjecté.
       </div>
 
       <h3>5.5 Agrégation mensuelle et mix</h3>
@@ -690,7 +694,7 @@ CA_solution = AVG( CA_famille )  sur familles
         </div>
         <div class="mini">
           <h4>3. Substitution contrôlée</h4>
-          <p>Le volume retiré est redistribué selon les parts historiques et le taux de conversion de l’hôtel : hypothèse explicite, auditée, non arbitraire.</p>
+          <p>Le volume retiré est redistribué au prorata des ventes historiques parmi les natures restantes (volume non perdu) : hypothèse explicite, auditée, non arbitraire.</p>
         </div>
         <div class="mini">
           <h4>4. Intensité séparable</h4>
