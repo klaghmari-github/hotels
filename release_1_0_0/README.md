@@ -63,6 +63,7 @@ Admin : onglets **LOO · comparaison** et **full · comparaison**.
 | [doc/index.html](doc/index.html) | Vue d’ensemble |
 | [doc/sim_v1.html](doc/sim_v1.html) | Règles Excel R1–R4, lab interactif (pilote → cible) |
 | [doc/sim_v2.html](doc/sim_v2.html) | Pipeline scénarios → dataset → coeffs → CA (lab live) |
+| [doc/ml.html](doc/ml.html) | Chaîne ml_tc → pont → ml_ca (sans détail d’algo) |
 | [doc/roi.html](doc/roi.html) | Marge, coûts solution, amortissement, ROI |
 | [doc/reco.html](doc/reco.html) | Arbre de décision concept (éditable) |
 | [doc/analyse.html](doc/analyse.html) | Interprétation LOO / full |

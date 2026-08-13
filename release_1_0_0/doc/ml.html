@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ml — chaîne de prédiction (doc interactive)</title>
+  <style>
+    :root {
+      --ink:#152033; --muted:#5b6778; --line:#d9e1ec; --navy:#163a5f;
+      --bg:#eef2f7; --card:#fff; --a:#6d28d9; --ok:#0d9488; --warn:#b45309;
+      --simply:#1d4ed8; --liberty:#047857; --conn:#b45309;
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0; font-family:"Segoe UI",system-ui,sans-serif; color:var(--ink); line-height:1.55;
+      background:
+        radial-gradient(900px 380px at 5% 0%, #ede9fe, transparent 50%),
+        radial-gradient(800px 360px at 100% 0%, #dbeafe, transparent 45%),
+        var(--bg);
+    }
+    header { background:linear-gradient(135deg,#2e1065 0%,#5b21b6 45%,#1e3a8a 100%); color:#fff; padding:1.7rem 1.25rem; }
+    header .wrap, nav.wrap, main, footer { max-width:1080px; margin:0 auto; }
+    h1 { margin:0 0 .35rem; font-size:1.4rem; }
+    .sub { margin:0; color:#e9d5ff; font-size:.92rem; max-width:50rem; }
+    nav.wrap {
+      display:flex; flex-wrap:wrap; gap:.5rem .9rem; padding:.7rem 1.25rem;
+      background:rgba(255,255,255,.94); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:10;
+    }
+    nav a { color:#6d28d9; text-decoration:none; font-weight:650; font-size:.86rem; }
+    main { padding:1rem 1.25rem 3rem; }
+    section {
+      background:var(--card); border:1px solid var(--line); border-radius:12px;
+      padding:1.05rem 1.2rem; margin-bottom:1rem; box-shadow:0 8px 24px rgba(46,16,101,.06);
+    }
+    h2 { margin:0 0 .65rem; font-size:1.12rem; color:var(--navy); border-left:4px solid var(--a); padding-left:.55rem; }
+    h3 { margin:1rem 0 .4rem; font-size:1rem; color:#1e3a5f; }
+    .muted { color:var(--muted); font-size:.9rem; }
+    table { width:100%; border-collapse:collapse; font-size:.86rem; margin:.45rem 0; }
+    th, td { text-align:left; padding:.38rem .48rem; border-bottom:1px solid var(--line); vertical-align:top; }
+    th { color:var(--muted); background:#f8fafc; font-weight:600; }
+    code, .f { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.8rem; }
+    .f {
+      display:block; background:#0f172a; color:#c4b5fd; padding:.75rem .9rem;
+      border-radius:8px; white-space:pre-wrap; margin:.5rem 0; overflow:auto; line-height:1.45;
+    }
+    .note { background:#fffbeb; border:1px solid #fcd34d; border-radius:8px; padding:.65rem .85rem; margin:.55rem 0; font-size:.9rem; }
+    .ok { background:#ecfdf5; border:1px solid #6ee7b7; border-radius:8px; padding:.65rem .85rem; margin:.55rem 0; font-size:.9rem; }
+    .warn { background:#fef2f2; border:1px solid #fca5a5; border-radius:8px; padding:.65rem .85rem; margin:.55rem 0; font-size:.9rem; }
+    .step {
+      border-left:3px solid var(--a); padding:.55rem .8rem; margin:.5rem 0;
+      background:#faf5ff; border-radius:0 8px 8px 0;
+    }
+    .step.g2 { border-left-color:var(--ok); background:#f0fdfa; }
+    .step.g3 { border-left-color:#2563eb; background:#eff6ff; }
+    .step.g4 { border-left-color:var(--warn); background:#fffbeb; }
+    .step strong { color:var(--navy); }
+    .ex {
+      background:#f5f3ff; border:1px dashed #c4b5fd; border-radius:8px;
+      padding:.55rem .75rem; margin:.4rem 0 .2rem; font-size:.88rem;
+    }
+    .ex b { color:#5b21b6; }
+    .tag { display:inline-block; font-size:.7rem; font-weight:700; padding:.1rem .4rem; border-radius:999px; }
+    .t1 { background:#ede9fe; color:#5b21b6; }
+    .t2 { background:#d1fae5; color:#065f46; }
+    .t3 { background:#dbeafe; color:#1e40af; }
+    .t4 { background:#ffedd5; color:#9a3412; }
+    label { display:block; font-size:.8rem; color:var(--muted); margin:.35rem 0 .12rem; }
+    input[type=number], select {
+      width:100%; max-width:100%; padding:.4rem .5rem; border:1px solid var(--line);
+      border-radius:6px; font-size:.9rem; background:#fff;
+    }
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+    @media(max-width:900px){ .grid2 { grid-template-columns:1fr; } }
+    .panel { background:#f8fafc; border:1px solid var(--line); border-radius:10px; padding:.75rem .9rem; }
+    .btnrow { display:flex; flex-wrap:wrap; gap:.45rem; margin:.55rem 0; }
+    button {
+      border:none; border-radius:7px; padding:.48rem .8rem; font-weight:600; font-size:.86rem; cursor:pointer;
+    }
+    .btn-primary { background:var(--a); color:#fff; }
+    .btn-sec { background:#e2e8f0; color:#1e293b; }
+    .kpi { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:.5rem; margin:.6rem 0; }
+    .kpi div { background:#f5f3ff; border:1px solid #ddd6fe; border-radius:8px; padding:.55rem .65rem; }
+    .kpi .v { font-weight:800; color:var(--navy); font-size:1.02rem; }
+    .kpi .l { font-size:.75rem; color:var(--muted); }
+    .flow-num {
+      display:inline-flex; width:1.6rem; height:1.6rem; border-radius:50%;
+      background:var(--a); color:#fff; font-weight:800; font-size:.8rem;
+      align-items:center; justify-content:center; margin-right:.35rem;
+    }
+    .schema {
+      background:#0b1220; color:#cbd5e1; border-radius:12px; padding:1rem 1.1rem;
+      font-family:ui-monospace,Menlo,monospace; font-size:.78rem; line-height:1.4;
+      white-space:pre; overflow-x:auto; margin:.6rem 0;
+    }
+    .sol-s { color:var(--simply); font-weight:700; }
+    .sol-l { color:var(--liberty); font-weight:700; }
+    .sol-c { color:var(--conn); font-weight:700; }
+    footer { padding:0 1.25rem 2rem; color:var(--muted); font-size:.82rem; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>ml — chaîne de prédiction par solution</h1>
+    <p class="sub">
+      Documentation des étapes du moteur <strong>ml</strong> : dataset enrichi,
+      modèle de taux de conversion, pont avec le simulateur de règles (sim_v2),
+      puis modèle de chiffre d’affaires. Sans détail d’algorithme d’apprentissage —
+      seul le rôle métier de chaque brique compte.
+    </p>
+  </div>
+</header>
+<nav class="wrap">
+  <a href="index.html">Index</a>
+  <a href="sim_v1.html">sim_v1</a>
+  <a href="sim_v2.html">sim_v2</a>
+  <a href="#why">Pourquoi</a>
+  <a href="#chain">Chaîne</a>
+  <a href="#s1">1·Dataset</a>
+  <a href="#s2">2·Features</a>
+  <a href="#s3">3·ml_tc</a>
+  <a href="#s4">4·Pont</a>
+  <a href="#s5">5·ml_ca</a>
+  <a href="#s6">6·Prédiction</a>
+  <a href="#eval">Éval</a>
+  <a href="#lab">Lab</a>
+  <a href="roi.html">ROI</a>
+</nav>
+<main>
+
+<section id="why">
+  <h2><span class="flow-num">0</span> Objectif du moteur ml</h2>
+  <p>
+    <strong>sim_v2</strong> estime déjà un CA à partir de règles (guests × m_lin × mix × coefficients).
+    Le moteur <strong>ml</strong> complète cette vision en apprenant, sur les hôtels pilotes
+    (observations + scénarios simulés), une correction qui tient compte du
+    <em>contexte</em> de l’hôtel (proximité, météo, marque, structure, etc.).
+  </p>
+  <div class="ok">
+    <strong>Principe.</strong> On ne prédit pas le CA « en une seule boîte noire » à partir des seuls leviers.
+    On enchaîne :
+    <ol style="margin:.4rem 0 0 1.1rem;padding:0">
+      <li>apprendre le <strong>taux de conversion</strong> (ventes / guests) ;</li>
+      <li>recaler le CA sim_v2 avec ce taux ;</li>
+      <li>apprendre le <strong>CA final</strong> à partir du contexte + ce pont.</li>
+    </ol>
+    La décision métier du moteur « ml » est la sortie de l’étape 3 (CA final), par solution.
+  </div>
+  <div class="warn">
+    <strong>Pourquoi trois étapes ?</strong>
+    Un ML qui ne prédit que le taux de conversion puis scale sim_v2 échoue souvent :
+    le TC prédit n’est pas forcément le TC « compatible » qui redonnerait le bon CA.
+    L’étape CA apprend la <em>correction résiduelle</em> entre le pont sim_v2×TC et la réalité.
+  </div>
+</section>
+
+<section id="chain">
+  <h2>Vue d’ensemble de la chaîne</h2>
+  <div class="schema">┌─────────────────────┐
+│ Dataset riche       │  pivot sim_v2 (obs+sim) + contexte hôtel
+│ (par solution)      │  + CA sim_v2 « brut » recalculé
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│ Étape A · ml_tc     │  ML → taux de conversion
+│                     │  features = leviers + mix + contexte + sim_v2_brut
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│ Étape B · pont      │  (pas un modèle)
+│ ml_tc_sim_v2        │  CA_sim_v2 × (TC_prédit / TC_baseline_solution)
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│ Étape C · ml_ca     │  ML → CA mensuel final
+│                     │  features = celles de A + colonnes du pont B
+└──────────┬──────────┘
+           │
+           ▼
+     CA / solution  →  ROI / reco (modules communs)</div>
+  <p class="muted">
+    Un couple de modèles (ml_tc + ml_ca) est entraîné <strong>par solution</strong>
+    (simply / liberty / connected). Les fichiers sont stockés sous
+    <code>models/super/{solution}/</code>.
+  </p>
+</section>
+
+<section id="s1">
+  <h2><span class="flow-num">1</span> Construction du dataset d’apprentissage</h2>
+  <p><strong>Traitement.</strong> On part du même nuage que sim_v2 :
+    chaque ligne = un <strong>hôtel × scénario</strong> (observation ou simulation de retrait de natures).
+    On joint le contexte hôtel et on recalcule le taux de conversion ligne à ligne.</p>
+  <div class="f">taux_conversion = nombre_ventes_par_mois / nombre_guests_par_mois
+// recalculé pour obs ET sim (un scénario allégé a souvent un TC différent)
+
+// Exclusions dataset ML (ex.)
+hotel_code ∉ { H5586, H6188 }</div>
+  <table>
+    <tr><th>Bloc</th><th>Contenu</th><th>Rôle</th></tr>
+    <tr><td>Identité</td><td>hotel_code, solution, scenario_id, is_observation</td><td>Groupes LOO, filtre solution</td></tr>
+    <tr><td>Leviers</td><td>chambres, TO, guests/ch, m_lin, guests/mois</td><td>Trafic / surface</td></tr>
+    <tr><td>Mix</td><td>type_* / gamme_*_part_natures</td><td>Structure assortiment</td></tr>
+    <tr><td>Cibles</td><td>taux_conversion, montant_ventes_par_mois, marges</td><td>Apprentissage</td></tr>
+    <tr><td>Contexte</td><td>proximité (px_), météo (wx_), hôtel (hd_), fériés (hol_), marque (br_)</td><td>Signaux hors rules-only</td></tr>
+    <tr><td>sim_v2_brut</td><td>CA / marges restitution pure</td><td>Ancrage règles métier</td></tr>
+  </table>
+  <div class="ex">
+    <b>Exemple.</b> Ligne H2075 · scénario vide · simply :<br>
+    guests/mois ≈ 4 816 · ventes/mois ≈ 164 · TC ≈ 3,4 % · CA réel ≈ 570 €.<br>
+    La même ligne enrichie reçoit un CA sim_v2_brut (restitution) et des features px_/wx_/br_ de l’hôtel.
+  </div>
+  <p class="muted">Sources code : <code>pipeline/ml/8_ml_dataset_pipeline.yaml</code>,
+    <code>9_rich_dataset_pipeline.yaml</code>, <code>SuperModelService.load_dataset</code>.</p>
+</section>
+
+<section id="s2">
+  <h2><span class="flow-num">2</span> Features autorisées (et fuites interdites)</h2>
+  <p><strong>Traitement.</strong> On construit un vecteur de variables numériques par ligne,
+    sans jamais donner au modèle les cibles qu’il doit prédire.</p>
+  <div class="f">// Inclus (descriptif + ancrage)
+CONTEXT : chambres, TO, guests/ch, m_lin
+MIX     : parts type / gamme
+sim_v2_brut__*  : CA et marges restitution sim_v2 pure
+px_*, wx_*, hd_*, hol_*, br_*  : contexte
+
+// Interdit (fuites)
+montant_ventes_par_mois   // cible CA
+montant_marge_*           // cibles marge
+nombre_ventes_par_mois    // fuite du TC
+taux_conversion           // cible ml_tc
+scenario_id, hotel_code   // identifiants</div>
+  <div class="note">
+    <strong>ml_ca</strong> réutilise les features de ml_tc et y ajoute uniquement
+    les sorties du pont <code>ml_tc_sim_v2__*</code> (étape 4) — pas le CA réel.
+  </div>
+</section>
+
+<section id="s3">
+  <h2><span class="flow-num">3</span> Étape A — ml_tc (taux de conversion)</h2>
+  <p><strong>Traitement.</strong> Pour chaque solution, un modèle ML apprend à prédire
+    le taux de conversion à partir des features descriptives + sim_v2_brut.</p>
+  <div class="f">// Cible
+y = taux_conversion ∈ [0, 1]
+
+// Sortie
+TC_prédit = clamp( modèle_ml_tc(features) , 0, 1 )</div>
+  <div class="step">
+    <span class="tag t1">ml_tc</span>
+    <strong>Rôle métier</strong> — « À quel rythme les clients hébergés achètent-ils ? »
+    en tenant compte du contexte (pas seulement du profil pilote Excel).
+  </div>
+  <div class="ex">
+    <b>Exemple conceptuel Simply.</b><br>
+    TC baseline solution (moyenne obs) ≈ 0,034 · TC prédit pour une cible « centre-ville dense »
+    pourrait monter à 0,045 → le pont (étape 4) gonflera le CA sim_v2 d’un facteur 0,045/0,034 ≈ 1,32.
+  </div>
+</section>
+
+<section id="s4">
+  <h2><span class="flow-num">4</span> Étape B — pont ml_tc_sim_v2 (sans modèle)</h2>
+  <p><strong>Traitement.</strong> On ne réentraîne rien : on applique le TC prédit
+    sur le CA déjà fourni par la restitution sim_v2.</p>
+  <div class="f">// Baseline = TC moyen observé de la solution (scénarios vides)
+TC_baseline(solution)
+
+// Pont
+ml_tc_sim_v2 = sim_v2_brut × ( TC_prédit / TC_baseline )
+
+// Lecture
+« CA qu’aurait donné sim_v2 si on forçait le TC de ml_tc »</div>
+  <div class="step g2">
+    <span class="tag t2">pont</span>
+    <strong>Rôle métier</strong> — garder l’ancrage des règles sim_v2 tout en
+    injectant l’information de conversion apprise par le ML.
+  </div>
+  <div class="ex">
+    <b>Exemple numérique.</b><br>
+    sim_v2_brut = 800 € · TC_prédit = 0,040 · TC_baseline = 0,032<br>
+    ml_tc_sim_v2 = 800 × (0,040 / 0,032) = <strong>1 000 €</strong>
+  </div>
+  <p class="muted">Même scaling pour les marges si présentes dans les colonnes sim_v2_brut.</p>
+</section>
+
+<section id="s5">
+  <h2><span class="flow-num">5</span> Étape C — ml_ca (CA final)</h2>
+  <p><strong>Traitement.</strong> Un second modèle ML, toujours par solution, prédit
+    le montant des ventes mensuel. Il voit le contexte + le pont de l’étape B.</p>
+  <div class="f">// Cible
+y = montant_ventes_par_mois
+
+// Features = features de ml_tc  ∪  { ml_tc_sim_v2__* }
+
+// Sortie (moteur ml)
+CA_ml = max( 0, modèle_ml_ca(features) )</div>
+  <div class="step g3">
+    <span class="tag t3">ml_ca</span>
+    <strong>Rôle métier</strong> — correction résiduelle : le modèle apprend à
+    coller au CA réel quand le pont seul ne suffit pas (effets marque, météo,
+    proximité, non-linéarités, etc.).
+  </div>
+  <div class="ex">
+    <b>Exemple.</b> Pont = 1 000 € · CA réel d’un pilote similaire = 1 150 €.<br>
+    ml_ca peut sortir ≈ 1 120 € en combinant le pont et les features de contexte.
+  </div>
+</section>
+
+<section id="s6">
+  <h2><span class="flow-num">6</span> Prédiction pour un hôtel cible (runtime)</h2>
+  <p><strong>Traitement.</strong> Même enchaînement qu’à l’entraînement, pour chaque solution :</p>
+  <ol>
+    <li>Assembler les leviers cibles + mix + features contexte (si hôtel connu) ;</li>
+    <li>Calculer <code>sim_v2_brut</code> (restitution pure, même formule que sim_v2) ;</li>
+    <li><span class="tag t1">ml_tc</span> → TC_prédit ;</li>
+    <li><span class="tag t2">pont</span> → ml_tc_sim_v2 ;</li>
+    <li><span class="tag t3">ml_ca</span> → CA final (sortie moteur ml) ;</li>
+    <li>Enrichissement ROI / reco (modules communs, hors ML).</li>
+  </ol>
+  <div class="f">// Pseudo-code runtime (par solution)
+features₀ = leviers + mix + contexte
+sim_v2_brut = restitution(features₀)
+TC = ml_tc(features₀ + sim_v2_brut)
+pont = sim_v2_brut × (TC / TC_baseline)
+CA  = ml_ca(features₀ + sim_v2_brut + pont)</div>
+  <div class="ok">
+    Les entrées utilisateur exploitables par ml sont celles de sim_v2
+    (chambres, TO, guests, m_lin, mix type/gammes) + éventuellement le code hôtel
+    pour charger le contexte (proximité, météo, marque…).
+  </div>
+</section>
+
+<section id="eval">
+  <h2><span class="flow-num">7</span> Évaluations LOO et full</h2>
+  <table>
+    <tr><th>Mode</th><th>Train</th><th>Test</th><th>Usage</th></tr>
+    <tr>
+      <td><strong>LOO</strong></td>
+      <td>Tous les hôtels de la solution sauf le cas exclu (si n ≥ 2)</td>
+      <td>Hôtel exclu (obs)</td>
+      <td>Mesure de généralisation « vrai » leave-one-out</td>
+    </tr>
+    <tr>
+      <td><strong>full</strong></td>
+      <td>Tous les pilotes (obs + sim selon config)</td>
+      <td>Même base (in-sample)</td>
+      <td>Potentiel du modèle sans exclusion</td>
+    </tr>
+  </table>
+  <div class="note">
+    Si une solution n’a qu’un seul hôtel pilote, le LOO ne peut pas exclure ce cas
+    sans vider le train : l’évaluation est alors <em>biaisée</em> (signalé côté admin).
+  </div>
+  <p class="muted">Exports : <code>data/files/output/ml/eval_*_loo.xlsx</code>,
+    comparaison multi-moteurs dans l’admin.</p>
+</section>
+
+<section id="lab">
+  <h2>Lab pédagogique — enchaînement des 3 étapes</h2>
+  <p class="muted">
+    Ce lab ne charge pas les modèles entraînés du disque : il <strong>illustre
+    numériquement</strong> la chaîne (TC → pont → CA) avec des valeurs éditables.
+    Pour le CA final « réel » du produit, utiliser l’UI / l’API qui lit
+    <code>models/super/</code>.
+  </p>
+
+  <div class="btnrow">
+    <button type="button" class="btn-primary" id="btnEx">Exemple Simply</button>
+    <button type="button" class="btn-sec" id="btnReset">Réinit.</button>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h3>Entrées (leviers + pont)</h3>
+      <label>Solution (baseline TC)</label>
+      <select id="sol">
+        <option value="simply">simply</option>
+        <option value="liberty">liberty</option>
+        <option value="connected">connected</option>
+      </select>
+      <label>CA sim_v2 brut (€ / mois)</label>
+      <input type="number" id="simv2" value="800" step="10"/>
+      <label>TC baseline solution (observé moyen)</label>
+      <input type="number" id="tcBase" value="0.034" step="0.001" min="0" max="1"/>
+      <label>TC prédit par ml_tc (éditable pour simuler le modèle)</label>
+      <input type="number" id="tcPred" value="0.040" step="0.001" min="0" max="1"/>
+      <label>Correction résiduelle ml_ca (facteur × pont)</label>
+      <input type="number" id="resid" value="1.08" step="0.01" min="0"/>
+      <p class="muted">Facteur 1,0 = ml_ca suit le pont ; &gt;1 = boost contexte ; &lt;1 = frein.</p>
+    </div>
+    <div class="panel">
+      <h3>Leviers (contexte d’affichage)</h3>
+      <label>Nb. chambres</label>
+      <input type="number" id="chambres" value="100" step="1"/>
+      <label>TO</label>
+      <input type="number" id="to" value="0.70" step="0.01"/>
+      <label>Guests / chambre</label>
+      <input type="number" id="guests" value="1.7" step="0.1"/>
+      <label>m_lin</label>
+      <input type="number" id="mlin" value="4" step="0.5"/>
+      <p class="muted" id="guestsOut"></p>
+    </div>
+  </div>
+
+  <div class="kpi" id="kpi"></div>
+  <div id="steps"></div>
+</section>
+
+<section id="refs">
+  <h2>Références code (sans détail d’algo)</h2>
+  <table>
+    <tr><th>Rôle</th><th>Emplacement</th></tr>
+    <tr><td>Orchestration chaîne</td><td><code>src/ml/super_model.py</code> — SuperModelService</td></tr>
+    <tr><td>Dataset / features</td><td><code>src/ml/common.py</code>, <code>pipeline/ml/*.yaml</code></td></tr>
+    <tr><td>Artefacts</td><td><code>models/super/{simply,liberty,connected}/</code></td></tr>
+    <tr><td>CLI</td><td><code>python run.py ml --rebuild</code></td></tr>
+    <tr><td>Amont sim_v2</td><td><a href="sim_v2.html">sim_v2.html</a></td></tr>
+    <tr><td>Aval ROI</td><td><a href="roi.html">roi.html</a></td></tr>
+  </table>
+</section>
+
+</main>
+<footer>
+  Doc ml release 1.0.0 — étapes métier de la chaîne de prédiction (algorithme d’apprentissage non détaillé).
+</footer>
+
+<script>
+const BASELINE = { simply: 0.034, liberty: 0.023, connected: 0.090 };
+const $ = id => document.getElementById(id);
+const fmt = (x, d=2) => !isFinite(x) ? "—" :
+  x.toLocaleString("fr-FR", { maximumFractionDigits:d, minimumFractionDigits:0 });
+
+function calc() {
+  let to = parseFloat($("to").value) || 0;
+  if (to > 1.5) to = to / 100;
+  const ch = Math.max(parseFloat($("chambres").value) || 0, 0);
+  const g = Math.max(parseFloat($("guests").value) || 0, 0);
+  const mlin = Math.max(parseFloat($("mlin").value) || 0, 0);
+  const guests = ch * to * g * 30.5;
+  $("guestsOut").textContent = `guests/mois = ${fmt(guests,1)} · m_lin = ${fmt(mlin,1)}`;
+
+  const sol = $("sol").value;
+  const simv2 = Math.max(parseFloat($("simv2").value) || 0, 0);
+  let tcBase = Math.max(parseFloat($("tcBase").value) || 0, 1e-9);
+  let tcPred = Math.max(parseFloat($("tcPred").value) || 0, 0);
+  tcPred = Math.min(tcPred, 1);
+  const resid = Math.max(parseFloat($("resid").value) || 0, 0);
+
+  const factor = tcPred / tcBase;
+  const pont = simv2 * factor;
+  const ca = Math.max(0, pont * resid);
+
+  $("kpi").innerHTML = `
+    <div><div class="l">sim_v2 brut</div><div class="v">${fmt(simv2)} €</div></div>
+    <div><div class="l">TC prédit / baseline</div><div class="v">${fmt(tcPred,4)} / ${fmt(tcBase,4)}</div></div>
+    <div><div class="l">Facteur TC</div><div class="v">× ${fmt(factor,3)}</div></div>
+    <div><div class="l">Pont ml_tc_sim_v2</div><div class="v">${fmt(pont)} €</div></div>
+    <div><div class="l">CA ml (final)</div><div class="v">${fmt(ca)} €</div></div>
+    <div><div class="l">CA annuel</div><div class="v">${fmt(ca*12)} €</div></div>
+  `;
+
+  $("steps").innerHTML = `
+    <div class="step"><span class="tag t1">A</span> <strong>ml_tc</strong> — taux de conversion prédit<br>
+      TC_prédit = <strong>${fmt(tcPred,4)}</strong> (ici saisi pour simuler le modèle ;
+      en prod : sortie de ml_tc sur features + sim_v2_brut)<br>
+      TC_baseline(${sol}) = <strong>${fmt(tcBase,4)}</strong></div>
+    <div class="step g2"><span class="tag t2">B</span> <strong>Pont</strong> — pas de modèle<br>
+      ml_tc_sim_v2 = ${fmt(simv2)} × (${fmt(tcPred,4)} / ${fmt(tcBase,4)})
+      = ${fmt(simv2)} × ${fmt(factor,3)} = <strong>${fmt(pont)} € / mois</strong></div>
+    <div class="step g3"><span class="tag t3">C</span> <strong>ml_ca</strong> — CA final<br>
+      CA = pont × correction_contexte = ${fmt(pont)} × ${fmt(resid,3)}
+      = <strong>${fmt(ca)} € / mois</strong> · <strong>${fmt(ca*12)} € / an</strong><br>
+      <span class="muted">En prod la correction est apprise (non un simple facteur fixe).</span></div>
+    <div class="step g4"><span class="tag t4">D</span> <strong>Aval</strong> — hors ML<br>
+      Marge produit + coûts solution → ROI (<a href="roi.html">roi.html</a>) ;
+      comparaison multi-solutions → reco.</div>
+  `;
+}
+
+$("sol").addEventListener("change", () => {
+  $("tcBase").value = BASELINE[$("sol").value];
+  calc();
+});
+$("btnEx").addEventListener("click", () => {
+  $("sol").value = "simply";
+  $("tcBase").value = BASELINE.simply;
+  $("simv2").value = 800;
+  $("tcPred").value = 0.040;
+  $("resid").value = 1.08;
+  $("chambres").value = 100;
+  $("to").value = 0.70;
+  $("guests").value = 1.7;
+  $("mlin").value = 4;
+  calc();
+});
+$("btnReset").addEventListener("click", () => {
+  $("sol").value = "liberty";
+  $("tcBase").value = BASELINE.liberty;
+  $("simv2").value = 1200;
+  $("tcPred").value = 0.025;
+  $("resid").value = 1.0;
+  $("chambres").value = 200;
+  $("to").value = 0.70;
+  $("guests").value = 1.8;
+  $("mlin").value = 6;
+  calc();
+});
+["simv2","tcBase","tcPred","resid","chambres","to","guests","mlin"].forEach(id =>
+  $(id).addEventListener("input", calc)
+);
+calc();
+</script>
+</body>
+</html>
