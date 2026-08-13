@@ -8,11 +8,9 @@ CLI haut niveau release 1.0.0 — appelle les services, n'implemente pas la logi
   python run.py sim-v1 --rebuild
   python run.py sim-v2 --rebuild
   python run.py sim-v2-build          # modelisation complete (scenarios + simulation)
-  python run.py ml --rebuild          # chaîne ml_tc → ml_tc_sim_v2 → ml_ca (GUI ml)
-  python run.py ml1 --rebuild         # legacy XGB multi-cibles CA (debug)
-  python run.py ml2 --rebuild         # legacy XGB multi-cibles CA rich (debug)
-  python run.py ml-xgb --rebuild      # legacy alias ml2/xgb
+  python run.py ml --rebuild          # chaîne ml_tc → ml_tc_sim_v2 → ml_ca
   python run.py ml-super --rebuild    # alias ml
+  python run.py eval-full             # eval in-sample (pas LOO)
   python run.py all --rebuild
 """
 
@@ -188,41 +186,21 @@ def cmd_ml(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_ml_xgb(args: argparse.Namespace) -> int:
-    from src.ml.xgboost_model import XGBoostService
-
-    _log()
-    result = XGBoostService(Paths(ROOT), variant="xgboost").run_full()
-    print(result["metrics"].to_string(index=False))
-    print(f"XGBoost LOO → {result['excel']}")
-    return 0
-
-
-def cmd_ml1(args: argparse.Namespace) -> int:
-    """XGBoost sur liste de simulations sim_v2 uniquement."""
-    from src.ml.xgboost_model import XGBoostService
-
-    _log()
-    result = XGBoostService(Paths(ROOT), variant="ml1").run_full()
-    print(result["metrics"].to_string(index=False))
-    print(f"ml1 LOO → {result['excel']} (source={result.get('source')})")
-    return 0
-
-
-def cmd_ml2(args: argparse.Namespace) -> int:
-    """XGBoost sim_v2 + rich (proximite, weather moyenne, hotel) + brand."""
-    from src.ml.xgboost_model import XGBoostService
-
-    _log()
-    result = XGBoostService(Paths(ROOT), variant="ml2").run_full()
-    print(result["metrics"].to_string(index=False))
-    print(f"ml2 LOO → {result['excel']} (source={result.get('source')})")
-    return 0
-
-
 def cmd_ml_super(args: argparse.Namespace) -> int:
-    """Alias de cmd_ml (chaîne ml_tc → ml_tc_sim_v2 → ml_ca)."""
+    """Alias de cmd_ml."""
     return cmd_ml(args)
+
+
+def cmd_eval_full(args: argparse.Namespace) -> int:
+    """Évaluation full-train (in-sample) sim_v1 / sim_v2 / ml — pas de LOO."""
+    from src.eval.full_train import FullTrainEvalService
+
+    _log()
+    paths = Paths(ROOT)
+    out = FullTrainEvalService(paths).export_all()
+    for k, p in out.items():
+        print(f"eval full {k} → {p}")
+    return 0
 
 
 def cmd_all(args: argparse.Namespace) -> int:
@@ -233,21 +211,9 @@ def cmd_all(args: argparse.Namespace) -> int:
         print(f"sim_v2 skip/erreur : {exc}")
     cmd_ml(args)
     try:
-        cmd_ml1(args)
+        cmd_eval_full(args)
     except Exception as exc:  # noqa: BLE001
-        print(f"ml1 skip/erreur : {exc}")
-    try:
-        cmd_ml2(args)
-    except Exception as exc:  # noqa: BLE001
-        print(f"ml2 skip/erreur : {exc}")
-    try:
-        cmd_ml_xgb(args)
-    except Exception as exc:  # noqa: BLE001
-        print(f"ml-xgb skip/erreur : {exc}")
-    try:
-        cmd_ml_super(args)
-    except Exception as exc:  # noqa: BLE001
-        print(f"ml-super skip/erreur : {exc}")
+        print(f"eval-full skip/erreur : {exc}")
     return 0
 
 
@@ -280,10 +246,8 @@ def main(argv: list[str] | None = None) -> int:
         ("sim-v1", cmd_sim_v1),
         ("sim-v2", cmd_sim_v2),
         ("ml", cmd_ml),
-        ("ml1", cmd_ml1),
-        ("ml2", cmd_ml2),
-        ("ml-xgb", cmd_ml_xgb),
         ("ml-super", cmd_ml_super),
+        ("eval-full", cmd_eval_full),
         ("all", cmd_all),
     ):
         p = sub.add_parser(name)

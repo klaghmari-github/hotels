@@ -1,11 +1,5 @@
-from .catboost_model import CatBoostService
-from .super_model import SuperModelService
-from .xgboost_model import ML1Service, ML2Service, XGBoostService
+"""Moteur ML actif : SuperModelService (conversion + CA par solution)."""
 
-__all__ = [
-    "CatBoostService",
-    "XGBoostService",
-    "ML1Service",
-    "ML2Service",
-    "SuperModelService",
-]
+from .super_model import SuperModelService
+
+__all__ = ["SuperModelService"]

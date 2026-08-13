@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Analyse des évaluations — Accor ROD 1.0.0</title>
+  <style>
+    :root { --ink:#1c2430; --muted:#5a6675; --line:#d5dde6; --navy:#1a3a5c; --bg:#f4f6f8; --ok:#1a7f4b; --warn:#b45309; }
+    body { margin:0; font-family:"Segoe UI",system-ui,sans-serif; background:var(--bg); color:var(--ink); line-height:1.55; }
+    header { background:linear-gradient(135deg,#142b45,#245c8f); color:#fff; padding:2rem 1.5rem; }
+    header, main, nav { max-width:960px; margin:0 auto; }
+    nav { display:flex; flex-wrap:wrap; gap:.6rem 1rem; padding:.85rem 1.25rem; background:#fff; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:2; }
+    nav a { color:#2a6fad; text-decoration:none; font-weight:600; font-size:.9rem; }
+    main { padding:1.25rem 1.25rem 3rem; }
+    section { background:#fff; border:1px solid var(--line); border-radius:10px; padding:1.1rem 1.25rem; margin-bottom:1rem; }
+    h1 { margin:0 0 .4rem; font-size:1.4rem; }
+    h2 { margin:0 0 .55rem; font-size:1.08rem; color:var(--navy); }
+    h3 { margin:1rem 0 .4rem; font-size:.98rem; color:var(--navy); }
+    p, li { font-size:.95rem; }
+    .muted { color:var(--muted); }
+    table { width:100%; border-collapse:collapse; font-size:.88rem; margin:.5rem 0 1rem; }
+    th, td { text-align:left; padding:.4rem .5rem; border-bottom:1px solid var(--line); }
+    th { color:var(--muted); font-size:.75rem; text-transform:uppercase; }
+    .num { text-align:right; font-variant-numeric:tabular-nums; }
+    .best { font-weight:700; color:var(--ok); }
+    .tag { display:inline-block; padding:.1rem .4rem; border-radius:6px; background:#e8eef5; font-size:.8rem; font-weight:700; }
+    code { background:#eef2f6; padding:.1rem .35rem; border-radius:4px; font-size:.85rem; }
+    .callout { border-left:3px solid #245c8f; background:#f0f5fa; padding:.7rem .9rem; margin:.7rem 0; border-radius:0 8px 8px 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Analyse des résultats de simulation</h1>
+      <p class="muted" style="color:#dbe7f5;margin:0">
+        Interprétation LOO vs full — sim_v1 · sim_v2 · ml (données pilotes, €/mois)
+      </p>
+    </div>
+  </header>
+  <nav>
+    <a href="index.html">Doc globale</a>
+    <a href="#methodes">Méthodes</a>
+    <a href="#loo">LOO</a>
+    <a href="#full">full</a>
+    <a href="#lecture">Lecture</a>
+  </nav>
+  <main>
+
+  <section id="methodes">
+    <h2>1. Deux stratégies d’évaluation</h2>
+    <table>
+      <tr><th>Mode</th><th>Apprentissage</th><th>Test</th><th>But</th></tr>
+      <tr>
+        <td><strong>LOO</strong></td>
+        <td>Sans l’hôtel testé (si ≥2 hôtels / solution ; sinon biaisé)</td>
+        <td>Observation pilote</td>
+        <td>Généralisation hors échantillon (réaliste sur Connected)</td>
+      </tr>
+      <tr>
+        <td><strong>full</strong></td>
+        <td>Tous les pilotes de la solution (v2/ml : obs + scénarios simulés)</td>
+        <td>Mêmes observations pilotes</td>
+        <td>Comportement in-sample, plafond de performance</td>
+      </tr>
+    </table>
+    <p class="muted">
+      Fichiers : <code>eval_*_loo.xlsx</code> · <code>eval_*_full.xlsx</code> ·
+      <code>data/files/output/common/eval_full_compare.xlsx</code>
+    </p>
+  </section>
+
+  <section id="loo">
+    <h2>2. Leave-one-out — résultats &amp; interprétation</h2>
+    <p>MAE CA globale (5 hôtels) :</p>
+    <table>
+      <tr><th>Moteur</th><th class="num">MAE CA €/mois</th><th>Lecture</th></tr>
+      <tr><td>sim_v2</td><td class="num best">~2 415</td><td>Meilleur global LOO</td></tr>
+      <tr><td>sim_v1</td><td class="num">~2 516</td><td>Proche de v2, règles Excel</td></tr>
+      <tr><td>ml</td><td class="num">~4 467</td><td>Plus d’erreur hors échantillon (surtout Connected)</td></tr>
+    </table>
+
+    <h3>Par hôtel (LOO)</h3>
+    <table>
+      <tr>
+        <th>Hôtel</th><th>Solution</th>
+        <th class="num">|err| v1</th><th class="num">|err| v2</th><th class="num">|err| ml</th>
+        <th>Meilleur</th>
+      </tr>
+      <tr><td>H0373</td><td>connected</td><td class="num best">5 967</td><td class="num">8 132</td><td class="num">7 810</td><td><span class="tag">sim_v1</span></td></tr>
+      <tr><td>H3546</td><td>connected</td><td class="num">4 195</td><td class="num best">3 227</td><td class="num">14 308</td><td><span class="tag">sim_v2</span></td></tr>
+      <tr><td>HB6A3</td><td>connected</td><td class="num">1 510</td><td class="num">432</td><td class="num best">218</td><td><span class="tag">ml</span></td></tr>
+      <tr><td>HB5I0</td><td>liberty</td><td class="num">670</td><td class="num">214</td><td class="num best">2</td><td><span class="tag">ml</span> (biaisé)</td></tr>
+      <tr><td>H2075</td><td>simply</td><td class="num">239</td><td class="num">68</td><td class="num best">0</td><td><span class="tag">ml</span> (biaisé)</td></tr>
+    </table>
+
+    <div class="callout">
+      <strong>Pourquoi sim_v1 gagne parfois (ex. H0373) ?</strong>
+      Les règles R1–R4 ancrent le CA sur des références pilote / pairs.
+      Sur un hôtel atypique (Montmartre), la moyenne des pairs Connected peut
+      mieux coller que des coefficients sim_v2 tirés aussi des simulations
+      d’assortiment réduit. sim_v1 ne “voit” pas le mix fin de la même façon
+      et évite une surestimation de trafic × mix.
+    </div>
+    <div class="callout">
+      <strong>Pourquoi sim_v2 est souvent moyen / bon (ex. H3546, HB6A3) ?</strong>
+      Les coefficients CA/(guests×m_lin×part) capturent l’intensité moyenne
+      de la solution. En LOO Connected (2 hôtels en train), la restitution
+      reste stable. Erreurs plus faibles que v1 dès que le mix observé
+      ressemble au nuage de simulations.
+    </div>
+    <div class="callout">
+      <strong>Pourquoi ml est le pire en LOO global, mais le meilleur en mono-solution ?</strong>
+      <ul>
+        <li><strong>Simply / Liberty</strong> : un seul hôtel → LOO <em>biaisé</em>
+          (l’hôtel reste dans le train) → le XGBoost mémorise presque parfaitement
+          (erreurs ~0–2 €). Ce n’est <em>pas</em> une preuve de généralisation.</li>
+        <li><strong>Connected</strong> : vrai LOO (3 hôtels). Le modèle appris sur
+          2 hôtels × scénarios ne transfert pas bien sur le 3<sup>e</sup>
+          (H3546 : ~14 k€ d’erreur). Peu d’hôtels, beaucoup de features
+          (proximité, météo, marque) → risque de sur-ajustement et variance.</li>
+      </ul>
+      En moyenne LOO, les gros écarts Connected dominent la MAE globale du ml.
+    </div>
+  </section>
+
+  <section id="full">
+    <h2>3. full (in-sample) — résultats &amp; interprétation</h2>
+    <p>MAE CA globale (mêmes 5 observations, train sans exclusion) :</p>
+    <table>
+      <tr><th>Moteur</th><th class="num">MAE CA €/mois</th><th>vs LOO</th></tr>
+      <tr><td>sim_v2</td><td class="num best">~1 084</td><td>Nette amélioration (coeffs appris aussi sur l’hôtel testé)</td></tr>
+      <tr><td>ml</td><td class="num">~1 667</td><td>Bien mieux qu’en LOO (modèles globaux)</td></tr>
+      <tr><td>sim_v1</td><td class="num">~2 140</td><td>Légère baisse vs LOO ; toujours le plus rigide</td></tr>
+    </table>
+
+    <h3>Par hôtel (full)</h3>
+    <table>
+      <tr>
+        <th>Hôtel</th><th>Solution</th>
+        <th class="num">|err| v1</th><th class="num">|err| v2</th><th class="num">|err| ml</th>
+        <th>Meilleur</th>
+      </tr>
+      <tr><td>H0373</td><td>connected</td><td class="num">5 465</td><td class="num best">3 626</td><td class="num">5 498</td><td><span class="tag">sim_v2</span></td></tr>
+      <tr><td>H3546</td><td>connected</td><td class="num">2 757</td><td class="num">1 475</td><td class="num best">1 231</td><td><span class="tag">ml</span></td></tr>
+      <tr><td>HB6A3</td><td>connected</td><td class="num">1 570</td><td class="num best">271</td><td class="num">1 602</td><td><span class="tag">sim_v2</span></td></tr>
+      <tr><td>HB5I0</td><td>liberty</td><td class="num">670</td><td class="num">6</td><td class="num best">2</td><td><span class="tag">ml</span></td></tr>
+      <tr><td>H2075</td><td>simply</td><td class="num">239</td><td class="num">42</td><td class="num best">0</td><td><span class="tag">ml</span></td></tr>
+    </table>
+
+    <div class="callout">
+      <strong>full : sim_v2 devient le plus fiable en moyenne.</strong>
+      En incluant l’hôtel (et ses simulations) dans les coefficients, la
+      restitution rejoue le mix observé avec une intensité “déjà vue”.
+      C’est le plafond naturel de la méthode coefficients.
+    </div>
+    <div class="callout">
+      <strong>full : ml rattrape le CA sur mono-hôtels et sur H3546.</strong>
+      Les modèles globaux (ml_tc → ml_ca) voient l’observation dans le train :
+      erreurs quasi nulles Simply/Liberty. Sur Connected, ml améliore le LOO
+      mais reste parfois derrière sim_v2 (H0373, HB6A3) quand le coefficient
+      métier suffit.
+    </div>
+    <div class="callout">
+      <strong>sim_v1 reste le plus “raide”.</strong>
+      Même in-sample, les règles Excel + coefficients fixes de marge ne collent
+      pas aussi finement au mix / m_lin que sim_v2. Utile comme baseline métier
+      et pour le ROI (coûts), moins comme estimateur de CA précis.
+    </div>
+  </section>
+
+  <section id="lecture">
+    <h2>4. Synthèse opérationnelle</h2>
+    <ul>
+      <li><strong>Comparer les moteurs en LOO sur Connected</strong> pour juger
+        la robustesse (vrai leave-out). Simply/Liberty LOO sont biaisés : ne pas
+        conclure “ml parfait”.</li>
+      <li><strong>full</strong> sert à vérifier que chaque moteur se
+        comporte bien quand il a vu les données (sanity check, plafond).</li>
+      <li><strong>Pour une estimation user</strong> : sim_v2 (intensité mix) +
+        ml (conversion / correction) ; ROI = marge ventes − coûts solution
+        (règles communes).</li>
+      <li><strong>Écarts géants</strong> (H0373, H3546) : hôtels hétérogènes
+        (taille, mix, localisation) dans une même solution — peu de pilotes
+        limitent tout modèle statistique.</li>
+    </ul>
+    <p class="muted" style="margin-top:1rem">
+      Admin : onglets <em>LOO · comparaison</em> et <em>full · comparaison</em>.
+      Régénérer full : <code>python run.py eval-full</code> (local uniquement).
+    </p>
+  </section>
+
+  </main>
+</body>
+</html>

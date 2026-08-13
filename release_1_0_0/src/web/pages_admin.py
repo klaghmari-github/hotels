@@ -78,9 +78,13 @@ ADMIN_BODY = """
     <div class="group-title">PILOTE</div>
     <div id="nav-pilote"></div>
     <div class="group-title">Evaluation</div>
-    <button type="button" class="nav-item" data-panel="eval" id="nav-eval">
+    <button type="button" class="nav-item" data-panel="eval" data-eval-mode="loo" id="nav-eval-loo">
       <span><span class="nav-label">LOO · comparaison</span>
-      <span class="nav-desc">sim_v1 · sim_v2 · ml</span></span>
+      <span class="nav-desc">leave-one-out</span></span>
+    </button>
+    <button type="button" class="nav-item" data-panel="eval" data-eval-mode="full" id="nav-eval-full">
+      <span><span class="nav-label">full · comparaison</span>
+      <span class="nav-desc">in-sample (pas de leave-out)</span></span>
     </button>
   </aside>
   <section class="admin-main">
@@ -96,6 +100,7 @@ ADMIN_BODY = """
       <div id="ds-table" class="scroll"><p class="muted">Chargement…</p></div>
     </div>
     <div id="view-eval" style="display:none">
+      <div id="eval-mode-banner" class="muted" style="margin:0 0 .65rem;font-size:.88rem"></div>
       <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem">
         <button class="btn primary" data-src="compare" type="button">comparaison</button>
         <button class="btn" data-src="sim_v1" type="button">sim_v1</button>
@@ -111,7 +116,7 @@ ADMIN_BODY = """
 ADMIN_SCRIPT = r"""
 const fmt=(n,d=2)=>{if(n==null||n===''||Number.isNaN(Number(n)))return '—';return Number(n).toLocaleString('fr-FR',{maximumFractionDigits:d});};
 const tag=s=>`<span class="tag ${(s||'').toString().toLowerCase().replace(/[^a-z0-9_]/g,'')}">${s??''}</span>`;
-const state={datasets:[], current:null, page:1, pageSize:50, totalPages:1, q:''};
+const state={datasets:[], current:null, page:1, pageSize:50, totalPages:1, q:'', evalMode:'loo'};
 
 function showView(name){
   document.getElementById('view-table').style.display=name==='table'?'':'none';
@@ -119,9 +124,24 @@ function showView(name){
   document.querySelectorAll('.admin-side .nav-item').forEach(b=>{
     const panel=b.dataset.panel;
     const id=b.dataset.id;
-    if(panel) b.classList.toggle('active', panel===name);
+    const em=b.dataset.evalMode;
+    if(panel==='eval'){
+      b.classList.toggle('active', name==='eval' && em===state.evalMode);
+    }else if(panel) b.classList.toggle('active', panel===name);
     else if(id) b.classList.toggle('active', name==='table' && id===state.current);
   });
+  const ban=document.getElementById('eval-mode-banner');
+  if(ban){
+    ban.textContent=state.evalMode==='full'
+      ? 'Mode full : coefficients / modèles appris sur tous les pilotes (obs+sim pour v2/ml), test sur observations uniquement — pas de leave-out.'
+      : 'Mode LOO : exclusion de l’hôtel test si la solution a ≥2 hôtels (sinon eval_biased).';
+  }
+}
+
+function evalApi(src){
+  const q=state.evalMode==='full'?'?mode=full':'';
+  if(src==='compare') return '/api/eval/compare'+q;
+  return '/api/eval/'+encodeURIComponent(src)+q;
 }
 
 function logoUrl(path){
@@ -608,7 +628,7 @@ async function loadEval(src){
   document.querySelectorAll('#view-eval button[data-src]').forEach(b=>b.classList.toggle('primary', b.dataset.src===src));
   try{
     if(src==='compare'){
-      const res=await fetch('/api/eval/compare');
+      const res=await fetch(evalApi('compare'));
       const data=await res.json();
       if(!data.ok) throw new Error(data.error||'erreur');
       const gm=data.global_metrics||{};
@@ -629,7 +649,7 @@ async function loadEval(src){
       main.innerHTML=html;
       return;
     }
-    const res=await fetch('/api/eval/'+src);
+    const res=await fetch(evalApi(src));
     const data=await res.json();
     if(!data.ok) throw new Error(data.error||'erreur');
     const maeCa=pickMetric(data.metrics,'mae_ca');
@@ -647,7 +667,13 @@ async function loadEval(src){
   }catch(e){ main.innerHTML=`<div class="errbox">${e.message}</div>`; }
 }
 
-document.getElementById('nav-eval').onclick=()=>{ showView('eval'); loadEval('compare'); };
+document.querySelectorAll('.admin-side [data-panel="eval"]').forEach(btn=>{
+  btn.onclick=()=>{
+    state.evalMode=btn.dataset.evalMode||'loo';
+    showView('eval');
+    loadEval('compare');
+  };
+});
 document.getElementById('ds-prev').onclick=()=>{
   if(state.page>1){ state.page--; loadPage(); }
 };

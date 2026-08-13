@@ -1,4 +1,9 @@
 """
+[DEPRECATED] XGBoost multi-cibles CA (ml1 / ml2 / xgboost legacy).
+
+Plus branché dans run.py ni GUI. Le moteur actif est SuperModelService.
+Conservé pour lecture éventuelle de models/ml1|ml2|xgboost.
+
 Modele XGBoost multi-cibles + leave-one-hotel-out.
 
 Variants :

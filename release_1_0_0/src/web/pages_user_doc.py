@@ -244,6 +244,7 @@ DOC_BODY = """
     <a href="#est">Estimation</a>
     <a href="#ml">ML</a>
     <a href="#marge">Marge ventes, ROI, coûts</a>
+    <a href="#eval">Évaluations</a>
     <a href="#parcours">Parcours UI</a>
   </nav>
 
@@ -522,8 +523,77 @@ ROI = marge_ventes − coûts_mensuels(solution)
 payback_mois = capex(solution) / ROI   (si ROI &gt; 0)</div>
   </section>
 
+  <section class="doc-section" id="eval">
+    <h3>9. Évaluations (pilotes)</h3>
+    <p>
+      Deux modes :
+    </p>
+    <table>
+      <tr><th>Mode</th><th>modélisation</th><th>Test</th></tr>
+      <tr>
+        <td><strong>LOO</strong></td>
+        <td>observations sauf cas exclu pour sim_v1, observations + simulations sauf cas exclu pour sim_v2 et ml</td>
+        <td>observation exclue de la modélisation</td>
+      </tr>
+      <tr>
+        <td><strong>full</strong></td>
+        <td>observations sans exclusion pour sim_v1, observations + simulations sans exclusion pour sim_v2 et ml</td>
+        <td>observation incluse dans la modélisation</td>
+      </tr>
+    </table>
+
+    <h4>LOO — |err| CA €/mois</h4>
+    <table>
+      <tr><th>Hôtel</th><th>Sol.</th><th class="num">sim_v1</th><th class="num">sim_v2</th><th class="num">ml</th><th>Meilleur</th></tr>
+      <tr><td>H0373</td><td>connected</td><td class="num">5 967</td><td class="num">8 132</td><td class="num">7 810</td><td>sim_v1</td></tr>
+      <tr><td>H3546</td><td>connected</td><td class="num">4 195</td><td class="num">3 227</td><td class="num">14 308</td><td>sim_v2</td></tr>
+      <tr><td>HB6A3</td><td>connected</td><td class="num">1 510</td><td class="num">432</td><td class="num">218</td><td>ml</td></tr>
+      <tr><td>HB5I0</td><td>liberty*</td><td class="num">670</td><td class="num">214</td><td class="num">2</td><td>ml</td></tr>
+      <tr><td>H2075</td><td>simply*</td><td class="num">239</td><td class="num">68</td><td class="num">0</td><td>ml</td></tr>
+    </table>
+    <p class="muted">* LOO biaisé (un seul hôtel dans la solution).</p>
+    <p>
+      <strong>Lecture LOO</strong> : sim_v2 a la meilleure MAE globale.
+      ml « parfait » sur Simply/Liberty = mémorisation (biaisé), pas généralisation.
+      Sur Connected (vrai LOO), ml varie fortement (H3546 difficile).
+      sim_v1 gagne parfois sur un hôtel atypique (H0373) grâce aux règles ancrées.
+    </p>
+
+    <h4>full — |err| CA €/mois</h4>
+    <table>
+      <tr><th>Hôtel</th><th>Sol.</th><th class="num">sim_v1</th><th class="num">sim_v2</th><th class="num">ml</th><th>Meilleur</th></tr>
+      <tr><td>H0373</td><td>connected</td><td class="num">5 465</td><td class="num">3 626</td><td class="num">5 498</td><td>sim_v2</td></tr>
+      <tr><td>H3546</td><td>connected</td><td class="num">2 757</td><td class="num">1 475</td><td class="num">1 231</td><td>ml</td></tr>
+      <tr><td>HB6A3</td><td>connected</td><td class="num">1 570</td><td class="num">271</td><td class="num">1 602</td><td>sim_v2</td></tr>
+      <tr><td>HB5I0</td><td>liberty</td><td class="num">670</td><td class="num">6</td><td class="num">2</td><td>ml</td></tr>
+      <tr><td>H2075</td><td>simply</td><td class="num">239</td><td class="num">42</td><td class="num">0</td><td>ml</td></tr>
+    </table>
+    <p>
+      <strong>Lecture full</strong> : MAE globale
+      sim_v2 (~1 084) &lt; ml (~1 667) &lt; sim_v1 (~2 140).
+      In-sample, les coefficients v2 et le ML (qui a vu l’hôtel) se rapprochent
+      du réel ; sim_v1 reste plus rigide. Ce mode mesure le plafond, pas la
+      généralisation.
+    </p>
+    <p>
+      Le potentiel de l’IA peut être davantage exploité en
+      <strong>générant plus de scénarios</strong> pour diversifier les données
+      d’apprentissage, et en <strong>collectant plus de données</strong>
+      (hôtels, tickets, contexte). Un modèle pourrait aussi apprendre des
+      règles de taux de conversion ou de montant de ventes sur une solution
+      en s’appuyant sur les résultats d’une autre — c’est-à-dire des
+      <strong>liens entre Simply, Liberty et Connected</strong> — plutôt que
+      des modèles strictement séparés par solution.
+    </p>
+    <p class="muted">
+      Détail : admin studio · analyse globale
+      <code>doc/analyse.html</code> · regen full
+      <code>python run.py eval-full</code>
+    </p>
+  </section>
+
   <section class="doc-section" id="parcours">
-    <h3>9. Parcours utilisateur</h3>
+    <h3>10. Parcours utilisateur</h3>
     <table>
       <tr><th>Étape</th><th>Contenu</th></tr>
       <tr><td>1 · Hôtel</td><td>Sélection</td></tr>

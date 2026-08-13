@@ -1,5 +1,5 @@
 """
-API REST unifiee : tables pipeline, LOO, predictions sim_v1 / sim_v2 / CatBoost.
+API REST unifiee : tables pipeline, LOO / full-train, predictions sim_v1 / sim_v2 / ml.
 """
 
 from __future__ import annotations
@@ -12,7 +12,6 @@ import pandas as pd
 from flask import Flask, jsonify, request, send_file
 
 from src.ml.super_model import SuperModelService
-from src.ml.xgboost_model import XGBoostService
 from src.pipeline.connection import PipelineFactory
 from src.pipeline.paths import Paths
 from src.sim_v1.service import SimV1Service
@@ -180,7 +179,6 @@ def create_api_app(paths: Paths | None = None) -> Flask:
     # « ml » = chaîne ml_tc → ml_tc_sim_v2 → ml_ca (SuperModelService)
     ml_super = SuperModelService(paths, factory=factory)
     ml = ml_super  # alias UI / predict
-    ml_xgb = XGBoostService(paths, factory=factory, variant="ml1")  # couche base
 
     @app.get("/api/health")
     def health():
@@ -445,7 +443,10 @@ def create_api_app(paths: Paths | None = None) -> Flask:
             for _, m in metrics.iterrows():
                 metric_rows.append(
                     {
-                        "scope": m.get("perimetre") or m.get("solution") or "ALL",
+                        "scope": m.get("scope")
+                        or m.get("perimetre")
+                        or m.get("solution")
+                        or "ALL",
                         "n_hotels": m.get("n_hotels"),
                         "mae_ca": m.get("mae_ca"),
                         "mae_marge": m.get("mae_marge"),
@@ -453,34 +454,69 @@ def create_api_app(paths: Paths | None = None) -> Flask:
                 )
         elif engine == "sim_v2":
             for _, m in metrics.iterrows():
+                # LOO : montant_ventes_mae ; full-train : mae_ca
+                scope = m.get("scope")
+                if scope is None or (isinstance(scope, float) and pd.isna(scope)):
+                    scope = (
+                        m.get("solution")
+                        if pd.notna(m.get("solution"))
+                        else "ALL"
+                    )
                 metric_rows.append(
                     {
-                        "scope": m.get("solution")
-                        if pd.notna(m.get("solution"))
-                        else "ALL",
-                        "n_hotels": m.get("nombre_hotels"),
-                        "mae_ca": m.get("montant_ventes_mae"),
-                        "mae_marge": m.get("marge_selon_coef_mae"),
+                        "scope": scope if pd.notna(scope) else "ALL",
+                        "n_hotels": m.get("nombre_hotels", m.get("n_hotels")),
+                        "mae_ca": m.get("montant_ventes_mae", m.get("mae_ca")),
+                        "mae_marge": m.get(
+                            "marge_selon_coef_mae", m.get("mae_marge")
+                        ),
                     }
                 )
         else:
-            mae_ca = mae_m = n_h = None
+            # ml LOO multi-target OU full-train avec mae_ca
+            if "mae_ca" in metrics.columns or "montant_ventes_mae" in metrics.columns:
+                for _, m in metrics.iterrows():
+                    metric_rows.append(
+                        {
+                            "scope": m.get("scope")
+                            if pd.notna(m.get("scope"))
+                            else "ALL",
+                            "n_hotels": m.get("n_hotels", m.get("nombre_hotels")),
+                            "mae_ca": m.get("mae_ca", m.get("montant_ventes_mae")),
+                            "mae_marge": m.get("mae_marge", m.get("marge_selon_coef_mae")),
+                        }
+                    )
+            else:
+                mae_ca = mae_m = n_h = None
+                for _, m in metrics.iterrows():
+                    t = str(m.get("target") or "")
+                    if t == "montant_ventes_par_mois":
+                        mae_ca = m.get("mae")
+                        n_h = m.get("nombre_hotels")
+                    elif t == "montant_marge_selon_coef_par_mois":
+                        mae_m = m.get("mae")
+                        n_h = m.get("nombre_hotels")
+                metric_rows.append(
+                    {
+                        "scope": "ALL",
+                        "n_hotels": n_h,
+                        "mae_ca": mae_ca,
+                        "mae_marge": mae_m,
+                    }
+                )
+        # sim_v1 full-train may already use mae_ca
+        if engine == "sim_v1" and not metric_rows and not metrics.empty:
             for _, m in metrics.iterrows():
-                t = str(m.get("target") or "")
-                if t == "montant_ventes_par_mois":
-                    mae_ca = m.get("mae")
-                    n_h = m.get("nombre_hotels")
-                elif t == "montant_marge_selon_coef_par_mois":
-                    mae_m = m.get("mae")
-                    n_h = m.get("nombre_hotels")
-            metric_rows.append(
-                {
-                    "scope": "ALL",
-                    "n_hotels": n_h,
-                    "mae_ca": mae_ca,
-                    "mae_marge": mae_m,
-                }
-            )
+                metric_rows.append(
+                    {
+                        "scope": m.get("scope")
+                        if pd.notna(m.get("scope"))
+                        else (m.get("perimetre") or "ALL"),
+                        "n_hotels": m.get("n_hotels"),
+                        "mae_ca": m.get("mae_ca"),
+                        "mae_marge": m.get("mae_marge"),
+                    }
+                )
 
         return {
             "predictions": _clean_records(web_pred),
@@ -516,52 +552,73 @@ def create_api_app(paths: Paths | None = None) -> Flask:
             "period_label": "€ / mois",
         }
 
-    @app.get("/api/eval/sim_v1")
-    def eval_v1():
-        path = paths.out_sim_v1("eval_sim_v1_loo.xlsx")
+    def _eval_file_response(
+        engine: str,
+        path: Path,
+        *,
+        mode: str = "loo",
+        rebuild_hint: str = "",
+    ):
         if not path.exists():
             return jsonify(
                 {
                     "ok": False,
-                    "error": "Excel introuvable. Lancer : python run.py sim-v1 --rebuild",
+                    "error": (
+                        f"Excel introuvable ({path.name}). "
+                        f"{rebuild_hint or 'Relancer l evaluation.'}"
+                    ),
                 }
             ), 404
         pred = pd.read_excel(path, sheet_name="predictions")
-        metrics = pd.read_excel(path, sheet_name="metrics")
-        web = _eval_web_payload("sim_v1", pred, metrics)
+        try:
+            metrics = pd.read_excel(path, sheet_name="metrics")
+        except Exception:  # noqa: BLE001
+            metrics = pd.DataFrame()
+        web = _eval_web_payload(engine, pred, metrics)
         return jsonify(
             {
                 "ok": True,
-                "source": "sim_v1",
-                "engine": "sim_v1",
+                "source": engine,
+                "engine": engine,
+                "eval_mode": mode,
                 **web,
                 "raw_predictions": _clean_records(pred),
                 "raw_metrics": _clean_records(metrics),
             }
         )
 
+    @app.get("/api/eval/sim_v1")
+    def eval_v1():
+        mode = (request.args.get("mode") or "loo").strip().lower()
+        if mode in {"full", "full_train", "in_sample"}:
+            return _eval_file_response(
+                "sim_v1",
+                paths.out_sim_v1("eval_sim_v1_full.xlsx"),
+                mode="full_train",
+                rebuild_hint="python run.py eval-full",
+            )
+        return _eval_file_response(
+            "sim_v1",
+            paths.out_sim_v1("eval_sim_v1_loo.xlsx"),
+            mode="loo",
+            rebuild_hint="python run.py sim-v1 --rebuild",
+        )
+
     @app.get("/api/eval/sim_v2")
     def eval_v2():
-        path = paths.out_sim_v2("eval_sim_v2_loo.xlsx")
-        if not path.exists():
-            return jsonify(
-                {
-                    "ok": False,
-                    "error": "Excel introuvable. Lancer : python run.py sim-v2 --rebuild",
-                }
-            ), 404
-        pred = pd.read_excel(path, sheet_name="predictions")
-        metrics = pd.read_excel(path, sheet_name="metrics")
-        web = _eval_web_payload("sim_v2", pred, metrics)
-        return jsonify(
-            {
-                "ok": True,
-                "source": "sim_v2",
-                "engine": "sim_v2",
-                **web,
-                "raw_predictions": _clean_records(pred),
-                "raw_metrics": _clean_records(metrics),
-            }
+        mode = (request.args.get("mode") or "loo").strip().lower()
+        if mode in {"full", "full_train", "in_sample"}:
+            return _eval_file_response(
+                "sim_v2",
+                paths.out_sim_v2("eval_sim_v2_full.xlsx"),
+                mode="full_train",
+                rebuild_hint="python run.py eval-full",
+            )
+        return _eval_file_response(
+            "sim_v2",
+            paths.out_sim_v2("eval_sim_v2_loo.xlsx"),
+            mode="loo",
+            rebuild_hint="python run.py sim-v2 --rebuild",
         )
 
     def _eval_ml_file(engine: str, filename: str, rebuild_hint: str):
@@ -589,8 +646,15 @@ def create_api_app(paths: Paths | None = None) -> Flask:
 
     @app.get("/api/eval/ml")
     def eval_ml():
-        """LOO du super-modele (seul modele ML expose)."""
-        # prefer eval_ml_loo, fallback super / catboost legacy
+        """Éval ML (LOO par défaut, full-train si ?mode=full)."""
+        mode = (request.args.get("mode") or "loo").strip().lower()
+        if mode in {"full", "full_train", "in_sample"}:
+            return _eval_file_response(
+                "ml",
+                paths.out_ml("eval_ml_full.xlsx"),
+                mode="full_train",
+                rebuild_hint="python run.py eval-full",
+            )
         for name in ("eval_ml_loo.xlsx", "eval_super_loo.xlsx", "eval_catboost_loo.xlsx"):
             path = paths.out_ml(name)
             if path.exists():
@@ -601,29 +665,54 @@ def create_api_app(paths: Paths | None = None) -> Flask:
             "ml", "eval_ml_loo.xlsx", "python run.py ml --rebuild"
         )
 
-    def _load_eval_web_engine(engine: str) -> dict[str, Any] | None:
-        """Charge predictions web normalisees pour un moteur LOO."""
+    def _load_eval_web_engine(
+        engine: str, *, mode: str = "loo"
+    ) -> dict[str, Any] | None:
+        """Charge predictions web normalisees (LOO ou full-train)."""
+        full = mode in {"full", "full_train", "in_sample"}
         if engine == "sim_v1":
-            path = paths.out_sim_v1("eval_sim_v1_loo.xlsx")
+            path = paths.out_sim_v1(
+                "eval_sim_v1_full.xlsx" if full else "eval_sim_v1_loo.xlsx"
+            )
             if not path.exists():
                 return None
             pred = pd.read_excel(path, sheet_name="predictions")
-            metrics = pd.read_excel(path, sheet_name="metrics")
+            try:
+                metrics = pd.read_excel(path, sheet_name="metrics")
+            except Exception:  # noqa: BLE001
+                metrics = pd.DataFrame()
             return {
                 "engine": "sim_v1",
                 **_eval_web_payload("sim_v1", pred, metrics),
             }
         if engine == "sim_v2":
-            path = paths.out_sim_v2("eval_sim_v2_loo.xlsx")
+            path = paths.out_sim_v2(
+                "eval_sim_v2_full.xlsx" if full else "eval_sim_v2_loo.xlsx"
+            )
             if not path.exists():
                 return None
             pred = pd.read_excel(path, sheet_name="predictions")
-            metrics = pd.read_excel(path, sheet_name="metrics")
+            try:
+                metrics = pd.read_excel(path, sheet_name="metrics")
+            except Exception:  # noqa: BLE001
+                metrics = pd.DataFrame()
             return {
                 "engine": "sim_v2",
                 **_eval_web_payload("sim_v2", pred, metrics),
             }
-        # ml
+        if full:
+            path = paths.out_ml("eval_ml_full.xlsx")
+            if path.exists():
+                pred = pd.read_excel(path, sheet_name="predictions")
+                try:
+                    metrics = pd.read_excel(path, sheet_name="metrics")
+                except Exception:  # noqa: BLE001
+                    metrics = pd.DataFrame()
+                return {
+                    "engine": "ml",
+                    **_eval_web_payload("ml", pred, metrics),
+                }
+            return None
         for name in ("eval_ml_loo.xlsx", "eval_super_loo.xlsx", "eval_catboost_loo.xlsx"):
             path = paths.out_ml(name)
             if path.exists():
@@ -638,16 +727,17 @@ def create_api_app(paths: Paths | None = None) -> Flask:
     @app.get("/api/eval/compare")
     def eval_compare():
         """
-        Comparaison LOO par hotel : sim_v1 vs sim_v2 vs ml.
-        CA reel aligne (ventes) + CA estime / err par moteur (mensuel).
+        Comparaison par hotel : sim_v1 vs sim_v2 vs ml.
+        ?mode=loo (defaut) ou ?mode=full (in-sample).
         """
+        mode = (request.args.get("mode") or "loo").strip().lower()
         engines = ("sim_v1", "sim_v2", "ml")
         by_hotel: dict[str, dict[str, Any]] = {}
         missing: list[str] = []
         global_metrics: dict[str, Any] = {}
 
         for eng in engines:
-            payload = _load_eval_web_engine(eng)
+            payload = _load_eval_web_engine(eng, mode=mode)
             if not payload:
                 missing.append(eng)
                 continue
@@ -843,8 +933,16 @@ def create_api_app(paths: Paths | None = None) -> Flask:
             return jsonify(
                 {
                     "ok": False,
-                    "error": "Aucune eval LOO trouvee. Lancer sim-v1, sim-v2 et ml.",
+                    "error": (
+                        "Aucune eval trouvee. "
+                        + (
+                            "Lancer : python run.py eval-full"
+                            if mode in {"full", "full_train", "in_sample"}
+                            else "Lancer sim-v1, sim-v2 et ml (LOO)."
+                        )
+                    ),
                     "missing": missing,
+                    "eval_mode": mode,
                 }
             ), 404
 
@@ -857,6 +955,11 @@ def create_api_app(paths: Paths | None = None) -> Flask:
             {
                 "ok": True,
                 "source": "compare",
+                "eval_mode": (
+                    "full_train"
+                    if mode in {"full", "full_train", "in_sample"}
+                    else "loo"
+                ),
                 "engines": list(engines),
                 "missing": missing,
                 "period": "monthly",
@@ -872,12 +975,8 @@ def create_api_app(paths: Paths | None = None) -> Flask:
 
     @app.get("/api/eval/ml-xgb")
     def eval_ml_xgb():
-        """Couche intermediaire XGB (non affichee UI) — debug."""
-        return _eval_ml_file(
-            "ml-xgb",
-            "eval_ml1_loo.xlsx",
-            "python run.py ml1 --rebuild",
-        )
+        """Legacy — alias de /api/eval/ml."""
+        return eval_ml()
 
     @app.get("/api/eval/ml-super")
     def eval_ml_super():
@@ -1012,14 +1111,8 @@ def create_api_app(paths: Paths | None = None) -> Flask:
 
     @app.post("/api/predict/ml-xgb")
     def predict_ml_xgb():
-        """Couche XGB intermediaire (debug, non affichee)."""
-        body = request.get_json(force=True) or {}
-        try:
-            solution, features = _features_from_body(body)
-            pred = ml_xgb.predict_row(features, solution)
-            return jsonify({"ok": True, "model": "ml-xgb", "prediction": pred})
-        except Exception as exc:  # noqa: BLE001
-            return jsonify({"ok": False, "error": str(exc)}), 400
+        """Legacy — alias de /api/predict/ml."""
+        return predict_ml()
 
     @app.post("/api/predict/ml-super")
     def predict_ml_super():
