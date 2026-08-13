@@ -609,53 +609,48 @@ function normalize(obj) {
 
 function predictSolution(sol, guests, mlin, typeMix, gammeMix) {
   const C = COEFF[sol];
-  // type family
   const typeVars = [];
   for (const [vn, part] of Object.entries(typeMix)) {
     if (part <= 0) continue;
     const coef = C.type[vn];
     if (coef == null) continue;
     const ca = coef * guests * mlin * part;
-    typeVars.push({ vn, part, coef, ca });
+    const mc = (C.marge_type && C.marge_type[vn]) || 0;
+    typeVars.push({ vn, part, coef, ca, marge: mc * guests * mlin * part });
   }
   const caType = typeVars.length
     ? typeVars.reduce((a,x)=>a+x.ca,0) / typeVars.length
     : 0;
+  const mType = typeVars.length
+    ? typeVars.reduce((a,x)=>a+x.marge,0) / typeVars.length
+    : 0;
 
-  // gamme family
   const gammeVars = [];
   for (const [vn, part] of Object.entries(gammeMix)) {
     if (part <= 0) continue;
     const coef = C.gamme[vn];
-    if (coef == null) continue; // variable absente de la solution → skip
+    if (coef == null) continue; // variable absente pour cette solution
     const ca = coef * guests * mlin * part;
-    gammeVars.push({ vn, part, coef, ca });
+    const mc = (C.marge_gamme && C.marge_gamme[vn]) || 0;
+    gammeVars.push({ vn, part, coef, ca, marge: mc * guests * mlin * part });
   }
   const caGamme = gammeVars.length
     ? gammeVars.reduce((a,x)=>a+x.ca,0) / gammeVars.length
     : 0;
-
-  // moyenne des familles présentes
-  const families = [];
-  if (typeVars.length) families.push(caType);
-  if (gammeVars.length) families.push(caGamme);
-  const ca = families.length
-    ? families.reduce((a,b)=>a+b,0) / families.length
+  const mGamme = gammeVars.length
+    ? gammeVars.reduce((a,x)=>a+x.marge,0) / gammeVars.length
     : 0;
 
-  // marge approx via ratio type coeffs (indicatif lab)
-  let marge = 0;
-  if (typeVars.length && C.marge_type) {
-    const mVars = typeVars.map(v => {
-      const mc = C.marge_type[v.vn] || (v.coef * 0.4);
-      return mc * guests * mlin * v.part;
-    });
-    const mType = mVars.reduce((a,b)=>a+b,0) / mVars.length;
-    // scale marge roughly like CA family average
-    marge = families.length >= 2
-      ? (mType + caGamme * 0.45) / 2
-      : mType;
-  }
+  const caFamilies = [];
+  const mFamilies = [];
+  if (typeVars.length) { caFamilies.push(caType); mFamilies.push(mType); }
+  if (gammeVars.length) { caFamilies.push(caGamme); mFamilies.push(mGamme); }
+  const ca = caFamilies.length
+    ? caFamilies.reduce((a,b)=>a+b,0) / caFamilies.length
+    : 0;
+  const marge = mFamilies.length
+    ? mFamilies.reduce((a,b)=>a+b,0) / mFamilies.length
+    : 0;
 
   return { ca, marge, caType, caGamme, typeVars, gammeVars };
 }
@@ -737,9 +732,9 @@ function calc() {
         </tr>`;
       }).join("")}
     </table>
-    <p class="muted">Note lab : coeffs gamme liberty/connected sont des ordres de grandeur
-      représentatifs pour l’UI (les types sont exacts base release). Le pipeline complet
-      lit toujours les vues DuckDB à jour.</p>
+    <p class="muted">Coefficients exacts extraits de
+      <code>v_restitution_solution_coefficients</code> (main.duckdb).
+      Même formule que le pipeline SQL de restitution.</p>
   `;
 }
 
